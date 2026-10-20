@@ -211,6 +211,11 @@ td.y{color:var(--quiz);font-weight:700} td.n{color:var(--wrong);font-weight:700}
 .chip:hover{border-color:var(--quiz)}
 .chip[aria-pressed="true"]{background:var(--quiz);border-color:var(--quiz);color:var(--on-quiz)}
 .chip .ct{font-family:var(--f-mono);font-size:.8em;opacity:.75;margin-left:3px}
+.resume{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px;padding:14px 18px;border-color:color-mix(in srgb,var(--quiz) 45%,var(--line))}
+.resume b{display:block;font-size:1rem}.resume span{font-size:.9rem;color:var(--muted)}.resume .ra{display:flex;gap:8px}
+.sprog{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:6px 0 12px;font-size:.9rem;color:var(--muted)}
+.sprog b{color:var(--ink);font-family:var(--f-mono)}
+.spbar{flex:1 1 160px;max-width:260px;height:6px;border-radius:3px;background:var(--line);overflow:hidden}.spbar i{display:block;height:100%;background:var(--quiz);border-radius:3px}
 .legend{display:flex;gap:18px;flex-wrap:wrap;font-size:.92rem;color:var(--muted);margin-top:18px;border-top:1px dashed var(--line);padding-top:16px}
 .legend b{color:var(--ink);font-family:var(--f-mono)}
 .actions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:24px}
@@ -554,11 +559,30 @@ function renderNotes(){
 
 /* ================= QUIZ ================= */
 let qsub=load("cprog_qsub","mc");if(qsub!=="mc"&&qsub!=="sa")qsub="mc";
-const setup={mc:{ch:"all",n:10},sa:{ch:"all",n:10,type:"all"}};
+const setup={mc:{ch:"all",n:10,st:"new"},sa:{ch:"all",n:10,type:"all",st:"new"}};
 let run=null;
-function poolFor(m){
+/* 푼 문제 기록: {문제id: {c: 마지막 채점 정답 여부, n: 푼 횟수, t: 시각}} */
+const SKEY="cprog_solved_v1";
+let SOLVED=load(SKEY,{});if(!SOLVED||typeof SOLVED!=="object")SOLVED={};
+function markSolved(id,correct){const o=SOLVED[id]||{n:0};o.n=(o.n||0)+1;o.c=!!correct;o.t=Date.now();SOLVED[id]=o;save(SKEY,SOLVED);}
+const stOK=(q,st)=>st==="all"||(st==="new"?!SOLVED[q.id]:!!SOLVED[q.id]);
+/* 진행 중인 퀴즈 저장 → 나갔다 와도 이어 풀기 */
+const RKEY="cprog_run_v1";
+function saveRun(){if(!run||run.ids.length<2)return;const done={};Object.keys(run.res).forEach(id=>done[id]=!!run.res[id].correct);
+  save(RKEY,{ids:run.ids,label:run.label,review:run.review,orders:run.orders,done,sub:run.sub});}
+function clearRun(){try{localStorage.removeItem(RKEY);}catch(e){}}
+function savedRun(){const v=load(RKEY,null);if(!v||!Array.isArray(v.ids)||!v.ids.length||!v.ids.every(id=>QMAP[id]))return null;
+  const left=v.ids.filter(id=>!(id in (v.done||{}))).length;return left?Object.assign(v,{left}):null;}
+function resumeRun(v){
+  run={ids:v.ids,i:0,label:v.label,review:!!v.review,res:{},orders:v.orders||{},sub:v.sub};
+  Object.keys(v.done||{}).forEach(id=>{run.res[id]={correct:v.done[id],resumed:true};});
+  run.ids.forEach(id=>{const q=QMAP[id];if(q.t==="mc"&&!run.orders[id])run.orders[id]=shuffle(q.opts.map((_,i)=>i));});
+  run.i=run.ids.findIndex(id=>!run.res[id]);
+  renderQuiz();window.scrollTo(0,0);fx($("#qroot"));
+}
+function poolFor(m,ign){
   const s=setup[m];
-  return QB.filter(q=>(m==="mc"?q.t==="mc":(isSub(q.t)&&(s.type==="all"||q.t===s.type)))&&(s.ch==="all"||q.ch===s.ch));
+  return QB.filter(q=>(m==="mc"?q.t==="mc":(isSub(q.t)&&(s.type==="all"||q.t===s.type)))&&(s.ch==="all"||q.ch===s.ch)&&(ign||stOK(q,s.st)));
 }
 function renderQuiz(){main.innerHTML='<div class="qpanel" id="qroot"></div>';if(run)renderQ();else renderSetup();}
 function chipRow(group,opts,cur){
@@ -567,31 +591,38 @@ function chipRow(group,opts,cur){
 function renderSetup(){
   const m=qsub,s=setup[m],p=poolFor(m);
   const base=QB.filter(q=>m==="mc"?q.t==="mc":isSub(q.t));
-  const chOpts=[["all","전체",null]].concat(NOTES.map(c=>[c.id,c.no+"장",base.filter(q=>q.ch===c.id&&(m==="mc"||s.type==="all"||q.t===s.type)).length]));
-  let h='<div class="qsub" role="tablist" aria-label="퀴즈 종류"><button role="tab" data-s="mc" aria-selected="'+(m==="mc")+'">퀴즈 (객관식)</button><button role="tab" data-s="sa" aria-selected="'+(m==="sa")+'">주관식</button></div>';
+  const chOpts=[["all","전체",null]].concat(NOTES.map(c=>[c.id,c.no+"장",base.filter(q=>q.ch===c.id&&(m==="mc"||s.type==="all"||q.t===s.type)&&stOK(q,s.st)).length]));
+  const all=poolFor(m,true),nDone=all.filter(q=>SOLVED[q.id]).length,nOk=all.filter(q=>SOLVED[q.id]&&SOLVED[q.id].c).length;
+  const sv=savedRun();
+  let h=sv?'<div class="panel resume"><div><b>풀던 퀴즈가 있어요</b><span>'+esc(sv.label)+(sv.review?" · 오답 복습":"")+' · '+(sv.ids.length-sv.left)+' / '+sv.ids.length+' 진행</span></div><div class="ra"><button class="btn ghost sm" id="rdrop">버리기</button><button class="btn g sm" id="rgo">이어 풀기 →</button></div></div>':'';
+  h+='<div class="qsub" role="tablist" aria-label="퀴즈 종류"><button role="tab" data-s="mc" aria-selected="'+(m==="mc")+'">퀴즈 (객관식)</button><button role="tab" data-s="sa" aria-selected="'+(m==="sa")+'">주관식</button></div>';
   h+='<div class="panel setup"><h2>'+(m==="mc"?"객관식 퀴즈":"주관식")+'</h2>';
   h+='<p class="sub">'+(m==="mc"
      ?"한 번에 한 문제씩 나옵니다. 문제 순서와 선택지 순서는 매번 섞이고, 틀린 문제는 오답노트에 자동 저장됩니다."
      :"단답형은 용어·기호를 쓰는 문제, 한 줄 코드는 강의 전체 코드에서 핵심 한 줄을 직접 쓰는 문제(옆 주석이 그 줄의 동작을 알려 줍니다), 코드 작성은 문제를 읽고 프로그램 전체를 작성해 실제로 실행·채점하는 문제입니다. 한 줄 코드는 띄어쓰기를 무시하고 채점합니다.")+'</p>';
+  h+='<div class="sprog"><div class="spbar"><i style="width:'+(all.length?nDone/all.length*100:0)+'%"></i></div><span>지금 조건에서 <b>'+nDone+'</b> / '+all.length+' 문제 풀었어요 · 마지막 채점 기준 정답 '+nOk+'</span></div>';
+  h+='<div class="field"><span class="fl">풀이 상태</span>'+chipRow("st",[["new","안 푼 문제",all.length-nDone],["done","푼 문제",nDone],["all","전체",all.length]],s.st)+'</div>';
   h+='<div class="field"><span class="fl">단원</span>'+chipRow("ch",chOpts,s.ch)+'</div>';
   if(m==="sa"){
-    const cnt=t=>base.filter(q=>q.t===t&&(s.ch==="all"||q.ch===s.ch)).length;
+    const cnt=t=>base.filter(q=>q.t===t&&(s.ch==="all"||q.ch===s.ch)&&stOK(q,s.st)).length;
     h+='<div class="field"><span class="fl">문제 유형</span>'+chipRow("type",[["all","전체",cnt("sa")+cnt("cb")+cnt("fc")],["sa","단답형",cnt("sa")],["cb","한 줄 코드",cnt("cb")],["fc","코드 작성",cnt("fc")]],s.type)+'</div>';
   }
   h+='<div class="field"><span class="fl">문제 수</span>'+chipRow("n",[[10,"10문제"],[20,"20문제"],["all","전부"]],s.n)+'</div>';
   const nCb=p.filter(q=>q.t==="cb").length,nSa=p.filter(q=>q.t==="sa").length,nFc=p.filter(q=>q.t==="fc").length;
   h+='<div class="legend"><span>선택한 조건의 문제 <b>'+p.length+'</b>개'+(m==="sa"?' (단답형 '+nSa+' · 한 줄 코드 '+nCb+' · 코드 작성 '+nFc+')':'')+'</span><span>키보드: '+(m==="mc"?'1~4로 선택, ':'')+'Enter로 채점·다음'+(m==="sa"?' · 코드 작성은 Ctrl+Enter':'')+'</span></div>';
-  h+='<div class="actions"><button class="btn g" id="qstart"'+(p.length?"":" disabled")+'>시작하기 →</button></div></div>';
+  h+='<div class="actions">'+(!p.length&&s.st==="new"&&all.length?'<span class="hint" style="margin:0 auto 0 0">이 조건의 문제를 모두 풀었어요. ‘푼 문제’나 ‘전체’로 다시 풀 수 있어요.</span>':'')+'<button class="btn g" id="qstart"'+(p.length?"":" disabled")+'>시작하기 →</button></div></div>';
   $("#qroot").innerHTML=h;
   $$("#qroot .qsub button").forEach(b=>b.onclick=()=>{qsub=b.dataset.s;save("cprog_qsub",qsub);renderSetup();});
   $$("#qroot .chips").forEach(g=>g.onclick=e=>{const c=e.target.closest(".chip");if(!c)return;let v=c.dataset.v;if(/^\d+$/.test(v))v=+v;s[g.dataset.group]=v;renderSetup();});
+  if(sv){$("#rgo").onclick=()=>resumeRun(sv);$("#rdrop").onclick=()=>{clearRun();renderSetup();};}
   $("#qstart").onclick=()=>{let ids=shuffle(p.map(q=>q.id));if(s.n!=="all")ids=ids.slice(0,s.n);
-    const lbl=(s.ch==="all"?"전체 단원":chLabel(s.ch))+(m==="sa"&&s.type!=="all"?" · "+TYPE[s.type]:"");
+    const lbl=(s.ch==="all"?"전체 단원":chLabel(s.ch))+(m==="sa"&&s.type!=="all"?" · "+TYPE[s.type]:"")+(s.st==="new"?" · 안 푼 문제":s.st==="done"?" · 푼 문제":"");
     startRun(ids,lbl,false);};
 }
 function startRun(ids,label,review){
-  run={ids:shuffle(ids),i:0,label,review:!!review,res:{},orders:{}};
+  run={ids:shuffle(ids),i:0,label,review:!!review,res:{},orders:{},sub:qsub};
   run.ids.forEach(id=>{const q=QMAP[id];if(q.t==="mc")run.orders[id]=shuffle(q.opts.map((_,i)=>i));});
+  saveRun();
   if(curTab!=="quiz"){location.hash="quiz";return;}
   renderQuiz();window.scrollTo(0,0);fx($("#qroot"));
 }
@@ -658,7 +689,7 @@ function renderQ(){
   const q=curQ(),n=run.ids.length,r=run.res[q.id];
   const done=Object.keys(run.res).length;
   let h='<div class="panel run">';
-  h+='<div class="prog"><span class="num">'+(run.i+1)+' / '+n+'</span><div class="bar"><i style="width:'+(done/n*100)+'%"></i></div><span>'+esc(run.label)+(run.review?" · 오답 복습":"")+'</span><button class="btn ghost sm" id="qexit">나가기</button></div>';
+  h+='<div class="prog"><span class="num">'+(run.i+1)+' / '+n+'</span><div class="bar"><i style="width:'+(done/n*100)+'%"></i></div><span>'+esc(run.label)+(run.review?" · 오답 복습":"")+'</span><button class="btn ghost sm" id="qexit" title="진행 상황은 저장돼요">나가기</button></div>';
   h+='<div class="qmeta"><span class="pill t">'+esc(chLabel(q.ch))+'</span><span class="pill ty">'+TYPE[q.t]+(q.t==="cb"&&q.n>1?' · 핵심 줄 '+q.k+'/'+q.n:'')+(q.t==="fc"?' · 테스트 '+q.tests.length+'개':'')+'</span></div>';
   if(q.t==="mc"){
     h+='<div class="qtext">'+qHTML(q.q)+'</div><div class="opts" role="radiogroup">';
@@ -708,7 +739,7 @@ function feedbackHTML(q,r,live){
 }
 function bindQ(q,r){
   const root=$("#qroot");
-  $("#qexit").onclick=()=>{run=null;renderQuiz();window.scrollTo(0,0);};
+  $("#qexit").onclick=()=>{saveRun();run=null;renderQuiz();window.scrollTo(0,0);};
   $$("[data-gonotes]",root).forEach(b=>b.onclick=()=>{curCh=b.dataset.gonotes;save("cprog_ch",curCh);location.hash="notes";});
   if(!r){
     if(q.t==="mc"){
@@ -729,7 +760,7 @@ function bindQ(q,r){
     $("#qnext").onclick=next;
     $("#qquit").onclick=renderResults;
     const acc=$("#qaccept");
-    if(acc)acc.onclick=()=>{r.correct=true;restore(q.id,r.prev);renderQ();};
+    if(acc)acc.onclick=()=>{r.correct=true;restore(q.id,r.prev);if(SOLVED[q.id]){SOLVED[q.id].c=true;save(SKEY,SOLVED);}saveRun();renderQ();};
     $("#qnext").focus({preventScroll:true});
   }
 }
@@ -753,11 +784,14 @@ function submit(skip){
     r.ans=r.any?r.vals.map((v,i)=>CIRC[i]+" "+(v||"—")).join("   "):"(모르겠어요)";
   }
   r.prev=record(q,r.correct,r.ans);
+  r.prevSolved=SOLVED[q.id]?Object.assign({},SOLVED[q.id]):null;markSolved(q.id,r.correct);
   run.res[q.id]=r;
+  saveRun();
   renderQ();
 }
-function next(){if(run.i+1<run.ids.length){run.i++;renderQ();window.scrollTo(0,0);fx($("#qroot"));}else renderResults();}
+function next(){const j=run.ids.findIndex((id,k)=>k>run.i&&!run.res[id]);if(j>=0){run.i=j;renderQ();window.scrollTo(0,0);fx($("#qroot"));}else renderResults();}
 function renderResults(){
+  clearRun();
   const done=run.ids.filter(id=>run.res[id]);
   const ok=done.filter(id=>run.res[id].correct).length;
   const wrongIds=done.filter(id=>!run.res[id].correct);
