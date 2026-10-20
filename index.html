@@ -541,7 +541,7 @@ function renderNotes(){
   const chsw=NOTES.map(c=>`<button class="chbtn" data-c="${c.color}" data-id="${c.id}" aria-pressed="${c.id===curCh}"><small>CHAPTER ${c.no}</small><b>${esc(c.title)}</b></button>`).join("");
   const toc=`<div class="lbl">${ch.no}장 소단원</div>`+ch.sections.map((s,i)=>`<a href="#" data-sec="${s.id}"><span class="n">${String(i+1).padStart(2,"0")}</span><span>${esc(s.title)}</span></a>`).join("");
   const head=`<div class="ch-head"><div class="node">${ch.no}장</div><div class="tt"><h2>${esc(ch.title)}</h2><p>${esc(ch.summary)}</p></div>
-    <div class="go"><button class="btn ghost sm" data-go="mc">${ch.no}장 퀴즈 ${nMc}문제 →</button><button class="btn ghost sm" data-go="cb">${ch.no}장 한 줄 코드 ${nCb}문제 →</button><button class="btn ghost sm" data-go="fc">${ch.no}장 코드 작성 ${nFc}문제 →</button><a class="btn ghost sm" href="motion/index.html#ch${ch.no}">▶ ${ch.no}장 영상</a></div></div>`;
+    <div class="go"><button class="btn ghost sm" data-go="mc">${ch.no}장 퀴즈 ${nMc}문제 →</button><button class="btn ghost sm" data-go="cb">${ch.no}장 한 줄 코드 ${nCb}문제 →</button><button class="btn ghost sm" data-go="fc">${ch.no}장 코드 작성 ${nFc}문제 →</button><a class="btn ghost sm" href="motion/index.html#ch${ch.no}">▶ ${ch.no}장 영상</a>${ch.id==="ch9"?'<a class="btn ghost sm" href="hanoi/index.html">▶ 하노이의 탑 실행 추적</a>':''}</div></div>`;
   const body=ch.sections.map((s,i)=>`<section class="sec" id="sec-${s.id}">
       <div class="sec-h"><span class="pg">${ch.no}-${i+1}</span><h3>${esc(s.title)}</h3>${s.en?`<span class="en">${esc(s.en)}</span>`:""}</div>
       ${s.blocks.map(renderBlock).join("")}</section>`).join("");
