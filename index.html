@@ -381,13 +381,15 @@ h4.mini{margin:14px 0 8px;font-size:.9rem}
 <script src="quiz.js"></script>
 <script src="bank.js"></script>
 <script src="cmini.js"></script>
+<script src="hw.js"></script>
 <script>
 "use strict";
 const NOTES=window.NOTES||[], QZ=window.QUIZ||{mc:[],sa:[]}, GEN=window.GEN||{mc:[],sa:[],lb:[],fc:[]};
 const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const main=$("#main"), topbar=$("#topbar");
 const CHN={}; NOTES.forEach(c=>CHN[c.id]=c);
-const chLabel=id=>CHN[id]?CHN[id].no+"장 "+CHN[id].title:"";
+const chs=c=>c.short||c.no+"장";
+const chLabel=id=>CHN[id]?(CHN[id].label||CHN[id].no+"장 "+CHN[id].title):"";
 const CIRC="①②③④⑤⑥⑦⑧⑨⑩";
 const LET="ABCDE";
 
@@ -538,12 +540,12 @@ function renderNotes(){
   if(!NOTES.some(c=>c.id===curCh))curCh=NOTES[0].id;
   const ch=CHN[curCh];
   const nMc=QB.filter(q=>q.ch===ch.id&&q.t==="mc").length, nCb=QB.filter(q=>q.ch===ch.id&&q.t==="cb").length, nFc=QB.filter(q=>q.ch===ch.id&&q.t==="fc").length;
-  const chsw=NOTES.map(c=>`<button class="chbtn" data-c="${c.color}" data-id="${c.id}" aria-pressed="${c.id===curCh}"><small>CHAPTER ${c.no}</small><b>${esc(c.title)}</b></button>`).join("");
-  const toc=`<div class="lbl">${ch.no}장 소단원</div>`+ch.sections.map((s,i)=>`<a href="#" data-sec="${s.id}"><span class="n">${String(i+1).padStart(2,"0")}</span><span>${esc(s.title)}</span></a>`).join("");
-  const head=`<div class="ch-head"><div class="node">${ch.no}장</div><div class="tt"><h2>${esc(ch.title)}</h2><p>${esc(ch.summary)}</p></div>
-    <div class="go"><button class="btn ghost sm" data-go="mc">${ch.no}장 퀴즈 ${nMc}문제 →</button><button class="btn ghost sm" data-go="cb">${ch.no}장 한 줄 코드 ${nCb}문제 →</button><button class="btn ghost sm" data-go="fc">${ch.no}장 코드 작성 ${nFc}문제 →</button><a class="btn ghost sm" href="motion/index.html#ch${ch.no}">▶ ${ch.no}장 영상</a>${ch.id==="ch9"?'<a class="btn ghost sm" href="hanoi/index.html">▶ 하노이의 탑 실행 추적</a>':''}</div></div>`;
+  const chsw=NOTES.map(c=>`<button class="chbtn" data-c="${c.color}" data-id="${c.id}" aria-pressed="${c.id===curCh}"><small>${c.cap||"CHAPTER "+c.no}</small><b>${esc(c.title)}</b></button>`).join("");
+  const toc=`<div class="lbl">${chs(ch)} 소단원</div>`+ch.sections.map((s,i)=>`<a href="#" data-sec="${s.id}"><span class="n">${String(i+1).padStart(2,"0")}</span><span>${esc(s.title)}</span></a>`).join("");
+  const head=`<div class="ch-head"><div class="node">${chs(ch)}</div><div class="tt"><h2>${esc(ch.title)}</h2><p>${esc(ch.summary)}</p></div>
+    <div class="go"><button class="btn ghost sm" data-go="mc">${chs(ch)} 퀴즈 ${nMc}문제 →</button><button class="btn ghost sm" data-go="cb">${chs(ch)} 한 줄 코드 ${nCb}문제 →</button><button class="btn ghost sm" data-go="fc">${chs(ch)} 코드 작성 ${nFc}문제 →</button>${ch.short?"":`<a class="btn ghost sm" href="motion/index.html#ch${ch.no}">▶ ${ch.no}장 영상</a>`}${ch.id==="ch9"?'<a class="btn ghost sm" href="hanoi/index.html">▶ 하노이의 탑 실행 추적</a>':''}</div></div>`;
   const body=ch.sections.map((s,i)=>`<section class="sec" id="sec-${s.id}">
-      <div class="sec-h"><span class="pg">${ch.no}-${i+1}</span><h3>${esc(s.title)}</h3>${s.en?`<span class="en">${esc(s.en)}</span>`:""}</div>
+      <div class="sec-h"><span class="pg">${ch.short||ch.no}-${i+1}</span><h3>${esc(s.title)}</h3>${s.en?`<span class="en">${esc(s.en)}</span>`:""}</div>
       ${s.blocks.map(renderBlock).join("")}</section>`).join("");
   main.innerHTML=`<div class="chsw">${chsw}</div><div class="notes" data-c="${ch.color}"><nav class="toc" aria-label="소단원">${toc}</nav><div>${head}${body}</div></div>`;
   $$(".chbtn").forEach(b=>b.onclick=()=>{curCh=b.dataset.id;save("cprog_ch",curCh);renderNotes();window.scrollTo(0,0);fx(main);});
@@ -591,7 +593,7 @@ function chipRow(group,opts,cur){
 function renderSetup(){
   const m=qsub,s=setup[m],p=poolFor(m);
   const base=QB.filter(q=>m==="mc"?q.t==="mc":isSub(q.t));
-  const chOpts=[["all","전체",null]].concat(NOTES.map(c=>[c.id,c.no+"장",base.filter(q=>q.ch===c.id&&(m==="mc"||s.type==="all"||q.t===s.type)&&stOK(q,s.st)).length]));
+  const chOpts=[["all","전체",null]].concat(NOTES.map(c=>[c.id,chs(c),base.filter(q=>q.ch===c.id&&(m==="mc"||s.type==="all"||q.t===s.type)&&stOK(q,s.st)).length]));
   const all=poolFor(m,true),nDone=all.filter(q=>SOLVED[q.id]).length,nOk=all.filter(q=>SOLVED[q.id]&&SOLVED[q.id].c).length;
   const sv=savedRun();
   let h=sv?'<div class="panel resume"><div><b>풀던 퀴즈가 있어요</b><span>'+esc(sv.label)+(sv.review?" · 오답 복습":"")+' · '+(sv.ids.length-sv.left)+' / '+sv.ids.length+' 진행</span></div><div class="ra"><button class="btn ghost sm" id="rdrop">버리기</button><button class="btn g sm" id="rgo">이어 풀기 →</button></div></div>':'';
@@ -646,6 +648,8 @@ function cbCode(q,mode,r){
 /* ---------- 코드 작성 (fc) ---------- */
 const FC_TEMPLATE="#include <stdio.h>\n\nint main(void)\n{\n    \n    return 0;\n}\n";
 const squash=s=>String(s==null?"":s).replace(/\s+/g,"");
+/* 기대 출력의 각 줄이 내 출력에 순서대로 들어 있으면 통과 (안내 문구가 사이에 있어도 됨) */
+function outOK(out,exp){const o=squash(out);let p=0;for(const ln of String(exp).split("\n")){const l=squash(ln);if(!l)continue;const j=o.indexOf(l,p);if(j<0)return false;p=j+l.length;}return true;}
 const DKEY="cprog_fc_drafts";
 function draftOf(id){const d=load(DKEY,{});return typeof d[id]==="string"?d[id]:null;}
 function saveDraft(id,v){const d=load(DKEY,{});if(v.trim()===FC_TEMPLATE.trim())delete d[id];else d[id]=v;save(DKEY,d);}
@@ -657,7 +661,7 @@ function fcEditorHTML(q){
     '<textarea id="fin" rows="2" spellcheck="false" aria-label="표준 입력">'+esc(q.tests[0].in.replace(/\n$/,""))+'</textarea>'+
     '<div class="out" id="fbox" hidden><span class="ol">실행 결과</span><pre id="fout"></pre></div></div>';
   if(q.h.length)h+='<div class="hints"><button class="btn ghost sm" id="hintBtn">힌트 보기</button><ul class="hlist" hidden>'+q.h.map((t,i)=>'<li><span class="c">'+CIRC[i]+'</span>'+esc(t)+'</li>').join("")+'</ul></div>';
-  h+='<div class="hint">채점은 테스트 입력마다 내 프로그램을 실행해, 기대 출력이 내 출력에 들어 있는지 비교합니다(공백·줄바꿈 무시). 입력 안내 문구는 출력해도 괜찮아요.</div>';
+  h+='<div class="hint">채점은 테스트 입력마다 내 프로그램을 실행해, 기대 출력의 각 줄이 내 출력에 순서대로 들어 있는지 비교합니다(공백·줄바꿈 무시). 입력 안내 문구는 출력해도 괜찮아요.</div>';
   return h;
 }
 function errLine(x){return x.err?'<div class="cerr"><b>'+(x.phase==="compile"?"컴파일 오류":"실행 오류")+(x.line?" · "+x.line+"번째 줄":"")+'</b> '+esc(x.err)+'</div>':'';}
@@ -775,7 +779,7 @@ function submit(skip){
   }else if(q.t==="fc"){
     const code=skip?"":$("#fcode").value;
     r.code=code;r.any=!skip&&code.trim()!==""&&code.trim()!==FC_TEMPLATE.trim();
-    r.tests=q.tests.map(t=>{if(skip)return{in:t.in,exp:t.out,out:"",pass:false};const res=window.CMini.run(code,t.in);return{in:t.in,exp:t.out,out:res.out,err:res.err,line:res.line,phase:res.phase,pass:!res.err&&squash(res.out).includes(squash(t.out))};});
+    r.tests=q.tests.map(t=>{if(skip)return{in:t.in,exp:t.out,out:"",pass:false};const res=window.CMini.run(code,t.in);return{in:t.in,exp:t.out,out:res.out,err:res.err,line:res.line,phase:res.phase,pass:!res.err&&outOK(res.out,t.out)};});
     r.correct=!skip&&r.tests.every(x=>x.pass);
     r.ans=skip?"(모르겠어요)":"테스트 "+r.tests.filter(x=>x.pass).length+"/"+r.tests.length+" 통과";
   }else{
@@ -842,7 +846,7 @@ function renderWrong(){
   const resN=all.filter(v=>v.resolved).length;
   let h='<div class="wrap-wrong"><div class="wn-head"><div><h2>오답노트</h2><p>객관식·단답형·한 줄 코드·코드 작성에서 틀린 문제가 모입니다. 다시 풀어 맞히면 ‘해결됨’으로 바뀝니다. 이 브라우저에 저장됩니다.</p></div>'+
     '<button class="btn g" id="wretry"'+(unres.length?"":" disabled")+'>오답 다시 풀기 ('+unres.length+')</button></div>';
-  h+='<div class="panel wfil"><div class="chips" id="wch">'+[["all","전체"]].concat(NOTES.map(c=>[c.id,c.no+"장"])).map(([v,l])=>{
+  h+='<div class="panel wfil"><div class="chips" id="wch">'+[["all","전체"]].concat(NOTES.map(c=>[c.id,chs(c)])).map(([v,l])=>{
       const c=all.filter(x=>!x.resolved&&(v==="all"||QMAP[x.qid].ch===v)).length;
       return '<button class="chip" data-v="'+v+'" aria-pressed="'+(v===wf.ch)+'">'+l+'<span class="ct">'+c+'</span></button>';}).join("")+
     '<button class="chip" id="wres" aria-pressed="'+wf.showRes+'">해결된 문제도 보기<span class="ct">'+resN+'</span></button></div>'+
@@ -865,7 +869,7 @@ function renderWrong(){
   const wn=$("#wclearno");if(wn)wn.onclick=()=>{wf.confirm=false;renderWrong();};
   const wy=$("#wclearyes");if(wy)wy.onclick=()=>{Object.values(W).filter(v=>v.resolved).forEach(v=>delete W[v.qid]);saveW();wf.confirm=false;renderWrong();};
   const wg=$("#wgo");if(wg)wg.onclick=()=>{run=null;location.hash="quiz";};
-  $("#wretry").onclick=()=>startRun(unres.map(v=>v.qid),"오답노트"+(wf.ch==="all"?"":" · "+CHN[wf.ch].no+"장"),true);
+  $("#wretry").onclick=()=>startRun(unres.map(v=>v.qid),"오답노트"+(wf.ch==="all"?"":" · "+chs(CHN[wf.ch])),true);
   $$("[data-wopen]").forEach(b=>b.onclick=()=>{wf.open[b.dataset.wopen]=!wf.open[b.dataset.wopen];renderWrong();});
   $$("[data-wone]").forEach(b=>b.onclick=()=>startRun([b.dataset.wone],"오답노트 · 한 문제",true));
   $$("[data-wdel]").forEach(b=>b.onclick=()=>{delete W[b.dataset.wdel];saveW();renderWrong();});
