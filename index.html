@@ -712,7 +712,7 @@ function renderQ(){
     if(!r)h+='<div class="hint">주석이 설명하는 동작을 하는 C 문장 한 줄을 쓰고 Enter를 누르면 채점합니다.</div>';
   }
   if(!r){
-    h+='<div class="actions"><button class="btn ghost" id="qskip">모르겠어요</button><button class="btn g" id="qsubmit"'+(q.t==="mc"?" disabled":"")+'>채점하기</button></div>';
+    h+='<div class="actions"><button class="btn ghost" id="qpass" title="채점하지 않고 다음 문제로 (나중에 다시 풀 수 있어요)">넘어가기 →</button><button class="btn ghost" id="qskip">모르겠어요</button><button class="btn g" id="qsubmit"'+(q.t==="mc"?" disabled":"")+'>채점하기</button></div>';
   }else{
     h+=feedbackHTML(q,r,true);
     h+='<div class="actions"><button class="btn ghost" id="qquit">그만하고 결과 보기</button><button class="btn g" id="qnext">'+(run.i+1<n?"다음 문제 →":"결과 보기 →")+'</button></div>';
@@ -756,6 +756,7 @@ function bindQ(q,r){
     }
     $("#qsubmit").onclick=()=>submit();
     $("#qskip").onclick=()=>submit(true);
+    $("#qpass").onclick=()=>{run.skipped=run.skipped||{};run.skipped[q.id]=1;next();};
   }else{
     $("#qnext").onclick=next;
     $("#qquit").onclick=renderResults;
@@ -789,23 +790,25 @@ function submit(skip){
   saveRun();
   renderQ();
 }
-function next(){const j=run.ids.findIndex((id,k)=>k>run.i&&!run.res[id]);if(j>=0){run.i=j;renderQ();window.scrollTo(0,0);fx($("#qroot"));}else renderResults();}
+function next(){const open=(id)=>!run.res[id]&&!(run.skipped&&run.skipped[id]);let j=run.ids.findIndex((id,k)=>k>run.i&&open(id));if(j<0)j=run.ids.findIndex(open);if(j>=0){run.i=j;renderQ();window.scrollTo(0,0);fx($("#qroot"));}else renderResults();}
 function renderResults(){
-  clearRun();
   const done=run.ids.filter(id=>run.res[id]);
   const ok=done.filter(id=>run.res[id].correct).length;
   const wrongIds=done.filter(id=>!run.res[id].correct);
+  const passIds=run.ids.filter(id=>!run.res[id]);
+  if(passIds.length)saveRun();else clearRun();
   const by={};done.forEach(id=>{const c=QMAP[id].ch;by[c]=by[c]||[0,0];by[c][1]++;if(run.res[id].correct)by[c][0]++;});
   let h='<div class="panel result"><div class="prog"><span>'+esc(run.label)+(run.review?" · 오답 복습":"")+'</span></div>'+
-    '<h2>'+ok+' / '+done.length+'</h2><div class="score">정답률 '+(done.length?Math.round(ok/done.length*100):0)+'%'+(done.length<run.ids.length?' · '+(run.ids.length-done.length)+'문제 남기고 종료':'')+'</div>';
+    '<h2>'+ok+' / '+done.length+'</h2><div class="score">정답률 '+(done.length?Math.round(ok/done.length*100):0)+'%'+(done.length<run.ids.length?' · '+(run.ids.length-done.length)+'문제 넘어감':'')+'</div>';
   if(done.length)h+='<div class="tw" style="margin-top:20px"><table><tr><th>단원</th><th>맞힘</th><th>정답률</th></tr>'+
     Object.keys(by).sort((a,b)=>CHN[a].no-CHN[b].no).map(c=>'<tr><td>'+esc(chLabel(c))+'</td><td>'+by[c][0]+' / '+by[c][1]+'</td><td>'+Math.round(by[c][0]/by[c][1]*100)+'%</td></tr>').join("")+'</table></div>';
   if(wrongIds.length)h+='<h4 style="margin:22px 0 4px">이번에 틀린 문제</h4><div class="wlist" style="margin-top:8px">'+
     wrongIds.map(id=>{const q=QMAP[id];return '<div class="wcard"><div class="wtop"><span class="pill t">'+esc(chLabel(q.ch))+'</span><span class="pill">'+TYPE[q.t]+'</span></div><div class="wq">'+esc(q.q)+'</div></div>';}).join("")+'</div>';
-  h+='<div class="actions">'+(wrongIds.length?'<button class="btn ghost" id="rretry">틀린 '+wrongIds.length+'문제 다시 풀기</button>':'')+
+  h+='<div class="actions">'+(passIds.length?'<button class="btn g" id="rpass">넘어간 '+passIds.length+'문제 풀기</button>':'')+(wrongIds.length?'<button class="btn ghost" id="rretry">틀린 '+wrongIds.length+'문제 다시 풀기</button>':'')+
     '<button class="btn ghost" id="rwrong">오답노트 보기</button><button class="btn g" id="rnew">새 퀴즈</button></div></div>';
   $("#qroot").innerHTML=h;window.scrollTo(0,0);fx($("#qroot"));
   const rr=$("#rretry");if(rr)rr.onclick=()=>startRun(wrongIds,"이번 퀴즈 오답",true);
+  const rp=$("#rpass");if(rp)rp.onclick=()=>{run.skipped={};run.i=run.ids.findIndex(id=>!run.res[id]);saveRun();renderQ();window.scrollTo(0,0);fx($("#qroot"));};
   $("#rwrong").onclick=()=>{location.hash="wrong";};
   $("#rnew").onclick=()=>{run=null;renderQuiz();};
 }
