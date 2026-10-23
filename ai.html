@@ -1876,7 +1876,7 @@ let vMode="det",vPart=0;
 const mmss=d=>Math.floor(d/60)+":"+String(d%60).padStart(2,"0");
 function vidHTML(){const det=vMode==="det",src=det?"videos/ch3d_"+VP[vPart].n+".mp4":"videos/ch3.mp4",po=det?"videos/ch3d_"+VP[vPart].n+".jpg":"videos/ch3.jpg";
   return '<div class="vid"><div class="vid-h"><b>3장 영상</b><div class="vtabs"><button data-vmode="det" aria-pressed="'+det+'">자세히 · 강의 슬라이드 8:15</button><button data-vmode="sum" aria-pressed="'+!det+'">요약 1:43</button></div></div>'+
-   '<a class="mlink" href="ai-motion/index.html" target="_blank" rel="noopener"><span class="mi">▶</span><span><b>모션 강의 · 36분</b><span>BFS · UCS · DFS · IDS · Greedy · A*를 단계별 애니메이션으로 — 새 탭에서 열기</span></span></a>'+
+   '<a class="mlink" href="ai-motion/index.html"><span class="mi">▶</span><span><b>모션 강의 · 36분</b><span>BFS · UCS · DFS · IDS · Greedy · A*를 단계별 애니메이션으로 — 누르면 재생 화면으로 이동</span></span></a>'+
    '<video id="ch3v" controls preload="metadata" playsinline poster="'+po+'" src="'+src+'"></video>'+
    (det?'<div class="vparts">'+VP.map((p,i)=>'<button data-vpart="'+i+'" aria-pressed="'+(i===vPart)+'"><span class="vn">'+p.n+'</span>'+esc(p.name)+'<span class="vd">'+mmss(p.d)+'</span></button>').join("")+'</div><div class="vnote">파트가 끝나면 다음 파트가 자동으로 이어집니다.</div>':'')+'</div>';}
 function vidRefresh(play){const old=document.querySelector(".vid");if(!old)return;const t=document.createElement("div");t.innerHTML=vidHTML();old.replaceWith(t.firstChild);vidBind();
@@ -1953,7 +1953,7 @@ function showNotesCh(ch){
     h+=(i?'<div class="secgap"></div>':'')+'<div class="secbar" id="s'+s+'"><div class="node">'+s+'</div><div><h2>'+esc(SECS[s])+'</h2><div class="en">'+SECEN[s]+' · '+(keyOnly?'핵심 '+shown.length+' / ':'')+list.length+' cards</div></div><div class="sp"><button class="btn ghost sm" data-goquiz="'+ch+'">'+ch+'장 퀴즈 →</button></div></div>'+shown.map(slideHTML).join("");
   });
   if(ch===3)h=vidHTML()+h;
-  if(ch===5)h='<a class="mlink" href="ai-motion5/index.html" target="_blank" rel="noopener" style="margin-bottom:18px"><span class="mi">▶</span><span><b>5장 모션 강의 · 12분</b><span>계획 vs 식별 · 지도 색칠 · N-퀸 세 정식화 · 제약 그래프 · 복면산 풀이 · 스도쿠 · 왈츠를 애니메이션으로 — 새 탭에서 열기</span></span></a>'+h;
+  if(ch===5)h='<a class="mlink" href="ai-motion5/index.html" style="margin-bottom:18px"><span class="mi">▶</span><span><b>5장 모션 강의 · 12분</b><span>계획 vs 식별 · 지도 색칠 · N-퀸 세 정식화 · 제약 그래프 · 복면산 풀이 · 스도쿠 · 왈츠를 애니메이션으로 — 누르면 재생 화면으로 이동</span></span></a>'+h;
   $("#notes-body").innerHTML=h;renderFills();stick();vidBind();
   const toc=$("#toc");
   toc.innerHTML='<div class="lbl">'+ch+'장 소단원</div>';
@@ -2338,7 +2338,7 @@ function renderWrong(){
 
 /* ---------------- boot ---------------- */
 Store.loadLocal();refreshBadge();showNotesCh(1);
-{const h=(location.hash||"").replace("#","");showPage(["notes","quiz","wrong","mid"].includes(h)?h:"notes",false);}
+{const h=(location.hash||"").replace("#","");const nm=/^notes-(\d)$/.exec(h);showPage(nm?"notes":["notes","quiz","wrong","mid"].includes(h)?h:"notes",false);if(nm)showNotesCh(+nm[1]);}
 Store.connect();
 
 </script>
