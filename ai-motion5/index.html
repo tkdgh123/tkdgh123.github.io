@@ -1,0 +1,140 @@
+<!doctype html><html lang="ko"><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>AI 5장 모션 강의</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+@font-face{font-family:"JBM";src:url(fonts/jetbrains-mono-latin-400-normal.woff2) format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"JBM";src:url(fonts/jetbrains-mono-latin-700-normal.woff2) format("woff2");font-weight:700;font-display:block}
+:root{color-scheme:dark;--page:#0b0b0d;--ui:rgba(28,28,32,.86);--ui-line:rgba(255,255,255,.12);--ui-ink:#f5f5f7;--ui-mute:#a1a1a6;--accent:#2997ff}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--page:#e8e8ed;color-scheme:light}}
+:root[data-theme="light"]{--page:#e8e8ed;color-scheme:light}
+:root[data-theme="dark"]{--page:#0b0b0d}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--page);overflow:hidden}
+body{font-family:"Noto Sans KR","Noto Sans CJK KR",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+#vp{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#frame{position:relative;background:#000;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.35)}
+#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;overflow:hidden;background:#000;color:#f5f5f7;
+  font-family:"Noto Sans KR","Noto Sans CJK KR",system-ui,sans-serif;letter-spacing:-.01em}
+#bg{position:absolute;inset:0;width:1920px;height:1080px}
+.grid{position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.07) 1.2px,transparent 1.3px);background-size:48px 48px;
+  -webkit-mask-image:radial-gradient(ellipse at 50% 45%,#000 20%,transparent 75%);mask-image:radial-gradient(ellipse at 50% 45%,#000 20%,transparent 75%)}
+.vig{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,transparent 55%,rgba(0,0,0,.65) 100%);pointer-events:none}
+.scene{position:absolute;inset:0;display:none;will-change:opacity,transform}
+.ab{position:absolute}
+.mono{font-family:"JBM","Noto Sans Mono CJK KR","Noto Sans KR",monospace;font-variant-ligatures:none}
+/* hud */
+#hud{position:absolute;inset:0;pointer-events:none}
+#hudL{position:absolute;left:80px;top:44px;font-size:21px;font-weight:500;color:rgba(255,255,255,.55);letter-spacing:.02em;display:flex;gap:14px;align-items:center}
+#hudL b{font-weight:700;color:var(--acc,#2997ff)}
+#hudL .dot{width:7px;height:7px;border-radius:50%;background:var(--acc,#2997ff);box-shadow:0 0 12px var(--acc,#2997ff)}
+#hudR{position:absolute;right:80px;top:44px;font-size:21px;color:rgba(255,255,255,.45);font-weight:500}
+#prog{position:absolute;left:80px;right:80px;bottom:34px;height:3px;border-radius:2px;background:rgba(255,255,255,.08);overflow:hidden}
+#prog i{position:absolute;left:0;top:0;bottom:0;background:var(--acc,#2997ff);border-radius:2px}
+#cap{position:absolute;left:160px;right:160px;margin:0 auto;width:fit-content;bottom:78px;max-width:1600px;text-align:center;font-size:36px;font-weight:500;line-height:1.5;color:#fff;
+  padding:16px 34px;border-radius:18px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.08);opacity:0;white-space:pre-line}
+#cap code,.ptext code,.k code{font-family:"JBM","Noto Sans Mono CJK KR",monospace;font-size:.88em;background:rgba(255,255,255,.1);padding:.05em .32em;border-radius:7px;color:#ffd479}
+#cap b,.ptext b{color:var(--acc,#2997ff);font-weight:700}
+/* code window */
+.win{position:absolute;background:linear-gradient(180deg,rgba(30,30,36,.94),rgba(18,18,22,.94));border:1px solid rgba(255,255,255,.09);border-radius:24px;
+  box-shadow:0 50px 120px rgba(0,0,0,.65),inset 0 1px 0 rgba(255,255,255,.06);overflow:hidden}
+.win .bar{position:absolute;left:0;right:0;top:0;height:58px;display:flex;align-items:center;padding:0 24px;gap:10px;border-bottom:1px solid rgba(255,255,255,.06)}
+.win .bar i{width:14px;height:14px;border-radius:50%;display:block}
+.win .bar .fn{margin-left:18px;font-size:20px;color:rgba(255,255,255,.6);font-family:"JBM","Noto Sans KR",monospace}
+.win .bar .tag{margin-left:auto;font-size:17px;color:var(--acc);border:1px solid var(--acc);border-radius:999px;padding:3px 14px;opacity:.9}
+.view{position:absolute;left:0;right:0;top:58px;bottom:0;overflow:hidden}
+.codewrap{position:absolute;left:0;right:0;top:0;padding:22px 0}
+.ver{position:absolute;left:0;right:0;top:22px}
+.ln{position:relative;white-space:pre;display:flex}
+.ln .g{width:74px;flex:none;text-align:right;padding-right:22px;color:rgba(255,255,255,.22)}
+.ln .c{flex:1;color:#e8e8ed}
+.band{position:absolute;left:10px;right:10px;border-radius:12px;background:linear-gradient(90deg,color-mix(in srgb,var(--acc) 26%,transparent),color-mix(in srgb,var(--acc) 8%,transparent));
+  border:1px solid color-mix(in srgb,var(--acc) 45%,transparent);box-shadow:0 0 40px color-mix(in srgb,var(--acc) 22%,transparent);opacity:0}
+.mark{position:absolute;border-radius:8px;border:2px solid #ffd479;box-shadow:0 0 18px rgba(255,212,121,.55);opacity:0;pointer-events:none}
+.kw{color:#ff7ab2;font-weight:700}.st{color:#ff8a75}.cm{color:#7f8c98;font-style:normal}.pp{color:#fd9a4b}.nm{color:#d9c97c}.fn{color:#6bdfff}
+/* right panel */
+.pcard{position:absolute;border-radius:24px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08);overflow:hidden}
+.plabel{position:absolute;left:30px;top:22px;font-size:17px;font-weight:700;letter-spacing:.12em;color:rgba(255,255,255,.42)}
+.pstep{position:absolute;left:30px;right:30px;top:62px}
+.pnum{font-size:18px;font-weight:700;color:var(--acc);letter-spacing:.06em;font-family:"JBM",monospace}
+.ptitle{font-size:38px;font-weight:800;line-height:1.25;margin:8px 0 14px;letter-spacing:-.02em}
+.ptext{font-size:27px;line-height:1.62;color:rgba(255,255,255,.82);font-weight:400}
+.vars{position:absolute;left:24px;right:24px;top:60px;display:flex;flex-wrap:wrap;gap:12px}
+.var{min-width:118px;border-radius:16px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.1);padding:10px 16px 12px;opacity:0}
+.var .vn{font-size:18px;color:rgba(255,255,255,.55);font-family:"JBM","Noto Sans KR",monospace}
+.var .vv{font-size:30px;font-weight:700;font-family:"JBM","Noto Sans KR",monospace;color:#fff;white-space:nowrap}
+.term{position:absolute;left:28px;right:24px;top:62px;bottom:18px;font-size:23px;line-height:1.5;color:#e8e8ed;white-space:pre-wrap;overflow:hidden}
+.term .in{color:#30d158;font-weight:700}
+.term .cur{display:inline-block;width:12px;height:1.1em;vertical-align:-.18em;background:#e8e8ed;margin-left:2px}
+/* titles */
+.big{font-weight:900;letter-spacing:-.045em;line-height:1}
+.grad{background:linear-gradient(120deg,#fff 10%,var(--acc) 60%,var(--acc2,#fff) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.chip{position:absolute;padding:14px 26px;border-radius:999px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.05);font-size:28px;font-weight:500;white-space:nowrap}
+.node{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;border-radius:26px;
+  background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.14);font-size:30px;font-weight:700;line-height:1.3}
+.node small{display:block;font-size:20px;font-weight:400;color:rgba(255,255,255,.6);margin-top:6px}
+.k{position:absolute;font-size:40px;font-weight:700;white-space:nowrap}
+.cell{position:absolute;display:flex;align-items:center;justify-content:center;font-family:"JBM",monospace;font-weight:700;border-radius:12px}
+svg.ov{position:absolute;left:0;top:0;width:1920px;height:1080px;overflow:visible;pointer-events:none}
+/* player ui */
+#ui{position:fixed;left:0;right:0;bottom:0;padding-block:16px calc(14px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));background:linear-gradient(transparent,rgba(0,0,0,.72));color:var(--ui-ink);transition:opacity .35s;z-index:5;font-size:14px}
+#ui.hide{opacity:0;pointer-events:none}
+#seek{position:relative;height:22px;cursor:pointer;margin-bottom:6px;touch-action:none}
+#seek .tr{position:absolute;left:0;right:0;top:9px;height:4px;border-radius:3px;background:rgba(255,255,255,.22)}
+#seek .fl{position:absolute;left:0;top:9px;height:4px;border-radius:3px;background:var(--accent)}
+#seek .tk{position:absolute;top:5px;width:2px;height:12px;background:rgba(255,255,255,.55);border-radius:1px}
+#seek .kn{position:absolute;top:4px;width:14px;height:14px;margin-left:-7px;border-radius:50%;background:#fff;box-shadow:0 1px 6px rgba(0,0,0,.5)}
+#seek .tip{position:absolute;bottom:24px;transform:translateX(-50%);background:var(--ui);border:1px solid var(--ui-line);padding:4px 9px;border-radius:8px;white-space:nowrap;display:none;font-size:12.5px}
+#row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+#row button{background:transparent;border:0;color:var(--ui-ink);font:inherit;height:36px;min-width:36px;padding:0 10px;border-radius:9px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+#row button:hover{background:rgba(255,255,255,.12)}#row button:focus-visible,#big:focus-visible,#menu button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+#row svg{width:20px;height:20px;fill:currentColor}
+#time{font-variant-numeric:tabular-nums;color:var(--ui-mute);margin:0 6px;white-space:nowrap}
+#now{color:var(--ui-ink);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.85}
+#menu{position:fixed;right:16px;bottom:96px;width:320px;max-width:calc(100vw - 32px);max-height:70vh;overflow:auto;background:var(--ui);border:1px solid var(--ui-line);border-radius:14px;padding:6px;display:none;z-index:6;color:var(--ui-ink)}
+#menu button{display:flex;width:100%;gap:12px;align-items:center;background:transparent;border:0;color:inherit;font:inherit;font-size:14.5px;padding:10px 12px;border-radius:9px;cursor:pointer;text-align:left}
+#menu button:hover{background:rgba(255,255,255,.1)}
+#menu .n{font-weight:800;width:30px;color:var(--c)}
+#menu .tm{margin-left:auto;color:var(--ui-mute);font-variant-numeric:tabular-nums;font-size:13px}
+#big{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:96px;height:96px;border-radius:50%;border:0;background:rgba(255,255,255,.92);color:#000;cursor:pointer;z-index:4;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 40px rgba(0,0,0,.4)}
+#big svg{width:40px;height:40px;margin-left:6px}
+#big.hide{display:none}
+#help{position:fixed;left:50%;top:calc(50% + 78px);transform:translateX(-50%);color:#fff;font-size:14px;opacity:.75;z-index:4;text-align:center;text-shadow:0 1px 6px #000;white-space:nowrap}
+@media (max-width:640px){#now{display:none}#help{display:none}}
+body.render #ui,body.render #big,body.render #help,body.render #menu{display:none!important}
+</style>
+<div id="vp"><div id="frame"><div id="stage">
+  <canvas id="bg" width="1920" height="1080"></canvas>
+  <div class="grid"></div>
+  <div id="scenes"></div>
+  <div class="vig"></div>
+  <div id="hud"><div id="hudL"><span class="dot"></span><span id="hudCh"></span></div><div id="hudR"></div><div id="prog"><i></i></div></div>
+  <div id="cap"></div>
+</div></div></div>
+<button id="big" aria-label="재생"><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8z"/></svg></button>
+<div id="help">Space 재생 · ←/→ 5초 · [ ] 이전/다음 장면 · 1–5 파트 이동 · F 전체화면</div>
+<div id="menu" role="menu"></div>
+<div id="ui">
+  <div id="seek" aria-label="탐색"><div class="tr"></div><div class="fl"></div><div class="kn"></div><div class="tip"></div></div>
+  <div id="row">
+    <button id="bPlay" aria-label="재생/일시정지"><svg viewBox="0 0 24 24" id="icPlay"><path d="M6 4l15 8-15 8z"/></svg></button>
+    <button id="bPrev" aria-label="이전 장면"><svg viewBox="0 0 24 24"><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg></button>
+    <button id="bNext" aria-label="다음 장면"><svg viewBox="0 0 24 24"><path d="M16 5h2v14h-2zM4 5v14l11-7z"/></svg></button>
+    <span id="time">0:00 / 0:00</span>
+    <span id="now"></span>
+    <button id="bSpeed" aria-label="재생 속도">1×</button>
+    <button id="bMute" aria-label="소리"><svg viewBox="0 0 24 24" id="icVol"><path d="M4 9h4l5-4v14l-5-4H4zM16 8a5 5 0 010 8M18.5 5.5a8.5 8.5 0 010 13" stroke="currentColor" stroke-width="2" fill="none"/><path d="M4 9h4l5-4v14l-5-4H4z"/></svg></button>
+    <button id="bCh" aria-label="챕터"><svg viewBox="0 0 24 24"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h10v2H4z"/></svg>챕터</button>
+    <button id="bFs" aria-label="전체화면"><svg viewBox="0 0 24 24"><path d="M4 4h6v2H6v4H4zm10 0h6v6h-2V6h-4zM4 14h2v4h4v2H4zm14 0h2v6h-6v-2h4z"/></svg></button>
+  </div>
+</div>
+<audio id="aud" src="audio.mp4" preload="auto"></audio>
+<script src="engine.js"></script>
+<script src="lib.js"></script>
+<script src="s5.js"></script>
+<script src="player.js"></script>
+
+
+</body></html>

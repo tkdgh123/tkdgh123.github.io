@@ -1953,6 +1953,7 @@ function showNotesCh(ch){
     h+=(i?'<div class="secgap"></div>':'')+'<div class="secbar" id="s'+s+'"><div class="node">'+s+'</div><div><h2>'+esc(SECS[s])+'</h2><div class="en">'+SECEN[s]+' · '+(keyOnly?'핵심 '+shown.length+' / ':'')+list.length+' cards</div></div><div class="sp"><button class="btn ghost sm" data-goquiz="'+ch+'">'+ch+'장 퀴즈 →</button></div></div>'+shown.map(slideHTML).join("");
   });
   if(ch===3)h=vidHTML()+h;
+  if(ch===5)h='<a class="mlink" href="ai-motion5/index.html" target="_blank" rel="noopener" style="margin-bottom:18px"><span class="mi">▶</span><span><b>5장 모션 강의 · 12분</b><span>계획 vs 식별 · 지도 색칠 · N-퀸 세 정식화 · 제약 그래프 · 복면산 풀이 · 스도쿠 · 왈츠를 애니메이션으로 — 새 탭에서 열기</span></span></a>'+h;
   $("#notes-body").innerHTML=h;renderFills();stick();vidBind();
   const toc=$("#toc");
   toc.innerHTML='<div class="lbl">'+ch+'장 소단원</div>';
