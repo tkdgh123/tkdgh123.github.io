@@ -13,6 +13,7 @@
 .hint{font-size:.88rem;color:var(--muted)}
 .spbar{flex:1 1 160px;max-width:260px;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
 .spbar i{display:block;height:100%;background:var(--frontier);border-radius:3px}
+html{overflow-anchor:none}
 .sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 .midwrap{max-width:980px;margin:0 auto}
 .owrap{max-width:1000px;margin:0 auto}
@@ -791,7 +792,14 @@ function refreshBadge(){const n=unresolvedCount(),b=$("#wbadge");b.textContent=n
 let curPage="notes";
 const fx=el=>{if(!el)return;el.classList.remove("enter");void el.offsetWidth;el.classList.add("enter");};
 function stick(){document.querySelectorAll(".slide:not(.nofloat):not(.multi) .shots,.slide:not(.nofloat):not(.multi) .sl-x").forEach(e=>e.classList.toggle("stk",e.offsetHeight<innerHeight-110));}
-addEventListener("resize",stick);
+/* 창 너비가 바뀌어도(브라우저 사이드 패널 열기 등) 읽던 위치 유지 */
+(function(){
+  const SEL='.slide,.mcard,.opage,.olec,.secbar,.wcard';let anc=null,off=0,rz=0,t=0;
+  const pick=()=>{if(rz)return;const els=document.querySelectorAll(SEL);for(const e of els){if(!e.offsetParent)continue;const r=e.getBoundingClientRect();if(r.bottom>90){anc=e;off=r.top;return;}}anc=null;};
+  addEventListener("scroll",()=>{if(!rz)requestAnimationFrame(pick);},{passive:true});
+  addEventListener("resize",()=>{rz=1;stick();requestAnimationFrame(()=>{if(anc&&anc.isConnected)window.scrollBy(0,anc.getBoundingClientRect().top-off);});clearTimeout(t);t=setTimeout(()=>{rz=0;pick();},400);});
+  setTimeout(pick,500);
+})();
 function showPage(p,push=true){
   curPage=p;
   document.querySelectorAll("[data-pg]").forEach(s=>s.hidden=s.dataset.pg!==p);
