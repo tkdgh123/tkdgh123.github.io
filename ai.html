@@ -13,6 +13,7 @@
 .hint{font-size:.88rem;color:var(--muted)}
 .spbar{flex:1 1 160px;max-width:260px;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
 .spbar i{display:block;height:100%;background:var(--frontier);border-radius:3px}
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 .midwrap{max-width:980px;margin:0 auto}
 .owrap{max-width:1000px;margin:0 auto}
 .ojump{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;align-items:center}.ojump a{font-size:.85rem;color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:3px 11px;text-decoration:none;background:var(--card)}.ojump a:hover{border-color:var(--ink)}
@@ -1263,6 +1264,20 @@ function gotoSection(sec){
   const a=document.getElementById("s"+sec);if(a)setTimeout(()=>a.scrollIntoView({block:"start"}),30);
 }
 
+
+/* ---- 문제 코드표: 페이지 텍스트에 항상 포함 (브라우저의 Claude가 페이지를 조작하지 않고 바로 읽을 수 있게) ---- */
+(function(){
+  const strip=t=>String(t||"").replace(/<[^>]+>/g,"");
+  const L={a:0,b:1,c:2,d:3},ord=q=>[L[q.c[0]],+q.c.slice(1)];
+  const list=QB.filter(q=>q.c).sort((x,y)=>{const a=ord(x),b=ord(y);return a[0]-b[0]||a[1]-b[1];});
+  const el=document.createElement("section");el.id="qcodes";el.className="sr-only";el.setAttribute("aria-label","퀴즈 문제 코드표");
+  el.innerHTML='<h2>퀴즈 문제 코드표 — 코드(a=2장, b=3장, c=4장, d=5장)로 문제·정답·해설을 찾을 수 있습니다</h2>'+list.map(q=>{
+    let h='<article><h3>'+q.c+' · '+q.s+' '+esc(SECS[q.s]||"")+' · '+(q.t==="mc"?"객관식":"주관식")+'</h3><p>Q: '+esc(strip(q.q))+'</p><p>문제: '+esc(strip(q.k))+'</p>';
+    if(q.t==="mc")h+='<ul>'+q.o.map(o=>'<li>['+(o[2]?"정답":"오답")+'] '+esc(strip(o[0]))+' — '+esc(strip(o[3]))+'</li>').join("")+'</ul>'+(q.o.some(o=>o[2])?'':'<p>정답 없음(모든 보기가 틀림)</p>');
+    else h+='<p>정답: '+esc(strip(q.show||(q.a||[])[0]))+'</p>';
+    return h+'<p>해설: '+esc(strip(q.e))+'</p></article>';}).join("");
+  document.body.appendChild(el);
+})();
 /* ---------------- quiz ---------------- */
 const setup={ch:"all",n:10,type:"all",st:"new"};
 /* 푼 문제 기록: {문제id:{c:마지막 정답 여부,n:푼 횟수,t:시각}} — 이 브라우저에 저장 */
