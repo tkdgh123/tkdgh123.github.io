@@ -288,6 +288,9 @@ body:has(.fcsplit) .wrap{max-width:1720px}
 .cdot{flex:none;width:9px;height:9px;border-radius:50%;margin-top:.45em;border:1.5px solid var(--line)}
 .citem.ok .cdot{background:var(--quiz);border-color:var(--quiz)}.citem.bad .cdot{background:var(--wrong);border-color:var(--wrong)}
 .cmain{min-width:0}
+.chd span{margin-left:auto}.chd #chide{padding:3px 10px;font-size:.8rem}
+.codews.nolist{grid-template-columns:minmax(0,1fr)}.codews.nolist .clist{display:none}
+.codews:not(.nolist) #copen{display:none}
 .cnav{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
 .cnb{display:flex;gap:8px}
 @media (max-width:1180px){.codews{grid-template-columns:minmax(0,1fr)}.clist{position:static;max-height:none}.citems{flex-direction:row;overflow-x:auto;gap:6px;padding-bottom:4px}.cgh{display:none}.citem{flex:none;white-space:nowrap;border:1px solid var(--line)}}
@@ -884,7 +887,7 @@ document.addEventListener("keydown",e=>{
 });
 
 /* ================= CODE (코드 작성 따로) ================= */
-const codeSt={ch:load("cprog_code_ch","all"),st:"all",cur:load("cprog_code_cur",null),sol:false,res:null};
+const codeSt={hide:load("cprog_code_hide",false),ch:load("cprog_code_ch","all"),st:"all",cur:load("cprog_code_cur",null),sol:false,res:null};
 const FCS=()=>QB.filter(q=>q.t==="fc");
 const cStat=id=>SOLVED[id]?(SOLVED[id].c?"ok":"bad"):"new";
 function codeList(){return FCS().filter(q=>(codeSt.ch==="all"||q.ch===codeSt.ch)&&(codeSt.st==="all"||cStat(q.id)===codeSt.st));}
@@ -899,10 +902,10 @@ function renderCode(){
   list.forEach(x=>{if(x.ch!==lastCh){lastCh=x.ch;items+='<div class="cgh">'+esc(chLabel(x.ch))+'</div>';}
     items+='<button class="citem '+cStat(x.id)+'" data-id="'+x.id+'" aria-current="'+(x.id===q.id)+'"><span class="cdot"></span><span>'+esc(x.q)+'</span></button>';});
   const idx=list.findIndex(x=>x.id===q.id),pv=list[idx-1],nx=list[idx+1];
-  main.innerHTML='<div class="codews"><aside class="clist panel"><div class="chd"><b>코드 작성</b><span>맞힌 문제 '+nOk+' / '+all.length+'</span></div>'+
+  main.innerHTML='<div class="codews'+(codeSt.hide?" nolist":"")+'"><aside class="clist panel"><div class="chd"><b>코드 작성</b><span>맞힌 문제 '+nOk+' / '+all.length+'</span><button class="btn ghost sm" id="chide" title="문제 목록 닫기" aria-label="문제 목록 닫기">◀</button></div>'+
     '<div class="spbar"><i style="width:'+(nOk/all.length*100)+'%"></i></div>'+chips("ch",chOpts,codeSt.ch)+chips("st",stOpts,codeSt.st)+
     '<div class="citems">'+(items||'<div class="hint" style="padding:8px">이 조건에 맞는 문제가 없어요.</div>')+'</div></aside>'+
-    '<section class="panel cmain"><div class="cnav"><div class="qmeta" style="margin:0"><span class="pill t">'+esc(chLabel(q.ch))+'</span><span class="pill ty">테스트 '+q.tests.length+'개</span>'+
+    '<section class="panel cmain"><div class="cnav"><button class="btn ghost sm" id="copen" aria-label="문제 목록 열기">☰ 문제 목록</button><div class="qmeta" style="margin:0 auto 0 0"><span class="pill t">'+esc(chLabel(q.ch))+'</span><span class="pill ty">테스트 '+q.tests.length+'개</span>'+
       (cStat(q.id)!=="new"?'<span class="pill '+(cStat(q.id)==="ok"?"ty":"")+'" style="'+(cStat(q.id)==="bad"?"color:var(--wrong);border-color:var(--wrong)":"")+'">'+(cStat(q.id)==="ok"?"✓ 맞힌 문제":"✗ 아직 못 맞힘")+'</span>':'')+'</div>'+
       '<div class="cnb"><button class="btn ghost sm" id="cprev"'+(pv?"":" disabled")+'>← 이전</button><button class="btn ghost sm" id="cnext"'+(nx?"":" disabled")+'>다음 →</button></div></div>'+
     '<div class="fcsplit"><div class="fcl"><div class="qtext">'+esc(q.q)+'</div>'+fcDesc(q.d,q.q)+'</div><div class="fcr">'+fcEditorHTML(q)+
@@ -912,6 +915,8 @@ function renderCode(){
     const l=codeList();if(l.length&&!l.some(x=>x.id===codeSt.cur))codeSt.cur=l[0].id;codeSt.res=null;codeSt.sol=false;renderCode();});
   $("#cprev").onclick=()=>pv&&openCode(pv.id);$("#cnext").onclick=()=>nx&&openCode(nx.id);
   $("#cgrade").onclick=gradeCode;
+  const tg=h=>{codeSt.hide=h;save("cprog_code_hide",h);$(".codews").classList.toggle("nolist",h);if(!h){const c=$(".citem[aria-current=true]");if(c)c.scrollIntoView({block:"nearest"});}};
+  $("#chide").onclick=()=>tg(true);$("#copen").onclick=()=>tg(false);
   $("#csol").onclick=()=>{codeSt.sol=!codeSt.sol;$("#csol").textContent=codeSt.sol?"모범 답안 숨기기":"모범 답안 보기";drawCodeRes();};
   bindEditor(q,gradeCode);drawCodeRes();
   const cur=$(".citem[aria-current=true]");if(cur&&cur.scrollIntoView)cur.scrollIntoView({block:"nearest"});
