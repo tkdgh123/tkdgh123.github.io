@@ -255,6 +255,25 @@ td.y{color:var(--quiz);font-weight:700} td.n{color:var(--wrong);font-weight:700}
 h4.mini{margin:14px 0 8px;font-size:.9rem}
 @media (max-width:640px){.tg{grid-template-columns:1fr}#fcode{min-height:300px;font-size:.9rem}}
 /* 코드 작성: 왼쪽 문제·출력 예시, 오른쪽 에디터 */
+/* VS 스타일 편집기 (vsedit.js) */
+.vs-body{display:flex;position:relative}
+.vs-gut{flex:none;min-width:46px;padding:0 10px 0 8px;text-align:right;color:var(--gut);white-space:pre;overflow:hidden;user-select:none;border-right:1px solid var(--code-line);background:color-mix(in srgb,var(--code-bg) 70%,var(--line));font-variant-numeric:tabular-nums}
+.vs-wrap{position:relative;flex:1;min-width:0;overflow:hidden}
+.vs-ov{position:absolute;left:0;top:0;margin:0;pointer-events:none;white-space:pre;color:var(--ink);min-width:100%;box-sizing:border-box}
+.vs-ov .kw{color:var(--kw)} .vs-ov .st{color:var(--st)} .vs-ov .cm{color:var(--cm);font-style:italic} .vs-ov .pp{color:var(--pp)} .vs-ov .nm{color:var(--nm)} .vs-ov .fn{color:var(--fn)}
+.vs-l{position:relative}
+.vs-ta{position:relative;z-index:1;background:transparent!important;color:transparent!important;-webkit-text-fill-color:transparent;caret-color:var(--ink)}
+.vs-ta::selection{background:color-mix(in srgb,var(--brand) 30%,transparent);-webkit-text-fill-color:transparent}
+.vs-cur{position:absolute;left:0;width:400vw;background:color-mix(in srgb,var(--brand) 7%,transparent);border-block:1px solid color-mix(in srgb,var(--brand) 12%,transparent);box-sizing:border-box}
+.vs-br{position:absolute;border:1px solid color-mix(in srgb,var(--brand) 70%,transparent);background:color-mix(in srgb,var(--brand) 16%,transparent);border-radius:3px;box-sizing:border-box}
+.vs-br.bad{border-color:var(--wrong);background:var(--wrong-soft)}
+.vs-pop{position:absolute;z-index:5;min-width:200px;max-width:320px;margin:0;padding:4px;list-style:none;background:var(--card);border:1px solid var(--line);border-radius:8px;box-shadow:0 12px 30px -12px rgba(0,0,0,.4);font-family:var(--f-mono);font-size:.88rem;line-height:1.5}
+.vs-pop li{display:flex;gap:8px;align-items:center;padding:3px 8px;border-radius:5px;cursor:pointer;white-space:nowrap}
+.vs-pop li[aria-selected="true"]{background:var(--brand);color:#fff}
+.vs-pop i{font-style:normal;font-size:.75em;width:16px;text-align:center;opacity:.75}
+.vs-pop b{font-weight:700}
+.edkeys{font-family:var(--f-body);font-size:.8rem;color:var(--muted);padding:6px 14px;border-top:1px solid var(--code-line);line-height:1.7}
+.edkeys kbd{font-family:var(--f-mono);font-size:.92em;border:1px solid var(--code-line);border-bottom-width:2px;border-radius:4px;padding:0 4px;background:var(--card)}
 body:has(.fcsplit) .wrap{max-width:1720px}
 .fcex{margin:16px 0 0;font-family:var(--f-mono);font-size:.92rem;line-height:1.7;white-space:pre-wrap;word-break:break-word;background:var(--code-bg);border:1px solid var(--code-line);border-radius:12px;padding:12px 16px;color:var(--ink)}
 .qpanel:has(.fcsplit){max-width:none}
@@ -395,6 +414,7 @@ body:has(.fcsplit) .wrap{max-width:1720px}
 <script src="bank.js"></script>
 <script src="cmini.js"></script>
 <script src="hw.js"></script>
+<script src="vsedit.js"></script>
 <script>
 "use strict";
 const NOTES=window.NOTES||[], QZ=window.QUIZ||{mc:[],sa:[]}, GEN=window.GEN||{mc:[],sa:[],lb:[],fc:[]};
@@ -676,8 +696,9 @@ function fcDesc(d,title){const i=String(d).search(/(입력|출력)\s*예/);let b
     (notes.length?'<ol class="fnotes" aria-label="각주">'+notes.map(x=>'<li>'+esc(x.n)+'</li>').join("")+'</ol>':'');}
 function fcEditorHTML(q){
   const code=draftOf(q.id)||FC_TEMPLATE;
-  let h='<div class="ed"><div class="edbar"><span>main.c</span><span>Tab 들여쓰기 · Ctrl+Enter 채점</span></div>'+
-    '<textarea id="fcode" spellcheck="false" autocomplete="off" autocapitalize="off" autocorrect="off" aria-label="C 코드 작성">'+esc(code)+'</textarea></div>';
+  let h='<div class="ed"><div class="edbar"><span>main.c</span><span>자동 괄호 · 자동 들여쓰기 · IntelliSense</span></div>'+
+    '<textarea id="fcode" spellcheck="false" autocomplete="off" autocapitalize="off" autocorrect="off" aria-label="C 코드 작성">'+esc(code)+'</textarea>'+
+    '<div class="edkeys"><kbd>F5</kbd> 실행 · <kbd>Ctrl</kbd>+<kbd>Enter</kbd> 채점 · <kbd>for</kbd> <kbd>if</kbd> <kbd>while</kbd> <kbd>main</kbd> 입력 후 <kbd>Tab</kbd> 코드 조각 · <kbd>Ctrl</kbd>+<kbd>/</kbd> 주석 · <kbd>Ctrl</kbd>+<kbd>D</kbd> 줄 복제 · <kbd>Alt</kbd>+<kbd>↑↓</kbd> 줄 이동 · <kbd>Shift</kbd>+<kbd>Tab</kbd> 내어쓰기</div></div>';
   h+='<div class="runbox"><div class="rbh"><label for="fin">실행할 때 넣을 입력</label><button class="btn ghost sm" id="frun">▶ 실행해 보기</button><button class="btn ghost sm" id="freset">처음 코드로</button></div>'+
     '<textarea id="fin" rows="2" spellcheck="false" aria-label="표준 입력">'+esc(q.tests[0].in.replace(/\n$/,""))+'</textarea>'+
     '<div class="out" id="fbox" hidden><span class="ol">실행 결과</span><pre id="fout"></pre></div></div>';
@@ -696,18 +717,11 @@ function bindEditor(q){
   const ta=$("#fcode"),fin=$("#fin");
   ta.focus({preventScroll:true});
   const p=ta.value.indexOf("    \n    return");if(p>0&&!draftOf(q.id))ta.setSelectionRange(p+4,p+4);
-  ta.addEventListener("input",()=>saveDraft(q.id,ta.value));
-  ta.addEventListener("keydown",e=>{
-    if(e.key==="Enter"&&(e.ctrlKey||e.metaKey)){e.preventDefault();submit();return;}
-    const v=ta.value,a=ta.selectionStart,b=ta.selectionEnd;
-    if(e.key==="Tab"&&!e.shiftKey){e.preventDefault();ta.setRangeText("    ",a,b,"end");saveDraft(q.id,ta.value);return;}
-    if(e.key==="Enter"&&!e.isComposing){const ls=v.lastIndexOf("\n",a-1)+1,ind=(/^[ \t]*/.exec(v.slice(ls,a))||[""])[0];
-      const extra=/\{\s*$/.test(v.slice(ls,a))?"    ":"";e.preventDefault();ta.setRangeText("\n"+ind+extra,a,b,"end");saveDraft(q.id,ta.value);return;}
-    if(e.key==="}"&&a===b){const ls=v.lastIndexOf("\n",a-1)+1;if(/^ {4,}$/.test(v.slice(ls,a))){e.preventDefault();ta.setRangeText("}",a-4,a,"end");saveDraft(q.id,ta.value);}}
-  });
+  const ed=window.VSEdit?VSEdit(ta,{highlight:hlC,onSubmit:()=>submit(),onRun:()=>$("#frun").click(),onChange:v=>saveDraft(q.id,v)}):null;
+  if(!ed)ta.addEventListener("input",()=>saveDraft(q.id,ta.value));
   $("#frun").onclick=()=>{const res=window.CMini.run(ta.value,fin.value+"\n");$("#fbox").hidden=false;
     $("#fout").innerHTML=esc(res.out||"")+(res.err?(res.out?'\n':'')+'<span class="perr">'+(res.phase==="compile"?"[컴파일 오류]":"[실행 오류]")+(res.line?" "+res.line+"번째 줄: ":" ")+esc(res.err)+'</span>':(res.out?"":"(출력 없음)"));};
-  $("#freset").onclick=()=>{ta.value=FC_TEMPLATE;saveDraft(q.id,ta.value);ta.focus();};
+  $("#freset").onclick=()=>{ta.value=FC_TEMPLATE;if(ed)ed.render();saveDraft(q.id,ta.value);ta.focus();};
   const hb=$("#hintBtn");if(hb)hb.onclick=()=>{const l=$(".hlist",$("#qroot"));l.hidden=!l.hidden;hb.textContent=l.hidden?"힌트 보기":"힌트 숨기기";};
 }
 function renderQ(){
