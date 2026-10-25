@@ -288,6 +288,23 @@ body:has(.fcsplit) .wrap{max-width:1720px}
 .cdot{flex:none;width:9px;height:9px;border-radius:50%;margin-top:.45em;border:1.5px solid var(--line)}
 .citem.ok .cdot{background:var(--quiz);border-color:var(--quiz)}.citem.bad .cdot{background:var(--wrong);border-color:var(--wrong)}
 .cmain{min-width:0}
+body:has(.qwrap.ai) .wrap{max-width:1440px}
+.qwrap.ai{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:20px;align-items:start}
+.qwrap.ai .qpanel{max-width:none;margin:0;width:100%;min-width:0}
+.qchat{position:sticky;top:calc(env(safe-area-inset-top,0px) + 84px);height:calc(100vh - 110px);display:flex;flex-direction:column;gap:10px;padding:16px!important}
+.chh{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap}.chh b{font-size:1.05rem}.chst{font-size:.78rem;color:var(--muted)}
+.chlog{flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:10px;padding-right:2px}
+.chempty{color:var(--muted);font-size:.92rem;margin:auto 0;text-align:center;padding:12px}
+.chm{border-radius:12px;padding:9px 13px;font-size:.94rem;line-height:1.7;max-width:92%;overflow-wrap:anywhere}
+.chm.user{align-self:flex-end;background:var(--ink);color:var(--paper)}
+.chm.assistant{align-self:flex-start;background:var(--info-soft);border:1px solid color-mix(in srgb,var(--info) 30%,var(--line))}
+.chm.assistant h4{margin:8px 0 2px;font-size:.92rem}.chm.assistant p{margin:4px 0}.chm.assistant ul{margin:4px 0;padding-left:1.2em}
+.chm.assistant pre.aicode{background:var(--code-bg);border:1px solid var(--code-line);border-radius:8px;padding:8px 10px;overflow-x:auto;margin:6px 0;font-size:.86rem}.chm.assistant pre.aicode code{border:0;background:none;padding:0}
+.chsug{display:flex;gap:6px;flex-wrap:wrap}.chsug .chip{padding:4px 11px;font-size:.82rem}
+.chin{display:flex;gap:8px;align-items:flex-end}
+.chin textarea{flex:1;min-width:0;resize:none;font:inherit;font-size:.94rem;line-height:1.5;border:1.5px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--paper);color:var(--ink)}
+.chin textarea:focus{outline:2.5px solid var(--info);outline-offset:-1px}
+@media (max-width:1100px){.qwrap.ai{grid-template-columns:minmax(0,1fr)}.qchat{position:static;height:480px}}
 .aibtn{border-color:var(--info)!important;color:var(--info)!important}
 .aiauto{display:flex;justify-content:flex-end;align-items:center;gap:6px;font-size:.85rem;color:var(--muted);margin-top:8px}
 .aibox{margin-top:16px;border:1.5px solid color-mix(in srgb,var(--info) 45%,var(--line));border-radius:14px;background:var(--info-soft);padding:14px 18px}
@@ -651,7 +668,7 @@ function poolFor(m,ign){
   const s=setup[m];
   return QB.filter(q=>(m==="mc"?q.t==="mc":(isSub(q.t)&&(s.type==="all"||q.t===s.type)))&&(s.ch==="all"||q.ch===s.ch)&&(ign||stOK(q,s.st)));
 }
-function renderQuiz(){main.innerHTML='<div class="qpanel" id="qroot"></div>';if(run)renderQ();else renderSetup();}
+function renderQuiz(){main.innerHTML='<div class="qwrap"><div class="qpanel" id="qroot"></div><aside class="qchat panel" id="qchat" hidden></aside></div>';if(run)renderQ();else renderSetup();chatSync(true);}
 function chipRow(group,opts,cur){
   return '<div class="chips" data-group="'+group+'">'+opts.map(([v,l,ct])=>'<button class="chip" data-v="'+v+'" aria-pressed="'+(String(v)===String(cur))+'">'+l+(ct!=null?'<span class="ct">'+ct+'</span>':'')+'</button>').join("")+'</div>';
 }
@@ -792,6 +809,7 @@ function renderQ(){
   h+='</div>';
   $("#qroot").innerHTML=h;
   bindQ(q,r);
+  chatSync();
 }
 function feedbackHTML(q,r,live){
   let h='<div class="verdict '+(r.correct?"ok":"bad")+'">'+(r.correct?"✓ 정답입니다":"✗ 틀렸습니다 — 오답노트에 저장했어요")+'</div><div class="exp">';
@@ -878,7 +896,7 @@ function renderResults(){
     wrongIds.map(id=>{const q=QMAP[id];return '<div class="wcard"><div class="wtop"><span class="pill t">'+esc(chLabel(q.ch))+'</span><span class="pill">'+TYPE[q.t]+'</span></div><div class="wq">'+esc(q.q)+'</div></div>';}).join("")+'</div>';
   h+='<div class="actions">'+(passIds.length?'<button class="btn g" id="rpass">넘어간 '+passIds.length+'문제 풀기</button>':'')+(wrongIds.length?'<button class="btn ghost" id="rretry">틀린 '+wrongIds.length+'문제 다시 풀기</button>':'')+
     '<button class="btn ghost" id="rwrong">오답노트 보기</button><button class="btn g" id="rnew">새 퀴즈</button></div></div>';
-  $("#qroot").innerHTML=h;window.scrollTo(0,0);fx($("#qroot"));
+  $("#qroot").innerHTML=h;window.scrollTo(0,0);fx($("#qroot"));chatSync();
   const rr=$("#rretry");if(rr)rr.onclick=()=>startRun(wrongIds,"이번 퀴즈 오답",true);
   const rp=$("#rpass");if(rp)rp.onclick=()=>{run.skipped={};run.i=run.ids.findIndex(id=>!run.res[id]);saveRun();renderQ();window.scrollTo(0,0);fx($("#qroot"));};
   $("#rwrong").onclick=()=>{location.hash="wrong";};
@@ -959,7 +977,50 @@ function gradeCode(){
 }
 /* ---------- AI 코드 리뷰: claude.ai에서 열었을 때만 (보는 사람의 Claude 사용량을 씀) ---------- */
 const AI={fn:null,ok:false,ctl:null,busy:false};
-if(window.claude&&typeof claude.use==="function")claude.use("sample").then(s=>{AI.fn=s;AI.ok=!!s;aiSetup();}).catch(()=>{});
+if(window.claude&&typeof claude.use==="function")claude.use("sample").then(s=>{AI.fn=s;AI.ok=!!s;aiSetup();chatSync(true);}).catch(()=>{});
+/* ---------- 퀴즈 옆 질문하기: 지금 보는 문제를 맥락으로 Claude에게 묻기 ---------- */
+const CHAT={qid:null,turns:[],busy:false,ctl:null};
+function chatQ(){return curTab==="quiz"&&run&&$("#qroot .run")?curQ():null;}
+function chatCtx(){
+  const q=chatQ();if(!q)return "지금 학생은 퀴즈 문제를 풀고 있지 않다(설정·결과 화면). 일반적인 C 질문에 답해라.";
+  const r=run.res[q.id];let s="[지금 보고 있는 퀴즈 문제] ("+chLabel(q.ch)+" · "+TYPE[q.t]+")\n"+q.q+"\n";
+  if(q.t==="mc")s+="보기:\n"+run.orders[q.id].map((oi,i)=>LET[i]+". "+q.opts[oi]).join("\n")+"\n";
+  if(q.t==="cb")s+=(q.d?q.d+"\n":"")+"코드(빈칸은 ____):\n"+q.src.replace(/\uE100/g,"____")+"\n";
+  if(!r||r.resumed)s+="\n학생은 아직 이 문제에 답하지 않았다. 정답(보기 기호나 정답 문장)을 직접 말하지 말고, 개념 설명과 힌트로 스스로 풀게 도와라. 학생이 정답을 꼭 알려 달라고 하면 그때만 알려 줘라.";
+  else{const ans=q.t==="mc"?LET[run.orders[q.id].indexOf(q.ans)]+". "+q.opts[q.ans]:q.t==="sa"?q.a[0]:q.acc.map(a=>a[0]).join(" / ");
+    s+="\n학생은 이미 답했다. 학생의 답: "+(r.ans||"")+" ("+(r.correct?"정답":"오답")+")\n정답: "+ans+(q.exp?"\n해설: "+q.exp:"");}
+  return s;}
+const CHAT_RULES="너는 대학교 1학년 'C 프로그래밍 기초'(2~9장: 프로그램 작성 과정, 변수·자료형, 연산자, 조건문, 반복문, 함수, 변수의 범위·static·재귀) 수업의 조교다. 학생이 퀴즈를 풀다가 묻는 질문에 답한다.\n- 한국어로, 짧고 정확하게. 필요하면 아주 짧은 C 예시 코드.\n- 수업 범위를 넘는 문법(배열·포인터·구조체)은 꼭 필요할 때만 짧게.\n- 계산기 없이 머리로 이해할 수 있게 설명해라.\n- 퀴즈 문제나 해설이 틀렸다고 판단되면 솔직하게 말해라.";
+function chatSync(force){
+  const box=$("#qchat"),wrap=$(".qwrap");if(!box||!wrap)return;
+  if(!AI.ok){box.hidden=true;wrap.classList.remove("ai");return;}
+  box.hidden=false;wrap.classList.add("ai");
+  const q=chatQ(),qid=q?q.id:null;
+  if(qid!==CHAT.qid){if(CHAT.ctl)CHAT.ctl.abort();CHAT.qid=qid;CHAT.turns=[];force=true;}
+  if(!force&&box.firstChild){const st=$(".chst",box);if(st)st.textContent=q?(run.res[q.id]&&!run.res[q.id].resumed?"채점 후 · 정답과 해설까지 보고 답해요":"채점 전 · 정답은 숨기고 힌트로 답해요"):"일반 질문";return;}
+  box.innerHTML='<div class="chh"><b>질문하기</b><span class="chst"></span></div><div class="chlog" id="chlog"></div>'+
+    '<div class="chsug">'+(q?["힌트만 주세요","이 개념 설명해 줘","왜 이게 답이에요?"]:["static 지역 변수와 전역 변수 차이","정수 나눗셈이 뭐예요?"]).map(s=>'<button class="chip" type="button">'+esc(s)+'</button>').join("")+'</div>'+
+    '<div class="chin"><textarea id="chtext" rows="2" placeholder="'+(q?"지금 문제에 대해 물어보세요":"C에 대해 물어보세요")+' (Enter 보내기, Shift+Enter 줄바꿈)"></textarea><button class="btn g sm" id="chsend" type="button">보내기</button></div>';
+  chatSync(false);chatDraw();
+  $$(".chsug .chip",box).forEach(c=>c.onclick=()=>chatSend(c.textContent));
+  const ta=$("#chtext");ta.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing){e.preventDefault();chatSend(ta.value);}});
+  $("#chsend").onclick=()=>CHAT.busy?CHAT.ctl&&CHAT.ctl.abort():chatSend(ta.value);
+}
+function chatDraw(live){const log=$("#chlog");if(!log)return;
+  log.innerHTML=CHAT.turns.length?CHAT.turns.map((m,i)=>'<div class="chm '+m.role+'">'+(m.role==="user"?esc(m.content).replace(/\n/g,"<br>"):aiMD(m.content)||'<p class="aiwait">생각하고 있어요…</p>')+'</div>').join(""):'<div class="chempty">문제를 풀다가 막히면 물어보세요. 지금 보고 있는 문제를 함께 보고 답해요.</div>';
+  log.scrollTop=log.scrollHeight;}
+async function chatSend(text){
+  text=String(text||"").trim();if(!text||CHAT.busy||!AI.ok)return;
+  const qid=CHAT.qid;CHAT.turns.push({role:"user",content:text});const ta=$("#chtext");if(ta)ta.value="";
+  const msg={role:"assistant",content:""};CHAT.turns.push(msg);chatDraw();
+  CHAT.busy=true;CHAT.ctl=new AbortController();const sb=$("#chsend");if(sb)sb.textContent="멈추기";
+  const hist=CHAT.turns.slice(0,-1).slice(-12);
+  try{const r=await AI.fn([{role:"user",content:CHAT_RULES+"\n\n"+chatCtx()}].concat(hist),{cache:false,signal:CHAT.ctl.signal,onText:({text})=>{if(CHAT.qid!==qid)return;msg.content=text;chatDraw();}});
+    msg.content=r.text;}
+  catch(e){const c=e&&e.code;msg.content=(e&&e.text||"")+(c==="cancelled"?"":"\n\n*"+(c==="rate_limited"?"요청이 많아요. 잠시 뒤에 다시 물어봐 주세요.":c==="not_granted"||c==="sampling_disabled"?"이 화면에서는 질문하기를 쓸 수 없어요.":"답을 받지 못했어요. 다시 보내 주세요.")+"*");
+    if(/not_granted|sampling_disabled|not_declared|capability_disabled/.test(c||"")){AI.ok=false;}}
+  finally{CHAT.busy=false;if(!msg.content.trim())CHAT.turns.splice(CHAT.turns.indexOf(msg)-1,2);if(CHAT.qid===qid)chatDraw();const b=$("#chsend");if(b)b.textContent="보내기";if(!AI.ok)chatSync(true);}
+}
 function aiSetup(){const b=$("#cai");if(!b)return;b.hidden=!AI.ok;const a=$(".aiauto");if(a)a.hidden=!AI.ok;
   b.onclick=()=>AI.busy?AI.ctl&&AI.ctl.abort():aiReview();
   const c=$("#caiauto");if(c)c.onchange=()=>save("cprog_ai_auto",c.checked);}
