@@ -288,6 +288,13 @@ body:has(.fcsplit) .wrap{max-width:1720px}
 .cdot{flex:none;width:9px;height:9px;border-radius:50%;margin-top:.45em;border:1.5px solid var(--line)}
 .citem.ok .cdot{background:var(--quiz);border-color:var(--quiz)}.citem.bad .cdot{background:var(--wrong);border-color:var(--wrong)}
 .cmain{min-width:0}
+.aibtn{border-color:var(--info)!important;color:var(--info)!important}
+.aiauto{display:flex;justify-content:flex-end;align-items:center;gap:6px;font-size:.85rem;color:var(--muted);margin-top:8px}
+.aibox{margin-top:16px;border:1.5px solid color-mix(in srgb,var(--info) 45%,var(--line));border-radius:14px;background:var(--info-soft);padding:14px 18px}
+.aih{font-weight:700;font-size:.85rem;color:var(--info);letter-spacing:.04em;margin-bottom:4px}
+.aibody{font-size:.98rem;line-height:1.75}.aibody h4{margin:12px 0 4px;font-size:.95rem}.aibody p{margin:6px 0}.aibody ul{margin:4px 0;padding-left:1.2em}.aibody li{margin:3px 0}
+.aibody pre.aicode{background:var(--code-bg);border:1px solid var(--code-line);border-radius:8px;padding:8px 12px;overflow-x:auto;margin:8px 0}.aibody pre.aicode code{border:0;background:none;padding:0}
+.aiwait{color:var(--muted)}
 .chd span{margin-left:auto}.chd #chide{padding:3px 10px;font-size:.8rem}
 .codews.nolist{grid-template-columns:minmax(0,1fr)}.codews.nolist .clist{display:none}
 .codews:not(.nolist) #copen{display:none}
@@ -924,12 +931,14 @@ function renderCode(){
       (cStat(q.id)!=="new"?'<span class="pill '+(cStat(q.id)==="ok"?"ty":"")+'" style="'+(cStat(q.id)==="bad"?"color:var(--wrong);border-color:var(--wrong)":"")+'">'+(cStat(q.id)==="ok"?"✓ 맞힌 문제":"✗ 아직 못 맞힘")+'</span>':'')+'</div>'+
       '<div class="cnb"><span class="ctime" id="ctime" title="이 문제를 연 채로 보낸 시간 (다른 탭·창을 보는 동안은 멈춤)"></span><button class="btn ghost sm" id="creset" title="시간을 0부터 다시 잽니다">다시 재기</button><button class="btn ghost sm" id="cprev"'+(pv?"":" disabled")+'>← 이전</button><button class="btn ghost sm" id="cnext"'+(nx?"":" disabled")+'>다음 →</button></div></div>'+
     '<div class="fcsplit"><div class="fcl"><div class="qtext">'+esc(q.q)+'</div>'+fcDesc(q.d,q.q)+'</div><div class="fcr">'+fcEditorHTML(q)+
-      '<div class="actions" style="margin-top:16px"><button class="btn ghost" id="csol">'+(codeSt.sol?"모범 답안 숨기기":"모범 답안 보기")+'</button><button class="btn g" id="cgrade">채점하기</button></div><div id="cres"></div></div></div></section></div>';
+      '<div class="actions" style="margin-top:16px"><button class="btn ghost" id="csol">'+(codeSt.sol?"모범 답안 숨기기":"모범 답안 보기")+'</button><button class="btn ghost aibtn" id="cai" hidden>AI 코드 리뷰</button><button class="btn g" id="cgrade">채점하기</button></div>'+
+      '<label class="aiauto" hidden><input type="checkbox" id="caiauto"'+(load("cprog_ai_auto",false)?" checked":"")+'> 채점에서 틀리면 바로 AI가 분석</label><div id="cres"></div><div id="caiout"></div></div></div></section></div>';
   $$(".citem").forEach(b=>b.onclick=()=>openCode(b.dataset.id));
   $$("[data-cg]").forEach(g=>g.onclick=e=>{const c=e.target.closest(".chip");if(!c)return;codeSt[g.dataset.cg]=c.dataset.v;if(g.dataset.cg==="ch")save("cprog_code_ch",codeSt.ch);
     const l=codeList();if(l.length&&!l.some(x=>x.id===codeSt.cur))codeSt.cur=l[0].id;codeSt.res=null;codeSt.sol=false;renderCode();});
   $("#cprev").onclick=()=>pv&&openCode(pv.id);$("#cnext").onclick=()=>nx&&openCode(nx.id);
   $("#cgrade").onclick=gradeCode;
+  aiSetup();
   $("#creset").onclick=()=>{TM[q.id]={t:0,done:null};save(TKEY,TM);tmShow();const c=$('.citem[data-id="'+q.id+'"] .ctm');if(c)c.remove();};
   tmStart();
   const tg=h=>{codeSt.hide=h;save("cprog_code_hide",h);$(".codews").classList.toggle("nolist",h);if(!h){const c=$(".citem[aria-current=true]");if(c)c.scrollIntoView({block:"nearest"});}};
@@ -945,7 +954,38 @@ function gradeCode(){
   const ok=tests.every(x=>x.pass);markSolved(q.id,ok);
   const o=tmOf(q.id);if(ok&&o.done==null)o.done=o.t;save(TKEY,TM);
   codeSt.res={tests,ok,time:o.done!=null?o.done:o.t};
-  saveDraft(q.id,code);renderCode();const r=$("#cres");if(r&&r.scrollIntoView)r.scrollIntoView({behavior:"smooth",block:"nearest"});
+  saveDraft(q.id,code);renderCode();
+  if(!ok&&AI.ok&&load("cprog_ai_auto",false))aiReview();const r=$("#cres");if(r&&r.scrollIntoView)r.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+/* ---------- AI 코드 리뷰: claude.ai에서 열었을 때만 (보는 사람의 Claude 사용량을 씀) ---------- */
+const AI={fn:null,ok:false,ctl:null,busy:false};
+if(window.claude&&typeof claude.use==="function")claude.use("sample").then(s=>{AI.fn=s;AI.ok=!!s;aiSetup();}).catch(()=>{});
+function aiSetup(){const b=$("#cai");if(!b)return;b.hidden=!AI.ok;const a=$(".aiauto");if(a)a.hidden=!AI.ok;
+  b.onclick=()=>AI.busy?AI.ctl&&AI.ctl.abort():aiReview();
+  const c=$("#caiauto");if(c)c.onchange=()=>save("cprog_ai_auto",c.checked);}
+function aiMD(s){const e=esc(s);let h="",inCode=false,inList=false;
+  e.split("\n").forEach(l=>{if(/^```/.test(l)){if(inList){h+="</ul>";inList=false;}h+=inCode?"</code></pre>":'<pre class="aicode"><code>';inCode=!inCode;return;}
+    if(inCode){h+=l+"\n";return;}
+    const il=x=>x.replace(/`([^`]+)`/g,"<code>$1</code>").replace(/\*\*([^*]+)\*\*/g,"<b>$1</b>");
+    if(/^#{1,4}\s/.test(l)){if(inList){h+="</ul>";inList=false;}h+="<h4>"+il(l.replace(/^#+\s*/,""))+"</h4>";return;}
+    if(/^\s*[-*]\s/.test(l)){if(!inList){h+="<ul>";inList=true;}h+="<li>"+il(l.replace(/^\s*[-*]\s/,""))+"</li>";return;}
+    if(inList){h+="</ul>";inList=false;}if(l.trim())h+="<p>"+il(l)+"</p>";});
+  if(inList)h+="</ul>";if(inCode)h+="</code></pre>";return h;}
+async function aiReview(){
+  if(!AI.ok||AI.busy)return;const q=QMAP[codeSt.cur],code=$("#fcode").value,out=$("#caiout"),btn=$("#cai");
+  const tests=q.tests.map((t,i)=>{const r=window.CMini.run(code,t.in);const pass=!r.err&&outOK(r.out,t.out);
+    return "테스트 "+(i+1)+(pass?" (통과)":" (실패)")+"\n입력: "+(t.in.trim()||"(없음)")+"\n기대 출력: "+t.out.trim()+"\n실제 출력: "+(r.out||"").trim().slice(0,600)+(r.err?"\n"+(r.phase==="compile"?"컴파일 오류":"실행 오류")+(r.line?" ("+r.line+"번째 줄)":"")+": "+r.err:"");}).join("\n\n");
+  const numbered=code.replace(/\s+$/,"").split("\n").map((l,i)=>String(i+1).padStart(3)+"| "+l).join("\n");
+  const prompt="너는 대학교 1학년 'C 프로그래밍 기초' 수업의 친절한 조교다. 아래 문제와 학생이 쓴 코드, 실제 실행 결과를 보고 코드를 평가해라.\n\n규칙:\n- 한국어로, 짧고 분명하게.\n- 학생이 스스로 고치게 하는 것이 목적이다. 정답 코드 전체는 쓰지 말고, 틀린 곳의 줄 번호와 이유, 고칠 방향을 짚어라. 꼭 필요할 때만 고친 한두 줄을 보여 줘라.\n- 수업 범위는 변수·자료형·연산자·조건문(if, switch)·반복문(while, for, do-while)·함수·재귀다. 배열·포인터·구조체처럼 범위 밖 문법은 권하지 마라.\n- 채점은 기대 출력 내용이 순서대로 들어 있는지만 보고 공백·줄바꿈·안내 문구는 무시한다. 그런 차이는 지적하지 마라.\n- 테스트를 모두 통과했으면 고칠 점 대신 더 좋게 만들 점만 말해라.\n\n형식(마크다운):\n## 결론\n(한 줄)\n## 고칠 점\n- N번째 줄: 무엇이 왜 문제인지 → 어떻게 고칠지\n(없으면 '없음')\n## 잘한 점\n- 1~2개\n## 더 좋게\n- 0~2개 (선택)\n\n[문제] "+q.q+"\n"+q.d+"\n\n[실행 결과]\n"+tests+"\n\n[학생 코드 (줄 번호| 코드)]\n"+numbered;
+  AI.busy=true;AI.ctl=new AbortController();btn.textContent="리뷰 멈추기";
+  out.innerHTML='<div class="aibox"><div class="aih">AI 코드 리뷰</div><div class="aibody"><p class="aiwait">코드를 읽고 있어요…</p></div></div>';
+  const body=$(".aibody",out);out.scrollIntoView&&out.scrollIntoView({behavior:"smooth",block:"nearest"});
+  try{const r=await AI.fn(prompt,{signal:AI.ctl.signal,onText:({text})=>{body.innerHTML=aiMD(text);}});
+    body.innerHTML=aiMD(r.text)+(r.truncated?'<p class="hint">답이 길어서 잘렸어요.</p>':'');}
+  catch(e){const keep=e&&e.text?aiMD(e.text):"";const c=e&&e.code;
+    const msg=c==="cancelled"?"":c==="not_granted"||c==="sampling_disabled"||c==="not_declared"||c==="capability_disabled"?"이 화면에서는 AI 리뷰를 쓸 수 없어요.":c==="rate_limited"?"요청이 많아요. 잠시 뒤에 다시 눌러 주세요.":c==="session_expired"?"Claude에 다시 로그인해 주세요.":"리뷰를 받지 못했어요. 다시 눌러 주세요.";
+    body.innerHTML=keep+(msg?'<p class="hint">'+msg+'</p>':'');if(/not_granted|sampling_disabled|not_declared|capability_disabled/.test(c||"")){AI.ok=false;aiSetup();}}
+  finally{AI.busy=false;const b=$("#cai");if(b)b.textContent="AI 코드 리뷰";}
 }
 function drawCodeRes(){
   const q=QMAP[codeSt.cur],r=codeSt.res;let h="";
