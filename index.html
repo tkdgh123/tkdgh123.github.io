@@ -292,7 +292,9 @@ body:has(.qwrap.ai) .wrap{max-width:1440px}
 .qwrap.ai{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:20px;align-items:start}
 .qwrap.ai .qpanel{max-width:none;margin:0;width:100%;min-width:0}
 .qchat{position:sticky;top:calc(env(safe-area-inset-top,0px) + 84px);height:calc(100vh - 110px);display:flex;flex-direction:column;gap:10px;padding:16px!important}
-.chh{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap}.chh b{font-size:1.05rem}.chst{font-size:.78rem;color:var(--muted)}
+.chh{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.chh .chst{margin-left:auto}.chh #chclose{padding:3px 10px;font-size:.8rem}
+.qwrap.ai.chclosed{grid-template-columns:minmax(0,1fr)}.qwrap.ai.chclosed .qchat{display:none}.qwrap.ai.chclosed .qpanel{max-width:940px;margin:0 auto}
+.chopen{position:fixed;right:calc(20px + env(safe-area-inset-right,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:20;box-shadow:0 10px 26px -10px rgba(0,0,0,.45)}.chh b{font-size:1.05rem}.chst{font-size:.78rem;color:var(--muted)}
 .chlog{flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:10px;padding-right:2px}
 .chempty{color:var(--muted);font-size:.92rem;margin:auto 0;text-align:center;padding:12px}
 .chm{border-radius:12px;padding:9px 13px;font-size:.94rem;line-height:1.7;max-width:92%;overflow-wrap:anywhere}
@@ -668,7 +670,7 @@ function poolFor(m,ign){
   const s=setup[m];
   return QB.filter(q=>(m==="mc"?q.t==="mc":(isSub(q.t)&&(s.type==="all"||q.t===s.type)))&&(s.ch==="all"||q.ch===s.ch)&&(ign||stOK(q,s.st)));
 }
-function renderQuiz(){main.innerHTML='<div class="qwrap"><div class="qpanel" id="qroot"></div><aside class="qchat panel" id="qchat" hidden></aside></div>';if(run)renderQ();else renderSetup();chatSync(true);}
+function renderQuiz(){main.innerHTML='<div class="qwrap"><div class="qpanel" id="qroot"></div><aside class="qchat panel" id="qchat" hidden></aside><button class="chopen btn g" id="chopen" type="button" hidden>질문하기</button></div>';if(run)renderQ();else renderSetup();chatSync(true);}
 function chipRow(group,opts,cur){
   return '<div class="chips" data-group="'+group+'">'+opts.map(([v,l,ct])=>'<button class="chip" data-v="'+v+'" aria-pressed="'+(String(v)===String(cur))+'">'+l+(ct!=null?'<span class="ct">'+ct+'</span>':'')+'</button>').join("")+'</div>';
 }
@@ -979,7 +981,8 @@ function gradeCode(){
 const AI={fn:null,ok:false,ctl:null,busy:false};
 if(window.claude&&typeof claude.use==="function")claude.use("sample").then(s=>{AI.fn=s;AI.ok=!!s;aiSetup();chatSync(true);}).catch(()=>{});
 /* ---------- 퀴즈 옆 질문하기: 지금 보는 문제를 맥락으로 Claude에게 묻기 ---------- */
-const CHAT={qid:null,turns:[],busy:false,ctl:null};
+const CHAT={qid:null,turns:[],busy:false,ctl:null,hide:load("cprog_chat_hide",false)};
+function chatShow(on){CHAT.hide=!on;save("cprog_chat_hide",CHAT.hide);const w=$(".qwrap");if(w)w.classList.toggle("chclosed",CHAT.hide);const o=$("#chopen");if(o)o.hidden=!CHAT.hide||!AI.ok;if(on){const t=$("#chtext");if(t)t.focus({preventScroll:true});const l=$("#chlog");if(l)l.scrollTop=l.scrollHeight;}}
 function chatQ(){return curTab==="quiz"&&run&&$("#qroot .run")?curQ():null;}
 function chatCtx(){
   const q=chatQ();if(!q)return "지금 학생은 퀴즈 문제를 풀고 있지 않다(설정·결과 화면). 일반적인 C 질문에 답해라.";
@@ -993,16 +996,19 @@ function chatCtx(){
 const CHAT_RULES="너는 대학교 1학년 'C 프로그래밍 기초'(2~9장: 프로그램 작성 과정, 변수·자료형, 연산자, 조건문, 반복문, 함수, 변수의 범위·static·재귀) 수업의 조교다. 학생이 퀴즈를 풀다가 묻는 질문에 답한다.\n- 한국어로, 짧고 정확하게. 필요하면 아주 짧은 C 예시 코드.\n- 수업 범위를 넘는 문법(배열·포인터·구조체)은 꼭 필요할 때만 짧게.\n- 계산기 없이 머리로 이해할 수 있게 설명해라.\n- 퀴즈 문제나 해설이 틀렸다고 판단되면 솔직하게 말해라.";
 function chatSync(force){
   const box=$("#qchat"),wrap=$(".qwrap");if(!box||!wrap)return;
-  if(!AI.ok){box.hidden=true;wrap.classList.remove("ai");return;}
-  box.hidden=false;wrap.classList.add("ai");
+  const op=$("#chopen");
+  if(!AI.ok){box.hidden=true;wrap.classList.remove("ai");if(op)op.hidden=true;return;}
+  box.hidden=false;wrap.classList.add("ai");wrap.classList.toggle("chclosed",CHAT.hide);
+  if(op){op.hidden=!CHAT.hide;op.onclick=()=>chatShow(true);}
   const q=chatQ(),qid=q?q.id:null;
   if(qid!==CHAT.qid){if(CHAT.ctl)CHAT.ctl.abort();CHAT.qid=qid;CHAT.turns=[];force=true;}
   if(!force&&box.firstChild){const st=$(".chst",box);if(st)st.textContent=q?(run.res[q.id]&&!run.res[q.id].resumed?"채점 후 · 정답과 해설까지 보고 답해요":"채점 전 · 정답은 숨기고 힌트로 답해요"):"일반 질문";return;}
-  box.innerHTML='<div class="chh"><b>질문하기</b><span class="chst"></span></div><div class="chlog" id="chlog"></div>'+
+  box.innerHTML='<div class="chh"><b>질문하기</b><span class="chst"></span><button class="btn ghost sm" id="chclose" type="button" aria-label="질문하기 닫기">닫기 ▶</button></div><div class="chlog" id="chlog"></div>'+
     '<div class="chsug">'+(q?["힌트만 주세요","이 개념 설명해 줘","왜 이게 답이에요?"]:["static 지역 변수와 전역 변수 차이","정수 나눗셈이 뭐예요?"]).map(s=>'<button class="chip" type="button">'+esc(s)+'</button>').join("")+'</div>'+
     '<div class="chin"><textarea id="chtext" rows="2" placeholder="'+(q?"지금 문제에 대해 물어보세요":"C에 대해 물어보세요")+' (Enter 보내기, Shift+Enter 줄바꿈)"></textarea><button class="btn g sm" id="chsend" type="button">보내기</button></div>';
   chatSync(false);chatDraw();
   $$(".chsug .chip",box).forEach(c=>c.onclick=()=>chatSend(c.textContent));
+  $("#chclose").onclick=()=>chatShow(false);
   const ta=$("#chtext");ta.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing){e.preventDefault();chatSend(ta.value);}});
   $("#chsend").onclick=()=>CHAT.busy?CHAT.ctl&&CHAT.ctl.abort():chatSend(ta.value);
 }
