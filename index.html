@@ -254,6 +254,16 @@ td.y{color:var(--quiz);font-weight:700} td.n{color:var(--wrong);font-weight:700}
 .cerr{margin-top:8px;font-size:.9rem;color:var(--wrong)}
 h4.mini{margin:14px 0 8px;font-size:.9rem}
 @media (max-width:640px){.tg{grid-template-columns:1fr}#fcode{min-height:300px;font-size:.9rem}}
+/* 코드 작성: 왼쪽 문제·출력 예시, 오른쪽 에디터 */
+body:has(.fcsplit) .wrap{max-width:1720px}
+.fcex{margin:16px 0 0;font-family:var(--f-mono);font-size:.92rem;line-height:1.7;white-space:pre-wrap;word-break:break-word;background:var(--code-bg);border:1px solid var(--code-line);border-radius:12px;padding:12px 16px;color:var(--ink)}
+.qpanel:has(.fcsplit){max-width:none}
+.fcsplit{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:30px;align-items:start}
+.fcl{position:sticky;top:calc(env(safe-area-inset-top,0px) + 84px);max-height:calc(100vh - 110px);overflow:auto}
+.fcl .qdesc{margin:0;max-width:none}
+.fcr{min-width:0}
+.fcr #fcode{min-height:440px}
+@media (max-width:900px){.fcsplit{grid-template-columns:minmax(0,1fr);gap:16px}.fcl{position:static;max-height:none;overflow:visible}.fcr #fcode{min-height:300px}}
 .qdesc{color:var(--muted);font-size:1.02rem;margin:0 0 14px;max-width:72ch}
 .opts{display:flex;flex-direction:column;gap:10px;margin-top:16px}
 .opt{display:flex;gap:14px;align-items:flex-start;border:1.5px solid var(--line);border-radius:14px;padding:14px 18px;background:var(--paper);text-align:left;width:100%;font-size:1.06rem;line-height:1.6}
@@ -653,6 +663,8 @@ function outOK(out,exp){const o=squash(out);let p=0;for(const ln of String(exp).
 const DKEY="cprog_fc_drafts";
 function draftOf(id){const d=load(DKEY,{});return typeof d[id]==="string"?d[id]:null;}
 function saveDraft(id,v){const d=load(DKEY,{});if(v.trim()===FC_TEMPLATE.trim())delete d[id];else d[id]=v;save(DKEY,d);}
+/* 문제 설명과 입력·출력 예시를 나눠서 예시는 코드 상자로 */
+function fcDesc(d){const i=String(d).search(/(입력|출력)\s*예/);return i>0?'<div class="qdesc">'+esc(d.slice(0,i).trim())+'</div><pre class="fcex">'+esc(d.slice(i).trim())+'</pre>':'<div class="qdesc">'+esc(d)+'</div>';}
 function fcEditorHTML(q){
   const code=draftOf(q.id)||FC_TEMPLATE;
   let h='<div class="ed"><div class="edbar"><span>main.c</span><span>Tab 들여쓰기 · Ctrl+Enter 채점</span></div>'+
@@ -707,8 +719,8 @@ function renderQ(){
     h+='<div class="qtext">'+qHTML(q.q)+'</div>';
     h+='<div class="sa"><input id="sainput" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="답을 입력하세요"'+(r?' disabled value="'+esc(r.text)+'"':'')+'></div>';
   }else if(q.t==="fc"){
-    h+='<div class="qtext">'+esc(q.q)+'</div><div class="qdesc">'+esc(q.d)+'</div>';
-    h+=r?fcResultHTML(q,r):fcEditorHTML(q);
+    h+='<div class="fcsplit"><div class="fcl"><div class="qtext">'+esc(q.q)+'</div>'+fcDesc(q.d)+'</div><div class="fcr">';
+    h+=(r?fcResultHTML(q,r):fcEditorHTML(q))+'</div></div>';
   }else{
     h+='<div class="qtext">'+esc(q.q)+'</div><div class="qdesc">'+esc(q.d)+'</div>';
     h+=r?cbCode(q,"result",r):cbCode(q,"input");
