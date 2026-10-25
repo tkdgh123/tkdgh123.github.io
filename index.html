@@ -86,7 +86,7 @@ code{font-family:var(--f-mono);font-size:.88em;background:var(--code-bg);border:
 @media (max-width:480px){.tab{padding:8px 11px;gap:6px;font-size:.88rem}.tab .dot{width:8px;height:8px}}
 .tab:hover{color:var(--ink)}
 .tab .dot{width:10px;height:10px;border-radius:50%;border:2px solid var(--dc)}
-.tab[data-t="notes"]{--dc:var(--notes)} .tab[data-t="quiz"]{--dc:var(--quiz)} .tab[data-t="wrong"]{--dc:var(--wrong)}
+.tab[data-t="notes"]{--dc:var(--notes)} .tab[data-t="quiz"]{--dc:var(--quiz)} .tab[data-t="wrong"]{--dc:var(--wrong)} .tab[data-t="code"]{--dc:var(--info)}
 .tab[aria-selected="true"]{background:var(--ink);color:var(--paper)}
 a.vtab{text-decoration:none;--dc:var(--warn)} a.vtab:hover{color:var(--ink)} a.btn{text-decoration:none}
 .tab[aria-selected="true"] .dot{background:var(--dc)}
@@ -275,6 +275,22 @@ h4.mini{margin:14px 0 8px;font-size:.9rem}
 .edkeys{font-family:var(--f-body);font-size:.8rem;color:var(--muted);padding:6px 14px;border-top:1px solid var(--code-line);line-height:1.7}
 .edkeys kbd{font-family:var(--f-mono);font-size:.92em;border:1px solid var(--code-line);border-bottom-width:2px;border-radius:4px;padding:0 4px;background:var(--card)}
 body:has(.fcsplit) .wrap{max-width:1720px}
+.codews{display:grid;grid-template-columns:250px minmax(0,1fr);gap:20px;align-items:start}
+.clist{position:sticky;top:calc(env(safe-area-inset-top,0px) + 84px);max-height:calc(100vh - 110px);display:flex;flex-direction:column;gap:10px;padding:16px 14px!important;overflow:hidden}
+.chd{display:flex;justify-content:space-between;align-items:baseline;gap:8px}.chd b{font-size:1.05rem}.chd span{font-size:.82rem;color:var(--muted)}
+.clist .spbar{max-width:none;flex:none}
+.chips.sm{gap:5px}.chips.sm .chip{padding:3px 10px;font-size:.82rem}
+.citems{overflow:auto;margin:0 -6px;padding:0 6px;display:flex;flex-direction:column;gap:2px}
+.cgh{font-size:.78rem;font-weight:700;color:var(--muted);margin:10px 4px 2px}
+.citem{display:flex;gap:9px;align-items:flex-start;text-align:left;padding:6px 8px;border-radius:9px;font-size:.9rem;line-height:1.45;color:var(--ink)}
+.citem:hover{background:var(--paper)}
+.citem[aria-current="true"]{background:var(--info-soft);box-shadow:inset 3px 0 0 var(--info);font-weight:600}
+.cdot{flex:none;width:9px;height:9px;border-radius:50%;margin-top:.45em;border:1.5px solid var(--line)}
+.citem.ok .cdot{background:var(--quiz);border-color:var(--quiz)}.citem.bad .cdot{background:var(--wrong);border-color:var(--wrong)}
+.cmain{min-width:0}
+.cnav{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.cnb{display:flex;gap:8px}
+@media (max-width:1180px){.codews{grid-template-columns:minmax(0,1fr)}.clist{position:static;max-height:none}.citems{flex-direction:row;overflow-x:auto;gap:6px;padding-bottom:4px}.cgh{display:none}.citem{flex:none;white-space:nowrap;border:1px solid var(--line)}}
 .fcex{margin:16px 0 0;font-family:var(--f-mono);font-size:.92rem;line-height:1.7;white-space:pre-wrap;word-break:break-word;background:var(--code-bg);border:1px solid var(--code-line);border-radius:12px;padding:12px 16px;color:var(--ink)}
 .qpanel:has(.fcsplit){max-width:none}
 .fcsplit{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:30px;align-items:start}
@@ -385,6 +401,7 @@ body:has(.fcsplit) .wrap{max-width:1720px}
   .pre code{padding:14px 14px}
   .opt{padding:12px 14px;font-size:1rem}
 }
+@media (max-width:540px){.tabs{overflow-x:auto;scrollbar-width:none}.tab .dot{display:none}.tab{padding:8px 4px;font-size:.86rem;gap:4px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
@@ -401,6 +418,7 @@ body:has(.fcsplit) .wrap{max-width:1720px}
     <nav class="tabs" role="tablist" aria-label="페이지">
       <button class="tab" role="tab" data-t="notes"><i class="dot"></i>강의정리</button>
       <button class="tab" role="tab" data-t="quiz"><i class="dot"></i>퀴즈</button>
+      <button class="tab" role="tab" data-t="code"><i class="dot"></i>코드 작성</button>
       <button class="tab" role="tab" data-t="wrong"><i class="dot"></i>오답노트<span class="badge" id="wbadge" hidden>0</span></button>
       <a class="tab vtab" href="motion/index.html"><i class="dot"></i>영상</a>
     </nav>
@@ -446,7 +464,7 @@ GEN.lb.forEach(b=>{const marks=[];b.s.replace(/⟦([^⟧]*)⟧/g,(m,g)=>{marks.p
 GEN.fc.forEach(f=>QB.push({id:qid("fc|"+f.t),t:"fc",ch:f.ch,q:f.t,d:f.d,tests:f.tests,sol:f.sol,h:f.h||[],exp:f.e||""}));
 const QMAP=Object.fromEntries(QB.map(q=>[q.id,q]));
 const TYPE={mc:"객관식",sa:"단답형",cb:"한 줄 코드",fc:"코드 작성"};
-const isSub=t=>t==="sa"||t==="cb"||t==="fc";
+const isSub=t=>t==="sa"||t==="cb";
 /* 질문 본문: 빈 줄 뒤는 코드로 보여 준다 */
 function qHTML(q){const i=q.indexOf("\n\n");if(i<0)return esc(q).replace(/\n/g,"<br>");return esc(q.slice(0,i))+preHTML(hlC(q.slice(i+2)),true);}
 
@@ -556,7 +574,7 @@ function showProg(tab){
   $$(".tab").forEach(t=>t.setAttribute("aria-selected",t.dataset.t===tab?"true":"false"));
   updateBadge();
   if(tab!=="notes")stopToc();
-  if(tab==="notes")renderNotes();else if(tab==="quiz")renderQuiz();else renderWrong();
+  if(tab==="notes")renderNotes();else if(tab==="quiz")renderQuiz();else if(tab==="code")renderCode();else renderWrong();
   window.scrollTo(0,0);fx(main);
 }
 
@@ -576,7 +594,7 @@ function renderNotes(){
   const chsw=NOTES.map(c=>`<button class="chbtn" data-c="${c.color}" data-id="${c.id}" aria-pressed="${c.id===curCh}"><small>${c.cap||"CHAPTER "+c.no}</small><b>${esc(c.title)}</b></button>`).join("");
   const toc=`<div class="lbl">${chs(ch)} 소단원</div>`+ch.sections.map((s,i)=>`<a href="#" data-sec="${s.id}"><span class="n">${String(i+1).padStart(2,"0")}</span><span>${esc(s.title)}</span></a>`).join("");
   const head=`<div class="ch-head"><div class="node">${chs(ch)}</div><div class="tt"><h2>${esc(ch.title)}</h2><p>${esc(ch.summary)}</p></div>
-    <div class="go"><button class="btn ghost sm" data-go="mc">${chs(ch)} 퀴즈 ${nMc}문제 →</button><button class="btn ghost sm" data-go="cb">${chs(ch)} 한 줄 코드 ${nCb}문제 →</button><button class="btn ghost sm" data-go="fc">${chs(ch)} 코드 작성 ${nFc}문제 →</button>${ch.short?"":`<a class="btn ghost sm" href="motion/index.html#ch${ch.no}">▶ ${ch.no}장 영상</a>`}${ch.id==="ch9"?'<a class="btn ghost sm" href="hanoi/index.html">▶ 하노이의 탑 실행 추적</a>':''}</div></div>`;
+    <div class="go"><button class="btn ghost sm" data-go="mc">${chs(ch)} 퀴즈 ${nMc}문제 →</button><button class="btn ghost sm" data-go="cb">${chs(ch)} 한 줄 코드 ${nCb}문제 →</button><button class="btn ghost sm" data-go="code">${chs(ch)} 코드 작성 ${nFc}문제 →</button>${ch.short?"":`<a class="btn ghost sm" href="motion/index.html#ch${ch.no}">▶ ${ch.no}장 영상</a>`}${ch.id==="ch9"?'<a class="btn ghost sm" href="hanoi/index.html">▶ 하노이의 탑 실행 추적</a>':''}</div></div>`;
   const body=ch.sections.map((s,i)=>`<section class="sec" id="sec-${s.id}">
       <div class="sec-h"><span class="pg">${ch.short||ch.no}-${i+1}</span><h3>${esc(s.title)}</h3>${s.en?`<span class="en">${esc(s.en)}</span>`:""}</div>
       ${s.blocks.map(renderBlock).join("")}</section>`).join("");
@@ -585,6 +603,7 @@ function renderNotes(){
   $$(".toc a").forEach(a=>a.onclick=e=>{e.preventDefault();const el=$("#sec-"+a.dataset.sec);if(el)el.scrollIntoView({behavior:"smooth",block:"start"});});
   $$("[data-go]").forEach(b=>b.onclick=()=>{
     run=null;
+    if(b.dataset.go==="code"){codeSt.ch=ch.id;codeSt.cur=null;save("cprog_code_ch",ch.id);location.hash="code";return;}
     if(b.dataset.go==="mc"){qsub="mc";setup.mc.ch=ch.id;}
     else{qsub="sa";setup.sa.ch=ch.id;setup.sa.type=b.dataset.go;}
     save("cprog_qsub",qsub);location.hash="quiz";
@@ -624,6 +643,7 @@ function chipRow(group,opts,cur){
   return '<div class="chips" data-group="'+group+'">'+opts.map(([v,l,ct])=>'<button class="chip" data-v="'+v+'" aria-pressed="'+(String(v)===String(cur))+'">'+l+(ct!=null?'<span class="ct">'+ct+'</span>':'')+'</button>').join("")+'</div>';
 }
 function renderSetup(){
+  if(setup.sa.type==="fc")setup.sa.type="all";
   const m=qsub,s=setup[m],p=poolFor(m);
   const base=QB.filter(q=>m==="mc"?q.t==="mc":isSub(q.t));
   const chOpts=[["all","전체",null]].concat(NOTES.map(c=>[c.id,chs(c),base.filter(q=>q.ch===c.id&&(m==="mc"||s.type==="all"||q.t===s.type)&&stOK(q,s.st)).length]));
@@ -634,17 +654,17 @@ function renderSetup(){
   h+='<div class="panel setup"><h2>'+(m==="mc"?"객관식 퀴즈":"주관식")+'</h2>';
   h+='<p class="sub">'+(m==="mc"
      ?"한 번에 한 문제씩 나옵니다. 문제 순서와 선택지 순서는 매번 섞이고, 틀린 문제는 오답노트에 자동 저장됩니다."
-     :"단답형은 용어·기호를 쓰는 문제, 한 줄 코드는 강의 전체 코드에서 핵심 한 줄을 직접 쓰는 문제(옆 주석이 그 줄의 동작을 알려 줍니다), 코드 작성은 문제를 읽고 프로그램 전체를 작성해 실제로 실행·채점하는 문제입니다. 한 줄 코드는 띄어쓰기를 무시하고 채점합니다.")+'</p>';
+     :"단답형은 용어·기호를 쓰는 문제, 한 줄 코드는 강의 전체 코드에서 핵심 한 줄을 직접 쓰는 문제(옆 주석이 그 줄의 동작을 알려 줍니다)입니다. 프로그램 전체를 직접 쓰는 문제는 위쪽 ‘코드 작성’ 탭에 따로 있어요. 한 줄 코드는 띄어쓰기를 무시하고 채점합니다.")+'</p>';
   h+='<div class="sprog"><div class="spbar"><i style="width:'+(all.length?nDone/all.length*100:0)+'%"></i></div><span>지금 조건에서 <b>'+nDone+'</b> / '+all.length+' 문제 풀었어요 · 마지막 채점 기준 정답 '+nOk+'</span></div>';
   h+='<div class="field"><span class="fl">풀이 상태</span>'+chipRow("st",[["new","안 푼 문제",all.length-nDone],["done","푼 문제",nDone],["all","전체",all.length]],s.st)+'</div>';
   h+='<div class="field"><span class="fl">단원</span>'+chipRow("ch",chOpts,s.ch)+'</div>';
   if(m==="sa"){
     const cnt=t=>base.filter(q=>q.t===t&&(s.ch==="all"||q.ch===s.ch)&&stOK(q,s.st)).length;
-    h+='<div class="field"><span class="fl">문제 유형</span>'+chipRow("type",[["all","전체",cnt("sa")+cnt("cb")+cnt("fc")],["sa","단답형",cnt("sa")],["cb","한 줄 코드",cnt("cb")],["fc","코드 작성",cnt("fc")]],s.type)+'</div>';
+    h+='<div class="field"><span class="fl">문제 유형</span>'+chipRow("type",[["all","전체",cnt("sa")+cnt("cb")],["sa","단답형",cnt("sa")],["cb","한 줄 코드",cnt("cb")]],s.type)+'</div>';
   }
   h+='<div class="field"><span class="fl">문제 수</span>'+chipRow("n",[[10,"10문제"],[20,"20문제"],["all","전부"]],s.n)+'</div>';
   const nCb=p.filter(q=>q.t==="cb").length,nSa=p.filter(q=>q.t==="sa").length,nFc=p.filter(q=>q.t==="fc").length;
-  h+='<div class="legend"><span>선택한 조건의 문제 <b>'+p.length+'</b>개'+(m==="sa"?' (단답형 '+nSa+' · 한 줄 코드 '+nCb+' · 코드 작성 '+nFc+')':'')+'</span><span>키보드: '+(m==="mc"?'1~4로 선택, ':'')+'Enter로 채점·다음'+(m==="sa"?' · 코드 작성은 Ctrl+Enter':'')+'</span></div>';
+  h+='<div class="legend"><span>선택한 조건의 문제 <b>'+p.length+'</b>개'+(m==="sa"?' (단답형 '+nSa+' · 한 줄 코드 '+nCb+')':'')+'</span><span>키보드: '+(m==="mc"?'1~4로 선택, ':'')+'Enter로 채점·다음'+""+'</span></div>';
   h+='<div class="actions">'+(!p.length&&s.st==="new"&&all.length?'<span class="hint" style="margin:0 auto 0 0">이 조건의 문제를 모두 풀었어요. ‘푼 문제’나 ‘전체’로 다시 풀 수 있어요.</span>':'')+'<button class="btn g" id="qstart"'+(p.length?"":" disabled")+'>시작하기 →</button></div></div>';
   $("#qroot").innerHTML=h;
   $$("#qroot .qsub button").forEach(b=>b.onclick=()=>{qsub=b.dataset.s;save("cprog_qsub",qsub);renderSetup();});
@@ -713,16 +733,16 @@ function fcResultHTML(q,r){
     '<div class="tg"><div><span class="tl">입력</span><pre>'+(x.in.trim()?esc(x.in.replace(/\n$/,"")):"(없음)")+'</pre></div><div><span class="tl">기대 출력</span><pre>'+esc(x.exp.replace(/\n$/,""))+'</pre></div><div><span class="tl">내 출력</span><pre>'+(x.out?esc(x.out.replace(/\n$/,"")):"(출력 없음)")+'</pre></div></div>'+errLine(x)+'</div>').join("")+'</div>';
   return h;
 }
-function bindEditor(q){
+function bindEditor(q,onSubmit){
   const ta=$("#fcode"),fin=$("#fin");
   ta.focus({preventScroll:true});
   const p=ta.value.indexOf("    \n    return");if(p>0&&!draftOf(q.id))ta.setSelectionRange(p+4,p+4);
-  const ed=window.VSEdit?VSEdit(ta,{highlight:hlC,onSubmit:()=>submit(),onRun:()=>$("#frun").click(),onChange:v=>saveDraft(q.id,v)}):null;
+  const ed=window.VSEdit?VSEdit(ta,{highlight:hlC,onSubmit:()=>(onSubmit||submit)(),onRun:()=>$("#frun").click(),onChange:v=>saveDraft(q.id,v)}):null;
   if(!ed)ta.addEventListener("input",()=>saveDraft(q.id,ta.value));
   $("#frun").onclick=()=>{const res=window.CMini.run(ta.value,fin.value+"\n");$("#fbox").hidden=false;
     $("#fout").innerHTML=esc(res.out||"")+(res.err?(res.out?'\n':'')+'<span class="perr">'+(res.phase==="compile"?"[컴파일 오류]":"[실행 오류]")+(res.line?" "+res.line+"번째 줄: ":" ")+esc(res.err)+'</span>':(res.out?"":"(출력 없음)"));};
   $("#freset").onclick=()=>{ta.value=FC_TEMPLATE;if(ed)ed.render();saveDraft(q.id,ta.value);ta.focus();};
-  const hb=$("#hintBtn");if(hb)hb.onclick=()=>{const l=$(".hlist",$("#qroot"));l.hidden=!l.hidden;hb.textContent=l.hidden?"힌트 보기":"힌트 숨기기";};
+  const hb=$("#hintBtn");if(hb)hb.onclick=()=>{const l=$(".hlist");l.hidden=!l.hidden;hb.textContent=l.hidden?"힌트 보기":"힌트 숨기기";};
 }
 function renderQ(){
   const q=curQ(),n=run.ids.length,r=run.res[q.id];
@@ -863,6 +883,53 @@ document.addEventListener("keydown",e=>{
   }
 });
 
+/* ================= CODE (코드 작성 따로) ================= */
+const codeSt={ch:load("cprog_code_ch","all"),st:"all",cur:load("cprog_code_cur",null),sol:false,res:null};
+const FCS=()=>QB.filter(q=>q.t==="fc");
+const cStat=id=>SOLVED[id]?(SOLVED[id].c?"ok":"bad"):"new";
+function codeList(){return FCS().filter(q=>(codeSt.ch==="all"||q.ch===codeSt.ch)&&(codeSt.st==="all"||cStat(q.id)===codeSt.st));}
+function renderCode(){
+  const all=FCS(),list=codeList();
+  if(!codeSt.cur||!QMAP[codeSt.cur]||QMAP[codeSt.cur].t!=="fc")codeSt.cur=(list[0]||all[0]).id;
+  const q=QMAP[codeSt.cur],nOk=all.filter(x=>cStat(x.id)==="ok").length;
+  const chips=(g,opts,cur)=>'<div class="chips sm" data-cg="'+g+'">'+opts.map(([v,l,c])=>'<button class="chip" data-v="'+v+'" aria-pressed="'+(v===cur)+'">'+l+(c!=null?'<span class="ct">'+c+'</span>':'')+'</button>').join("")+'</div>';
+  const chOpts=[["all","전체",all.length]].concat(NOTES.map(c=>[c.id,chs(c),all.filter(x=>x.ch===c.id).length]).filter(o=>o[2]));
+  const stOpts=[["all","전체",null],["new","안 푼",all.filter(x=>cStat(x.id)==="new").length],["bad","틀린",all.filter(x=>cStat(x.id)==="bad").length],["ok","맞힌",nOk]];
+  let items="",lastCh=null;
+  list.forEach(x=>{if(x.ch!==lastCh){lastCh=x.ch;items+='<div class="cgh">'+esc(chLabel(x.ch))+'</div>';}
+    items+='<button class="citem '+cStat(x.id)+'" data-id="'+x.id+'" aria-current="'+(x.id===q.id)+'"><span class="cdot"></span><span>'+esc(x.q)+'</span></button>';});
+  const idx=list.findIndex(x=>x.id===q.id),pv=list[idx-1],nx=list[idx+1];
+  main.innerHTML='<div class="codews"><aside class="clist panel"><div class="chd"><b>코드 작성</b><span>맞힌 문제 '+nOk+' / '+all.length+'</span></div>'+
+    '<div class="spbar"><i style="width:'+(nOk/all.length*100)+'%"></i></div>'+chips("ch",chOpts,codeSt.ch)+chips("st",stOpts,codeSt.st)+
+    '<div class="citems">'+(items||'<div class="hint" style="padding:8px">이 조건에 맞는 문제가 없어요.</div>')+'</div></aside>'+
+    '<section class="panel cmain"><div class="cnav"><div class="qmeta" style="margin:0"><span class="pill t">'+esc(chLabel(q.ch))+'</span><span class="pill ty">테스트 '+q.tests.length+'개</span>'+
+      (cStat(q.id)!=="new"?'<span class="pill '+(cStat(q.id)==="ok"?"ty":"")+'" style="'+(cStat(q.id)==="bad"?"color:var(--wrong);border-color:var(--wrong)":"")+'">'+(cStat(q.id)==="ok"?"✓ 맞힌 문제":"✗ 아직 못 맞힘")+'</span>':'')+'</div>'+
+      '<div class="cnb"><button class="btn ghost sm" id="cprev"'+(pv?"":" disabled")+'>← 이전</button><button class="btn ghost sm" id="cnext"'+(nx?"":" disabled")+'>다음 →</button></div></div>'+
+    '<div class="fcsplit"><div class="fcl"><div class="qtext">'+esc(q.q)+'</div>'+fcDesc(q.d,q.q)+'</div><div class="fcr">'+fcEditorHTML(q)+
+      '<div class="actions" style="margin-top:16px"><button class="btn ghost" id="csol">'+(codeSt.sol?"모범 답안 숨기기":"모범 답안 보기")+'</button><button class="btn g" id="cgrade">채점하기</button></div><div id="cres"></div></div></div></section></div>';
+  $$(".citem").forEach(b=>b.onclick=()=>openCode(b.dataset.id));
+  $$("[data-cg]").forEach(g=>g.onclick=e=>{const c=e.target.closest(".chip");if(!c)return;codeSt[g.dataset.cg]=c.dataset.v;if(g.dataset.cg==="ch")save("cprog_code_ch",codeSt.ch);
+    const l=codeList();if(l.length&&!l.some(x=>x.id===codeSt.cur))codeSt.cur=l[0].id;codeSt.res=null;codeSt.sol=false;renderCode();});
+  $("#cprev").onclick=()=>pv&&openCode(pv.id);$("#cnext").onclick=()=>nx&&openCode(nx.id);
+  $("#cgrade").onclick=gradeCode;
+  $("#csol").onclick=()=>{codeSt.sol=!codeSt.sol;$("#csol").textContent=codeSt.sol?"모범 답안 숨기기":"모범 답안 보기";drawCodeRes();};
+  bindEditor(q,gradeCode);drawCodeRes();
+  const cur=$(".citem[aria-current=true]");if(cur&&cur.scrollIntoView)cur.scrollIntoView({block:"nearest"});
+}
+function openCode(id){codeSt.cur=id;codeSt.res=null;codeSt.sol=false;save("cprog_code_cur",id);renderCode();window.scrollTo(0,0);}
+function gradeCode(){
+  const q=QMAP[codeSt.cur],code=$("#fcode").value;
+  const tests=q.tests.map(t=>{const r=window.CMini.run(code,t.in);return{in:t.in,exp:t.out,out:r.out,err:r.err,line:r.line,phase:r.phase,pass:!r.err&&outOK(r.out,t.out)};});
+  const ok=tests.every(x=>x.pass);markSolved(q.id,ok);codeSt.res={tests,ok};
+  saveDraft(q.id,code);renderCode();const r=$("#cres");if(r&&r.scrollIntoView)r.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+function drawCodeRes(){
+  const q=QMAP[codeSt.cur],r=codeSt.res;let h="";
+  if(r)h+='<div class="verdict '+(r.ok?"ok":"bad")+'">'+(r.ok?"✓ 모든 테스트 통과":"✗ "+r.tests.filter(x=>x.pass).length+" / "+r.tests.length+" 통과 — 고쳐서 다시 채점해 보세요")+'</div>'+fcResultHTML(q,{tests:r.tests});
+  if(codeSt.sol||(r&&r.ok))h+='<div class="exp">'+(codeSt.sol?'<h4>모범 답안</h4>'+preHTML(hlC(q.sol),true):'')+(q.exp?'<h4>해설</h4><div class="xp">'+esc(q.exp)+'</div>':'')+'</div>';
+  $("#cres").innerHTML=h;
+}
+
 /* ================= WRONG NOTES ================= */
 const wf={ch:"all",showRes:false,open:{},confirm:false};
 function answerHTML(q){
@@ -916,6 +983,7 @@ function route(){
   if(h==="notes"||h==="prog")showProg("notes");
   else if(h==="quiz")showProg("quiz");
   else if(h==="wrong")showProg("wrong");
+  else if(h==="code")showProg("code");
   else showHome();
 }
 $$(".tab[data-t]").forEach(t=>t.onclick=()=>{if(location.hash==="#"+t.dataset.t)route();else location.hash=t.dataset.t;});
