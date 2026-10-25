@@ -292,7 +292,10 @@ body:has(.fcsplit) .wrap{max-width:1720px}
 .codews.nolist{grid-template-columns:minmax(0,1fr)}.codews.nolist .clist{display:none}
 .codews:not(.nolist) #copen{display:none}
 .cnav{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
-.cnb{display:flex;gap:8px}
+.cnb{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.ctime{font-family:var(--f-mono);font-size:.92rem;color:var(--muted);padding:4px 12px;border:1px solid var(--line);border-radius:999px;background:var(--paper);white-space:nowrap;font-variant-numeric:tabular-nums}
+.ctime b{color:var(--ink);font-weight:600}.ctime.done{color:var(--quiz);border-color:var(--quiz);background:var(--quiz-soft)}.ctime.done b{color:var(--quiz)}
+.ctm{margin-left:auto;flex:none;font-family:var(--f-mono);font-size:.75rem;color:var(--quiz);padding-top:.15em}
 @media (max-width:1180px){.codews{grid-template-columns:minmax(0,1fr)}.clist{position:static;max-height:none}.citems{flex-direction:row;overflow-x:auto;gap:6px;padding-bottom:4px}.cgh{display:none}.citem{flex:none;white-space:nowrap;border:1px solid var(--line)}}
 .fcex{margin:16px 0 0;font-family:var(--f-mono);font-size:.92rem;line-height:1.7;white-space:pre-wrap;word-break:break-word;background:var(--code-bg);border:1px solid var(--code-line);border-radius:12px;padding:12px 16px;color:var(--ink)}
 .qpanel:has(.fcsplit){max-width:none}
@@ -889,6 +892,18 @@ document.addEventListener("keydown",e=>{
 /* ================= CODE (코드 작성 따로) ================= */
 const codeSt={hide:load("cprog_code_hide",false),ch:load("cprog_code_ch","all"),st:"all",cur:load("cprog_code_cur",null),sol:false,res:null};
 const FCS=()=>QB.filter(q=>q.t==="fc");
+/* 문제 푸는 시간: 문제를 열어 둔 동안(화면이 보일 때만) 초 단위로 누적, 처음 맞힌 순간 기록 */
+const TKEY="cprog_code_time";let TM=load(TKEY,{});if(!TM||typeof TM!=="object")TM={};
+let tmTick=null,tmDirty=0;
+const fmtT=s=>{s=Math.max(0,Math.floor(s||0));const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return (h?h+":"+String(m).padStart(2,"0"):m)+":"+String(x).padStart(2,"0");};
+const tmOf=id=>TM[id]||(TM[id]={t:0,done:null});
+function tmShow(){const el=$("#ctime");if(!el)return;const o=tmOf(codeSt.cur);
+  el.innerHTML=o.done!=null?'⏱ <b>'+fmtT(o.done)+'</b> 만에 맞힘':'⏱ <b>'+fmtT(o.t)+'</b>';el.classList.toggle("done",o.done!=null);}
+function tmStart(){clearInterval(tmTick);tmTick=setInterval(()=>{
+  if(curTab!=="code"||document.visibilityState!=="visible"||!$("#ctime"))return;
+  const o=tmOf(codeSt.cur);if(o.done!=null)return;o.t++;tmShow();if(++tmDirty>=5){tmDirty=0;save(TKEY,TM);}},1000);tmShow();}
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState!=="visible")save(TKEY,TM);});
+addEventListener("pagehide",()=>save(TKEY,TM));
 const cStat=id=>SOLVED[id]?(SOLVED[id].c?"ok":"bad"):"new";
 function codeList(){return FCS().filter(q=>(codeSt.ch==="all"||q.ch===codeSt.ch)&&(codeSt.st==="all"||cStat(q.id)===codeSt.st));}
 function renderCode(){
@@ -900,14 +915,14 @@ function renderCode(){
   const stOpts=[["all","전체",null],["new","안 푼",all.filter(x=>cStat(x.id)==="new").length],["bad","틀린",all.filter(x=>cStat(x.id)==="bad").length],["ok","맞힌",nOk]];
   let items="",lastCh=null;
   list.forEach(x=>{if(x.ch!==lastCh){lastCh=x.ch;items+='<div class="cgh">'+esc(chLabel(x.ch))+'</div>';}
-    items+='<button class="citem '+cStat(x.id)+'" data-id="'+x.id+'" aria-current="'+(x.id===q.id)+'"><span class="cdot"></span><span>'+esc(x.q)+'</span></button>';});
+    items+='<button class="citem '+cStat(x.id)+'" data-id="'+x.id+'" aria-current="'+(x.id===q.id)+'"><span class="cdot"></span><span>'+esc(x.q)+'</span>'+(TM[x.id]&&TM[x.id].done!=null?'<small class="ctm">'+fmtT(TM[x.id].done)+'</small>':'')+'</button>';});
   const idx=list.findIndex(x=>x.id===q.id),pv=list[idx-1],nx=list[idx+1];
   main.innerHTML='<div class="codews'+(codeSt.hide?" nolist":"")+'"><aside class="clist panel"><div class="chd"><b>코드 작성</b><span>맞힌 문제 '+nOk+' / '+all.length+'</span><button class="btn ghost sm" id="chide" title="문제 목록 닫기" aria-label="문제 목록 닫기">◀</button></div>'+
     '<div class="spbar"><i style="width:'+(nOk/all.length*100)+'%"></i></div>'+chips("ch",chOpts,codeSt.ch)+chips("st",stOpts,codeSt.st)+
     '<div class="citems">'+(items||'<div class="hint" style="padding:8px">이 조건에 맞는 문제가 없어요.</div>')+'</div></aside>'+
     '<section class="panel cmain"><div class="cnav"><button class="btn ghost sm" id="copen" aria-label="문제 목록 열기">☰ 문제 목록</button><div class="qmeta" style="margin:0 auto 0 0"><span class="pill t">'+esc(chLabel(q.ch))+'</span><span class="pill ty">테스트 '+q.tests.length+'개</span>'+
       (cStat(q.id)!=="new"?'<span class="pill '+(cStat(q.id)==="ok"?"ty":"")+'" style="'+(cStat(q.id)==="bad"?"color:var(--wrong);border-color:var(--wrong)":"")+'">'+(cStat(q.id)==="ok"?"✓ 맞힌 문제":"✗ 아직 못 맞힘")+'</span>':'')+'</div>'+
-      '<div class="cnb"><button class="btn ghost sm" id="cprev"'+(pv?"":" disabled")+'>← 이전</button><button class="btn ghost sm" id="cnext"'+(nx?"":" disabled")+'>다음 →</button></div></div>'+
+      '<div class="cnb"><span class="ctime" id="ctime" title="이 문제를 연 채로 보낸 시간 (다른 탭·창을 보는 동안은 멈춤)"></span><button class="btn ghost sm" id="creset" title="시간을 0부터 다시 잽니다">다시 재기</button><button class="btn ghost sm" id="cprev"'+(pv?"":" disabled")+'>← 이전</button><button class="btn ghost sm" id="cnext"'+(nx?"":" disabled")+'>다음 →</button></div></div>'+
     '<div class="fcsplit"><div class="fcl"><div class="qtext">'+esc(q.q)+'</div>'+fcDesc(q.d,q.q)+'</div><div class="fcr">'+fcEditorHTML(q)+
       '<div class="actions" style="margin-top:16px"><button class="btn ghost" id="csol">'+(codeSt.sol?"모범 답안 숨기기":"모범 답안 보기")+'</button><button class="btn g" id="cgrade">채점하기</button></div><div id="cres"></div></div></div></section></div>';
   $$(".citem").forEach(b=>b.onclick=()=>openCode(b.dataset.id));
@@ -915,6 +930,8 @@ function renderCode(){
     const l=codeList();if(l.length&&!l.some(x=>x.id===codeSt.cur))codeSt.cur=l[0].id;codeSt.res=null;codeSt.sol=false;renderCode();});
   $("#cprev").onclick=()=>pv&&openCode(pv.id);$("#cnext").onclick=()=>nx&&openCode(nx.id);
   $("#cgrade").onclick=gradeCode;
+  $("#creset").onclick=()=>{TM[q.id]={t:0,done:null};save(TKEY,TM);tmShow();const c=$('.citem[data-id="'+q.id+'"] .ctm');if(c)c.remove();};
+  tmStart();
   const tg=h=>{codeSt.hide=h;save("cprog_code_hide",h);$(".codews").classList.toggle("nolist",h);if(!h){const c=$(".citem[aria-current=true]");if(c)c.scrollIntoView({block:"nearest"});}};
   $("#chide").onclick=()=>tg(true);$("#copen").onclick=()=>tg(false);
   $("#csol").onclick=()=>{codeSt.sol=!codeSt.sol;$("#csol").textContent=codeSt.sol?"모범 답안 숨기기":"모범 답안 보기";drawCodeRes();};
@@ -925,12 +942,14 @@ function openCode(id){codeSt.cur=id;codeSt.res=null;codeSt.sol=false;save("cprog
 function gradeCode(){
   const q=QMAP[codeSt.cur],code=$("#fcode").value;
   const tests=q.tests.map(t=>{const r=window.CMini.run(code,t.in);return{in:t.in,exp:t.out,out:r.out,err:r.err,line:r.line,phase:r.phase,pass:!r.err&&outOK(r.out,t.out)};});
-  const ok=tests.every(x=>x.pass);markSolved(q.id,ok);codeSt.res={tests,ok};
+  const ok=tests.every(x=>x.pass);markSolved(q.id,ok);
+  const o=tmOf(q.id);if(ok&&o.done==null)o.done=o.t;save(TKEY,TM);
+  codeSt.res={tests,ok,time:o.done!=null?o.done:o.t};
   saveDraft(q.id,code);renderCode();const r=$("#cres");if(r&&r.scrollIntoView)r.scrollIntoView({behavior:"smooth",block:"nearest"});
 }
 function drawCodeRes(){
   const q=QMAP[codeSt.cur],r=codeSt.res;let h="";
-  if(r)h+='<div class="verdict '+(r.ok?"ok":"bad")+'">'+(r.ok?"✓ 모든 테스트 통과":"✗ "+r.tests.filter(x=>x.pass).length+" / "+r.tests.length+" 통과 — 고쳐서 다시 채점해 보세요")+'</div>'+fcResultHTML(q,{tests:r.tests});
+  if(r)h+='<div class="verdict '+(r.ok?"ok":"bad")+'">'+(r.ok?"✓ 모든 테스트 통과 · 걸린 시간 "+fmtT(r.time):"✗ "+r.tests.filter(x=>x.pass).length+" / "+r.tests.length+" 통과 — 고쳐서 다시 채점해 보세요")+'</div>'+fcResultHTML(q,{tests:r.tests});
   if(codeSt.sol||(r&&r.ok))h+='<div class="exp">'+(codeSt.sol?'<h4>모범 답안</h4>'+preHTML(hlC(q.sol),true):'')+(q.exp?'<h4>해설</h4><div class="xp">'+esc(q.exp)+'</div>':'')+'</div>';
   $("#cres").innerHTML=h;
 }
