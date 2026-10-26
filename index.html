@@ -332,6 +332,8 @@ body:has(.qwrap.ai) .wrap{max-width:1440px}
 .fnotes{margin:16px 0 0;padding:12px 16px 12px 36px;border-top:1px dashed var(--line);font-size:.92rem;line-height:1.65;color:var(--muted)}
 .fnotes li{margin:3px 0}.fnotes li::marker{color:var(--quiz);font-family:var(--f-mono);font-weight:700}
 .fcr{min-width:0}
+.tests.short5 .tg pre{max-height:calc(5 * 1.8em + 14px);overflow-y:auto}
+.out.short5 pre{max-height:calc(5 * 1.65em);overflow-y:auto}
 .fcr #fcode{min-height:440px}
 @media (max-width:900px){.fcsplit{grid-template-columns:minmax(0,1fr);gap:16px}.fcl{position:static;max-height:none;overflow:visible}.fcr #fcode{min-height:300px}}
 .qdesc{color:var(--muted);font-size:1.02rem;margin:0 0 14px;max-width:72ch}
@@ -754,15 +756,17 @@ function fcEditorHTML(q){
     '<div class="edkeys"><kbd>F5</kbd> 실행 · <kbd>Ctrl</kbd>+<kbd>Enter</kbd> 채점 · <kbd>for</kbd> <kbd>if</kbd> <kbd>while</kbd> <kbd>main</kbd> 입력 후 <kbd>Tab</kbd> 코드 조각 · <kbd>Ctrl</kbd>+<kbd>/</kbd> 주석 · <kbd>Ctrl</kbd>+<kbd>D</kbd> 줄 복제 · <kbd>Alt</kbd>+<kbd>↑↓</kbd> 줄 이동 · <kbd>Shift</kbd>+<kbd>Tab</kbd> 내어쓰기</div></div>';
   h+='<div class="runbox"><div class="rbh"><label for="fin">실행할 때 넣을 입력</label><button class="btn ghost sm" id="frun">▶ 실행해 보기</button><button class="btn ghost sm" id="freset">처음 코드로</button></div>'+
     '<textarea id="fin" rows="2" spellcheck="false" aria-label="표준 입력">'+esc(q.tests[0].in.replace(/\n$/,""))+'</textarea>'+
-    '<div class="out" id="fbox" hidden><span class="ol">실행 결과</span><pre id="fout"></pre></div></div>';
+    '<div class="out'+(isLongOut(q)?' short5':'')+'" id="fbox" hidden><span class="ol">실행 결과</span><pre id="fout"></pre></div></div>';
   if(q.h.length)h+='<div class="hints"><button class="btn ghost sm" id="hintBtn">힌트 보기</button><ul class="hlist" hidden>'+q.h.map((t,i)=>'<li><span class="c">'+CIRC[i]+'</span>'+esc(t)+'</li>').join("")+'</ul></div>';
   h+='<div class="hint">채점은 테스트 입력마다 내 프로그램을 실행해, 기대 출력의 각 줄이 내 출력에 순서대로 들어 있는지 비교합니다(공백·줄바꿈 무시). 입력 안내 문구는 출력해도 괜찮아요.</div>';
   return h;
 }
 function errLine(x){return x.err?'<div class="cerr"><b>'+(x.phase==="compile"?"컴파일 오류":"실행 오류")+(x.line?" · "+x.line+"번째 줄":"")+'</b> '+esc(x.err)+'</div>':'';}
+/* 출력이 긴 문제(369 게임)는 출력 칸을 5줄 높이로 제한하고 넘치면 스크롤 */
+const isLongOut=q=>/^369 게임/.test(q.q);
 function fcResultHTML(q,r){
   let h=r.code?'<h4 class="mini">내가 작성한 코드</h4>'+preHTML(hlC(r.code.replace(/\s+$/,"")),true):'';
-  h+='<div class="tests">'+r.tests.map((x,i)=>'<div class="trow '+(x.pass?"ok":"bad")+'"><div class="th"><b>테스트 '+(i+1)+'</b><span>'+(x.pass?"✓ 통과":"✗ 실패")+'</span></div>'+
+  h+='<div class="tests'+(isLongOut(q)?' short5':'')+'">'+r.tests.map((x,i)=>'<div class="trow '+(x.pass?"ok":"bad")+'"><div class="th"><b>테스트 '+(i+1)+'</b><span>'+(x.pass?"✓ 통과":"✗ 실패")+'</span></div>'+
     '<div class="tg"><div><span class="tl">입력</span><pre>'+(x.in.trim()?esc(x.in.replace(/\n$/,"")):"(없음)")+'</pre></div><div><span class="tl">기대 출력</span><pre>'+esc(x.exp.replace(/\n$/,""))+'</pre></div><div><span class="tl">내 출력</span><pre>'+(x.out?esc(x.out.replace(/\n$/,"")):"(출력 없음)")+'</pre></div></div>'+errLine(x)+'</div>').join("")+'</div>';
   return h;
 }
