@@ -688,7 +688,7 @@ const STOPS = [
              { at: [0, (AXIS_Y + MOTOR_Y) / 2, 0.3], t: "GT2 벨트", s: "200mm", dx: 130, dy: -10 }, { at: at(motorBody, [3.0, 1.6, -11.0]), t: "MY1016 모터", s: "24V 250W", dx: 60, dy: -110 }] },
   { key: "sensor", chip: "조향 센서", part: "ANGLE SENSOR", title: "조향각 센서",
     lead: "조향축 뒤쪽 끝에 지름 방향 자석을 붙이고, 1~2mm 떨어진 자리에 AS5600을 고정한다. 축과 1:1로 돌기 때문에 핸들 각도를 그대로 읽는다.",
-    specs: [["센서", "AS5600, 4096단계 / 회전"], ["분해능", "약 0.09°"], ["연결", "I2C (Leonardo D2, D3)"], ["간격", "자석과 센서 사이 1~2mm"]],
+    specs: [["센서", "AS5600 자기 각도 센서"], ["연결", "I2C (Leonardo D2, D3)"], ["간격", "자석과 센서 사이 1~2mm"]],
     note: "센서 브래킷은 프레임과 같은 집성목으로 만든다.",
     cam: [24, 24, -13], target: [0, 20, -11.1], focus: ["sensor", "magnet"], ghost: ["bracket", "motor", "plateBack"], anim: "steer",
     labels: [{ at: [0.42, AXIS_Y + 0.2, -10.62], t: "자석", s: "N·S 2극", dx: 80, dy: -110 }, { at: at(asBoard, [1.15, AXIS_Y + 0.8, AS_Z]), t: "AS5600", s: "I2C", dx: 120, dy: 40 },
