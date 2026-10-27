@@ -3,867 +3,103 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>FFB 휠 3D 설계도</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
+<title>포스 피드백 레이싱 휠</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <style>
-/* Layout: CAD viewport. Full-bleed 3D canvas, spec sheet docked bottom-left, stop rail on top. Single light look on purpose (projector). */
-:root {
-  --sky-top: #E8EDF1;
-  --sky-bottom: #C9D2D9;
-  --ink: #1C2228;
-  --ink-soft: #55606B;
-  --rule: #C3CBD2;
-  --paper: #FFFFFF;
-  --accent: #C8102E;
-  --accent-ink: #FFFFFF;
-  --planned: #9A6B00;
-  --font-ui: "IBM Plex Sans KR", "Malgun Gothic", "Apple SD Gothic Neo", system-ui, sans-serif;
-  --font-data: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
-  color-scheme: light;
-}
-html, body { height: 100%; }
-body {
-  margin: 0; overflow: hidden;
-  background: linear-gradient(180deg, var(--sky-top), var(--sky-bottom));
-  color: var(--ink); font-family: var(--font-ui); font-size: 15px;
-  -webkit-font-smoothing: antialiased;
-}
-#stage { position: fixed; inset: 0; }
-#stage canvas { display: block; width: 100%; height: 100%; touch-action: none; }
-#leaders { position: fixed; inset: 0; pointer-events: none; overflow: visible; }
-#labels { position: fixed; inset: 0; pointer-events: none; }
-.tag {
-  position: absolute; transform: translate(-50%, -50%);
-  background: var(--paper); color: var(--ink);
-  border: 1px solid var(--ink); padding: 3px 8px;
-  font-size: 13px; font-weight: 500; white-space: nowrap; line-height: 1.35;
-  transition: opacity .25s;
-}
-.tag small { display: block; font-family: var(--font-data); font-size: 11px; color: var(--ink-soft); font-weight: 400; }
-.tag.planned { border-style: dashed; border-color: var(--planned); }
-.tag.planned small { color: var(--planned); }
-.dot { position: absolute; width: 7px; height: 7px; margin: -3.5px 0 0 -3.5px; background: var(--accent); border: 1.5px solid var(--paper); border-radius: 50%; }
-
-header.rail {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 3;
-  display: flex; align-items: center; gap: 16px;
-  padding-top: calc(12px + env(safe-area-inset-top, 0px)); padding-bottom: 12px;
-  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
-  pointer-events: none;
-}
-.brand { font-weight: 700; font-size: 14px; letter-spacing: .02em; white-space: nowrap; }
-.brand span { font-family: var(--font-data); font-weight: 400; color: var(--ink-soft); margin-left: 8px; font-size: 12px; }
-.stops { display: flex; gap: 4px; flex-wrap: wrap; pointer-events: auto; margin-left: auto; }
-.stops button {
-  font: inherit; font-size: 12.5px; border: 1px solid var(--rule); background: rgba(255,255,255,.72);
-  color: var(--ink-soft); padding: 5px 10px; cursor: pointer; border-radius: 2px;
-}
-.stops button[aria-current="step"] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
-.stops button:focus-visible, .nav button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-
-aside.sheet {
-  position: fixed; z-index: 3;
-  left: max(24px, calc(16px + env(safe-area-inset-left, 0px)));
-  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
-  width: min(400px, calc(100vw - 48px));
-  background: var(--paper); border: 1px solid var(--ink);
-  box-shadow: 6px 6px 0 rgba(28,34,40,.12);
-}
-.sheet .head { display: flex; align-items: baseline; justify-content: space-between; padding: 14px 18px 0; }
-.sheet .count { font-family: var(--font-data); font-size: 12px; color: var(--ink-soft); }
-.sheet .part { font-size: 12px; color: var(--accent); font-weight: 700; letter-spacing: .06em; }
-.sheet h1 { margin: 6px 18px 0; font-size: 26px; line-height: 1.25; font-weight: 700; text-wrap: balance; }
-.sheet p.lead { margin: 10px 18px 0; font-size: 15px; line-height: 1.6; color: var(--ink); max-width: 60ch; }
-.sheet dl { margin: 14px 0 0; border-top: 1px solid var(--rule); display: grid; grid-template-columns: max-content 1fr; }
-.sheet dt, .sheet dd { margin: 0; padding: 8px 18px; border-bottom: 1px solid var(--rule); font-size: 13.5px; line-height: 1.45; }
-.sheet dt { color: var(--ink-soft); padding-right: 6px; }
-.sheet dd { font-family: var(--font-data); font-size: 13px; padding-left: 6px; min-width: 0; }
-.sheet ol.flow { list-style: none; margin: 14px 0 0; padding: 0; border-top: 1px solid var(--rule); counter-reset: f; }
-.sheet ol.flow li { counter-increment: f; display: grid; grid-template-columns: 28px 1fr; gap: 6px; padding: 8px 18px; border-bottom: 1px solid var(--rule); font-size: 14px; color: var(--ink-soft); transition: background .2s, color .2s; }
-.sheet ol.flow li::before { content: counter(f); font-family: var(--font-data); font-weight: 500; }
-.sheet ol.flow li b { color: var(--ink); font-weight: 700; }
-.sheet ol.flow li.on { background: var(--accent); color: var(--accent-ink); }
-.sheet ol.flow li.on b { color: var(--accent-ink); }
-.sheet .note { margin: 0; padding: 10px 18px 14px; font-size: 13px; line-height: 1.55; color: var(--ink-soft); }
-.sheet .note:empty { display: none; }
-.sheet .note.warn { color: var(--planned); }
-
-.nav {
-  position: fixed; z-index: 3; display: flex; align-items: center; gap: 8px;
-  right: max(24px, calc(16px + env(safe-area-inset-right, 0px)));
-  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
-}
-.nav .hint { font-size: 12.5px; color: var(--ink-soft); margin-right: 6px; }
-.nav kbd { font-family: var(--font-data); font-size: 11.5px; border: 1px solid var(--ink-soft); border-bottom-width: 2px; padding: 1px 6px; background: var(--paper); color: var(--ink); }
-.nav button {
-  font: inherit; font-size: 14px; min-width: 44px; height: 40px; padding: 0 14px; cursor: pointer;
-  border: 1px solid var(--ink); background: var(--paper); color: var(--ink);
-}
-.nav button.primary { background: var(--ink); color: var(--paper); }
-.nav button:disabled { opacity: .35; cursor: default; }
-.nav button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
-#loading { position: fixed; inset: 0; display: grid; place-items: center; font-family: var(--font-data); color: var(--ink-soft); font-size: 13px; z-index: 2; }
-
-@media (max-width: 760px) {
-  header.rail .stops { display: none; }
-  aside.sheet { left: 0; right: 0; bottom: 0; width: auto; box-shadow: none; border-width: 1px 0 0;
-    padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)); padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); }
-  .sheet h1 { font-size: 21px; }
-  .sheet p.lead { font-size: 14px; }
-  .sheet dl, .sheet .note { display: none; }
-  .sheet ol.flow li { padding-block: 5px; font-size: 13px; }
-  .nav { bottom: calc(12px + env(safe-area-inset-bottom, 0px)); right: max(16px, env(safe-area-inset-right, 0px)); }
-  .nav .hint, #fs { display: none; }
-  .nav button { padding: 0 10px; }
-  .tag { font-size: 11.5px; padding: 2px 6px; }
-  .tag small { display: none; }
-}
-@media (prefers-reduced-motion: reduce) { .tag, .sheet ol.flow li { transition: none; } }
+:root { --ink:#111; --soft:#777; --rule:#d6d6d6; --bg:#fff; --stage:#f4f4f4; --font:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif; }
+* { box-sizing:border-box; }
+html,body { height:100%; margin:0; }
+body { background:var(--bg); color:var(--ink); font-family:var(--font); display:flex; flex-direction:column; }
+header { display:flex; align-items:flex-end; gap:32px; padding:18px max(24px,env(safe-area-inset-right)) 0 max(24px,env(safe-area-inset-left)); border-bottom:1px solid var(--ink); flex-wrap:wrap; }
+header h1 { margin:0 0 14px; font-size:20px; font-weight:700; letter-spacing:-.01em; }
+nav { display:flex; gap:24px; }
+nav button { font:inherit; font-size:15px; background:none; border:0; padding:0 0 13px; color:var(--soft); cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; }
+nav button[aria-selected="true"] { color:var(--ink); font-weight:700; border-bottom-color:var(--ink); }
+nav button:focus-visible, .bar button:focus-visible, .bar a:focus-visible { outline:2px solid var(--ink); outline-offset:3px; }
+main { flex:1; min-height:0; position:relative; }
+section { position:absolute; inset:0; display:flex; flex-direction:column; }
+section[hidden] { display:none; }
+#slides .stage { flex:1; min-height:0; container-type:size; display:flex; align-items:center; justify-content:center; padding:24px; background:var(--stage); }
+#slides img { width:min(100cqw, 100cqh * 16 / 9); height:auto; display:block; background:#fff; box-shadow:0 1px 2px rgba(0,0,0,.08),0 8px 24px rgba(0,0,0,.06); }
+#slides .stage:fullscreen { padding:0; background:#fff; }
+#slides .stage:fullscreen img { box-shadow:none; }
+.bar { display:flex; align-items:center; gap:16px; padding:12px max(24px,env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) max(24px,env(safe-area-inset-left)); border-top:1px solid var(--rule); font-size:14px; flex-wrap:wrap; }
+.bar button, .bar a { font:inherit; font-size:14px; background:none; border:1px solid var(--rule); color:var(--ink); padding:7px 14px; cursor:pointer; text-decoration:none; }
+.bar button:disabled { color:#bbb; cursor:default; }
+.bar .count { font-variant-numeric:tabular-nums; color:var(--soft); min-width:48px; text-align:center; }
+.bar .spacer { flex:1; }
+.notes { border-top:1px solid var(--rule); padding:14px max(24px,env(safe-area-inset-right)) 18px max(24px,env(safe-area-inset-left)); font-size:15px; line-height:1.7; color:#333; max-height:30vh; overflow:auto; }
+.notes p { margin:0; max-width:70ch; }
+#sim iframe { flex:1; width:100%; border:0; display:block; }
+@media (max-width:600px) { header { gap:12px; } header h1 { font-size:17px; margin-bottom:10px; } #slides .stage { padding:12px; } .bar { gap:8px; } .hint { display:none; } }
 </style>
 </head>
 <body>
-
-<div id="stage"></div>
-<svg id="leaders" aria-hidden="true"></svg>
-<div id="labels" aria-hidden="true"></div>
-<div id="loading">3D 모델 불러오는 중…</div>
-
-<header class="rail">
-  <div class="brand">DIY FFB 레이싱 휠<span>3D 구현 설계</span></div>
-  <nav class="stops" id="stops" aria-label="카메라 위치"></nav>
+<header>
+  <h1>포스 피드백 레이싱 휠</h1>
+  <nav role="tablist" aria-label="보기 선택">
+    <button role="tab" id="tab-slides" aria-controls="slides" aria-selected="true">발표 자료</button>
+    <button role="tab" id="tab-sim" aria-controls="sim" aria-selected="false">3D 시뮬레이션</button>
+  </nav>
 </header>
-
-<aside class="sheet" id="sheet" aria-live="polite">
-  <div class="head"><span class="part" id="part"></span><span class="count" id="count"></span></div>
-  <h1 id="title"></h1>
-  <p class="lead" id="lead"></p>
-  <div id="body"></div>
-  <p class="note" id="note"></p>
-</aside>
-
-<div class="nav">
-  <span class="hint"><kbd>Space</kbd> 다음 · <kbd>←</kbd> 이전 · <kbd>X</kbd> 분해</span>
-  <button id="explode" type="button" aria-pressed="false" title="X 키">분해 보기</button>
-  <button id="fs" type="button" title="전체 화면">전체 화면</button>
-  <button id="prev" type="button" aria-label="이전 장면">←</button>
-  <button id="next" type="button" class="primary" aria-label="다음 장면">다음 →</button>
-</div>
-
-<script type="importmap">
-{ "imports": {
-  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
-} }
-</script>
-<script type="module">
-import * as THREE from "three";
-import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
-import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
-import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
-import { OutlinePass } from "three/addons/postprocessing/OutlinePass.js";
-import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
-
-const ACCENT = 0xC8102E;
-const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
-const SHOT = window.__SHOT === true;
-
-/* ---------- renderer / scene ---------- */
-const stage = document.getElementById("stage");
-const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
-renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.05;
-stage.appendChild(renderer.domElement);
-
-const scene = new THREE.Scene();
-const pmrem = new THREE.PMREMGenerator(renderer);
-scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-
-const camera = new THREE.PerspectiveCamera(36, 1, 1, 2000);
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
-controls.dampingFactor = 0.08;
-controls.minDistance = 10;
-controls.maxDistance = 420;
-
-scene.add(new THREE.HemisphereLight(0xffffff, 0xaab4bd, 1.0));
-const sun = new THREE.DirectionalLight(0xffffff, 2.3);
-sun.position.set(70, 140, 90);
-sun.castShadow = true;
-sun.shadow.mapSize.set(4096, 4096);
-Object.assign(sun.shadow.camera, { left: -120, right: 120, top: 120, bottom: -120, near: 10, far: 400 });
-sun.shadow.bias = -0.0003;
-sun.shadow.normalBias = 0.02;
-scene.add(sun);
-const fill = new THREE.DirectionalLight(0xdfe8f0, 0.8);
-fill.position.set(-90, 40, 60);
-scene.add(fill);
-const rimLight = new THREE.DirectionalLight(0xffffff, 0.6);
-rimLight.position.set(0, 60, -120);
-scene.add(rimLight);
-
-/* ---------- textures ---------- */
-function canvasTex(w, h, draw, repeat) {
-  const c = document.createElement("canvas"); c.width = w; c.height = h;
-  draw(c.getContext("2d"), w, h);
-  const t = new THREE.CanvasTexture(c);
-  t.colorSpace = THREE.SRGBColorSpace;
-  t.anisotropy = 8;
-  if (repeat) { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(repeat[0], repeat[1]); }
-  return t;
-}
-let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-scene.background = canvasTex(4, 512, (g, w, h) => {
-  const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, "#E8EDF1"); gr.addColorStop(1, "#C6CFD7");
-  g.fillStyle = gr; g.fillRect(0, 0, w, h);
-});
-const woodTex = canvasTex(512, 512, (g, w, h) => {
-  g.fillStyle = "#C99A62"; g.fillRect(0, 0, w, h);
-  for (let i = 0; i < 90; i++) {
-    const y = rnd() * h, a = 2 + rnd() * 6, f = 0.004 + rnd() * 0.01, ph = rnd() * 6;
-    g.strokeStyle = `rgba(${110 + rnd() * 30},${70 + rnd() * 20},35,${0.12 + rnd() * 0.18})`;
-    g.lineWidth = 0.6 + rnd() * 1.8; g.beginPath();
-    for (let x = 0; x <= w; x += 8) g.lineTo(x, y + Math.sin(x * f + ph) * a);
-    g.stroke();
-  }
-  for (let i = 0; i < 7; i++) { g.fillStyle = "rgba(255,240,215,.07)"; g.fillRect(0, rnd() * h, w, 10 + rnd() * 40); }
-}, [1, 1]);
-const threadTex = canvasTex(16, 64, (g, w, h) => {
-  for (let y = 0; y < h; y += 4) { g.fillStyle = "#d2d6d9"; g.fillRect(0, y, w, 2); g.fillStyle = "#7d8489"; g.fillRect(0, y + 2, w, 2); }
-}, [1, 20]);
-const perfTex = canvasTex(256, 256, (g, w, h) => {
-  g.fillStyle = "#c7ccd0"; g.fillRect(0, 0, w, h);
-  g.fillStyle = "#4b5258";
-  for (let y = 8; y < h; y += 16) for (let x = 8 + ((y / 16) % 2) * 8; x < w; x += 16) { g.beginPath(); g.arc(x, y, 3.2, 0, 7); g.fill(); }
-}, [3, 2]);
-const gripTex = canvasTex(2048, 128, (g, w, h) => {
-  g.fillStyle = "#26282b"; g.fillRect(0, 0, w, h);
-  for (let i = 0; i < 9000; i++) { g.fillStyle = `rgba(255,255,255,${rnd() * 0.035})`; g.fillRect(rnd() * w, rnd() * h, 2, 2); }
-  g.strokeStyle = "#8d949b"; g.lineWidth = 3; g.setLineDash([10, 8]);
-  [h * 0.22, h * 0.78].forEach(y => { g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke(); });
-});
-gripTex.wrapS = THREE.RepeatWrapping;
-function pcbTex(bg, text, sub) {
-  return canvasTex(512, 384, (g, w, h) => {
-    g.fillStyle = bg; g.fillRect(0, 0, w, h);
-    g.strokeStyle = "rgba(255,255,255,.18)"; g.lineWidth = 3;
-    for (let i = 0; i < 14; i++) { g.beginPath(); const y = 40 + i * 24; g.moveTo(30, y); g.lineTo(200 + rnd() * 200, y); g.lineTo(260 + rnd() * 200, y + 40); g.stroke(); }
-    g.fillStyle = "rgba(255,255,255,.92)"; g.font = "bold 54px monospace"; g.fillText(text, 34, h - 70);
-    if (sub) { g.font = "30px monospace"; g.fillText(sub, 36, h - 28); }
-  });
-}
-const motorLabelTex = canvasTex(1024, 128, (g, w, h) => {
-  g.fillStyle = "#f2f2ee"; g.fillRect(0, 0, w, h);
-  g.fillStyle = "#1c2228"; g.font = "bold 64px monospace"; g.fillText("MY1016  24V 250W", 40, 86);
-  g.fillStyle = "#C8102E"; g.fillRect(800, 30, 160, 68);
-});
-const screenTex = canvasTex(1024, 576, (g, w, h) => {
-  const sky = g.createLinearGradient(0, 0, 0, h * .5); sky.addColorStop(0, "#5f8fb8"); sky.addColorStop(1, "#c8dbe8");
-  g.fillStyle = sky; g.fillRect(0, 0, w, h * .5);
-  g.fillStyle = "#6f8f5a"; g.fillRect(0, h * .5, w, h * .5);
-  g.fillStyle = "#3d4247"; g.beginPath(); g.moveTo(w * .47, h * .5); g.lineTo(w * .53, h * .5); g.lineTo(w * .95, h); g.lineTo(w * .05, h); g.fill();
-  for (let i = 0; i < 12; i++) { const t0 = i / 12, t1 = (i + .5) / 12; g.fillStyle = i % 2 ? "#ffffff" : "#d11"; const k = t => [w * .47 - (w * .42) * t, h * .5 + h * .5 * t];
-    const a = k(t0 * t0), b = k(t1 * t1); g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); g.lineTo(b[0] - 26 * t1, b[1]); g.lineTo(a[0] - 26 * t0, a[1]); g.fill(); }
-  g.strokeStyle = "#f1f1f1"; g.lineWidth = 4; g.setLineDash([30, 30]); g.beginPath(); g.moveTo(w * .5, h * .52); g.lineTo(w * .5, h); g.stroke(); g.setLineDash([]);
-  g.fillStyle = "rgba(10,12,14,.72)"; g.fillRect(36, h - 108, 300, 72);
-  g.fillStyle = "#fff"; g.font = "bold 26px monospace"; g.fillText("FFB", 52, h - 64);
-  g.fillStyle = "#333"; g.fillRect(122, h - 86, 196, 26); g.fillStyle = "#C8102E"; g.fillRect(122, h - 86, 128, 26);
-  g.fillStyle = "#fff"; g.font = "bold 44px monospace"; g.fillText("3", w - 90, h - 48);
-});
-const floorTex = canvasTex(1024, 1024, (g, w, h) => {
-  const step = 32;
-  g.strokeStyle = "rgba(60,72,84,.16)"; g.lineWidth = 1;
-  for (let i = 0; i <= w; i += step) { g.beginPath(); g.moveTo(i + .5, 0); g.lineTo(i + .5, h); g.stroke(); g.beginPath(); g.moveTo(0, i + .5); g.lineTo(w, i + .5); g.stroke(); }
-  g.strokeStyle = "rgba(60,72,84,.28)";
-  for (let i = 0; i <= w; i += step * 5) { g.beginPath(); g.moveTo(i + .5, 0); g.lineTo(i + .5, h); g.stroke(); g.beginPath(); g.moveTo(0, i + .5); g.lineTo(w, i + .5); g.stroke(); }
-  g.globalCompositeOperation = "destination-in";
-  const r = g.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, w / 2);
-  r.addColorStop(0, "rgba(0,0,0,1)"); r.addColorStop(.55, "rgba(0,0,0,.9)"); r.addColorStop(1, "rgba(0,0,0,0)");
-  g.fillStyle = r; g.fillRect(0, 0, w, h);
-});
-
-/* ---------- part registry ---------- */
-const tagged = new Map();
-function tag(obj, ...names) { obj.traverse(o => { if (o.isMesh) names.forEach(n => { if (!tagged.has(n)) tagged.set(n, new Set()); tagged.get(n).add(o); }); }); return obj; }
-const meshesOf = names => { const s = new Set(); names.forEach(n => (tagged.get(n) || []).forEach(m => s.add(m))); return s; };
-function mat(color, o = {}) { return new THREE.MeshStandardMaterial(Object.assign({ color, roughness: .55, metalness: 0, envMapIntensity: .75 }, o)); }
-const M = {
-  wood: () => mat(0xffffff, { map: woodTex, roughness: .78 }),
-  steel: () => mat(0xc4c9cd, { metalness: .9, roughness: .3 }),
-  zinc: () => mat(0xb9bec2, { metalness: .85, roughness: .38 }),
-  thread: () => mat(0xffffff, { map: threadTex.clone(), metalness: .85, roughness: .4 }),
-  alu: () => mat(0xd5d9dc, { metalness: .85, roughness: .26 }),
-  black: () => mat(0x1d1f22, { roughness: .7 }),
-  rubber: () => mat(0x26282b, { roughness: .9 }),
-};
-function mesh(geo, material, parent, pos = [0, 0, 0], rot) {
-  const m = new THREE.Mesh(geo, material);
-  m.position.set(...pos); if (rot) m.rotation.set(...rot);
-  m.castShadow = true; m.receiveShadow = true;
-  (parent || scene).add(m); return m;
-}
-const box = (w, h, d) => new THREE.BoxGeometry(w, h, d);
-const cyl = (r, l, seg = 32, r2) => new THREE.CylinderGeometry(r2 ?? r, r, l, seg);
-const Z = [Math.PI / 2, 0, 0], X = [0, 0, Math.PI / 2];
-const rotFor = a => a === "z" ? Z : a === "x" ? X : [0, 0, 0];
-const offFor = (a, d) => a === "z" ? [0, 0, d] : a === "x" ? [d, 0, 0] : [0, d, 0];
-
-function nut(parent, pos, axis = "z") {
-  const g = new THREE.Group(); g.position.set(...pos);
-  mesh(cyl(0.75, 0.62, 6), M.zinc(), g, [0, 0, 0], rotFor(axis));
-  mesh(cyl(0.7, 0.06, 6, 0.6), M.zinc(), g, offFor(axis, 0.34), rotFor(axis));
-  mesh(cyl(0.86, 0.15, 28), M.steel(), g, offFor(axis, -0.4), rotFor(axis));
-  parent.add(g); return g;
-}
-function rod(parent, len, pos, axis = "z") {
-  const m = mesh(cyl(0.4, len, 18), M.thread(), parent, pos, rotFor(axis));
-  m.material.map.repeat.set(1, len * 1.25);
-  return m;
-}
-function bearing(parent, pos, axis = "z") {
-  const g = new THREE.Group(); g.position.set(...pos);
-  const r = rotFor(axis);
-  mesh(new THREE.TorusGeometry(1.0, 0.12, 12, 40), M.steel(), g, [0, 0, 0], axis === "x" ? [0, Math.PI / 2, 0] : [0, 0, 0]);
-  mesh(cyl(1.1, 0.7, 40), M.steel(), g, [0, 0, 0], r);
-  mesh(cyl(0.92, 0.72, 40), mat(0x2a2f35, { roughness: .45 }), g, [0, 0, 0], r);
-  mesh(cyl(0.6, 0.74, 32), M.steel(), g, [0, 0, 0], r);
-  parent.add(g); return g;
-}
-
-/* ---------- desk, floor, room props ---------- */
-const FLOOR = -72;
-const floor = new THREE.Mesh(new THREE.PlaneGeometry(520, 520), new THREE.MeshStandardMaterial({ map: floorTex, transparent: true, depthWrite: false, roughness: 1 }));
-floor.rotation.x = -Math.PI / 2; floor.position.y = FLOOR; scene.add(floor);
-const shadowCatcher = new THREE.Mesh(new THREE.PlaneGeometry(520, 520), new THREE.ShadowMaterial({ opacity: .16 }));
-shadowCatcher.rotation.x = -Math.PI / 2; shadowCatcher.position.y = FLOOR + 0.02; shadowCatcher.receiveShadow = true; scene.add(shadowCatcher);
-
-const desk = new THREE.Group(); scene.add(desk);
-mesh(box(140, 3, 65), mat(0xe9eaeb, { roughness: .6 }), desk, [0, -1.5, -22.5]);
-[[-66, -51], [66, -51], [-66, 6], [66, 6]].forEach(([x, z]) => mesh(box(3.5, 69, 3.5), mat(0x5a6168, { metalness: .6, roughness: .4 }), desk, [x, -37.5, z]));
-
-const monitor = new THREE.Group(); scene.add(monitor);
-mesh(box(24, 1, 14), M.black(), monitor, [0, 0.5, -44]);
-mesh(box(4, 12, 2), M.black(), monitor, [0, 7, -46]);
-mesh(box(64, 37, 2.4), M.black(), monitor, [0, 29, -44.5]);
-const screen = mesh(new THREE.PlaneGeometry(61, 34), new THREE.MeshBasicMaterial({ map: screenTex, toneMapped: false }), monitor, [0, 29, -43.25]);
-screen.castShadow = false;
-tag(monitor, "monitor");
-
-const pc = new THREE.Group(); scene.add(pc);
-mesh(box(20, 42, 42), mat(0x2b3036, { roughness: .45, metalness: .3 }), pc, [-86, FLOOR + 21, -24]);
-mesh(box(0.3, 30, 2), mat(0x9aa3ab), pc, [-75.9, FLOOR + 24, -6]);
-tag(pc, "pc");
-
-/* ---------- explode registry ---------- */
-const explodables = [];
-const exp = (obj, dz) => { explodables.push({ obj, base: obj.position.clone(), d: new THREE.Vector3(0, 0, dz) }); return obj; };
-
-/* ---------- wheel base frame ---------- */
-const AXIS_Y = 20, MOTOR_Y = AXIS_Y - 5.86;
-const base = new THREE.Group(); scene.add(base);
-mesh(box(26, 1.5, 32), M.wood(), base, [0, 0.75, -4]);
-const plateFront = new THREE.Group(), plateBack = new THREE.Group();
-[[plateFront, 6], [plateBack, -6]].forEach(([g, z]) => {
-  g.position.z = z; base.add(g);
-  mesh(box(18, 26, 1.5), M.wood(), g, [0, 14.5, 0]);
-  mesh(cyl(1.14, 1.52, 40), mat(0x6b4e2e, { roughness: .9 }), g, [0, AXIS_Y, 0], Z);
-  for (const x of [-6.5, 0, 6.5]) mesh(cyl(0.45, 0.2, 12), M.steel(), g, [x, 2.2, z > 0 ? 0.8 : -0.8], Z);
-  bearing(g, [0, AXIS_Y, z > 0 ? 0.4 : -0.4]);
-});
-tag(plateFront, "plateFront", "plates"); tag(plateBack, "plateBack", "plates");
-tag(plateFront.children[plateFront.children.length - 1], "bearings"); tag(plateBack.children[plateBack.children.length - 1], "bearings");
-exp(plateFront, 7); exp(plateBack, -6);
-const rods = new THREE.Group(); base.add(rods);
-[[-7.5, 3.8], [7.5, 3.8], [-7.5, 25.5], [7.5, 25.5]].forEach(([x, y]) => {
-  rod(rods, 17, [x, y, 0]);
-  [-7.1, -4.9].forEach(z => exp(nut(rods, [x, y, z]), -6));
-  [4.9, 7.1].forEach(z => exp(nut(rods, [x, y, z]), 7));
-});
-tag(rods, "rods");
-const riserH = MOTOR_Y - 3.4 - 1.5;
-const riser = exp(mesh(box(9, riserH, 9), M.wood(), base, [0, 1.5 + riserH / 2, -12.5]), -10);
-tag(riser, "riser");
-
-/* ---------- steering assembly (rotates) ---------- */
-const steer = new THREE.Group(); steer.position.set(0, AXIS_Y, 0); scene.add(steer);
-const shaft = new THREE.Group(); steer.add(shaft);
-rod(shaft, 23, [0, 0, 1]);
-[[7.1, 7], [7.6, 7], [-7.1, -6], [-7.6, -6], [11.2, 13], [13.4, 13]].forEach(([z, dz]) => exp(nut(shaft, [0, 0, z]), dz));
-tag(shaft, "shaft");
-
-const P60 = 60 * 0.2 / (2 * Math.PI), P20 = 20 * 0.2 / (2 * Math.PI);
-function pulley(parent, teeth, pitchR, pos) {
-  const g = new THREE.Group(); g.position.set(...pos); parent.add(g);
-  const body = M.alu();
-  mesh(cyl(pitchR - 0.08, 0.62, 64), body, g, [0, 0, 0], Z);
-  mesh(cyl(pitchR + 0.32, 0.1, 64), body, g, [0, 0, 0.36], Z);
-  mesh(cyl(pitchR + 0.32, 0.1, 64), body, g, [0, 0, -0.36], Z);
-  const hubR = Math.max(0.8, pitchR * 0.55);
-  mesh(cyl(hubR, 1.3, 40), body, g, [0, 0, -0.95], Z);
-  mesh(cyl(0.16, 0.5, 12), M.black(), g, [0, hubR - 0.05, -1.0]);
-  const tm = M.alu();
-  for (let i = 0; i < teeth; i++) {
-    const a = i / teeth * Math.PI * 2;
-    const t = mesh(box(0.1, 0.12, 0.6), tm, g, [Math.cos(a) * (pitchR - 0.03), Math.sin(a) * (pitchR - 0.03), 0], [0, 0, a]);
-    t.castShadow = false;
-  }
-  return g;
-}
-const p60 = pulley(steer, 60, P60, [0, 0, 0]);
-tag(p60, "pulley60");
-
-/* hub plate + wheel */
-const wheel = new THREE.Group(); wheel.position.z = 12.3; steer.add(wheel);
-exp(wheel, 13);
-const hubPlate = mesh(cyl(5.2, 1.5, 64), M.wood(), wheel, [0, 0, 0], Z);
-tag(hubPlate, "hub");
-const rimR = 17.5, rimZ = 3.6;
-const rim = mesh(new THREE.TorusGeometry(rimR, 1.5, 32, 160), mat(0xffffff, { map: gripTex, roughness: .85 }), wheel, [0, 0, rimZ]);
-const marker = mesh(new THREE.TorusGeometry(rimR, 1.56, 24, 16, 0.12), mat(ACCENT, { roughness: .6 }), wheel, [0, 0, rimZ], [0, 0, Math.PI / 2 - 0.06]);
-tag(rim, "rim"); tag(marker, "rim");
-function spokeGeo(len, w) {
-  const s = new THREE.Shape();
-  s.moveTo(0, -w / 2); s.lineTo(len, -w * 0.38); s.absarc(len, 0, w * 0.38, -Math.PI / 2, Math.PI / 2, false); s.lineTo(0, w / 2); s.lineTo(0, -w / 2);
-  [[len * 0.3, len * 0.12], [len * 0.62, len * 0.1]].forEach(([cx, hw]) => {
-    const h = new THREE.Path(); const r = w * 0.18;
-    h.moveTo(cx - hw, -r); h.lineTo(cx + hw, -r); h.absarc(cx + hw, 0, r, -Math.PI / 2, Math.PI / 2, false); h.lineTo(cx - hw, r); h.absarc(cx - hw, 0, r, Math.PI / 2, Math.PI * 1.5, false);
-    s.holes.push(h);
-  });
-  const geo = new THREE.ExtrudeGeometry(s, { depth: 0.5, bevelEnabled: true, bevelThickness: 0.08, bevelSize: 0.08, bevelSegments: 2, curveSegments: 24 });
-  geo.translate(0, 0, -0.25); return geo;
-}
-const spokes = new THREE.Group(); wheel.add(spokes);
-const sg = spokeGeo(rimR - 4.6, 3.8);
-[0, Math.PI, -Math.PI / 2].forEach(a => {
-  const holder = new THREE.Group(); holder.rotation.z = a; spokes.add(holder);
-  const sp = mesh(sg, M.alu(), holder, [4.0, 0, 1.75], [0, -0.12, 0]);
-});
-tag(spokes, "spokes");
-const hubCap = new THREE.Group(); wheel.add(hubCap);
-mesh(cyl(4.3, 2.0, 64), mat(0x2d3034, { metalness: .5, roughness: .35 }), hubCap, [0, 0, 1.6], Z);
-mesh(cyl(2.4, 0.3, 64), mat(ACCENT, { roughness: .45 }), hubCap, [0, 0, 2.7], Z);
-for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2 + Math.PI / 6; mesh(cyl(0.38, 0.4, 6), M.zinc(), hubCap, [Math.cos(a) * 3.5, Math.sin(a) * 3.5, 2.75], Z); }
-tag(hubCap, "hubcap");
-tag(wheel, "wheel");
-
-/* paddles: limit switch modules on the hub plate back */
-const paddles = new THREE.Group(); paddles.position.z = -1.05; wheel.add(paddles);
-const paddleLevers = [];
-[-1, 1].forEach(s => {
-  const g = new THREE.Group(); g.position.set(s * 6.0, 4.4, 0); paddles.add(g);
-  mesh(box(3.6, 2.2, 0.16), mat(0x1f4fa8, { roughness: .5 }), g, [0, 0, 0]);
-  mesh(box(2.0, 1.0, 1.0), M.black(), g, [0, 0.2, -0.58]);
-  const lv = new THREE.Group(); lv.position.set(s * 0.9, 0.75, -1.0); g.add(lv);
-  mesh(box(5.2, 0.12, 0.5), M.steel(), lv, [s * 2.5, 0, 0], [0, 0, s * 0.12]);
-  mesh(box(1.2, 4.4, 0.4), mat(0x2f3338, { roughness: .4, metalness: .3 }), lv, [s * 5.3, 0.6, 0], [0, 0, s * 0.12]);
-  paddleLevers.push(lv);
-});
-tag(paddles, "paddles");
-
-/* diametric magnet on shaft end (N/S halves) */
-const magnet = new THREE.Group(); magnet.position.z = -10.62; steer.add(magnet);
-mesh(new THREE.CylinderGeometry(0.42, 0.42, 0.28, 32, 1, false, 0, Math.PI), mat(ACCENT, { roughness: .4 }), magnet, [0, 0, 0], Z);
-mesh(new THREE.CylinderGeometry(0.42, 0.42, 0.28, 32, 1, false, Math.PI, Math.PI), mat(0x2463b4, { roughness: .4 }), magnet, [0, 0, 0], Z);
-tag(magnet, "magnet");
-
-/* ---------- motor ---------- */
-const motor = new THREE.Group(); motor.position.set(0, MOTOR_Y, 0); scene.add(motor);
-const motorBody = new THREE.Group(); motor.add(motorBody);
-exp(motorBody, -10);
-mesh(cyl(3.4, 9.2, 64), mat(0x2f3438, { metalness: .55, roughness: .4 }), motorBody, [0, 0, -12.4], Z);
-mesh(new THREE.CylinderGeometry(3.42, 3.42, 2.2, 64, 1, true), mat(0xffffff, { map: motorLabelTex, roughness: .6, side: THREE.DoubleSide }), motorBody, [0, 0, -12.6], Z);
-mesh(cyl(3.45, 1.4, 64), M.alu(), motorBody, [0, 0, -7.5], Z);
-mesh(cyl(3.45, 1.2, 64), M.alu(), motorBody, [0, 0, -17.2], Z);
-mesh(cyl(1.4, 0.6, 32), M.alu(), motorBody, [0, 0, -6.5], Z);
-for (let i = 0; i < 8; i++) { const a = i / 8 * Math.PI * 2; mesh(box(0.25, 0.9, 0.3), M.black(), motorBody, [Math.cos(a) * 3.47, Math.sin(a) * 3.47, -16.7], [0, 0, a]); }
-[[-1, 0xC8102E], [1, 0x1b1c1e]].forEach(([s, c]) => { mesh(cyl(0.3, 0.8, 12), mat(0xc9a24a, { metalness: .8, roughness: .3 }), motorBody, [s * 1.2, 0.6, -18.1], Z); mesh(cyl(0.34, 0.25, 12), mat(c), motorBody, [s * 1.2, 0.6, -18.4], Z); });
-mesh(box(8.5, 0.5, 7), mat(0x6b7178, { metalness: .7, roughness: .4 }), motorBody, [0, -3.55, -12.4]);
-const rotor = new THREE.Group(); motor.add(rotor);
-const motorShaft = mesh(cyl(0.4, 6.4, 20), M.steel(), rotor, [0, 0, -3.0], Z);
-const p20 = pulley(rotor, 20, P20, [0, 0, 0]);
-tag(motorBody, "motor"); tag(motorShaft, "motor"); tag(p20, "pulley20");
-
-/* belt (GT2 loop) */
-function beltShape(R1, R2) {
-  const c1 = new THREE.Vector2(0, AXIS_Y), c2 = new THREE.Vector2(0, MOTOR_Y);
-  const d = c1.distanceTo(c2), th = Math.atan2(c2.y - c1.y, c2.x - c1.x), b = Math.acos((R1 - R2) / d);
-  const path = (r1, r2, s) => { s.absarc(c1.x, c1.y, r1, th + b, th + 2 * Math.PI - b, false); s.absarc(c2.x, c2.y, r2, th - b, th + b, false); s.closePath(); return s; };
-  const sh = path(R1 + 0.1, R2 + 0.1, new THREE.Shape());
-  sh.holes.push(path(R1 - 0.05, R2 - 0.05, new THREE.Path()));
-  return sh;
-}
-const beltGeo = new THREE.ExtrudeGeometry(beltShape(P60, P20), { depth: 0.6, bevelEnabled: false, curveSegments: 96 });
-beltGeo.translate(0, 0, -0.3);
-const belt = mesh(beltGeo, mat(0x1b1c1e, { roughness: .85 }));
-tag(belt, "belt");
-
-/* ---------- steering sensor (AS5600) ---------- */
-const sensor = new THREE.Group(); scene.add(sensor);
-exp(sensor, -11);
-const bracket = new THREE.Group(); sensor.add(bracket);
-mesh(box(2.4, 1, 5.4), M.wood(), bracket, [0, 26.1, -9.45]);
-mesh(box(5, 9.6, 0.6), M.wood(), bracket, [0, 22, -12.05]);
-tag(bracket, "bracket");
-const asTex = pcbTex("#5b3aa8", "AS5600", "I2C 0x36");
-const asBoard = new THREE.Group(); sensor.add(asBoard);
-mesh(box(2.3, 2.3, 0.16), mat(0xffffff, { map: asTex, roughness: .5 }), asBoard, [0, AXIS_Y, -11.67]);
-mesh(box(0.5, 0.5, 0.14), M.black(), asBoard, [0, AXIS_Y, -11.54]);
-for (let i = 0; i < 4; i++) mesh(box(0.08, 0.5, 0.08), mat(0xc9a24a, { metalness: .8, roughness: .3 }), asBoard, [-0.75 + i * 0.5, AXIS_Y - 1.35, -11.67]);
-tag(asBoard, "sensor");
-
-/* ---------- electronics ---------- */
-const elec = new THREE.Group(); scene.add(elec);
-mesh(box(32, 1.5, 26), M.wood(), elec, [-34, 0.75, -13]);
-const smps = new THREE.Group(); elec.add(smps);
-mesh(box(21.5, 3, 11.5), mat(0xffffff, { map: perfTex, metalness: .6, roughness: .45 }), smps, [-38, 3, -18]);
-mesh(box(1.6, 2.2, 11), M.black(), smps, [-26.5, 2.7, -18]);
-for (let i = 0; i < 9; i++) mesh(cyl(0.3, 0.3, 12), M.steel(), smps, [-26.5, 3.9, -22.5 + i * 1.12]);
-mesh(box(8, 0.05, 4), mat(0xf4f1e4), smps, [-42, 4.53, -18]);
-tag(smps, "smps");
-const bts = new THREE.Group(); elec.add(bts);
-mesh(box(5, 0.16, 5), mat(0xffffff, { map: pcbTex("#b5161f", "BTS7960", "43A"), roughness: .5 }), bts, [-22.5, 2.1, -6]);
-for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) mesh(cyl(0.12, 0.6, 8), M.steel(), bts, [-24.6 + i * 1.4, 1.8, -8.1 + j * 4.2]);
-mesh(box(4, 0.5, 4), M.alu(), bts, [-22.5, 2.45, -6]);
-for (let i = 0; i < 7; i++) mesh(box(0.2, 1.7, 4), M.alu(), bts, [-24.2 + i * 0.57, 3.5, -6]);
-mesh(box(1.1, 0.9, 3.2), mat(0x2463b4, { roughness: .5 }), bts, [-25.35, 2.6, -6]);
-tag(bts, "bts");
-const leo = new THREE.Group(); elec.add(leo);
-mesh(box(6.86, 0.16, 5.33), mat(0xffffff, { map: pcbTex("#0e7c86", "LEONARDO", "ATmega32U4"), roughness: .5 }), leo, [-38, 2.3, -5]);
-for (let i = 0; i < 4; i++) mesh(cyl(0.15, 0.7, 8), M.steel(), leo, [-38 + (i % 2 ? 3 : -3), 1.85, -5 + (i < 2 ? 2.2 : -2.2)]);
-mesh(box(1.2, 0.2, 1.2), M.black(), leo, [-37.5, 2.48, -5]);
-mesh(box(5.2, 0.85, 0.25), M.black(), leo, [-37.4, 2.8, -7.45]);
-mesh(box(5.2, 0.85, 0.25), M.black(), leo, [-37.4, 2.8, -2.55]);
-mesh(box(0.6, 0.3, 0.8), M.steel(), leo, [-41.3, 2.55, -5]);
-tag(leo, "leonardo");
-const estop = new THREE.Group(); scene.add(estop);
-mesh(box(5, 5, 5), mat(0xF2B807, { roughness: .6 }), estop, [-57, 2.5, -18]);
-mesh(cyl(1.5, 1.2, 40), mat(ACCENT), estop, [-57, 5.6, -18]);
-tag(estop, "estop");
-
-/* ---------- wires ---------- */
-const wires = new THREE.Group(); scene.add(wires);
-const motorWires = new THREE.Group(); wires.add(motorWires);
-function wire(pts, color, r = 0.18, parent = wires) {
-  const curve = new THREE.CatmullRomCurve3(pts.map(p => new THREE.Vector3(...p)), false, "centripetal");
-  mesh(new THREE.TubeGeometry(curve, Math.max(40, pts.length * 24), r, 10, false), mat(color, { roughness: .6 }), parent);
-  return curve;
-}
-const W = {};
-wire([[-26.5, 3.4, -20], [-25.5, 3.6, -14], [-25.6, 2.9, -8.4]], 0xC8102E, 0.26);
-wire([[-26.5, 3.4, -21], [-24.4, 3.6, -14], [-24.2, 2.9, -8.4]], 0x1b1c1e, 0.26);
-W.power = wire([[-21.2, 2.9, -8.2], [-17, 3.2, -12], [-12, 2.4, -21], [-4, 3, -22], [-1.2, MOTOR_Y + 0.6, -18.6]], 0xC8102E, 0.26, motorWires);
-wire([[-20.4, 2.9, -8.2], [-16, 3.0, -12.6], [-11, 2.4, -22], [-3, 2.8, -23], [1.2, MOTOR_Y + 0.6, -18.6]], 0x1b1c1e, 0.26, motorWires);
-W.ctrl = wire([[-36, 3.1, -7.6], [-31, 4.5, -8.2], [-27, 4.4, -7.2], [-24.6, 2.4, -7.6]], 0xF2B807, 0.1);
-wire([[-37, 3.1, -7.6], [-31, 4.9, -8.6], [-27, 4.6, -7.6], [-24.6, 2.4, -7.2]], 0x2a7fd4, 0.1);
-W.sensor = wire([[0, AXIS_Y - 1.6, -11.75], [2.6, 17.5, -12.6], [7.8, 12, -13], [10.5, 2.4, -14], [-18, 2.2, -2], [-33, 3.0, -1.6], [-36.5, 3.1, -2.4]], 0x7a3fd0, 0.12, motorWires);
-W.usb = wire([[-41.7, 2.5, -5], [-50, 2.2, -6], [-64, 2.0, -10], [-71, -1, -12], [-76, -18, -12], [-82, -30.5, -14]], 0x3a3f45, 0.32);
-W.pedal = wire([[-12, FLOOR + 4, 34], [-16, FLOOR + 10, 22], [-24, -32, 13], [-28, -2, 11.2], [-31, 2.0, 2], [-36, 3.1, -2.2]], 0x7a3fd0, 0.14);
-wire([[-48.8, 3, -18], [-54.4, 3, -18]], 0x2c3136, 0.3);
-wire([[-59.6, 3, -18], [-68, 2, -22], [-72, -4, -24], [-74, -30, -26]], 0x2c3136, 0.3);
-tag(wires, "wires"); tag(motorWires, "motorWires");
-
-/* ---------- pedals ---------- */
-const pedalsRoot = new THREE.Group(); pedalsRoot.position.set(0, FLOOR, 0); scene.add(pedalsRoot);
-mesh(box(32, 1.5, 34), M.wood(), pedalsRoot, [0, 0.75, 22]);
-const PIV_Z = 34, PIV_Y = 4, L = 22, SPR_AT = 17, REST = Math.asin((7.84 - 1.75) / SPR_AT);
-const helix = new (class extends THREE.Curve { getPoint(t, v = new THREE.Vector3()) { const a = t * 10 * Math.PI * 2; return v.set(Math.cos(a) * 0.82, t, Math.sin(a) * 0.82); } })();
-const springGeo = new THREE.TubeGeometry(helix, 420, 0.075, 6, false);
-const pedals = [];
-[["brake", -7.5], ["accel", 7.5]].forEach(([name, x]) => {
-  const hinge = new THREE.Group(); hinge.position.set(x, 0, 0); pedalsRoot.add(hinge);
-  [-5.4, 5.4].forEach(dx => { mesh(box(2.2, 5, 4), M.wood(), hinge, [dx, 4, PIV_Z]); bearing(hinge, [dx + Math.sign(dx) * 1.15, PIV_Y, PIV_Z], "x"); });
-  rod(hinge, 14, [0, PIV_Y, PIV_Z], "x");
-  nut(hinge, [-6.9, PIV_Y, PIV_Z], "x"); nut(hinge, [6.9, PIV_Y, PIV_Z], "x");
-  const arm = new THREE.Group(); arm.position.set(0, PIV_Y, PIV_Z); hinge.add(arm);
-  mesh(box(9.5, 1.5, L), M.wood(), arm, [0, 0.6, -L / 2]);
-  mesh(box(8.4, 0.12, 11), M.rubber(), arm, [0, 1.42, -L + 6.8]);
-  const springs = [];
-  [-2.4, 2.4].forEach(sx => springs.push(mesh(springGeo, M.steel(), hinge, [sx, 1.5, 0])));
-  const sens = new THREE.Group(); hinge.add(sens);
-  mesh(cyl(0.3, 0.25, 24), mat(0x8c939a, { metalness: .7 }), sens, [Math.sign(x) * 7.35, PIV_Y, PIV_Z], X);
-  mesh(box(0.16, 2.3, 2.3), mat(0xffffff, { map: asTex, roughness: .5 }), sens, [Math.sign(x) * 7.75, PIV_Y, PIV_Z]);
-  mesh(box(0.6, 6, 3), M.wood(), sens, [Math.sign(x) * 8.2, 3, PIV_Z]);
-  tag(arm, "pedals", name); springs.forEach(s => tag(s, "springs")); tag(sens, "pedalSensors");
-  pedals.push({ name, arm, springs, x });
-});
-function setPedal(p, press) {
-  const a = REST - press * 0.17;
-  p.arm.rotation.x = a;
-  const zS = PIV_Z - Math.cos(a) * SPR_AT, top = PIV_Y + Math.sin(a) * SPR_AT - 0.15;
-  p.springs.forEach(s => { s.position.z = zS; s.scale.y = Math.max(1, top - 1.5); });
-}
-pedals.forEach(p => setPedal(p, 0));
-
-/* ---------- ghosting (see-through) ---------- */
-const allMeshes = []; scene.traverse(o => { if (o.isMesh && o !== floor && o.material && o.material.isMeshStandardMaterial) { o.userData.op = 1; allMeshes.push(o); } });
-let ghostTarget = new Set();
-function setGhost(names) { ghostTarget = meshesOf(names); }
-const motorWireSet = () => tagged.get("motorWires") || new Set();
-function updateGhost(dt, ex) {
-  const k = Math.min(1, dt * 6), mw = motorWireSet();
-  allMeshes.forEach(m => {
-    const want = ghostTarget.has(m) ? 0.14 : mw.has(m) ? 1 - ex * 0.85 : 1;
-    m.userData.op += (want - m.userData.op) * (reduceMotion ? 1 : k);
-    const op = m.userData.op, mt = m.material;
-    const tr = op < 0.995;
-    if (mt.transparent !== tr) { mt.transparent = tr; mt.needsUpdate = true; }
-    mt.opacity = op; mt.depthWrite = !tr; m.castShadow = op > 0.5;
-  });
-}
-
-/* ---------- labels: world point or object-local point ---------- */
-const at = (obj, p) => ({ obj, p });
-
-/* ---------- stops ---------- */
-const STOPS = [
-  { key: "overview", chip: "전체", part: "OVERVIEW", title: "DIY FFB 레이싱 휠",
-    lead: "책상 위 휠 베이스, 바닥 페달, 전자부 세 덩어리로 만든다. 스페이스바를 누르면 부위별로 카메라가 이동한다.",
-    specs: [["핸들 토크 목표", "약 2.6 N·m"], ["회전 범위", "900°"], ["부품비", "198,570원"]],
-    cam: [150, 44, 178], target: [-14, -26, -6], focus: [], anim: "idle", orbit: true,
-    labels: [{ at: [0, 30, 6], t: "휠 베이스", s: "책상 위", dx: 70, dy: -40 }, { at: [-34, 4, -13], t: "전자부", s: "전원·제어", dx: -70, dy: -50 },
-             { at: [0, FLOOR + 8, 20], t: "페달", s: "엑셀·브레이크", dx: 80, dy: 10 }, { at: [0, 40, -43], t: "게임 화면", dx: -40, dy: -50 }] },
-  { key: "steering", chip: "핸들", part: "STEERING", title: "핸들과 조향축",
-    lead: "350mm 휠을 집성목 허브판에 볼트로 고정하고, M8 전산볼트를 조향축으로 쓴다. 축은 앞판과 뒤판의 608ZZ 베어링 2개가 받친다.",
-    specs: [["휠", "350mm 알루미늄 + PU"], ["조향축", "M8 전산볼트, 너트·와셔로 앞뒤 고정"], ["베어링", "608ZZ × 2 (내경 8mm)"], ["회전 범위", "900° (펌웨어 엔드스톱)"]],
-    note: "앞판과 뒤판은 M8 전산볼트 4개와 너트로 12cm 간격을 잡는다.",
-    cam: [-50, 34, 66], target: [3, 17, 2], focus: ["wheel", "shaft", "bearings"], ghost: [], anim: "steer",
-    labels: [{ at: [-17.5, AXIS_Y + 1, 15.9], t: "스티어링 휠", s: "350mm", dx: -90, dy: -60 }, { at: at(hubPlate, [0, -3.2, 0.8]), t: "허브판", s: "집성목 + 볼트 6개", dx: -120, dy: 70 },
-             { at: [0, AXIS_Y, 9.4], t: "조향축", s: "M8 전산볼트", dx: -40, dy: -170 }, { at: [8.9, 25.5, 6.8], t: "프레임 볼트", s: "M8 × 4", dx: 130, dy: -60 },
-             { at: [9, 10, 6.8], t: "앞판", s: "집성목 15T", dx: 120, dy: 40 }] },
-  { key: "exploded", chip: "분해도", part: "EXPLODED VIEW", title: "휠 베이스 분해도",
-    lead: "휠 베이스를 축 방향으로 펼친 모습이다. 앞에서부터 핸들, 앞판, 풀리와 벨트, 뒤판, 모터, 센서 순서로 조립한다.",
-    specs: [["조향축", "M8 전산볼트 1개가 모든 부품을 관통"], ["베어링", "앞판·뒤판에 608ZZ 1개씩"], ["고정", "너트·와셔로 축 방향 위치 고정"]],
-    note: "X 키나 분해 보기 버튼으로 어느 장면에서든 펼치고 접을 수 있다.",
-    cam: [96, 40, 46], target: [0, 15, 3], focus: [], explode: 1, anim: "none", ghost: ["motorWires"],
-    labels: [{ at: at(wheel, [0, 17.5, rimZ]), t: "핸들 + 허브판", dx: -20, dy: -50 },
-             { at: at(plateFront, [9, 22, 0.8]), t: "앞판", s: "608ZZ", dx: 60, dy: -70 },
-             { at: [0, AXIS_Y + P60 + 0.4, 0], t: "60T 풀리", dx: 30, dy: -110 },
-             { at: [0, MOTOR_Y - P20 - 0.2, 0.2], t: "GT2 벨트 · 20T 풀리", dx: 120, dy: 80 },
-             { at: at(plateBack, [9, 22, -0.8]), t: "뒤판", s: "608ZZ", dx: 40, dy: -120 },
-             { at: at(motorBody, [3.4, 0, -12.6]), t: "MY1016 모터", dx: 80, dy: 70 },
-             { at: at(asBoard, [0, AXIS_Y + 1.2, -11.67]), t: "AS5600", s: "센서 브래킷", dx: 110, dy: -70 }] },
-  { key: "paddles", chip: "패들", part: "PADDLES", title: "패들 시프터",
-    lead: "리미트 스위치 2개를 허브판 뒤에 붙이고, 스위치 레버 끝에 패들을 달아 손가락으로 당긴다.",
-    specs: [["스위치", "리미트 스위치 모듈 × 2"], ["왼쪽", "기어 다운 (버튼 1)"], ["오른쪽", "기어 업 (버튼 2)"], ["연결", "Leonardo 디지털 핀"]],
-    note: "핸들이 900° 돌아가는 만큼 스위치 배선은 넉넉한 길이로 감아 둔다.",
-    cam: [9, 31, 60], target: [0, AXIS_Y + 3, 10], focus: ["paddles"], ghost: ["rim", "spokes"], anim: "paddle",
-    labels: [{ at: at(paddleLevers[0], [-5.3, 2.4, 0]), t: "기어 다운", s: "왼쪽 패들", dx: -80, dy: -60 }, { at: at(paddleLevers[1], [5.3, 2.4, 0]), t: "기어 업", s: "오른쪽 패들", dx: 80, dy: -60 },
-             { at: at(paddles, [6.0, 3.4, 0]), t: "리미트 스위치", s: "허브판 뒤", dx: 110, dy: 70 }] },
-  { key: "belt", chip: "감속부", part: "BELT DRIVE", title: "벨트 감속부",
-    lead: "모터 축의 20T 풀리가 조향축의 60T 풀리를 GT2 벨트로 돌린다. 회전은 3분의 1로 줄고 토크는 3배가 된다.",
-    specs: [["감속비", "20T : 60T = 1 : 3"], ["벨트", "GT2 폐루프 200mm, 폭 6mm"], ["축간 거리", "약 58.6mm (벨트 길이로 결정)"], ["핸들 토크", "0.87 N·m × 3 ≈ 2.6 N·m"]],
-    note: "벨트 장력은 모터 받침 높이로 맞춘다.",
-    cam: [40, 23, 26], target: [0, 17, -1], focus: ["pulley60", "pulley20", "belt"], ghost: ["plateFront", "plateBack", "rim", "spokes", "hubcap", "paddles", "hub"], anim: "belt",
-    labels: [{ at: [0, AXIS_Y + P60 + 0.4, 0], t: "60T 풀리", s: "조향축", dx: 80, dy: -70 }, { at: [0, MOTOR_Y - P20 - 0.2, 0], t: "20T 풀리", s: "모터 축", dx: 100, dy: 40 },
-             { at: [0, (AXIS_Y + MOTOR_Y) / 2, 0.3], t: "GT2 벨트", s: "200mm", dx: 130, dy: -10 }, { at: at(motorBody, [3.0, 1.6, -11.0]), t: "MY1016 모터", s: "24V 250W", dx: 60, dy: -110 }] },
-  { key: "sensor", chip: "조향 센서", part: "ANGLE SENSOR", title: "조향각 센서",
-    lead: "조향축 뒤쪽 끝에 지름 방향 자석을 붙이고, 1~2mm 떨어진 자리에 AS5600을 고정한다. 축과 1:1로 돌기 때문에 핸들 각도를 그대로 읽는다.",
-    specs: [["센서", "AS5600, 4096단계 / 회전"], ["분해능", "약 0.09°"], ["연결", "I2C (Leonardo D2, D3)"], ["간격", "자석과 센서 사이 1~2mm"]],
-    note: "센서 브래킷은 프레임과 같은 집성목으로 만든다.",
-    cam: [24, 24, -13], target: [0, 20, -11.1], focus: ["sensor", "magnet"], ghost: ["bracket", "motor", "plateBack"], anim: "steer",
-    labels: [{ at: [0.42, AXIS_Y + 0.2, -10.62], t: "자석", s: "N·S 2극", dx: 80, dy: -110 }, { at: at(asBoard, [1.15, AXIS_Y + 0.8, -11.67]), t: "AS5600", s: "I2C", dx: 120, dy: 40 },
-             { at: [0, AXIS_Y - 0.6, -11.14], t: "간격 1~2mm", dx: -60, dy: 130 }, { at: [0, AXIS_Y, -8], t: "조향축 끝", dx: -100, dy: -90 }] },
-  { key: "pedals", chip: "페달", part: "PEDALS", title: "엑셀·브레이크 페달",
-    lead: "발판 뒤쪽 힌지에 M8 축과 608ZZ 베어링을 넣고, 압축 스프링 2개로 발판을 원위치시킨다. 힌지 축 끝의 AS5600이 밟은 각도를 읽는다.",
-    specs: [["페달", "엑셀, 브레이크"], ["복원", "압축 스프링 2개 / 페달, 자유길이 78.4mm"], ["센서", "AS5600 OUT → 아날로그 핀"], ["보정", "놓으면 0%, 끝까지 100%"]],
-    note: "페달 센서는 AS5600의 아날로그 출력(OUT)을 Leonardo 아날로그 핀에 바로 연결한다.",
-    cam: [58, FLOOR + 30, 84], target: [3, FLOOR + 5, 21], focus: ["pedals", "springs", "pedalSensors"], anim: "pedals",
-    labels: [{ at: [7.5, FLOOR + 10, 18], t: "엑셀", dx: 70, dy: -50 }, { at: [-7.5, FLOOR + 10, 18], t: "브레이크", dx: -70, dy: -50 },
-             { at: [10.6, FLOOR + 4.5, 18.4], t: "압축 스프링", s: "× 2", dx: 150, dy: -60 }, { at: [7.5 + 6.6, FLOOR + PIV_Y, PIV_Z], t: "힌지", s: "608ZZ + M8 축", dx: -110, dy: 90 },
-             { at: [15.8, FLOOR + PIV_Y + 1, PIV_Z], t: "AS5600", s: "아날로그 출력", dx: 130, dy: 60 }] },
-  { key: "electronics", chip: "전자부", part: "ELECTRONICS", title: "전자부와 배선",
-    lead: "SMPS 24V가 BTS7960을 거쳐 모터에 전류를 보내고, Leonardo는 PC의 USB 전원으로 따로 돈다. 두 전원은 GND만 공통으로 묶는다.",
-    specs: [["제어", "Arduino Leonardo"], ["모터 드라이버", "BTS7960 43A"], ["전원", "LRS-350-24, 24V 14.6A"], ["모터 배선", "14AWG 빨강·검정"]],
-    note: "SMPS 입력 쪽에 비상 차단 스위치를 달아 언제든 24V를 끊을 수 있게 한다.",
-    cam: [-20, 40, 34], target: [-36, 0, -10], focus: ["leonardo", "bts", "smps", "estop"], anim: "idle",
-    labels: [{ at: [-38, 2.5, -5], t: "Arduino Leonardo", s: "입력 처리 / FFB 제어", dx: 30, dy: 70 }, { at: [-22.5, 4.3, -6], t: "BTS7960", s: "모터 드라이버", dx: 90, dy: -20 },
-             { at: [-40, 4.5, -18], t: "SMPS 24V", s: "350W", dx: -40, dy: -60 }, { at: [-12, 2.4, -21], t: "모터 전원선", s: "14AWG", dx: 80, dy: -50 },
-             { at: [-57, 6.2, -18], t: "비상 스위치", s: "24V 차단", dx: -60, dy: -40 }, { at: [-50, 2.2, -6], t: "USB", s: "PC로", dx: -70, dy: 40 }] },
-  { key: "loop", chip: "동작 흐름", part: "FFB LOOP", title: "힘이 핸들에 전달되는 순서",
-    lead: "게임에서 힘 명령이 나오면 아래 순서로 핸들이 움직이고, 바뀐 각도가 다시 게임으로 돌아간다.",
-    flow: [["게임", "USB로 FFB 명령을 보낸다"], ["Leonardo", "모터 세기(PWM)를 계산한다"], ["BTS7960", "24V로 모터를 돌린다"], ["벨트", "토크를 3배로 키워 핸들을 돌린다"], ["AS5600", "바뀐 각도를 게임으로 보낸다"]],
-    cam: [96, 52, 92], target: [-16, 4, -12], focus: [], anim: "flow", labels: [] },
-];
-
-/* ---------- post-processing: outline highlight ---------- */
-const composer = new EffectComposer(renderer);
-composer.addPass(new RenderPass(scene, camera));
-const outline = new OutlinePass(new THREE.Vector2(1, 1), scene, camera);
-Object.assign(outline, { edgeStrength: 4.5, edgeGlow: 0.25, edgeThickness: 1.4, pulsePeriod: reduceMotion || SHOT ? 0 : 2.6 });
-outline.visibleEdgeColor.set(ACCENT); outline.hiddenEdgeColor.set(0x8a1020);
-composer.addPass(outline);
-composer.addPass(new OutputPass());
-function setOutline(names) { outline.selectedObjects = [...meshesOf(names)]; }
-
-/* ---------- UI ---------- */
+<main>
+  <section id="slides" role="tabpanel" aria-labelledby="tab-slides">
+    <div class="stage" id="stage"><img id="slide" src="slides/s-1.png" alt="발표 자료 1번 슬라이드" width="1920" height="1080"></div>
+    <div class="notes" id="notes" hidden><p id="notesText"></p></div>
+    <div class="bar">
+      <button id="prev" type="button">이전</button>
+      <span class="count" id="count">1 / 3</span>
+      <button id="next" type="button">다음</button>
+      <span class="spacer"></span>
+      <span class="hint" style="color:var(--soft)">← → 키로 넘기기</span>
+      <button id="toggleNotes" type="button" aria-expanded="false" aria-controls="notes">대본 보기</button>
+      <button id="full" type="button">전체 화면</button>
+    </div>
+  </section>
+  <section id="sim" role="tabpanel" aria-labelledby="tab-sim" hidden>
+    <iframe id="simFrame" title="포스 피드백 레이싱 휠 3D 시뮬레이션" allow="fullscreen" allowfullscreen></iframe>
+  </section>
+</main>
+<script>
+const NOTES = ["안녕하세요. 저희 팀은 포스 피드백 레이싱 휠을 만듭니다. 게임 속 노면과 코너링의 힘을 모터로 핸들에 전달하는 아두이노 운전 장치입니다. 먼저 팀원을 소개하겠습니다. 황찬웅 학생은 소프트웨어를 맡아 펌웨어 설정과 캘리브레이션, 게임 연동을 담당합니다. 최민호 학생은 하드웨어를 맡아 모터와 전원 배선, 센서 연결, 안전 장치를 담당합니다. 김도영 학생은 기구와 시연을 맡아 프레임 조립과 페달 제작, 시연 진행을 담당합니다. 저 김창식은 기획을 맡아 요구사항 명세 작성과 3D 설계, 일정 관리와 발표를 담당합니다. 이제 저희가 이 휠을 만드는 이유를 말씀드리겠습니다.", "저희는 이 휠을 누구나 쓸 수 있는 운전 연습 장비로 만들고자 합니다. 도로에 나가기 전에 안전한 곳에서 핸들 감각을 익힐 수 있고, 구하기 쉬운 부품으로 만들어 학교나 복지관에서도 부담 없이 갖출 수 있습니다. 또 설계를 공개해서 누구나 따라 만들 수 있게 하려 합니다.", "이 휠을 쓰는 사람은 네 부류입니다. 도로에 나가기 전 연습이 필요한 초보 운전자, 운전 감각을 유지하고 다시 교육받는 고령 운전자, 학교와 동아리에서 공학을 배우는 학생, 그리고 집에서 레이싱 게임을 즐기는 사람들입니다. 이들이 이 휠을 쓰는 이유는 세 가지입니다. 노면과 코너링의 힘이 핸들로 전해져 실제 같은 손맛을 주고, 핸들 각도를 세밀하게 읽어 정밀하게 조향할 수 있으며, 회전 범위와 힘 세기를 사용자에게 맞게 조절할 수 있습니다. 이상으로 발표를 마치겠습니다. 감사합니다."];
+const N = NOTES.length;
 const $ = id => document.getElementById(id);
-const stopsNav = $("stops");
-STOPS.forEach((s, i) => {
-  const b = document.createElement("button"); b.type = "button"; b.textContent = s.chip;
-  b.addEventListener("click", () => go(i)); stopsNav.appendChild(b);
+const imgs = Array.from({ length: N }, (_, k) => { const im = new Image(); im.src = `slides/s-${k + 1}.png`; return im; });
+let cur = 0;
+function show(n) {
+  cur = Math.max(0, Math.min(N - 1, n));
+  $("slide").src = imgs[cur].src;
+  $("slide").alt = `발표 자료 ${cur + 1}번 슬라이드`;
+  $("count").textContent = `${cur + 1} / ${N}`;
+  $("prev").disabled = cur === 0;
+  $("next").disabled = cur === N - 1;
+  $("notesText").textContent = NOTES[cur];
+}
+$("prev").onclick = () => show(cur - 1);
+$("next").onclick = () => show(cur + 1);
+$("stage").onclick = e => { const r = e.currentTarget.getBoundingClientRect(); show(cur + (e.clientX - r.left < r.width / 3 ? -1 : 1)); };
+$("toggleNotes").onclick = () => { const h = !$("notes").hidden; $("notes").hidden = h; $("toggleNotes").setAttribute("aria-expanded", String(!h)); $("toggleNotes").textContent = h ? "대본 보기" : "대본 숨기기"; };
+$("full").onclick = () => { const st = $("stage"); (document.fullscreenElement ? document.exitFullscreen() : st.requestFullscreen?.())?.catch?.(() => {}); };
+
+function openTab(name) {
+  const sim = name === "sim";
+  $("slides").hidden = sim; $("sim").hidden = !sim;
+  $("tab-slides").setAttribute("aria-selected", String(!sim));
+  $("tab-sim").setAttribute("aria-selected", String(sim));
+  const f = $("simFrame");
+  if (sim) { if (!f.src) { f.src = "sim/"; f.addEventListener("load", () => f.contentWindow.focus(), { once: true }); } else f.contentWindow.focus(); }
+  history.replaceState(null, "", "#" + (sim ? "sim" : "slides"));
+}
+$("tab-slides").onclick = () => openTab("slides");
+$("tab-sim").onclick = () => openTab("sim");
+document.addEventListener("keydown", e => {
+  if ($("slides").hidden || e.target.closest("button")) return;
+  if (["ArrowRight", "PageDown", " "].includes(e.key)) { e.preventDefault(); show(cur + 1); }
+  else if (["ArrowLeft", "PageUp"].includes(e.key)) { e.preventDefault(); show(cur - 1); }
+  else if (e.key === "f" || e.key === "F") $("full").click();
 });
-const labelsEl = $("labels"), leaders = $("leaders");
-let current = -1, labelEls = [];
-let explodeTarget = 0, explodeNow = 0;
-const exBtn = $("explode");
-function setExplode(v) { explodeTarget = v; exBtn.setAttribute("aria-pressed", v ? "true" : "false"); exBtn.textContent = v ? "조립 보기" : "분해 보기"; }
-
-function renderSheet(s, i) {
-  $("part").textContent = s.part;
-  $("count").textContent = `${String(i + 1).padStart(2, "0")} / ${String(STOPS.length).padStart(2, "0")}`;
-  $("title").textContent = s.title;
-  $("lead").textContent = s.lead;
-  const body = $("body"); body.innerHTML = "";
-  if (s.specs) {
-    const dl = document.createElement("dl");
-    s.specs.forEach(([k, v]) => { const dt = document.createElement("dt"); dt.textContent = k; const dd = document.createElement("dd"); dd.textContent = v; dl.append(dt, dd); });
-    body.appendChild(dl);
-  }
-  if (s.flow) {
-    const ol = document.createElement("ol"); ol.className = "flow"; ol.id = "flow";
-    s.flow.forEach(([k, v]) => { const li = document.createElement("li"); const span = document.createElement("span"); const b = document.createElement("b"); b.textContent = k; span.append(b, " " + v); li.appendChild(span); ol.appendChild(li); });
-    body.appendChild(ol);
-  }
-  $("note").textContent = s.note || "";
-  [...stopsNav.children].forEach((b, k) => k === i ? b.setAttribute("aria-current", "step") : b.removeAttribute("aria-current"));
-  $("prev").disabled = i === 0;
-  $("next").textContent = i === STOPS.length - 1 ? "처음으로" : "다음 →";
-}
-function renderLabels(s) {
-  labelsEl.innerHTML = ""; leaders.innerHTML = ""; labelEls = [];
-  s.labels.forEach(l => {
-    const el = document.createElement("div"); el.className = "tag";
-    el.textContent = l.t; if (l.s) { const sm = document.createElement("small"); sm.textContent = l.s; el.appendChild(sm); }
-    const dot = document.createElement("div"); dot.className = "dot";
-    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-    line.setAttribute("stroke", "#1C2228"); line.setAttribute("stroke-width", SHOT ? "2" : "1");
-    leaders.appendChild(line); labelsEl.append(el, dot);
-    labelEls.push({ l, el, dot, line });
-  });
-}
-
-let tween = null;
-const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-function go(i, instant) {
-  i = (i + STOPS.length) % STOPS.length;
-  if (i === current) return;
-  current = i; const s = STOPS[i];
-  renderSheet(s, i); renderLabels(s);
-  setOutline(s.focus || []); setGhost(s.ghost || []); setExplode(s.explode || 0);
-  flowT = 0;
-  const tgt = new THREE.Vector3(...s.target);
-  const k = innerWidth / innerHeight < 0.9 ? 1.6 : 1;
-  const to = { p: new THREE.Vector3(...s.cam).sub(tgt).multiplyScalar(k).add(tgt), t: tgt };
-  if (reduceMotion || instant) { camera.position.copy(to.p); controls.target.copy(to.t); tween = null; }
-  else tween = { from: { p: camera.position.clone(), t: controls.target.clone() }, to, start: performance.now(), dur: 1500 };
-  controls.autoRotate = !!s.orbit && !reduceMotion && !SHOT; controls.autoRotateSpeed = 0.35;
-  try { history.replaceState(null, "", "#" + s.key); } catch (e) {}
-}
-addEventListener("keydown", e => {
-  const k = e.key;
-  if (e.target.closest && e.target.closest("button") && (k === " " || k === "Enter")) { if (k === " ") e.preventDefault(); else return; }
-  if (k === " " || k === "ArrowRight" || k === "PageDown") { e.preventDefault(); go(current + 1); }
-  else if (k === "ArrowLeft" || k === "PageUp" || k === "Backspace") { e.preventDefault(); go(current - 1); }
-  else if (k === "Home") go(0); else if (k === "End") go(STOPS.length - 1);
-  else if (k === "x" || k === "X" || k === "ㅌ") setExplode(explodeTarget ? 0 : 1);
-  else if (/^[1-9]$/.test(k)) go(+k - 1);
-});
-$("next").addEventListener("click", () => go(current + 1));
-$("prev").addEventListener("click", () => go(current - 1));
-exBtn.addEventListener("click", () => setExplode(explodeTarget ? 0 : 1));
-$("fs").addEventListener("click", () => { const d = document.documentElement; (document.fullscreenElement ? document.exitFullscreen() : d.requestFullscreen?.())?.catch?.(() => {}); });
-
-/* ---------- resize ---------- */
-function resize() {
-  const w = innerWidth, h = innerHeight;
-  renderer.setSize(w, h, false); composer.setSize(w, h); composer.setPixelRatio(renderer.getPixelRatio());
-  camera.aspect = w / h;
-  if (SHOT) camera.clearViewOffset();
-  else camera.setViewOffset(w, h, w < 760 ? 0 : -Math.min(200, w * 0.12), w < 760 ? h * 0.1 : 0, w, h);
-  camera.updateProjectionMatrix();
-  leaders.setAttribute("viewBox", `0 0 ${w} ${h}`); leaders.setAttribute("width", w); leaders.setAttribute("height", h);
-}
-addEventListener("resize", resize); resize();
-
-/* ---------- loop ---------- */
-const clock = new THREE.Clock(); let flowT = 0;
-const pulse = new THREE.Mesh(new THREE.SphereGeometry(0.9, 24, 16), new THREE.MeshBasicMaterial({ color: ACCENT, toneMapped: false }));
-pulse.visible = false; scene.add(pulse);
-pulse.add(new THREE.Mesh(new THREE.SphereGeometry(1.8, 24, 16), new THREE.MeshBasicMaterial({ color: ACCENT, transparent: true, opacity: .25, depthWrite: false })));
-const FLOW = [
-  { curve: () => W.usb, rev: true, tags: ["monitor", "pc"] },
-  { curve: () => W.ctrl, tags: ["leonardo"] },
-  { curve: () => W.power, tags: ["bts"] },
-  { curve: null, tags: ["pulley20", "pulley60", "belt", "rim"] },
-  { curve: () => W.sensor, tags: ["sensor", "magnet"] },
-];
-const PH = 1.6;
-const tmp = new THREE.Vector3();
-let lastPhase = -1;
-
-function frame() {
-  const dt = Math.min(clock.getDelta(), 0.05); const t = clock.elapsedTime;
-  const s = STOPS[current] || STOPS[0];
-
-  if (tween) {
-    const k = Math.min(1, (performance.now() - tween.start) / tween.dur), e = ease(k);
-    camera.position.lerpVectors(tween.from.p, tween.to.p, e); controls.target.lerpVectors(tween.from.t, tween.to.t, e);
-    if (k >= 1) tween = null;
-  }
-  controls.update();
-
-  explodeNow += (explodeTarget - explodeNow) * (reduceMotion || SHOT ? 1 : Math.min(1, dt * 3.2));
-  const ex = ease(Math.max(0, Math.min(1, explodeNow)));
-  explodables.forEach(o => o.obj.position.copy(o.base).addScaledVector(o.d, ex));
-  updateGhost(SHOT ? 1 : dt, ex);
-
-  let steerA = 0, press = [0, 0];
-  if (s.anim === "steer" || s.anim === "belt") steerA = Math.sin(t * 0.9) * 0.9;
-  if (s.anim === "pedals") { const w = Math.sin(t * 1.7); press = [Math.max(0, -w), Math.max(0, w)]; }
-  if (s.anim === "idle") steerA = Math.sin(t * 0.5) * 0.12;
-  if (SHOT) { steerA = s.anim === "steer" || s.anim === "belt" ? 0.35 : 0; press = s.anim === "pedals" ? [0, 0.5] : [0, 0]; }
-  if (s.anim === "flow") {
-    flowT += dt; const cyc = flowT % (PH * FLOW.length); const ph = Math.floor(cyc / PH); const u = (cyc % PH) / PH;
-    const f = FLOW[ph];
-    if (f.curve) { pulse.visible = true; f.curve().getPointAt(f.rev ? 1 - u : u, pulse.position); } else pulse.visible = false;
-    steerA = ph === 3 ? ease(u) * 0.55 : ph === 4 ? 0.55 : ph === 0 ? 0.55 * (1 - ease(Math.min(1, u * 1.5))) : 0;
-    if (ph !== lastPhase) { lastPhase = ph; document.querySelectorAll("#flow li").forEach((li, k) => li.classList.toggle("on", k === ph)); setOutline(f.tags); }
-  } else { pulse.visible = false; lastPhase = -1; }
-  steer.rotation.z = steerA; rotor.rotation.z = steerA * 3;
-  setPedal(pedals[0], press[0]); setPedal(pedals[1], press[1]);
-  if (s.anim === "paddle") { const k = Math.max(0, Math.sin(t * 2.2)), side = Math.floor(t / 2.85) % 2; paddleLevers.forEach((lv, j) => lv.rotation.y = (j ? -1 : 1) * (j === side ? k * 0.35 : 0)); }
-  else paddleLevers.forEach(lv => lv.rotation.y = 0);
-
-  composer.render(dt);
-
-  const W2 = innerWidth, H2 = innerHeight;
-  const ready = !tween;
-  labelsEl.style.opacity = ready ? 1 : 0; leaders.style.opacity = ready ? 1 : 0;
-  if (ready) labelEls.forEach(o => {
-    const a = o.l.at;
-    if (Array.isArray(a)) tmp.set(...a); else { tmp.set(...a.p); a.obj.localToWorld(tmp); }
-    tmp.project(camera);
-    const behind = tmp.z > 1;
-    const x = (tmp.x * .5 + .5) * W2, y = (-tmp.y * .5 + .5) * H2;
-    const f = !SHOT && W2 < 760 ? 0.6 : 1;
-    const lx = x + o.l.dx * f, ly = y + o.l.dy * f;
-    o.dot.style.left = x + "px"; o.dot.style.top = y + "px";
-    o.el.style.left = lx + "px"; o.el.style.top = ly + "px";
-    o.line.setAttribute("x1", x); o.line.setAttribute("y1", y); o.line.setAttribute("x2", lx); o.line.setAttribute("y2", ly);
-    const vis = behind ? "hidden" : "visible"; o.el.style.visibility = o.dot.style.visibility = o.line.style.visibility = vis;
-  });
-  requestAnimationFrame(frame);
-}
-
-const startAt = Math.max(0, STOPS.findIndex(s => s.key === location.hash.slice(1)));
-go(startAt, true);
-$("loading").remove();
-requestAnimationFrame(frame);
+show(0);
+openTab(location.hash === "#sim" ? "sim" : "slides");
 </script>
 </body>
 </html>
