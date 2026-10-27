@@ -313,11 +313,11 @@ const Z = [Math.PI / 2, 0, 0], X = [0, 0, Math.PI / 2];
 const rotFor = a => a === "z" ? Z : a === "x" ? X : [0, 0, 0];
 const offFor = (a, d) => a === "z" ? [0, 0, d] : a === "x" ? [d, 0, 0] : [0, d, 0];
 
-function nut(parent, pos, axis = "z") {
+function nut(parent, pos, axis = "z", ws = -1) { // ws: side of the washer (toward the part it clamps)
   const g = new THREE.Group(); g.position.set(...pos);
   mesh(cyl(0.75, 0.62, 6), M.zinc(), g, [0, 0, 0], rotFor(axis));
-  mesh(cyl(0.7, 0.06, 6, 0.6), M.zinc(), g, offFor(axis, 0.34), rotFor(axis));
-  mesh(cyl(0.86, 0.15, 28), M.steel(), g, offFor(axis, -0.4), rotFor(axis));
+  mesh(cyl(0.7, 0.06, 6, 0.6), M.zinc(), g, offFor(axis, -ws * 0.34), rotFor(axis));
+  mesh(cyl(0.86, 0.15, 28), M.steel(), g, offFor(axis, ws * 0.4), rotFor(axis));
   parent.add(g); return g;
 }
 function rod(parent, len, pos, axis = "z") {
@@ -373,6 +373,7 @@ const plateFront = new THREE.Group(), plateBack = new THREE.Group();
   mesh(box(18, 26, 1.5), M.wood(), g, [0, 14.5, 0]);
   mesh(cyl(1.14, 1.52, 40), mat(0x6b4e2e, { roughness: .9 }), g, [0, AXIS_Y, 0], Z);
   for (const x of [-6.5, 0, 6.5]) mesh(cyl(0.45, 0.2, 12), M.steel(), g, [x, 2.2, z > 0 ? 0.8 : -0.8], Z);
+  if (z < 0) mesh(cyl(1.5, 1.52, 40), mat(0x6b4e2e, { roughness: .9 }), g, [0, MOTOR_Y, 0], Z); // motor boss + shaft hole
   bearing(g, [0, AXIS_Y, z > 0 ? 0.4 : -0.4]);
 });
 tag(plateFront, "plateFront", "plates"); tag(plateBack, "plateBack", "plates");
@@ -381,10 +382,23 @@ exp(plateFront, 7); exp(plateBack, -6);
 const rods = new THREE.Group(); base.add(rods);
 [[-7.5, 3.8], [7.5, 3.8], [-7.5, 25.5], [7.5, 25.5]].forEach(([x, y]) => {
   rod(rods, 17, [x, y, 0]);
-  [-7.1, -4.9].forEach(z => exp(nut(rods, [x, y, z]), -6));
-  [4.9, 7.1].forEach(z => exp(nut(rods, [x, y, z]), 7));
+  exp(nut(rods, [x, y, -7.1], "z", 1), -6); exp(nut(rods, [x, y, -4.9]), -6);
+  exp(nut(rods, [x, y, 4.9], "z", 1), 7); exp(nut(rods, [x, y, 7.1]), 7);
 });
 tag(rods, "rods");
+
+/* C-clamps holding the base board to the desk's front edge */
+const clamps = new THREE.Group(); base.add(clamps);
+[-11.3, 11.3].forEach(x => {
+  const c = M.steel();
+  mesh(box(1.4, 9.0, 1.0), c, clamps, [x, -2.1, 12.6]);
+  mesh(box(1.4, 0.9, 5.0), c, clamps, [x, 1.95, 10.35]);
+  mesh(box(1.4, 0.9, 5.0), c, clamps, [x, -6.15, 10.35]);
+  mesh(cyl(0.35, 4.4, 16), M.thread(), clamps, [x, -5.3, 9.0]);
+  mesh(cyl(0.9, 0.3, 24), M.zinc(), clamps, [x, -3.15, 9.0]);
+  mesh(box(3.2, 0.5, 0.5), M.black(), clamps, [x, -7.6, 9.0]);
+});
+tag(clamps, "clamps");
 const riserH = MOTOR_Y - 3.4 - 1.5;
 const riser = exp(mesh(box(9, riserH, 9), M.wood(), base, [0, 1.5 + riserH / 2, -12.5]), -10);
 tag(riser, "riser");
@@ -392,8 +406,8 @@ tag(riser, "riser");
 /* ---------- steering assembly (rotates) ---------- */
 const steer = new THREE.Group(); steer.position.set(0, AXIS_Y, 0); scene.add(steer);
 const shaft = new THREE.Group(); steer.add(shaft);
-rod(shaft, 23, [0, 0, 1]);
-[[7.1, 7], [7.6, 7], [-7.1, -6], [-7.6, -6], [11.2, 13], [13.4, 13]].forEach(([z, dz]) => exp(nut(shaft, [0, 0, z]), dz));
+rod(shaft, 24.8, [0, 0, 1.9]); // -10.5 (magnet end) .. 14.3 (past the hub's front nut)
+[[7.1, 7, -1], [7.75, 7, -1], [-7.1, -6, 1], [-7.75, -6, 1], [11.1, 13, 1], [13.45, 13, -1]].forEach(([z, dz, ws]) => exp(nut(shaft, [0, 0, z], "z", ws), dz));
 tag(shaft, "shaft");
 
 const P60 = 60 * 0.2 / (2 * Math.PI), P20 = 20 * 0.2 / (2 * Math.PI);
@@ -484,7 +498,7 @@ for (let i = 0; i < 8; i++) { const a = i / 8 * Math.PI * 2; mesh(box(0.25, 0.9,
 [[-1, 0xC8102E], [1, 0x1b1c1e]].forEach(([s, c]) => { mesh(cyl(0.3, 0.8, 12), mat(0xc9a24a, { metalness: .8, roughness: .3 }), motorBody, [s * 1.2, 0.6, -18.1], Z); mesh(cyl(0.34, 0.25, 12), mat(c), motorBody, [s * 1.2, 0.6, -18.4], Z); });
 mesh(box(8.5, 0.5, 7), mat(0x6b7178, { metalness: .7, roughness: .4 }), motorBody, [0, -3.55, -12.4]);
 const rotor = new THREE.Group(); motor.add(rotor);
-const motorShaft = mesh(cyl(0.4, 6.4, 20), M.steel(), rotor, [0, 0, -3.0], Z);
+const motorShaft = exp(mesh(cyl(0.4, 6.4, 20), M.steel(), rotor, [0, 0, -3.0], Z), -10);
 const p20 = pulley(rotor, 20, P20, [0, 0, 0]);
 tag(motorBody, "motor"); tag(motorShaft, "motor"); tag(p20, "pulley20");
 
@@ -506,14 +520,16 @@ tag(belt, "belt");
 const sensor = new THREE.Group(); scene.add(sensor);
 exp(sensor, -11);
 const bracket = new THREE.Group(); sensor.add(bracket);
-mesh(box(2.4, 1, 5.4), M.wood(), bracket, [0, 26.1, -9.45]);
-mesh(box(5, 9.6, 0.6), M.wood(), bracket, [0, 22, -12.05]);
+// chip face 1.5mm behind the magnet (-10.76); board -11.21..-11.05; bracket stops above the motor (top y 17.6)
+const AS_Z = -11.13;
+mesh(box(2.4, 1, 5.04), M.wood(), bracket, [0, 26.1, -9.27]);
+mesh(box(5, 8.6, 0.6), M.wood(), bracket, [0, 22.5, AS_Z - 0.38]);
 tag(bracket, "bracket");
 const asTex = pcbTex("#5b3aa8", "AS5600", "I2C 0x36");
 const asBoard = new THREE.Group(); sensor.add(asBoard);
-mesh(box(2.3, 2.3, 0.16), mat(0xffffff, { map: asTex, roughness: .5 }), asBoard, [0, AXIS_Y, -11.67]);
-mesh(box(0.5, 0.5, 0.14), M.black(), asBoard, [0, AXIS_Y, -11.54]);
-for (let i = 0; i < 4; i++) mesh(box(0.08, 0.5, 0.08), mat(0xc9a24a, { metalness: .8, roughness: .3 }), asBoard, [-0.75 + i * 0.5, AXIS_Y - 1.35, -11.67]);
+mesh(box(2.3, 2.3, 0.16), mat(0xffffff, { map: asTex, roughness: .5 }), asBoard, [0, AXIS_Y, AS_Z]);
+mesh(box(0.5, 0.5, 0.14), M.black(), asBoard, [0, AXIS_Y, AS_Z + 0.15]);
+for (let i = 0; i < 4; i++) mesh(box(0.08, 0.5, 0.08), mat(0xc9a24a, { metalness: .8, roughness: .3 }), asBoard, [-0.75 + i * 0.5, AXIS_Y - 1.35, AS_Z]);
 tag(asBoard, "sensor");
 
 /* ---------- electronics ---------- */
@@ -527,7 +543,7 @@ mesh(box(8, 0.05, 4), mat(0xf4f1e4), smps, [-42, 4.53, -18]);
 tag(smps, "smps");
 const bts = new THREE.Group(); elec.add(bts);
 mesh(box(5, 0.16, 5), mat(0xffffff, { map: pcbTex("#b5161f", "BTS7960", "43A"), roughness: .5 }), bts, [-22.5, 2.1, -6]);
-for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) mesh(cyl(0.12, 0.6, 8), M.steel(), bts, [-24.6 + i * 1.4, 1.8, -8.1 + j * 4.2]);
+for (const i of [-1, 1]) for (const j of [-1, 1]) mesh(cyl(0.12, 0.6, 8), M.steel(), bts, [-22.5 + i * 2.1, 1.8, -6 + j * 2.1]);
 mesh(box(4, 0.5, 4), M.alu(), bts, [-22.5, 2.45, -6]);
 for (let i = 0; i < 7; i++) mesh(box(0.2, 1.7, 4), M.alu(), bts, [-24.2 + i * 0.57, 3.5, -6]);
 mesh(box(1.1, 0.9, 3.2), mat(0x2463b4, { roughness: .5 }), bts, [-25.35, 2.6, -6]);
@@ -560,35 +576,44 @@ W.power = wire([[-21.2, 2.9, -8.2], [-17, 3.2, -12], [-12, 2.4, -21], [-4, 3, -2
 wire([[-20.4, 2.9, -8.2], [-16, 3.0, -12.6], [-11, 2.4, -22], [-3, 2.8, -23], [1.2, MOTOR_Y + 0.6, -18.6]], 0x1b1c1e, 0.26, motorWires);
 W.ctrl = wire([[-36, 3.1, -7.6], [-31, 4.5, -8.2], [-27, 4.4, -7.2], [-24.6, 2.4, -7.6]], 0xF2B807, 0.1);
 wire([[-37, 3.1, -7.6], [-31, 4.9, -8.6], [-27, 4.6, -7.6], [-24.6, 2.4, -7.2]], 0x2a7fd4, 0.1);
-W.sensor = wire([[0, AXIS_Y - 1.6, -11.75], [2.6, 17.5, -12.6], [7.8, 12, -13], [10.5, 2.4, -14], [-18, 2.2, -2], [-33, 3.0, -1.6], [-36.5, 3.1, -2.4]], 0x7a3fd0, 0.12, motorWires);
-W.usb = wire([[-41.7, 2.5, -5], [-50, 2.2, -6], [-64, 2.0, -10], [-71, -1, -12], [-76, -18, -12], [-82, -30.5, -14]], 0x3a3f45, 0.32);
-W.pedal = wire([[-12, FLOOR + 4, 34], [-16, FLOOR + 10, 22], [-24, -32, 13], [-28, -2, 11.2], [-31, 2.0, 2], [-36, 3.1, -2.2]], 0x7a3fd0, 0.14);
+// sensor lead: beside the motor, down the riser's side, behind the riser, across to the Leonardo (clear of plates and riser)
+W.sensor = wire([[0, AXIS_Y - 1.65, AS_Z], [2.6, 17.6, -11.4], [4.6, 12, -12.5], [5.4, 3, -15], [4, 2.2, -18.6], [-8, 2.2, -18.8], [-15.5, 1.8, -13],
+                 [-21, 2.0, -10.5], [-30, 2.0, -10.5], [-33.6, 2.4, -4.5], [-36.5, 3.1, -2.4]], 0x7a3fd0, 0.12, motorWires);
+W.usb = wire([[-41.7, 2.5, -5], [-50, 2.2, -6], [-64, 2.0, -10], [-71.2, 1.2, -11], [-72.5, -4, -12], [-76, -18, -12], [-82, -30.5, -14]], 0x3a3f45, 0.32);
+W.pedal = wire([[-12, FLOOR + 4, 34], [-16, FLOOR + 10, 22], [-24, -32, 13], [-28, -6, 11.2], [-29.5, 0.8, 10.4], [-31, 2.0, 4], [-36, 3.1, -2.2]], 0x7a3fd0, 0.14);
 wire([[-48.8, 3, -18], [-54.4, 3, -18]], 0x2c3136, 0.3);
-wire([[-59.6, 3, -18], [-68, 2, -22], [-72, -4, -24], [-74, -30, -26]], 0x2c3136, 0.3);
+wire([[-59.6, 3, -18], [-68, 2, -22], [-71.2, 1.6, -23], [-72.5, -4, -24], [-74, -30, -26]], 0x2c3136, 0.3);
 tag(wires, "wires"); tag(motorWires, "motorWires");
 
 /* ---------- pedals ---------- */
 const pedalsRoot = new THREE.Group(); pedalsRoot.position.set(0, FLOOR, 0); scene.add(pedalsRoot);
-mesh(box(32, 1.5, 34), M.wood(), pedalsRoot, [0, 0.75, 22]);
-const PIV_Z = 34, PIV_Y = 4, L = 22, SPR_AT = 17, REST = Math.asin((7.84 - 1.75) / SPR_AT);
+mesh(box(33, 1.5, 34), M.wood(), pedalsRoot, [0, 0.75, 22]);
+// at rest the spring is 76mm (2.4mm preload on its 78.4mm free length): 1.5 + SPR_REST = PIV_Y + sin(REST) * SPR_AT - 0.15
+const PIV_Z = 34, PIV_Y = 4, L = 22, SPR_AT = 17, SPR_REST = 7.6, REST = Math.asin((SPR_REST + 1.65 - PIV_Y) / SPR_AT);
 const helix = new (class extends THREE.Curve { getPoint(t, v = new THREE.Vector3()) { const a = t * 10 * Math.PI * 2; return v.set(Math.cos(a) * 0.82, t, Math.sin(a) * 0.82); } })();
 const springGeo = new THREE.TubeGeometry(helix, 420, 0.075, 6, false);
 const pedals = [];
 [["brake", -7.5], ["accel", 7.5]].forEach(([name, x]) => {
   const hinge = new THREE.Group(); hinge.position.set(x, 0, 0); pedalsRoot.add(hinge);
-  [-5.4, 5.4].forEach(dx => { mesh(box(2.2, 5, 4), M.wood(), hinge, [dx, 4, PIV_Z]); bearing(hinge, [dx + Math.sign(dx) * 1.15, PIV_Y, PIV_Z], "x"); });
-  rod(hinge, 14, [0, PIV_Y, PIV_Z], "x");
-  nut(hinge, [-6.9, PIV_Y, PIV_Z], "x"); nut(hinge, [6.9, PIV_Y, PIV_Z], "x");
+  const s = Math.sign(x);
+  // 608ZZ pressed flush into the outer face of each hinge block (blocks 4.3..6.5 from centre)
+  [-5.4, 5.4].forEach(dx => { mesh(box(2.2, 5, 4), M.wood(), hinge, [dx, 4, PIV_Z]); bearing(hinge, [dx + Math.sign(dx) * 0.73, PIV_Y, PIV_Z], "x"); });
+  // the arm is bolted to the M8 axle, so axle, nuts and magnet turn with it inside the bearings
   const arm = new THREE.Group(); arm.position.set(0, PIV_Y, PIV_Z); hinge.add(arm);
-  mesh(box(9.5, 1.5, L), M.wood(), arm, [0, 0.6, -L / 2]);
-  mesh(box(8.4, 0.12, 11), M.rubber(), arm, [0, 1.42, -L + 6.8]);
+  mesh(box(8.2, 1.5, L), M.wood(), arm, [0, 0.6, -L / 2]);
+  mesh(box(8.2, 2.4, 3.2), M.wood(), arm, [0, 0.2, -0.9]);
+  mesh(cyl(0.55, 0.35, 6), M.zinc(), arm, [0, 1.58, -0.9]);
+  mesh(box(7.2, 0.12, 11), M.rubber(), arm, [0, 1.42, -L + 6.8]);
+  rod(arm, 14.9, [0, 0, 0], "x");
+  nut(arm, [-6.98, 0, 0], "x", 1); nut(arm, [6.98, 0, 0], "x");
+  const pMag = new THREE.Group(); pMag.position.x = s * 7.575; arm.add(pMag);
+  [[0, ACCENT], [Math.PI, 0x2463b4]].forEach(([a0, c]) => mesh(new THREE.CylinderGeometry(0.3, 0.3, 0.25, 24, 1, false, a0, Math.PI), mat(c, { roughness: .4 }), pMag, [0, 0, 0], X));
   const springs = [];
   [-2.4, 2.4].forEach(sx => springs.push(mesh(springGeo, M.steel(), hinge, [sx, 1.5, 0])));
   const sens = new THREE.Group(); hinge.add(sens);
-  mesh(cyl(0.3, 0.25, 24), mat(0x8c939a, { metalness: .7 }), sens, [Math.sign(x) * 7.35, PIV_Y, PIV_Z], X);
-  mesh(box(0.16, 2.3, 2.3), mat(0xffffff, { map: asTex, roughness: .5 }), sens, [Math.sign(x) * 7.75, PIV_Y, PIV_Z]);
-  mesh(box(0.6, 6, 3), M.wood(), sens, [Math.sign(x) * 8.2, 3, PIV_Z]);
-  tag(arm, "pedals", name); springs.forEach(s => tag(s, "springs")); tag(sens, "pedalSensors");
+  mesh(box(0.16, 2.3, 2.3), mat(0xffffff, { map: asTex, roughness: .5 }), sens, [s * 7.93, PIV_Y, PIV_Z]);
+  mesh(box(0.6, 5.5, 3), M.wood(), sens, [s * 8.31, 4.25, PIV_Z]);
+  tag(arm, "pedals", name); springs.forEach(sp => tag(sp, "springs")); tag(sens, "pedalSensors"); tag(pMag, "pedalSensors");
   pedals.push({ name, arm, springs, x });
 });
 function setPedal(p, press) {
@@ -624,13 +649,13 @@ const STOPS = [
   { key: "overview", chip: "전체", part: "OVERVIEW", title: "DIY FFB 레이싱 휠",
     lead: "책상 위 휠 베이스, 바닥 페달, 전자부 세 덩어리로 만든다. 스페이스바를 누르면 부위별로 카메라가 이동한다.",
     specs: [["핸들 토크 목표", "약 2.6 N·m"], ["회전 범위", "900°"], ["부품비", "198,570원"]],
-    cam: [150, 44, 178], target: [-14, -26, -6], focus: [], anim: "idle", orbit: true,
-    labels: [{ at: [0, 30, 6], t: "휠 베이스", s: "책상 위", dx: 70, dy: -40 }, { at: [-34, 4, -13], t: "전자부", s: "전원·제어", dx: -70, dy: -50 },
-             { at: [0, FLOOR + 8, 20], t: "페달", s: "엑셀·브레이크", dx: 80, dy: 10 }, { at: [0, 40, -43], t: "게임 화면", dx: -40, dy: -50 }] },
+    cam: [150, 48, 178], target: [-14, -22, -6], focus: [], anim: "idle", orbit: true,
+    labels: [{ at: [0, 30, 6], t: "휠 베이스", s: "책상 위", dx: 90, dy: 10 }, { at: [-34, 4, -13], t: "전자부", s: "전원·제어", dx: -70, dy: -50 },
+             { at: [0, FLOOR + 8, 20], t: "페달", s: "액셀·브레이크", dx: 80, dy: 10 }, { at: [0, 40, -43], t: "게임 화면", dx: -150, dy: -10 }] },
   { key: "steering", chip: "핸들", part: "STEERING", title: "핸들과 조향축",
     lead: "350mm 휠을 집성목 허브판에 볼트로 고정하고, M8 전산볼트를 조향축으로 쓴다. 축은 앞판과 뒤판의 608ZZ 베어링 2개가 받친다.",
     specs: [["휠", "350mm 알루미늄 + PU"], ["조향축", "M8 전산볼트, 너트·와셔로 앞뒤 고정"], ["베어링", "608ZZ × 2 (내경 8mm)"], ["회전 범위", "900° (펌웨어 엔드스톱)"]],
-    note: "앞판과 뒤판은 M8 전산볼트 4개와 너트로 12cm 간격을 잡는다.",
+    note: "앞판과 뒤판은 M8 전산볼트 4개와 너트로 12cm 간격을 잡고, 베이스판은 C클램프 2개로 책상 앞 모서리에 고정한다.",
     cam: [-50, 34, 66], target: [3, 17, 2], focus: ["wheel", "shaft", "bearings"], ghost: [], anim: "steer",
     labels: [{ at: [-17.5, AXIS_Y + 1, 15.9], t: "스티어링 휠", s: "350mm", dx: -90, dy: -60 }, { at: at(hubPlate, [0, -3.2, 0.8]), t: "허브판", s: "집성목 + 볼트 6개", dx: -120, dy: 70 },
              { at: [0, AXIS_Y, 9.4], t: "조향축", s: "M8 전산볼트", dx: -40, dy: -170 }, { at: [8.9, 25.5, 6.8], t: "프레임 볼트", s: "M8 × 4", dx: 130, dy: -60 },
@@ -646,7 +671,7 @@ const STOPS = [
              { at: [0, MOTOR_Y - P20 - 0.2, 0.2], t: "GT2 벨트 · 20T 풀리", dx: 120, dy: 80 },
              { at: at(plateBack, [9, 22, -0.8]), t: "뒤판", s: "608ZZ", dx: 40, dy: -120 },
              { at: at(motorBody, [3.4, 0, -12.6]), t: "MY1016 모터", dx: 80, dy: 70 },
-             { at: at(asBoard, [0, AXIS_Y + 1.2, -11.67]), t: "AS5600", s: "센서 브래킷", dx: 110, dy: -70 }] },
+             { at: at(asBoard, [0, AXIS_Y + 1.2, AS_Z]), t: "AS5600", s: "센서 브래킷", dx: 110, dy: -70 }] },
   { key: "paddles", chip: "패들", part: "PADDLES", title: "패들 시프터",
     lead: "리미트 스위치 2개를 허브판 뒤에 붙이고, 스위치 레버 끝에 패들을 달아 손가락으로 당긴다.",
     specs: [["스위치", "리미트 스위치 모듈 × 2"], ["왼쪽", "기어 다운 (버튼 1)"], ["오른쪽", "기어 업 (버튼 2)"], ["연결", "Leonardo 디지털 핀"]],
@@ -666,16 +691,16 @@ const STOPS = [
     specs: [["센서", "AS5600, 4096단계 / 회전"], ["분해능", "약 0.09°"], ["연결", "I2C (Leonardo D2, D3)"], ["간격", "자석과 센서 사이 1~2mm"]],
     note: "센서 브래킷은 프레임과 같은 집성목으로 만든다.",
     cam: [24, 24, -13], target: [0, 20, -11.1], focus: ["sensor", "magnet"], ghost: ["bracket", "motor", "plateBack"], anim: "steer",
-    labels: [{ at: [0.42, AXIS_Y + 0.2, -10.62], t: "자석", s: "N·S 2극", dx: 80, dy: -110 }, { at: at(asBoard, [1.15, AXIS_Y + 0.8, -11.67]), t: "AS5600", s: "I2C", dx: 120, dy: 40 },
-             { at: [0, AXIS_Y - 0.6, -11.14], t: "간격 1~2mm", dx: -60, dy: 130 }, { at: [0, AXIS_Y, -8], t: "조향축 끝", dx: -100, dy: -90 }] },
-  { key: "pedals", chip: "페달", part: "PEDALS", title: "엑셀·브레이크 페달",
-    lead: "발판 뒤쪽 힌지에 M8 축과 608ZZ 베어링을 넣고, 압축 스프링 2개로 발판을 원위치시킨다. 힌지 축 끝의 AS5600이 밟은 각도를 읽는다.",
-    specs: [["페달", "엑셀, 브레이크"], ["복원", "압축 스프링 2개 / 페달, 자유길이 78.4mm"], ["센서", "AS5600 OUT → 아날로그 핀"], ["보정", "놓으면 0%, 끝까지 100%"]],
+    labels: [{ at: [0.42, AXIS_Y + 0.2, -10.62], t: "자석", s: "N·S 2극", dx: 80, dy: -110 }, { at: at(asBoard, [1.15, AXIS_Y + 0.8, AS_Z]), t: "AS5600", s: "I2C", dx: 120, dy: 40 },
+             { at: [0, AXIS_Y - 0.6, -10.83], t: "간격 1~2mm", dx: -60, dy: 130 }, { at: [0, AXIS_Y, -8], t: "조향축 끝", dx: -100, dy: -90 }] },
+  { key: "pedals", chip: "페달", part: "PEDALS", title: "액셀·브레이크 페달",
+    lead: "힌지 블록의 608ZZ 베어링에 M8 축을 넣고, 발판을 축에 볼트로 고정해 축과 함께 돌게 한다. 압축 스프링 2개가 발판을 원위치시키고, 축 끝 자석의 각도를 AS5600이 읽는다.",
+    specs: [["페달", "액셀, 브레이크"], ["복원", "압축 스프링 2개 / 페달, 자유길이 78.4mm (놓은 상태 76mm)"], ["축 고정", "발판-축 관통 볼트 1개"], ["센서", "축 끝 자석 + AS5600 OUT → 아날로그 핀"], ["보정", "놓으면 0%, 끝까지 100%"]],
     note: "페달 센서는 AS5600의 아날로그 출력(OUT)을 Leonardo 아날로그 핀에 바로 연결한다.",
     cam: [58, FLOOR + 30, 84], target: [3, FLOOR + 5, 21], focus: ["pedals", "springs", "pedalSensors"], anim: "pedals",
-    labels: [{ at: [7.5, FLOOR + 10, 18], t: "엑셀", dx: 70, dy: -50 }, { at: [-7.5, FLOOR + 10, 18], t: "브레이크", dx: -70, dy: -50 },
-             { at: [10.6, FLOOR + 4.5, 18.4], t: "압축 스프링", s: "× 2", dx: 150, dy: -60 }, { at: [7.5 + 6.6, FLOOR + PIV_Y, PIV_Z], t: "힌지", s: "608ZZ + M8 축", dx: -110, dy: 90 },
-             { at: [15.8, FLOOR + PIV_Y + 1, PIV_Z], t: "AS5600", s: "아날로그 출력", dx: 130, dy: 60 }] },
+    labels: [{ at: [7.5, FLOOR + 10, 18], t: "액셀", dx: 70, dy: -50 }, { at: [-7.5, FLOOR + 10, 18], t: "브레이크", dx: -70, dy: -50 },
+             { at: [10.6, FLOOR + 4.5, 18.4], t: "압축 스프링", s: "× 2", dx: 150, dy: -60 }, { at: [7.5 + 6.5, FLOOR + PIV_Y, PIV_Z], t: "힌지", s: "608ZZ + M8 축", dx: -110, dy: 90 },
+             { at: [7.5 + 7.93, FLOOR + PIV_Y + 1, PIV_Z], t: "AS5600", s: "아날로그 출력", dx: 130, dy: 60 }] },
   { key: "electronics", chip: "전자부", part: "ELECTRONICS", title: "전자부와 배선",
     lead: "SMPS 24V가 BTS7960을 거쳐 모터에 전류를 보내고, Leonardo는 PC의 USB 전원으로 따로 돈다. 두 전원은 GND만 공통으로 묶는다.",
     specs: [["제어", "Arduino Leonardo"], ["모터 드라이버", "BTS7960 43A"], ["전원", "LRS-350-24, 24V 14.6A"], ["모터 배선", "14AWG 빨강·검정"]],
