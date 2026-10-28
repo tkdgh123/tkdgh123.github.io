@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>SRS 첨삭</title>
+<style>
+:root {
+  --bg: #ECEAE5; --ink: #1C1B1F; --ink-2: #5E5A63; --rule: #D6D1C6; --red: #C21414;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #141519; --ink: #ECE8E1; --ink-2: #A29DA7; --rule: #2E3038; --red: #F07E66; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #141519; --ink: #ECE8E1; --ink-2: #A29DA7; --rule: #2E3038; --red: #F07E66; color-scheme: dark }
+
+* { box-sizing: border-box }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 "Pretendard", system-ui, "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; word-break: keep-all; overflow-wrap: anywhere }
+a { color: inherit }
+.wrap { max-width: 900px; margin: 0 auto; padding: 0 max(16px, env(safe-area-inset-left)) 0 max(16px, env(safe-area-inset-right)) }
+
+header { padding: 40px 0 20px }
+.back { font-size: 14px; color: var(--ink-2); text-decoration: none }
+.back:hover { color: var(--ink) }
+h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.15; margin: 10px 0 8px }
+header p { margin: 0 0 14px; color: var(--ink-2); max-width: 40rem }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 14px; margin: 0 0 16px; padding: 0; list-style: none }
+.legend li { display: flex; align-items: center; gap: 7px }
+.legend s { color: var(--ink); text-decoration-color: var(--red); text-decoration-thickness: 2px }
+.legend b { color: var(--red) }
+.legend i { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: var(--red); color: #fff; font: 700 11px/1 system-ui, sans-serif }
+.dl { display: inline-block; font-size: 14px; padding: 6px 14px; border: 1px solid var(--rule); border-radius: 99px; text-decoration: none }
+.dl:hover, .dl:focus-visible { border-color: var(--red); outline: none }
+
+.pages { display: grid; gap: 22px; padding-bottom: 64px }
+figure { margin: 0 }
+figure img { display: block; width: 100%; height: auto; aspect-ratio: 1489 / 2105; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.08), 0 8px 24px rgba(0,0,0,.08) }
+figcaption { font-size: 13px; color: var(--ink-2); margin-top: 6px; text-align: right }
+</style>
+</head>
+<body>
+
+<header><div class="wrap">
+  <a class="back" href="../../#make">← 작업실</a>
+  <h1>FFB 휠 펌웨어 SRS 첨삭</h1>
+  <p>팀 SRS(8쪽)에 고칠 곳을 빨간 펜으로 직접 표시했습니다. 마지막 9쪽은 문서에 없는 3.3~3.6 요구사항을 새로 쓴 초안입니다. 숫자(1ms, 100ms, 20kHz, 기본값 등)는 제안값이니 팀이 정해서 바꿔 넣으면 됩니다.</p>
+  <ul class="legend">
+    <li><s>취소선</s> 지울 곳</li>
+    <li><b>빨간 글씨</b> 바꾸거나 넣을 내용</li>
+    <li><b>∧</b> 끼워 넣을 자리</li>
+    <li><i>1</i> 같은 쪽 아래 메모와 짝</li>
+  </ul>
+  <a class="dl" href="srs-review.pdf" download>첨삭한 PDF 받기</a>
+</div></header>
+
+<main class="wrap pages">
+  <figure><img src="p1.webp" alt="1쪽 표지: 버전과 개정 이력 추가, 제안값 안내" width="1489" height="2105"><figcaption>1 / 9 · 표지</figcaption></figure>
+  <figure><img src="p2.webp" alt="2쪽 목차: 3.3~3.6 절 추가" width="1489" height="2105" loading="lazy"><figcaption>2 / 9 · 목차</figcaption></figure>
+  <figure><img src="p3.webp" alt="3쪽 서론: 오타, 프레임 정의, 힘 명령 범위, 참고 문서, 요구사항 ID 규칙" width="1489" height="2105" loading="lazy"><figcaption>3 / 9 · 서론</figcaption></figure>
+  <figure><img src="p4.webp" alt="4쪽 전체 설명: 기능과 요구사항 연결, 리셋 중 EN 핀, 송신 버퍼" width="1489" height="2105" loading="lazy"><figcaption>4 / 9 · 전체 설명</figcaption></figure>
+  <figure><img src="p5.webp" alt="5쪽 제약과 가정: 1080도, READY 대기, 통신 두절, AS5600 굽기, 풀다운, 2차 표시" width="1489" height="2105" loading="lazy"><figcaption>5 / 9 · 제약, 가정, 요구사항 분할</figcaption></figure>
+  <figure><img src="p6.webp" alt="6쪽 구조도: 안전 감시로 가는 빠진 선 2개, 모드 상태도 추가" width="1489" height="2105" loading="lazy"><figcaption>6 / 9 · 펌웨어 구조</figcaption></figure>
+  <figure><img src="p7.webp" alt="7쪽 명령표와 핀 표: 단위, 기본값, D4 핀 충돌, 풀업, PWM 주파수" width="1489" height="2105" loading="lazy"><figcaption>7 / 9 · 사용자·하드웨어 인터페이스</figcaption></figure>
+  <figure><img src="p8.webp" alt="8쪽 시리얼 규칙: 8N1, 프레임 형식, 데이터 형식, 전송 주기, 상태 비트" width="1489" height="2105" loading="lazy"><figcaption>8 / 9 · 시리얼 통신 규칙, 설계 제약</figcaption></figure>
+  <figure><img src="p9.webp" alt="9쪽 새로 추가할 3.3~3.6 요구사항 초안" width="1489" height="2105" loading="lazy"><figcaption>9 / 9 · 새로 추가할 쪽</figcaption></figure>
+</main>
+
+</body>
+</html>
