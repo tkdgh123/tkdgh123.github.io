@@ -322,19 +322,31 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: s
   <div class="wrap">
     <div class="read">
       <p class="eyebrow">기본 · 메시지마다 바뀌는 열쇠</p>
-      <h2>한 번 쓴 열쇠는 바로 버립니다</h2>
-      <p class="lead">메시지를 하나 보낼 때마다 지금 열쇠를 해시해서 다음 열쇠를 만들고, 쓴 열쇠는 지웁니다. 해시는 거꾸로 계산할 수 없으니, 나중에 누가 지금 열쇠를 훔쳐도 <b>지난</b> 메시지는 열지 못합니다. 이것을 래칫(ratchet, 한쪽으로만 도는 톱니)이라고 부릅니다.</p>
+      <h2>방금 한 말이 다음 열쇠가 됩니다</h2>
+      <p class="lead">메시지를 하나 보낼 때마다 <b>지금 열쇠에 방금 보낸 문장을 섞어</b> 해시해서 다음 열쇠를 만들고, 쓴 열쇠는 지웁니다. 해시는 거꾸로 계산할 수 없으니, 나중에 누가 지금 열쇠를 훔쳐도 <b>지난</b> 메시지는 열지 못합니다. 이렇게 한쪽으로만 도는 톱니 같은 열쇠 사슬을 래칫(ratchet)이라고 부릅니다.</p>
+      <p>새 열쇠는 상대에게 보내지 않습니다. 그 문장은 보낸 A도 받은 B도 이미 알고 있으니, 둘이 각자 계산하면 똑같은 열쇠가 나옵니다. 열쇠가 네트워크를 지나가지 않으니 훔칠 것도 없습니다. 대신 서버가 메시지 하나를 몰래 빼면 B는 그 문장을 몰라서 다음 열쇠를 만들 수 없고, 그 자리에서 들킵니다.</p>
     </div>
     <div class="bench">
-      <div class="head"><b>실습 · 래칫</b><span>브라우저의 SHA-256으로 실제 열쇠를 만듭니다</span></div>
+      <div class="head"><b>실습 · 문장 섞기 래칫</b><span>브라우저의 SHA-256으로 실제 열쇠를 만듭니다</span></div>
       <div class="chain" id="chain"></div>
+      <form class="send" id="rForm" style="margin-bottom:10px"><input id="rIn" placeholder="A가 보낼 문장" aria-label="A가 보낼 문장" maxlength="40"><button class="btn primary" type="submit">보내기</button></form>
       <div class="controls">
-        <button class="btn primary" id="rSend" type="button">메시지 하나 보내기</button>
+        <button class="btn atk" id="rDrop" type="button">서버가 다음 메시지 빼먹기</button>
         <button class="btn atk" id="rSteal" type="button">지금 열쇠 훔치기</button>
         <button class="btn" id="rReset" type="button">처음부터</button>
       </div>
       <div class="term" id="rLog" style="margin-top:14px" aria-live="polite"></div>
-      <p class="fine">정직하게 말하면, 지금 열쇠를 훔친 사람은 <b>다음</b> 열쇠는 계산할 수 있습니다. 덜미가 지키는 건 지난 대화입니다.</p>
+      <p class="fine">정직하게 말하면, 지금 열쇠를 훔친 사람은 다음 메시지를 열어 그 문장을 알게 되므로 <b>다음</b> 열쇠도 계산할 수 있습니다. 문장을 섞어도 마찬가지입니다. 덜미가 지키는 건 지난 대화입니다.</p>
+    </div>
+    <div class="read">
+      <h3>팀의 처음 생각에서 고친 것</h3>
+      <p>처음 아이디어는 "전 대화의 문장으로 새 열쇠를 만들어 상대에게 보내고, 받으면 지우기를 반복한다"였습니다. 쓰고 지우는 부분은 그대로 살렸고, 네 군데를 고쳤습니다.</p>
+    </div>
+    <div class="four">
+      <div><h4>문장만으로 만들지 않습니다</h4><p>"ㅇㅇ", "ㅋㅋ", "밥 먹었어?" 같은 문장은 하나씩 넣어 보면 맞혀집니다. 그래서 비밀인 지금 열쇠에 섞습니다. 지금 열쇠를 모르면 문장을 맞혀도 소용없습니다.</p></div>
+      <div><h4>열쇠를 보내지 않습니다</h4><p>보내려면 그 열쇠를 또 무언가로 잠가야 하고, 이전 열쇠로 잠그면 이전 열쇠 하나가 그 뒤를 전부 엽니다. 양쪽이 각자 계산하면 보낼 필요가 없습니다.</p></div>
+      <div><h4>방향마다 사슬이 따로 있습니다</h4><p>여럿이 동시에 말하면 '직전 문장'이 사람마다 달라집니다. 그래서 A→B, B→A 사슬을 따로 두고, 내 사슬에는 내가 보낸 문장만 섞습니다.</p></div>
+      <div><h4>빠지면 끊고 알립니다</h4><p>문장 하나가 빠지면 그 뒤 열쇠를 못 만듭니다. 메시지가 저절로 빠지는 일은 없으니(TCP), 빠졌다면 서버가 뺀 것입니다. 다시 접속하면 새 열쇠로 이어집니다.</p></div>
     </div>
   </div>
 </section>
@@ -451,6 +463,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: s
           <div class="atkgrid">
             <button class="btn atk" id="aTamper" type="button">변조<small>다음 메시지 1바이트 바꾸기</small></button>
             <button class="btn atk" id="aReplay" type="button">재전송<small>직전 메시지 한 번 더</small></button>
+            <button class="btn atk" id="aDrop" type="button">빼먹기<small>다음 메시지 버리기</small></button>
             <button class="btn atk" id="aForge" type="button">위조<small>A인 척 가짜 메시지</small></button>
             <button class="btn atk" id="aSwap" type="button">바꿔치기<small>A의 열쇠를 내 것으로</small></button>
             <button class="btn atk" id="aPeek" type="button">엿보기<small>지나간 메시지 열어 보기</small></button>
@@ -468,7 +481,8 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: s
     </div>
     <div class="four">
       <div><h4>서버가 메시지를 바꾸면</h4><p>인증 암호가 붙여 둔 확인 태그가 맞지 않아 B가 버립니다.</p><code>[!] 변조 감지: 메시지 폐기</code></div>
-      <div><h4>서버가 옛 메시지를 다시 보내면</h4><p>메시지마다 붙인 순서번호가 이미 받은 번호라서 버립니다.</p><code>[!] 순서번호 불일치 (재전송)</code></div>
+      <div><h4>서버가 옛 메시지를 다시 보내거나 빼먹으면</h4><p>이미 받은 순서번호면 버리고, 번호가 건너뛰었으면 빠진 문장이 있어 다음 열쇠를 못 만듭니다.</p><code>[!] 순서번호 불일치 (재전송)
+[!] #6 메시지가 오지 않음: 대화 끊김</code></div>
       <div><h4>서버가 끼어들면</h4><p>대화 중이면 열쇠가 바뀌었다는 경보가 뜨고, 처음부터 끼어들었으면 단어 여덟 개가 어긋납니다.</p><code>[!] A의 열쇠가 바뀜: 단어를 다시 맞춰 보세요</code></div>
       <div><h4>서버가 금고나 승인을 위조하면</h4><p>A, B, C의 도장(서명)이 없어서 받는 쪽이 거절합니다.</p><code>[!] 서명 불일치: A가 보낸 금고가 아님</code></div>
     </div>
@@ -552,7 +566,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: s
       <figcaption><code>crypto.c</code>는 네트워크를 전혀 모르고 <code>net.c</code>는 암호를 전혀 모르게 나눴습니다. 그래서 네 명이 서로 기다리지 않고 동시에 만들 수 있고, 암호 부분은 네트워크 없이 따로 시험할 수 있습니다.</figcaption>
     </figure>
     <div class="split">
-      <div class="ours"><h4>우리가 직접 짜는 것</h4><ul><li>봉투(패킷) 모양과 길이 적기</li><li>여러 사람을 동시에 받는 중계 서버</li><li>순서번호 검사와 경고 화면</li><li>열쇠를 XOR로 반 나누기와 금고 흐름 전체</li><li>한글 단어 지문과 열쇠 바뀜 경보</li><li>공격 실험실의 공격 명령들</li></ul></div>
+      <div class="ours"><h4>우리가 직접 짜는 것</h4><ul><li>봉투(패킷) 모양과 길이 적기</li><li>여러 사람을 동시에 받는 중계 서버</li><li>문장 섞기 래칫, 순서번호 검사와 경고 화면</li><li>열쇠를 XOR로 반 나누기와 금고 흐름 전체</li><li>한글 단어 지문과 열쇠 바뀜 경보</li><li>공격 실험실의 공격 명령들</li></ul></div>
       <div class="lib"><h4>libsodium에서 빌려 쓰는 것</h4><ul><li>공개키 만들기와 열쇠 맞추기 (X25519)</li><li>인증 암호 (XChaCha20-Poly1305)</li><li>해시 (BLAKE2b)와 서명 (Ed25519)</li><li>받는 사람만 여는 봉인 (sealed box)</li><li>안전한 난수</li></ul></div>
     </div>
   </div>
@@ -565,7 +579,8 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: s
     <p class="lead">과장은 질문 하나에 무너집니다. 그래서 한계를 먼저 적어 둡니다.</p>
     <ul class="limits">
       <li><b>단어를 맞추기 전에는 모든 보호가 서버 앞에서 무력합니다.</b> 처음 만났을 때 한 번은 꼭 소리 내어 확인해야 합니다.</li>
-      <li>지금 열쇠가 새면 지난 메시지는 안전하지만, 그 뒤 메시지는 열립니다.</li>
+      <li>지금 열쇠가 새면 지난 메시지는 안전하지만, 그 뒤 메시지는 열립니다. 문장을 섞어도 마찬가지입니다. 훔친 사람이 다음 메시지를 열면 그 문장도 알게 되니까요.</li>
+      <li>서버가 메시지를 일부러 빼면 대화가 끊깁니다. 들키지만 막지는 못하고, 다시 접속해야 이어집니다.</li>
       <li>금고에서 연 내용을 B가 베껴 적거나 화면을 찍는 건 막지 못합니다. 증명할 수 있는 것은 "C가 B에게 열쇠를 넘겼다"까지입니다.</li>
       <li>금고를 맡긴 A는 원래 내용을 압니다. 금고가 막는 건 받는 사람 한 명이나 서버가 혼자 여는 것입니다.</li>
       <li>누가 누구에게, 언제, 얼마나 보냈는지는 서버가 봅니다. 1:1 대화도 내용은 숨기지만 누구와 1:1로 대화하는지는 서버가 압니다.</li>
@@ -646,33 +661,40 @@ const fingerprint = async key => [...(await sha(key)).slice(0, 8)].map(x => WORD
   matchMedia('(prefers-color-scheme: dark)').addEventListener('change', draw);
 })();
 
-/* 래칫 */
+/* 래칫: 다음 열쇠 = 해시(지금 열쇠 + 방금 보낸 문장) */
 (() => {
-  const chain = $('#chain'), log = $('#rLog');
-  let ck, n, keys, stolen;
+  const chain = $('#chain'), log = $('#rLog'), dropBtn = $('#rDrop');
+  let ck, n, keys, stolen, drop, bck, bn, broken;
+  const step = (k, text) => sha(cat(k, [2], te.encode(text)));
   const render = () => {
     chain.innerHTML = keys.map((k, i) => `<span class="k ${i < n ? 'gone' : 'now'}${stolen && i === n ? ' stolen' : ''}" title="${hex(k, 4)}">CK${i}${i < n ? ' 지움' : ''}</span>`).join('<i>→</i>');
   };
   const reset = async () => {
-    ck = rnd(32); n = 0; keys = [ck]; stolen = false;
+    ck = bck = rnd(32); n = 0; bn = 1; keys = [ck]; stolen = drop = broken = false; dropBtn.classList.remove('armed');
     log.innerHTML = ''; line(log, `<span class="d">처음 열쇠 CK0 = ${hex(ck, 6)}  (A와 B가 각자 똑같이 계산)</span>`);
     render();
   };
-  $('#rSend').onclick = async () => {
-    if (n >= 9) return;
-    const mk = await sha(cat(ck, [1])), next = await sha(cat(ck, [2]));
+  const send = async text => {
+    if (n >= 9) return line(log, '<span class="d">사슬이 길어졌습니다. "처음부터"를 눌러 주세요.</span>');
+    const mk = await sha(cat(ck, [1])), next = await step(ck, text);
     n++; ck = next; keys.push(ck); stolen = false;
-    line(log, `#${n} 메시지를 메시지 열쇠 <span class="b">${hex(mk, 4)}</span> 로 잠가 보냄 → CK${n - 1} 지움`);
+    line(log, `A&gt; ${esc(text)}  <span class="d">#${n} · 메시지 열쇠 ${hex(mk, 4)} 로 잠금 → CK${n - 1} 지움</span>`);
+    if (drop) { drop = false; dropBtn.classList.remove('armed'); line(log, `<span class="r">[서버] #${n} 메시지를 몰래 버림</span>`) }
+    else if (!broken && bn !== n) { broken = true; line(log, `<span class="r">B: [!] #${bn} 메시지가 오지 않음 · 그 문장을 몰라 다음 열쇠를 못 만듭니다 · 대화 끊김</span>`) }
+    else if (broken) line(log, `<span class="r">B: #${n} 열 수 없음 · 다시 접속해야 합니다 ("처음부터")</span>`);
+    else { bck = await step(bck, text); bn++; line(log, `<span class="g">B: 같은 문장으로 CK${n} = ${hex(bck, 4)} 계산 ${hex(bck) === hex(ck) ? '✔ A와 같음' : '✕'} (열쇠는 받지 않음)</span>`) }
     render();
   };
+  $('#rForm').onsubmit = e => { e.preventDefault(); const v = $('#rIn').value.trim(); if (v) { send(v); $('#rIn').value = '' } };
+  dropBtn.onclick = () => { drop = !drop; dropBtn.classList.toggle('armed', drop); line(log, drop ? '<span class="r">[서버] 빼먹기 준비: A가 다음에 보내는 메시지를 버립니다</span>' : '<span class="d">빼먹기 취소</span>') };
   $('#rSteal').onclick = () => {
     stolen = true; render();
     line(log, `<span class="r">[훔침] CK${n} = ${hex(ck, 6)}</span>`);
     line(log, n ? `<span class="g">#1 ~ #${n}: 못 엶. 해시는 거꾸로 계산할 수 없어서 CK${n}에서 CK${n - 1}로 돌아갈 수 없음</span>` : '<span class="d">아직 보낸 메시지가 없습니다. 먼저 몇 개 보내 보세요.</span>');
-    line(log, `<span class="y">#${n + 1}부터: 열림. 다음 열쇠는 앞으로 계산할 수 있음</span>`);
+    line(log, `<span class="y">#${n + 1}부터: 열림. CK${n}로 #${n + 1} 메시지를 열면 그 문장이 보이고, 그 문장으로 다음 열쇠도 계산됨</span>`);
   };
   $('#rReset').onclick = reset;
-  reset().then(async () => { for (let i = 0; i < 3; i++) await $('#rSend').onclick() });
+  reset().then(async () => { for (const t of ['안녕', '내일 회의 3시야', '회비는 금요일까지']) await send(t) });
 })();
 
 /* 단어 지문 */
@@ -724,13 +746,14 @@ const fingerprint = async key => [...(await sha(key)).slice(0, 8)].map(x => WORD
 
 /* 공격 실험실 */
 (() => {
-  const A = $('#labA'), S = $('#labS'), B = $('#labB'), tamperBtn = $('#aTamper');
-  let key, seq, lastSeq, last, tamper, wordsA;
+  const A = $('#labA'), S = $('#labS'), B = $('#labB'), tamperBtn = $('#aTamper'), dropBtn = $('#aDrop');
+  let key, seq, lastSeq, last, tamper, drop, wordsA;
   const aad = n => new Uint8Array([0, 0, 0, n]);
   const encrypt = async (k, n, text) => { const iv = rnd(12); return { seq: n, iv, ct: new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv, additionalData: aad(n) }, k, te.encode(text))) } };
   const deliver = async (p, note = '') => {
     line(S, `<span class="${note ? 'r' : 'd'}">→B seq=${p.seq} ${hex(cat(p.iv, p.ct), 10)}${note}</span>`);
     if (p.seq <= lastSeq) return line(B, `<span class="r">[!] 순서번호 불일치 (재전송 의심) · #${p.seq} 폐기</span>`);
+    if (p.seq > lastSeq + 1) return line(B, `<span class="r">[!] #${lastSeq + 1} 메시지가 오지 않음 · 그 문장을 몰라 다음 열쇠를 못 만듭니다 · 대화 끊김</span>`);
     try {
       const pt = td.decode(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: p.iv, additionalData: aad(p.seq) }, key, p.ct));
       lastSeq = p.seq; line(B, `[A] ${esc(pt)} <span class="d">#${p.seq}</span>`);
@@ -740,12 +763,13 @@ const fingerprint = async key => [...(await sha(key)).slice(0, 8)].map(x => WORD
     seq++; const p = await encrypt(key, seq, text);
     line(A, `A&gt; ${esc(text)}`);
     last = { seq: p.seq, iv: p.iv, ct: p.ct.slice() };
+    if (drop) { drop = false; dropBtn.classList.remove('armed'); return line(S, `<span class="r">→B seq=${p.seq} 버림 ← 빼먹기</span>`) }
     if (tamper) { p.ct[p.ct.length - 1] ^= 1; tamper = false; tamperBtn.classList.remove('armed'); return deliver(p, ' ← 1바이트 바꿈') }
     deliver(p);
   };
   const reset = async () => {
     key = await crypto.subtle.generateKey({ name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
-    seq = 0; lastSeq = 0; last = null; tamper = false; tamperBtn.classList.remove('armed');
+    seq = 0; lastSeq = 0; last = null; tamper = drop = false; tamperBtn.classList.remove('armed'); dropBtn.classList.remove('armed');
     wordsA = await fingerprint(rnd(32));
     A.innerHTML = S.innerHTML = B.innerHTML = '';
     line(A, `<span class="d">내 단어: ${wordsA.slice(0, 4).join('-')}…</span>`);
@@ -755,6 +779,7 @@ const fingerprint = async key => [...(await sha(key)).slice(0, 8)].map(x => WORD
   };
   $('#labForm').onsubmit = e => { e.preventDefault(); const v = $('#labIn').value.trim(); if (v) { send(v); $('#labIn').value = '' } };
   tamperBtn.onclick = () => { tamper = !tamper; tamperBtn.classList.toggle('armed', tamper); line(S, tamper ? '<span class="r">[공격] 변조 준비: A가 다음 메시지를 보내면 1바이트를 바꿉니다</span>' : '<span class="d">변조 취소</span>') };
+  dropBtn.onclick = () => { drop = !drop; dropBtn.classList.toggle('armed', drop); line(S, drop ? '<span class="r">[공격] 빼먹기 준비: A가 다음 메시지를 보내면 B에게 넘기지 않습니다</span>' : '<span class="d">빼먹기 취소</span>') };
   $('#aReplay').onclick = () => { if (!last) return; line(S, '<span class="r">[공격] 직전 메시지를 한 번 더 보냄</span>'); deliver({ ...last }, ' ← 재전송') };
   $('#aForge').onclick = async () => {
     const fakeKey = await crypto.subtle.generateKey({ name: 'AES-GCM', length: 256 }, false, ['encrypt']);
