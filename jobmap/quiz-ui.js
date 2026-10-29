@@ -16,7 +16,7 @@ function steps() {
 const yearNum = () => parseInt(qa.a.year) || 1;
 const total = () => steps().filter((s) => s.q).length + items.length;
 const done = () => steps().filter((s) => s.q && qa.a[s.q.id]).length + items.filter((it) => qa.a[it.id]).length;
-const label = (id) => Q.scale[qa.a[id] - 1];
+const label = (id) => items.find((it) => it.id === id).scale[qa.a[id] - 1];
 
 function optionsFor(q) {
   if (q.id === "school") return [{ t: "숭실대학교", v: "ssu" }, { t: "다른 학교", v: "etc" }];
@@ -37,7 +37,7 @@ function fits() {
   return (D.jobs || []).map((job) => {
     const mine = items.filter((it) => it.jobs?.includes(job.key));
     const why = mine.filter((it) => qa.a[it.id] >= 6).sort((x, y) => qa.a[y.id] - qa.a[x.id]).slice(0, 3)
-      .map((it) => `'${it.q}'에 '${label(it.id)}'`);
+      .map((it) => `${Q.say(it.id, qa.a[it.id])} 골랐어요`);
     return { job, score: score(mine), why };
   }).sort((x, y) => y.score - x.score);
 }
@@ -45,7 +45,7 @@ function fits() {
 function testIntro() {
   return `<div class="quiz intro">
     <h2>나에게 맞는 취업 준비 찾기</h2>
-    <p>질문 ${total()}개에 '매우 안좋음'부터 '매우 좋음'까지 7단계로 답하면, 지금 내 상황을 진단하고 맞는 직무와 보완할 점, 이번 학기 할 일을 알려 줘요. 20분쯤 걸려요.</p>
+    <p>질문 ${total()}개에 7단계로 답하면, 지금 내 상황을 진단하고 맞는 직무와 보완할 점, 이번 학기 할 일을 알려 줘요. 20분쯤 걸려요.</p>
     <div class="secs">${["기본 정보", ...Q.groups.map((g) => g.title)].map((s, k) => `<span><b>${k + 1}</b>${esc(s)}</span>`).join("")}</div>
     <button type="button" class="go" id="q-start">시작하기</button>
     <p class="safe">답은 이 화면에서만 쓰이고 어디에도 저장되지 않아요.</p>
@@ -69,7 +69,7 @@ function testPage(s) {
   return `<div class="quiz">${head(s.group.title, s.group.ask)}
     <ol class="lks">${s.items.map((it) => `<li class="lk${qa.a[it.id] ? " done" : ""}" id="lk-${it.id}">
       <p>${esc(it.q)}</p>
-      <div class="lscale">${Q.scale.map((t, k) => `<button type="button" class="lv v${k + 1}" data-id="${it.id}" data-v="${k + 1}" aria-pressed="${qa.a[it.id] === k + 1}"><i></i><span>${t}</span></button>`).join("")}</div>
+      <div class="lscale">${it.scale.map((t, k) => `<button type="button" class="lv v${k + 1}" data-id="${it.id}" data-v="${k + 1}" aria-pressed="${qa.a[it.id] === k + 1}"><i></i><span>${t}</span></button>`).join("")}</div>
     </li>`).join("")}</ol>
     <button type="button" class="go" id="q-next"${all ? "" : " disabled"}>다음</button></div>`;
 }
@@ -95,7 +95,7 @@ function testResult() {
   const weak = stateItems.filter((it) => qa.a[it.id] <= 3).sort((x, y) => qa.a[x.id] - qa.a[y.id]).slice(0, 8);
   const strong = stateItems.filter((it) => qa.a[it.id] >= 6);
   const liked = (ids) => Q.groups.filter((g) => ids.includes(g.id)).flatMap((g) => g.items).filter((it) => qa.a[it.id] >= 6).sort((x, y) => qa.a[y.id] - qa.a[x.id]);
-  const likes = liked(["work", "style"]), wants = liked(["org"]);
+  const likes = liked(["work", "style"]), wants = liked(["org", "value"]);
   const majorWorry = qa.a.majorBelief <= 3;
   const S = D.ssu;
   const todo = a.school === "ssu" ? [...(S.roadmap[year] || []), ...(((d || {}).roadmap || {})[year] || [])] : [];
@@ -103,12 +103,12 @@ function testResult() {
   const facts = [d ? d.name : a.school === "ssu" ? "학과 미선택" : "다른 학교", a.year, a.double === "하고 있어요" ? "복수·부전공 중" : null].filter(Boolean);
 
   const prompt = `나는 ${d ? d.promptName : "대학"}을 공부하는 대학교 ${a.year} 학생이야. 복수·부전공은 ${a.double}.
-취업 준비 질문지(7단계: 매우 안좋음~매우 좋음)에 답한 결과야.
+취업 준비 질문지에 7단계로 답한 결과야.
 - 준비 상태(0~100점): ${areas.map((x) => `${x.name} ${x.score}`).join(", ")}
-- 안좋다고 답한 것: ${weak.map((it) => `${it.q}(${label(it.id)})`).join(", ") || "없음"}
-- 좋다고 답한 것: ${strong.map((it) => it.q).join(", ") || "없음"}
-- 하고 싶은 일·방식: ${likes.slice(0, 8).map((it) => it.q).join(", ") || "뚜렷하게 좋은 것 없음"}
-- 가고 싶은 곳·중요한 것: ${wants.map((it) => it.q).join(", ") || "뚜렷하게 좋은 것 없음"}${a.note ? `\n- 고민: ${a.note}` : ""}
+- 낮게 답한 것: ${weak.map((it) => `${it.q}(${label(it.id)})`).join(", ") || "없음"}
+- 높게 답한 것: ${strong.map((it) => `${it.q}(${label(it.id)})`).join(", ") || "없음"}
+- 하고 싶은 일·방식: ${likes.slice(0, 8).map((it) => `${it.q}(${label(it.id)})`).join(", ") || "뚜렷하게 좋은 것 없음"}
+- 가고 싶은 곳·중요한 것: ${wants.map((it) => `${it.q}(${label(it.id)})`).join(", ") || "뚜렷하게 좋은 것 없음"}${a.note ? `\n- 고민: ${a.note}` : ""}
 - 맞을 수 있는 직무 후보: ${recs.map((r) => `${r.job.name}(${r.score}점)`).join(", ")}
 
 1. 내 상황에서 가장 먼저 채워야 할 부분을 솔직하게 말해줘.
@@ -136,14 +136,14 @@ function testResult() {
     </section>` : ""}
 
     ${weak.length ? `<section>
-      <h2>안좋다고 답한 것</h2>
+      <h2>낮게 답한 것</h2>
       <p class="sh">낮게 답한 순서예요. 할 수 있는 것을 붙였어요.</p>
       <ul class="todo weak">${weak.map((it) => `<li><b>${esc(it.q)}</b> <em>${label(it.id)}</em>${it.fix ? `<br>${link(it.fix)}` : ""}</li>`).join("")}</ul>
     </section>` : ""}
 
     ${recs.length ? `<section>
       <h2>나에게 맞을 수 있는 직무</h2>
-      <p class="sh">하고 싶은 일·일하는 방식·가고 싶은 곳 답으로 점수를 냈어요. 눌러서 직무 사전을 보세요.</p>
+      <p class="sh">하고 싶은 일·일하는 방식·가고 싶은 곳·중요한 것 답으로 점수를 냈어요. 눌러서 직무 사전을 보세요.</p>
       <div class="rjobs">${recs.map((r, k) => `<a class="rjob" href="#jobs-${r.job.key}"><i>${k + 1}</i><b>${esc(r.job.name)} <span class="num">${r.score}점</span></b><span>${esc(r.job.does)}</span>${r.why.length ? `<ul>${r.why.map((w) => `<li>${esc(w)}</li>`).join("")}</ul>` : ""}<em>직무 사전에서 보기 →</em></a>`).join("")}</div>
       <details class="allfit"><summary>직무 12개 모두 보기</summary>${bars(all.map((r) => ({ name: r.job.name, score: r.score, href: `#jobs-${r.job.key}` })))}</details>
     </section>` : ""}
