@@ -96,24 +96,24 @@ footer { padding: 48px 0 64px; color: var(--ink-2); font-size: 13px }
   <h3>한 줄 요약</h3>
   <p><b>서버도 내용을 볼 수 없는 C 언어 종단간 암호화 채팅.</b> 메시지마다 키가 바뀌어서 지금 키가 털려도 지난 대화는 안전하고, 중요한 메시지는 두 사람이 모여야만 열립니다.</p>
 
-  <h3>할 수 있는 것: 기능 7가지</h3>
-  <p>A, B, C 세 사람이 접속해 있다고 하고, 각 기능을 쓰면 화면에 무엇이 보이는지 적었습니다.</p>
+  <h3>할 수 있는 것: 기능 8가지</h3>
+  <p>A, B, C 세 사람이 접속해 있다고 하고, 각 기능을 쓰면 화면에 무엇이 보이는지 적었습니다. 대화는 <b>전체 대화</b>와 <b>1:1 대화</b> 둘 다 됩니다. 두 사람만 접속하면 그대로 1:1 메신저입니다.</p>
   <div class="scroll"><table>
     <tr><th>기능</th><th>이렇게 쓴다</th><th>화면에 보이는 것</th><th>설명</th></tr>
     <tr><td>1. 접속</td><td><code>./client --user B --server 192.168.0.12:9000</code></td><td><code>[*] 서버 연결 완료</code><br><code>[*] 접속 중: A, C</code></td><td>이름을 정하고 대화방에 들어갑니다. 이미 있는 이름이면 거절됩니다.</td></tr>
-    <tr><td>2. 일반 메시지</td><td>그냥 글자를 치고 Enter</td><td>B, C 화면: <code>[A] 내일 회의 3시야</code></td><td>접속해 있는 <b>모든 사람</b>에게 갑니다. 서버에는 알아볼 수 없는 바이트만 지나갑니다.</td></tr>
-    <tr><td>3. 안전번호 확인</td><td><code>/verify A</code></td><td><code>A와의 안전번호: 4821 0937 1150</code></td><td>A도 <code>/verify B</code>를 쳐서 두 사람이 숫자를 소리 내어 맞춰 봅니다. 같으면 서버가 중간에서 키를 바꿔치기하지 않은 것입니다.</td></tr>
-    <tr><td>4. 잠금 메시지 보내기</td><td>A: <code>/lock B C 금고 비번은 4512</code></td><td>A: <code>[*] 잠금 #3 보냄</code><br>B, C: <code>[잠금] A의 잠금 메시지 #3 (B, C 둘 다 동의해야 열림)</code></td><td>B와 C에게 번호만 도착하고 내용은 보이지 않습니다. 열쇠를 반으로 쪼개 B와 C가 반쪽씩 가진 상태입니다.</td></tr>
-    <tr><td>5. 열람 요청</td><td>B: <code>/open 3</code></td><td>B: <code>[!] C의 승인을 기다리는 중</code><br>C: <code>[요청] B가 #3을 열려고 합니다 → /approve 3</code></td><td>B 혼자서는 열 수 없습니다. 반쪽 열쇠로는 아무것도 알 수 없습니다.</td></tr>
-    <tr><td>6. 승인</td><td>C: <code>/approve 3</code></td><td>B: <code>[#3] 금고 비번은 4512</code></td><td>C가 자기 반쪽을 B에게만 넘겨 B가 엽니다. <b>읽는 사람은 요청한 B 한 명, 한 번뿐</b>이고, 열리면 #3은 서버에서도 지워집니다. 승인한 C는 내용을 보지 못합니다.</td></tr>
-    <tr><td>7. 종료</td><td><code>/quit</code></td><td>다른 사람 화면: <code>[*] B 퇴장</code></td><td>내 컴퓨터의 키를 전부 지우고 끝냅니다. 내가 반쪽을 가진 잠금 메시지도 함께 사라집니다.</td></tr>
+    <tr><td>2. 전체 대화</td><td>그냥 글자를 치고 Enter</td><td>B, C 화면: <code>[A] 내일 회의 3시야</code></td><td>접속해 있는 <b>모든 사람</b>에게 갑니다. 서버에는 알아볼 수 없는 바이트만 지나갑니다.</td></tr>
+    <tr><td>3. 1:1 대화</td><td>B: <code>/dm A</code> 후 글자를 치고 Enter<br><code>/all</code>로 전체 대화로 돌아감</td><td>B 입력줄: <code>B→A&gt;</code><br>A 화면: <code>[B → 나] 이따 따로 얘기해</code><br>C 화면: 아무것도 안 뜸</td><td>B와 A 두 사람만 아는 열쇠로 잠가 <b>A 한 명에게만</b> 보냅니다. C는 받지 않습니다. 서버는 내용은 못 보지만 B가 A에게만 보냈다는 사실은 압니다.</td></tr>
+    <tr><td>4. 안전번호 확인</td><td><code>/verify A</code></td><td><code>A와의 안전번호: 4821 0937 1150</code></td><td>A도 <code>/verify B</code>를 쳐서 두 사람이 숫자를 소리 내어 맞춰 봅니다. 같으면 서버가 중간에서 키를 바꿔치기하지 않은 것입니다.</td></tr>
+    <tr><td>5. 잠금 메시지 보내기</td><td>A: <code>/lock B C 금고 비번은 4512</code></td><td>A: <code>[*] 잠금 #3 보냄</code><br>B, C: <code>[잠금] A의 잠금 메시지 #3 (B, C 둘 다 동의해야 열림)</code></td><td>B와 C에게 번호만 도착하고 내용은 보이지 않습니다. 열쇠를 반으로 쪼개 B와 C가 반쪽씩 가진 상태입니다.</td></tr>
+    <tr><td>6. 열람 요청</td><td>B: <code>/open 3</code></td><td>B: <code>[!] C의 승인을 기다리는 중</code><br>C: <code>[요청] B가 #3을 열려고 합니다 → /approve 3</code></td><td>B 혼자서는 열 수 없습니다. 반쪽 열쇠로는 아무것도 알 수 없습니다.</td></tr>
+    <tr><td>7. 승인</td><td>C: <code>/approve 3</code></td><td>B: <code>[#3] 금고 비번은 4512</code></td><td>C가 자기 반쪽을 B에게만 넘겨 B가 엽니다. <b>읽는 사람은 요청한 B 한 명, 한 번뿐</b>이고, 열리면 #3은 서버에서도 지워집니다. 승인한 C는 내용을 보지 못합니다.</td></tr>
+    <tr><td>8. 종료</td><td><code>/quit</code></td><td>다른 사람 화면: <code>[*] B 퇴장</code></td><td>내 컴퓨터의 키를 전부 지우고 끝냅니다. 내가 반쪽을 가진 잠금 메시지도 함께 사라집니다.</td></tr>
   </table></div>
 
   <h3>하지 않는 것</h3>
   <ul>
     <li><b>대화 기록 저장 없음.</b> 프로그램을 끄면 대화가 사라집니다. 파일에 남기지 않는 것도 보안 설계의 일부입니다.</li>
     <li><b>접속해 있지 않은 사람에게는 보낼 수 없음.</b> 나중에 접속해도 지난 메시지를 받지 못합니다.</li>
-    <li><b>1:1 귓속말 없음.</b> 일반 메시지는 접속자 전원에게 갑니다. 특정 두 사람을 지정하는 건 잠금 메시지뿐입니다.</li>
     <li><b>글자만 보냄.</b> 파일과 사진은 보내지 않습니다.</li>
   </ul>
 
@@ -268,7 +268,7 @@ footer { padding: 48px 0 64px; color: var(--ink-2); font-size: 13px }
     <tr><th>type</th><th>방향</th><th>body</th><th>비고</th></tr>
     <tr><td>1 HELLO</td><td>클라 → 서버</td><td>키 교환 공개키 32 + 봉인용 공개키 32</td><td>접속 후 첫 패킷이어야 함. <code>from</code> = 쓰고 싶은 이름</td></tr>
     <tr><td>1 HELLO</td><td>서버 → 클라</td><td>같음</td><td>"<code>from</code> 사용자의 공개키는 이것"이라는 뜻. 새 사용자와 기존 사용자에게 서로 보냄</td></tr>
-    <tr><td>2 MSG</td><td>클라 → 서버 → 클라</td><td>암호문 + 태그 16</td><td>서버는 손대지 않고 전달. 단체 대화는 클라이언트가 상대마다 따로 보냄</td></tr>
+    <tr><td>2 MSG</td><td>클라 → 서버 → 클라</td><td>암호문 + 태그 16</td><td>서버는 손대지 않고 전달. 전체 대화는 클라이언트가 상대마다 따로 보내고, 1:1 대화는 한 명에게만 보냄. 서버 쪽 처리는 둘이 같음. 1:1인지 여부는 암호문 안 첫 바이트에 넣어 받는 쪽이 <code>[B → 나]</code>로 표시</td></tr>
     <tr><td>3 LOCK</td><td>클라 → 서버</td><td>보유자1 이름 16 + 보유자2 이름 16 + 봉인 조각1 80 + 봉인 조각2 80 + 암호문</td><td><code>nonce</code> = 잠금 암호문의 nonce</td></tr>
     <tr><td>3 LOCK</td><td>서버 → 요청자</td><td>요청자의 봉인 조각 80 + 암호문</td><td><code>from</code> = 원래 보낸 사람, <code>seq</code> = 잠금 번호</td></tr>
     <tr><td>4 OPEN_REQ</td><td>클라 → 서버</td><td>없음</td><td><code>seq</code> = 잠금 번호</td></tr>

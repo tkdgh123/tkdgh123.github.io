@@ -122,6 +122,7 @@ footer { padding: 48px 0 64px; color: var(--ink-2); font-size: 13px }
   <div class="scroll"><table>
     <tr><th></th><th>지금까지 (제안서·수정본)</th><th>바뀐 안</th></tr>
     <tr><td>이름과 콘셉트</td><td>암호화 통신 프로그램</td><td><b>덜미</b>: 몰래 열 수 없고, 몰래 건드리면 덜미 잡히는 메신저</td></tr>
+    <tr><td>대화 방식</td><td>접속자 전원 대화만 (1:1 귓속말 없음)</td><td><b>전체 대화 + 1:1 대화</b>. 상대마다 따로 잠그는 설계라 한 명에게만 보내면 됨. 서버는 바꿀 것 없음 (10. 29. 추가)</td></tr>
     <tr><td>내세우는 차별점</td><td>키 래칫 + 2인 합의 잠금 (둘이 같은 무게)</td><td><b>두 열쇠 금고</b>(서버를 믿지 않는 2인 열람)가 간판, <b>공격 실험실</b>이 그 증거</td></tr>
     <tr><td>안전번호</td><td>숫자 12자리, 두 사람 키를 합친 해시</td><td><b>사람별 한글 단어 8개</b>(64비트). 단어 256개는 팀이 직접 고름</td></tr>
     <tr><td>공개키</td><td>서버가 나눠 주는 키를 그대로 믿음</td><td>파일에 저장하는 <b>신원 키</b>가 매 세션 키에 서명. 단어 지문은 실행할 때마다 같음</td></tr>
@@ -274,7 +275,7 @@ footer { padding: 48px 0 64px; color: var(--ink-2); font-size: 13px }
   <h3>기능 등급</h3>
   <div class="scroll"><table>
     <tr><th>등급</th><th>기능</th></tr>
-    <tr><td><span class="tier base">기본</span></td><td>접속, 일반 메시지(접속자 전원), 해시 래칫(복호화 성공 시에만 전진), AEAD, 순서번호. 발표에서는 "기반 기술" 한 장으로 설명</td></tr>
+    <tr><td><span class="tier base">기본</span></td><td>접속, 전체 대화(접속자 전원)와 <b>1:1 대화</b>(<code>/dm 이름</code>, <code>/all</code>로 복귀), 해시 래칫(복호화 성공 시에만 전진), AEAD, 순서번호. 발표에서는 "기반 기술" 한 장으로 설명</td></tr>
     <tr><td><span class="tier">핵심</span></td><td><b>두 열쇠 금고</b>: 제목, 서명, 열쇠 전달 증명, 보유자 노트북에 저장, 열람 후 화면 지우기 (<a href="#vault">9절</a>)</td></tr>
     <tr><td><span class="tier">핵심</span></td><td><b>신원 키와 한글 단어 지문</b>: 접속 체크인, <code>/verify</code>, 열쇠 바뀜 경보</td></tr>
     <tr><td><span class="tier">핵심</span></td><td><b>공격 실험실</b>: 서버 콘솔 공격 명령(<code>tamper</code> <code>replay</code> <code>swap</code> <code>peek</code> <code>forge</code>)과 서버의 눈 (<a href="#lab">10절</a>)</td></tr>
@@ -353,6 +354,7 @@ footer { padding: 48px 0 64px; color: var(--ink-2); font-size: 13px }
     <li>금고를 맡긴 A는 원래 내용을 압니다. 금고가 막는 것은 "보유자 한 명이나 서버가 혼자 여는 것"입니다.</li>
     <li>누가 누구에게, 언제, 얼마나 보냈는지(메타데이터)는 서버가 봅니다.</li>
     <li>일반 메시지는 받는 사람이 각자 읽습니다. 두 사람이 필요한 건 금고뿐입니다.</li>
+    <li>1:1 대화는 내용은 숨기지만, 누가 누구와 1:1로 대화하는지는 서버가 압니다.</li>
     <li>같은 Wi-Fi 안에서만 연결되고, 접속해 있지 않은 사람에게는 보낼 수 없습니다.</li>
   </ul>
 </section>
