@@ -8,7 +8,7 @@ const YW = "https://yw.work24.go.kr";
 const COUNSEL = "https://counsel.ssu.ac.kr";
 
 window.JOBMAP = {
-  checked: "2026년 10월 29일",
+  checked: "2026년 10월 30일",
   schools: [{ id: "ssu", name: "숭실대학교" }],
   collegeOrder: ["인문대학", "법과대학", "사회과학대학", "경제통상대학", "경영대학", "공과대학", "자연과학대학", "IT대학", "AI대학"],
   // 단과대 → 전국 같은 계열 취업률 (2024년 졸업자, 교육부 취업통계)

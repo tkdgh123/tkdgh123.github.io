@@ -14,7 +14,7 @@
 
   window.JOBMAP.depts = [
     {
-      id: "jp", name: "일어일문학과", college: "인문대학", promptName: "예: 일본어·일본학 전공",
+      id: "jp", name: "일어일문학과", college: "인문대학", promptName: "일본어·일본학 전공",
       intro: "통번역·교육·일본 취업을 많이 꼽지만, 실제론 기업·금융·공무원도 많아요.",
       uni: { n: 8, list: "상명대·명지대·영남대·전주대·충남대·한남대·동국대·국립창원대" },
       paths: [
@@ -83,7 +83,7 @@
       ]
     },
     {
-      id: "eng", name: "영어영문학과", college: "인문대학", promptName: "예: 영어·영문학 전공",
+      id: "eng", name: "영어영문학과", college: "인문대학", promptName: "영어·영문학 전공",
       intro: "교육·일반기업·공직을 고루 꼽고, 실제론 영업·사무 같은 전공 무관이 많아요.",
       uni: { n: 8, list: "숭실대·연세대(미래)·경성대·동국대·서울시립대·공주대·명지대·전주대" },
       paths: [
@@ -150,7 +150,7 @@
       ]
     },
     {
-      id: "biz", name: "경영학부", college: "경영대학", promptName: "예: 경영학 전공",
+      id: "biz", name: "경영학부", college: "경영대학", promptName: "경영학 전공",
       intro: "일반기업·공무원·마케팅·창업을 고루 꼽고, 합격자는 직무 인턴이 많아요.",
       uni: { n: 6, list: "동명대·국립창원대·신라대·부산디지털대·한경국립대·명지대" },
       paths: [
@@ -213,7 +213,7 @@
       ]
     },
     {
-      id: "pubadmin", name: "행정학부", college: "사회과학대학", promptName: "예: 행정학 전공",
+      id: "pubadmin", name: "행정학부", college: "사회과학대학", promptName: "행정학 전공",
       intro: "공무원만이 아니라 언론·민간기업·금융까지 거의 모든 대학이 함께 꼽아요.",
       uni: { n: 5, list: "국립경국대·동의대·강원대·한국교통대·국립창원대" },
       paths: [
@@ -268,7 +268,7 @@
       ]
     },
     {
-      id: "masscom", name: "언론홍보학과", college: "사회과학대학", promptName: "예: 언론홍보·미디어 전공",
+      id: "masscom", name: "언론홍보학과", college: "사회과학대학", promptName: "언론홍보·미디어 전공",
       intro: "기자·PD·광고·PR은 모든 대학이 꼽고, 실제론 기업 마케팅·일반직도 절반쯤이에요.",
       uni: { n: 10, list: "성신여대·영남대·원광대·호남대·세종대·서강대·국민대·충남대·동명대·한양대" },
       paths: [
@@ -332,7 +332,7 @@
       ]
     },
     {
-      id: "mechanical", name: "기계공학부", college: "공과대학", promptName: "예: 기계공학 전공",
+      id: "mechanical", name: "기계공학부", college: "공과대학", promptName: "기계공학 전공",
       intro: "자동차·조선은 모든 대학이 꼽아요. 실제론 구매·품질·설비 직무로도 가요.",
       uni: { n: 10, list: "건국대·아주대·전주대·한경국립대·영남대·강원대·한국기술교육대·울산대·전북대·명지대" },
       paths: [
@@ -397,7 +397,7 @@
       ]
     },
     {
-      id: "math", name: "수학과", college: "자연과학대학", promptName: "예: 수학 전공",
+      id: "math", name: "수학과", college: "자연과학대학", promptName: "수학 전공",
       intro: "연구·금융·교사·IT·계리사를 많이 꼽고, 데이터·AI는 거의 적혀 있지 않아요.",
       uni: { n: 9, list: "서강대·인천대·성신여대·국립창원대·숭실대·건국대·경희대·전북대·영남대" },
       paths: [
@@ -457,7 +457,7 @@
       ]
     },
     {
-      id: "aisw", name: "AI소프트웨어학부", college: "AI대학", promptName: "예: AI·소프트웨어 전공",
+      id: "aisw", name: "AI소프트웨어학부", college: "AI대학", promptName: "AI·소프트웨어 전공",
       intro: "개발자와 대학원을 거의 모든 대학이 꼽고, 기획·기술영업은 거의 없어요.",
       uni: { n: 12, list: "성신여대·국립창원대·동명대·동의대·영산대·금오공대·고려대(세종)·중앙대·연세대(미래)·상명대·경성대·숭실대(AI융합학부)" },
       paths: [

@@ -1,4 +1,4 @@
-// 직무 사전 12개. 근거: research_notes 직무사전·취업QA·비정형_공학직무 (2024년 이후 자료).
+// 직무 사전 17개(12개 + 2026-10-30 추가 5개). 근거: research_notes 직무사전·취업QA·비정형_공학직무 (2024년 이후 자료).
 // does·tasks·skills는 기존 직무 사전(커리어넷·고용24 직업정보)에서 그대로 옮겼다.
 // pay: 2024년 이후 직무별 신입 임금 공식 수치를 찾지 못해 모두 null.
 (function () {
@@ -186,6 +186,113 @@
         { text: "2026년 공무원 보수 3.5% 인상, 9년 만의 최대폭", source: "https://www.newsis.com/view/NISX20250829_0003308629" }
       ],
       source: "https://www.mpm.go.kr/mpm/comm/newsPress/newsPressRelease/?boardId=bbs_0000000000000029&mode=view&cntId=4208&category=&pageIdx="
+    },
+    // 아래 5개는 학과(AI소프트웨어·기계·수학·언론홍보)에 맞춰 2026-10-30 추가. 근거: research_notes/jobmap 발전 조사/새 직무와 AI 영향.md
+    // does·tasks·skills는 커리어넷 직업정보. 원문을 열어 보지 못한 사례·팁은 넣지 않았다.
+    {
+      key: "sw", name: "소프트웨어 개발자",
+      does: "컴퓨터가 알아듣는 언어로 프로그램과 시스템을 기획하고 만들어요.",
+      tasks: ["개발한 소프트웨어를 시험 운영하고 기능·성능 평가하기", "사용자 교육과 기술 자문", "새로운 소프트웨어 기술 조사하고 연구하기"],
+      skills: ["논리적·분석적 사고", "프로그래밍", "수리논리력"],
+      open: "경기권 4년제 컴공(학점 3점 중반, 자격증·어학 없음)이 넥슨코리아 백엔드 수시 채용에 합격했어요(2025).",
+      pay: null,
+      outlook: null,
+      tips: ["코딩테스트를 꾸준히 풀어요", "프로젝트는 문제 인식→해결 과정과 기술을 고른 이유 중심으로 정리해요", "CS 개념서 한 권을 반복해 읽고 기술 면접을 준비해요", "신기술 나열보다 깊이 고민한 흔적을 보여줘요"],
+      tipSources: ["https://ohksj77.tistory.com/279", "https://kyko.tistory.com/82"],
+      facts: [
+        { text: "개발직 공고 중 신입 비중이 2022년 53.5%에서 2024년 37.4%로 줄었어요(한국노동연구원 인용)", source: "https://www.twig24.com/news/2026/01/07/20260107014003" },
+        { text: "2024년 3년 미만 신입 개발자 취업자는 9천 명 줄고, 3년 이상 경력자는 4만 2천 명 늘었어요(한국노동연구원 인용)", source: "https://www.twig24.com/news/2026/01/07/20260107014003" }
+      ],
+      source: "https://www.career.go.kr/cnet/app/base/job/jobView.m?SEQ=834"
+    },
+    {
+      key: "ai", name: "AI 엔지니어",
+      // 커리어넷에 'AI 개발자' 항목이 없어 유사직업이 인공지능전문가인 신경회로망연구원을 썼다(연구직 성격)
+      does: "영상·음성인식, 로봇 제어 같은 데 쓰이는 인공지능 기술을 연구하고 개발해요.",
+      tasks: ["학습하고 판단하는 컴퓨터·로봇 프로그램 만들기", "영상·음성인식, 로봇 제어 같은 응용 기술 연구하기", "새 기술을 익히고 실험하기"],
+      skills: ["수학·물리 같은 기초과학", "프로그래밍", "논리적 사고·분석력"],
+      open: null,
+      pay: null,
+      outlook: null,
+      tips: ["프로젝트는 기술을 고른 이유와 대안 비교까지 정리해요", "AI를 면접 연습 상대로 써요"],
+      tipSources: ["https://kyko.tistory.com/82"],
+      facts: [],
+      source: "https://www.career.go.kr/cnet/app/base/job/jobView.m?SEQ=98"
+    },
+    {
+      key: "mech", name: "기계 설계·생산기술",
+      does: "기계·설비·생산시스템을 연구하고 설계하거나, 생산 공정을 운영하고 감독해요.",
+      tasks: ["기계의 고장이나 문제를 찾아 해결하기", "신제품 아이디어를 기획하고 세부 설계하기", "현장 설치와 검사 감독, 견적서·보고서 작성"],
+      skills: ["공간시각능력", "수리논리력", "분석적 사고"],
+      open: "현직 멘토 10명은 설계는 연구소 중심으로 적게 뽑아 석사·프로젝트 경험을 보고, 생산기술·품질은 채용 인원이 훨씬 많다고 답했어요(2026).",
+      pay: null,
+      outlook: null,
+      tips: ["설계 신입은 CAD 숙련도보다 4대 역학으로 설계 이유를 설명하는 힘을 봐요", "요구조건부터 시제품 개선까지 해 본 설계 프로젝트·캡스톤을 포트폴리오로 만들어요", "반도체 장비, 이차전지 공정 장비, 로봇·자동화처럼 산업군을 좁혀요", "생산기술로 들어가 설계로 옮기는 길도 있지만 자동으로 바뀌진 않아요"],
+      tipSources: ["https://community.linkareer.com/STEM_mentoring/6048404", "https://community.linkareer.com/STEM_mentoring/5484894", "https://community.linkareer.com/STEM_mentoring/5053954"],
+      facts: [],
+      source: "https://www.career.go.kr/cnet/app/base/job/jobView.m?SEQ=56"
+    },
+    {
+      key: "rnd", name: "연구개발(R&D)",
+      // R&D는 전공마다 직업이 달라 국내 기업 연구소에서 큰 갈래인 재료·소재 연구를 대표로 썼다
+      does: "새 기술·재료·제품을 연구하고 실험해 회사의 다음 제품을 만들어요.",
+      tasks: ["세라믹·반도체 등의 공정 설계", "재료의 구조와 성질 연구", "문제 원인을 실험으로 찾고 개선안 세우기"],
+      skills: ["수리논리력", "분석적 사고", "실험 설계"],
+      open: null,
+      pay: null,
+      outlook: null,
+      tips: ["연구직은 석사 졸업자와 겨루는 경우가 많아 학부연구생 성과와 연구 공모전이 경쟁력이 돼요", "공고의 우대 전공 표기를 먼저 확인해요"],
+      tipSources: ["https://community.linkareer.com/STEM_mentoring/5484894"],
+      facts: [
+        { text: "LG AI연구원은 후보 물질 42만 개 이상 중 탈모 관리 소재를 AI로 하루 만에 찾았다고 발표했어요(2026-07)", source: "https://view.asiae.co.kr/article/2026070808465086575" }
+      ],
+      source: "https://www.career.go.kr/cnet/app/base/job/jobView.m?SEQ=112"
+    },
+    {
+      key: "media", name: "기자·PD·콘텐츠 제작",
+      does: "소식을 취재해 신문·방송·인터넷으로 알리고, 프로그램과 콘텐츠를 기획하고 만들어요.",
+      tasks: ["현장을 취재하고 기사 쓰기", "원고 교정과 기사 배치 정하기", "제작진·출연진을 꾸리고 촬영을 지휘하기"],
+      skills: ["글쓰기·언어능력", "창의력", "대인관계"],
+      open: "언론홍보영상 전공이 조연출·인턴 경력으로 JTBC·CJ ENM·SBS미디어그룹 예능 PD 합격 자소서를 남겼어요(2024~2025).",
+      pay: null,
+      outlook: null,
+      tips: ["조연출·방송 인턴처럼 제작 현장 경험을 앞에 둬요", "플랫폼별 기획안으로 기획력을 보여줘요", "신입 공채가 줄고 채용연계형 인턴이 늘어요. 인턴 우수 수료자가 최종 면접 대상이 되기도 해요", "방송사만 보지 말고 유통사·웹예능 제작사까지 넓혀요"],
+      tipSources: ["https://linkareer.com/cover-letter/search?page=1&role=PD&sort=RELEVANCE&tab=all", "http://www.journalist.or.kr/news/article.html?no=61915"],
+      facts: [
+        { text: "2026-10-20 기준 경향신문·조선미디어·중앙그룹·MBC가 올해 신입기자 공채를 하지 않았어요(기자협회보)", source: "http://www.journalist.or.kr/news/article.html?no=61915" }
+      ],
+      source: "https://www.career.go.kr/cnet/app/base/job/jobView.m?SEQ=262"
     }
   ];
+
+  // 흥미 코드: 가장 가까운 O*NET 직업의 Interest Code (O*NET OnLine 2026-10 열람).
+  // 미국에 같은 직업이 없는 해외영업(영업 준용)·공기업 사무·공무원은 가장 가까운 것을 골랐다. IT 기획·PM은 시스템 분석가(IC)와 PM(EC)을 합쳤다.
+  const ONET = (soc) => `https://www.onetonline.org/link/summary/${soc}`;
+  const CODES = {
+    sales: ["EC", "41-4012.00"], trade: ["EC", "41-4012.00"], marketing: ["ECI", "13-1161.00"], hr: ["ECS", "13-1071.00"],
+    finance: ["CEI", "13-2011.00"], strategy: ["CIE", "13-1111.00"], scm: ["CEI", "13-1081.00"], cs: ["CES", "43-4051.00"],
+    itpm: ["ICE", "15-1211.00"], data: ["IC", "15-2051.00"], ncs: ["C", "43-9061.00"], civil: ["CE", "13-1041.00"],
+    sw: ["IC", "15-1252.00"], ai: ["IC", "15-1221.00"], mech: ["RIC", "17-2141.00"], rnd: ["IRC", "19-2032.00"], media: ["AIE", "27-3023.00"]
+  };
+  // AI가 바꾸는 점: now 현장 사례, change 바뀌는 일, need 신입이 갖출 것. 2024년 이후 근거가 없는 줄은 비웠다.
+  // 회사 자기 발표(이노션·CJ대한통운·한화생명·서부발전·LG AI연구원)가 섞여 있다. need 일부는 근거 내용에서 끌어낸 해석이다.
+  const AI = {
+    sales: { change: "KDI는 생성형 AI로 10년 뒤 일자리 약 25.6만 개가 줄고, 사무·판매처럼 AI 노출이 큰 직종에 몰릴 것으로 추정했어요(2026-07)", need: "졸업 전에 실무 경험 쌓기. 한국은행은 20대가 AI 시대에 수요가 는 전문성·실무 경험을 갖추기 어려워 밀린다고 봤어요(2026-09)", source: "https://www.khan.co.kr/article/202607222035025, https://www.metroseoul.co.kr/article/20260914500451" },
+    trade: { now: "수출기업 444곳 중 54.5%가 무역 업무에 AI를 쓰고, 시장조사·바이어 발굴·공급망 관리에 적용해요(무역협회, 2026)", need: "AI를 안 쓰는 기업은 어떤 서비스가 있는지(47.5%), 어디에 쓸지(40.6%) 몰라요. 무역 업무에 맞는 AI 도구를 아는 사람이 강점이 돼요", source: "https://www.venturesquare.net/1112777/" },
+    marketing: { now: "광고회사는 AI 전담팀을 두고, 촬영 없이 생성형 AI로 만든 광고도 나왔어요(2024)", change: "제작비를 약 1/4, 기간을 약 1/3로 줄일 수 있다고 봐요. 반복 제작은 AI가, 사람은 기획에 집중해요", need: "기획·전략 역량. 광고·홍보 전문가는 '다소 증가' 전망이에요(2026-05)", source: "https://magazine.hankyung.com/business/article/202408293875b" },
+    hr: { now: "HR 업계는 AI 서류 스크리닝, 공고 자동 작성, AI 영상면접 서비스를 내놓고 있어요(2026-10)", source: "https://m.ddaily.co.kr/page/view/2026100218450201107" },
+    finance: { change: "회계사무원은 '현상 유지' 전망이지만 일의 중심이 단순 행정에서 시스템 운영·프로세스 관리로 옮겨 가요(2026-05)", need: "회계 시스템과 업무 프로세스를 이해하기", source: "https://m.seoul.co.kr/news/2026/05/18/20260518500141" },
+    strategy: { need: "데이터와 ESG를 이해하기. 경영·진단 전문가는 데이터 기반 리스크 관리와 ESG 수요로 '다소 증가' 전망이에요(2026-05)", source: "https://m.seoul.co.kr/news/2026/05/18/20260518500141" },
+    scm: { now: "CJ대한통운은 수요예측·최적화 엔진으로 배차를 짜고, 적재율 최적화 AI를 현장에서 써요(2025-11 발표)", change: "적재율 계산이 약 1시간에서 10분 이내로 줄었어요. 담당자 경험에 따라 달라지던 방식이 표준화돼요", source: "https://byline.network/2025/11/1128/" },
+    cs: { now: "상담봇이 단순 문의를 처리하고, 상담 중엔 AI가 답변을 추천해요. 신입 상담사는 AI와 모의상담을 연습해요(한화생명, 2025-03)", change: "상담사는 복잡한 문의에 집중해요. 안내·접수원은 챗봇 확산으로 '다소 감소' 전망이에요", need: "AI가 못 푸는 복잡한 문의를 해결하는 상담 역량", source: "https://sateconomy.co.kr/news/view/1065579185045971" },
+    ncs: { now: "한국서부발전은 전 직원이 쓰는 생성형 AI 플랫폼과 내부 자료 질의응답, 업무 자동화를 구축하고 있어요(2025-08)", source: "https://byline.network/2025/08/8269/" },
+    civil: { now: "광주 북구는 공문·사업계획서·보도자료 작성과 문서 요약에 생성형 AI를 쓰고, 야간·휴일엔 AI 콜봇이 민원을 접수해요(2026-09)", change: "콜봇은 긴급 상황이나 모르는 민원을 바로 당직자에게 넘겨요. 판단과 책임은 사람에게 남아요", source: "https://news.mtn.co.kr/news-detail/2026092815023967346" },
+    sw: { now: "개발직의 80% 이상이 생성형 AI를 쓰고, AI가 참조 코드 검색과 간단한 코드 작성을 맡아요(2026-01). 넥슨은 AI를 쓰는 문제 해결 과정을 보는 면접으로 코딩테스트를 대체했어요", change: "신입 공고 비중이 2022년 53.5%에서 2024년 37.4%로 줄었어요. 숙련 개발자가 AI로 효율을 높이며 신입을 덜 뽑는다는 분석이 있어요", need: "바로 성과를 내는 역량과 AI 도구를 다루는 능력. 스타트업 경험이나 대학원을 권하는 의견도 있어요", source: "https://www.twig24.com/news/2026/01/07/20260107014003" },
+    rnd: { now: "LG AI연구원은 AI로 후보 물질 42만 개 이상 중 소재를 하루 만에 찾았다고 발표했어요(2026-07)", change: "후보 물질을 찾는 단계를 AI가 맡는 사례가 나왔어요. 실험과 검증은 여전히 연구원이 해요", source: "https://view.asiae.co.kr/article/2026070808465086575" },
+    media: { now: "조선일보는 2025년 11월 AI 교열을 도입하고 교열 자회사와 계약을 끝냈어요(2026-10 보도)", change: "신입 공채를 줄이고 경력기자·채용연계형 인턴을 늘리는 흐름이에요. 기사는 AI를 직접 원인으로 보진 않아요", need: "채용연계형 인턴에서 실무를 보여 주기", source: "http://www.journalist.or.kr/news/article.html?no=61915" }
+  };
+  window.JOBMAP.jobs.forEach((j) => {
+    if (CODES[j.key]) { j.riasec = CODES[j.key][0]; j.onet = ONET(CODES[j.key][1]); }
+    if (AI[j.key]) j.ai = AI[j.key];
+  });
 })();

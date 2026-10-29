@@ -3,380 +3,91 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="claude:viewport-fit-sides" content="cover">
 <title>학과 진로 지도</title>
+<meta name="description" content="대학생 1~4학년을 위한 진로 지도. 60문항 검사로 흥미·준비 상태·가치를 보고, 8개 학과 전국 졸업생 진로와 직무 17개, AI가 채용과 직무를 어떻게 바꾸는지 2024년 이후 자료로 정리했어요.">
+<meta property="og:title" content="학과 진로 지도">
+<meta property="og:description" content="60문항 진로 검사, 학과별 졸업생 진로, 직무 사전, AI와 취업. 로그인 없이, 답은 저장되지 않아요.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://tkdgh123.github.io/jobmap/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
-<style>
-/* 길 안내판: 위에서 학교·학과·학년을 고르면 바로 아래 결과가 바뀐다. 갈림길(전공 따라 / 전공 밖으로)을 중심 그림으로, 섹션마다 모양을 다르게 */
-:root {
-  --bg: #F5F4EF; --card: #FFFFFF; --ink: #1F2430; --ink-2: #5F6573; --rule: #E2DFD6;
-  --acc: #2F5DA8; --on-acc: #FFFFFF; --acc-soft: #DCE6F6; --sign: #D9792B; --sign-soft: #FBE6D3; --tint: #EEF2F8;
-  --display: "Jua", "Gowun Dodum", system-ui, sans-serif;
-  --body: "Gowun Dodum", "Pretendard", system-ui, "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
-  --r: 22px;
-  color-scheme: light;
-}
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --bg: #14161B; --card: #1D2028; --ink: #ECEAE4; --ink-2: #A3A8B4; --rule: #2E323C;
-  --acc: #8DB0EC; --on-acc: #101828; --acc-soft: #243553; --sign: #F0A160; --sign-soft: #47301D; --tint: #1A212E; color-scheme: dark } }
-:root[data-theme="dark"] {
-  --bg: #14161B; --card: #1D2028; --ink: #ECEAE4; --ink-2: #A3A8B4; --rule: #2E323C;
-  --acc: #8DB0EC; --on-acc: #101828; --acc-soft: #243553; --sign: #F0A160; --sign-soft: #47301D; --tint: #1A212E; color-scheme: dark }
-
-* { box-sizing: border-box }
-body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.7 var(--body); word-break: keep-all; overflow-wrap: anywhere }
-a { color: inherit }
-p { margin: 0 }
-h1, h2, h3 { font-family: var(--display); font-weight: 400; margin: 0; text-wrap: balance }
-.wrap { max-width: 980px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)) }
-.muted { color: var(--ink-2) }
-.num { font-variant-numeric: tabular-nums }
-:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px }
-
-/* 머리 + 고르기 */
-header { padding-block: 22px 8px }
-.back { display: inline-flex; gap: 6px; font-size: 14px; color: var(--ink-2); text-decoration: none; padding: 4px 12px; border-radius: 99px; background: var(--card); border: 1px solid var(--rule) }
-h1 { font-size: clamp(36px, 6vw, 54px); line-height: 1.15; margin-top: 18px }
-.lead { font-size: 17px; color: var(--ink-2); margin-top: 6px }
-
-.pick { margin-top: 22px; background: var(--card); border: 1px solid var(--rule); border-radius: 28px; padding: 20px 22px; display: grid; gap: 14px }
-.row { display: grid; grid-template-columns: 64px minmax(0, 1fr); align-items: start; gap: 10px }
-.row > span { font-family: var(--display); font-size: 17px; padding-top: 5px }
-.chips { display: flex; flex-wrap: wrap; gap: 8px }
-.chip { font: inherit; font-size: 15px; padding: 6px 16px; border-radius: 99px; border: 1.5px solid var(--rule); background: var(--bg); color: var(--ink); cursor: pointer }
-.chip:hover { border-color: var(--acc) }
-.chip[aria-pressed="true"] { background: var(--acc); border-color: var(--acc); color: var(--on-acc) }
-.chip.ghost { border-style: dashed; color: var(--ink-2) }
-.safe { font-size: 13.5px; color: var(--ink-2); display: flex; gap: 6px; align-items: center }
-.safe::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--acc) }
-
-/* 결과 공통 */
-main { padding-bottom: 40px }
-section { margin-top: 34px }
-section > h2 { font-size: 26px }
-section > .sh { font-size: 14.5px; color: var(--ink-2); margin-top: 2px }
-.src { font-size: 12.5px; color: var(--ink-2); text-decoration: none; border-bottom: 1px dotted var(--ink-2); white-space: nowrap }
-.src:hover { color: var(--acc); border-color: var(--acc) }
-
-/* 학과 한 줄 + 숫자 */
-.dept { margin-top: 30px; display: grid; gap: 14px }
-.dept .tag { justify-self: start; font-size: 13px; color: var(--acc); background: var(--acc-soft); padding: 2px 12px; border-radius: 99px }
-.dept h2 { font-size: clamp(30px, 5vw, 40px) }
-.dept .intro { font-size: 17px; max-width: 40em }
-.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px }
-.stat { background: var(--card); border: 1px solid var(--rule); border-radius: 18px; padding: 14px 16px; display: grid; gap: 2px; align-content: start }
-.stat b { font-family: var(--display); font-weight: 400; font-size: 30px; color: var(--acc); line-height: 1.2 }
-.stat span { font-size: 14.5px }
-.stat small { font-size: 12.5px; color: var(--ink-2) }
-
-/* 갈림길 */
-.fork { margin-top: 18px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 18px; position: relative }
-.fork svg { grid-column: 1 / -1; width: 100%; height: 64px; display: block }
-.lane { display: grid; gap: 10px; align-content: start; min-width: 0 }
-.lane h3 { font-size: 21px; display: flex; gap: 8px; align-items: center }
-.lane h3 i { font-style: normal; font-size: 12.5px; font-family: var(--body); padding: 1px 10px; border-radius: 99px }
-.lane.in h3 i { background: var(--acc-soft); color: var(--acc) }
-.lane.out h3 i { background: var(--sign-soft); color: var(--sign) }
-.job { background: var(--card); border: 1px solid var(--rule); border-radius: 16px; padding: 11px 15px; display: grid; gap: 2px }
-.lane.in .job { border-left: 0; box-shadow: inset 4px 0 0 var(--acc) }
-.lane.out .job { border-left: 0; box-shadow: inset 4px 0 0 var(--sign) }
-.job b { font-size: 16.5px }
-.job span { font-size: 14px; color: var(--ink-2) }
-@media (max-width: 680px) { .fork { grid-template-columns: 1fr; gap: 22px } .fork svg { display: none } }
-
-/* 어디로 */
-.places { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 14px }
-@media (max-width: 560px) { .places { grid-template-columns: 1fr } }
-.place { background: var(--tint); border-radius: 20px; padding: 14px 18px; display: grid; gap: 8px; align-content: start }
-.place b { font-family: var(--display); font-weight: 400; font-size: 18px }
-.place .ex { display: flex; flex-wrap: wrap; gap: 6px }
-.place .ex span { font-size: 13.5px; background: var(--card); border-radius: 99px; padding: 1px 10px }
-.certs { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center }
-.certs b { font-family: var(--display); font-weight: 400; font-size: 17px; margin-right: 4px }
-.certs span { font-size: 14px; border: 1.5px solid var(--rule); border-radius: 99px; padding: 2px 12px; background: var(--card) }
-
-/* 학년 길 */
-.road { margin-top: 14px; background: var(--card); border: 1px solid var(--rule); border-radius: 28px; padding: 22px }
-.steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; position: relative }
-.steps::before { content: ""; position: absolute; left: 12%; right: 12%; top: 16px; height: 4px; border-radius: 4px; background: var(--acc-soft) }
-.steps li { position: relative; display: grid; gap: 8px; align-content: start; justify-items: center; text-align: center; min-width: 0 }
-.steps i { width: 36px; height: 36px; border-radius: 50%; background: var(--card); border: 4px solid var(--acc-soft); display: grid; place-items: center; font-style: normal; font-family: var(--display); color: var(--acc); z-index: 1 }
-.steps li.now i { background: var(--acc); border-color: var(--acc); color: var(--on-acc); box-shadow: 0 0 0 6px var(--acc-soft) }
-.steps b { font-family: var(--display); font-weight: 400; font-size: 17px; line-height: 1.2 }
-.stage { font-size: 12px; color: var(--sign); background: var(--sign-soft); padding: 0 9px; border-radius: 99px }
-.steps ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; text-align: left; width: 100% }
-.steps ul li { display: block; font-size: 14px; background: var(--bg); border-radius: 12px; padding: 7px 10px; text-align: left; justify-items: start }
-.steps li.now ul li { background: var(--acc-soft) }
-.steps ul a { text-decoration: none; border-bottom: 1px dotted currentColor }
-@media (max-width: 760px) {
-  .steps { grid-template-columns: 1fr; gap: 16px }
-  .steps::before { left: 16px; right: auto; top: 10px; bottom: 10px; width: 4px; height: auto }
-  .steps > li { grid-template-columns: 36px minmax(0, 1fr); justify-items: start; text-align: left; column-gap: 12px }
-  .steps > li > i { grid-row: 1 / span 3 }
-  .steps > li > *:not(i) { grid-column: 2 }
-}
-
-/* AI */
-.ai { margin-top: 14px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px }
-.scene { background: var(--card); border: 1px solid var(--rule); border-radius: 20px; padding: 16px; display: grid; gap: 6px; align-content: start }
-.scene i { font-style: normal; justify-self: start; font-size: 12.5px; color: var(--sign); background: var(--sign-soft); padding: 1px 10px; border-radius: 99px }
-.scene b { font-size: 16.5px }
-.scene span { font-size: 14px; color: var(--ink-2) }
-@media (max-width: 760px) { .ai { grid-template-columns: 1fr } }
-
-.prompt { margin-top: 14px; background: var(--acc); color: var(--on-acc); border-radius: 28px; padding: 22px; display: grid; gap: 14px }
-.prompt h3 { font-size: 22px }
-.prompt .row > span { color: var(--on-acc) }
-.prompt .chip { background: transparent; color: var(--on-acc); border-color: color-mix(in srgb, var(--on-acc) 40%, transparent) }
-.prompt .chip[aria-pressed="true"] { background: var(--on-acc); color: var(--acc); border-color: var(--on-acc) }
-.prompt pre { margin: 0; white-space: pre-wrap; font: 14.5px/1.7 var(--body); background: var(--card); color: var(--ink); border-radius: 18px; padding: 16px 18px; max-height: 320px; overflow: auto }
-.prompt .bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between }
-.prompt .bar small { font-size: 13.5px; opacity: .9 }
-.copy { font: inherit; font-family: var(--display); font-size: 17px; padding: 8px 22px; border-radius: 99px; border: 0; background: var(--sign); color: #FFFFFF; cursor: pointer }
-
-/* 숭실대 자원 */
-.res { margin-top: 14px; display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 10px }
-.res a { text-decoration: none; background: var(--card); border: 1px solid var(--rule); border-radius: 18px; padding: 14px 16px; display: grid; gap: 4px; align-content: start }
-.res a:hover { border-color: var(--acc) }
-.res b { font-size: 16px }
-.res span { font-size: 13.5px; color: var(--ink-2) }
-
-.soon { margin-top: 34px; border: 2px dashed var(--rule); border-radius: 24px; padding: 18px 20px; display: grid; gap: 4px }
-.soon h2 { font-size: 21px }
-
-.empty { margin-top: 30px; background: var(--card); border: 1px solid var(--rule); border-radius: 28px; padding: 26px; display: grid; gap: 10px; justify-items: start }
-.empty h2 { font-size: 26px }
-
-footer { border-top: 1px solid var(--rule); padding-block: 20px 36px; font-size: 13px; color: var(--ink-2) }
-footer .wrap { display: grid; gap: 6px }
-footer details summary { cursor: pointer }
-footer ul { margin: 8px 0 0; padding-left: 18px }
-
-/* 탭 */
-.tabs { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 8px }
-.tabs a { text-decoration: none; font-family: var(--display); font-size: 17px; padding: 6px 18px; border-radius: 99px; background: var(--card); border: 1.5px solid var(--rule); color: var(--ink-2) }
-.tabs a:hover { color: var(--ink) }
-.tabs a[aria-current="page"] { background: var(--ink); border-color: var(--ink); color: var(--bg) }
-.view-head { margin-top: 26px; display: grid; gap: 4px }
-.view-head h2 { font-size: 30px }
-.dict { font-family: var(--body); font-size: 12.5px; text-decoration: none; color: var(--acc); background: var(--acc-soft); border-radius: 99px; padding: 0 9px; margin-left: 6px; white-space: nowrap; vertical-align: 2px }
-
-/* 직무 사전 */
-.jds { margin-top: 18px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-items: start }
-@media (max-width: 700px) { .jds { grid-template-columns: 1fr } }
-.jd { background: var(--card); border: 1px solid var(--rule); border-radius: 22px; scroll-margin-top: 16px }
-.jd[open] { border-color: var(--acc); box-shadow: 0 0 0 3px var(--acc-soft) }
-.jd summary { list-style: none; cursor: pointer; padding: 16px 18px; display: grid; gap: 2px }
-.jd summary::-webkit-details-marker { display: none }
-.jd summary b { font-family: var(--display); font-weight: 400; font-size: 21px; display: flex; justify-content: space-between; gap: 8px }
-.jd summary b::after { content: "+"; color: var(--acc) }
-.jd[open] summary b::after { content: "−" }
-.jd summary span { font-size: 14.5px; color: var(--ink-2) }
-.jd .body { padding: 0 18px 18px; display: grid; gap: 14px }
-.jd h4 { margin: 0 0 6px; font-size: 13px; color: var(--ink-2); font-weight: 400; letter-spacing: .02em }
-.jd ol { margin: 0; padding-left: 20px; display: grid; gap: 2px; font-size: 15px }
-.jd .sk { display: flex; flex-wrap: wrap; gap: 6px }
-.jd .sk span { font-size: 14px; background: var(--tint); border-radius: 99px; padding: 2px 12px }
-.jd .open { font-size: 14.5px; background: var(--sign-soft); border-radius: 14px; padding: 8px 12px }
-.jd .nums { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px }
-.jd .nums div { background: var(--bg); border-radius: 14px; padding: 10px 12px; display: grid; gap: 2px; align-content: start }
-.jd .nums b { font-size: 16px; color: var(--acc) }
-.jd .nums small { font-size: 12.5px; color: var(--ink-2) }
-
-/* 많이 묻는 것 */
-.qas { margin-top: 18px; display: grid; gap: 10px; max-width: 760px }
-.qa { background: var(--card); border: 1px solid var(--rule); border-radius: 20px }
-.qa summary { list-style: none; cursor: pointer; padding: 14px 18px; font-family: var(--display); font-size: 19px; display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 8px; align-items: start }
-.qa summary::-webkit-details-marker { display: none }
-.qa summary i { font-style: normal; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--acc-soft); color: var(--acc); font-size: 15px }
-.qa[open] summary i { background: var(--acc); color: var(--on-acc) }
-.qa .body { padding: 0 18px 16px 56px; display: grid; gap: 8px }
-.qa .body p { font-size: 15.5px }
-.qa .body small { font-size: 12.5px; color: var(--ink-2) }
-@media (max-width: 560px) { .qa .body { padding-left: 18px } }
-
-/* 유형 검사 */
-.srct { font-size: 12px; color: var(--ink-2) }
-.quiz { margin-top: 24px; background: var(--card); border: 1px solid var(--rule); border-radius: 32px; padding: 28px clamp(18px, 4vw, 40px) 30px; display: grid; gap: 18px; max-width: 720px; scroll-margin-top: 12px }
-.quiz h2 { font-size: clamp(26px, 4.4vw, 34px); line-height: 1.3 }
-.quiz.intro { background: var(--acc); color: var(--on-acc); border: 0; max-width: none }
-.quiz.intro p { font-size: 17px }
-.quiz.intro .safe { color: var(--on-acc); opacity: .85; font-size: 13.5px }
-.quiz.intro .safe::before { background: var(--on-acc) }
-.go { justify-self: start; font: inherit; font-family: var(--display); font-size: 21px; padding: 10px 34px; border-radius: 99px; border: 0; background: var(--sign); color: #FFFFFF; cursor: pointer }
-.qbar { height: 8px; border-radius: 8px; background: var(--acc-soft); overflow: hidden }
-.qbar span { display: block; height: 100%; background: var(--acc); border-radius: 8px; transition: width .3s }
-@media (prefers-reduced-motion: reduce) { .qbar span { transition: none } }
-.qtop { display: flex; justify-content: space-between; align-items: center; font-size: 14px; color: var(--ink-2) }
-.qback { font: inherit; font-size: 14px; border: 0; background: none; color: var(--ink-2); cursor: pointer; padding: 4px 0 }
-.qopts { display: grid; gap: 10px }
-.qopts.many { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)) }
-.qopt { font: inherit; font-size: 17px; text-align: left; padding: 15px 20px; border-radius: 20px; border: 2px solid var(--rule); background: var(--bg); color: var(--ink); cursor: pointer }
-.qopt:hover { border-color: var(--acc); background: var(--tint) }
-.qopt[aria-pressed="true"] { border-color: var(--acc); background: var(--acc-soft) }
-
-.result { margin-top: 24px }
-.rhero { background: var(--acc); color: var(--on-acc); border-radius: 32px; padding: 28px clamp(18px, 4vw, 40px); display: grid; gap: 8px; justify-items: start }
-.rk { font-size: 14px; opacity: .85 }
-.rhero h2 { font-size: clamp(26px, 4.6vw, 38px); margin-top: 6px }
-.rjobs { margin-top: 14px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px }
-@media (max-width: 760px) { .rjobs { grid-template-columns: 1fr } }
-.rjob { text-decoration: none; background: var(--card); border: 1px solid var(--rule); border-radius: 22px; padding: 16px 18px; display: grid; gap: 6px; align-content: start }
-.rjob:hover { border-color: var(--acc) }
-.rjob i { font-style: normal; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: var(--sign); color: #FFFFFF; font-family: var(--display) }
-.rjob b { font-family: var(--display); font-weight: 400; font-size: 21px }
-.rjob span { font-size: 14.5px; color: var(--ink-2) }
-.rjob em { font-style: normal; font-size: 13px; color: var(--acc) }
-.rlane { margin: 14px 0 12px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px }
-@media (max-width: 760px) { .rlane { grid-template-columns: 1fr } }
-.rlane.in .job { border-left: 0; box-shadow: inset 4px 0 0 var(--acc) }
-.rlane.out .job { border-left: 0; box-shadow: inset 4px 0 0 var(--sign) }
-.fix { margin-top: 14px; background: var(--sign-soft); border-radius: 26px; padding: 20px 22px; display: grid; gap: 14px }
-.fix ol { margin: 0; padding-left: 22px; display: grid; gap: 6px; font-size: 16px }
-.fix a, .todo a { text-decoration: none; border-bottom: 1px dotted currentColor }
-.fq { background: var(--card); border-radius: 18px; padding: 14px 16px; display: grid; gap: 4px }
-.fq b { font-family: var(--display); font-weight: 400; font-size: 17px }
-.fq p { font-size: 14.5px }
-.fq small { font-size: 12.5px; color: var(--ink-2) }
-.todo { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 8px }
-.todo li { background: var(--card); border: 1px solid var(--rule); border-radius: 16px; padding: 12px 16px 12px 44px; position: relative; font-size: 15.5px }
-.todo li::before { content: ""; position: absolute; left: 16px; top: 15px; width: 16px; height: 16px; border-radius: 6px; border: 2px solid var(--acc) }
-.result .prompt { margin-top: 14px }
-.again { margin-top: 28px; display: flex; justify-content: center }
-
-.secs { display: flex; flex-wrap: wrap; gap: 8px }
-.secs span { display: inline-flex; gap: 8px; align-items: center; font-size: 15px; background: color-mix(in srgb, var(--on-acc) 14%, transparent); border-radius: 99px; padding: 5px 14px 5px 6px }
-.secs b { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; background: var(--on-acc); color: var(--acc); font-size: 13px }
-.hint { font-size: 14px; color: var(--ink-2) }
-.quiz textarea { font: inherit; font-size: 16px; width: 100%; border-radius: 18px; border: 2px solid var(--rule); background: var(--bg); color: var(--ink); padding: 14px 16px; resize: vertical }
-.quiz textarea:focus { outline: none; border-color: var(--acc) }
-.qopts.grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) }
-.qopt.multi { position: relative; padding-left: 50px }
-.qopt.multi::before { content: ""; position: absolute; left: 18px; top: 50%; width: 18px; height: 18px; margin-top: -9px; border-radius: 6px; border: 2px solid var(--ink-2) }
-.qopt.multi[aria-pressed="true"]::before { background: var(--acc); border-color: var(--acc); box-shadow: inset 0 0 0 3px var(--acc-soft) }
-.go[disabled] { opacity: .4; cursor: default }
-.facts { display: flex; flex-wrap: wrap; gap: 6px }
-.facts span { font-size: 14.5px; background: var(--on-acc); color: var(--acc); border-radius: 99px; padding: 3px 12px }
-.rnote { font-size: 16px; opacity: .92 }
-.diags { margin-top: 14px; display: grid; gap: 12px }
-.diag { background: var(--sign-soft); border-radius: 24px; padding: 18px 20px; display: grid; gap: 8px }
-.diag b { font-family: var(--display); font-weight: 400; font-size: 21px }
-.diag .dwhy { font-size: 15.5px }
-.diag .dev { font-size: 13.5px; background: var(--card); border-radius: 14px; padding: 8px 12px; color: var(--ink-2) }
-.diag ol { margin: 0; padding-left: 22px; display: grid; gap: 4px; font-size: 15.5px }
-.diag a { text-decoration: none; border-bottom: 1px dotted currentColor }
-.rjob ul { margin: 2px 0 0; padding-left: 18px; font-size: 13.5px; color: var(--ink-2) }
-.rjob b .num { font-size: 15px; color: var(--acc) }
-
-/* 7단계 문항: 양 끝일수록 큰 동그라미, 안좋음 쪽과 좋음 쪽은 색을 다르게 */
-.lks { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px }
-.lk { background: var(--bg); border-radius: 24px; padding: 18px 14px 12px; display: grid; gap: 12px; scroll-margin: 90px }
-.lk p { font-size: 18px; text-align: center; word-break: keep-all }
-.lk.done p { color: var(--ink-2) }
-.lscale { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 2px; align-items: start; max-width: 560px; width: 100%; justify-self: center }
-.lv { font: inherit; background: none; border: 0; padding: 4px 0; cursor: pointer; display: grid; justify-items: center; align-content: start; gap: 6px; color: var(--ink-2); --d: 24px; --c: var(--ink-2) }
-.lv.v1, .lv.v7 { --d: 42px } .lv.v2, .lv.v6 { --d: 36px } .lv.v3, .lv.v5 { --d: 30px }
-.lv.v1, .lv.v2, .lv.v3 { --c: var(--sign) } .lv.v5, .lv.v6, .lv.v7 { --c: var(--acc) }
-.lv i { display: block; width: var(--d); height: var(--d); border-radius: 50%; border: 2.5px solid var(--c); margin-top: calc((42px - var(--d)) / 2) }
-.lv:hover i { background: color-mix(in srgb, var(--c) 18%, transparent) }
-.lv[aria-pressed="true"] i { background: var(--c) }
-.lv span { font-size: 12.5px; line-height: 1.25; word-break: keep-all; text-align: center }
-.lv[aria-pressed="true"] span { color: var(--ink); font-weight: 700 }
-@media (max-width: 480px) {
-  .lv.v1, .lv.v7 { --d: 32px } .lv.v2, .lv.v6 { --d: 27px } .lv.v3, .lv.v5 { --d: 23px } .lv { --d: 19px }
-  .lv i { margin-top: calc((32px - var(--d)) / 2) }
-  .lv span { font-size: 10.5px }
-}
-
-/* 결과 점수 막대 */
-.meters { display: grid; gap: 8px; width: 100% }
-.meter { display: grid; grid-template-columns: 9em minmax(0, 1fr) 2.2em; gap: 10px; align-items: center; font-size: 15px; color: inherit; text-decoration: none }
-.meter .track { height: 10px; border-radius: 10px; background: var(--acc-soft); overflow: hidden }
-.meter .track span { display: block; height: 100%; border-radius: 10px; background: var(--acc) }
-.meter b { text-align: right }
-.rhero .meters { margin-top: 8px }
-.rhero .meter .track { background: color-mix(in srgb, var(--on-acc) 22%, transparent) }
-.rhero .meter .track span { background: var(--on-acc) }
-.allfit { margin-top: 14px; background: var(--card); border: 1px solid var(--rule); border-radius: 22px; padding: 14px 18px }
-.allfit summary { cursor: pointer; font-size: 15.5px }
-.allfit .meters { margin-top: 12px }
-a.meter:hover { color: var(--acc) }
-.weak em { font-style: normal; font-size: 13px; color: var(--sign); margin-left: 4px }
-
-/* 진로 빈도 막대 */
-.path { display: grid; grid-template-columns: minmax(0, 1fr) 80px 44px; gap: 10px; align-items: center; background: var(--card); border: 1px solid var(--rule); border-radius: 14px; padding: 9px 12px }
-.path .pl { display: grid; min-width: 0 }
-.path .pl b { font-size: 15.5px }
-.path .pl span { font-size: 13px; color: var(--ink-2) }
-.pb { height: 8px; border-radius: 8px; background: var(--tint); overflow: hidden }
-.pb i { display: block; height: 100%; border-radius: 8px }
-.path.in .pb i { background: var(--acc) }
-.path.out .pb i { background: var(--sign) }
-.pk { font-size: 13px; color: var(--ink-2); text-align: right; white-space: nowrap }
-/* 사례 */
-.cases { margin-top: 14px; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; align-items: start }
-.case { background: var(--card); border: 1px solid var(--rule); border-radius: 20px; padding: 14px 16px; display: grid; gap: 6px }
-.case.in { box-shadow: inset 0 4px 0 var(--acc) }
-.case.out { box-shadow: inset 0 4px 0 var(--sign) }
-.ctop { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; justify-content: space-between }
-.ck { font-size: 12px; padding: 0 9px; border-radius: 99px }
-.case.in .ck { background: var(--acc-soft); color: var(--acc) }
-.case.out .ck { background: var(--sign-soft); color: var(--sign) }
-.cm { font-size: 12px; color: var(--ink-2) }
-.case b { font-size: 16px }
-.case ul { margin: 0; padding-left: 18px; font-size: 14px; color: var(--ink-2); display: grid; gap: 2px }
-.tips { margin: 14px 0 0; padding: 18px 22px 18px 42px; background: var(--tint); border-radius: 22px; display: grid; gap: 6px; font-size: 15.5px }
-.trends { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 8px }
-.trends li { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 12px; background: var(--card); border: 1px solid var(--rule); border-radius: 16px; padding: 10px 14px; font-size: 15px }
-.trends li > span { font-size: 13px; color: var(--sign); padding-top: 2px }
-.jfacts { margin: 0; padding-left: 18px; font-size: 14.5px; display: grid; gap: 4px }
-.rcases { margin-top: 14px; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; align-items: start }
-</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@500;700&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
+<a class="skip" href="#main">본문으로 건너뛰기</a>
+<div class="page">
 
-<header class="wrap">
-  <a class="back" href="../">← 작업실</a>
+<header class="top">
+  <a class="mback" href="../">← 작업실</a>
+  <div class="eb">학과 진로 지도 · <span class="checked"></span> 기준</div>
   <h1>학과 진로 지도</h1>
-  <p class="lead">내 학과를 나오면 어디로 가는지, 지금 학년에 뭘 해 볼지.</p>
-  <nav class="tabs" id="tabs">
-    <a href="#test">유형 검사</a>
-    <a href="#map">학과 지도</a>
-    <a href="#jobs">직무 사전</a>
-    <a href="#faq">많이 묻는 것</a>
-  </nav>
+  <p class="sub">내 학과를 나오면 어디로 가는지, <b>지금 학년에 무엇을 해 볼지</b>. 로그인 없이 쓰고, 답은 어디에도 저장되지 않아요.</p>
+  <ol class="picks">
+    <li><a href="#test"><small>60문항 · 10분쯤</small><b>진로 검사</b><span>흥미·준비 상태·가치로 맞는 직무와 이번 학기 할 일</span></a></li>
+    <li><a href="#map"><small>8개 학과 · 전국 대학</small><b>학과 지도</b><span>졸업생이 실제로 간 길과 학년별 할 일</span></a></li>
+    <li><a href="#ai"><small>구직자와 회사 양쪽에서</small><b>AI와 취업</b><span>채용에 쓰는 AI, 직무별로 바뀌는 일</span></a></li>
+  </ol>
 </header>
 
-<main class="wrap">
+<nav class="toc" aria-label="목차">
+  <a class="back" href="../">← 작업실</a>
+  <ol id="tabs">
+    <li><a href="#test">진로 검사</a></li>
+    <li><a href="#map">학과 지도</a></li>
+    <li><a href="#jobs">직무 사전</a></li>
+    <li><a href="#ai">AI와 취업</a></li>
+    <li><a href="#faq">많이 묻는 것</a></li>
+    <li><a href="#about">만든 방법</a></li>
+  </ol>
+</nav>
+
+<main id="main" tabindex="-1">
   <div id="v-test"></div>
 
   <div id="v-map" hidden>
-    <div class="pick" id="pick">
-      <div class="row"><span>학교</span><div class="chips" id="school"></div></div>
-      <div class="row"><span>단과대</span><div class="chips" id="college"></div></div>
-      <div class="row"><span>학과</span><div class="chips" id="dept"></div></div>
-      <div class="row"><span>학년</span><div class="chips" id="year"></div></div>
-      <p class="safe">고른 내용은 이 화면에서만 쓰이고 어디에도 저장되지 않아요.</p>
-    </div>
+    <section>
+      <h2>학과 지도</h2>
+      <p class="lead">여러 대학이 안내하는 진로와 2024년 이후 졸업생 사례를 학과별로 모았어요.</p>
+      <div class="pick" id="pick">
+        <div class="row"><span>학교</span><div class="chips" id="school"></div></div>
+        <div class="row"><span>단과대</span><div class="chips" id="college"></div></div>
+        <div class="row"><span>학과</span><div class="chips" id="dept"></div></div>
+        <div class="row"><span>학년</span><div class="chips" id="year"></div></div>
+      </div>
+    </section>
     <div id="out"></div>
   </div>
 
   <div id="v-jobs" hidden>
-    <div class="view-head"><h2>직무 사전</h2><p class="muted">전공과 관계없이 신입이 많이 지원하는 직무예요. 눌러서 펼쳐 보세요.</p></div>
-    <div class="jds" id="jds"></div>
+    <section>
+      <h2>직무 사전</h2>
+      <p class="lead">신입이 많이 지원하는 직무 17개예요. 직무마다 흥미 코드와 AI가 바꾸는 점을 붙였어요.</p>
+      <div class="jdtools chips" id="jdtools"></div>
+      <div class="jds" id="jds"></div>
+    </section>
   </div>
+
+  <div id="v-ai" hidden></div>
 
   <div id="v-faq" hidden>
-    <div class="view-head"><h2>요즘 취업, 많이 묻는 것</h2><p class="muted">조사 기관과 대상을 같이 적었어요.</p></div>
-    <div class="qas" id="qas"></div>
+    <section>
+      <h2>요즘 취업, 많이 묻는 것</h2>
+      <p class="lead">조사 기관과 대상을 같이 적었어요.</p>
+      <div class="qas" id="qas"></div>
+    </section>
+    <section>
+      <h2>처음 보면 헷갈리는 말</h2>
+      <div class="rows" id="terms"></div>
+    </section>
   </div>
-</main>
 
-<footer><div class="wrap">
-  <p>비공식 학생 프로젝트예요. 학교와 관계없고, 정보는 <span id="checked"></span> 기준이에요. 정확한 내용은 원문 링크에서 확인하세요.</p>
-  <details><summary>출처 전체 보기</summary><ul id="sources"></ul></details>
+  <div id="v-about" hidden></div>
+</main>
+</div>
+
+<footer><div class="in">
+  <p>비공식 학생 프로젝트예요. 학교와 관계없고, 정보는 <span class="checked"></span> 기준이에요. 정확한 내용은 원문 링크에서 확인하세요.</p>
 </div></footer>
 
 <script src="data.js"></script>
@@ -384,184 +95,11 @@ a.meter:hover { color: var(--acc) }
 <script src="depts-ssu.js"></script>
 <script src="jobs.js"></script>
 <script src="faq.js"></script>
-<script src="diag.js"></script>
+<script src="ai.js"></script>
 <script src="quiz.js"></script>
+<script src="diag.js"></script>
 
-<script>
-const D = window.JOBMAP;
-D.depts.sort((a, b) => D.collegeOrder.indexOf(a.college) - D.collegeOrder.indexOf(b.college));
-D.depts.forEach((d) => Object.assign(d, (D.ssuDept || {})[d.id] || {}));
-const colleges = D.collegeOrder.filter((c) => D.depts.some((d) => d.college === c));
-const st = { school: "ssu", college: D.depts[0].college, dept: D.depts[0].id, year: 1 };
-const $ = (id) => document.getElementById(id);
-const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-const urls = (u) => String(u || "").split(/\s*,\s*(?=https?:)/).filter((x) => /^https?:|^\.\.\//.test(x));
-const src = (u) => !u ? "" : urls(u).length
-  ? urls(u).map((x) => ` <a class="src" href="${esc(x)}" target="_blank" rel="noopener">출처</a>`).join("")
-  : ` <span class="srct">출처: ${esc(u)}</span>`;
-(D.jobs || []).forEach((j) => j.alias = D.quiz.jobAlias[j.key] || [j.name.split(/[·(\s]/)[0]]);
-const dictFor = (name) => (D.jobs || []).filter((j) => !(D.quiz.jobExclude[j.key] || []).some((x) => name.includes(x)) && !(j.key === "ncs" && st.college === "공과대학"))
-  .map((j) => [j, Math.max(0, ...j.alias.filter((a) => name.includes(a)).map((a) => a.length))])
-  .filter((x) => x[1] > 0).sort((a, b) => b[1] - a[1])[0]?.[0];
-const dictLink = (name) => { const k = dictFor(name); return k ? `<a class="dict" href="#jobs-${k.key}">직무 사전</a>` : ""; };
-
-function chips(el, items, key, after) {
-  el.innerHTML = items.map((it) =>
-    `<button type="button" class="chip${it.ghost ? " ghost" : ""}" data-v="${esc(it.v)}" aria-pressed="${String(st[key]) === String(it.v)}">${esc(it.label)}</button>`).join("");
-  el.onclick = (e) => {
-    const b = e.target.closest("button"); if (!b) return;
-    st[key] = isNaN(b.dataset.v) || b.dataset.v === "" ? b.dataset.v : Number(b.dataset.v);
-    el.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", x === b));
-    after();
-  };
-}
-
-const caseCard = (c) => `<div class="case ${c.kind === "in" ? "in" : "out"}">
-  <div class="ctop"><span class="ck">${c.kind === "in" ? "전공 따라" : "전공 밖으로"}</span><span class="cm">${esc(c.type)} · ${esc(c.date)}${c.trust && c.trust !== "높음" ? ` · 신뢰 ${esc(c.trust)}` : ""}</span></div>
-  <b>${esc(c.to)}${dictLink(c.to)}</b>
-  ${c.how?.length ? `<ul>${c.how.map((h) => `<li>${esc(h)}</li>`).join("")}</ul>` : ""}
-  ${src(c.source)}
-</div>`;
-
-function render() {
-  const out = $("out");
-  if (st.school !== "ssu") {
-    out.innerHTML = `<div class="empty"><h2>이 학교는 아직 없어요</h2><p class="muted">학과 진로는 전국 대학 자료로 정리했지만, 학년별 할 일과 학교 프로그램은 지금 숭실대만 있어요.</p><a class="chip" href="#jobs">직무 사전 보기</a></div>`;
-    return;
-  }
-  if (st.dept === "none") {
-    out.innerHTML = `<div class="empty"><h2>내 학과는 아직 없어요</h2><p class="muted">지금은 ${D.depts.map((d) => d.name).join(", ")}를 깊게 조사해 두었어요. 계열이 비슷한 학과를 먼저 보고, 직무 사전도 함께 보세요.</p><div class="chips">${D.depts.map((d) => `<button type="button" class="chip" data-go="${d.id}">${esc(d.name)}</button>`).join("")}</div></div>`;
-    out.querySelectorAll("[data-go]").forEach((b) => b.onclick = () => { const d = D.depts.find((x) => x.id === b.dataset.go); st.college = d.college; st.dept = d.id; drawPick(); render(); });
-    return;
-  }
-  const d = D.depts.find((x) => x.id === st.dept);
-  const S = D.ssu;
-  const stats = [S.rate, (d.stats || []).some((x) => x.label.includes("계열")) ? null : D.fieldRate[d.college], ...(d.stats || [])].filter(Boolean).map((s) =>
-    `<div class="stat"><b class="num">${esc(s.value)}</b><span>${esc(s.label)}</span><small>${esc(s.basis)}${src(s.source)}</small></div>`).join("");
-  const n = d.uni?.n || 1;
-  const bar = (p) => `<div class="path ${p.kind}"><div class="pl"><b>${esc(p.name)}${dictLink(p.name)}</b>${p.note ? `<span>${esc(p.note)}</span>` : ""}</div>
-    <div class="pb" aria-label="${p.k}개 대학"><i style="width:${Math.round(p.k / n * 100)}%"></i></div><span class="pk num">${p.k}/${n}</span></div>`;
-  const ins = (d.paths || []).filter((p) => p.kind === "in"), outs = (d.paths || []).filter((p) => p.kind !== "in");
-  const cases = d.cases || [];
-  const years = [1, 2, 3, 4].map((y) => {
-    const items = [...(S.roadmap[y] || []), ...((d.roadmap || {})[y] || [])];
-    return `<li class="${y === st.year ? "now" : ""}"><i>${y}</i><b>${y}학년</b><ul>${items.map((t) => `<li>${t.url ? `<a href="${esc(t.url)}" target="_blank" rel="noopener">${esc(t.text)}</a>` : esc(t.text)}</li>`).join("")}</ul></li>`;
-  }).join("");
-  const scenes = (d.ai || []).map((a) => `<div class="scene"><i>${esc(a.task)}</i><b>${esc(a.title)}</b><span>${esc(a.how)}</span></div>`).join("");
-  const res = [...S.resources, ...(d.ssu_specific || [])].map((r) =>
-    `<a href="${esc(r.url)}" target="_blank" rel="noopener"><b>${esc(r.name)}</b><span>${esc(r.desc)}</span></a>`).join("");
-
-  out.innerHTML = `
-  <div class="dept">
-    <span class="tag">${esc(d.college)}</span>
-    <h2>${esc(d.name)}</h2>
-    <p class="intro">${esc(d.intro)}</p>
-    <div class="stats">${stats}</div>
-  </div>
-
-  <section>
-    <h2>여러 대학이 꼽는 진로</h2>
-    <p class="sh">${n}개 대학 학과가 안내하는 진로를 세었어요. 막대가 길수록 많은 대학이 꼽았어요.${d.uni?.list ? ` (${esc(d.uni.list)})` : ""}</p>
-    <div class="fork">
-      <div class="lane in"><h3>전공 따라 <i>${ins.length}</i></h3>${ins.map(bar).join("")}</div>
-      <div class="lane out"><h3>전공 밖으로 <i>${outs.length}</i></h3>${outs.map(bar).join("")}</div>
-    </div>
-  </section>
-
-  ${cases.length ? `<section>
-    <h2>실제로 이렇게 갔어요</h2>
-    <p class="sh">2024년 이후 공개된 졸업생 사례예요. 대학 공식 후기, 합격 자소서, 블로그·유튜브에서 모았어요.</p>
-    <div class="cases">${cases.map(caseCard).join("")}</div>
-  </section>` : ""}
-
-  ${d.tips?.length ? `<section>
-    <h2>사례에서 반복된 준비법</h2>
-    <ol class="tips">${d.tips.map((t) => `<li>${esc(t)}</li>`).join("")}</ol>
-    ${d.certs?.length ? `<div class="certs"><b>근거 있는 자격·점수</b>${d.certs.map((c) => `<span title="${esc(c.note)}">${esc(c.name)}</span>`).join("")}</div>` : ""}
-  </section>` : ""}
-
-  ${d.trends?.length ? `<section>
-    <h2>요즘 채용 분위기</h2>
-    <ul class="trends">${d.trends.map((t) => `<li><span class="num">${esc(t.date)}</span><p>${esc(t.text)}${src(t.source)}</p></li>`).join("")}</ul>
-  </section>` : ""}
-
-  <section>
-    <h2>숭실대에서 학년별로 해 볼 것</h2>
-    <p class="sh">정답 순서는 없어요. 지금 학년 칸부터 보세요.</p>
-    <div class="road"><ol class="steps">${years}</ol></div>
-  </section>
-
-  ${scenes ? `<section>
-    <h2>이 학과에서 AI 쓰는 장면</h2>
-    <p class="sh">도구 이름보다 어떤 일에 쓰는지가 오래가요. 과제에 쓸 땐 수업 규칙부터 확인하세요.</p>
-    <div class="ai">${scenes}</div>
-  </section>` : ""}
-
-  <section>
-    <h2>숭실대에서 쓸 수 있는 것</h2>
-    <div class="res">${res}</div>
-  </section>`;
-}
-
-function drawPick() {
-  chips($("school"), [...D.schools.map((s) => ({ v: s.id, label: s.name })), { v: "etc", label: "다른 학교", ghost: true }], "school", () => { drawPick(); render(); });
-  chips($("college"), colleges.map((c) => ({ v: c, label: c })), "college", () => {
-    st.dept = D.depts.find((d) => d.college === st.college).id; drawPick(); render();
-  });
-  chips($("dept"), [...D.depts.filter((d) => d.college === st.college).map((x) => ({ v: x.id, label: x.name })), { v: "none", label: "내 학과가 없어요", ghost: true }], "dept", render);
-  chips($("year"), [1, 2, 3, 4].map((y) => ({ v: y, label: `${y}학년` })), "year", render);
-  $("pick").querySelectorAll(".row:not(:first-child)").forEach((r) => r.hidden = st.school !== "ssu");
-}
-
-function drawJobs() {
-  const list = (a) => (a || []).map((t) => `<li>${esc(t)}</li>`).join("");
-  $("jds").innerHTML = (D.jobs || []).map((j) => `
-    <details class="jd" id="job-${j.key}">
-      <summary><b>${esc(j.name)}</b><span>${esc(j.does)}</span></summary>
-      <div class="body">
-        ${j.tasks?.length ? `<div><h4>하는 일</h4><ol>${list(j.tasks)}</ol></div>` : ""}
-        ${j.skills?.length ? `<div><h4>필요한 힘</h4><div class="sk">${j.skills.map((t) => `<span>${esc(t)}</span>`).join("")}</div></div>` : ""}
-        ${j.open ? `<p class="open">${esc(j.open)}</p>` : ""}
-        ${j.pay || j.outlook ? `<div class="nums">${[["임금", j.pay], ["전망", j.outlook]].filter((x) => x[1]).map(([l, v]) => `<div><small>${l}</small><b>${esc(v.value)}</b><small>${esc(v.basis)}${src(v.source)}</small></div>`).join("")}</div>` : ""}
-        ${j.facts?.length ? `<ul class="jfacts">${j.facts.map((f) => `<li>${esc(f.text)}${src(f.source)}</li>`).join("")}</ul>` : ""}
-        ${j.tips?.length ? `<div><h4>합격자·현직자가 말하는 준비법</h4><ol>${list(j.tips)}</ol>${(j.tipSources || []).map((u) => src(u)).join("")}</div>` : ""}
-        <small class="muted">직무 설명${src(j.source)}</small>
-      </div>
-    </details>`).join("");
-}
-
-function drawFaq() {
-  $("qas").innerHTML = (D.faq || []).map((f, i) => `
-    <details class="qa"${i === 0 ? " open" : ""}>
-      <summary><i>Q</i><span>${esc(f.q)}</span></summary>
-      <div class="body"><p>${esc(f.a)}</p><small>${esc(f.basis)}${src(f.source)}</small></div>
-    </details>`).join("");
-}
-
-function route() {
-  const h = location.hash.slice(1) || "test";
-  const view = h.startsWith("jobs") ? "jobs" : ["faq", "map"].includes(h) ? h : "test";
-  ["test", "map", "jobs", "faq"].forEach((v) => $("v-" + v).hidden = v !== view);
-  $("tabs").querySelectorAll("a").forEach((a) => a.setAttribute("aria-current", a.hash === "#" + view ? "page" : "false"));
-  if (h.startsWith("jobs-")) {
-    const el = $("job-" + h.slice(5));
-    if (el) { el.open = true; el.scrollIntoView({ block: "start" }); }
-  } else if (view !== "map") scrollTo(0, 0);
-}
-
-$("checked").textContent = D.checked;
-const all = [
-  ...D.depts.flatMap((d) => [...(d.cases || []), ...(d.trends || []), ...(d.stats || []), ...(d.certs || [])].map((x) => x.source).concat(d.sources || [])),
-  ...(D.jobs || []).flatMap((j) => [j.source, j.pay?.source, j.outlook?.source, ...(j.tipSources || []), ...(j.facts || []).map((f) => f.source)]),
-  ...(D.faq || []).map((f) => f.source),
-  ...(D.diag || []).map((r) => r.evidence?.source),
-  ...Object.values(D.fieldRate).map((r) => r.source),
-  D.ssu.rate.source
-];
-$("sources").innerHTML = [...new Set(all.flatMap(urls).filter((u) => /^https?:/.test(u)))].map((u) => `<li><a href="${esc(u)}" target="_blank" rel="noopener">${esc(u)}</a></li>`).join("");
-drawPick(); render(); drawJobs(); drawFaq();
-addEventListener("hashchange", route);
-</script>
+<script src="app.js"></script>
 <script src="quiz-ui.js"></script>
 <script>drawTest(); route();</script>
 </body>
