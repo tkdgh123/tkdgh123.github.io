@@ -93,7 +93,7 @@ footer { padding: 48px 0 64px; color: var(--ink-2); font-size: 13px }
   <div class="hero">
     <div class="name">덜미</div>
     <div class="tag">몰래 열 수 없고, 몰래 건드리면 덜미 잡히는 메신저</div>
-    <p>받는 사람 혼자서는 못 여는 <b>두 열쇠 금고</b>, 그리고 그 말이 사실인지 심사위원이 서버 키보드를 잡고 직접 확인하는 <b>공격 실험실</b>. 서로의 단어 지문만 한 번 맞춰 두면, 서버가 바꾸거나 끼어들거나 위조할 때 화면에 드러납니다.</p>
+    <p>받는 사람 혼자서는 못 여는 <b>두 열쇠 금고</b>, 그리고 그 말이 사실인지 심사위원이 서버 키보드를 잡고 직접 확인하는 <b>공격 실험실</b>. 서로의 단어 지문만 한 번 맞춰 두면, 서버가 바꾸거나 빼먹거나 끼어들거나 위조할 때 화면에 드러납니다.</p>
   </div>
 
   <ul class="toc">
@@ -123,11 +123,13 @@ footer { padding: 48px 0 64px; color: var(--ink-2); font-size: 13px }
     <tr><th></th><th>지금까지 (제안서·수정본)</th><th>바뀐 안</th></tr>
     <tr><td>이름과 콘셉트</td><td>암호화 통신 프로그램</td><td><b>덜미</b>: 몰래 열 수 없고, 몰래 건드리면 덜미 잡히는 메신저</td></tr>
     <tr><td>대화 방식</td><td>접속자 전원 대화만 (1:1 귓속말 없음)</td><td><b>전체 대화 + 1:1 대화</b>. 상대마다 따로 잠그는 설계라 한 명에게만 보내면 됨. 서버는 바꿀 것 없음 (10. 29. 추가)</td></tr>
+    <tr><td>대화 기록</td><td>저장하지 않음 (프로그램을 끄면 사라짐)</td><td><b>내 노트북에만 암호화해서 저장</b>(선택 4). 켜려면 비밀번호를 정함. 서버는 여전히 아무것도 보관하지 않음 (10. 29. 추가)</td></tr>
+    <tr><td>열쇠 바꾸는 법</td><td>팀 아이디어: 전 대화의 문장으로 새 열쇠를 만들어 상대에게 보내고, 받으면 지우기를 반복</td><td><b>문장 섞기 래칫</b>: 방금 보낸 문장을 지금 열쇠에 섞어 다음 열쇠를 만듦. 열쇠는 보내지 않고 양쪽이 각자 계산. 서버가 메시지를 빼먹으면 들킴 (10. 29. 추가, <a href="#mix">8절</a>)</td></tr>
     <tr><td>내세우는 차별점</td><td>키 래칫 + 2인 합의 잠금 (둘이 같은 무게)</td><td><b>두 열쇠 금고</b>(서버를 믿지 않는 2인 열람)가 간판, <b>공격 실험실</b>이 그 증거</td></tr>
     <tr><td>안전번호</td><td>숫자 12자리, 두 사람 키를 합친 해시</td><td><b>사람별 한글 단어 8개</b>(64비트). 단어 256개는 팀이 직접 고름</td></tr>
     <tr><td>공개키</td><td>서버가 나눠 주는 키를 그대로 믿음</td><td>파일에 저장하는 <b>신원 키</b>가 매 세션 키에 서명. 단어 지문은 실행할 때마다 같음</td></tr>
     <tr><td>잠금 메시지</td><td>서버가 보관, 번호만 보임, 서명 없음, 세션이 끝나면 사라짐</td><td>서버는 아무것도 보관하지 않음. <b>제목</b>이 보이고, <b>서명</b>으로 위조를 막고, <b>열쇠 전달 증명</b>을 남기고, 보유자 노트북에 저장돼 <b>다음 세션에도 열 수 있음</b></td></tr>
-    <tr><td>공격 시연</td><td>서버 실행 옵션 3개 (<code>--tamper</code> 등)</td><td>서버 터미널에서 치는 <b>실시간 공격 명령 6개</b>와 서버가 보는 화면(<b>서버의 눈</b>). 키보드는 심사위원에게</td></tr>
+    <tr><td>공격 시연</td><td>서버 실행 옵션 3개 (<code>--tamper</code> 등)</td><td>서버 터미널에서 치는 <b>실시간 공격 명령 7개</b>와 서버가 보는 화면(<b>서버의 눈</b>). 키보드는 심사위원에게</td></tr>
     <tr><td>확장 아이디어</td><td>AI 자동 잠금, 서명 기록, 마스킹, 자동 삭제, DH 래칫</td><td>서명 기록만 살려 금고에 흡수하고, 나머지 4개는 버림</td></tr>
     <tr><td>필수 마감선</td><td>10주차: CLI 완성 + 공격 시연 3종</td><td>11주차: 암호화 채팅 + 변조·재전송 덜미 (지금 9주차라 현실에 맞춤)</td></tr>
   </table></div>
@@ -266,7 +268,7 @@ footer { padding: 48px 0 64px; color: var(--ink-2); font-size: 13px }
   <h3>네 가지 덜미</h3>
   <div class="scroll"><table>
     <tr><th>몰래 하는 일</th><th>덜미 잡는 장치</th><th>화면에 뜨는 것</th></tr>
-    <tr><td>서버가 메시지를 몰래 바꿈</td><td>AEAD 인증 태그 + 순서번호</td><td><code>[!] 변조 감지: A→B #7 폐기</code> / <code>[!] 순서번호 불일치 (재전송)</code></td></tr>
+    <tr><td>서버가 메시지를 몰래 바꾸거나 빼먹음</td><td>AEAD 인증 태그 + 순서번호 + 문장 섞기 래칫</td><td><code>[!] 변조 감지: A→B #7 폐기</code> / <code>[!] 순서번호 불일치 (재전송)</code> / <code>[!] A→B #6이 오지 않음: 대화 끊김</code></td></tr>
     <tr><td>서버가 몰래 끼어듦</td><td>사람별 한글 단어 지문 + 열쇠 바뀜 경보</td><td><code>[!] B의 열쇠가 바뀜: 호랑이-연필… → 고래-사과…</code></td></tr>
     <tr><td>서버가 금고나 승인을 몰래 위조</td><td>신원 키 서명</td><td><code>[!] 서명 불일치: A가 보낸 금고가 아님</code></td></tr>
     <tr><td>보유자 한 명이 몰래 열기</td><td>두 열쇠 금고 + 열쇠 전달 증명</td><td>혼자서는 못 열고, 열리면 <code>[증명] C가 B에게 '국민은행 비번' 열쇠를 넘김 21:03 ✔</code></td></tr>
@@ -275,13 +277,14 @@ footer { padding: 48px 0 64px; color: var(--ink-2); font-size: 13px }
   <h3>기능 등급</h3>
   <div class="scroll"><table>
     <tr><th>등급</th><th>기능</th></tr>
-    <tr><td><span class="tier base">기본</span></td><td>접속, 전체 대화(접속자 전원)와 <b>1:1 대화</b>(<code>/dm 이름</code>, <code>/all</code>로 복귀), 해시 래칫(복호화 성공 시에만 전진), AEAD, 순서번호. 발표에서는 "기반 기술" 한 장으로 설명</td></tr>
+    <tr><td><span class="tier base">기본</span></td><td>접속, 전체 대화(접속자 전원)와 <b>1:1 대화</b>(<code>/dm 이름</code>, <code>/all</code>로 복귀), <b>문장 섞기 래칫</b>(복호화 성공 시에만 전진, <a href="#mix">아래</a>), AEAD, 순서번호. 발표에서는 "기반 기술" 한 장으로 설명</td></tr>
     <tr><td><span class="tier">핵심</span></td><td><b>두 열쇠 금고</b>: 제목, 서명, 열쇠 전달 증명, 보유자 노트북에 저장, 열람 후 화면 지우기 (<a href="#vault">9절</a>)</td></tr>
     <tr><td><span class="tier">핵심</span></td><td><b>신원 키와 한글 단어 지문</b>: 접속 체크인, <code>/verify</code>, 열쇠 바뀜 경보</td></tr>
-    <tr><td><span class="tier">핵심</span></td><td><b>공격 실험실</b>: 서버 콘솔 공격 명령(<code>tamper</code> <code>replay</code> <code>swap</code> <code>peek</code> <code>forge</code>)과 서버의 눈 (<a href="#lab">10절</a>)</td></tr>
+    <tr><td><span class="tier">핵심</span></td><td><b>공격 실험실</b>: 서버 콘솔 공격 명령(<code>tamper</code> <code>replay</code> <code>drop</code> <code>swap</code> <code>peek</code> <code>forge</code>)과 서버의 눈 (<a href="#lab">10절</a>)</td></tr>
     <tr><td><span class="tier opt">선택 1</span></td><td><b>진짜 중간자</b> <code>mitm A B</code>: 서버 창에 평문이 보이다가 단어를 맞추는 순간 들킴. 11주차 판정</td></tr>
     <tr><td><span class="tier opt">선택 2</span></td><td><b>키 탈취 극장</b> <code>/steal</code>: 훔친 체인 키로 지난 메시지를 열어 보지만 실패하고, 이후 메시지는 열림(정직하게 표시)</td></tr>
     <tr><td><span class="tier opt">선택 3</span></td><td><b>증명 지문 단어 3개</b>: 열쇠 전달 증명의 해시를 단어 3개로 보여주고, 셋이 카톡에 붙여 넣어 같은지 대조. 서버 밖의 확인 채널로 카톡을 쓰는 방식</td></tr>
+    <tr><td><span class="tier opt">선택 4</span></td><td><b>잠긴 대화 기록</b> <code>/history</code>: 읽은 메시지를 내 노트북에 암호화해서 쌓아 두고, 다음 실행 때 비밀번호로 엶. 파일을 몰래 고치면 들킴 (<a href="#history">아래</a>)</td></tr>
   </table></div>
 
   <h3>신원 키 구조</h3>
@@ -293,6 +296,55 @@ footer { padding: 48px 0 64px; color: var(--ink-2); font-size: 13px }
 <span class="d">세션마다 새로 만듦</span>
   └─ kx 키 쌍 → 신원 키로 서명해서 HELLO에 함께 보냄 → 래칫 시작 키 CK0</code></pre>
   <p>지문이 실행할 때마다 같으니 <b>한 번 맞춰 두면 끝</b>입니다. 자기 단어 8개를 카톡 프로필이나 동아리 공지에 적어 두면, 만나지 않고도 서버 바깥에서 확인할 수 있습니다.</p>
+
+  <h3 id="mix">문장 섞기 래칫 (기본, 10. 29. 추가)</h3>
+  <p>팀이 처음 낸 아이디어는 <b>"전 대화에서 했던 문장으로 새 열쇠를 만들어 상대에게 보내고, 받으면 지우고, 이걸 반복한다"</b>였습니다. 쓰고 지우는 부분은 래칫과 같은 생각이라 그대로 살리고, 문제가 되는 부분을 아래처럼 고쳐 기본 기능의 래칫으로 씁니다.</p>
+  <div class="scroll"><table>
+    <tr><th>처음 생각</th><th>그대로 두면 생기는 문제</th><th>덜미에서는</th></tr>
+    <tr><td>문장으로 열쇠를 만든다</td><td>채팅 문장은 짧고 뻔해서("ㅇㅇ", "ㅋㅋ", "밥 먹었어?") 사전을 만들어 하나씩 넣어 보면 맞혀짐. 열쇠가 한 번 새면 다음 메시지를 열어 그 문장을 알게 되고, 그 문장으로 다음 열쇠를 만드는 식으로 끝까지 열림</td><td>문장을 <b>단독으로 쓰지 않고</b> 비밀인 지금 체인 키에 섞음. 체인 키를 모르면 문장을 맞혀도 소용없음</td></tr>
+    <tr><td>새 열쇠를 상대에게 보낸다</td><td>보내는 열쇠를 다시 무언가로 잠가야 함. 이전 열쇠로 잠그면 이전 열쇠 하나가 그 뒤 전부를 엶</td><td><b>보내지 않음.</b> 그 문장은 보낸 사람과 받은 사람이 이미 알고 있어서 각자 계산하면 같은 열쇠가 나옴. 열쇠가 네트워크를 한 번도 지나가지 않음</td></tr>
+    <tr><td>'전 문장' 하나로 만든다</td><td>여럿이 동시에 말하면 사람마다 직전 문장이 달라 열쇠가 갈라짐</td><td>두 사람 사이에 <b>방향마다 체인을 따로</b> 둠(A→B, B→A). <code>crypto_kx</code>가 처음부터 보내기용·받기용 열쇠를 따로 줌. 내 체인에는 내가 보낸 문장만 섞임</td></tr>
+    <tr><td>받으면 지운다</td><td>그대로 좋음. 지난 메시지를 지키는 핵심</td><td>복호화에 성공한 뒤에만 다음 열쇠를 만들고, 쓴 열쇠를 지움</td></tr>
+    <tr><td>(섞으면 새로 생김)</td><td>메시지 하나가 빠지면 그 문장을 몰라서 그 뒤 열쇠를 못 만듦. 순서번호가 건너뛰면 래칫을 앞으로 돌려 따라잡던 방식은 쓸 수 없음</td><td>따라잡지 않고 <b>끊김 경고</b>를 띄움. TCP라 저절로 빠지는 일은 없어서, 빠졌다면 서버가 뺀 것. 공격 실험실 <code>drop</code>으로 시연</td></tr>
+  </table></div>
+<pre><code><span class="d">CK0 ── 세션 시작 때 kx로 계산 (A→B, B→A 따로)</span>
+
+<span class="d">── 보낼 때 (n번째) ──</span>
+MK_n   = BLAKE2b(키 = CK_n, 내용 = "msg")             <span class="d">이 메시지만 잠그는 열쇠</span>
+암호문  = XChaCha20-Poly1305(MK_n, 평문_n, AD = 순서번호 n)
+CK_n+1 = BLAKE2b(키 = CK_n, 내용 = "next" ‖ 평문_n)    <span class="d">방금 보낸 문장을 섞음</span>
+CK_n, MK_n 지움                                      <span class="d">열쇠는 보내지 않음</span>
+
+<span class="d">── 받을 때 ──</span>
+복사본으로 MK_n 계산 → 복호화 성공 → 같은 식으로 CK_n+1 → 반영하고 지움
+<span class="r">[!] A→B #6이 오지 않음: 대화가 끊겼습니다. 다시 접속하세요</span>   <span class="d">#5 다음에 #7이 오면</span></code></pre>
+  <p>C에서는 libsodium의 <code>crypto_generichash(ck_next, 32, buf, len, ck, 32)</code> 한 줄입니다(마지막 두 인자가 키). 맡는 사람은 그대로 암복호화 담당(<code>crypto.c</code>)입니다. 다시 접속하면 새 kx 키로 CK0부터 새로 시작합니다.</p>
+  <div class="note"><b>발표에서 내세울 말:</b> "대화 내용 자체가 다음 열쇠에 엮입니다. 서버가 한 줄만 빼거나 바꿔도 그 뒤가 열리지 않습니다." 팀이 처음 낸 생각이 설계에 그대로 남아 있다는 점도 함께 말합니다.</div>
+  <div class="note warn"><b>과장하면 안 되는 점:</b> 문장을 섞어도 <b>열쇠를 도둑맞은 뒤의 메시지</b>는 보호되지 않습니다. 체인 키를 훔친 사람은 다음 메시지를 열어 문장을 얻고, 그 문장으로 다음 열쇠를 계산합니다. 그 보호는 DH 래칫이 하는 일이고 덜미는 버렸습니다(<a href="#cut">14절</a>). "문장을 섞었으니 더 안전하냐"는 질문에는 "보안이 더 세진 게 아니라, 맞히기 공격과 열쇠 전송을 없앴고 빼먹기를 잡는다"로 답합니다.</div>
+
+  <h3 id="history">잠긴 대화 기록 (선택 4, 10. 29. 추가)</h3>
+  <p>1라운드에서 실사용자가 "기록 없음은 진입 장벽"이라고 했던 부분입니다. 서버는 그대로 아무것도 보관하지 않고, <b>각자의 클라이언트가 자기가 읽은 메시지만</b> 자기 노트북에 잠가 둡니다. 서버는 바꿀 것이 없습니다.</p>
+<pre><code><span class="d">── 처음 실행 ──</span>
+<span class="y">[*] 대화 기록을 저장할까요? 비밀번호를 정하면 켜집니다 (Enter = 저장 안 함)</span>
+<span class="d">비밀번호:</span> ********
+
+<span class="d">── 다음 실행 ──</span>
+<span class="d">비밀번호:</span> ********
+<span class="g">[기록] 전체 대화 마지막 20줄을 불러왔습니다  /history 50 으로 더 보기</span>
+
+<span class="d">── 누가 기록 파일 1바이트를 고쳤다면 ──</span>
+<span class="r">[!] 기록 변조 감지: all.log #12</span></code></pre>
+  <div class="scroll"><table>
+    <tr><th>무엇</th><th>어떻게</th></tr>
+    <tr><td>열쇠</td><td>K = Argon2id(비밀번호, 무작위 소금 16바이트) (<code>crypto_pwhash</code>). K는 메모리에만 두고 끌 때 지움. 비밀번호를 하나씩 넣어 보는 공격을 일부러 느리게 만드는 함수</td></tr>
+    <tr><td>파일</td><td><code>~/.deolmi/log/</code> 아래 대화마다 하나(<code>all.log</code>, <code>dm-B.log</code>)와 <code>salt</code>. 한 줄 = [길이 4][nonce 24][암호문 + 태그 16]</td></tr>
+    <tr><td>암호</td><td>메시지에 쓰는 것과 같은 XChaCha20-Poly1305. 추가 인증 데이터(AD)에 <b>대화 이름 + 줄 번호</b>를 넣어서, 줄을 바꾸거나 중간에서 지우거나 다른 대화로 옮기면 열 때 걸림</td></tr>
+    <tr><td>저장하는 것</td><td>복호화에 성공한 일반·1:1 메시지, 경고 줄, 열쇠 전달 증명</td></tr>
+    <tr><td>저장하지 않는 것</td><td><b>금고 내용</b>("열람 후 화면 지우기" 약속을 지키려고), 모든 키</td></tr>
+    <tr><td>명령</td><td><code>/history [줄 수]</code>: 지금 대화의 기록 보기. <code>/forget</code>: <code>salt</code>와 기록 파일을 지움. 소금이 없으면 비밀번호를 알아도 K를 다시 못 만듦</td></tr>
+    <tr><td>맡는 사람</td><td>UI 담당이 <code>history.c</code>. 암호 함수는 <code>crypto.c</code>의 것을 그대로 씀</td></tr>
+  </table></div>
+  <div class="note warn"><b>래칫과 부딪히는 점:</b> 래칫은 "지금 열쇠가 새도 지난 메시지는 못 연다"를 지킵니다. 기록을 켜면 그 지난 메시지가 내 노트북에 남습니다. 노트북과 비밀번호를 함께 뺏기면 기록이 열립니다. 그래서 기본은 꺼 두고, 켤지는 사람마다 고릅니다. 키 탈취 극장(<code>/steal</code>)은 메모리의 체인 키만 훔치는 시연이라 그대로 성립합니다.</div>
 </section>
 
 <section id="vault">
@@ -335,6 +387,7 @@ footer { padding: 48px 0 64px; color: var(--ink-2); font-size: 13px }
     <tr><th>명령</th><th>서버가 하는 짓</th><th>덜미</th></tr>
     <tr><td><code>tamper B</code></td><td>B에게 가는 다음 메시지 1바이트 변조</td><td>B: <code>[!] 변조 감지</code></td></tr>
     <tr><td><code>replay B</code></td><td>B에게 직전 메시지를 한 번 더 보냄</td><td>B: <code>[!] 순서번호 불일치</code></td></tr>
+    <tr><td><code>drop B</code></td><td>B에게 가는 다음 메시지를 몰래 버림</td><td>그다음 메시지가 왔을 때 B: <code>[!] A→B #6이 오지 않음: 대화 끊김</code> (<a href="#mix">문장 섞기 래칫</a>)</td></tr>
     <tr><td><code>swap B</code></td><td>대화 도중 B의 열쇠를 서버 것으로 바꿔 뿌림</td><td>전원: <code>[!] B의 열쇠가 바뀜</code> + 단어 비교</td></tr>
     <tr><td><code>peek</code></td><td>지나간 금고 묶음을 서버가 열어 보려 함</td><td>서버 창: <code>열기 실패: 조각이 B, C에게 봉인됨</code></td></tr>
     <tr><td><code>forge B C</code></td><td>A 이름으로 가짜 금고를 만들거나 C의 승인을 사칭</td><td>B: <code>[!] 서명 불일치</code></td></tr>
@@ -349,12 +402,14 @@ footer { padding: 48px 0 64px; color: var(--ink-2); font-size: 13px }
   <p>보안 전문가가 "과장하면 질의응답에서 무너진다"고 강조한 부분입니다. 발표 마지막 장에 그대로 넣습니다.</p>
   <ul>
     <li><b>단어를 맞추기 전에는 서명도 금고도 서버 앞에서 무력합니다.</b> 모든 보호의 뿌리는 단어 지문 확인입니다.</li>
-    <li>체인 키가 새면 <b>지난</b> 메시지는 안전하지만 <b>이후</b> 메시지는 열립니다. 프로그램 메모리 전체가 털리면 그 세션은 위험합니다.</li>
+    <li>체인 키가 새면 <b>지난</b> 메시지는 안전하지만 <b>이후</b> 메시지는 열립니다. 문장을 섞어도 마찬가지입니다(훔친 사람이 다음 메시지를 열어 문장을 알게 되니까). 프로그램 메모리 전체가 털리면 그 세션은 위험합니다.</li>
+    <li>서버가 메시지를 일부러 빼면 그 방향의 대화가 끊깁니다. <b>들키지만 막지는 못하고</b>, 다시 접속해야 이어집니다. 마지막 메시지를 빼면 다음 메시지가 올 때까지 알아채지 못합니다.</li>
     <li>"1회 열람"은 화면 규칙입니다. B가 열린 내용을 베껴 적거나 캡처하는 건 막지 못합니다. 증명할 수 있는 것은 "C가 B에게 열쇠를 넘겼다"는 사실까지입니다.</li>
     <li>금고를 맡긴 A는 원래 내용을 압니다. 금고가 막는 것은 "보유자 한 명이나 서버가 혼자 여는 것"입니다.</li>
     <li>누가 누구에게, 언제, 얼마나 보냈는지(메타데이터)는 서버가 봅니다.</li>
     <li>일반 메시지는 받는 사람이 각자 읽습니다. 두 사람이 필요한 건 금고뿐입니다.</li>
     <li>1:1 대화는 내용은 숨기지만, 누가 누구와 1:1로 대화하는지는 서버가 압니다.</li>
+    <li>대화 기록을 켜면 노트북과 비밀번호를 함께 뺏겼을 때 지난 대화가 열립니다. 비밀번호가 짧으면 맞혀질 수 있습니다. 기록 끝부분을 통째로 잘라 내는 건 알아채지 못하고, 상대가 자기 기록을 남기는 것도 막지 못합니다. <code>/forget</code> 전에 누가 파일을 복사해 갔다면 지워도 소용없습니다.</li>
     <li>같은 Wi-Fi 안에서만 연결되고, 접속해 있지 않은 사람에게는 보낼 수 없습니다.</li>
   </ul>
 </section>
@@ -364,7 +419,7 @@ footer { padding: 48px 0 64px; color: var(--ink-2); font-size: 13px }
   <ol>
     <li><b>받았던 질문에 정면으로 답하기 (첫 장).</b> 비교표 세 줄로 시작합니다. 카톡·Signal은 받은 사람이 혼자 열고, CyberArk·Vault는 서버 관리자가 원문을 보고, 덜미는 둘 다 안 됩니다.</li>
     <li><b>동아리 회계 인수인계 시연.</b> A가 맡기고, B가 요청하고, C가 승인하고, 증명이 뜨는 정상 흐름을 보여줍니다.</li>
-    <li><b>"교수님이 서버입니다."</b> 서버 노트북 키보드를 넘기고 "회비 비번을 훔쳐 보세요"라고 말합니다. <code>peek</code>는 실패하고, <code>forge</code>는 서명 경고가 뜨고, <code>tamper</code>와 <code>replay</code>는 경고가 뜨고, <code>swap</code>이나 <code>mitm</code>은 단어가 어긋나 들킵니다.</li>
+    <li><b>"교수님이 서버입니다."</b> 서버 노트북 키보드를 넘기고 "회비 비번을 훔쳐 보세요"라고 말합니다. <code>peek</code>는 실패하고, <code>forge</code>는 서명 경고가 뜨고, <code>tamper</code>·<code>replay</code>·<code>drop</code>은 경고가 뜨고, <code>swap</code>이나 <code>mitm</code>은 단어가 어긋나 들킵니다.</li>
     <li><b>1인 1덜미 (각 2분).</b> 각자 자기 공격과 방어 한 쌍을 설명합니다. 코드 슬라이드는 "라이브러리 한 줄"과 "우리가 짠 줄"(패킷 구조, 길이 접두, 순서번호 검사, XOR 분할, 금고 흐름, 단어 지문)을 색으로 구분합니다.</li>
     <li><b>정직한 한계 한 장</b>(<a href="#honest">11절</a>)과 "패킷 유실·순서" 질문 대비: TCP가 순서와 재전송을 보장하고, 우리는 길이 접두로 메시지 경계를 나눈다.</li>
   </ol>
@@ -376,7 +431,7 @@ footer { padding: 48px 0 64px; color: var(--ink-2); font-size: 13px }
   <h3>역할: 코드는 파일 단위, 발표는 1인 1덜미</h3>
   <div class="scroll"><table>
     <tr><th>팀 역할</th><th>맡는 코드</th><th>발표에서 맡는 덜미</th></tr>
-    <tr><td>서버</td><td><code>server.c</code>, <code>net.c</code>, <code>evil.c</code>(공격 콘솔, 서버의 눈)</td><td>변조·재전송: 서버가 바꾸면 들킨다</td></tr>
+    <tr><td>서버</td><td><code>server.c</code>, <code>net.c</code>, <code>evil.c</code>(공격 콘솔, 서버의 눈)</td><td>변조·재전송·빼먹기: 서버가 바꾸거나 빼면 들킨다</td></tr>
     <tr><td>암복호화</td><td><code>crypto.c</code>(신원 키, 서명, 래칫, 단어 지문)</td><td>끼어들기: 단어 8개가 막는다</td></tr>
     <tr><td>UI</td><td><code>client.c</code>(명령어, 경고 화면, 체크인, 화면 지우기)</td><td>위조: 서명이 없으면 무슨 일이 생기나 (두 단계 시연)</td></tr>
     <tr><td>총괄</td><td><code>vault.c</code>(금고 흐름), <code>tests/</code>, 시연 스크립트</td><td>몰래 열기: 두 열쇠 금고와 열쇠 전달 증명</td></tr>
@@ -388,9 +443,9 @@ footer { padding: 48px 0 64px; color: var(--ink-2); font-size: 13px }
     <tr><th>주차</th><th>할 일</th><th>끝났는지 확인하는 법</th></tr>
     <tr><td>9주차 (~11/1)</td><td>WSL·libsodium 통일, GitHub 저장소, 단어 256개 고르기</td><td>4명 모두 <code>sodium_init()</code> 빌드</td></tr>
     <tr><td>10주차</td><td>평문 패킷 채팅(서버 S1~S4, 클라이언트 입력·수신 동시 처리), <code>crypto.c</code> 단위 테스트(래칫·AEAD·서명), 공격 콘솔 뼈대와 서버의 눈</td><td>노트북 1대에서 3명 평문 채팅, 서버 창에 hex</td></tr>
-    <tr><td>11주차 <b>필수 마감선</b></td><td>암호화 채팅 통합(신원 키, 세션 키 서명, 단어 지문, 성공 시에만 래칫 전진), <code>tamper</code>·<code>replay</code>·<code>swap</code>과 경고</td><td>공격 3개가 각각 경고를 띄움 → <b>진짜 중간자 진행 여부 판정</b></td></tr>
+    <tr><td>11주차 <b>필수 마감선</b></td><td>암호화 채팅 통합(신원 키, 세션 키 서명, 단어 지문, 성공 시에만 래칫 전진, 문장 섞기), <code>tamper</code>·<code>replay</code>·<code>drop</code>·<code>swap</code>과 경고</td><td>공격 4개가 각각 경고를 띄움 → <b>진짜 중간자 진행 여부 판정</b></td></tr>
     <tr><td>12주차</td><td>두 열쇠 금고(서명, 제목, 저장, 증명, 화면 지우기), <code>peek</code>·<code>forge</code> / 판정이 났으면 서버 담당이 <code>mitm</code></td><td>B 혼자는 못 열고 C 승인 후 열림, 위조는 서명 경고</td></tr>
-    <tr><td>13주차 <b>기능 동결</b></td><td>버그 수정, 노트북 3대 리허설, tmux Plan B, 백업 영상. 여유가 있으면 선택 2·3</td><td>발표 시나리오를 처음부터 끝까지 두 번 연속 성공</td></tr>
+    <tr><td>13주차 <b>기능 동결</b></td><td>버그 수정, 노트북 3대 리허설, tmux Plan B, 백업 영상. 여유가 있으면 선택 2·3·4</td><td>발표 시나리오를 처음부터 끝까지 두 번 연속 성공</td></tr>
     <tr><td>14주차</td><td>발표</td><td></td></tr>
   </table></div>
   <div class="note warn"><b>일정이 바뀐 이유:</b> 원래 계획은 10주차에 "CLI 완성 + 공격 시연 3종"이었지만, 지금이 9주차이고 구현이 막 시작된 상태라 마감선을 11주차로 한 주 미뤘습니다. 대신 13주차에는 새 기능을 넣지 않습니다.</div>
@@ -419,6 +474,8 @@ footer { padding: 48px 0 64px; color: var(--ink-2); font-size: 13px }
     <li><b>잠금 표 삭제</b>: LOCK 묶음을 보유자 둘에게 즉시 전달하고 보관하지 않습니다. OPEN_REQ와 SHARE는 <code>to</code>를 보고 중계만 합니다. 서버가 잠금 번호를 붙이지 않습니다(금고 ID = 묶음 해시).</li>
     <li><b>시연 옵션을 공격 콘솔로</b>: <code>poll</code>에 stdin을 추가하고 <code>evil.c</code>에 명령 처리를 둡니다. 중계 직전에 <code>evil_apply()</code>를 호출하고, 서버의 눈(hex 출력)을 켭니다.</li>
     <li>보유자가 접속해 있지 않을 때 금고를 보내면 SYS 오류를 보냅니다(서버가 대신 보관하지 않음).</li>
+    <li>대화 기록(선택 4)은 클라이언트에만 있어서 서버는 바꿀 것이 없습니다.</li>
+    <li><b>문장 섞기 래칫</b>: 서버 기획서의 "순서번호가 건너뛰면 래칫을 최대 50개 앞으로 돌림"을 "끊김 경고"로 바꾸고, 래칫 식을 <a href="#mix">8절</a>의 것으로 고칩니다. 서버 중계는 그대로이고 <code>evil.c</code>에 <code>drop</code> 명령만 더합니다.</li>
   </ul>
 </section>
 
