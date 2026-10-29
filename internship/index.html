@@ -133,6 +133,17 @@ ol.steps em { font-style: normal; font-size: 12.5px; color: var(--acc); margin-l
 .check input { width: 18px; height: 18px; margin: 3px 0 0; accent-color: var(--acc) }
 .check input:checked + span { color: var(--ink-2); text-decoration: line-through }
 .check small { display: block; color: var(--ink-2); font-size: 13px; text-decoration: none }
+.ssu { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 12px; margin-bottom: 28px }
+.ssu .box { border-color: var(--acc) }
+.ssu dl { margin: 0; display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 6px 10px; font-size: 14px }
+.ssu dt { font-weight: 600 }
+.ssu dd { margin: 0; color: var(--ink-2) }
+.ssu a { color: var(--acc) }
+ol.wess { margin: 0; padding-left: 20px; display: grid; gap: 5px; font-size: 14px; color: var(--ink-2) }
+ol.wess b { color: var(--ink) }
+.stages { display: grid; gap: 22px }
+.stage h3 { margin: 0 0 8px; font-size: 18px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px }
+.stage h3 span { font-size: 13px; font-weight: 400; color: var(--ink-2) }
 .progress { font-size: 14px; color: var(--ink-2); margin: 12px 0 0 }
 
 .src { font-size: 13.5px; color: var(--ink-2); padding-left: 18px; display: grid; gap: 3px }
@@ -166,7 +177,7 @@ footer { padding: 48px 0 64px; color: var(--ink-2); font-size: 13px }
   <a href="#me">나라면?</a>
   <a href="#history">지금까지</a>
   <a href="#next">2027년 변화</a>
-  <a href="#check">체크리스트</a>
+  <a href="#check">내가 할 일</a>
 </div></nav>
 
 <main>
@@ -297,17 +308,54 @@ footer { padding: 48px 0 64px; color: var(--ink-2); font-size: 13px }
     <p>여기에 학생 교통·숙박비 월 10만 원, 회사 멘토링비 월 10만 원, 대학 운영비 1인당 약 90만 원이 따로 붙습니다.</p>
   </div>
   <div class="vs">
-    <div class="box"><h3>규모</h3><ul><li>약 <b>6만 명</b> (4년제 약 4만 + 전문대 약 2만)</li><li>약 <b>5개월</b> 실습, 학점 취득</li><li>총 <b>4,650억 원</b></li><li>2028년 1·2학년 → 2029년 1~3학년 → 2030년 전 학년으로 확대 계획</li></ul></div>
+    <div class="box"><h3>규모</h3><ul><li>약 <b>6만 명</b> (4년제 약 4만 + 전문대 약 2만)</li><li>약 <b>5개월</b> 실습, 학점 취득</li><li>총 <b>4,650억 원</b></li><li>2027년 3월부터 2029년까지 운영</li></ul></div>
     <div class="box"><h3>지금과 비교하면</h3><ul><li>실습지원비: 최저선 월 약 162만 원 → 월 230만 원</li><li>회사 부담: 162만 원 이상 → 115만 원</li><li>기간: 4주짜리가 20~30%인 지금 → 5개월 장기</li></ul></div>
-    <div class="box"><h3>아직 안 정해진 것 <span class="tag warn">미정</span></h3><ul><li>지원비를 누가 어떤 경로로 지급하는지</li><li>지금의 표준형을 대체하는지, 함께 가는지</li><li>예산 (12월 국회 확정, 4,650억 원과 미래대응기금 4,000억 원 액수가 서로 다르다는 지적)</li></ul></div>
+    <div class="box"><h3>아직 안 정해진 것 <span class="tag warn">미정</span></h3><ul><li>대상 학년과 전공 조건, 신청 방법</li><li>지원비를 누가 어떤 경로로 지급하는지</li><li>지금의 표준형을 대체하는지, 함께 가는지</li><li>예산 (12월 국회 확정, 4,650억 원과 미래대응기금 4,000억 원 액수가 서로 다르다는 지적)</li></ul></div>
   </div>
   <p class="note">비판도 있습니다. 중소기업이 115만 원을 감당할 수 있는지, 실습 뒤 채용으로 이어지게 하는 목표가 없다는 점이 지적됐습니다. 6만 명은 회사 수요를 조사한 숫자가 아니라 정책 목표라고 교육부가 밝혔습니다. 발표일은 일부 매체가 9월 1일로 적었습니다.</p>
 </div></section>
 
 <section id="check"><div class="wrap">
-  <h2>지원 전 체크리스트</h2>
-  <p class="lead">눌러서 체크해 두면 이 브라우저에 남습니다.</p>
-  <ul class="check" id="checks"></ul>
+  <h2>내가 할 일</h2>
+  <p class="lead">지금부터 실습이 끝날 때까지 순서대로 정리했습니다. 체크하면 이 브라우저에 남아요.</p>
+  <div class="ssu">
+    <div class="box">
+      <h3>숭실대에서는</h3>
+      <dl>
+        <dt>신청</dt><dd><a href="http://wess.ssu.ac.kr/">WESS</a>에서 지원부터 협약, 보고서까지 처리 · 공지는 <a href="https://scatch.ssu.ac.kr/공지사항/">학교 공지사항</a>의 "현장실습학기제 학생 참여 안내"</dd>
+        <dt>문의</dt><dd>현장실습지원센터 · 학생회관 501호 · 02-820-0878</dd>
+        <dt>자격</dt><dd>3~4학년 재학생. 직전 학기 휴학생과 그 학기 졸업예정자는 안 됨</dd>
+        <dt>모집</dt><dd>1년에 세 번, 지원 기간은 열흘 남짓 (2026년: 여름 5월 4~14일, 2학기 7월 9~20일, 겨울 11월 2~12일)</dd>
+        <dt>학교 지원</dt><dd>2학기 16주 실습은 장학금 120만 원, 여름·겨울은 계절학기 수업료만큼. 상해보험도 학교가 가입</dd>
+        <dt>학점</dt><dd>일반선택 또는 전공선택, P/F. 전공 인정은 기한 안에 신청서를 따로 냄 (2026-2학기는 8월 11일)</dd>
+        <dt>주의</dt><dd>교내 ICT·창업 실습 프로그램과 중복 지원 불가</dd>
+      </dl>
+    </div>
+    <div class="box">
+      <h3>WESS에서 하는 순서</h3>
+      <ol class="wess">
+        <li>LMS에서 사전교육 1 듣기 (지원 전 필수)</li>
+        <li>WESS 로그인, 서약서·이력서·자기소개서 작성</li>
+        <li>회사별 운영계획서 보고 지원, 수강과목 선택</li>
+        <li>서류·면접</li>
+        <li>선발되면 사전교육 2, 수업료 납부</li>
+        <li>WESS에서 3자 협약</li>
+        <li>실습, 보고서 제출</li>
+      </ol>
+      <p class="note" style="margin:10px 0 0">WESS는 여러 대학이 함께 쓰는 현장실습 관리 시스템입니다.</p>
+    </div>
+    <div class="box">
+      <h3>1학년인 지금부터</h3>
+      <ol class="wess">
+        <li><b>지금</b> · WESS에 로그인해 메뉴와 회사 공고 둘러보기, 학교 공지 "현장실습" 알림 켜기</li>
+        <li><b>2학년</b> · 프로젝트와 포트폴리오 쌓기, 졸업 요건표에서 현장실습이 들어갈 전공선택 자리 확인, 첫 경력 프로젝트 대상 학년 발표 확인</li>
+        <li><b>3학년 봄</b> · 4월 여름 실습 공지 확인, 5월 지원 (가장 빠른 기회)</li>
+        <li><b>3학년 2학기~4학년 1학기</b> · 16주 학기 실습. 졸업예정 학기인 4학년 2학기는 피하기</li>
+      </ol>
+      <p class="note" style="margin:10px 0 0">시기는 2026년 공지 일정을 기준으로 잡았습니다.</p>
+    </div>
+  </div>
+  <div class="stages" id="stages"></div>
   <p class="progress" id="progress"></p>
 </div></section>
 
@@ -329,6 +377,8 @@ footer { padding: 48px 0 64px; color: var(--ink-2); font-size: 13px }
     <li><a href="https://uipa.inu.ac.kr/bbs/inu/2611/387732/download.do">인천대 2026-2학기 현장실습 안내</a></li>
     <li><a href="https://biz.korea.ac.kr/news/notice_view.html?no=7260">고려대 경영대 현장실습 공지</a></li>
     <li><a href="https://mech.jnu.ac.kr/bbs/mech/2038/836461/download.do">전남대 2026 하계 운영계획</a></li>
+    <li><a href="http://wess.ssu.ac.kr/">숭실대 WESS · 현장실습 신청 시스템</a></li>
+    <li><a href="https://scatch.ssu.ac.kr/공지사항/">숭실대 공지사항 · 2026 여름·2학기·겨울 현장실습학기제 학생 참여 안내</a></li>
     <li><a href="https://hecology.ulsan.ac.kr/boardDownload.do?no=344269">울산대 2026-2학기 현장실습 안내</a></li>
     <li><a href="https://top.jbnu.ac.kr/bbs/bie/4373/350594/download.do">전북대 2026 현장실습 모집 안내</a></li>
     <li><a href="https://job.skuniv.ac.kr/wp-content/uploads/2024/12/붙임1.-서경대학교-표준-현장실습학기제Co-op-운영서식2025-1학기-실습기관용.docx">표준 현장실습 운영서식 · 협약서 (서경대 배포본)</a></li>
@@ -431,28 +481,51 @@ $("who").innerHTML = PERSONAS.map(([name], i) => `<button type="button" role="ta
 $("who").addEventListener("click", e => { const b = e.target.closest("button"); if (b) showWho(+b.dataset.i); });
 showWho(0);
 
-/* 체크리스트: 체크 상태는 이 브라우저에만 저장 */
-const CHECKS = [
-  ["학교 현장실습지원센터에 등록된 회사인가", "직접 구했거나 회사가 직접 뽑은 자리는 학점으로 인정되지 않음"],
-  ["그 학기에 수강신청을 할 수 있는 신분인가", "휴학생, 졸업유예생, 졸업예정자는 대개 불가"],
-  ["협약서의 실습지원비가 최저선 이상인가", "2026년 교육시간 25%면 월 1,617,660원, 10%면 1,941,192원 이상. 현물이나 학교 장학금은 포함 안 됨"],
-  ["산재보험 증빙과 학교 상해보험을 확인했나", "하나라도 빠지면 학점 인정 안 됨"],
-  ["필요한 학점만큼 실제 출근일이 나오는가", "공휴일이나 연차가 출근일에서 빠지는 대학이 있음"],
-  ["면접에서 업무, 멘토, 교육시간을 물어봤나", "구체적인 업무와 전공 관련성, 현장교육담당자, 주간보고서 작성 방식"],
-  ["시간 규칙을 알고 있나", "주 40시간, 동의 시 주 5시간 연장, 밤 10시~아침 6시 금지"],
-  ["문제가 생기면 어디에 알릴지 알고 있나", "회사 평가가 학점에 영향을 주니 갈등 초기에 센터와 상의"],
-  ["중도 포기하면 학점과 지원금이 어떻게 되는지 확인했나", "대학마다 F 처리, 지원금 제외 등 규정이 다름"],
+/* 내가 할 일: [단계, 시기, [[할 일, 설명]]] · 체크 상태는 이 브라우저에만 저장 */
+const STAGES = [
+  ["미리 준비", "실습 한 학기 이상 전", [
+    ["학교 현장실습지원센터 공지와 신청 시스템 찾아 두기", "모집은 보통 실습 시작 약 두 달 전에 열리고 기간이 짧음"],
+    ["졸업 요건표에서 현장실습 학점이 들어갈 자리 확인", "전공선택인지 일반선택인지, 최대 몇 학점인지 학과 사무실에 물어보기"],
+    ["실습할 학기 정해 두기", "졸업예정 학기와 졸업유예 중에는 못 하는 대학이 많아서 3학년 전후가 무난함"],
+    ["이력서, 자기소개서, 포트폴리오 초안 만들기", "선발권은 회사에 있음. 전공과 직무가 어떻게 이어지는지 쓸 거리 모으기"],
+  ]],
+  ["모집 공고가 뜨면", "실습 약 두 달 전", [
+    ["센터에 등록된 회사 목록에서 전공과 맞는 직무 고르기", "직접 구한 회사는 인정되지 않음"],
+    ["마감 안에 지원서 내기", "떨어지면 2차 모집에 다시 지원"],
+    ["면접에서 업무, 멘토, 교육시간 비율, 결과물 공개 범위 묻기", "실습지원비 최저선이 교육시간 비율로 정해짐"],
+  ]],
+  ["합격 후 실습 전", "실습 시작 1~2주 전", [
+    ["수강신청하고 등록금이나 수강료 내기", "안 내면 수강신청이 취소되는 대학이 있음"],
+    ["사전교육 듣기", "안전교육과 성희롱 예방교육은 필수"],
+    ["협약서에서 기간, 업무, 실습지원비, 근로계약 여부 확인", "2026년 기준 교육시간 25%면 월 1,617,660원 이상. 서명 뒤에는 바꾸기 어려움"],
+    ["회사 산재보험 가입과 학교 상해보험 확인", "하나라도 없으면 학점 인정 안 됨"],
+    ["타지라면 숙박·교통비 지원 신청", "학교마다 있거나 없음"],
+  ]],
+  ["실습 중", "매주", [
+    ["주간보고서 제때 내기", "중간점검서도 있음"],
+    ["출근일 세기", "학점이 실제 출근일로 정해짐. 결석은 증빙을 내고 보강"],
+    ["실습지원비가 현금으로 제때 들어오는지 확인", "현물이나 학교 장학금은 실습지원비가 아님"],
+    ["계획서에 없는 업무, 시간 위반, 안전 문제는 바로 센터에 알리기", "회사 평가가 학점에 들어가니 갈등 초기에 상의"],
+  ]],
+  ["끝난 뒤", "실습 종료 후 2주 안", [
+    ["결과보고서와 만족도조사 내기", "빠지면 학점이 안 나옴"],
+    ["성적표에 학점이 전공으로 들어갔는지 확인", "아니면 바로 학과에 문의"],
+    ["실습비에서 세금이 떼였는지 확인", "떼였다면 학교에 환급 절차 문의"],
+    ["한 일을 이력서와 포트폴리오에 정리", "채용연계형이면 전환 면접 일정 확인"],
+  ]],
 ];
-const KEY = "internship-checks";
-let saved = [];
-try { saved = JSON.parse(localStorage.getItem(KEY)) || []; } catch {}
-$("checks").innerHTML = CHECKS.map(([t, d], i) => `<li><label><input type="checkbox" data-i="${i}"${saved[i] ? " checked" : ""}><span>${t}<small>${d}</small></span></label></li>`).join("");
+const KEY = "internship-todo";
+let saved = {};
+try { saved = JSON.parse(localStorage.getItem(KEY)) || {}; } catch {}
+$("stages").innerHTML = STAGES.map(([stage, when, items], s) =>
+  `<div class="stage"><h3>${stage}<span>${when}</span></h3><ul class="check">${items.map(([t, d], i) =>
+    `<li><label><input type="checkbox" data-k="${s}-${i}"${saved[`${s}-${i}`] ? " checked" : ""}><span>${t}<small>${d}</small></span></label></li>`).join("")}</ul></div>`).join("");
 const count = () => {
-  const boxes = [...$("checks").querySelectorAll("input")];
-  $("progress").textContent = `${boxes.filter(b => b.checked).length} / ${boxes.length} 확인`;
-  try { localStorage.setItem(KEY, JSON.stringify(boxes.map(b => b.checked))); } catch {}
+  const boxes = [...$("stages").querySelectorAll("input")];
+  $("progress").textContent = `${boxes.filter(b => b.checked).length} / ${boxes.length} 완료`;
+  try { localStorage.setItem(KEY, JSON.stringify(Object.fromEntries(boxes.map(b => [b.dataset.k, b.checked])))); } catch {}
 };
-$("checks").addEventListener("change", count);
+$("stages").addEventListener("change", count);
 count();
 </script>
 </body>
