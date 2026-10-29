@@ -95,6 +95,58 @@ footer { padding: 48px 0 64px; color: var(--ink-2); font-size: 13px }
   <h3>한 줄 요약</h3>
   <p><b>서버도 내용을 볼 수 없는 C 언어 종단간 암호화 채팅.</b> 메시지마다 키가 바뀌어서 지금 키가 털려도 지난 대화는 안전하고, 중요한 메시지는 두 사람이 모여야만 열립니다.</p>
 
+  <h3>할 수 있는 것: 기능 7가지</h3>
+  <p>A, B, C 세 사람이 접속해 있다고 하고, 각 기능을 쓰면 화면에 무엇이 보이는지 적었습니다.</p>
+  <div class="scroll"><table>
+    <tr><th>기능</th><th>이렇게 쓴다</th><th>화면에 보이는 것</th><th>설명</th></tr>
+    <tr><td>1. 접속</td><td><code>./client --user B --server 192.168.0.12:9000</code></td><td><code>[*] 서버 연결 완료</code><br><code>[*] 접속 중: A, C</code></td><td>이름을 정하고 대화방에 들어갑니다. 이미 있는 이름이면 거절됩니다.</td></tr>
+    <tr><td>2. 일반 메시지</td><td>그냥 글자를 치고 Enter</td><td>B, C 화면: <code>[A] 내일 회의 3시야</code></td><td>접속해 있는 <b>모든 사람</b>에게 갑니다. 서버에는 알아볼 수 없는 바이트만 지나갑니다.</td></tr>
+    <tr><td>3. 안전번호 확인</td><td><code>/verify A</code></td><td><code>A와의 안전번호: 4821 0937 1150</code></td><td>A도 <code>/verify B</code>를 쳐서 두 사람이 숫자를 소리 내어 맞춰 봅니다. 같으면 서버가 중간에서 키를 바꿔치기하지 않은 것입니다.</td></tr>
+    <tr><td>4. 잠금 메시지 보내기</td><td>A: <code>/lock B C 금고 비번은 4512</code></td><td>A: <code>[*] 잠금 #3 보냄</code><br>B, C: <code>[잠금] A의 잠금 메시지 #3 (B, C 둘 다 동의해야 열림)</code></td><td>B와 C에게 번호만 도착하고 내용은 보이지 않습니다. 열쇠를 반으로 쪼개 B와 C가 반쪽씩 가진 상태입니다.</td></tr>
+    <tr><td>5. 열람 요청</td><td>B: <code>/open 3</code></td><td>B: <code>[!] C의 승인을 기다리는 중</code><br>C: <code>[요청] B가 #3을 열려고 합니다 → /approve 3</code></td><td>B 혼자서는 열 수 없습니다. 반쪽 열쇠로는 아무것도 알 수 없습니다.</td></tr>
+    <tr><td>6. 승인</td><td>C: <code>/approve 3</code></td><td>B: <code>[#3] 금고 비번은 4512</code></td><td>C가 자기 반쪽을 B에게만 넘겨 B가 엽니다. <b>읽는 사람은 요청한 B 한 명, 한 번뿐</b>이고, 열리면 #3은 서버에서도 지워집니다. 승인한 C는 내용을 보지 못합니다.</td></tr>
+    <tr><td>7. 종료</td><td><code>/quit</code></td><td>다른 사람 화면: <code>[*] B 퇴장</code></td><td>내 컴퓨터의 키를 전부 지우고 끝냅니다. 내가 반쪽을 가진 잠금 메시지도 함께 사라집니다.</td></tr>
+  </table></div>
+
+  <h3>하지 않는 것</h3>
+  <ul>
+    <li><b>대화 기록 저장 없음.</b> 프로그램을 끄면 대화가 사라집니다. 파일에 남기지 않는 것도 보안 설계의 일부입니다.</li>
+    <li><b>접속해 있지 않은 사람에게는 보낼 수 없음.</b> 나중에 접속해도 지난 메시지를 받지 못합니다.</li>
+    <li><b>1:1 귓속말 없음.</b> 일반 메시지는 접속자 전원에게 갑니다. 특정 두 사람을 지정하는 건 잠금 메시지뿐입니다.</li>
+    <li><b>글자만 보냄.</b> 파일과 사진은 보내지 않습니다.</li>
+  </ul>
+
+  <h3>어디서 실행하나: 설치형</h3>
+  <p><b>설치형으로 결정했습니다 (10. 29.).</b> 각자 컴퓨터에 프로그램을 설치해서 실행하는 방식이고, 웹 버전은 만들지 않습니다. 프로그램은 두 개입니다.</p>
+  <ul>
+    <li><code>server</code>: 중계 서버. <b>딱 한 대</b>에서만 켭니다.</li>
+    <li><code>client</code>: 채팅 프로그램. 대화하는 사람마다 하나씩 켭니다.</li>
+  </ul>
+  <p>서버도 그냥 프로그램 하나라서 <b>데스크탑이든 노트북이든 아무 컴퓨터에서나</b> 켤 수 있습니다. 서버 전용 컴퓨터도 필요 없어서, 서버를 켠 노트북에서 client를 같이 켜고 대화에 참여해도 됩니다. 따라서 노트북끼리만으로도 충분히 됩니다.</p>
+  <div class="scroll"><table>
+    <tr><th>상황</th><th>구성</th><th>client에 넣는 서버 주소</th><th>설정</th></tr>
+    <tr><td>① 혼자 개발·테스트</td><td>컴퓨터 1대에서 터미널 4개 (server 1개 + client 3개)</td><td><code>127.0.0.1:9000</code> (자기 자신)</td><td>없음</td></tr>
+    <tr><td>② 발표 시연</td><td>노트북 1대가 server + client A, 다른 노트북 2대가 client B, C. <b>모두 같은 Wi-Fi</b></td><td>서버 노트북의 IP (예: <code>192.168.0.12:9000</code>). 서버 노트북 자신은 <code>127.0.0.1:9000</code></td><td>서버 노트북만 한 번 (아래)</td></tr>
+    <tr><td>③ 서로 다른 장소 (집 ↔ 학교)</td><td>인터넷 너머로 연결</td><td>공인 IP</td><td>공유기 포트포워딩이나 클라우드 서버가 필요 → <b>이번 범위 밖</b></td></tr>
+  </table></div>
+<pre><code>        같은 Wi-Fi (발표 때는 휴대폰 핫스팟 추천)
+
+  노트북 1  IP 192.168.0.12
+    ./server
+    ./client --user A --server 127.0.0.1:9000
+
+  노트북 2  ./client --user B --server 192.168.0.12:9000   ──▶ 노트북 1
+  노트북 3  ./client --user C --server 192.168.0.12:9000   ──▶ 노트북 1</code></pre>
+  <div class="note warn"><b>서버 컴퓨터에서만 할 설정 (②):</b>
+    <ul style="margin:6px 0 0">
+      <li>서버는 모든 주소에서 연결을 받도록 <code>0.0.0.0</code>(<code>INADDR_ANY</code>)에 bind합니다. <code>net_listen</code>이 이렇게 만들어야 합니다.</li>
+      <li>WSL2는 기본 설정으로는 <b>다른 컴퓨터에서 들어오는 연결을 WSL 안까지 넘겨주지 않습니다.</b> Windows 11에서는 <code>%UserProfile%\.wslconfig</code>에 <code>networkingMode=mirrored</code>를 넣는 방법과 <code>netsh interface portproxy</code>로 9000번을 넘겨주는 방법이 있습니다. 거기에 Windows 방화벽에서 TCP 9000 허용이 필요합니다. 정확한 절차는 WSL 설치 후 직접 해 보고 이 문서에 고정합니다.</li>
+      <li>학교 Wi-Fi는 같은 Wi-Fi에 붙은 기기끼리의 접속을 막아 두기도 합니다. 시연 때는 휴대폰 핫스팟 하나에 노트북을 모두 연결하는 편이 안전합니다.</li>
+      <li>client 쪽 컴퓨터는 설정할 것이 없습니다. 밖으로 나가는 연결이라 막히지 않습니다.</li>
+    </ul>
+  </div>
+  <p><b>설치 방법:</b> 개발 환경과 똑같이 WSL2(Ubuntu)에 <code>libsodium-dev</code>를 깔고 <code>make</code>로 빌드합니다. Windows에서 더블클릭하는 <code>.exe</code>로 만들려면 소켓 코드(Winsock)와 키보드 입력 처리를 다시 짜야 해서 이번 범위에서는 하지 않고, 확장 과제로 둡니다.</p>
+
   <h3>왜 만드나: 세 가지 문제와 답</h3>
   <div class="scroll"><table>
     <tr><th>문제</th><th>우리 답</th><th>한계 (정직하게 적어 둘 것)</th></tr>
@@ -103,7 +155,7 @@ footer { padding: 48px 0 64px; color: var(--ink-2); font-size: 13px }
     <tr><td>③ 암호화만으로 공격을 막는지 알 수 없음</td><td>변조 → 인증 암호(AEAD), 재전송 → 순서번호, 중간자 → 안전번호 비교. <b>"나쁜 서버" 옵션으로 직접 공격해서 막히는 걸 보여줌</b></td><td>시연은 우리가 정한 3가지 공격에 한함</td></tr>
   </table></div>
 
-  <h3>어떻게 돌아가나</h3>
+  <h3>속에서 일어나는 일 (개발자용)</h3>
 <pre><code> [클라이언트 A]                 [중계 서버]                 [클라이언트 B]
   키 쌍 만들기 ── HELLO(공개키) ──▶ 이름·공개키 등록 ──▶ A의 공개키 전달
   X25519 키 교환으로 시작 키 CK0 ◀─────── (네트워크로 키를 보내지 않음) ───────▶ 같은 CK0
@@ -125,15 +177,15 @@ footer { padding: 48px 0 64px; color: var(--ink-2); font-size: 13px }
     <tr><td><code>crypto.c/h</code></td><td>키 교환, 안전번호, 래칫, 암복호화, XOR 분할. 소켓을 전혀 모름</td><td>암복호화</td></tr>
     <tr><td><code>net.c/h</code>, <code>server.c</code></td><td>길이 붙인 패킷 송수신, 중계 서버. 암호를 전혀 모름</td><td>서버 (이 문서)</td></tr>
     <tr><td><code>client.c</code></td><td>명령어(<code>/verify /lock /open /approve /quit</code>), 상대별 래칫 상태, 화면</td><td>UI</td></tr>
-    <tr><td><code>tests/</code>, 발표</td><td>암호 단위 테스트, 공격 시연 시나리오, PPT, (선택) 웹</td><td>총괄</td></tr>
+    <tr><td><code>tests/</code>, 발표</td><td>암호 단위 테스트, 공격 시연 시나리오, PPT</td><td>총괄</td></tr>
   </table></div>
   <p>암호와 네트워크를 서로 모르게 나눴기 때문에 서버는 평문으로 먼저 완성할 수 있고, 암호 담당은 네트워크 없이 테스트를 먼저 만들 수 있습니다. 두 갈래가 6단계(평문 채팅 → 암호화 채팅)에서 만납니다.</p>
 
   <h3>목표와 일정</h3>
   <ul>
     <li><b>필수 (10주차 마감선):</b> CLI 버전 완성 + 공격 시연 3종(변조·재전송·중간자) 통과. 개발 환경은 4명 모두 WSL2(Ubuntu) + gcc + Makefile.</li>
-    <li><b>선택 (11주차~):</b> 웹 클라이언트. 브라우저 안에서 JS용 libsodium으로 암호화하고, websockify로 WebSocket ↔ TCP를 중계합니다. C 서버는 고치지 않습니다.</li>
-    <li><b>판단 기준:</b> 10주차 끝에 시연 3종이 모두 통과하면 웹으로 넘어가고, 하나라도 안 되면 CLI 완성에 집중합니다. 발표의 핵심은 웹이 아니라 "실제로 막힌다"를 보여주는 것입니다.</li>
+    <li><b>11~13주차:</b> 웹 버전은 만들지 않습니다(설치형 결정). 대신 노트북 여러 대로 시연하는 ②번 구성을 맞추고, 버그 수정과 통합 테스트, 시연 리허설에 씁니다.</li>
+    <li>발표의 핵심은 "실제로 막힌다"를 보여주는 것입니다.</li>
   </ul>
 
   <h3>지금까지 흐름</h3>
@@ -149,7 +201,7 @@ footer { padding: 48px 0 64px; color: var(--ink-2); font-size: 13px }
   <h3>질의응답에서 나온 질문에 대한 지금의 답</h3>
   <ul>
     <li><b>패킷이 유실되거나 순서가 바뀌면?</b> TCP라서 순서는 보장됩니다. 순서번호가 건너뛰면 그만큼 래칫을 앞으로 돌리고(최대 50개), 작으면 재전송으로 보고 버립니다. 지우는 것은 지난 <b>키</b>이지 메시지가 아닙니다.</li>
-    <li><b>배포는 웹인가 설치형인가?</b> 아직 정하지 않았습니다. 지금 계획대로라면 필수 결과물은 터미널 프로그램(설치형)이고, 웹은 10주차 판단에 따른 선택 목표입니다.</li>
+    <li><b>배포는 웹인가 설치형인가?</b> 설치형입니다(10. 29. 결정). 각자 컴퓨터에 client를 설치하고, 한 대가 server를 켭니다. 위 "어디서 실행하나"를 참고하세요.</li>
     <li><b>시중에 이미 있지 않나?</b> 종단간 암호화와 키 래칫 자체는 Signal 같은 메신저에 있습니다. 차별점은 "두 사람이 모여야 열리는" 2인 합의 잠금이고, 직접 구현해 공격을 막는 것까지 보여주는 데 의미를 둡니다.</li>
   </ul>
 </section>
@@ -172,7 +224,7 @@ footer { padding: 48px 0 64px; color: var(--ink-2); font-size: 13px }
   <h2><span>2</span>구조</h2>
   <p>스레드 없이 <b><code>poll()</code> 하나로 돌아가는 단일 루프</b>로 만듭니다. 리스닝 소켓과 접속한 클라이언트 소켓을 모두 <code>poll</code>에 걸어 두고, 읽을 거리가 생긴 소켓만 처리합니다. 스레드를 쓰지 않으니 락(mutex)도 필요 없습니다.</p>
 <pre><code>main()
- ├─ net_listen(9000)                  <span class="cm">소켓 생성 · SO_REUSEADDR · bind · listen</span>
+ ├─ net_listen(9000)                  <span class="cm">소켓 생성 · SO_REUSEADDR · bind(0.0.0.0) · listen</span>
  └─ for (;;) poll(fds, n, -1)
       ├─ 리스닝 소켓이 읽기 가능 → accept → 클라이언트 표에 추가
       └─ 클라이언트 소켓이 읽기 가능 → recv → 그 클라이언트의 버퍼 뒤에 붙임
@@ -464,6 +516,8 @@ int main(int argc, char **argv)
     <tr><td>암호</td><td>잠금 암호문의 AD</td><td><code>from</code>만 (서버가 seq를 붙이므로)</td></tr>
     <tr><td>테스트·발표</td><td>시연 옵션 동작 주기</td><td>MSG 3개마다 1번 (첫 두 개는 정상이라 비교가 됨)</td></tr>
     <tr><td>팀 전체</td><td>포트, 최대 인원</td><td>9000번, 16명</td></tr>
+    <tr><td>팀 전체</td><td>잠금 메시지를 누가 읽나</td><td>요청한 1명이 1번만 (승인자는 못 읽음)</td></tr>
+    <tr><td>팀 전체</td><td>시연 때 서버 노트북과 네트워크</td><td>노트북 1대가 server + client, 휴대폰 핫스팟</td></tr>
   </table></div>
 </section>
 
