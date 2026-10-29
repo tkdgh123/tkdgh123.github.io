@@ -14,12 +14,15 @@
 
 <script>
 const app = document.getElementById("app");
+const DONE_URL = "https://script.google.com/macros/s/AKfycbxhsQA5ijXl4AtQ4kECjZCs0ZXeBAfJqVousGYJ6lEV7aZ7Saqxi8WFoAqleaTsxaTM/exec";
+let done = new Set();
+try { done = new Set(JSON.parse(localStorage.getItem("daily-done") || "[]")) } catch (e) {}
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 const LAPTOP = '<svg viewBox="0 0 44 44" aria-hidden="true"><rect x="7" y="9" width="30" height="20" rx="4" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M3 33h38l-3 4H6z" fill="currentColor"/></svg>';
 const HAND = '<svg viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="17" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M17 15l12 7-12 7z" fill="currentColor"/></svg>';
 
 function nav(on) {
-  return `<nav><a class="pill${on === "home" ? " on" : ""}" href="./">전체 목록</a><a class="pill${on === "terms" ? " on" : ""}" href="?t">용어 사전</a><a class="pill" href="portfolio.html">포트폴리오</a></nav>`;
+  return `<nav><a class="pill${on === "home" ? " on" : ""}" href="./">전체 목록</a><a class="pill${on === "terms" ? " on" : ""}" href="?t">용어 사전</a></nav>`;
 }
 
 function quizHTML(qz, label, id) {
@@ -54,6 +57,7 @@ function lessonView(data, id) {
     ${x.mine ? `<section class="card mine">${LAPTOP}<div><h2>내 노트북으로 보면</h2><p>${esc(x.mine)}</p></div></section>` : ""}
     ${x.try ? `<section class="card mine">${HAND}<div><h2>직접 해 보기</h2><p>${esc(x.try)}</p></div></section>` : ""}
     <section class="sec"><h2>오늘 나온 말</h2><div class="terms">${x.terms.map(([t, d]) => `<details><summary>${esc(t)}</summary><p>${esc(d)}</p></details>`).join("")}</div></section>
+    <button type="button" class="donebtn" data-done="${id}"></button>
     <div class="pager">${prev ? `<a href="?d=${prev.id}">← D${prev.id}</a>` : ""}${next ? `<a class="next" href="?d=${next.id}">D${next.id} →</a>` : ""}</div>`;
 }
 
@@ -82,9 +86,22 @@ function homeView(data) {
     <div class="hero"><h1>매일 AI 공부</h1><p>아침 8시, 카톡으로 하루 한 주제. 컴퓨터 기초부터 AI학과 전공 기초까지 차례대로.</p></div>
     ${data.units.map(u => {
       const ls = u.from ? data.lessons.filter(l => l.id >= u.from && l.id <= u.to) : [];
-      return `<section class="unitbox"><h2>${esc(u.name)}</h2>${ls.length ? `<div class="list">${ls.map(l => `<a href="?d=${l.id}"><b>D${l.id}</b><span>${esc(l.title)}</span></a>`).join("")}</div>` : ""}
+      return `<section class="unitbox"><h2>${esc(u.name)}</h2>${ls.length ? `<div class="list">${ls.map(l => `<a href="?d=${l.id}" data-done="${l.id}"><b>D${l.id}</b><span>${esc(l.title)}</span></a>`).join("")}</div>` : ""}
         ${u.plan ? `<div class="soon">${u.plan.map(p => `<span>${esc(p)}</span>`).join("")}</div>` : ""}</section>`;
     }).join("")}`;
+}
+
+function paint() {
+  try { localStorage.setItem("daily-done", JSON.stringify([...done])) } catch (e) {}
+  document.querySelectorAll("[data-done]").forEach(el => {
+    const ok = done.has(+el.dataset.done);
+    el.classList.toggle("ok", ok);
+    if (el.tagName === "BUTTON") el.textContent = ok ? "✓ 학습 완료 (누르면 취소)" : "학습 완료";
+  });
+}
+
+function sync(q) {
+  return fetch(DONE_URL + (q || "")).then(r => r.json()).then(j => { done = new Set(j.done); paint(); });
 }
 
 fetch("lessons.json").then(r => r.json()).then(data => {
@@ -95,7 +112,21 @@ fetch("lessons.json").then(r => r.json()).then(data => {
   else if (q.has("t")) app.innerHTML = termsView(data);
   else app.innerHTML = homeView(data);
 
+  paint();
+  sync().catch(() => {});
+
   app.addEventListener("click", e => {
+    const d = e.target.closest(".donebtn");
+    if (d) {
+      const id = +d.dataset.done, was = done.has(id);
+      was ? done.delete(id) : done.add(id);
+      paint();
+      d.disabled = true;
+      sync(`?${was ? "undo" : "done"}=${id}`)
+        .catch(() => { was ? done.add(id) : done.delete(id); paint(); d.textContent = "저장 실패, 다시 눌러 주세요"; })
+        .finally(() => { d.disabled = false; });
+      return;
+    }
     const b = e.target.closest(".opts button");
     if (!b) return;
     const card = b.closest(".quiz"), a = +card.dataset.a;
