@@ -17,6 +17,13 @@ window.JOBMAP = {
   checked: "2026년 10월 29일",
   mismatch: "https://dhnews.co.kr/news/view/179521250315407",
   schools: [{ id: "ssu", name: "숭실대학교" }],
+  collegeOrder: ["인문대학", "법과대학", "사회과학대학", "경제통상대학", "경영대학", "공과대학", "자연과학대학", "IT대학", "AI대학"],
+  // 단과대 → 전국 같은 계열 취업률 (2024년 졸업자, 교육부 취업통계)
+  fieldRate: (() => {
+    const r = (field, value) => ({ label: `전국 ${field}계열 취업률`, value, basis: "2024년 졸업자, 교육부 취업통계", source: STAT_2024 });
+    const hum = r("인문", "61.1%"), soc = r("사회", "69.0%"), eng = r("공학", "70.4%"), sci = r("자연", "65.4%");
+    return { "인문대학": hum, "법과대학": soc, "사회과학대학": soc, "경제통상대학": soc, "경영대학": soc, "공과대학": eng, "자연과학대학": sci, "IT대학": eng, "AI대학": eng };
+  })(),
 
   ssu: {
     rate: { label: "숭실대 전체 취업률", value: "67.7%", basis: "2024년 졸업자, 대학알리미 기준 보도", source: SSU_RATE },
@@ -55,7 +62,7 @@ window.JOBMAP = {
     {
       id: "jp", name: "일어일문학과", college: "인문대학", promptName: "일본어·일본문학 전공",
       intro: "일본어와 일본 문화를 배우고, 통번역·일본학 전문가를 기르는 학과예요.",
-      stats: [{ label: "전국 인문계열 취업률", value: "61.1%", basis: "2024년 졸업자, 교육부 취업통계", source: STAT_2024 }],
+      stats: [],
       laneOut: "전공 밖으로",
       related_jobs: [
         { name: "통역가·번역가", why: "학과가 내세우는 교육 목표", source: JP_INTRO },
@@ -98,7 +105,7 @@ window.JOBMAP = {
     {
       id: "biz", name: "경영학부", college: "경영대학", promptName: "경영학 전공",
       intro: "1959년 문을 연 국내 두 번째 경영학부예요. 졸업생이 5천 명이 넘어요.",
-      stats: [{ label: "전국 사회계열 취업률", value: "69.0%", basis: "2024년 졸업자, 교육부 취업통계", source: STAT_2024 }],
+      stats: [],
       laneOut: "회사 밖으로",
       related_jobs: [
         { name: "인사 (HR)", why: "인적자원관리, 인사·조직 컨설팅 (타 대학 경영학부 안내)", source: MJU_BIZ },
@@ -139,7 +146,6 @@ window.JOBMAP = {
       id: "aisw", name: "AI소프트웨어학부", college: "AI대학", promptName: "AI·소프트웨어 전공",
       intro: "소프트웨어·정보보호·인공지능·AI시스템 네 세부전공 중 3학년 때 골라요.",
       stats: [
-        { label: "전국 공학계열 취업률", value: "70.4%", basis: "2024년 졸업자, 교육부 취업통계", source: STAT_2024 },
         { label: "숭실대 소프트웨어 전공 취업률", value: "76.8%", basis: "2019년 기준, 입시 기사 보도", source: "https://dhnews.co.kr/news/view/179520401118107" }
       ],
       laneOut: "개발 말고",
