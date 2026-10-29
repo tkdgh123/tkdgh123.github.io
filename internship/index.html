@@ -6,198 +6,245 @@
 <title>표준 현장실습학기제</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@500;700&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
 <style>
-/* 실습 수첩: 왼쪽 목차 + 오른쪽 본문 한 줄기. 출근부처럼 가는 선으로 칸을 나누고, 상자는 직접 만지는 곳(계산기·질문·체크)에만 쓴다 */
+/* 둥근 수첩: 왼쪽 알약 목차 + 본문. 중요한 섹션만 색 바탕의 둥근 판에 올리고, 설명은 막대·흐름도·단계 카드로 보여 준다 */
 :root {
-  --paper: #F5F4EF; --sheet: #FFFFFF; --tint: #ECEAE2; --ink: #1B1D1C; --ink-2: #5A5E5B; --rule: #DCD8CE;
-  --acc: #1E5B4F; --on-acc: #FFFFFF; --co: #B5562F; --warn: #9A6400;
-  --display: "Hahmlet", "Noto Serif KR", "Nanum Myeongjo", serif;
-  --body: "IBM Plex Sans KR", "Pretendard", system-ui, "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+  --bg: #F7F5F0; --card: #FFFFFF; --tint: #EAF3EF; --peach: #FBEFE7; --ink: #23272A; --ink-2: #62686C; --rule: #E4E0D8;
+  --acc: #2C7A6B; --on-acc: #FFFFFF; --acc-soft: #D7EBE4; --co: #C25E3B; --co-soft: #F6DDD0; --warn: #A36500;
+  --display: "Jua", "Gowun Dodum", system-ui, sans-serif;
+  --body: "Gowun Dodum", "Pretendard", system-ui, "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+  --r: 22px;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --paper: #131615; --sheet: #1B1F1E; --tint: #222826; --ink: #E9E6DF; --ink-2: #A3A8A4; --rule: #2E3431;
-  --acc: #7CC5B0; --on-acc: #0F1B18; --co: #E28659; --warn: #F0B54A; color-scheme: dark } }
+  --bg: #151817; --card: #1E2321; --tint: #1C2926; --peach: #2A221E; --ink: #ECE9E3; --ink-2: #A6ACA9; --rule: #2F3532;
+  --acc: #7FCBB8; --on-acc: #10201C; --acc-soft: #24403A; --co: #E58A66; --co-soft: #4A2E24; --warn: #F0B54A; color-scheme: dark } }
 :root[data-theme="dark"] {
-  --paper: #131615; --sheet: #1B1F1E; --tint: #222826; --ink: #E9E6DF; --ink-2: #A3A8A4; --rule: #2E3431;
-  --acc: #7CC5B0; --on-acc: #0F1B18; --co: #E28659; --warn: #F0B54A; color-scheme: dark }
+  --bg: #151817; --card: #1E2321; --tint: #1C2926; --peach: #2A221E; --ink: #ECE9E3; --ink-2: #A6ACA9; --rule: #2F3532;
+  --acc: #7FCBB8; --on-acc: #10201C; --acc-soft: #24403A; --co: #E58A66; --co-soft: #4A2E24; --warn: #F0B54A; color-scheme: dark }
 
 * { box-sizing: border-box }
 html { scroll-behavior: smooth }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto } }
-body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.7 var(--body); word-break: keep-all; overflow-wrap: anywhere }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.75 var(--body); word-break: keep-all; overflow-wrap: anywhere }
 a { color: inherit }
-.num { font-variant-numeric: tabular-nums }
+b, strong { font-weight: 700 }
+p { margin: 0 }
 .muted { color: var(--ink-2) }
+.num { font-variant-numeric: tabular-nums }
 
-.page { max-width: 1140px; margin: 0 auto; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 64px }
-.toc { position: sticky; top: 28px; align-self: start; padding-top: 28px }
-.toc .back { display: block; font-size: 14px; color: var(--ink-2); text-decoration: none; margin-bottom: 28px }
-.toc .back:hover { color: var(--ink) }
-.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; border-left: 1px solid var(--rule) }
-.toc a { display: block; text-decoration: none; font-size: 14px; color: var(--ink-2); padding: 4px 0 4px 14px; margin-left: -1px; border-left: 2px solid transparent }
-.toc a:hover { color: var(--ink) }
-.toc a.on { color: var(--acc); border-left-color: var(--acc); font-weight: 600 }
+.page { max-width: 1160px; margin: 0 auto; padding-left: max(18px, env(safe-area-inset-left, 0px)); padding-right: max(18px, env(safe-area-inset-right, 0px)); display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 0 48px }
+header.top { grid-column: 1 / -1; padding: 26px 0 10px }
+.toc { position: sticky; top: 24px; align-self: start; padding-top: 30px }
+.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px }
+.toc a { display: block; text-decoration: none; font-size: 14.5px; color: var(--ink-2); padding: 6px 14px; border-radius: 99px }
+.toc a:hover { color: var(--ink); background: var(--card) }
+.toc a.on { color: var(--on-acc); background: var(--acc) }
 .toc a:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px }
-main { min-width: 0; max-width: 780px; padding-bottom: 40px }
-
-@media (max-width: 900px) {
-  .page { grid-template-columns: minmax(0, 1fr); gap: 0 }
-  .toc { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 3; padding: 0; margin-inline: calc(-1 * max(20px, env(safe-area-inset-left, 0px))); background: color-mix(in srgb, var(--paper) 92%, transparent); backdrop-filter: blur(6px); border-bottom: 1px solid var(--rule); order: 2 }
-  .toc .back { display: none }
-  .toc ol { display: flex; gap: 0; border: 0; overflow-x: auto; scrollbar-width: none; padding: 0 max(20px, env(safe-area-inset-left, 0px)) }
-  .toc a { white-space: nowrap; padding: 10px 10px; border-left: 0; border-bottom: 2px solid transparent; margin: 0 }
-  .toc a.on { border-bottom-color: var(--acc) }
-  header.top { order: 1 }
-  main { order: 3 }
-  body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--paper) }
+main { min-width: 0; max-width: 820px; padding-bottom: 32px }
+@media (max-width: 920px) {
+  .page { grid-template-columns: minmax(0, 1fr) }
+  .toc { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 3; padding: 8px 0; margin-inline: calc(-1 * max(18px, env(safe-area-inset-left, 0px))); background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(6px) }
+  .toc ol { display: flex; overflow-x: auto; scrollbar-width: none; padding: 0 max(18px, env(safe-area-inset-left, 0px)) }
+  .toc a { white-space: nowrap }
+  body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg) }
 }
 
-header.top { grid-column: 1 / -1; padding: 28px 0 8px }
-.mback { display: inline-block; margin-bottom: 18px; font-size: 14px; color: var(--ink-2); text-decoration: none }
-.mback:hover { color: var(--ink) }
-.eb { font-size: 13px; letter-spacing: .08em; color: var(--acc); font-weight: 600 }
-h1 { font-family: var(--display); font-weight: 700; font-size: clamp(38px, 6.4vw, 64px); line-height: 1.12; letter-spacing: -.01em; margin: 14px 0 14px; text-wrap: balance }
-.sub { margin: 0; font-size: 18px; color: var(--ink-2); max-width: 34em }
-.strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 36px 0 12px; border-top: 2px solid var(--ink) }
-.strip div { padding: 14px 18px 4px 0; display: grid; gap: 2px; align-content: start }
-.strip div + div { padding-left: 18px; border-left: 1px solid var(--rule) }
-.strip b { font-family: var(--display); font-weight: 700; font-size: clamp(24px, 3vw, 32px); line-height: 1.2; font-variant-numeric: tabular-nums }
-.strip span { font-size: 14px }
-.strip small { font-size: 12.5px; color: var(--ink-2); line-height: 1.5 }
-@media (max-width: 640px) { .strip { grid-template-columns: repeat(2, minmax(0, 1fr)) } .strip div:nth-child(3) { padding-left: 0; border-left: 0 } .strip div:nth-child(n+3) { border-top: 1px solid var(--rule) } }
+.back { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: var(--ink-2); text-decoration: none; padding: 4px 12px 4px 10px; border-radius: 99px; background: var(--card); border: 1px solid var(--rule) }
+.back:hover { color: var(--ink) }
+.kick { display: inline-block; margin: 22px 0 0; font-size: 13px; color: var(--acc); background: var(--acc-soft); padding: 2px 12px; border-radius: 99px }
+h1 { font-family: var(--display); font-weight: 400; font-size: clamp(38px, 6.6vw, 62px); line-height: 1.15; margin: 12px 0 8px; letter-spacing: -.01em; text-wrap: balance }
+.sub { font-size: 18px; color: var(--ink-2); max-width: 32em }
 
-section { padding: 56px 0 8px; scroll-margin-top: 64px }
-section + section { border-top: 1px solid var(--rule) }
-h2 { font-family: var(--display); font-weight: 700; font-size: clamp(26px, 3.4vw, 32px); line-height: 1.25; margin: 6px 0 10px; text-wrap: balance }
-.lead { margin: 0 0 24px; color: var(--ink-2); max-width: 40em }
-h3 { font-size: 17px; margin: 0 0 6px; line-height: 1.4 }
-p { margin: 0 }
+.road { margin-top: 26px; background: var(--card); border: 1px solid var(--rule); border-radius: 28px; padding: 24px 26px 22px }
+.road h2 { font-size: 22px; margin: 0 0 4px }
+.road > p { font-size: 14px; color: var(--ink-2) }
+.nodes { list-style: none; margin: 22px 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); position: relative }
+.nodes::before { content: ""; position: absolute; left: 12.5%; right: 12.5%; top: 15px; height: 4px; border-radius: 4px; background: var(--acc-soft) }
+.nodes li { position: relative; display: grid; justify-items: center; text-align: center; gap: 6px; padding: 0 8px }
+.nodes i { width: 34px; height: 34px; border-radius: 50%; background: var(--card); border: 4px solid var(--acc-soft); display: grid; place-items: center; font-style: normal; font-family: var(--display); font-size: 15px; color: var(--acc); z-index: 1 }
+.nodes li.now i { background: var(--acc); border-color: var(--acc); color: var(--on-acc); box-shadow: 0 0 0 6px var(--acc-soft) }
+.nodes b { font-family: var(--display); font-weight: 400; font-size: 17px }
+.nodes span { font-size: 13.5px; color: var(--ink-2); line-height: 1.55 }
+.nodes em { position: absolute; top: -30px; font-style: normal; font-size: 12px; color: var(--on-acc); background: var(--acc); padding: 0 9px; border-radius: 99px; white-space: nowrap }
+.nodes { margin-top: 44px }
+@media (max-width: 640px) {
+  .nodes { grid-template-columns: 1fr; gap: 14px; margin-top: 22px }
+  .nodes em { position: static; justify-self: start }
+  .nodes::before { left: 15px; right: auto; top: 10px; bottom: 10px; width: 4px; height: auto }
+  .nodes li { grid-template-columns: 34px minmax(0, 1fr); justify-items: start; text-align: left; padding: 0; column-gap: 12px }
+  .nodes li > *:not(i) { grid-column: 2 }
+  .nodes i { grid-row: 1 / span 3 }
+}
+.first { margin-top: 20px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; background: var(--peach); border-radius: 18px; padding: 12px 18px; font-size: 15px }
+.first b { font-family: var(--display); font-weight: 400; font-size: 16px; color: var(--co) }
+
+.pills { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 14px }
+.pills div { background: var(--tint); border-radius: var(--r); padding: 14px 18px; display: grid; gap: 0 }
+.pills b { font-family: var(--display); font-weight: 400; font-size: clamp(22px, 2.6vw, 28px); line-height: 1.25; color: var(--acc); font-variant-numeric: tabular-nums }
+.pills span { font-size: 14px }
+.pills small { font-size: 12.5px; color: var(--ink-2); line-height: 1.5 }
+@media (max-width: 760px) { .pills { grid-template-columns: repeat(2, minmax(0, 1fr)) } }
+
+section { padding: 48px 0 6px; scroll-margin-top: 70px }
+section.band { margin-top: 40px; padding: 34px clamp(18px, 4vw, 34px) 30px; border-radius: 32px; background: var(--tint) }
+section.band.warm { background: var(--peach) }
+h2 { font-family: var(--display); font-weight: 400; font-size: clamp(26px, 3.6vw, 32px); line-height: 1.3; margin: 0 0 8px; text-wrap: balance }
+.lead { color: var(--ink-2); margin-bottom: 22px; max-width: 38em }
+h3 { font-family: var(--display); font-weight: 400; font-size: 19px; line-height: 1.35; margin: 0 0 6px }
 .note { font-size: 13px; color: var(--ink-2); margin-top: 12px }
 
-.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); gap: 20px 28px }
-.cols > div { border-top: 1px solid var(--ink); padding-top: 12px; min-width: 0 }
-.cols p, .cols ul { font-size: 15px; color: var(--ink-2) }
-.cols ul { margin: 0; padding-left: 18px; display: grid; gap: 4px }
-.cols.two { grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)) }
+.card { background: var(--card); border: 1px solid var(--rule); border-radius: var(--r); padding: 20px }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 12px }
+.grid.two { grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)) }
+.badge { width: 52px; height: 52px; border-radius: 50%; background: var(--acc-soft); color: var(--acc); display: grid; place-items: center; font-family: var(--display); font-size: 17px; margin-bottom: 12px }
+.card p, .card li { font-size: 15px; color: var(--ink-2) }
+.card ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px }
+.card ul li { padding-left: 16px; position: relative }
+.card ul li::before { content: ""; position: absolute; left: 2px; top: .7em; width: 6px; height: 6px; border-radius: 50%; background: var(--acc) }
 
-.tbl { overflow-x: auto }
-table { border-collapse: collapse; width: 100%; font-size: 15px }
-.tbl table { min-width: 540px }
-th, td { text-align: left; padding: 12px 14px 12px 0; border-bottom: 1px solid var(--rule); vertical-align: top }
-thead th { font-size: 13px; font-weight: 600; color: var(--ink-2); border-bottom: 2px solid var(--ink) }
-thead th.std { color: var(--acc) }
-tbody th { font-weight: 600; width: 22% }
+.ratio { margin-bottom: 18px }
+.ratio .bar { position: relative; display: flex; height: 44px; border-radius: 99px; overflow: hidden; background: var(--rule) }
+.ratio .bar i { display: grid; place-items: center; font-style: normal; font-family: var(--display); font-size: 15px }
+.ratio .z { width: 16.67%; background: var(--rule) }
+.ratio .s { width: 25%; background: var(--acc); color: var(--on-acc) }
+.ratio .f { flex: 1; background: var(--co-soft); color: var(--co) }
+.ticks { position: relative; height: 22px; font-size: 12.5px; color: var(--ink-2); font-variant-numeric: tabular-nums }
+.ticks span { position: absolute; top: 4px; transform: translateX(-50%) }
+.vs .card h3 { display: flex; align-items: center; gap: 8px }
+.vs .card h3::before { content: ""; width: 12px; height: 12px; border-radius: 50%; background: var(--c) }
 
-.panel { background: var(--sheet); border: 1px solid var(--rule); border-radius: 14px; padding: 24px }
 .calc { display: grid; gap: 16px }
-.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; width: fit-content; max-width: 100% }
-.seg button { font: inherit; font-size: 14px; padding: 8px 16px; border: 0; background: var(--sheet); color: var(--ink); cursor: pointer }
-.seg button + button { border-left: 1px solid var(--rule) }
-.seg button[aria-pressed="true"] { background: var(--acc); color: var(--on-acc); font-weight: 600 }
-.seg button:focus-visible { outline: 2px solid var(--acc); outline-offset: -2px }
-.out { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px }
-.out b { font-family: var(--display); font-size: clamp(36px, 7vw, 54px); line-height: 1.05; font-variant-numeric: tabular-nums }
+.seg { display: flex; flex-wrap: wrap; gap: 6px }
+.seg button, .who button { font: inherit; font-size: 14.5px; padding: 7px 16px; border-radius: 99px; border: 1px solid var(--rule); background: var(--card); color: var(--ink); cursor: pointer }
+.seg button[aria-pressed="true"], .who button[aria-selected="true"] { background: var(--acc); border-color: var(--acc); color: var(--on-acc) }
+.seg button:focus-visible, .who button:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px }
+.out { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px }
+.out b { font-family: var(--display); font-weight: 400; font-size: clamp(38px, 7vw, 56px); line-height: 1.1; color: var(--acc); font-variant-numeric: tabular-nums }
+.meter { height: 12px; border-radius: 99px; background: var(--acc-soft); overflow: hidden }
+.meter i { display: block; height: 100%; background: var(--acc); border-radius: 99px; transition: width .3s }
 .formula { font-size: 14px; color: var(--ink-2); font-variant-numeric: tabular-nums }
-.meter { height: 8px; border-radius: 99px; background: var(--tint); overflow: hidden }
-.meter i { display: block; height: 100%; background: var(--acc); border-radius: 99px; transition: width .25s }
 
-.rows { margin-top: 28px; display: grid }
-.rows > div { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 4px 20px; padding: 14px 0; border-top: 1px solid var(--rule) }
-.rows > div:last-child { border-bottom: 1px solid var(--rule) }
-.rows b { font-size: 15px }
-.rows p { font-size: 15px; color: var(--ink-2) }
-@media (max-width: 560px) { .rows > div { grid-template-columns: 1fr } }
+.flow { display: grid; grid-template-columns: minmax(0, 1fr) 120px minmax(0, 1fr) 120px minmax(0, 1fr); align-items: center; gap: 8px; margin-top: 18px }
+.flow .node { background: var(--card); border: 1px solid var(--rule); border-radius: var(--r); padding: 16px 12px; text-align: center }
+.flow .node b { display: block; font-family: var(--display); font-weight: 400; font-size: 20px }
+.flow .node.me { background: var(--acc); border-color: var(--acc); color: var(--on-acc) }
+.flow .node small { font-size: 12.5px; opacity: .8 }
+.flow .arrow { display: grid; justify-items: center; gap: 2px; font-size: 13px; text-align: center; color: var(--ink-2) }
+.flow .arrow b { font-family: var(--display); font-weight: 400; font-size: 15px; color: var(--ink) }
+.flow .arrow i { display: block; width: 100%; height: 3px; border-radius: 3px; background: var(--acc); position: relative }
+.flow .arrow i::after { content: ""; position: absolute; top: -5px; border: 6.5px solid transparent }
+.flow .arrow.r i::after { right: -4px; border-left-color: var(--acc) }
+.flow .arrow.l i::after { left: -4px; border-right-color: var(--acc) }
+.back-flow { margin-top: 10px; text-align: center; font-size: 13.5px; color: var(--ink-2); background: var(--card); border: 1px dashed var(--rule); border-radius: 99px; padding: 6px 14px }
+@media (max-width: 640px) {
+  .flow { grid-template-columns: 1fr }
+  .flow .arrow i { width: 3px; height: 26px }
+  .flow .arrow.r i::after, .flow .arrow.l i::after { left: -5px; right: auto; top: auto; border-left-color: transparent; border-right-color: transparent }
+  .flow .arrow.r i::after { bottom: -10px; border-top-color: var(--acc) }
+  .flow .arrow.l i::after { top: -10px; border-bottom-color: var(--acc) }
+}
 
-ol.steps { list-style: none; margin: 0; padding: 0; counter-reset: s }
-ol.steps li { counter-increment: s; display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 14px; position: relative; padding-bottom: 18px }
-ol.steps li::before { content: counter(s); width: 28px; height: 28px; border-radius: 50%; background: var(--acc); color: var(--on-acc); display: grid; place-items: center; font-size: 13px; font-weight: 600; z-index: 1 }
-ol.steps li:not(:last-child)::after { content: ""; position: absolute; left: 13px; top: 30px; bottom: 2px; width: 2px; background: var(--rule) }
-ol.steps b { display: block; font-size: 15.5px }
-ol.steps span { font-size: 14px; color: var(--ink-2) }
-ol.steps em { font-style: normal; font-size: 13px; color: var(--acc); white-space: nowrap; font-variant-numeric: tabular-nums; padding-top: 2px }
+.phases { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; counter-reset: p }
+.phases li { counter-increment: p; background: var(--card); border: 1px solid var(--rule); border-radius: var(--r); padding: 18px; position: relative }
+.phases li::before { content: counter(p); width: 32px; height: 32px; border-radius: 50%; background: var(--acc); color: var(--on-acc); display: grid; place-items: center; font-family: var(--display); font-size: 16px; margin-bottom: 10px }
+.phases li:not(:last-child)::after { content: ""; position: absolute; top: 33px; right: -12px; width: 12px; height: 3px; background: var(--acc-soft) }
+.phases small { display: block; font-size: 12.5px; color: var(--acc); margin-bottom: 6px }
+.phases p { font-size: 14px; color: var(--ink-2); line-height: 1.65 }
+@media (max-width: 760px) { .phases { grid-template-columns: repeat(2, minmax(0, 1fr)) } .phases li::after { display: none } }
+@media (max-width: 420px) { .phases { grid-template-columns: 1fr } }
+.credit { margin-top: 16px; display: grid; gap: 10px }
+.credit div { display: flex; flex-wrap: wrap; align-items: center; gap: 6px }
+.credit span.lab { font-size: 14px; color: var(--ink-2); margin-right: 4px }
+.chip { font-size: 14px; background: var(--card); border: 1px solid var(--rule); border-radius: 99px; padding: 3px 12px; font-variant-numeric: tabular-nums }
+.chip b { color: var(--acc); font-weight: 400; font-family: var(--display) }
 
-.ledger td.num { text-align: right; font-weight: 600 }
-.ledger th { font-weight: 400 }
-
-.who { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px }
-.who button { font: inherit; font-size: 14px; padding: 6px 14px; border-radius: 99px; border: 1px solid var(--rule); background: var(--sheet); color: var(--ink); cursor: pointer }
-.who button[aria-selected="true"] { border-color: var(--acc); background: var(--acc); color: var(--on-acc); font-weight: 600 }
-.who button:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px }
-.persona { margin: 0 0 12px; font-family: var(--display); font-size: 18px }
-.qa { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 10px }
-.qa li { background: var(--sheet); border: 1px solid var(--rule); border-radius: 12px; padding: 16px 18px; display: grid; gap: 6px; align-content: start }
-.qa b { font-size: 15.5px }
+.persona { margin: 4px 0 12px; font-size: 15px; color: var(--ink-2) }
+.who { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px }
+.qa { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 330px), 1fr)); gap: 10px }
+.qa li { background: var(--card); border: 1px solid var(--rule); border-radius: var(--r); padding: 18px 20px; display: grid; gap: 6px; align-content: start }
+.qa b { font-family: var(--display); font-weight: 400; font-size: 17px }
 .qa p { font-size: 14.5px; color: var(--ink-2) }
-.qa small { font-size: 12px; color: var(--ink-2) }
-.qa small.ask { color: var(--warn); font-weight: 600 }
+.qa small { justify-self: start; font-size: 12px; color: var(--ink-2); background: var(--bg); border-radius: 99px; padding: 1px 10px }
+.qa small.ask { color: var(--warn); background: var(--peach) }
 
-.tl { list-style: none; margin: 0; padding: 0 }
-.tl li { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 16px; padding: 14px 0; border-top: 1px solid var(--rule) }
-.tl time { font-family: var(--display); font-weight: 700; font-size: 18px; color: var(--acc); font-variant-numeric: tabular-nums }
-.tl b { display: block }
+.ssu { margin-bottom: 26px }
+.ssu dl { margin: 0; display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 8px 10px; font-size: 14.5px }
+.ssu dt { font-family: var(--display); color: var(--acc) }
+.ssu dd { margin: 0; color: var(--ink-2) }
+.ssu a { color: var(--acc) }
+ol.small { margin: 0; padding: 0; list-style: none; counter-reset: w; display: grid; gap: 8px; font-size: 14.5px; color: var(--ink-2) }
+ol.small li { counter-increment: w; display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 8px }
+ol.small li::before { content: counter(w); width: 22px; height: 22px; border-radius: 50%; background: var(--acc-soft); color: var(--acc); display: grid; place-items: center; font-size: 12px; font-family: var(--display); margin-top: 2px }
+.stages { display: grid; gap: 22px }
+.stage h3 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px }
+.stage h3 span { font-family: var(--body); font-size: 13px; color: var(--ink-2) }
+.check { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px }
+.check label { display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 12px; background: var(--card); border: 1px solid var(--rule); border-radius: 18px; padding: 13px 18px; cursor: pointer; font-size: 15px }
+.check input { appearance: none; width: 22px; height: 22px; margin: 2px 0 0; border-radius: 50%; border: 2px solid var(--rule); background: var(--card); display: grid; place-items: center; cursor: pointer }
+.check input:checked { background: var(--acc); border-color: var(--acc) }
+.check input:checked::after { content: ""; width: 6px; height: 11px; border: solid var(--on-acc); border-width: 0 2.5px 2.5px 0; transform: translateY(-1px) rotate(45deg) }
+.check input:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px }
+.check input:checked + span { color: var(--ink-2); text-decoration: line-through }
+.check small { display: block; color: var(--ink-2); font-size: 13px; text-decoration: none }
+.progress { display: flex; align-items: center; gap: 12px; margin-top: 16px; font-size: 14px; color: var(--ink-2) }
+.progress .meter { flex: 1; max-width: 280px }
+
+.tl { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px }
+.tl li { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 14px; align-items: start }
+.tl time { font-family: var(--display); font-size: 15px; color: var(--acc); background: var(--acc-soft); border-radius: 99px; text-align: center; padding: 3px 0; font-variant-numeric: tabular-nums }
+.tl b { display: block; font-family: var(--display); font-weight: 400; font-size: 17px }
 .tl span { font-size: 14px; color: var(--ink-2) }
-
-.chart { margin-top: 28px }
-.chart h3 { font-size: 15px }
-.bars { display: grid; gap: 8px; margin: 12px 0 0; padding: 0; list-style: none }
+.chart { margin-top: 22px }
+.bars { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 8px }
 .bars li { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 10px; align-items: center; font-size: 14px }
 .bars .track { display: flex; align-items: center; gap: 8px }
-.bars i { display: block; height: 20px; background: var(--acc); border-radius: 0 4px 4px 0 }
+.bars i { display: block; height: 22px; border-radius: 99px; background: var(--acc) }
 .bars i:hover, .bars i:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px }
 .bars em { font-style: normal; font-variant-numeric: tabular-nums; white-space: nowrap }
 
-.split { display: flex; gap: 2px; height: 52px; margin: 14px 0 10px }
-.split i { flex: 1; display: grid; place-items: center; color: var(--on-acc); font-style: normal; font-weight: 600; font-size: 15px; font-variant-numeric: tabular-nums }
-.split i:first-child { background: var(--acc); border-radius: 8px 0 0 8px }
-.split i:last-child { background: var(--co); border-radius: 0 8px 8px 0 }
-.tag { display: inline-block; font-size: 12px; font-weight: 600; padding: 0 8px; border-radius: 99px; border: 1px solid currentColor; color: var(--warn); vertical-align: 2px; margin-left: 4px }
+.split { display: flex; gap: 4px; height: 54px; margin: 12px 0 10px }
+.split i { flex: 1; display: grid; place-items: center; font-style: normal; font-family: var(--display); font-size: 17px }
+.split i:first-child { background: var(--acc); color: var(--on-acc); border-radius: 99px 10px 10px 99px }
+.split i:last-child { background: var(--co-soft); color: var(--co); border-radius: 10px 99px 99px 10px }
+.tag { font-family: var(--body); font-size: 12px; color: var(--warn); background: var(--peach); border-radius: 99px; padding: 1px 9px; vertical-align: 3px; margin-left: 4px }
 
-.ssu { background: var(--sheet); border: 1px solid var(--rule); border-radius: 14px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); margin-bottom: 36px; overflow: hidden }
-.ssu > div { padding: 20px 22px; min-width: 0 }
-.ssu > div + div { border-left: 1px solid var(--rule) }
-@media (max-width: 760px) { .ssu > div + div { border-left: 0; border-top: 1px solid var(--rule) } }
-.ssu h3 { font-family: var(--display); font-size: 18px; margin-bottom: 10px }
-.ssu dl { margin: 0; display: grid; grid-template-columns: 58px minmax(0, 1fr); gap: 7px 10px; font-size: 14px }
-.ssu dt { font-weight: 600 }
-.ssu dd { margin: 0; color: var(--ink-2) }
-.ssu a { color: var(--acc) }
-ol.small { margin: 0; padding-left: 20px; display: grid; gap: 6px; font-size: 14px; color: var(--ink-2) }
-ol.small b { color: var(--ink) }
-
-.stages { display: grid; gap: 26px }
-.stage h3 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; font-family: var(--display); font-size: 19px; margin-bottom: 10px }
-.stage h3 span { font-family: var(--body); font-size: 13px; font-weight: 400; color: var(--ink-2) }
-.check { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px }
-.check label { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; background: var(--sheet); border: 1px solid var(--rule); border-radius: 10px; padding: 12px 16px; cursor: pointer; font-size: 15px }
-.check input { width: 18px; height: 18px; margin: 4px 0 0; accent-color: var(--acc) }
-.check input:checked + span { color: var(--ink-2); text-decoration: line-through }
-.check small { display: block; color: var(--ink-2); font-size: 13px }
-.progress { font-size: 14px; color: var(--ink-2); margin-top: 14px }
-
-details { margin-top: 18px; border-top: 1px solid var(--rule); padding-top: 12px }
-summary { cursor: pointer; font-weight: 600; font-size: 15px }
+details { margin-top: 18px }
+summary { cursor: pointer; display: inline-block; font-size: 14.5px; background: var(--card); border: 1px solid var(--rule); border-radius: 99px; padding: 6px 16px; list-style: none }
+summary::-webkit-details-marker { display: none }
 summary:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px }
-.src { font-size: 13.5px; color: var(--ink-2); padding-left: 18px; display: grid; gap: 3px; margin: 12px 0 0 }
+.src { font-size: 13.5px; color: var(--ink-2); padding-left: 20px; display: grid; gap: 3px; margin: 14px 0 0 }
 .src a { color: var(--acc) }
-
-footer { padding: 40px 0 64px; color: var(--ink-2); font-size: 13px; border-top: 1px solid var(--rule); margin-top: 48px }
+footer { margin-top: 36px; font-size: 13px; color: var(--ink-2) }
 </style>
 </head>
 <body>
 
 <div class="page">
 <header class="top">
-  <a class="mback" href="../">← 작업실</a>
-  <div class="eb">현장실습 수첩 · 2026년 10월 29일 기준</div>
+  <a class="back" href="../">← 작업실</a><br>
+  <span class="kick">현장실습 수첩 · 2026년 10월 29일 기준</span>
   <h1>표준 현장실습학기제</h1>
-  <p class="sub">회사에서 일하면서 학점을 받는 대학 수업. 얼마를 받고, 어떻게 신청하고, 무엇을 지켜야 하는지.</p>
-  <div class="strip">
-    <div><b>161만 원↑</b><span>한 달 실습지원비 최저선</span><small>2026년 최저시급 · 주 40시간</small></div>
+  <p class="sub">회사에서 일하면서 학점을 받는 대학 수업. 얼마를 받고, 어떻게 신청하고, 언제 무엇을 하면 되는지.</p>
+
+  <div class="road">
+    <h2>나의 현장실습 길</h2>
+    <p>숭실대 1학년 2학기 기준, 휴학 없이 다닐 때</p>
+    <ol class="nodes">
+      <li class="now"><i>1</i><em>지금 여기</em><b>1학년 2학기</b><span>슈패스에서 현장실습 서류·면접 특강 듣기</span></li>
+      <li><i>2</i><b>2학년</b><span>포트폴리오 쌓기. 2학기를 마치면 WESS 열림</span></li>
+      <li><i>3</i><b>3학년 여름</b><span>5월에 첫 지원, 방학 동안 4~8주 실습</span></li>
+      <li><i>4</i><b>3학년 2학기~4학년 1학기</b><span>16주 학기 실습. 4학년 2학기는 피하기</span></li>
+    </ol>
+    <div class="first"><b>첫 할 일</b><span>슈패스 → 비교과 → "현장실습" 검색 → 현장실습지원팀 특강 신청 (학년 제한 없음)</span></div>
+  </div>
+
+  <div class="pills">
+    <div><b>161만 원↑</b><span>한 달 실습비 최저선</span><small>2026년 · 주 40시간</small></div>
     <div><b>주 40시간</b><span>실습 시간 상한</span><small>밤 10시~아침 6시 금지</small></div>
-    <div><b>보험 2개</b><span>산재 + 상해</span><small>빠지면 학점 인정 안 됨</small></div>
-    <div><b>2027.3</b><span>첫 경력 프로젝트</span><small>월 230만 원 · 예산 심의 중</small></div>
+    <div><b>보험 2개</b><span>산재 + 상해</span><small>빠지면 학점 없음</small></div>
+    <div><b>230만 원</b><span>2027 첫 경력 프로젝트</span><small>월 실습비 · 예산 심의 중</small></div>
   </div>
 </header>
 
@@ -209,207 +256,164 @@ footer { padding: 40px 0 64px; color: var(--ink-2); font-size: 13px; border-top:
     <li><a href="#apply">신청부터 학점까지</a></li>
     <li><a href="#rights">내 권리</a></li>
     <li><a href="#me">나라면?</a></li>
+    <li><a href="#check">내가 할 일</a></li>
     <li><a href="#history">지금까지</a></li>
     <li><a href="#next">2027년 변화</a></li>
-    <li><a href="#check">내가 할 일</a></li>
     <li><a href="#src">출처</a></li>
   </ol>
 </nav>
 
 <main>
 <section id="what">
-  <div class="eb">제도</div>
   <h2>회사가 교실이 되는 수업</h2>
-  <p class="lead">교육부 고시 「대학생 현장실습학기제 운영규정」(제2025-36호, 2025.12.22. 시행)은 현장실습을 일자리가 아닌 <b>학교 밖으로 연장된 수업</b>으로 봅니다.</p>
-  <div class="cols">
-    <div><h3>수업이다</h3><p>수강신청, 출석, 평가를 거쳐 학점을 받습니다. 같은 회사에서 이미 일하고 있으면 인정되지 않아요.</p></div>
-    <div><h3>돈을 받는다</h3><p>회사가 실습지원비를 <b>현금으로 직접</b> 줍니다. 밥이나 기숙사 같은 현물은 계산에 넣지 않습니다.</p></div>
-    <div><h3>보호받는다</h3><p>산재보험과 상해보험, 시간 상한과 휴일이 정해져 있고, 문제가 생기면 학교가 실습을 멈출 수 있습니다.</p></div>
+  <p class="lead">교육부 고시 「대학생 현장실습학기제 운영규정」(제2025-36호)은 현장실습을 일자리가 아닌 <b>학교 밖으로 연장된 수업</b>으로 봅니다.</p>
+  <div class="grid">
+    <div class="card"><div class="badge">수업</div><h3>학점을 받는다</h3><p>수강신청, 출석, 평가를 거칩니다. 이미 일하는 회사에서는 인정 안 돼요.</p></div>
+    <div class="card"><div class="badge">돈</div><h3>실습비를 받는다</h3><p>회사가 현금으로 직접 줍니다. 밥이나 기숙사는 계산에 넣지 않아요.</p></div>
+    <div class="card"><div class="badge">보호</div><h3>보호받는다</h3><p>보험 두 개와 시간 상한이 있고, 문제가 생기면 학교가 실습을 멈춥니다.</p></div>
   </div>
 </section>
 
 <section id="type">
-  <div class="eb">구분</div>
   <h2>표준형과 자율형</h2>
-  <p class="lead">가르는 기준은 <b>교육시간 비율</b>입니다. 사전교육, 점검, 지도처럼 일 대신 배우는 시간이 전체의 10~25%면 표준형, 25%를 넘으면 자율형이에요.</p>
-  <div class="tbl"><table>
-    <thead><tr><th></th><th class="std">표준 현장실습</th><th>자율 현장실습</th></tr></thead>
-    <tbody>
-      <tr><th>교육시간 비율</th><td>10~25%</td><td>25% 초과</td></tr>
-      <tr><th>기간·시간</th><td>최소 1개월, 주 5일, 주 40시간 이내</td><td>학교가 정함</td></tr>
-      <tr><th>서류</th><td>교육부 표준 서식 (운영계획서, 3자 협약서, 평가표)</td><td>학교별 서식</td></tr>
-      <tr><th>실습지원비</th><td>최저임금 × 시간 × (1 − 교육시간 비율) 이상</td><td>같은 계산이 원칙. 까다로운 조건을 모두 갖추면 무급 가능</td></tr>
-      <tr><th>회사 주도 모집</th><td>가능</td><td>불가</td></tr>
-    </tbody>
-  </table></div>
-  <p class="note">직접 섭외했거나 회사가 직접 뽑은 실습은 어느 쪽으로도 인정되지 않습니다.</p>
+  <p class="lead">가르는 기준은 <b>교육시간 비율</b>, 곧 일 대신 배우는 시간이 전체에서 차지하는 몫입니다.</p>
+  <div class="ratio" role="img" aria-label="교육시간 비율 10~25%는 표준형, 25% 초과는 자율형">
+    <div class="bar"><i class="z"></i><i class="s">표준</i><i class="f">자율</i></div>
+    <div class="ticks"><span style="left:0;transform:none">0%</span><span style="left:16.67%">10%</span><span style="left:41.67%">25%</span><span style="right:0;left:auto;transform:none">더 많이 →</span></div>
+  </div>
+  <div class="grid two vs">
+    <div class="card" style="--c:var(--acc)"><h3>표준 현장실습</h3><ul><li>최소 1개월, 주 40시간 이내</li><li>교육부 표준 서식으로 협약</li><li>실습비 최저선이 꼭 지켜짐</li><li>회사가 모집하는 방식도 가능</li></ul></div>
+    <div class="card" style="--c:var(--co)"><h3>자율 현장실습</h3><ul><li>기간과 시간을 학교가 정함</li><li>학교별 서식</li><li>까다로운 조건을 다 갖추면 무급도 가능</li><li>학교가 모집하는 방식만</li></ul></div>
+  </div>
+  <p class="note">직접 구했거나 회사가 직접 뽑은 실습은 어느 쪽으로도 인정되지 않습니다.</p>
 </section>
 
-<section id="money">
-  <div class="eb">돈</div>
+<section id="money" class="band">
   <h2>얼마를 받나</h2>
-  <p class="lead">최저선은 <b>최저시급 × 한 달 실습시간 × (1 − 교육시간 비율)</b>. 교육시간이 많을수록 최저선이 내려갑니다. 내 비율은 운영계획서에 적혀 있어요.</p>
-  <div class="panel calc">
+  <p class="lead">최저선 = 최저시급 × 한 달 실습시간 × (1 − 교육시간 비율). 내 비율은 운영계획서에 적혀 있어요.</p>
+  <div class="card calc">
     <div class="seg" role="group" aria-label="교육시간 비율" id="seg"></div>
     <div class="out"><b id="amt">1,617,660원</b><span class="muted">한 달 최저선</span></div>
     <div class="meter" aria-hidden="true"><i id="bar"></i></div>
     <div class="formula" id="formula"></div>
   </div>
-  <p class="note">주 40시간이면 한 달 209시간(주휴 포함). 연장·야간은 최저시급의 50% 이상을 더 받습니다.</p>
-
-  <div class="rows">
-    <div><b>회사 → 나</b><p>최저선 이상을 현금으로 직접. 학교를 거친 장학금 형태는 금지입니다. 요건을 갖춘 실습지원비는 세금을 떼지 않아요(기재부 해석, 2021).</p></div>
-    <div><b>학교 → 회사</b><p>회사가 최저임금 100%(월 2,156,880원)를 주면 25%(월 539,220원)를 돌려주는 대학이 많습니다(부산대, 전남대 등). 예산에 따라 달라요.</p></div>
-    <div><b>학교 → 나</b><p>숭실대 2학기 16주 장학금 120만 원, 인천대 월 40만 원, 전남대 숙박비 월 최대 25만 원 등 대학마다 다릅니다.</p></div>
+  <div class="flow" aria-label="돈의 흐름">
+    <div class="node"><b>회사</b><small>실습기관</small></div>
+    <div class="arrow r"><b>실습비</b><i></i>현금 직접</div>
+    <div class="node me"><b>나</b><small>실습생</small></div>
+    <div class="arrow l"><b>장학금</b><i></i>대학마다</div>
+    <div class="node"><b>학교</b><small>현장실습지원센터</small></div>
   </div>
+  <p class="back-flow">학교 → 회사: 회사가 최저임금 100%를 주면 25%(월 539,220원)를 돌려주는 대학이 많아요</p>
+  <p class="note">숭실대 2학기 16주 장학금 120만 원 · 요건을 갖춘 실습비는 세금을 떼지 않음(기재부 해석, 2021) · 연장·야간은 50% 이상 더</p>
 </section>
 
 <section id="apply">
-  <div class="eb">절차</div>
   <h2>신청부터 학점까지</h2>
-  <p class="lead">대학마다 순서는 거의 같습니다. 날짜는 인천대 2026년 2학기 예시예요.</p>
-  <ol class="steps">
-    <li><div><b>회사가 실습 자리 등록</b><span>운영계획서 제출, 처음 오는 회사는 점검</span></div><em>7.10</em></li>
-    <li><div><b>학교 시스템에서 지원</b><span>보통 3~4학년 재학생. 휴학생·졸업유예생은 안 됨</span></div><em>7.26</em></li>
-    <li><div><b>회사 면접·선발</b><span>선발권은 회사에 있음</span></div></li>
-    <li><div><b>수강신청 · 수강료 · 상해보험</b><span>상해보험은 학교가 가입</span></div></li>
-    <li><div><b>사전교육</b><span>안전교육과 성희롱 예방교육 필수</span></div><em>8.25</em></li>
-    <li><div><b>3자 협약 (학교·회사·나)</b><span>기간, 업무, 지원비 확정</span></div><em>8.28</em></li>
-    <li><div><b>회사 산재보험 가입</b><span>1주일 안에 학교에 증빙</span></div></li>
-    <li><div><b>실습 · 주간보고서</b><span>중간점검, 결과보고서, 만족도조사까지</span></div><em>9.1~</em></li>
-    <li><div><b>평가 · 학점</b><span>보통 P/F. 서류가 빠지거나 회사 평가가 낮으면 학점이 안 나옴</span></div></li>
+  <p class="lead">대학마다 순서는 거의 같습니다.</p>
+  <ol class="phases">
+    <li><small>실습 약 두 달 전</small><h3>지원</h3><p>등록된 회사 고르기 → 학교 시스템에서 지원 → 서류·면접</p></li>
+    <li><small>실습 1~2주 전</small><h3>준비</h3><p>수강신청·수강료 → 사전교육 → 3자 협약 → 보험 확인</p></li>
+    <li><small>실습 기간</small><h3>실습</h3><p>주 40시간 이내 → 주간보고서·중간점검</p></li>
+    <li><small>끝난 뒤</small><h3>학점</h3><p>결과보고서·만족도조사 → P/F 평가</p></li>
   </ol>
-
-  <div class="cols two" style="margin-top:20px">
-    <div><h3>학점은 출근한 날 수로</h3><p style="margin-bottom:6px">고려대 경영대 2026년 2학기. 주말·공휴일·연차·병가는 빠짐</p>
-      <table class="ledger"><tbody>
-        <tr><th>20일 이상</th><td class="num">3학점</td></tr>
-        <tr><th>40일 이상</th><td class="num">6학점</td></tr>
-        <tr><th>60일 이상</th><td class="num">9학점</td></tr>
-        <tr><th>70일 이상 (15주)</th><td class="num">12학점</td></tr>
-      </tbody></table></div>
-    <div><h3>방학 실습</h3><p style="margin-bottom:6px">전남대 2026년 하계. 회사 평가 50점 이하면 학점 없음</p>
-      <table class="ledger"><tbody>
-        <tr><th>4주 (20일)</th><td class="num">2학점</td></tr>
-        <tr><th>8주 (40일)</th><td class="num">5학점</td></tr>
-      </tbody></table></div>
+  <div class="credit">
+    <div><span class="lab">학기 실습 (고려대 경영 2026)</span><span class="chip">20일 <b>3학점</b></span><span class="chip">40일 <b>6학점</b></span><span class="chip">60일 <b>9학점</b></span><span class="chip">70일 <b>12학점</b></span></div>
+    <div><span class="lab">방학 실습 (전남대 2026)</span><span class="chip">4주 <b>2학점</b></span><span class="chip">8주 <b>5학점</b></span></div>
   </div>
+  <p class="note">학점은 실제 출근한 날 수로 셉니다. 주말·공휴일·연차·병가는 빠져요.</p>
 </section>
 
 <section id="rights">
-  <div class="eb">권리</div>
   <h2>실습생으로서 내 권리</h2>
-  <p class="lead">회사와 학교가 지켜야 하는 것들입니다. 어기면 학교에 알리세요.</p>
-  <div class="cols two">
-    <div><h3>시간</h3><ul><li>주 40시간, 하루 8시간 이내</li><li>연장은 내가 동의할 때만, 주 5시간까지</li><li>밤 10시~아침 6시 금지</li><li>하루 1시간 휴게, 주 1일 유급휴일</li></ul></div>
-    <div><h3>보험</h3><ul><li>회사 산재보험, 학교 상해보험</li><li>하나라도 없으면 학점 인정 안 됨</li></ul></div>
-    <div><h3>업무</h3><ul><li>운영계획서에 없는 일은 시킬 수 없음</li><li>회사 규정으로 징계할 수 없음</li><li>재택실습은 기간의 25% 이하</li></ul></div>
-    <div><h3>문제가 생기면</h3><p>학교에 알리면 학교가 시정을 요청하거나 실습을 멈추고 복귀시킵니다. 중도 포기 시 학점 처리는 대학마다 달라요.</p></div>
+  <p class="lead">어기면 학교에 알리세요. 학교가 시정을 요청하거나 실습을 멈추고 복귀시킵니다.</p>
+  <div class="grid two">
+    <div class="card"><div class="badge">시간</div><ul><li>주 40시간, 하루 8시간 이내</li><li>연장은 동의할 때만, 주 5시간까지</li><li>밤 10시~아침 6시 금지</li><li>하루 1시간 휴게, 주 1일 유급휴일</li></ul></div>
+    <div class="card"><div class="badge">보험</div><ul><li>회사 산재보험</li><li>학교 상해보험</li><li>하나라도 없으면 학점 인정 안 됨</li></ul></div>
+    <div class="card"><div class="badge">업무</div><ul><li>운영계획서에 없는 일은 시킬 수 없음</li><li>회사 규정으로 징계할 수 없음</li><li>재택실습은 기간의 25% 이하</li></ul></div>
+    <div class="card"><div class="badge">결과물</div><ul><li>협약서에 소유권 조항이 없음</li><li>포트폴리오 공개 범위는 시작 전에 글로 정하기</li></ul></div>
   </div>
 </section>
 
-<section id="me">
-  <div class="eb">질문</div>
+<section id="me" class="band warm">
   <h2>나라면?</h2>
-  <p class="lead">전공과 처지에 따라 궁금한 게 다릅니다. 내 상황을 골라 보세요.</p>
+  <p class="lead">전공과 처지에 따라 궁금한 게 다릅니다.</p>
   <div class="who" role="tablist" aria-label="학생 상황" id="who"></div>
   <p class="persona" id="persona"></p>
   <ul class="qa" id="qa" role="tabpanel"></ul>
 </section>
 
-<section id="history">
-  <div class="eb">흐름</div>
-  <h2>무급 실습에서 실습처 부족으로</h2>
-  <p class="lead">2021년 개정으로 무급 실습은 줄었지만, 비용이 부담스러운 작은 회사들이 빠지며 참여도 줄었다는 평가가 나옵니다.</p>
-  <ol class="tl">
-    <li><time>2019</time><div><b>10명 중 4명은 실습비를 못 받음</b><span>이수자 약 12.6만 명, 수령률 59.6% (2020 국정감사)</span></div></li>
-    <li><time>2021.7</time><div><b>운영규정 전부개정</b><span>표준·자율 구분, 실습지원비와 보험 의무화</span></div></li>
-    <li><time>2021~23</time><div><b>참여 급감 뒤 일부 회복</b><span>참여 기업 약 7.6만 곳(2019) → 약 2.8만 곳(2023)</span></div></li>
-    <li><time>2024.10</time><div><b>인권위, 자율형 관리 강화 의견</b><span>2022년 산재보험 가입률 표준형 98.8%, 자율형 65.8%</span></div></li>
-    <li><time>2025.12</time><div><b>현행 운영규정 시행</b><span>교육부고시 제2025-36호</span></div></li>
-    <li><time>2026.8</time><div><b>첫 경력 프로젝트 발표</b><span>정부가 실습지원비 절반 부담</span></div></li>
-  </ol>
-  <div class="chart">
-    <h3>현장실습 참여 학생 수</h3>
-    <ul class="bars" id="bars"></ul>
-    <p class="note">교수신문 기고(2026.10.6.) 수치로, 원출처가 적혀 있지 않습니다.</p>
-  </div>
-</section>
-
-<section id="next">
-  <div class="eb">2027</div>
-  <h2>대학생 첫 경력 프로젝트</h2>
-  <p class="lead">교육부가 2026년 8월 28일 발표한 사업입니다. 2027년 3월 시작이 목표이고, 예산은 12월 국회에서 확정됩니다.</p>
-  <h3>실습지원비 월 230만 원</h3>
-  <div class="split" role="img" aria-label="월 230만 원 중 정부 115만 원, 회사 115만 원"><i>정부 115만</i><i>회사 115만</i></div>
-  <p class="muted" style="font-size:14px">학생 교통·숙박비 월 10만 원, 회사 멘토링비 월 10만 원이 따로 붙습니다.</p>
-  <div class="cols" style="margin-top:26px">
-    <div><h3>규모</h3><ul><li>약 6만 명 (4년제 4만, 전문대 2만)</li><li>약 5개월, 학점 취득</li><li>4,650억 원, 2029년까지</li></ul></div>
-    <div><h3>지금과 비교</h3><ul><li>최저선 약 162만 원 → 230만 원</li><li>회사 부담 162만 원 이상 → 115만 원</li><li>4주 단기 위주 → 5개월</li></ul></div>
-    <div><h3>미정 <span class="tag">발표 전</span></h3><ul><li>대상 학년, 신청 방법</li><li>지원비 지급 경로</li><li>지금 제도와의 관계</li></ul></div>
-  </div>
-</section>
-
-<section id="check">
-  <div class="eb">할 일</div>
+<section id="check" class="band">
   <h2>내가 할 일</h2>
-  <p class="lead">지금부터 실습이 끝날 때까지. 체크하면 이 브라우저에 남아요.</p>
-  <div class="ssu">
-    <div>
+  <p class="lead">체크하면 이 브라우저에 남아요.</p>
+  <div class="grid two ssu">
+    <div class="card">
       <h3>숭실대에서는</h3>
       <dl>
         <dt>신청</dt><dd><a href="http://wess.ssu.ac.kr/">WESS</a> · 공지는 <a href="https://scatch.ssu.ac.kr/공지사항/">학교 공지사항</a></dd>
-        <dt>문의</dt><dd>현장실습지원센터 · 학생회관 501호 · 02-820-0878</dd>
         <dt>자격</dt><dd>4학기 이상 이수한 3~4학년 재학생. 직전 학기 휴학생, 그 학기 졸업예정자 제외</dd>
-        <dt>준비</dt><dd>슈패스 비교과에서 "현장실습" 검색 · 현장실습지원팀 서류·면접 특강은 학년 제한 없음</dd>
         <dt>모집</dt><dd>1년에 세 번, 지원은 열흘 남짓 (2026년: 5월 4~14일, 7월 9~20일, 11월 2~12일)</dd>
         <dt>지원</dt><dd>2학기 16주 장학금 120만 원, 여름·겨울은 계절학기 수업료만큼</dd>
         <dt>학점</dt><dd>일반선택 또는 전공선택(P/F). 전공 인정은 신청서를 따로 냄</dd>
-        <dt>주의</dt><dd>교내 ICT·창업 실습 프로그램과 중복 지원 불가</dd>
+        <dt>문의</dt><dd>현장실습지원센터 · 학생회관 501호 · 02-820-0878</dd>
       </dl>
     </div>
-    <div>
+    <div class="card">
       <h3>WESS에서 하는 순서</h3>
       <ol class="small">
         <li>LMS 사전교육 1 (지원 전 필수)</li>
-        <li>WESS에서 서약서·이력서·자기소개서</li>
+        <li>서약서·이력서·자기소개서</li>
         <li>회사 운영계획서 보고 지원</li>
         <li>서류·면접</li>
         <li>사전교육 2, 수업료 납부</li>
         <li>3자 협약</li>
         <li>실습, 보고서 제출</li>
       </ol>
-    </div>
-    <div>
-      <h3>1학년인 지금부터</h3>
-      <ol class="small">
-        <li><b>지금</b> · 슈패스에서 현장실습 서류·면접 특강 신청, 학교 공지 알림 켜기</li>
-        <li><b>2학년</b> · 포트폴리오 쌓기, 졸업 요건표에서 전공선택 자리 확인. 2학기를 마치면 WESS 이용 가능</li>
-        <li><b>3학년 봄</b> · 5월 여름 실습 지원 (가장 빠른 기회)</li>
-        <li><b>3학년 2학기~4학년 1학기</b> · 16주 학기 실습. 4학년 2학기는 피하기</li>
-      </ol>
+      <p class="note">교내 ICT·창업 실습 프로그램과 중복 지원은 안 돼요.</p>
     </div>
   </div>
   <div class="stages" id="stages"></div>
-  <p class="progress" id="progress"></p>
+  <div class="progress"><div class="meter"><i id="pbar"></i></div><span id="progress"></span></div>
+</section>
+
+<section id="history">
+  <h2>무급 실습에서 실습처 부족으로</h2>
+  <p class="lead">2021년 개정으로 무급 실습은 줄었지만, 비용이 부담스러운 작은 회사들이 빠지며 참여도 줄었습니다.</p>
+  <ol class="tl">
+    <li><time>2019</time><div><b>10명 중 4명은 실습비를 못 받음</b><span>수령률 59.6% (2020 국정감사)</span></div></li>
+    <li><time>2021.7</time><div><b>운영규정 전부개정</b><span>표준·자율 구분, 실습비와 보험 의무화</span></div></li>
+    <li><time>2023</time><div><b>참여 기업 약 2.8만 곳</b><span>2019년 약 7.6만 곳에서 줄어듦</span></div></li>
+    <li><time>2024.10</time><div><b>인권위, 자율형 관리 강화 의견</b><span>산재보험 가입률 표준형 98.8%, 자율형 65.8% (2022)</span></div></li>
+    <li><time>2025.12</time><div><b>현행 운영규정 시행</b><span>교육부고시 제2025-36호</span></div></li>
+  </ol>
+  <div class="chart">
+    <h3>현장실습 참여 학생 수</h3>
+    <ul class="bars" id="bars"></ul>
+    <p class="note">교수신문 기고(2026.10.6.) 수치, 원출처 미표기</p>
+  </div>
+</section>
+
+<section id="next" class="band warm">
+  <h2>2027년, 대학생 첫 경력 프로젝트</h2>
+  <p class="lead">교육부가 2026년 8월 28일 발표했습니다. 2027년 3월 시작이 목표이고, 예산은 12월 국회에서 확정돼요.</p>
+  <h3>실습비 월 230만 원을 나눠 냄</h3>
+  <div class="split" role="img" aria-label="월 230만 원 중 정부 115만 원, 회사 115만 원"><i>정부 115만</i><i>회사 115만</i></div>
+  <div class="grid" style="margin-top:16px">
+    <div class="card"><h3>규모</h3><ul><li>약 6만 명</li><li>약 5개월, 학점 취득</li><li>2029년까지</li></ul></div>
+    <div class="card"><h3>지금과 비교</h3><ul><li>최저선 162만 → 230만 원</li><li>회사 부담 → 115만 원</li><li>4주 위주 → 5개월</li></ul></div>
+    <div class="card"><h3>미정 <span class="tag">발표 전</span></h3><ul><li>대상 학년, 신청 방법</li><li>지원비 지급 경로</li><li>지금 제도와의 관계</li></ul></div>
+  </div>
 </section>
 
 <section id="src">
-  <div class="eb">출처</div>
-  <h2>확인하지 못한 것</h2>
-  <p class="lead">공개 자료로 찾지 못했습니다. 학교 현장실습지원센터에 묻는 게 가장 정확해요.</p>
-  <div class="cols two">
-    <div><ul>
-      <li>2025년 12월 개정에서 바뀐 조항</li>
-      <li>표준·자율 전국 비율, 최신 공식 통계</li>
-      <li>실습의 취업 효과 전국 분석</li>
-    </ul></div>
-    <div><ul>
-      <li>실습비가 국가장학금·건강보험 피부양자에 주는 영향</li>
-      <li>실습 경쟁률과 정규직 전환율</li>
-      <li>첫 경력 프로젝트 대상 학년</li>
-    </ul></div>
-  </div>
+  <h2>아직 확인하지 못한 것</h2>
+  <p class="lead">학교 현장실습지원센터에 묻는 게 가장 정확해요.</p>
+  <div class="card"><ul>
+    <li>2025년 12월 개정에서 바뀐 조항</li>
+    <li>실습비가 국가장학금·건강보험 피부양자에 주는 영향</li>
+    <li>실습 경쟁률과 정규직 전환율</li>
+    <li>첫 경력 프로젝트 대상 학년</li>
+  </ul></div>
   <details>
     <summary>출처 21곳 보기</summary>
     <ol class="src">
@@ -565,20 +569,21 @@ $("stages").innerHTML = STAGES.map(([stage, when, items], s) =>
   `<div class="stage"><h3>${stage}<span>${when}</span></h3><ul class="check">${items.map(([t, d], i) =>
     `<li><label><input type="checkbox" data-k="${s}-${i}"${saved[`${s}-${i}`] ? " checked" : ""}><span>${t}<small>${d}</small></span></label></li>`).join("")}</ul></div>`).join("");
 const count = () => {
-  const boxes = [...$("stages").querySelectorAll("input")];
-  $("progress").textContent = `${boxes.filter(b => b.checked).length} / ${boxes.length} 완료`;
+  const boxes = [...$("stages").querySelectorAll("input")], done = boxes.filter(b => b.checked).length;
+  $("progress").textContent = `${done} / ${boxes.length} 완료`;
+  $("pbar").style.width = (done / boxes.length * 100) + "%";
   try { localStorage.setItem(KEY, JSON.stringify(Object.fromEntries(boxes.map(b => [b.dataset.k, b.checked])))); } catch {}
 };
 $("stages").addEventListener("change", count);
 count();
 
 /* 목차: 지금 보고 있는 섹션 표시 */
-const links = [...document.querySelectorAll(".toc ol a")];
+const links = [...document.querySelectorAll(".toc a")];
 const io = new IntersectionObserver(es => es.forEach(e => {
   if (!e.isIntersecting) return;
   links.forEach(a => a.classList.toggle("on", a.hash === "#" + e.target.id));
-  const on = links.find(a => a.classList.contains("on"));
-  if (on && getComputedStyle(on.closest("ol")).display === "flex") on.closest("ol").scrollTo({ left: on.offsetLeft - 20, behavior: "smooth" });
+  const on = links.find(a => a.classList.contains("on")), ol = on && on.closest("ol");
+  if (ol && getComputedStyle(ol).display === "flex") ol.scrollTo({ left: on.offsetLeft - 24, behavior: "smooth" });
 }), { rootMargin: "-30% 0px -60% 0px" });
 document.querySelectorAll("main section[id]").forEach(s => io.observe(s));
 </script>
