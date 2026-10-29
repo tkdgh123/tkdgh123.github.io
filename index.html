@@ -44,6 +44,8 @@ section > .wrap > p { margin: 0 0 18px; color: var(--ink-2); font-size: 15px }
 .game { --c: var(--game) } .study { --c: var(--study) } .make { --c: var(--make) } .etc { --c: var(--etc) }
 
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 14px }
+.sub { font-size: 15px; font-weight: 600; color: var(--ink-2); margin: 22px 0 10px; padding-left: 10px; border-left: 3px solid var(--c) }
+.sub:first-of-type { margin-top: 4px }
 .card { display: grid; align-content: start; gap: 6px; text-decoration: none; background: var(--card); border: 1px solid var(--rule); border-radius: 12px; padding: 18px; transition: border-color .15s, transform .15s }
 .card:hover, .card:focus-visible { border-color: var(--c); transform: translateY(-2px); outline: none }
 .card.big { grid-column: 1 / -1; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 0; padding: 0; overflow: hidden }
@@ -145,22 +147,26 @@ footer { padding: 56px 0 64px; color: var(--ink-2); font-size: 13px }
 <section id="make" class="make"><div class="wrap">
   <h2>프로젝트</h2>
   <p>팀으로 만드는 것들</p>
+  <h3 class="sub">창공설</h3>
   <div class="grid">
-    <a class="card" href="ffb-wheel/">
-      <h3>포스 피드백 레이싱 휠</h3>
-      <p>아두이노로 만드는 FFB 레이싱 휠. 팀 발표 자료와 3D 시뮬레이션</p>
-      <div class="tags"><span>발표 자료</span><span>3D</span></div>
+    <a class="card" href="ffb-wheel/srs-review/">
+      <h3>FFB 휠 펌웨어 SRS 첨삭</h3>
+      <p>팀 SRS 문서 위에 고칠 곳을 빨간 펜으로 표시하고, 빠진 요구사항 초안을 붙였습니다</p>
+      <div class="tags"><span>문서</span><span>첨삭</span></div>
     </a>
     <a class="card" href="ffb-wheel/sim/">
       <h3>FFB 휠 3D 설계도</h3>
       <p>부품 배치와 작동 방식을 돌려 보며 확인하는 3D 모델</p>
       <div class="tags"><span>3D</span></div>
     </a>
-    <a class="card" href="ffb-wheel/srs-review/">
-      <h3>FFB 휠 펌웨어 SRS 첨삭</h3>
-      <p>팀 SRS 문서 위에 고칠 곳을 빨간 펜으로 표시하고, 빠진 요구사항 초안을 붙였습니다</p>
-      <div class="tags"><span>문서</span><span>첨삭</span></div>
+    <a class="card" href="ffb-wheel/">
+      <h3>포스 피드백 레이싱 휠</h3>
+      <p>아두이노로 만드는 FFB 레이싱 휠. 팀 발표 자료와 3D 시뮬레이션</p>
+      <div class="tags"><span>발표 자료</span><span>3D</span></div>
     </a>
+  </div>
+  <h3 class="sub">프밍기</h3>
+  <div class="grid">
     <a class="card" href="secure-msg/guide/">
       <h3>덜미 설명서</h3>
       <p>C를 몰라도 읽히는 프밍기2 암호화 메신저 설명서. 반쪽 열쇠 금고, 단어 지문, 공격 실험실을 직접 눌러 봅니다</p>
