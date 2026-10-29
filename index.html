@@ -11,15 +11,15 @@ if (/^#(notes|prog|quiz|wrong|code)$/.test(location.hash)) location.replace("stu
 <style>
 :root {
   --bg: #F6F4EF; --card: #FFFFFF; --ink: #1C1B1F; --ink-2: #5E5A63; --rule: #E3DED4;
-  --game: #B4432F; --study: #2D5BA8; --make: #2F7D55;
+  --game: #B4432F; --study: #2D5BA8; --make: #2F7D55; --etc: #6B6470;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
   --bg: #141519; --card: #1D1F25; --ink: #ECE8E1; --ink-2: #A29DA7; --rule: #2E3038;
-  --game: #F07E66; --study: #8EB0F0; --make: #7FC9A0; color-scheme: dark } }
+  --game: #F07E66; --study: #8EB0F0; --make: #7FC9A0; --etc: #B3ACB8; color-scheme: dark } }
 :root[data-theme="dark"] {
   --bg: #141519; --card: #1D1F25; --ink: #ECE8E1; --ink-2: #A29DA7; --rule: #2E3038;
-  --game: #F07E66; --study: #8EB0F0; --make: #7FC9A0; color-scheme: dark }
+  --game: #F07E66; --study: #8EB0F0; --make: #7FC9A0; --etc: #B3ACB8; color-scheme: dark }
 
 * { box-sizing: border-box }
 body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 "Pretendard", system-ui, "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; word-break: keep-all; overflow-wrap: anywhere }
@@ -41,7 +41,7 @@ section { padding: 44px 0 8px; scroll-margin-top: 56px }
 section h2 { font-size: 24px; margin: 0 0 4px; display: flex; align-items: center; gap: 10px }
 section h2::before { content: ""; width: 12px; height: 12px; border-radius: 3px; background: var(--c) }
 section > .wrap > p { margin: 0 0 18px; color: var(--ink-2); font-size: 15px }
-.game { --c: var(--game) } .study { --c: var(--study) } .make { --c: var(--make) }
+.game { --c: var(--game) } .study { --c: var(--study) } .make { --c: var(--make) } .etc { --c: var(--etc) }
 
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 14px }
 .card { display: grid; align-content: start; gap: 6px; text-decoration: none; background: var(--card); border: 1px solid var(--rule); border-radius: 12px; padding: 18px; transition: border-color .15s, transform .15s }
@@ -71,6 +71,7 @@ footer { padding: 56px 0 64px; color: var(--ink-2); font-size: 13px }
   <a href="#game" class="game"><i></i>게임</a>
   <a href="#study" class="study"><i></i>공부</a>
   <a href="#make" class="make"><i></i>프로젝트</a>
+  <a href="#etc" class="etc"><i></i>기타</a>
 </div></nav>
 
 <main>
@@ -164,6 +165,18 @@ footer { padding: 56px 0 64px; color: var(--ink-2); font-size: 13px }
       <h3>암호화 메신저 중계 서버 기획서</h3>
       <p>프밍기2 팀 프로젝트의 C 서버 파트. 패킷 형식, poll 루프, 2인 잠금 중계, 공격 시연 옵션, 단계별 확인 방법</p>
       <div class="tags"><span>기획서</span><span>C</span></div>
+    </a>
+  </div>
+</div></section>
+
+<section id="etc" class="etc"><div class="wrap">
+  <h2>기타</h2>
+  <p>노트북 관리 같은 잡다한 정리</p>
+  <div class="grid">
+    <a class="card" href="storage/">
+      <h3>노트북 저장공간 정리</h3>
+      <p>C 드라이브 424 GB를 시스템·게임·창작·내 파일·개발 등 여덟 갈래로 나누고, 지워도 되는 것을 모았습니다</p>
+      <div class="tags"><span>2026.10.29</span><span>정리 제안</span></div>
     </a>
   </div>
 </div></section>

@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>노트북 저장공간</title>
+<style>
+:root {
+  --bg: #F6F4EF; --card: #FFFFFF; --ink: #1C1B1F; --ink-2: #5E5A63; --rule: #E3DED4; --free: #E3DED4;
+  --c1: #2a78d6; --c2: #eb6834; --c3: #1baf7a; --c4: #eda100; --c5: #e87ba4; --c6: #008300; --c7: #6250d6; --c8: #e34948;
+  --good: #0ca30c; --warn: #b77a00; --bad: #d03b3b;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #141519; --card: #1D1F25; --ink: #ECE8E1; --ink-2: #A29DA7; --rule: #2E3038; --free: #383835;
+  --c1: #3987e5; --c2: #d95926; --c3: #199e70; --c4: #c98500; --c5: #d55181; --c6: #008300; --c7: #9085e9; --c8: #e66767;
+  --good: #3fc23f; --warn: #fab219; --bad: #e66767; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #141519; --card: #1D1F25; --ink: #ECE8E1; --ink-2: #A29DA7; --rule: #2E3038; --free: #383835;
+  --c1: #3987e5; --c2: #d95926; --c3: #199e70; --c4: #c98500; --c5: #d55181; --c6: #008300; --c7: #9085e9; --c8: #e66767;
+  --good: #3fc23f; --warn: #fab219; --bad: #e66767; color-scheme: dark }
+
+* { box-sizing: border-box }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 "Pretendard", system-ui, "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; word-break: keep-all; overflow-wrap: anywhere }
+a { color: inherit }
+.wrap { max-width: 1040px; margin: 0 auto; padding: 0 max(16px, env(safe-area-inset-left)) 0 max(16px, env(safe-area-inset-right)) }
+.back { display: inline-block; margin-top: 24px; font-size: 14px; color: var(--ink-2); text-decoration: none }
+.back:hover { color: var(--ink) }
+
+header { padding: 28px 0 8px }
+.kick { font-size: 13px; letter-spacing: .12em; color: var(--ink-2) }
+h1 { font-size: clamp(32px, 6vw, 48px); line-height: 1.15; margin: 8px 0 12px }
+header p { margin: 0; color: var(--ink-2); max-width: 40rem }
+
+.hero { display: flex; flex-wrap: wrap; gap: 12px 40px; margin: 28px 0 16px }
+.hero div { display: grid }
+.hero b { font-size: 34px; line-height: 1.1; font-variant-numeric: tabular-nums }
+.hero span { font-size: 13px; color: var(--ink-2) }
+.hero .low b { color: var(--bad) }
+
+.bar { position: relative; display: flex; gap: 2px; height: 28px; margin: 8px 0 12px }
+.bar i { display: block; height: 100%; background: var(--c); cursor: default }
+.bar i:first-child { border-radius: 4px 0 0 4px } .bar i:last-child { border-radius: 0 4px 4px 0 }
+.bar i:hover, .bar i:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px }
+.tip { position: absolute; top: 36px; z-index: 3; pointer-events: none; background: var(--card); border: 1px solid var(--rule); border-radius: 8px; padding: 6px 10px; font-size: 13px; white-space: nowrap; box-shadow: 0 4px 14px rgb(0 0 0 / .12); display: none }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 13px; color: var(--ink-2); margin: 0; padding: 0; list-style: none }
+.legend li::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 3px; background: var(--c); margin-right: 6px; vertical-align: -1px }
+.legend b { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums }
+
+section { padding: 40px 0 4px }
+section > .wrap > h2 { font-size: 24px; margin: 0 0 4px }
+section > .wrap > p { margin: 0 0 18px; color: var(--ink-2); font-size: 15px }
+
+.cats { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 460px), 1fr)); gap: 14px }
+.cat { background: var(--card); border: 1px solid var(--rule); border-radius: 12px; padding: 18px }
+.cat h3 { margin: 0; font-size: 18px; display: flex; align-items: baseline; gap: 10px }
+.cat h3::before { content: ""; width: 12px; height: 12px; border-radius: 3px; background: var(--c); flex: none; align-self: center }
+.cat h3 small { margin-left: auto; font-size: 18px; font-variant-numeric: tabular-nums }
+.cat > p { margin: 4px 0 12px; color: var(--ink-2); font-size: 14px }
+.rows { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none }
+.rows li { display: grid; grid-template-columns: minmax(0, 1fr) 64px; gap: 2px 10px; font-size: 14px; align-items: center }
+.rows li span { grid-column: 1 }
+.rows li em { font-style: normal; text-align: right; font-variant-numeric: tabular-nums; color: var(--ink-2) }
+.rows li i { grid-column: 1 / -1; height: 4px; border-radius: 2px; background: var(--c); opacity: .85 }
+
+.tips { display: grid; gap: 10px }
+.tipcard { background: var(--card); border: 1px solid var(--rule); border-radius: 12px; padding: 16px 18px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 16px }
+.tipcard h3 { margin: 0; font-size: 17px }
+.tipcard .gb { font-size: 20px; font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; grid-row: span 2 }
+.tipcard p { margin: 0; color: var(--ink-2); font-size: 14px }
+.tipcard code { font-size: 13px; background: var(--bg); border: 1px solid var(--rule); border-radius: 5px; padding: 0 5px }
+.lv { font-size: 12px; font-weight: 600; margin-right: 8px; white-space: nowrap }
+.lv.ok { color: var(--good) } .lv.chk { color: var(--warn) } .lv.no { color: var(--bad) }
+.sum { margin: 14px 0 0; font-size: 15px }
+
+footer { padding: 48px 0 64px; color: var(--ink-2); font-size: 13px }
+</style>
+</head>
+<body>
+
+<div class="wrap"><a class="back" href="../">← 작업실</a></div>
+
+<header><div class="wrap">
+  <div class="kick">기타 · 2026년 10월 29일 기준</div>
+  <h1>노트북 저장공간 정리</h1>
+  <p>C 드라이브 하나에 무엇이 얼마나 들어 있는지 여덟 갈래로 묶었습니다. 파일은 그대로 두고 목록만 만들었고, 맨 아래에 지워도 되는 것들을 따로 모았습니다.</p>
+</div></header>
+
+<main>
+<section style="padding-top:8px"><div class="wrap">
+  <div class="hero">
+    <div><b>454 GB</b><span>전체 용량</span></div>
+    <div><b>424 GB</b><span>사용 중</span></div>
+    <div class="low"><b>29.6 GB</b><span>남은 공간 (6.5%) · 넉넉하려면 15% 이상</span></div>
+  </div>
+  <div class="bar" id="bar" role="img" aria-label="카테고리별 사용량 막대"></div>
+  <div class="tip" id="tip"></div>
+  <ul class="legend" id="legend"></ul>
+</div></section>
+
+<section><div class="wrap">
+  <h2>카테고리별 내용</h2>
+  <p>폴더 단위로 잰 용량입니다. 0.3 GB보다 작은 폴더는 각 묶음 합계에만 들어 있어요.</p>
+  <div class="cats" id="cats"></div>
+</div></section>
+
+<section><div class="wrap">
+  <h2>정리 제안</h2>
+  <p>위에서부터 안전한 순서입니다. <span class="lv ok">● 바로 가능</span><span class="lv chk">▲ 확인 후</span><span class="lv no">■ 지우지 말 것</span></p>
+  <div class="tips" id="tips"></div>
+  <p class="sum" id="sum"></p>
+</div></section>
+</main>
+
+<footer><div class="wrap">robocopy로 폴더별 크기를 잰 값입니다. 권한 때문에 잴 수 없는 시스템 영역(약 17 GB)은 Windows·시스템에 넣었습니다.</div></footer>
+
+<script>
+const CATS = [
+  { name: "Windows·시스템", gb: 110.0, note: "운영체제와 노트북 제조사(LG) 복구 데이터. 대부분 건드리지 않는 영역", rows: [
+    ["Windows 폴더", 44.0], ["가상 메모리·최대 절전 파일", 17.8], ["잴 수 없는 시스템 영역 (복원 지점 등)", 16.6],
+    ["LG 업데이트·복구", 12.0], ["Microsoft 공용 데이터·앱", 18.3], ["기타 드라이버·공용 파일", 1.3] ] },
+  { name: "게임", gb: 92.0, note: "라이엇 게임이 대부분", rows: [
+    ["리그 오브 레전드", 37.5], ["발로란트", 32.7], ["전략적 팀 전투", 7.8], ["Steam", 8.8],
+    ["마인크래프트", 1.7], ["라이엇 클라이언트·뱅가드", 1.9], ["Epic Games", 0.8], ["게임 저장 파일", 0.5] ] },
+  { name: "창작·영상 프로그램", gb: 63.8, note: "Adobe가 약 57 GB. 2025·2026 버전이 같이 깔려 있음", rows: [
+    ["Adobe 공용 파일·설정·캐시", 16.5], ["Premiere Pro 2026", 6.5], ["Premiere Pro 2025", 6.3], ["After Effects 2026", 5.3],
+    ["Photoshop 2026", 5.2], ["After Effects 2025", 5.0], ["Media Encoder 2026", 5.0], ["Illustrator 2026", 3.1],
+    ["InDesign 2026", 2.2], ["Acrobat", 1.2], ["Cinema 4D 2025 · 2024", 2.1], ["Filmora", 2.0], ["YY캠 프로", 1.5], ["Blender", 0.9], ["OBS", 0.5] ] },
+  { name: "내 작업·파일", gb: 56.7, note: "바탕화면의 넋굿 프로젝트가 절반 이상", rows: [
+    ["넋굿 (Unity 프로젝트)", 34.0], ["다운로드", 10.4], ["인터뷰 영상 (바탕화면 새 폴더)", 4.7], ["카카오톡 받은 파일", 3.4],
+    ["설정 가이드 튜토리얼 (Unity 프로젝트)", 2.1], ["브라운 로그", 0.7], ["작업실 사이트", 0.4], ["바탕화면 기타 파일·폴더", 1.0] ] },
+  { name: "개발 도구", gb: 55.0, note: "IDE·엔진과 패키지 캐시", rows: [
+    ["Visual Studio · Windows SDK", 15.6], ["Unity 에디터·허브", 10.2], ["npm (캐시 3.6 + 전역 2.7)", 6.3], ["Claude Code 설정·기록", 3.6],
+    ["JetBrains (PyCharm 등)", 3.6], ["VS Code 등 사용자 설치 프로그램", 4.2], ["AI 모델·런타임 캐시", 2.9], ["uv (파이썬) 캐시", 2.1],
+    ["Whisper 음성인식 모델", 1.4], ["Codex · OmniRoute", 1.7], ["Git · Dev-C++ · pip 등", 2.4] ] },
+  { name: "일상 프로그램", gb: 26.4, note: "오피스, 메신저, 브라우저, 백신", rows: [
+    ["Microsoft Office", 4.8], ["Chrome", 4.8], ["Avast 백신", 3.8], ["Alt", 4.0], ["카카오톡", 3.2],
+    ["한컴오피스", 2.9], ["Discord", 1.0], ["Zoom", 0.7], ["OneDrive", 0.6] ] },
+  { name: "임시 파일·휴지통", gb: 18.2, note: "지워도 되는 것들", rows: [
+    ["사용자 임시 폴더 (Temp)", 12.5], ["휴지통", 3.0], ["Adobe 임시 폴더", 2.1], ["프로그램 오류 덤프", 0.6] ] },
+  { name: "기타", gb: 1.9, note: "어디에도 안 맞는 작은 폴더들", rows: [
+    ["PCmover · GOM · 메모 앱 등", 1.9] ] },
+];
+const TIPS = [
+  ["ok", "임시 폴더 비우기", 12.5, "설정 → 시스템 → 저장소 → 임시 파일에서 지우거나, <code>Win+R</code> → <code>%temp%</code> 열고 전체 삭제(사용 중인 파일은 건너뜀)."],
+  ["ok", "휴지통 비우기 · 오류 덤프 삭제", 3.6, "휴지통 3.0 GB, 프로그램 오류 덤프 0.6 GB. 저장소 설정의 임시 파일 화면에서 같이 지울 수 있어요."],
+  ["ok", "개발 패키지 캐시 비우기", 6.1, "<code>npm cache clean --force</code> (3.6) · <code>uv cache clean</code> (2.1) · <code>pip cache purge</code> (0.4). 필요하면 다시 받아집니다."],
+  ["ok", "다운로드의 설치 파일·중복 압축 지우기", 3.5, "이미 설치한 프로그램의 설치 파일(.exe·.msi) 약 2.9 GB와 이름 뒤에 (1)이 붙은 중복 파일들."],
+  ["chk", "Adobe 구버전 제거", 12.2, "2026 버전이 있는데 Premiere Pro 2025(6.3)·After Effects 2025(5.0)가 남아 있어요. Cinema 4D 2024(0.9)도 2025가 있음. 예전 버전으로 만든 프로젝트를 열 일이 없으면 Creative Cloud 앱에서 제거."],
+  ["chk", "넋굿 작업 사본(worktree) 정리", 16.3, "넋굿 폴더 안 .claude/worktrees에 프로젝트 사본 하나가 통째로 있어요(10월 29일 생성). 그 작업이 본 프로젝트에 합쳐졌다면 Claude에게 정리를 맡기면 됩니다."],
+  ["chk", "넋굿 테스트 로그 정리", 5.6, "넋굿/Logs에 테스트 기록·스크린샷이 쌓여 있어요. 지난 테스트(feel1029, heromotion 등) 중 다시 볼 일 없는 것."],
+  ["chk", "Adobe 임시 폴더", 2.1, "C:\\adobeTemp. Adobe 프로그램을 다 끄고 비우면 됩니다."],
+  ["chk", "인터뷰 영상 옮기기", 4.7, "바탕화면 새 폴더의 원본 .mov 10개. 과제가 끝났으면 외장 하드나 클라우드로."],
+  ["chk", "안 하는 게임 지우기", 78.0, "롤 37.5 · 발로란트 32.7 · 롤체 7.8. 하나라도 안 하면 가장 크게 비는 곳. 라이엇 클라이언트에서 제거, 언제든 다시 설치 가능."],
+  ["no", "Windows · LG 업데이트·복구 · 가상 메모리", 0, "LG 복구 데이터(10 GB)는 공장 초기화에 쓰입니다. 최대 절전 파일(6.2 GB)은 <code>powercfg /h off</code>로 없앨 수 있지만 노트북 덮개를 닫을 때 최대 절전을 못 쓰게 돼서 권하지 않아요."],
+];
+
+const $ = id => document.getElementById(id);
+const TOTAL = 453.7, FREE = 29.6;
+const segs = [...CATS.map((c, i) => ({ name: c.name, gb: c.gb, c: `var(--c${i + 1})` })), { name: "남은 공간", gb: FREE, c: "var(--free)" }];
+$("bar").innerHTML = segs.map(s => `<i tabindex="0" style="flex:${s.gb} 1 0;--c:${s.c}" data-t="${s.name} · ${s.gb.toFixed(1)} GB (${(s.gb / TOTAL * 100).toFixed(1)}%)"></i>`).join("");
+$("legend").innerHTML = segs.map(s => `<li style="--c:${s.c}">${s.name} <b>${s.gb.toFixed(1)}</b></li>`).join("");
+const tip = $("tip");
+$("bar").append(tip);
+const show = e => { const el = e.target.closest("i"); if (!el) return; tip.textContent = el.dataset.t; tip.style.display = "block";
+  const box = $("bar").getBoundingClientRect(), r = el.getBoundingClientRect();
+  tip.style.left = Math.max(0, Math.min(r.left - box.left + r.width / 2 - tip.offsetWidth / 2, box.width - tip.offsetWidth)) + "px"; };
+const hide = () => tip.style.display = "none";
+$("bar").addEventListener("mouseover", show); $("bar").addEventListener("focusin", show);
+$("bar").addEventListener("mouseleave", hide); $("bar").addEventListener("focusout", hide);
+
+$("cats").innerHTML = CATS.map((c, i) => {
+  const max = Math.max(...c.rows.map(r => r[1]));
+  const rows = [...c.rows].sort((a, b) => b[1] - a[1]).map(([n, g]) => `<li><span>${n}</span><em>${g.toFixed(1)} GB</em><i style="width:${g / max * 100}%"></i></li>`).join("");
+  return `<div class="cat" style="--c:var(--c${i + 1})"><h3>${c.name}<small>${c.gb.toFixed(1)} GB</small></h3><p>${c.note}</p><ul class="rows">${rows}</ul></div>`;
+}).join("");
+
+const LV = { ok: "● 바로 가능", chk: "▲ 확인 후", no: "■ 지우지 말 것" };
+$("tips").innerHTML = TIPS.map(([lv, t, gb, d]) =>
+  `<div class="tipcard"><h3><span class="lv ${lv}">${LV[lv]}</span>${t}</h3><div class="gb">${gb ? gb.toFixed(1) + " GB" : "—"}</div><p>${d}</p></div>`).join("");
+const sum = k => TIPS.filter(t => t[0] === k).reduce((a, t) => a + t[2], 0);
+const chkNoGame = sum("chk") - 78.0;
+$("sum").innerHTML = `바로 가능한 것만 해도 약 <b>${sum("ok").toFixed(0)} GB</b>, 확인 후 항목(게임 제외)까지 하면 약 <b>${(sum("ok") + chkNoGame).toFixed(0)} GB</b>가 비어서 남은 공간이 ${FREE} GB → 약 ${(FREE + sum("ok") + chkNoGame).toFixed(0)} GB(${((FREE + sum("ok") + chkNoGame) / TOTAL * 100).toFixed(0)}%)가 됩니다.`;
+</script>
+</body>
+</html>
