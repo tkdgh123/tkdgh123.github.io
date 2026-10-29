@@ -178,6 +178,39 @@ h3 { font-family: var(--display); font-weight: 400; font-size: 19px; line-height
 .qa small.ask { color: var(--warn); background: var(--peach) }
 
 
+.duel { display: grid; gap: 8px }
+.duel .hd, .duel .row { display: grid; grid-template-columns: minmax(0, 1fr) 92px minmax(0, 1fr); gap: 8px }
+.duel .hd b { font-family: var(--display); font-weight: 400; font-size: 19px; text-align: center; border-radius: 99px; padding: 5px }
+.duel .hd b:first-child { background: var(--acc); color: var(--on-acc) }
+.duel .hd b:last-child { background: var(--co-soft); color: var(--co) }
+.duel .row p { background: var(--card); border: 1px solid var(--rule); border-radius: 18px; padding: 11px 16px; font-size: 14.5px; color: var(--ink-2) }
+.duel .row span { display: grid; place-items: center; text-align: center; font-family: var(--display); font-size: 15px; line-height: 1.3 }
+@media (max-width: 640px) {
+  .duel .hd { display: none }
+  .duel .row { grid-template-columns: 1fr 1fr; margin-top: 6px }
+  .duel .row span { grid-column: 1 / -1; grid-row: 1; justify-self: start }
+  .duel .row p::before { display: block; font-family: var(--display); font-size: 13px; color: var(--acc); content: "공기업" }
+  .duel .row p:last-child::before { color: var(--co); content: "사기업" }
+}
+.cmp { overflow-x: auto; background: var(--card); border: 1px solid var(--rule); border-radius: var(--r); padding: 4px 18px 6px }
+.cmp table { width: 100%; min-width: 580px; border-collapse: collapse; font-size: 14.5px }
+.cmp th, .cmp td { text-align: left; vertical-align: top; padding: 11px 14px 11px 0; border-bottom: 1px solid var(--rule) }
+.cmp tbody tr:last-child > * { border-bottom: 0 }
+.cmp thead th { font-family: var(--display); font-weight: 400; font-size: 17px; color: var(--acc); line-height: 1.35 }
+.cmp tbody th { font-weight: 400; font-size: 13.5px; color: var(--ink-2); white-space: nowrap }
+.cmp td small { display: block; font-size: 12.5px; color: var(--ink-2) }
+.dots { display: flex; flex-wrap: wrap; gap: 6px; max-width: 360px; margin: 10px 0 6px }
+.dots i { width: 18px; height: 18px; border-radius: 50% ; background: var(--card); border: 2px solid var(--rule) }
+.dots i.on { background: var(--acc); border-color: var(--acc) }
+.mine { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px }
+.mine li { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 4px 14px; align-items: center; background: var(--card); border: 1px solid var(--rule); border-radius: var(--r); padding: 16px 20px }
+.mine i { width: 40px; height: 40px; border-radius: 50%; background: var(--acc); color: var(--on-acc); display: grid; place-items: center; font-style: normal; font-family: var(--display); font-size: 18px }
+.mine li.side i { background: var(--co-soft); color: var(--co) }
+.mine b { font-family: var(--display); font-weight: 400; font-size: 18px }
+.mine p { font-size: 14.5px; color: var(--ink-2) }
+.mine span { font-size: 13px; color: var(--acc); background: var(--acc-soft); border-radius: 99px; padding: 2px 12px; white-space: nowrap }
+@media (max-width: 560px) { .mine li { grid-template-columns: 40px minmax(0, 1fr) } .mine span { grid-column: 2; justify-self: start } }
+
 .ssu dl { margin: 0; display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 8px 10px; font-size: 14.5px }
 .ssu dt { font-family: var(--display); color: var(--acc) }
 .ssu dd { margin: 0; color: var(--ink-2) }
@@ -257,6 +290,7 @@ footer { margin-top: 36px; font-size: 13px; color: var(--ink-2) }
     <li><a href="#money">얼마 받나</a></li>
     <li><a href="#apply">신청부터 학점까지</a></li>
     <li><a href="#rights">내 권리</a></li>
+    <li><a href="#pub">공기업 vs 사기업</a></li>
     <li><a href="#me">나라면?</a></li>
     <li><a href="#check">내가 할 일</a></li>
     <li><a href="#ssu">숭실대라면</a></li>
@@ -336,6 +370,58 @@ footer { margin-top: 36px; font-size: 13px; color: var(--ink-2) }
     <div class="card"><div class="badge">업무</div><ul><li>운영계획서에 없는 일은 시킬 수 없음</li><li>회사 규정으로 징계할 수 없음</li><li>재택실습은 기간의 25% 이하</li></ul></div>
     <div class="card"><div class="badge">결과물</div><ul><li>협약서에 소유권 조항이 없음</li><li>포트폴리오 공개 범위는 시작 전에 글로 정하기</li></ul></div>
   </div>
+</section>
+
+<section id="pub" class="band">
+  <h2>공기업 vs 사기업</h2>
+  <p class="lead">공기업은 정부가 주인인 회사입니다. 2026년 기준 약 30곳이에요.</p>
+
+  <div class="duel">
+    <div class="hd"><b>공기업</b><span></span><b>사기업</b></div>
+    <div class="row"><p>정부. 법으로 지정되고 경영평가를 받음</p><span>주인</span><p>오너·주주</p></div>
+    <div class="row"><p>잡알리오 공고 → 블라인드 서류 → NCS 필기 → 면접</p><span>뽑는 법</span><p>회사마다. IT·게임은 코딩 테스트, 포트폴리오, 과제</p></div>
+    <div class="row"><p>전산 운영, 사업 관리 비중이 큼</p><span>IT 직원의 일</span><p>서비스를 직접 개발</p></div>
+    <div class="row"><p>지방 혁신도시 본사가 많음 (예: KISA·한전 나주)</p><span>근무지</span><p>IT·게임은 판교·서울에 몰려 있음</p></div>
+    <div class="row"><p>정년까지 안정, 호봉 따라 오름</p><span>돈·안정</span><p>회사마다 차이 큼, 성과급과 이직</p></div>
+  </div>
+
+  <h3 style="margin-top:30px">실습·인턴으로 보면</h3>
+  <p class="persona">청년인턴은 학교 현장실습이 아니라 기관과 직접 맺는 근로계약입니다.</p>
+  <div class="cmp">
+    <table>
+      <thead><tr><th></th><th>학교 현장실습</th><th>공기업 체험형 청년인턴</th><th>채용형 인턴</th></tr></thead>
+      <tbody>
+        <tr><th>신분</th><td>실습생(학생)</td><td>기간제 근로자, 4대보험</td><td>근로자</td></tr>
+        <tr><th>학점</th><td><b>있음</b></td><td>없음</td><td>없음</td></tr>
+        <tr><th>한 달 돈</th><td>162~194만 원 이상<small>교육시간 비율에 따라</small></td><td>약 216~222만 원<small>반일제는 105만 원 (KISA)</small></td><td>기관·회사마다</td></tr>
+        <tr><th>기간</th><td>4주~16주</td><td>보통 6개월</td><td>몇 달</td></tr>
+        <tr><th>지원</th><td>학교 센터</td><td>잡알리오·기관 홈페이지</td><td>기관·회사 홈페이지</td></tr>
+        <tr><th>끝나면</th><td>학점, 경험</td><td>그 기관 정규직 서류 가점이 있는 곳도<small>KISA: 수료 1점, 우수 3점</small></td><td>평가 통과하면 정규직</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="grid two" style="margin-top:14px">
+    <div class="card">
+      <h3>정규직으로 이어지는 인턴은 드묾</h3>
+      <div class="dots" role="img" aria-label="공기업 30곳 중 7곳"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <p>2026년 1분기 채용형 인턴을 뽑은 공기업은 30곳 중 7곳 (코레일 109명, 한전 23명 등)</p>
+    </div>
+    <div class="card">
+      <h3>대신 체험형은 많음</h3>
+      <ul><li>2026년 공공기관 청년인턴 2.4만 명, 체험형이 더 많음</li><li>만 34세 이하, 학력 무관이 보통</li><li>대부분 평일 8시간이라 학기 중엔 휴학해야 함</li></ul>
+    </div>
+  </div>
+  <p class="note">공기업에서 학점을 받으려면 그 기관이 학교 현장실습 목록에 있어야 합니다.</p>
+
+  <h3 style="margin-top:30px">내 입장에서는</h3>
+  <p class="persona">AI 응용 개발·게임이 1·2순위라면 기준은 하나, 코드를 짤 기회가 어디 더 많은가.</p>
+  <ol class="mine">
+    <li><i>1</i><div><b>사기업 현장실습</b><p>학점과 실습비를 받으며 개발 경력을 만든다</p></div><span>3학년</span></li>
+    <li><i>2</i><div><b>사기업 채용연계형 인턴</b><p>크래프톤·넷마블처럼 잘하면 정직원이 되는 입구</p></div><span>4학년</span></li>
+    <li class="side"><i>3</i><div><b>공기업 체험형 청년인턴</b><p>학점 없고 일은 자료 조사·사업 지원 위주. 월급과 4대보험이 있어 군 전후 휴학 공백 메우기용</p></div><span>휴학 중</span></li>
+  </ol>
+  <div class="first"><b>공기업으로 마음이 바뀌면</b><span>NCS 필기 준비 · 정보처리기사 (가점 주는 곳 있음) · 체험형 인턴 수료 가점</span></div>
 </section>
 
 <section id="me" class="band warm">
@@ -445,7 +531,7 @@ footer { margin-top: 36px; font-size: 13px; color: var(--ink-2) }
     <li>숭실대: 2학년 겨울 지원 가능 여부, AI대학 학부별 전공 인정 기준</li>
   </ul></div>
   <details>
-    <summary>출처 23곳 보기</summary>
+    <summary>출처 28곳 보기</summary>
     <ol class="src">
       <li><a href="https://law.go.kr/admRulLsInfoP.do?admRulId=51949&amp;efYd=0">국가법령정보센터 · 대학생 현장실습학기제 운영규정 (교육부고시 제2025-36호)</a></li>
       <li><a href="https://www.hallym.ac.kr/bbs/intern/1407/228903/download.do">고시 전문 (한림대 게시본)</a></li>
@@ -470,6 +556,11 @@ footer { margin-top: 36px; font-size: 13px; color: var(--ink-2) }
       <li><a href="https://www.issueon.co.kr/news/articleView.html?idxno=13927">이슈온 · 첫 경력 프로젝트 쟁점</a></li>
       <li><a href="https://supple.kr/news/cmtcnng2n007y10l4ehz2yroi">서플 · 첫 경력 프로젝트</a></li>
       <li><a href="https://www.syworks.com/">싸이웍스 · WESS 2.0</a></li>
+      <li><a href="https://www.fnnews.com/news/202601271000407972">파이낸셜뉴스 (2026.1.27) · 2026 공공기관 채용·청년인턴 2.4만 명</a></li>
+      <li><a href="https://www.youthdaily.co.kr/mobile/article.html?no=221120">청년일보 (2026.6.18) · 공기업 채용형 인턴 30곳 중 7곳 (알리오)</a></li>
+      <li><a href="https://media-cdn.linkareer.com/activity_manager/applications/581511">한국인터넷진흥원 2025 체험형 청년인턴 공고 · 반일제, 수료 가점</a></li>
+      <li><a href="https://sports.khan.co.kr/article/202605050502003">스포츠경향 (2026.5.5) · 한국마사회 체험형 청년인턴 6개월</a></li>
+      <li><a href="https://www.catch.co.kr/NCS/RecruitInfoDetails/540782">한국수력원자력 2026 체험형 청년인턴 (월 222만 원)</a> · <a href="https://www.catch.co.kr/NCS/RecruitInfoDetails/541211">한국연구재단 (월 216만 원)</a></li>
     </ol>
   </details>
   <footer>대학 현장실습 이야기이며, 고등학생 대상 직업계고 현장실습은 다른 제도입니다. 금액과 일정은 학교 공지로 다시 확인하세요.</footer>
