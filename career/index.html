@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>나의 적성과 취업 방향</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@500;700&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
+<style>
+/* 진로 수첩: 왼쪽 목차 + 오른쪽 본문 한 줄기. 현장실습 페이지와 같은 틀, 색만 남색으로 */
+:root {
+  --paper: #F4F5F8; --sheet: #FFFFFF; --tint: #E8EAF1; --ink: #1A1C24; --ink-2: #585D6E; --rule: #D9DCE6;
+  --acc: #34418F; --on-acc: #FFFFFF; --army: #EDEEF2; --warn: #9A6400;
+  --display: "Hahmlet", "Noto Serif KR", "Nanum Myeongjo", serif;
+  --body: "IBM Plex Sans KR", "Pretendard", system-ui, "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #121420; --sheet: #1A1D2B; --tint: #232740; --ink: #E7E8EF; --ink-2: #A2A6B8; --rule: #2C3044;
+  --acc: #9DA9F0; --on-acc: #141833; --army: #1E2130; --warn: #F0B54A; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #121420; --sheet: #1A1D2B; --tint: #232740; --ink: #E7E8EF; --ink-2: #A2A6B8; --rule: #2C3044;
+  --acc: #9DA9F0; --on-acc: #141833; --army: #1E2130; --warn: #F0B54A; color-scheme: dark }
+
+* { box-sizing: border-box }
+html { scroll-behavior: smooth }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto } }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.7 var(--body); word-break: keep-all; overflow-wrap: anywhere }
+a { color: inherit }
+a:focus-visible, input:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px }
+
+.page { max-width: 1140px; margin: 0 auto; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 64px }
+.toc { position: sticky; top: 28px; align-self: start; padding-top: 28px }
+.toc .back { display: block; font-size: 14px; color: var(--ink-2); text-decoration: none; margin-bottom: 28px }
+.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; border-left: 1px solid var(--rule) }
+.toc a { display: block; text-decoration: none; font-size: 14px; color: var(--ink-2); padding: 4px 0 4px 14px; margin-left: -1px; border-left: 2px solid transparent }
+.toc a:hover, .toc .back:hover { color: var(--ink) }
+.toc a.on { color: var(--acc); border-left-color: var(--acc); font-weight: 600 }
+main { min-width: 0; max-width: 800px; padding-bottom: 48px }
+
+@media (max-width: 900px) {
+  .page { grid-template-columns: minmax(0, 1fr); gap: 0 }
+  .toc { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 3; padding: 0; margin-inline: calc(-1 * max(20px, env(safe-area-inset-left, 0px))); background: color-mix(in srgb, var(--paper) 92%, transparent); backdrop-filter: blur(6px); border-bottom: 1px solid var(--rule); order: 2 }
+  .toc .back { display: none }
+  .toc ol { display: flex; gap: 0; border: 0; overflow-x: auto; scrollbar-width: none; padding: 0 max(20px, env(safe-area-inset-left, 0px)) }
+  .toc a { white-space: nowrap; padding: 10px; border-left: 0; border-bottom: 2px solid transparent; margin: 0 }
+  .toc a.on { border-bottom-color: var(--acc) }
+  header.top { order: 1 }
+  main { order: 3 }
+  body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--paper) }
+}
+
+header.top { grid-column: 1 / -1; padding: 28px 0 8px }
+.mback { display: inline-block; margin-bottom: 18px; font-size: 14px; color: var(--ink-2); text-decoration: none }
+.eb { font-size: 13px; letter-spacing: .08em; color: var(--acc); font-weight: 600 }
+h1 { font-family: var(--display); font-weight: 700; font-size: clamp(36px, 6vw, 60px); line-height: 1.15; margin: 14px 0; text-wrap: balance }
+.sub { margin: 0; font-size: 18px; color: var(--ink-2); max-width: 34em }
+.sub b { color: var(--ink) }
+
+.picks { list-style: none; margin: 32px 0 8px; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 2px solid var(--ink) }
+.picks li { padding: 14px 18px 6px 0; display: grid; gap: 4px; align-content: start }
+.picks li + li { padding-left: 18px; border-left: 1px solid var(--rule) }
+.picks small { font-size: 12.5px; color: var(--acc); font-weight: 600; letter-spacing: .04em }
+.picks b { font-family: var(--display); font-size: clamp(19px, 2.4vw, 23px); line-height: 1.3 }
+.picks span { font-size: 14px; color: var(--ink-2) }
+@media (max-width: 640px) { .picks { grid-template-columns: 1fr } .picks li + li { padding-left: 0; border-left: 0; border-top: 1px solid var(--rule) } }
+
+section { padding: 56px 0 8px; scroll-margin-top: 64px }
+section + section { border-top: 1px solid var(--rule) }
+h2 { font-family: var(--display); font-weight: 700; font-size: clamp(26px, 3.4vw, 32px); line-height: 1.25; margin: 6px 0 10px; text-wrap: balance }
+.lead { margin: 0 0 24px; color: var(--ink-2); max-width: 40em }
+h3 { font-size: 17px; margin: 32px 0 10px; line-height: 1.4 }
+p { margin: 0 }
+
+.rows { display: grid }
+.rows > div { display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 4px 20px; padding: 14px 0; border-top: 1px solid var(--rule) }
+.rows > div:last-child { border-bottom: 1px solid var(--rule) }
+.rows b { font-size: 15.5px }
+.rows p { font-size: 15px; color: var(--ink-2) }
+.rows p em { font-style: normal; color: var(--ink) }
+@media (max-width: 560px) { .rows > div { grid-template-columns: 1fr } }
+
+.weak { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 18px 28px }
+.weak li { border-top: 1px solid var(--ink); padding-top: 12px; display: grid; gap: 4px; align-content: start }
+.weak b { font-size: 15.5px }
+.weak span { font-size: 14.5px; color: var(--ink-2) }
+
+.tbl { overflow-x: auto }
+table { border-collapse: collapse; width: 100%; font-size: 15px }
+.tbl table { min-width: 600px }
+th, td { text-align: left; padding: 12px 14px 12px 0; border-bottom: 1px solid var(--rule); vertical-align: top }
+thead th { font-size: 13px; font-weight: 600; color: var(--ink-2); border-bottom: 2px solid var(--ink); white-space: nowrap }
+tbody th { font-weight: 600; width: 20% }
+td.muted { color: var(--ink-2) }
+.fit { white-space: nowrap; letter-spacing: 2px; color: var(--acc); font-size: 13px }
+.fit i { font-style: normal; color: var(--rule) }
+tr.top th, tr.top td:first-of-type { color: var(--acc) }
+
+/* 로드맵: 다섯 칸, 군 복무는 빗금 칸 */
+.road { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; counter-reset: r }
+.road > li { border: 1px solid var(--rule); background: var(--sheet); border-radius: 12px; padding: 16px 14px; display: grid; gap: 2px; align-content: start; min-width: 0 }
+.road > li.now { border: 2px solid var(--acc); background: color-mix(in srgb, var(--acc) 9%, var(--sheet)) }
+.road > li.army { border-style: dashed; background: repeating-linear-gradient(135deg, var(--army) 0 8px, var(--paper) 8px 16px) }
+.road b { font-family: var(--display); font-size: 17px }
+.road time { font-size: 13px; color: var(--ink-2); font-variant-numeric: tabular-nums; padding-bottom: 8px; border-bottom: 1px solid var(--rule); margin-bottom: 8px }
+.road ul { margin: 0; padding-left: 16px; font-size: 14px; display: grid; gap: 4px }
+.road .key { font-weight: 600; color: var(--acc) }
+.road + p { margin-top: 12px; font-size: 13.5px; color: var(--ink-2) }
+@media (max-width: 760px) { .road { grid-template-columns: 1fr 1fr } .road li.now { grid-column: 1 / -1 } }
+@media (max-width: 420px) { .road { grid-template-columns: 1fr } }
+
+.views { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: 10px }
+.views li { background: var(--sheet); border: 1px solid var(--rule); border-radius: 12px; padding: 16px 18px; display: grid; gap: 6px; align-content: start }
+.views small { font-size: 12.5px; color: var(--ink-2); font-weight: 600 }
+.views p { font-size: 14.5px }
+.views em { font-style: normal; font-size: 14px; color: var(--acc); font-weight: 600 }
+.debate { margin: 0; padding: 0; list-style: none; display: grid }
+.debate li { padding: 14px 0; border-top: 1px solid var(--rule); font-size: 15px; display: grid; gap: 4px }
+.debate b { font-size: 14px; color: var(--acc) }
+.debate span { color: var(--ink-2) }
+.verdict { margin-top: 20px; padding: 18px 20px; border-left: 3px solid var(--acc); background: var(--sheet); border-radius: 0 12px 12px 0; font-size: 15.5px }
+
+.todo { list-style: none; margin: 0; padding: 0; display: grid }
+.todo li { border-top: 1px solid var(--rule) }
+.todo li:last-child { border-bottom: 1px solid var(--rule) }
+.todo label { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 12px; padding: 14px 0; cursor: pointer; font-size: 15.5px }
+.todo input { width: 18px; height: 18px; margin: 4px 0 0; accent-color: var(--acc) }
+.todo input:checked + span { color: var(--ink-2); text-decoration: line-through }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header class="top">
+  <a class="mback" href="../">← 작업실</a>
+  <div class="eb">진로 수첩 · 2026년 10월 29일 기준</div>
+  <h1>나의 적성과 취업 방향</h1>
+  <p class="sub">김창식 · 숭실대 AI소프트웨어학부 1학년. 적성은 <b>설계하고, AI와 도구를 지휘해 직접 만들어 내는 사람</b>.</p>
+  <ol class="picks">
+    <li><small>1순위 · 주력</small><b>AI 응용 개발자</b><span>LLM·에이전트·자동화. 이미 하고 있는 일</span></li>
+    <li><small>2순위 · 좋아하는 일</small><b>게임 테크니컬 디자이너</b><span>시스템 기획 + 엔진 구현</span></li>
+    <li><small>3순위 · 장기</small><b>프로덕트 매니저</b><span>경력 3~5년 뒤 전환</span></li>
+  </ol>
+</header>
+
+<nav class="toc" aria-label="목차">
+  <a class="back" href="../">← 작업실</a>
+  <ol>
+    <li><a href="#fit">적성</a></li>
+    <li><a href="#jobs">맞는 직무</a></li>
+    <li><a href="#where">어디로</a></li>
+    <li><a href="#road">로드맵</a></li>
+    <li><a href="#views">여러 관점</a></li>
+    <li><a href="#todo">지금 할 일</a></li>
+  </ol>
+</nav>
+
+<main>
+
+<section id="fit">
+  <h2>강점은 설계·지휘·품질 감각</h2>
+  <p class="lead">약점은 혼자 짠 코드의 양과 깊이. 근거는 2026년 10월 한 달 동안 실제로 한 일입니다.</p>
+  <div class="rows">
+    <div><b>시스템 설계</b><p>넋굿의 오행 상생·상극 체인 전투, 덜미의 문장 섞기 래칫 아이디어. <em>시스템 기획, 아키텍처 감각</em></p></div>
+    <div><b>착수 속도</b><p>경험 없이 Unity 3D 로그라이트를 시작했고, 그 전엔 Python 게임 Brown Rogue를 만들었다. <em>프로토타이핑</em></p></div>
+    <div><b>AI 지휘</b><p>Claude에게 일을 나눠 맡기고, 모델을 난이도별로 나눠 쓰고, 작업 규칙 20여 개를 관리한다. <em>AI 에이전트 운영</em></p></div>
+    <div><b>자동화</b><p>LMS 마감표를 Canvas API로 뽑고, 강의를 Whisper로 받아 적는 도구를 만들었다. <em>업무 자동화, 내부 툴</em></p></div>
+    <div><b>품질 기준</b><p>테스트 삭제 금지, 확인하고 말하기, 화면에서 군더더기 빼기. <em>QA·UX 감각</em></p></div>
+    <div><b>비판적 사고</b><p>맞장구 대신 근거를 요구하고, 판단은 여러 관점의 토론으로 받는다. <em>의사결정</em></p></div>
+  </div>
+
+  <h3>약점과 위험</h3>
+  <ul class="weak">
+    <li><b>직접 짠 코드가 적다</b><span>면접과 코딩 테스트는 AI 없이 설명하고 짜는 능력을 본다.</span></li>
+    <li><b>여러 갈래로 흩어진다</b><span>한 달에 프로젝트 다섯 개 이상. 끝낸 것 하나가 시작한 것 다섯보다 강하다.</span></li>
+    <li><b>시간과 돈이 빠듯하다</b><span>노트북 한 대로 수업과 작업을 병행한다. 무료이면서 지원금을 주는 프로그램이 중요하다.</span></li>
+  </ul>
+</section>
+
+<section id="jobs">
+  <h2>설계도 하고 코드도 짜는 직무</h2>
+  <p class="lead">어느 길이든 관문은 같다. AI 없이도 내 코드를 설명할 수 있어야 한다.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>직무</th><th>적합도</th><th>하는 일</th><th>채워야 할 것</th></tr></thead>
+    <tbody>
+      <tr class="top"><th>AI 응용 개발자</th><td class="fit">●●●</td><td>LLM으로 챗봇·에이전트·자동화 서비스를 만든다</td><td class="muted">Python, API·백엔드 기초, RAG·평가</td></tr>
+      <tr class="top"><th>테크니컬 디자이너</th><td class="fit">●●●</td><td>전투 시스템을 엔진 안에서 직접 구현하고 튜닝한다</td><td class="muted">Unity·C# 직접 구현, 밸런스 수치</td></tr>
+      <tr><th>게임 시스템 기획자</th><td class="fit">●●<i>●</i></td><td>전투·성장·경제 규칙을 설계하고 문서로 푼다</td><td class="muted">엑셀 밸런싱, 기획서 포트폴리오</td></tr>
+      <tr><th>게임 클라이언트 개발자</th><td class="fit">●●<i>●</i></td><td>화면·조작·게임플레이를 코드로 만든다</td><td class="muted">C#/C++, 자료구조·알고리즘</td></tr>
+      <tr><th>프로덕트 매니저</th><td class="fit">●●<i>●</i></td><td>무엇을 왜 만들지 정하고 팀을 맞춘다</td><td class="muted">데이터 분석, 협업, 도메인 경력</td></tr>
+      <tr><th>백엔드 개발자</th><td class="fit">●●<i>●</i></td><td>서버·DB·API를 만든다</td><td class="muted">AI 응용 개발과 함께 익히면 된다</td></tr>
+      <tr><th>보안 엔지니어</th><td class="fit">●<i>●●</i></td><td>시스템의 취약점을 찾고 막는다</td><td class="muted">네트워크·OS. 덜미 하나로는 이르다</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="where">
+  <h2>입구는 채용연계형 인턴</h2>
+  <p class="lead">2026년 게임사 신입 전형에 AI 활용 역량 평가가 들어왔다. 넥슨은 코딩 테스트를 빼고 이것으로 대신했다. 지금의 강점이 점수가 되는 시점이다.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>곳</th><th>최근 채용 방식</th><th>맞는 직군</th></tr></thead>
+    <tbody>
+      <tr><th><a href="https://news.mtn.co.kr/article/2026101312433186539" target="_blank" rel="noopener">크래프톤</a></th><td>채용연계형 인턴, 10월 접수. 서류 → 적성 → AI 역량평가 → 면접. 매년 운영 예정</td><td class="muted">AI연구, 게임 기획·프로그래밍</td></tr>
+      <tr><th><a href="https://www.inews24.com/view/1998007" target="_blank" rel="noopener">넥슨</a></th><td>‘넥토리얼’ 인턴, 9월 마감, 졸업예정자. 코딩 테스트 대신 AI 면접·AI 활용 평가</td><td class="muted">게임 프로그래머 (2025년엔 기획·TA도)</td></tr>
+      <tr><th><a href="https://sateconomy.co.kr/news/view/1065585549525255" target="_blank" rel="noopener">엔씨소프트</a></th><td>하반기 신입 공채, 10월 접수. 개발·AI 직군은 코딩 테스트 추가</td><td class="muted">프로그래밍, 기획, PM, AI</td></tr>
+      <tr><th><a href="https://m.catch.co.kr/Comp/RecruitInfo/H79414" target="_blank" rel="noopener">넷마블</a></th><td>채용전환형 인턴 (상반기)</td><td class="muted">클라이언트, 기획</td></tr>
+      <tr><th><a href="https://www.wanted.co.kr/wd/176519" target="_blank" rel="noopener">AI 스타트업</a></th><td>수시채용. 예: 뤼튼의 LLM·Agentic AI 개발 공고</td><td class="muted">AI 응용, 백엔드</td></tr>
+      <tr><th><a href="https://v.daum.net/v/20250903172050557?f=p" target="_blank" rel="noopener">네이버·카카오</a></th><td>2026년 신입 공채 일정 미정</td><td class="muted">AI 서비스 개발</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>취업 전에 거칠 무료 프로그램</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>프로그램</th><th>나는 언제</th><th>혜택</th></tr></thead>
+    <tbody>
+      <tr><th><a href="https://www.swmaestro.ai" target="_blank" rel="noopener">SW마에스트로</a></th><td>입대 전 기회는 2027년 1~2월 모집 한 번. 군 복무 중엔 지원 불가</td><td class="muted">월 100만 원 × 6개월 (2025 기준)</td></tr>
+      <tr><th><a href="https://jungle.krafton.com" target="_blank" rel="noopener">크래프톤 정글</a></th><td>게임랩 약 24주 합숙. 재학생 지원 가능 여부 미확인</td><td class="muted">참가비·기숙사비 무료</td></tr>
+      <tr><th><a href="../internship/">현장실습학기제</a></th><td>복학 후 3·4학년 학기 중</td><td class="muted">학점 + 최저임금 기반 지원비</td></tr>
+      <tr><th>SSAFY</th><td>졸업예정자부터</td><td class="muted">월 100만 원, 1년</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>취업 대신 출시하는 길</h3>
+  <div class="rows">
+    <div><b><a href="https://partner.steamgames.com/doc/marketing/upcoming_events/nextfest/2026october?language=english" target="_blank" rel="noopener">Steam 넥스트 페스트</a></b><p>출시 전 게임만. 다음은 2027년 2월·6월</p></div>
+    <div><b><a href="https://www.gamemeca.com/en/view.php?gid=1774037" target="_blank" rel="noopener">BIC 페스티벌</a></b><p>2026년 856개 중 332개 전시. 신인용 루키 부문</p></div>
+    <div><b><a href="https://www.heraldk.com/article/2026022216110223057" target="_blank" rel="noopener">인디게임 데브캠프</a></b><p>콘진원, 개인 최대 8,500만 원. 2026년엔 2~3월 접수</p></div>
+    <div><b><a href="https://globalgamejam.org/ko/group/31725" target="_blank" rel="noopener">글로벌 게임잼</a></b><p>매년 1월 말, 판교에서도 열림</p></div>
+  </div>
+</section>
+
+<section id="road">
+  <h2>입대 전에 기초와 데모, 복학 후 현장으로</h2>
+  <p class="lead">진로를 정하는 시점은 한 번, 입대 직전인 2학년 끝이다.</p>
+  <ol class="road">
+    <li class="now"><b>1학년 겨울방학</b><time>2026.12 ~ 2027.2</time><ul><li>알고리즘 주 3문제</li><li>넋굿 데모 범위 확정</li><li>SW마에스트로 지원</li><li>게임잼 참가</li></ul></li>
+    <li><b>2학년</b><time>2027</time><ul><li>자료구조·OS 직접 공부</li><li>넋굿 데모 완성</li><li>넥스트 페스트 출품</li><li class="key">주력 진로 결정</li></ul></li>
+    <li class="army"><b>군 복무</b><time>2028 ~ 2029</time><ul><li>알고리즘 꾸준히</li><li>게임 분석 노트</li><li>복학 학기 정하기</li></ul></li>
+    <li><b>3학년</b><time>2030</time><ul><li>현장실습학기제</li><li>스타트업 인턴</li><li>AI 도구 1개 공개</li><li>포트폴리오 정리</li></ul></li>
+    <li><b>4학년</b><time>2031</time><ul><li>채용연계형 인턴 (9~10월)</li><li>게임사·AI 기업 공채</li><li>SSAFY는 예비 카드</li></ul></li>
+  </ol>
+  <p>육군 18개월 기준. 전역 시기에 따라 복학이 2029년 2학기로 당겨질 수 있다.</p>
+</section>
+
+<section id="views">
+  <h2>다섯 관점의 평가</h2>
+  <p class="lead">‘AI 응용 개발을 주력으로, 게임을 무기로’에 네 명이 동의했다.</p>
+  <ul class="views">
+    <li><small>게임사 현직 기획자</small><p>오행 체인 전투는 독창적이다. 하지만 기획 신입은 끝까지 만든 게임과 수치 문서로 뽑는다.</p><em>넋굿을 작게 잘라 완성하라</em></li>
+    <li><small>AI 스타트업 CTO</small><p>에이전트에게 규칙을 주고 검증까지 돌리는 사람은 드물다. 지금 시장이 찾는 감각이다.</p><em>그 노하우를 제품으로 보여라</em></li>
+    <li><small>대기업 인사담당자</small><p>AI 활용 평가가 생겼지만 코딩 테스트를 보는 곳도 많고, 면접은 AI 없이 치른다.</p><em>알고리즘을 매주 풀어라</em></li>
+    <li><small>전공 교수</small><p>1학년에 프로젝트를 이만큼 벌인 건 좋다. 기초가 뒤처지면 3학년에 무너진다.</p><em>전공 필수는 직접 하라</em></li>
+    <li><small>인디 개발자</small><p>AI 덕분에 1인 개발의 범위가 넓어졌다. 출시도 진로다.</p><em>스팀 출시를 목표로 두라</em></li>
+  </ul>
+  <ul class="debate">
+    <li><b>인사담당자 ↔ CTO</b><span>“AI가 짠 코드는 실력이 아니다” 대 “현장도 AI로 짠다, 문제 정의와 검증이 실력이다.” 면접에서 내 코드를 줄 단위로 설명할 수 있어야 한다는 데는 둘 다 동의.</span></li>
+    <li><b>인디 개발자 ↔ 기획자</b><span>“출시가 낫다” 대 “출시로 생활비 버는 인디는 소수다.” 절충은 출시는 목표로, 생계는 취업으로.</span></li>
+    <li><b>교수 → 모두</b><span>프로젝트 수를 줄여야 한다는 지적엔 반대가 없었다.</span></li>
+  </ul>
+  <p class="verdict">강점은 진짜이고 드물다. 부족한 건 혼자 짠 코드와 끝낸 결과물 두 가지뿐이다. 게임사를 목표로 둘지는 입대 전인 2학년 끝에 넋굿의 진척을 보고 정하면 된다.</p>
+</section>
+
+<section id="todo">
+  <h2>이번 겨울까지 할 일</h2>
+  <p class="lead">모두 돈이 들지 않는다.</p>
+  <ul class="todo">
+    <li><label><input type="checkbox" id="t1"><span>전공 과제는 한 번씩 AI 없이 다시 짜 보고, 줄마다 설명할 수 있는지 확인</span></label></li>
+    <li><label><input type="checkbox" id="t2"><span>프로그래머스나 백준에서 주 3문제를 Python으로</span></label></li>
+    <li><label><input type="checkbox" id="t3"><span>넋굿 범위를 ‘방 10개짜리 데모’로 줄이고 끝낼 날짜 정하기</span></label></li>
+    <li><label><input type="checkbox" id="t4"><span>LMS 마감표·강의 받아쓰기 도구를 GitHub에 README와 함께 정리 (토큰은 빼고)</span></label></li>
+    <li><label><input type="checkbox" id="t5"><span>SW마에스트로 2027년 모집 공고 확인하고 지원</span></label></li>
+  </ul>
+</section>
+
+</main>
+</div>
+
+<script>
+/* 체크 상태는 이 브라우저에만 저장 */
+document.querySelectorAll(".todo input").forEach(c => {
+  try { c.checked = localStorage.getItem("career-" + c.id) === "1" } catch (e) {}
+  c.addEventListener("change", () => { try { localStorage.setItem("career-" + c.id, c.checked ? "1" : "0") } catch (e) {} });
+});
+
+const links = [...document.querySelectorAll(".toc ol a")];
+const io = new IntersectionObserver(es => es.forEach(e => {
+  if (!e.isIntersecting) return;
+  links.forEach(a => a.classList.toggle("on", a.hash === "#" + e.target.id));
+  const on = links.find(a => a.classList.contains("on"));
+  if (on && getComputedStyle(on.closest("ol")).display === "flex") on.closest("ol").scrollTo({ left: on.offsetLeft - 20, behavior: "smooth" });
+}), { rootMargin: "-30% 0px -60% 0px" });
+document.querySelectorAll("main section[id]").forEach(s => io.observe(s));
+</script>
+</body>
+</html>
