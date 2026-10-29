@@ -1,0 +1,141 @@
+/* 아침 카톡에서 여는 한 장짜리 수업 노트: 휴대폰 한 손 폭, 둥근 카드, 핵심은 카톡 노랑 판 */
+:root {
+  --bg: #F2F5FA; --card: #FFFFFF; --ink: #1E2638; --ink-2: #5C667C; --line: #DDE3EE;
+  --acc: #3E63DD; --acc-soft: #E5EBFC; --key: #FFE97A; --key-ink: #3A3000; --good: #1F8A55; --bad: #C2413A;
+  --title: "Jua", "Gowun Dodum", "Malgun Gothic", sans-serif;
+  --body: "Gowun Dodum", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #12161F; --card: #1B2130; --ink: #E8ECF4; --ink-2: #A3ACBF; --line: #2B3346;
+  --acc: #8FA8FF; --acc-soft: #252F4D; --key: #5A4D10; --key-ink: #FFF3B8; --good: #5CD39A; --bad: #FF8A80; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #12161F; --card: #1B2130; --ink: #E8ECF4; --ink-2: #A3ACBF; --line: #2B3346;
+  --acc: #8FA8FF; --acc-soft: #252F4D; --key: #5A4D10; --key-ink: #FFF3B8; --good: #5CD39A; --bad: #FF8A80; color-scheme: dark }
+
+* { box-sizing: border-box }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.75 var(--body); word-break: keep-all; overflow-wrap: anywhere }
+.wrap { max-width: 680px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 20px 56px; display: grid; gap: 18px }
+a { color: inherit }
+button { font: inherit; color: inherit }
+:focus-visible { outline: 3px solid var(--acc); outline-offset: 2px }
+
+nav { display: flex; gap: 8px; flex-wrap: wrap }
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 7px 16px; border-radius: 999px; background: var(--card); border: 1px solid var(--line); text-decoration: none; font-size: 15px; cursor: pointer }
+.pill.on { background: var(--acc); border-color: var(--acc); color: #fff }
+
+.meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 6px }
+.day { font-family: var(--title); font-size: 15px; background: var(--acc); color: #fff; padding: 3px 12px; border-radius: 999px }
+.unit { font-size: 14px; color: var(--ink-2) }
+h1 { font-family: var(--title); font-weight: 400; font-size: clamp(30px, 7vw, 40px); line-height: 1.3; margin: 0; text-wrap: balance }
+h2 { font-family: var(--title); font-weight: 400; font-size: 22px; line-height: 1.4; margin: 0 0 6px }
+p { margin: 0 }
+
+.card { background: var(--card); border-radius: 24px; padding: 20px 22px; border: 1px solid var(--line) }
+.key { background: var(--key); color: var(--key-ink); border: 0 }
+.key h2 { font-size: 18px; opacity: .8 }
+.key ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; counter-reset: k }
+.key li { counter-increment: k; display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 10px; font-size: 18px; line-height: 1.55 }
+.key li::before { content: counter(k); width: 28px; height: 28px; border-radius: 50%; background: var(--key-ink); color: var(--key); display: grid; place-items: center; font-family: var(--title); font-size: 15px; margin-top: 1px }
+
+.quiz h2 small { font-family: var(--body); font-size: 14px; color: var(--ink-2); margin-left: 6px }
+.quiz .q { margin-bottom: 12px }
+.opts { display: grid; gap: 8px }
+.opts button { text-align: left; padding: 10px 16px; border-radius: 16px; border: 1.5px solid var(--line); background: var(--bg); cursor: pointer; font-size: 16px }
+.opts button.right { border-color: var(--good); color: var(--good); font-weight: 700 }
+.opts button.wrong { border-color: var(--bad); color: var(--bad); text-decoration: line-through }
+.opts button:disabled { cursor: default }
+.why { margin-top: 10px; font-size: 15.5px; color: var(--ink-2) }
+
+.steps { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px }
+.steps li { background: var(--acc-soft); color: var(--ink); padding: 8px 14px; border-radius: 16px; font-size: 15.5px }
+.steps li + li::before { content: "→"; color: var(--acc); margin: 0 10px 0 -2px; font-weight: 700 }
+.steps li + li { background: none; padding: 0 }
+.steps li + li span { display: inline-block; background: var(--acc-soft); padding: 8px 14px; border-radius: 16px }
+
+.bars { display: grid; gap: 12px }
+.bar { display: grid; gap: 4px }
+.bar div { display: flex; justify-content: space-between; gap: 10px; font-size: 15px }
+.bar b { font-weight: 700 }
+.bar span { color: var(--ink-2) }
+.track { height: 14px; border-radius: 999px; background: var(--bg) }
+.track i { display: block; height: 100%; border-radius: 999px; background: var(--acc); min-width: 14px }
+.fignote { font-size: 13.5px; color: var(--ink-2); margin-top: 10px }
+
+.sec { display: grid; gap: 4px; padding: 0 4px }
+.sec p { font-size: 17px }
+
+.mine { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 14px; align-items: start; background: var(--acc-soft); border: 0 }
+.mine svg { width: 44px; height: 44px }
+.mine h2 { font-size: 18px; margin: 0 }
+.mine p { font-size: 16px }
+
+.terms { display: flex; flex-wrap: wrap; gap: 8px }
+.terms details { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 6px 14px }
+.terms summary { cursor: pointer; font-family: var(--title); font-size: 16px; list-style: none }
+.terms summary::-webkit-details-marker { display: none }
+.terms details[open] { flex-basis: 100% }
+.terms details p { font-size: 15.5px; color: var(--ink-2); padding: 2px 0 6px }
+
+.pager { display: flex; justify-content: space-between; gap: 10px }
+.pager a { flex: 1; text-align: center; padding: 14px; border-radius: 18px; background: var(--card); border: 1px solid var(--line); text-decoration: none; font-family: var(--title); font-size: 16px }
+.pager a.next { background: var(--acc); border-color: var(--acc); color: #fff }
+
+.hero { display: grid; gap: 8px; padding: 6px 4px }
+.hero p { color: var(--ink-2) }
+.unitbox { display: grid; gap: 10px }
+.unitbox h2 { padding: 0 4px }
+.list { display: grid; gap: 8px }
+.list a { display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 12px; align-items: center; padding: 12px 16px; border-radius: 20px; background: var(--card); border: 1px solid var(--line); text-decoration: none }
+.list a b { font-family: var(--title); font-weight: 400; color: var(--acc); font-size: 17px }
+.soon { display: flex; flex-wrap: wrap; gap: 8px }
+.soon span { padding: 6px 14px; border-radius: 999px; border: 1.5px dashed var(--line); color: var(--ink-2); font-size: 15px }
+
+.search { width: 100%; padding: 12px 18px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--card); font: inherit; color: var(--ink) }
+.dict { display: grid; gap: 8px }
+.dict div { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 12px 16px; display: grid; gap: 2px }
+.dict b { font-family: var(--title); font-weight: 400; font-size: 18px }
+.dict p { font-size: 15.5px; color: var(--ink-2) }
+.dict a { font-size: 13.5px; color: var(--acc); text-decoration: none }
+
+.rv { display: grid; gap: 6px }
+.rv a { font-family: var(--title); font-size: 19px; text-decoration: none }
+.rv ul { margin: 0; padding-left: 20px; color: var(--ink-2); font-size: 16px }
+
+/* 포트폴리오 탭 */
+.tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px }
+.tile { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 14px 16px; display: grid; gap: 2px; align-content: start }
+.tile svg { width: 30px; height: 30px; color: var(--acc) }
+.tile b { font-family: var(--title); font-weight: 400; font-size: 18px }
+.tile span { font-size: 14.5px; color: var(--ink-2); line-height: 1.5 }
+.badge { display: inline-block; font-size: 13px; line-height: 1.6; padding: 1px 10px; border-radius: 999px; background: var(--acc-soft); color: var(--acc); white-space: nowrap }
+.badge.good { background: color-mix(in srgb, var(--good) 15%, transparent); color: var(--good) }
+.badge.warn { background: var(--key); color: var(--key-ink) }
+.pros { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 10px }
+.pros ul { margin: 0; padding: 12px 14px 12px 30px; border-radius: 18px; background: var(--bg); font-size: 15.5px; line-height: 1.6 }
+.pros b { display: block; margin-left: -16px; font-family: var(--title); font-weight: 400 }
+.num { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; counter-reset: n }
+.num li { counter-increment: n; display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 10px; font-size: 16px; line-height: 1.6 }
+.num li::before { content: counter(n); width: 28px; height: 28px; border-radius: 50%; background: var(--acc-soft); color: var(--acc); display: grid; place-items: center; font-family: var(--title); font-size: 15px }
+.cells { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px }
+.cells div { background: var(--bg); border-radius: 16px; padding: 10px 14px; display: grid; gap: 0 }
+.cells b { font-family: var(--title); font-weight: 400; font-size: 16px }
+.cells span { font-size: 14px; color: var(--ink-2); line-height: 1.5 }
+.swap { display: grid; gap: 4px; padding: 12px 0; border-top: 1px dashed var(--line) }
+.swap:first-of-type { border-top: 0; padding-top: 4px }
+.swap s { color: var(--ink-2); font-size: 15px }
+.swap p { font-size: 16px }
+.swap p::before { content: "→ "; color: var(--acc); font-weight: 700 }
+.blank { background: var(--key); color: var(--key-ink); border-radius: 6px; padding: 0 6px; white-space: nowrap }
+.works { display: grid; gap: 8px }
+.works a, .works div { display: grid; gap: 2px; padding: 12px 16px; border-radius: 20px; background: var(--card); border: 1px solid var(--line); text-decoration: none }
+.works .first { border: 2px solid var(--acc) }
+.works b { font-family: var(--title); font-weight: 400; font-size: 18px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap }
+.works span { font-size: 14.5px; color: var(--ink-2); line-height: 1.5 }
+.time { list-style: none; margin: 0; padding: 0 0 0 6px; display: grid; gap: 14px }
+.time li { position: relative; padding-left: 26px; font-size: 15.5px; line-height: 1.55 }
+.time li::before { content: ""; position: absolute; left: 0; top: 6px; width: 14px; height: 14px; border-radius: 50%; background: var(--acc) }
+.time li + li::after { content: ""; position: absolute; left: 6px; top: -14px; height: 20px; border-left: 2px solid var(--line) }
+.time b { display: block; font-family: var(--title); font-weight: 400; font-size: 17px }
+pre { margin: 10px 0 0; background: var(--bg); border-radius: 16px; padding: 14px 16px; overflow: auto; font-size: 14px; line-height: 1.6 }
+@media (max-width: 400px) { .pros { grid-template-columns: minmax(0, 1fr) } }
