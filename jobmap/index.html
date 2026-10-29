@@ -268,6 +268,42 @@ footer ul { margin: 8px 0 0; padding-left: 18px }
 .diag ol { margin: 0; padding-left: 22px; display: grid; gap: 4px; font-size: 15.5px }
 .diag a { text-decoration: none; border-bottom: 1px dotted currentColor }
 .rjob ul { margin: 2px 0 0; padding-left: 18px; font-size: 13.5px; color: var(--ink-2) }
+.rjob b .num { font-size: 15px; color: var(--acc) }
+
+/* 7단계 문항: 양 끝일수록 큰 동그라미, 안좋음 쪽과 좋음 쪽은 색을 다르게 */
+.lks { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px }
+.lk { background: var(--bg); border-radius: 24px; padding: 18px 14px 12px; display: grid; gap: 12px; scroll-margin: 90px }
+.lk p { font-size: 18px; text-align: center; word-break: keep-all }
+.lk.done p { color: var(--ink-2) }
+.lscale { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 2px; align-items: start; max-width: 560px; width: 100%; justify-self: center }
+.lv { font: inherit; background: none; border: 0; padding: 4px 0; cursor: pointer; display: grid; justify-items: center; align-content: start; gap: 6px; color: var(--ink-2); --d: 24px; --c: var(--ink-2) }
+.lv.v1, .lv.v7 { --d: 42px } .lv.v2, .lv.v6 { --d: 36px } .lv.v3, .lv.v5 { --d: 30px }
+.lv.v1, .lv.v2, .lv.v3 { --c: var(--sign) } .lv.v5, .lv.v6, .lv.v7 { --c: var(--acc) }
+.lv i { display: block; width: var(--d); height: var(--d); border-radius: 50%; border: 2.5px solid var(--c); margin-top: calc((42px - var(--d)) / 2) }
+.lv:hover i { background: color-mix(in srgb, var(--c) 18%, transparent) }
+.lv[aria-pressed="true"] i { background: var(--c) }
+.lv span { font-size: 12.5px; line-height: 1.25; word-break: keep-all; text-align: center }
+.lv[aria-pressed="true"] span { color: var(--ink); font-weight: 700 }
+@media (max-width: 480px) {
+  .lv.v1, .lv.v7 { --d: 32px } .lv.v2, .lv.v6 { --d: 27px } .lv.v3, .lv.v5 { --d: 23px } .lv { --d: 19px }
+  .lv i { margin-top: calc((32px - var(--d)) / 2) }
+  .lv span { font-size: 10.5px }
+}
+
+/* 결과 점수 막대 */
+.meters { display: grid; gap: 8px; width: 100% }
+.meter { display: grid; grid-template-columns: 9em minmax(0, 1fr) 2.2em; gap: 10px; align-items: center; font-size: 15px; color: inherit; text-decoration: none }
+.meter .track { height: 10px; border-radius: 10px; background: var(--acc-soft); overflow: hidden }
+.meter .track span { display: block; height: 100%; border-radius: 10px; background: var(--acc) }
+.meter b { text-align: right }
+.rhero .meters { margin-top: 8px }
+.rhero .meter .track { background: color-mix(in srgb, var(--on-acc) 22%, transparent) }
+.rhero .meter .track span { background: var(--on-acc) }
+.allfit { margin-top: 14px; background: var(--card); border: 1px solid var(--rule); border-radius: 22px; padding: 14px 18px }
+.allfit summary { cursor: pointer; font-size: 15.5px }
+.allfit .meters { margin-top: 12px }
+a.meter:hover { color: var(--acc) }
+.weak em { font-style: normal; font-size: 13px; color: var(--sign); margin-left: 4px }
 
 /* 진로 빈도 막대 */
 .path { display: grid; grid-template-columns: minmax(0, 1fr) 80px 44px; gap: 10px; align-items: center; background: var(--card); border: 1px solid var(--rule); border-radius: 14px; padding: 9px 12px }
@@ -356,7 +392,7 @@ const D = window.JOBMAP;
 D.depts.sort((a, b) => D.collegeOrder.indexOf(a.college) - D.collegeOrder.indexOf(b.college));
 D.depts.forEach((d) => Object.assign(d, (D.ssuDept || {})[d.id] || {}));
 const colleges = D.collegeOrder.filter((c) => D.depts.some((d) => d.college === c));
-const st = { school: "ssu", college: D.depts[0].college, dept: D.depts[0].id, year: 1, dir: "아직 모름", worry: D.quiz.questions.find((q) => q.id === "worry").options[0], place: "아직 모름" };
+const st = { school: "ssu", college: D.depts[0].college, dept: D.depts[0].id, year: 1 };
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const urls = (u) => String(u || "").split(/\s*,\s*(?=https?:)/).filter((x) => /^https?:|^\.\.\//.test(x));

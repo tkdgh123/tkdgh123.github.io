@@ -4,6 +4,8 @@ const SSU_RATE = "https://sgsg.hankyung.com/article/2026013029461";
 const JOB = "http://job.ssu.ac.kr";
 const PATH = "https://path.ssu.ac.kr/";
 const WESS = "https://wess.ssu.ac.kr/";
+const YW = "https://yw.work24.go.kr";
+const COUNSEL = "https://counsel.ssu.ac.kr";
 
 window.JOBMAP = {
   checked: "2026년 10월 29일",
