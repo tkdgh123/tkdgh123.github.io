@@ -77,6 +77,14 @@ h1 { font-family: var(--display); font-weight: 400; font-size: clamp(38px, 6.6vw
   .nodes li > *:not(i) { grid-column: 2 }
   .nodes i { grid-row: 1 / span 3 }
 }
+.go { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 24px }
+.go a { display: grid; gap: 2px; text-decoration: none; background: var(--card); border: 1px solid var(--rule); border-radius: var(--r); padding: 16px 20px; transition: border-color .15s, transform .15s }
+.go a:hover, .go a:focus-visible { border-color: var(--acc); transform: translateY(-2px); outline: none }
+.go b { font-family: var(--display); font-weight: 400; font-size: 19px; color: var(--acc) }
+.go b::after { content: " →" }
+.go span { font-size: 14px; color: var(--ink-2) }
+@media (max-width: 640px) { .go { grid-template-columns: 1fr } }
+@media (prefers-reduced-motion: reduce) { .go a { transition: none } .go a:hover { transform: none } }
 .first { margin-top: 20px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; background: var(--peach); border-radius: 18px; padding: 12px 18px; font-size: 15px }
 .first b { font-family: var(--display); font-weight: 400; font-size: 16px; color: var(--co) }
 
@@ -169,7 +177,7 @@ h3 { font-family: var(--display); font-weight: 400; font-size: 19px; line-height
 .qa small { justify-self: start; font-size: 12px; color: var(--ink-2); background: var(--bg); border-radius: 99px; padding: 1px 10px }
 .qa small.ask { color: var(--warn); background: var(--peach) }
 
-.ssu { margin-bottom: 26px }
+
 .ssu dl { margin: 0; display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 8px 10px; font-size: 14.5px }
 .ssu dt { font-family: var(--display); color: var(--acc) }
 .ssu dd { margin: 0; color: var(--ink-2) }
@@ -228,20 +236,14 @@ footer { margin-top: 36px; font-size: 13px; color: var(--ink-2) }
   <h1>표준 현장실습학기제</h1>
   <p class="sub">회사에서 일하면서 학점을 받는 대학 수업. 얼마를 받고, 어떻게 신청하고, 언제 무엇을 하면 되는지.</p>
 
-  <div class="road">
-    <h2>나의 현장실습 길</h2>
-    <p>숭실대 1학년 2학기 기준, 휴학 없이 다닐 때</p>
-    <ol class="nodes">
-      <li class="now"><i>1</i><em>지금 여기</em><b>1학년 2학기</b><span>슈패스에서 현장실습 서류·면접 특강 듣기</span></li>
-      <li><i>2</i><b>2학년</b><span>포트폴리오 쌓기. 2학기를 마치면 WESS 열림</span></li>
-      <li><i>3</i><b>3학년 여름</b><span>5월에 첫 지원, 방학 동안 4~8주 실습</span></li>
-      <li><i>4</i><b>3학년 2학기~4학년 1학기</b><span>16주 학기 실습. 4학년 2학기는 피하기</span></li>
-    </ol>
-    <div class="first"><b>첫 할 일</b><span>슈패스 → 비교과 → "현장실습" 검색 → 현장실습지원팀 특강 신청 (학년 제한 없음)</span></div>
+  <div class="go">
+    <a href="#money"><b>얼마 받을까</b><span>교육시간 비율로 바로 계산</span></a>
+    <a href="#me"><b>내 상황엔?</b><span>전공·처지별 질문 아홉 묶음</span></a>
+    <a href="#check"><b>무엇부터 할까</b><span>준비부터 학점까지 체크리스트</span></a>
   </div>
 
   <div class="pills">
-    <div><b>161만 원↑</b><span>한 달 실습비 최저선</span><small>2026년 · 주 40시간</small></div>
+    <div><b>162~194만 원</b><span>한 달 실습비 최저선</span><small>2026년 · 주 40시간 · 교육시간 비율에 따라</small></div>
     <div><b>주 40시간</b><span>실습 시간 상한</span><small>밤 10시~아침 6시 금지</small></div>
     <div><b>보험 2개</b><span>산재 + 상해</span><small>빠지면 학점 없음</small></div>
     <div><b>230만 원</b><span>2027 첫 경력 프로젝트</span><small>월 실습비 · 예산 심의 중</small></div>
@@ -257,6 +259,7 @@ footer { margin-top: 36px; font-size: 13px; color: var(--ink-2) }
     <li><a href="#rights">내 권리</a></li>
     <li><a href="#me">나라면?</a></li>
     <li><a href="#check">내가 할 일</a></li>
+    <li><a href="#ssu">숭실대라면</a></li>
     <li><a href="#history">지금까지</a></li>
     <li><a href="#next">2027년 변화</a></li>
     <li><a href="#src">출처</a></li>
@@ -282,10 +285,10 @@ footer { margin-top: 36px; font-size: 13px; color: var(--ink-2) }
     <div class="ticks"><span style="left:0;transform:none">0%</span><span style="left:16.67%">10%</span><span style="left:41.67%">25%</span><span style="right:0;left:auto;transform:none">더 많이 →</span></div>
   </div>
   <div class="grid two vs">
-    <div class="card" style="--c:var(--acc)"><h3>표준 현장실습</h3><ul><li>최소 1개월, 주 40시간 이내</li><li>교육부 표준 서식으로 협약</li><li>실습비 최저선이 꼭 지켜짐</li><li>회사가 모집하는 방식도 가능</li></ul></div>
-    <div class="card" style="--c:var(--co)"><h3>자율 현장실습</h3><ul><li>기간과 시간을 학교가 정함</li><li>학교별 서식</li><li>까다로운 조건을 다 갖추면 무급도 가능</li><li>학교가 모집하는 방식만</li></ul></div>
+    <div class="card" style="--c:var(--acc)"><h3>표준 현장실습</h3><ul><li>최소 1개월, 주 40시간 이내</li><li>교육부 표준 서식으로 협약</li><li>실습비 최저선이 꼭 지켜짐</li><li>회사가 짠 프로그램(실습기관 주도형)도 가능</li></ul></div>
+    <div class="card" style="--c:var(--co)"><h3>자율 현장실습</h3><ul><li>기간과 시간을 학교가 정함</li><li>학교별 서식</li><li>까다로운 조건을 다 갖추면 무급도 가능</li><li>학교가 짠 프로그램만</li></ul></div>
   </div>
-  <p class="note">직접 구했거나 회사가 직접 뽑은 실습은 어느 쪽으로도 인정되지 않습니다.</p>
+  <p class="note">어느 쪽이든 모집과 선발은 학교 센터를 거칩니다. 내가 직접 구했거나 회사가 학교 밖에서 따로 뽑은 실습은 인정되지 않아요.</p>
 </section>
 
 <section id="money" class="band">
@@ -346,16 +349,36 @@ footer { margin-top: 36px; font-size: 13px; color: var(--ink-2) }
 <section id="check" class="band">
   <h2>내가 할 일</h2>
   <p class="lead">체크하면 이 브라우저에 남아요.</p>
-  <div class="grid two ssu">
-    <div class="card">
-      <h3>숭실대에서는</h3>
+  <div class="stages" id="stages"></div>
+  <div class="progress"><div class="meter"><i id="pbar"></i></div><span id="progress"></span></div>
+</section>
+
+<section id="ssu" class="band warm">
+  <h2>숭실대 학생이라면</h2>
+  <p class="lead">2026학년도 현장실습 안내문과 리플렛 원문을 기준으로 정리했습니다.</p>
+
+  <div class="road">
+    <h3>1학년 2학기부터의 길</h3>
+    <p>휴학 없이 다닐 때</p>
+    <ol class="nodes">
+      <li class="now"><i>1</i><em>지금 여기</em><b>1학년</b><span>슈패스에서 현장실습 서류·면접 특강 듣기</span></li>
+      <li><i>2</i><b>2학년 여름</b><span>캠퍼스타운 스타트업 인턴십 지원 가능 (6주, 3학점)</span></li>
+      <li><i>3</i><b>3학년</b><span>4학기 이수로 표준 현장실습 자격. 여름·겨울 4~8주, ICT 인턴십 4개월</span></li>
+      <li><i>4</i><b>3~4학년 학기 중</b><span>12~16주 실습, 최대 15학점. 졸업 학기는 제외</span></li>
+    </ol>
+    <div class="first"><b>첫 할 일</b><span>슈패스 → 비교과 → "현장실습" 검색 → 현장실습지원팀 특강 신청 (학년 제한 없음)</span></div>
+  </div>
+
+  <div class="grid two" style="margin-top:14px">
+    <div class="card ssu">
+      <h3>표준 현장실습</h3>
       <dl>
-        <dt>신청</dt><dd><a href="http://wess.ssu.ac.kr/">WESS</a> · 공지는 <a href="https://scatch.ssu.ac.kr/공지사항/">학교 공지사항</a></dd>
-        <dt>자격</dt><dd>4학기 이상 이수한 3~4학년 재학생. 직전 학기 휴학생, 그 학기 졸업예정자 제외</dd>
+        <dt>자격</dt><dd>3~4학년 재학생 중 정규 4학기 이상 이수. 직전 학기 휴학생, 그 학기 졸업예정자는 안 됨</dd>
         <dt>모집</dt><dd>1년에 세 번, 지원은 열흘 남짓 (2026년: 5월 4~14일, 7월 9~20일, 11월 2~12일)</dd>
-        <dt>지원</dt><dd>2학기 16주 장학금 120만 원, 여름·겨울은 계절학기 수업료만큼</dd>
-        <dt>학점</dt><dd>일반선택 또는 전공선택(P/F). 전공 인정은 신청서를 따로 냄</dd>
-        <dt>문의</dt><dd>현장실습지원센터 · 학생회관 501호 · 02-820-0878</dd>
+        <dt>학점</dt><dd>여름·겨울: 4주 이상 일반선택 3학점, 8주 이상 3~6학점 (재학 중 2회까지)<br>학기: 12주 이상 최대 12학점, 16주 이상 최대 15학점, 그중 전공선택 최대 6학점</dd>
+        <dt>지원금</dt><dd>학기 16주 120만 원, 12주 이상 90만 원 · 겨울은 낸 수업료를 돌려받음</dd>
+        <dt>주의</dt><dd>선발되면 포기할 수 없음 · 교내 다른 현장실습·창업 프로그램과 중복 지원 불가 · 주차보고서 매주 200자 이상</dd>
+        <dt>신청</dt><dd><a href="http://wess.ssu.ac.kr/">WESS</a> · 현장실습지원센터 학생회관 501호, 02-820-0878</dd>
       </dl>
     </div>
     <div class="card">
@@ -365,15 +388,21 @@ footer { margin-top: 36px; font-size: 13px; color: var(--ink-2) }
         <li>서약서·이력서·자기소개서</li>
         <li>회사 운영계획서 보고 지원</li>
         <li>서류·면접</li>
-        <li>사전교육 2, 수업료 납부</li>
+        <li>사전교육 2 (Zoom 2회), 수업료 납부</li>
         <li>3자 협약</li>
-        <li>실습, 보고서 제출</li>
+        <li>실습, 주차보고서, 기관 평가</li>
       </ol>
-      <p class="note">교내 ICT·창업 실습 프로그램과 중복 지원은 안 돼요.</p>
+      <p class="note">전공선택으로 인정받으려면 학과장 승인 신청서를 기한 안에 따로 냅니다. IT대학 학부별 인정 기준은 학과에 물어보세요.</p>
     </div>
   </div>
-  <div class="stages" id="stages"></div>
-  <div class="progress"><div class="meter"><i id="pbar"></i></div><span id="progress"></span></div>
+
+  <h3 style="margin-top:26px">컴퓨터·AI 전공이 함께 볼 다른 길</h3>
+  <div class="grid">
+    <div class="card"><div class="badge">ICT</div><h3>ICT 학점연계 프로젝트 인턴십</h3><ul><li>과기정통부 사업, 4개월 (3~6월, 9~12월)</li><li>4~5학기 이수한 정보통신 전공생</li><li>정부가 회사에 월 120만 원 지원, 학생은 최저임금 이상</li><li>대학을 통해 신청</li></ul></div>
+    <div class="card"><div class="badge">교내</div><h3>캠퍼스타운 스타트업 인턴십</h3><ul><li>창업지원단, 2~4학년 (2개 학기 이수)</li><li>여름 6주 240시간, 210만 원 (세전)</li><li>계절학기 3학점 P/F</li><li>2026년 모집 5월 14~21일</li></ul></div>
+    <div class="card"><div class="badge">창업</div><h3>창업 실습</h3><ul><li>창업동아리실습: 창업교과목 3학점 이수 후, 학기당 3학점</li><li>창업기업실습: 창업한 대표자, 학기당 6학점</li><li>학과장 승인, P/F</li></ul></div>
+  </div>
+  <p class="note">2학년 겨울방학(4학기를 막 마친 때)에 표준 현장실습을 지원할 수 있는지는 안내문에 없어서 센터에 물어봐야 합니다. ICT 인턴십의 2026년 숭실대 모집 공지는 찾지 못했습니다.</p>
 </section>
 
 <section id="history">
@@ -413,13 +442,16 @@ footer { margin-top: 36px; font-size: 13px; color: var(--ink-2) }
     <li>실습비가 국가장학금·건강보험 피부양자에 주는 영향</li>
     <li>실습 경쟁률과 정규직 전환율</li>
     <li>첫 경력 프로젝트 대상 학년</li>
+    <li>숭실대: 2학년 겨울 지원 가능 여부, IT대학 학부별 전공 인정 기준</li>
   </ul></div>
   <details>
-    <summary>출처 21곳 보기</summary>
+    <summary>출처 23곳 보기</summary>
     <ol class="src">
       <li><a href="https://law.go.kr/admRulLsInfoP.do?admRulId=51949&amp;efYd=0">국가법령정보센터 · 대학생 현장실습학기제 운영규정 (교육부고시 제2025-36호)</a></li>
       <li><a href="https://www.hallym.ac.kr/bbs/intern/1407/228903/download.do">고시 전문 (한림대 게시본)</a></li>
       <li><a href="http://wess.ssu.ac.kr/">숭실대 WESS</a></li>
+      <li><a href="https://scatch.ssu.ac.kr/공지사항/?slug=2026-겨울학기-현장실습학기제-학생-참여-안내">숭실대 2026-겨울학기 현장실습학기제 학생 참여 안내 (안내문·리플렛)</a></li>
+      <li><a href="https://ictintern.or.kr">ICT 학점연계 프로젝트 인턴십</a></li>
       <li><a href="https://scatch.ssu.ac.kr/공지사항/">숭실대 공지사항 · 2026 현장실습학기제 학생 참여 안내</a></li>
       <li><a href="https://uipa.inu.ac.kr/bbs/inu/2611/387732/download.do">인천대 2026-2학기 현장실습 안내</a></li>
       <li><a href="https://biz.korea.ac.kr/news/notice_view.html?no=7260">고려대 경영대 현장실습 공지</a></li>
