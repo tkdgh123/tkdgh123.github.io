@@ -4,398 +4,442 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>표준 현장실습학기제</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@500;700&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
 <style>
+/* 실습 수첩: 왼쪽 목차 + 오른쪽 본문 한 줄기. 출근부처럼 가는 선으로 칸을 나누고, 상자는 직접 만지는 곳(계산기·질문·체크)에만 쓴다 */
 :root {
-  --bg: #F6F4EF; --card: #FFFFFF; --ink: #1C1B1F; --ink-2: #5E5A63; --rule: #E3DED4; --soft: #EFEBE3;
-  --acc: #2D5BA8; --gov: #2a78d6; --co: #cf5422; --good: #0ca30c; --warn: #b77a00; --bad: #d03b3b;
+  --paper: #F5F4EF; --sheet: #FFFFFF; --tint: #ECEAE2; --ink: #1B1D1C; --ink-2: #5A5E5B; --rule: #DCD8CE;
+  --acc: #1E5B4F; --on-acc: #FFFFFF; --co: #B5562F; --warn: #9A6400;
+  --display: "Hahmlet", "Noto Serif KR", "Nanum Myeongjo", serif;
+  --body: "IBM Plex Sans KR", "Pretendard", system-ui, "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --bg: #141519; --card: #1D1F25; --ink: #ECE8E1; --ink-2: #A29DA7; --rule: #2E3038; --soft: #24262D;
-  --acc: #8EB0F0; --gov: #3987e5; --co: #d95926; --good: #3fc23f; --warn: #fab219; --bad: #e66767; color-scheme: dark } }
+  --paper: #131615; --sheet: #1B1F1E; --tint: #222826; --ink: #E9E6DF; --ink-2: #A3A8A4; --rule: #2E3431;
+  --acc: #7CC5B0; --on-acc: #0F1B18; --co: #E28659; --warn: #F0B54A; color-scheme: dark } }
 :root[data-theme="dark"] {
-  --bg: #141519; --card: #1D1F25; --ink: #ECE8E1; --ink-2: #A29DA7; --rule: #2E3038; --soft: #24262D;
-  --acc: #8EB0F0; --gov: #3987e5; --co: #d95926; --good: #3fc23f; --warn: #fab219; --bad: #e66767; color-scheme: dark }
+  --paper: #131615; --sheet: #1B1F1E; --tint: #222826; --ink: #E9E6DF; --ink-2: #A3A8A4; --rule: #2E3431;
+  --acc: #7CC5B0; --on-acc: #0F1B18; --co: #E28659; --warn: #F0B54A; color-scheme: dark }
 
 * { box-sizing: border-box }
-body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.65 "Pretendard", system-ui, "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; word-break: keep-all; overflow-wrap: anywhere }
+html { scroll-behavior: smooth }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto } }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.7 var(--body); word-break: keep-all; overflow-wrap: anywhere }
 a { color: inherit }
-.wrap { max-width: 1040px; margin: 0 auto; padding: 0 max(16px, env(safe-area-inset-left)) 0 max(16px, env(safe-area-inset-right)) }
-.back { display: inline-block; margin-top: 24px; font-size: 14px; color: var(--ink-2); text-decoration: none }
-.back:hover { color: var(--ink) }
-
-header { padding: 28px 0 8px }
-.kick { font-size: 13px; letter-spacing: .12em; color: var(--ink-2) }
-h1 { font-size: clamp(32px, 6vw, 48px); line-height: 1.15; margin: 8px 0 12px }
-header p { margin: 0; color: var(--ink-2); max-width: 42rem }
-
-nav { position: sticky; top: 0; z-index: 2; background: color-mix(in srgb, var(--bg) 90%, transparent); backdrop-filter: blur(6px); border-bottom: 1px solid var(--rule); margin-top: 24px }
-nav .wrap { display: flex; gap: 6px; padding-block: 10px; overflow-x: auto }
-nav a { text-decoration: none; font-size: 14px; padding: 4px 13px; border-radius: 99px; border: 1px solid var(--rule); white-space: nowrap; background: var(--card) }
-nav a:hover, nav a:focus-visible { border-color: var(--acc); outline: none }
-
-section { padding: 44px 0 4px; scroll-margin-top: 56px }
-section > .wrap > h2 { font-size: 24px; margin: 0 0 4px }
-section > .wrap > p.lead { margin: 0 0 18px; color: var(--ink-2); font-size: 15px; max-width: 46rem }
 .num { font-variant-numeric: tabular-nums }
-.note { font-size: 13px; color: var(--ink-2) }
+.muted { color: var(--ink-2) }
 
-.hero { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 12px; margin: 28px 0 0 }
-.stat { background: var(--card); border: 1px solid var(--rule); border-radius: 12px; padding: 16px 18px; display: grid; gap: 2px }
-.stat b { font-size: 28px; line-height: 1.15; font-variant-numeric: tabular-nums }
-.stat span { font-size: 14px }
-.stat small { font-size: 12.5px; color: var(--ink-2) }
+.page { max-width: 1140px; margin: 0 auto; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 64px }
+.toc { position: sticky; top: 28px; align-self: start; padding-top: 28px }
+.toc .back { display: block; font-size: 14px; color: var(--ink-2); text-decoration: none; margin-bottom: 28px }
+.toc .back:hover { color: var(--ink) }
+.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; border-left: 1px solid var(--rule) }
+.toc a { display: block; text-decoration: none; font-size: 14px; color: var(--ink-2); padding: 4px 0 4px 14px; margin-left: -1px; border-left: 2px solid transparent }
+.toc a:hover { color: var(--ink) }
+.toc a.on { color: var(--acc); border-left-color: var(--acc); font-weight: 600 }
+.toc a:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px }
+main { min-width: 0; max-width: 780px; padding-bottom: 40px }
 
-.grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 12px }
-.box { background: var(--card); border: 1px solid var(--rule); border-radius: 12px; padding: 18px }
-.box h3 { margin: 0 0 6px; font-size: 17px }
-.box p, .box ul { margin: 0; font-size: 14.5px; color: var(--ink-2) }
-.box ul { padding-left: 18px; display: grid; gap: 3px }
-.box .ic { font-size: 22px; line-height: 1; display: block; margin-bottom: 8px }
+@media (max-width: 900px) {
+  .page { grid-template-columns: minmax(0, 1fr); gap: 0 }
+  .toc { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 3; padding: 0; margin-inline: calc(-1 * max(20px, env(safe-area-inset-left, 0px))); background: color-mix(in srgb, var(--paper) 92%, transparent); backdrop-filter: blur(6px); border-bottom: 1px solid var(--rule); order: 2 }
+  .toc .back { display: none }
+  .toc ol { display: flex; gap: 0; border: 0; overflow-x: auto; scrollbar-width: none; padding: 0 max(20px, env(safe-area-inset-left, 0px)) }
+  .toc a { white-space: nowrap; padding: 10px 10px; border-left: 0; border-bottom: 2px solid transparent; margin: 0 }
+  .toc a.on { border-bottom-color: var(--acc) }
+  header.top { order: 1 }
+  main { order: 3 }
+  body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--paper) }
+}
 
-.tbl { overflow-x: auto; background: var(--card); border: 1px solid var(--rule); border-radius: 12px }
-table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 14.5px }
-th, td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--rule); vertical-align: top }
-tr:last-child td { border-bottom: 0 }
-thead th { font-size: 13px; color: var(--ink-2); font-weight: 600; background: var(--soft) }
+header.top { grid-column: 1 / -1; padding: 28px 0 8px }
+.mback { display: inline-block; margin-bottom: 18px; font-size: 14px; color: var(--ink-2); text-decoration: none }
+.mback:hover { color: var(--ink) }
+.eb { font-size: 13px; letter-spacing: .08em; color: var(--acc); font-weight: 600 }
+h1 { font-family: var(--display); font-weight: 700; font-size: clamp(38px, 6.4vw, 64px); line-height: 1.12; letter-spacing: -.01em; margin: 14px 0 14px; text-wrap: balance }
+.sub { margin: 0; font-size: 18px; color: var(--ink-2); max-width: 34em }
+.strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 36px 0 12px; border-top: 2px solid var(--ink) }
+.strip div { padding: 14px 18px 4px 0; display: grid; gap: 2px; align-content: start }
+.strip div + div { padding-left: 18px; border-left: 1px solid var(--rule) }
+.strip b { font-family: var(--display); font-weight: 700; font-size: clamp(24px, 3vw, 32px); line-height: 1.2; font-variant-numeric: tabular-nums }
+.strip span { font-size: 14px }
+.strip small { font-size: 12.5px; color: var(--ink-2); line-height: 1.5 }
+@media (max-width: 640px) { .strip { grid-template-columns: repeat(2, minmax(0, 1fr)) } .strip div:nth-child(3) { padding-left: 0; border-left: 0 } .strip div:nth-child(n+3) { border-top: 1px solid var(--rule) } }
+
+section { padding: 56px 0 8px; scroll-margin-top: 64px }
+section + section { border-top: 1px solid var(--rule) }
+h2 { font-family: var(--display); font-weight: 700; font-size: clamp(26px, 3.4vw, 32px); line-height: 1.25; margin: 6px 0 10px; text-wrap: balance }
+.lead { margin: 0 0 24px; color: var(--ink-2); max-width: 40em }
+h3 { font-size: 17px; margin: 0 0 6px; line-height: 1.4 }
+p { margin: 0 }
+.note { font-size: 13px; color: var(--ink-2); margin-top: 12px }
+
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); gap: 20px 28px }
+.cols > div { border-top: 1px solid var(--ink); padding-top: 12px; min-width: 0 }
+.cols p, .cols ul { font-size: 15px; color: var(--ink-2) }
+.cols ul { margin: 0; padding-left: 18px; display: grid; gap: 4px }
+.cols.two { grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)) }
+
+.tbl { overflow-x: auto }
+table { border-collapse: collapse; width: 100%; font-size: 15px }
+.tbl table { min-width: 540px }
+th, td { text-align: left; padding: 12px 14px 12px 0; border-bottom: 1px solid var(--rule); vertical-align: top }
+thead th { font-size: 13px; font-weight: 600; color: var(--ink-2); border-bottom: 2px solid var(--ink) }
 thead th.std { color: var(--acc) }
 tbody th { font-weight: 600; width: 22% }
 
-.calc { background: var(--card); border: 1px solid var(--rule); border-radius: 12px; padding: 20px; display: grid; gap: 14px }
-.seg { display: flex; flex-wrap: wrap; gap: 6px }
-.seg button { font: inherit; font-size: 14px; padding: 6px 14px; border-radius: 99px; border: 1px solid var(--rule); background: var(--bg); color: var(--ink); cursor: pointer }
-.seg button[aria-pressed="true"] { border-color: var(--acc); background: var(--acc); color: var(--card) }
-.seg button:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px }
+.panel { background: var(--sheet); border: 1px solid var(--rule); border-radius: 14px; padding: 24px }
+.calc { display: grid; gap: 16px }
+.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; width: fit-content; max-width: 100% }
+.seg button { font: inherit; font-size: 14px; padding: 8px 16px; border: 0; background: var(--sheet); color: var(--ink); cursor: pointer }
+.seg button + button { border-left: 1px solid var(--rule) }
+.seg button[aria-pressed="true"] { background: var(--acc); color: var(--on-acc); font-weight: 600 }
+.seg button:focus-visible { outline: 2px solid var(--acc); outline-offset: -2px }
 .out { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px }
-.out b { font-size: clamp(30px, 6vw, 42px); line-height: 1.1; font-variant-numeric: tabular-nums }
+.out b { font-family: var(--display); font-size: clamp(36px, 7vw, 54px); line-height: 1.05; font-variant-numeric: tabular-nums }
 .formula { font-size: 14px; color: var(--ink-2); font-variant-numeric: tabular-nums }
-.meter { height: 10px; border-radius: 99px; background: var(--soft); overflow: hidden }
+.meter { height: 8px; border-radius: 99px; background: var(--tint); overflow: hidden }
 .meter i { display: block; height: 100%; background: var(--acc); border-radius: 99px; transition: width .25s }
 
-.flow { display: grid; gap: 10px }
-.flow .row { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 4px 16px; background: var(--card); border: 1px solid var(--rule); border-radius: 12px; padding: 14px 18px; align-items: start }
-.flow .who { font-weight: 700; font-size: 15px }
-.flow .who small { display: block; font-weight: 400; font-size: 12.5px; color: var(--ink-2) }
-.flow p { margin: 0; font-size: 14.5px }
-@media (max-width: 560px) { .flow .row { grid-template-columns: 1fr } }
+.rows { margin-top: 28px; display: grid }
+.rows > div { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 4px 20px; padding: 14px 0; border-top: 1px solid var(--rule) }
+.rows > div:last-child { border-bottom: 1px solid var(--rule) }
+.rows b { font-size: 15px }
+.rows p { font-size: 15px; color: var(--ink-2) }
+@media (max-width: 560px) { .rows > div { grid-template-columns: 1fr } }
 
-ol.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; counter-reset: s }
-ol.steps li { counter-increment: s; display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 12px; position: relative; padding-bottom: 14px }
-ol.steps li::before { content: counter(s); width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--acc); color: var(--acc); display: grid; place-items: center; font-size: 14px; font-weight: 700; background: var(--bg); z-index: 1 }
-ol.steps li:not(:last-child)::after { content: ""; position: absolute; left: 14px; top: 30px; bottom: 0; width: 2px; background: var(--rule) }
+ol.steps { list-style: none; margin: 0; padding: 0; counter-reset: s }
+ol.steps li { counter-increment: s; display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 14px; position: relative; padding-bottom: 18px }
+ol.steps li::before { content: counter(s); width: 28px; height: 28px; border-radius: 50%; background: var(--acc); color: var(--on-acc); display: grid; place-items: center; font-size: 13px; font-weight: 600; z-index: 1 }
+ol.steps li:not(:last-child)::after { content: ""; position: absolute; left: 13px; top: 30px; bottom: 2px; width: 2px; background: var(--rule) }
 ol.steps b { display: block; font-size: 15.5px }
 ol.steps span { font-size: 14px; color: var(--ink-2) }
-ol.steps em { font-style: normal; font-size: 12.5px; color: var(--acc); margin-left: 6px; white-space: nowrap }
+ol.steps em { font-style: normal; font-size: 13px; color: var(--acc); white-space: nowrap; font-variant-numeric: tabular-nums; padding-top: 2px }
 
-.credit { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 12px; margin-top: 18px }
-.credit .box table { min-width: 0; font-size: 14px }
-.credit .box td, .credit .box th { padding: 6px 4px }
+.ledger td.num { text-align: right; font-weight: 600 }
+.ledger th { font-weight: 400 }
 
-.tl { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px }
-.tl li { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 14px; background: var(--card); border: 1px solid var(--rule); border-radius: 12px; padding: 14px 18px }
-.tl time { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--acc) }
+.who { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px }
+.who button { font: inherit; font-size: 14px; padding: 6px 14px; border-radius: 99px; border: 1px solid var(--rule); background: var(--sheet); color: var(--ink); cursor: pointer }
+.who button[aria-selected="true"] { border-color: var(--acc); background: var(--acc); color: var(--on-acc); font-weight: 600 }
+.who button:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px }
+.persona { margin: 0 0 12px; font-family: var(--display); font-size: 18px }
+.qa { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 10px }
+.qa li { background: var(--sheet); border: 1px solid var(--rule); border-radius: 12px; padding: 16px 18px; display: grid; gap: 6px; align-content: start }
+.qa b { font-size: 15.5px }
+.qa p { font-size: 14.5px; color: var(--ink-2) }
+.qa small { font-size: 12px; color: var(--ink-2) }
+.qa small.ask { color: var(--warn); font-weight: 600 }
+
+.tl { list-style: none; margin: 0; padding: 0 }
+.tl li { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 16px; padding: 14px 0; border-top: 1px solid var(--rule) }
+.tl time { font-family: var(--display); font-weight: 700; font-size: 18px; color: var(--acc); font-variant-numeric: tabular-nums }
 .tl b { display: block }
 .tl span { font-size: 14px; color: var(--ink-2) }
-.tl li.next { border-style: dashed }
 
-.chart { background: var(--card); border: 1px solid var(--rule); border-radius: 12px; padding: 18px; margin-top: 14px }
-.chart h3 { margin: 0 0 12px; font-size: 16px }
-.bars { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none }
-.bars li { display: grid; grid-template-columns: 48px minmax(0, 1fr); gap: 10px; align-items: center; font-size: 14px }
+.chart { margin-top: 28px }
+.chart h3 { font-size: 15px }
+.bars { display: grid; gap: 8px; margin: 12px 0 0; padding: 0; list-style: none }
+.bars li { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 10px; align-items: center; font-size: 14px }
 .bars .track { display: flex; align-items: center; gap: 8px }
-.bars i { display: block; height: 22px; background: var(--acc); border-radius: 0 4px 4px 0; outline-offset: 2px }
-.bars i:hover, .bars i:focus-visible { outline: 2px solid var(--ink) }
-.bars em { font-style: normal; font-variant-numeric: tabular-nums; color: var(--ink); white-space: nowrap }
+.bars i { display: block; height: 20px; background: var(--acc); border-radius: 0 4px 4px 0 }
+.bars i:hover, .bars i:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px }
+.bars em { font-style: normal; font-variant-numeric: tabular-nums; white-space: nowrap }
 
-.split { display: flex; gap: 2px; height: 46px; margin: 14px 0 8px }
-.split i { flex: 1; display: grid; place-items: center; color: #fff; font-style: normal; font-weight: 700; font-size: 15px; font-variant-numeric: tabular-nums }
-.split i:first-child { background: var(--gov); border-radius: 6px 0 0 6px }
-.split i:last-child { background: var(--co); border-radius: 0 6px 6px 0 }
-.vs { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 12px; margin-top: 14px }
-.tag { display: inline-block; font-size: 12px; padding: 1px 9px; border-radius: 99px; border: 1px solid var(--rule); color: var(--ink-2); margin-right: 4px }
-.tag.warn { color: var(--warn); border-color: currentColor }
+.split { display: flex; gap: 2px; height: 52px; margin: 14px 0 10px }
+.split i { flex: 1; display: grid; place-items: center; color: var(--on-acc); font-style: normal; font-weight: 600; font-size: 15px; font-variant-numeric: tabular-nums }
+.split i:first-child { background: var(--acc); border-radius: 8px 0 0 8px }
+.split i:last-child { background: var(--co); border-radius: 0 8px 8px 0 }
+.tag { display: inline-block; font-size: 12px; font-weight: 600; padding: 0 8px; border-radius: 99px; border: 1px solid currentColor; color: var(--warn); vertical-align: 2px; margin-left: 4px }
 
-.who { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px }
-.who button { font: inherit; font-size: 14px; padding: 6px 14px; border-radius: 99px; border: 1px solid var(--rule); background: var(--card); color: var(--ink); cursor: pointer }
-.who button[aria-selected="true"] { border-color: var(--acc); background: var(--acc); color: var(--card) }
-.who button:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px }
-.persona { margin: 0 0 12px; font-size: 15px; color: var(--ink-2) }
-.qa { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 10px }
-.qa li { background: var(--card); border: 1px solid var(--rule); border-radius: 12px; padding: 14px 18px; display: grid; gap: 4px; align-content: start }
-.qa b { font-size: 15.5px }
-.qa b::before { content: "Q. "; color: var(--acc) }
-.qa p { margin: 0; font-size: 14.5px; color: var(--ink-2) }
-.qa small { font-size: 12px; color: var(--ink-2) }
-.qa small.ask { color: var(--warn) }
-
-.check { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px }
-.check label { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; background: var(--card); border: 1px solid var(--rule); border-radius: 10px; padding: 12px 16px; cursor: pointer; font-size: 14.5px }
-.check input { width: 18px; height: 18px; margin: 3px 0 0; accent-color: var(--acc) }
-.check input:checked + span { color: var(--ink-2); text-decoration: line-through }
-.check small { display: block; color: var(--ink-2); font-size: 13px; text-decoration: none }
-.ssu { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 12px; margin-bottom: 28px }
-.ssu .box { border-color: var(--acc) }
-.ssu dl { margin: 0; display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 6px 10px; font-size: 14px }
+.ssu { background: var(--sheet); border: 1px solid var(--rule); border-radius: 14px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); margin-bottom: 36px; overflow: hidden }
+.ssu > div { padding: 20px 22px; min-width: 0 }
+.ssu > div + div { border-left: 1px solid var(--rule) }
+@media (max-width: 760px) { .ssu > div + div { border-left: 0; border-top: 1px solid var(--rule) } }
+.ssu h3 { font-family: var(--display); font-size: 18px; margin-bottom: 10px }
+.ssu dl { margin: 0; display: grid; grid-template-columns: 58px minmax(0, 1fr); gap: 7px 10px; font-size: 14px }
 .ssu dt { font-weight: 600 }
 .ssu dd { margin: 0; color: var(--ink-2) }
 .ssu a { color: var(--acc) }
-ol.wess { margin: 0; padding-left: 20px; display: grid; gap: 5px; font-size: 14px; color: var(--ink-2) }
-ol.wess b { color: var(--ink) }
-.stages { display: grid; gap: 22px }
-.stage h3 { margin: 0 0 8px; font-size: 18px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px }
-.stage h3 span { font-size: 13px; font-weight: 400; color: var(--ink-2) }
-.progress { font-size: 14px; color: var(--ink-2); margin: 12px 0 0 }
+ol.small { margin: 0; padding-left: 20px; display: grid; gap: 6px; font-size: 14px; color: var(--ink-2) }
+ol.small b { color: var(--ink) }
 
-.src { font-size: 13.5px; color: var(--ink-2); padding-left: 18px; display: grid; gap: 3px }
+.stages { display: grid; gap: 26px }
+.stage h3 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; font-family: var(--display); font-size: 19px; margin-bottom: 10px }
+.stage h3 span { font-family: var(--body); font-size: 13px; font-weight: 400; color: var(--ink-2) }
+.check { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px }
+.check label { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; background: var(--sheet); border: 1px solid var(--rule); border-radius: 10px; padding: 12px 16px; cursor: pointer; font-size: 15px }
+.check input { width: 18px; height: 18px; margin: 4px 0 0; accent-color: var(--acc) }
+.check input:checked + span { color: var(--ink-2); text-decoration: line-through }
+.check small { display: block; color: var(--ink-2); font-size: 13px }
+.progress { font-size: 14px; color: var(--ink-2); margin-top: 14px }
+
+details { margin-top: 18px; border-top: 1px solid var(--rule); padding-top: 12px }
+summary { cursor: pointer; font-weight: 600; font-size: 15px }
+summary:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px }
+.src { font-size: 13.5px; color: var(--ink-2); padding-left: 18px; display: grid; gap: 3px; margin: 12px 0 0 }
 .src a { color: var(--acc) }
 
-footer { padding: 48px 0 64px; color: var(--ink-2); font-size: 13px }
+footer { padding: 40px 0 64px; color: var(--ink-2); font-size: 13px; border-top: 1px solid var(--rule); margin-top: 48px }
 </style>
 </head>
 <body>
 
-<div class="wrap"><a class="back" href="../">← 작업실</a></div>
-
-<header><div class="wrap">
-  <div class="kick">기타 · 2026년 10월 29일 기준</div>
-  <h1>표준 현장실습학기제 한눈에</h1>
-  <p>회사에서 일하면서 학점을 받는 대학 수업입니다. 돈은 얼마를 받는지, 어떻게 신청하는지, 내가 보호받는 건 무엇인지, 2027년에 무엇이 바뀌는지를 차례로 풀었습니다.</p>
-  <div class="hero">
-    <div class="stat"><b>월 161만 원↑</b><span>실습지원비 최저선</span><small>2026년 최저시급 10,320원 · 주 40시간 기준</small></div>
-    <div class="stat"><b>주 40시간</b><span>실습 시간 상한</span><small>동의하면 주 5시간까지 연장 · 밤 10시~아침 6시 금지</small></div>
-    <div class="stat"><b>보험 2개</b><span>산재보험 + 상해보험</span><small>하나라도 빠지면 학점 인정 안 됨</small></div>
-    <div class="stat"><b>2027년 3월</b><span>「대학생 첫 경력 프로젝트」</span><small>약 6만 명 · 5개월 · 월 230만 원 (예산 국회 심의 중)</small></div>
+<div class="page">
+<header class="top">
+  <a class="mback" href="../">← 작업실</a>
+  <div class="eb">현장실습 수첩 · 2026년 10월 29일 기준</div>
+  <h1>표준 현장실습학기제</h1>
+  <p class="sub">회사에서 일하면서 학점을 받는 대학 수업. 얼마를 받고, 어떻게 신청하고, 무엇을 지켜야 하는지.</p>
+  <div class="strip">
+    <div><b>161만 원↑</b><span>한 달 실습지원비 최저선</span><small>2026년 최저시급 · 주 40시간</small></div>
+    <div><b>주 40시간</b><span>실습 시간 상한</span><small>밤 10시~아침 6시 금지</small></div>
+    <div><b>보험 2개</b><span>산재 + 상해</span><small>빠지면 학점 인정 안 됨</small></div>
+    <div><b>2027.3</b><span>첫 경력 프로젝트</span><small>월 230만 원 · 예산 심의 중</small></div>
   </div>
-</div></header>
+</header>
 
-<nav aria-label="목차"><div class="wrap">
-  <a href="#what">어떤 제도</a>
-  <a href="#type">표준 vs 자율</a>
-  <a href="#money">얼마 받나</a>
-  <a href="#apply">신청부터 학점까지</a>
-  <a href="#rights">내 권리</a>
-  <a href="#me">나라면?</a>
-  <a href="#history">지금까지</a>
-  <a href="#next">2027년 변화</a>
-  <a href="#check">내가 할 일</a>
-</div></nav>
+<nav class="toc" aria-label="목차">
+  <ol>
+    <li><a href="#what">어떤 제도</a></li>
+    <li><a href="#type">표준 vs 자율</a></li>
+    <li><a href="#money">얼마 받나</a></li>
+    <li><a href="#apply">신청부터 학점까지</a></li>
+    <li><a href="#rights">내 권리</a></li>
+    <li><a href="#me">나라면?</a></li>
+    <li><a href="#history">지금까지</a></li>
+    <li><a href="#next">2027년 변화</a></li>
+    <li><a href="#check">내가 할 일</a></li>
+    <li><a href="#src">출처</a></li>
+  </ol>
+</nav>
 
 <main>
-<section id="what"><div class="wrap">
-  <h2>한 줄로: 회사가 교실이 되는 수업</h2>
-  <p class="lead">교육부 고시 「대학생 현장실습학기제 운영규정」(제2025-36호, 2025년 12월 22일 시행)이 정한 제도입니다. 규정은 현장실습을 일자리가 아니라 <b>"학교 밖으로 연장된 수업"</b>으로 봅니다. 그래서 아래 세 가지가 한 묶음으로 따라옵니다.</p>
-  <div class="grid3">
-    <div class="box"><span class="ic" aria-hidden="true">📘</span><h3>수업이다</h3><p>수강신청을 하고 출석·평가를 거쳐 학점을 받습니다. 같은 회사에서 이미 아르바이트·인턴·근로 중이면 현장실습으로 인정되지 않아요.</p></div>
-    <div class="box"><span class="ic" aria-hidden="true">💳</span><h3>돈을 받는다</h3><p>회사가 학생에게 <b>현금으로 직접</b> 실습지원비를 줍니다. 최저임금을 바탕으로 한 최저선이 있고, 밥·기숙사 같은 현물은 계산에 넣지 않습니다.</p></div>
-    <div class="box"><span class="ic" aria-hidden="true">🛡️</span><h3>보호받는다</h3><p>회사는 산재보험, 학교는 상해보험에 가입해야 합니다. 시간 상한과 휴일이 정해져 있고, 문제가 생기면 학교가 시정을 요청하거나 실습을 멈출 수 있습니다.</p></div>
+<section id="what">
+  <div class="eb">제도</div>
+  <h2>회사가 교실이 되는 수업</h2>
+  <p class="lead">교육부 고시 「대학생 현장실습학기제 운영규정」(제2025-36호, 2025.12.22. 시행)은 현장실습을 일자리가 아닌 <b>학교 밖으로 연장된 수업</b>으로 봅니다.</p>
+  <div class="cols">
+    <div><h3>수업이다</h3><p>수강신청, 출석, 평가를 거쳐 학점을 받습니다. 같은 회사에서 이미 일하고 있으면 인정되지 않아요.</p></div>
+    <div><h3>돈을 받는다</h3><p>회사가 실습지원비를 <b>현금으로 직접</b> 줍니다. 밥이나 기숙사 같은 현물은 계산에 넣지 않습니다.</p></div>
+    <div><h3>보호받는다</h3><p>산재보험과 상해보험, 시간 상한과 휴일이 정해져 있고, 문제가 생기면 학교가 실습을 멈출 수 있습니다.</p></div>
   </div>
-</div></section>
+</section>
 
-<section id="type"><div class="wrap">
-  <h2>표준형과 자율형, 무엇이 다른가</h2>
-  <p class="lead">둘을 가르는 기준은 <b>교육시간 비율</b>입니다. 교육시간은 사전교육, 점검, 지도처럼 일 대신 배우는 시간을 말합니다. 전체 실습시간 중 10~25%면 표준형, 25%를 넘으면 자율형입니다.</p>
+<section id="type">
+  <div class="eb">구분</div>
+  <h2>표준형과 자율형</h2>
+  <p class="lead">가르는 기준은 <b>교육시간 비율</b>입니다. 사전교육, 점검, 지도처럼 일 대신 배우는 시간이 전체의 10~25%면 표준형, 25%를 넘으면 자율형이에요.</p>
   <div class="tbl"><table>
     <thead><tr><th></th><th class="std">표준 현장실습</th><th>자율 현장실습</th></tr></thead>
     <tbody>
-      <tr><th>교육시간 비율</th><td>10% 이상 25% 이하</td><td>25% 초과</td></tr>
-      <tr><th>기간·시간</th><td>최소 1개월, 주 5일, 하루 8시간 · 주 40시간 이내</td><td>학교가 정해서 운영</td></tr>
-      <tr><th>서류</th><td>교육부 표준 서식 (운영계획서, 3자 협약서, 평가표·출석부)</td><td>학교별 서식, 학교장 책임</td></tr>
-      <tr><th>실습지원비</th><td>최저임금 × 시간 × (1 − 교육시간 비율) 이상</td><td>원칙은 같은 계산. 8가지 조건을 모두 충족하고 주 15시간 미만·2개월 이하일 때만 무급 가능</td></tr>
-      <tr><th>회사가 주도하는 모집</th><td>가능</td><td>불가 (학교 주도만)</td></tr>
-      <tr><th>공개·관리</th><td>실제 출석 20일 이상이면 대학 정보공시 대상</td><td>공시 대신 실태조사 대상</td></tr>
+      <tr><th>교육시간 비율</th><td>10~25%</td><td>25% 초과</td></tr>
+      <tr><th>기간·시간</th><td>최소 1개월, 주 5일, 주 40시간 이내</td><td>학교가 정함</td></tr>
+      <tr><th>서류</th><td>교육부 표준 서식 (운영계획서, 3자 협약서, 평가표)</td><td>학교별 서식</td></tr>
+      <tr><th>실습지원비</th><td>최저임금 × 시간 × (1 − 교육시간 비율) 이상</td><td>같은 계산이 원칙. 까다로운 조건을 모두 갖추면 무급 가능</td></tr>
+      <tr><th>회사 주도 모집</th><td>가능</td><td>불가</td></tr>
     </tbody>
   </table></div>
-  <p class="note">학생이 개인적으로 섭외했거나 회사가 직접 모집한 실습은 어느 쪽으로도 인정되지 않습니다. 대학 현장실습지원센터를 거쳐야 해요.</p>
-</div></section>
+  <p class="note">직접 섭외했거나 회사가 직접 뽑은 실습은 어느 쪽으로도 인정되지 않습니다.</p>
+</section>
 
-<section id="money"><div class="wrap">
+<section id="money">
+  <div class="eb">돈</div>
   <h2>얼마를 받나</h2>
-  <p class="lead">최저선은 <b>최저시급 × 한 달 실습시간 × (1 − 교육시간 비율)</b>입니다. 교육시간이 많을수록 "배우는 시간"으로 빠지는 몫이 커져서 최저선이 내려갑니다. 내 실습의 교육시간 비율은 운영계획서에서 확인할 수 있어요.</p>
-  <div class="calc">
-    <div>
-      <div class="note" id="segLabel">교육시간 비율을 골라 보세요 (표준형 범위)</div>
-      <div class="seg" role="group" aria-labelledby="segLabel" id="seg"></div>
-    </div>
-    <div class="out"><b id="amt">1,617,660원</b><span>한 달 최저선</span></div>
+  <p class="lead">최저선은 <b>최저시급 × 한 달 실습시간 × (1 − 교육시간 비율)</b>. 교육시간이 많을수록 최저선이 내려갑니다. 내 비율은 운영계획서에 적혀 있어요.</p>
+  <div class="panel calc">
+    <div class="seg" role="group" aria-label="교육시간 비율" id="seg"></div>
+    <div class="out"><b id="amt">1,617,660원</b><span class="muted">한 달 최저선</span></div>
     <div class="meter" aria-hidden="true"><i id="bar"></i></div>
     <div class="formula" id="formula"></div>
-    <p class="note" style="margin:0">주 40시간이면 한 달을 209시간(주휴 포함 환산)으로 칩니다. 연장·야간 시간은 최저시급의 50% 이상을 더 받습니다. 대학 공지가 쓰는 계산법을 그대로 따랐습니다.</p>
   </div>
+  <p class="note">주 40시간이면 한 달 209시간(주휴 포함). 연장·야간은 최저시급의 50% 이상을 더 받습니다.</p>
 
-  <h3 style="margin:26px 0 10px;font-size:18px">돈은 세 갈래로 오간다</h3>
-  <div class="flow">
-    <div class="row"><div class="who">회사 → 나<small>법으로 정한 몫</small></div><p>위 계산기의 최저선 이상을 현금으로 직접 받습니다. 학교를 거친 장학금 형태로 받는 건 금지예요. 대학 안내(부산대)에 따르면, 기획재정부 회신(2021)상 요건을 갖춘 실습지원비는 원천징수 대상이 아닙니다.</p></div>
-    <div class="row"><div class="who">학교 → 회사<small>대학별 지원</small></div><p>많은 대학은 회사가 최저임금 100%(월 2,156,880원)를 주면 <b>25%(월 539,220원)</b>를 회사에 돌려줍니다(부산대, 한경국립대, 전남대 등). 한국교통대는 충주 소재 회사에 최대 50%를 돌려줍니다. 의무가 아니라 사업 예산에 따라 달라집니다.</p></div>
-    <div class="row"><div class="who">학교 → 나<small>대학별 지원</small></div><p>인천대는 월 40만 원을 줍니다(회사에서 최저임금 이상을 받으면 제외). 전남대는 숙박비 월 최대 25만 원과 교통비 월 최대 6만 원을 줍니다. 우리 학교 공지를 꼭 확인하세요.</p></div>
+  <div class="rows">
+    <div><b>회사 → 나</b><p>최저선 이상을 현금으로 직접. 학교를 거친 장학금 형태는 금지입니다. 요건을 갖춘 실습지원비는 세금을 떼지 않아요(기재부 해석, 2021).</p></div>
+    <div><b>학교 → 회사</b><p>회사가 최저임금 100%(월 2,156,880원)를 주면 25%(월 539,220원)를 돌려주는 대학이 많습니다(부산대, 전남대 등). 예산에 따라 달라요.</p></div>
+    <div><b>학교 → 나</b><p>숭실대 2학기 16주 장학금 120만 원, 인천대 월 40만 원, 전남대 숙박비 월 최대 25만 원 등 대학마다 다릅니다.</p></div>
   </div>
-</div></section>
+</section>
 
-<section id="apply"><div class="wrap">
+<section id="apply">
+  <div class="eb">절차</div>
   <h2>신청부터 학점까지</h2>
-  <p class="lead">대학마다 순서가 거의 같습니다. 옆의 날짜는 인천대 2026년 2학기(실습 9월 1일~12월 31일) 예시예요. 보통 실습 시작 두 달 전쯤 모집이 열립니다.</p>
+  <p class="lead">대학마다 순서는 거의 같습니다. 날짜는 인천대 2026년 2학기 예시예요.</p>
   <ol class="steps">
-    <li><div><b>회사가 대학에 실습 자리를 등록</b><span>운영계획서를 내고, 처음 오는 회사는 서면·현장 점검을 받습니다.</span><em>7월 10일</em></div></li>
-    <li><div><b>학생이 학교 시스템에서 지원</b><span>보통 3~4학년이거나 4학기 이상 이수한 재학생이 지원합니다. 휴학생·졸업유예생은 수강신청을 못 해서 사실상 안 돼요.</span><em>7월 26일</em></div></li>
-    <li><div><b>회사 면접·선발</b><span>회사가 기간 안에 선발하지 않으면 자동 탈락하는 대학도 있습니다(부산대).</span></div></li>
-    <li><div><b>수강신청 · 수강료 납부 · 상해보험</b><span>학교가 학생을 피보험자로 상해보험에 가입합니다.</span></div></li>
-    <li><div><b>사전교육</b><span>안전교육과 성희롱 예방교육은 필수입니다.</span><em>8월 25일</em></div></li>
-    <li><div><b>3자 협약 (학교 · 회사 · 나)</b><span>기간, 업무, 지원비가 여기서 확정됩니다. 선발 후에는 바꿀 수 없다는 대학 안내가 있어요.</span><em>8월 28일</em></div></li>
-    <li><div><b>회사 산재보험 가입</b><span>회사는 가입 후 1주일 안에 증빙을 학교에 내야 합니다.</span></div></li>
-    <li><div><b>실습 · 주간보고서</b><span>주간보고서, 중간점검, 결과보고서, 만족도조사를 냅니다.</span><em>9월 1일~</em></div></li>
-    <li><div><b>평가 · 학점 인정</b><span>보통 P/F로 매깁니다. 서류를 빠뜨리거나 회사 평가가 낮으면 학점이 안 나올 수 있어요.</span></div></li>
+    <li><div><b>회사가 실습 자리 등록</b><span>운영계획서 제출, 처음 오는 회사는 점검</span></div><em>7.10</em></li>
+    <li><div><b>학교 시스템에서 지원</b><span>보통 3~4학년 재학생. 휴학생·졸업유예생은 안 됨</span></div><em>7.26</em></li>
+    <li><div><b>회사 면접·선발</b><span>선발권은 회사에 있음</span></div></li>
+    <li><div><b>수강신청 · 수강료 · 상해보험</b><span>상해보험은 학교가 가입</span></div></li>
+    <li><div><b>사전교육</b><span>안전교육과 성희롱 예방교육 필수</span></div><em>8.25</em></li>
+    <li><div><b>3자 협약 (학교·회사·나)</b><span>기간, 업무, 지원비 확정</span></div><em>8.28</em></li>
+    <li><div><b>회사 산재보험 가입</b><span>1주일 안에 학교에 증빙</span></div></li>
+    <li><div><b>실습 · 주간보고서</b><span>중간점검, 결과보고서, 만족도조사까지</span></div><em>9.1~</em></li>
+    <li><div><b>평가 · 학점</b><span>보통 P/F. 서류가 빠지거나 회사 평가가 낮으면 학점이 안 나옴</span></div></li>
   </ol>
 
-  <div class="credit">
-    <div class="box"><h3>학점은 "출근한 날 수"로</h3><p style="margin-bottom:8px">고려대 경영대 2026년 2학기 기준입니다. 주말, 공휴일, 연차, 병가는 출근일에서 빠집니다.</p>
-      <table><tbody>
+  <div class="cols two" style="margin-top:20px">
+    <div><h3>학점은 출근한 날 수로</h3><p style="margin-bottom:6px">고려대 경영대 2026년 2학기. 주말·공휴일·연차·병가는 빠짐</p>
+      <table class="ledger"><tbody>
         <tr><th>20일 이상</th><td class="num">3학점</td></tr>
         <tr><th>40일 이상</th><td class="num">6학점</td></tr>
         <tr><th>60일 이상</th><td class="num">9학점</td></tr>
-        <tr><th>15주 · 70일 이상</th><td class="num">12학점</td></tr>
+        <tr><th>70일 이상 (15주)</th><td class="num">12학점</td></tr>
       </tbody></table></div>
-    <div class="box"><h3>방학 실습 예시</h3><p style="margin-bottom:8px">전남대 2026년 하계 기준입니다. 회사 평가가 50점 이하면 학점이 인정되지 않습니다.</p>
-      <table><tbody>
+    <div><h3>방학 실습</h3><p style="margin-bottom:6px">전남대 2026년 하계. 회사 평가 50점 이하면 학점 없음</p>
+      <table class="ledger"><tbody>
         <tr><th>4주 (20일)</th><td class="num">2학점</td></tr>
         <tr><th>8주 (40일)</th><td class="num">5학점</td></tr>
-      </tbody></table>
-      <p class="note" style="margin-top:8px">학점 기준은 고시가 아니라 학칙이 정해서 대학마다 다릅니다.</p></div>
+      </tbody></table></div>
   </div>
-</div></section>
+</section>
 
-<section id="rights"><div class="wrap">
+<section id="rights">
+  <div class="eb">권리</div>
   <h2>실습생으로서 내 권리</h2>
-  <p class="lead">운영규정이 회사와 학교에 지운 의무입니다. 하나라도 어기면 학교에 알릴 수 있어요.</p>
-  <div class="grid3">
-    <div class="box"><h3>⏰ 시간</h3><ul><li>주 40시간 이내, 하루 8시간</li><li>연장은 내가 동의할 때만, 주 5시간까지</li><li>밤 10시~아침 6시 실습 금지</li><li>하루 1시간 이상 휴게</li><li>주 1일 유급휴일 (1개월 이상이면 월 1일 추가)</li></ul></div>
-    <div class="box"><h3>🛡️ 보험</h3><ul><li>회사: 산재보험 (가입 후 1주일 안에 학교에 증빙)</li><li>학교: 학생 상해보험</li><li>둘 중 하나라도 없으면 학점 인정 불가</li></ul></div>
-    <div class="box"><h3>📋 업무</h3><ul><li>운영계획서에 없는 업무를 시키면 안 됨</li><li>회사 자체 규정으로 학생을 징계할 수 없음</li><li>재택실습은 전체 기간의 25% 이하</li></ul></div>
-    <div class="box"><h3>📣 문제가 생기면</h3><p>계획서에 없는 업무 강요, 시간 위반, 지원비 미달, 안전·성희롱 문제가 생기면 학교에 알리세요. 학교가 회사에 시정을 요청하거나 실습을 중단시키고 학교로 복귀시킵니다. 다만 고충처리 창구와 중도 포기 시 학점 처리는 대학마다 다릅니다.</p></div>
+  <p class="lead">회사와 학교가 지켜야 하는 것들입니다. 어기면 학교에 알리세요.</p>
+  <div class="cols two">
+    <div><h3>시간</h3><ul><li>주 40시간, 하루 8시간 이내</li><li>연장은 내가 동의할 때만, 주 5시간까지</li><li>밤 10시~아침 6시 금지</li><li>하루 1시간 휴게, 주 1일 유급휴일</li></ul></div>
+    <div><h3>보험</h3><ul><li>회사 산재보험, 학교 상해보험</li><li>하나라도 없으면 학점 인정 안 됨</li></ul></div>
+    <div><h3>업무</h3><ul><li>운영계획서에 없는 일은 시킬 수 없음</li><li>회사 규정으로 징계할 수 없음</li><li>재택실습은 기간의 25% 이하</li></ul></div>
+    <div><h3>문제가 생기면</h3><p>학교에 알리면 학교가 시정을 요청하거나 실습을 멈추고 복귀시킵니다. 중도 포기 시 학점 처리는 대학마다 달라요.</p></div>
   </div>
-</div></section>
+</section>
 
-<section id="me"><div class="wrap">
-  <h2>나라면? 상황별 질문</h2>
+<section id="me">
+  <div class="eb">질문</div>
+  <h2>나라면?</h2>
   <p class="lead">전공과 처지에 따라 궁금한 게 다릅니다. 내 상황을 골라 보세요.</p>
   <div class="who" role="tablist" aria-label="학생 상황" id="who"></div>
   <p class="persona" id="persona"></p>
   <ul class="qa" id="qa" role="tabpanel"></ul>
-</div></section>
+</section>
 
-<section id="history"><div class="wrap">
-  <h2>지금까지: 무급 실습에서 실습처 부족으로</h2>
-  <p class="lead">2021년에 규정을 크게 고쳐 무급 실습은 줄었습니다. 대신 최저임금 기준이 부담스러운 작은 회사들이 빠지면서 참여 인원도 줄었다는 평가가 나옵니다.</p>
+<section id="history">
+  <div class="eb">흐름</div>
+  <h2>무급 실습에서 실습처 부족으로</h2>
+  <p class="lead">2021년 개정으로 무급 실습은 줄었지만, 비용이 부담스러운 작은 회사들이 빠지며 참여도 줄었다는 평가가 나옵니다.</p>
   <ol class="tl">
-    <li><time>2019</time><div><b>10명 중 4명은 실습비를 못 받음</b><span>이수자 약 12.6만 명, 실습지원비 수령률 59.6% (2020년 국정감사 교육부 자료)</span></div></li>
-    <li><time>2021.7</time><div><b>운영규정 전부개정</b><span>표준·자율 구분, 실습지원비와 보험 의무화 (2021년 2학기부터 적용)</span></div></li>
-    <li><time>2021~23</time><div><b>참여가 크게 줄었다가 일부 회복</b><span>참여 기업 약 7.6만 곳(2019) → 약 2.8만 곳(2023). 12주 이상 장기 실습은 14.6% → 34.5%로 늘어남</span></div></li>
-    <li><time>2024.10</time><div><b>국가인권위, 자율형 관리 강화 의견</b><span>2022년 산재보험 가입률은 표준형 98.8%, 자율형 65.8%였음</span></div></li>
-    <li><time>2025.12</time><div><b>운영규정 일부개정 (제2025-36호) 시행</b><span>지금 적용되는 규정. 바뀐 조항의 세부 내용은 확인하지 못함</span></div></li>
-    <li><time>2026.8</time><div><b>「대학생 첫 경력 프로젝트」 발표</b><span>정부가 실습지원비 절반을 내는 대규모 실습 사업 (아래 참고)</span></div></li>
+    <li><time>2019</time><div><b>10명 중 4명은 실습비를 못 받음</b><span>이수자 약 12.6만 명, 수령률 59.6% (2020 국정감사)</span></div></li>
+    <li><time>2021.7</time><div><b>운영규정 전부개정</b><span>표준·자율 구분, 실습지원비와 보험 의무화</span></div></li>
+    <li><time>2021~23</time><div><b>참여 급감 뒤 일부 회복</b><span>참여 기업 약 7.6만 곳(2019) → 약 2.8만 곳(2023)</span></div></li>
+    <li><time>2024.10</time><div><b>인권위, 자율형 관리 강화 의견</b><span>2022년 산재보험 가입률 표준형 98.8%, 자율형 65.8%</span></div></li>
+    <li><time>2025.12</time><div><b>현행 운영규정 시행</b><span>교육부고시 제2025-36호</span></div></li>
+    <li><time>2026.8</time><div><b>첫 경력 프로젝트 발표</b><span>정부가 실습지원비 절반 부담</span></div></li>
   </ol>
   <div class="chart">
     <h3>현장실습 참여 학생 수</h3>
     <ul class="bars" id="bars"></ul>
-    <p class="note" style="margin:10px 0 0">교수신문 기고문(2026.10.6.)의 수치이고, 원래 출처가 적혀 있지 않습니다. 2019년 국정감사 수치(약 12.6만 명)와는 집계 기준이 다를 수 있어 같은 그래프에 넣지 않았습니다. 2026년 보도는 현재 규모를 "약 4만 명"으로 씁니다.</p>
+    <p class="note">교수신문 기고(2026.10.6.) 수치로, 원출처가 적혀 있지 않습니다.</p>
   </div>
-</div></section>
+</section>
 
-<section id="next"><div class="wrap">
-  <h2>2027년 변화: 대학생 첫 경력 프로젝트</h2>
-  <p class="lead">교육부가 2026년 8월 28일에 발표했습니다. 회사 부담 때문에 실습 자리가 줄어드는 문제를 정부 돈으로 메우려는 사업입니다. 2027년 3월 시작이 목표이고, 예산은 12월 국회에서 확정됩니다.</p>
-  <div class="box">
-    <h3>실습지원비 월 230만 원을 둘이 나눠 냄</h3>
-    <div class="split" role="img" aria-label="월 230만 원 중 정부 115만 원, 회사 115만 원"><i>정부 115만</i><i>회사 115만</i></div>
-    <p>여기에 학생 교통·숙박비 월 10만 원, 회사 멘토링비 월 10만 원, 대학 운영비 1인당 약 90만 원이 따로 붙습니다.</p>
+<section id="next">
+  <div class="eb">2027</div>
+  <h2>대학생 첫 경력 프로젝트</h2>
+  <p class="lead">교육부가 2026년 8월 28일 발표한 사업입니다. 2027년 3월 시작이 목표이고, 예산은 12월 국회에서 확정됩니다.</p>
+  <h3>실습지원비 월 230만 원</h3>
+  <div class="split" role="img" aria-label="월 230만 원 중 정부 115만 원, 회사 115만 원"><i>정부 115만</i><i>회사 115만</i></div>
+  <p class="muted" style="font-size:14px">학생 교통·숙박비 월 10만 원, 회사 멘토링비 월 10만 원이 따로 붙습니다.</p>
+  <div class="cols" style="margin-top:26px">
+    <div><h3>규모</h3><ul><li>약 6만 명 (4년제 4만, 전문대 2만)</li><li>약 5개월, 학점 취득</li><li>4,650억 원, 2029년까지</li></ul></div>
+    <div><h3>지금과 비교</h3><ul><li>최저선 약 162만 원 → 230만 원</li><li>회사 부담 162만 원 이상 → 115만 원</li><li>4주 단기 위주 → 5개월</li></ul></div>
+    <div><h3>미정 <span class="tag">발표 전</span></h3><ul><li>대상 학년, 신청 방법</li><li>지원비 지급 경로</li><li>지금 제도와의 관계</li></ul></div>
   </div>
-  <div class="vs">
-    <div class="box"><h3>규모</h3><ul><li>약 <b>6만 명</b> (4년제 약 4만 + 전문대 약 2만)</li><li>약 <b>5개월</b> 실습, 학점 취득</li><li>총 <b>4,650억 원</b></li><li>2027년 3월부터 2029년까지 운영</li></ul></div>
-    <div class="box"><h3>지금과 비교하면</h3><ul><li>실습지원비: 최저선 월 약 162만 원 → 월 230만 원</li><li>회사 부담: 162만 원 이상 → 115만 원</li><li>기간: 4주짜리가 20~30%인 지금 → 5개월 장기</li></ul></div>
-    <div class="box"><h3>아직 안 정해진 것 <span class="tag warn">미정</span></h3><ul><li>대상 학년과 전공 조건, 신청 방법</li><li>지원비를 누가 어떤 경로로 지급하는지</li><li>지금의 표준형을 대체하는지, 함께 가는지</li><li>예산 (12월 국회 확정, 4,650억 원과 미래대응기금 4,000억 원 액수가 서로 다르다는 지적)</li></ul></div>
-  </div>
-  <p class="note">비판도 있습니다. 중소기업이 115만 원을 감당할 수 있는지, 실습 뒤 채용으로 이어지게 하는 목표가 없다는 점이 지적됐습니다. 6만 명은 회사 수요를 조사한 숫자가 아니라 정책 목표라고 교육부가 밝혔습니다. 발표일은 일부 매체가 9월 1일로 적었습니다.</p>
-</div></section>
+</section>
 
-<section id="check"><div class="wrap">
+<section id="check">
+  <div class="eb">할 일</div>
   <h2>내가 할 일</h2>
-  <p class="lead">지금부터 실습이 끝날 때까지 순서대로 정리했습니다. 체크하면 이 브라우저에 남아요.</p>
+  <p class="lead">지금부터 실습이 끝날 때까지. 체크하면 이 브라우저에 남아요.</p>
   <div class="ssu">
-    <div class="box">
+    <div>
       <h3>숭실대에서는</h3>
       <dl>
-        <dt>신청</dt><dd><a href="http://wess.ssu.ac.kr/">WESS</a>에서 지원부터 협약, 보고서까지 처리 · 공지는 <a href="https://scatch.ssu.ac.kr/공지사항/">학교 공지사항</a>의 "현장실습학기제 학생 참여 안내"</dd>
+        <dt>신청</dt><dd><a href="http://wess.ssu.ac.kr/">WESS</a> · 공지는 <a href="https://scatch.ssu.ac.kr/공지사항/">학교 공지사항</a></dd>
         <dt>문의</dt><dd>현장실습지원센터 · 학생회관 501호 · 02-820-0878</dd>
-        <dt>자격</dt><dd>3~4학년 재학생. 직전 학기 휴학생과 그 학기 졸업예정자는 안 됨</dd>
-        <dt>모집</dt><dd>1년에 세 번, 지원 기간은 열흘 남짓 (2026년: 여름 5월 4~14일, 2학기 7월 9~20일, 겨울 11월 2~12일)</dd>
-        <dt>학교 지원</dt><dd>2학기 16주 실습은 장학금 120만 원, 여름·겨울은 계절학기 수업료만큼. 상해보험도 학교가 가입</dd>
-        <dt>학점</dt><dd>일반선택 또는 전공선택, P/F. 전공 인정은 기한 안에 신청서를 따로 냄 (2026-2학기는 8월 11일)</dd>
+        <dt>자격</dt><dd>4학기 이상 이수한 3~4학년 재학생. 직전 학기 휴학생, 그 학기 졸업예정자 제외</dd>
+        <dt>준비</dt><dd>슈패스 비교과에서 "현장실습" 검색 · 현장실습지원팀 서류·면접 특강은 학년 제한 없음</dd>
+        <dt>모집</dt><dd>1년에 세 번, 지원은 열흘 남짓 (2026년: 5월 4~14일, 7월 9~20일, 11월 2~12일)</dd>
+        <dt>지원</dt><dd>2학기 16주 장학금 120만 원, 여름·겨울은 계절학기 수업료만큼</dd>
+        <dt>학점</dt><dd>일반선택 또는 전공선택(P/F). 전공 인정은 신청서를 따로 냄</dd>
         <dt>주의</dt><dd>교내 ICT·창업 실습 프로그램과 중복 지원 불가</dd>
       </dl>
     </div>
-    <div class="box">
+    <div>
       <h3>WESS에서 하는 순서</h3>
-      <ol class="wess">
-        <li>LMS에서 사전교육 1 듣기 (지원 전 필수)</li>
-        <li>WESS 로그인, 서약서·이력서·자기소개서 작성</li>
-        <li>회사별 운영계획서 보고 지원, 수강과목 선택</li>
+      <ol class="small">
+        <li>LMS 사전교육 1 (지원 전 필수)</li>
+        <li>WESS에서 서약서·이력서·자기소개서</li>
+        <li>회사 운영계획서 보고 지원</li>
         <li>서류·면접</li>
-        <li>선발되면 사전교육 2, 수업료 납부</li>
-        <li>WESS에서 3자 협약</li>
+        <li>사전교육 2, 수업료 납부</li>
+        <li>3자 협약</li>
         <li>실습, 보고서 제출</li>
       </ol>
-      <p class="note" style="margin:10px 0 0">WESS는 여러 대학이 함께 쓰는 현장실습 관리 시스템입니다.</p>
     </div>
-    <div class="box">
+    <div>
       <h3>1학년인 지금부터</h3>
-      <ol class="wess">
-        <li><b>지금</b> · WESS에 로그인해 메뉴와 회사 공고 둘러보기, 학교 공지 "현장실습" 알림 켜기</li>
-        <li><b>2학년</b> · 프로젝트와 포트폴리오 쌓기, 졸업 요건표에서 현장실습이 들어갈 전공선택 자리 확인, 첫 경력 프로젝트 대상 학년 발표 확인</li>
-        <li><b>3학년 봄</b> · 4월 여름 실습 공지 확인, 5월 지원 (가장 빠른 기회)</li>
-        <li><b>3학년 2학기~4학년 1학기</b> · 16주 학기 실습. 졸업예정 학기인 4학년 2학기는 피하기</li>
+      <ol class="small">
+        <li><b>지금</b> · 슈패스에서 현장실습 서류·면접 특강 신청, 학교 공지 알림 켜기</li>
+        <li><b>2학년</b> · 포트폴리오 쌓기, 졸업 요건표에서 전공선택 자리 확인. 2학기를 마치면 WESS 이용 가능</li>
+        <li><b>3학년 봄</b> · 5월 여름 실습 지원 (가장 빠른 기회)</li>
+        <li><b>3학년 2학기~4학년 1학기</b> · 16주 학기 실습. 4학년 2학기는 피하기</li>
       </ol>
-      <p class="note" style="margin:10px 0 0">시기는 2026년 공지 일정을 기준으로 잡았습니다.</p>
     </div>
   </div>
   <div class="stages" id="stages"></div>
   <p class="progress" id="progress"></p>
-</div></section>
+</section>
 
-<section><div class="wrap">
-  <h2>확인하지 못한 것과 출처</h2>
-  <p class="lead">공개 자료로 찾지 못한 것들입니다. 우리 학교 현장실습지원센터에 물어보는 게 가장 정확합니다.</p>
-  <div class="box" style="margin-bottom:14px"><ul>
-    <li>2025년 12월 개정(제2025-36호)에서 정확히 어떤 조항이 바뀌었는지</li>
-    <li>대학이 회사에 25%를 돌려주는 근거가 현행 고시의 몇 조인지 (자료마다 다르게 적혀 있음)</li>
-    <li>표준형과 자율형의 전국 비율, 대학알리미 최신 공시 수치, 2024·2025년 공식 참여 통계</li>
-    <li>실습이 취업에 주는 효과를 전국 단위로 분석한 자료 (대학별 홍보 사례만 있음)</li>
-    <li>실습비가 국가장학금, 학자금대출, 건강보험 피부양자 자격에 주는 영향</li>
-    <li>실습 경쟁률과 정규직 전환율</li>
-    <li>실습 기업에 대한 세액공제 여부, 실제 학생 후기</li>
-  </ul></div>
-  <ol class="src">
-    <li><a href="https://law.go.kr/admRulLsInfoP.do?admRulId=51949&amp;efYd=0">국가법령정보센터 · 대학생 현장실습학기제 운영규정 (교육부고시 제2025-36호)</a></li>
-    <li><a href="https://www.hallym.ac.kr/bbs/intern/1407/228903/download.do">고시 전문 (한림대 게시본)</a></li>
-    <li><a href="https://uipa.inu.ac.kr/bbs/inu/2611/387732/download.do">인천대 2026-2학기 현장실습 안내</a></li>
-    <li><a href="https://biz.korea.ac.kr/news/notice_view.html?no=7260">고려대 경영대 현장실습 공지</a></li>
-    <li><a href="https://mech.jnu.ac.kr/bbs/mech/2038/836461/download.do">전남대 2026 하계 운영계획</a></li>
-    <li><a href="http://wess.ssu.ac.kr/">숭실대 WESS · 현장실습 신청 시스템</a></li>
-    <li><a href="https://scatch.ssu.ac.kr/공지사항/">숭실대 공지사항 · 2026 여름·2학기·겨울 현장실습학기제 학생 참여 안내</a></li>
-    <li><a href="https://hecology.ulsan.ac.kr/boardDownload.do?no=344269">울산대 2026-2학기 현장실습 안내</a></li>
-    <li><a href="https://top.jbnu.ac.kr/bbs/bie/4373/350594/download.do">전북대 2026 현장실습 모집 안내</a></li>
-    <li><a href="https://job.skuniv.ac.kr/wp-content/uploads/2024/12/붙임1.-서경대학교-표준-현장실습학기제Co-op-운영서식2025-1학기-실습기관용.docx">표준 현장실습 운영서식 · 협약서 (서경대 배포본)</a></li>
-    <li><a href="https://www.kecla.org/uploads/board/attach1/20260127135736.pdf">2026 한국 유학 가이드북 · 유학생 시간제취업 특례</a></li>
-    <li><a href="https://albup.co.kr/page/interpretation_detail.php?com_idx=4191">기획재정부 소득세제과-153 (2021) 해석 정리</a></li>
-    <li><a href="https://www.inhapress.com/news/articleView.html?idxno=20997">인하대학신문 (2025.9) · 인문계 전공학점 인정</a></li>
-    <li><a href="https://cba.jnu.ac.kr/bbs/cba/1615/945210/artclView.do">전남대 공지 (2026.1) · HD현대 채용연계형 현장실습</a></li>
-    <li><a href="https://dhnews.co.kr/news/view/179521918028867">대학신문 (2020.10.7) · 2019 실습지원비 수령률</a></li>
-    <li><a href="https://www.kyosu.net/news/articleView.html?idxno=210898">교수신문 기고 (2026.10.6) · 참여 추이</a></li>
-    <li><a href="https://www.humanrights.go.kr/base/board/read?boardManagementNo=24&amp;boardNo=7610668&amp;menuLevel=3&amp;menuNo=91">국가인권위원회 · 자율 현장실습 의견표명 (2024.10)</a></li>
-    <li><a href="https://www.mt.co.kr/policy/2026/08/28/2026082814214214455">머니투데이 (2026.8.28) · 대학생 첫 경력 프로젝트</a></li>
-    <li><a href="https://www.issueon.co.kr/news/articleView.html?idxno=13927">이슈온 · 첫 경력 프로젝트 쟁점</a></li>
-  </ol>
-</div></section>
+<section id="src">
+  <div class="eb">출처</div>
+  <h2>확인하지 못한 것</h2>
+  <p class="lead">공개 자료로 찾지 못했습니다. 학교 현장실습지원센터에 묻는 게 가장 정확해요.</p>
+  <div class="cols two">
+    <div><ul>
+      <li>2025년 12월 개정에서 바뀐 조항</li>
+      <li>표준·자율 전국 비율, 최신 공식 통계</li>
+      <li>실습의 취업 효과 전국 분석</li>
+    </ul></div>
+    <div><ul>
+      <li>실습비가 국가장학금·건강보험 피부양자에 주는 영향</li>
+      <li>실습 경쟁률과 정규직 전환율</li>
+      <li>첫 경력 프로젝트 대상 학년</li>
+    </ul></div>
+  </div>
+  <details>
+    <summary>출처 21곳 보기</summary>
+    <ol class="src">
+      <li><a href="https://law.go.kr/admRulLsInfoP.do?admRulId=51949&amp;efYd=0">국가법령정보센터 · 대학생 현장실습학기제 운영규정 (교육부고시 제2025-36호)</a></li>
+      <li><a href="https://www.hallym.ac.kr/bbs/intern/1407/228903/download.do">고시 전문 (한림대 게시본)</a></li>
+      <li><a href="http://wess.ssu.ac.kr/">숭실대 WESS</a></li>
+      <li><a href="https://scatch.ssu.ac.kr/공지사항/">숭실대 공지사항 · 2026 현장실습학기제 학생 참여 안내</a></li>
+      <li><a href="https://uipa.inu.ac.kr/bbs/inu/2611/387732/download.do">인천대 2026-2학기 현장실습 안내</a></li>
+      <li><a href="https://biz.korea.ac.kr/news/notice_view.html?no=7260">고려대 경영대 현장실습 공지</a></li>
+      <li><a href="https://mech.jnu.ac.kr/bbs/mech/2038/836461/download.do">전남대 2026 하계 운영계획</a></li>
+      <li><a href="https://hecology.ulsan.ac.kr/boardDownload.do?no=344269">울산대 2026-2학기 현장실습 안내</a></li>
+      <li><a href="https://top.jbnu.ac.kr/bbs/bie/4373/350594/download.do">전북대 2026 현장실습 모집 안내</a></li>
+      <li><a href="https://job.skuniv.ac.kr/wp-content/uploads/2024/12/붙임1.-서경대학교-표준-현장실습학기제Co-op-운영서식2025-1학기-실습기관용.docx">표준 운영서식 · 협약서 (서경대 배포본)</a></li>
+      <li><a href="https://www.kecla.org/uploads/board/attach1/20260127135736.pdf">2026 한국 유학 가이드북</a></li>
+      <li><a href="https://albup.co.kr/page/interpretation_detail.php?com_idx=4191">기획재정부 소득세제과-153 (2021) 해석</a></li>
+      <li><a href="https://www.inhapress.com/news/articleView.html?idxno=20997">인하대학신문 (2025.9) · 인문계 전공학점</a></li>
+      <li><a href="https://cba.jnu.ac.kr/bbs/cba/1615/945210/artclView.do">전남대 공지 (2026.1) · HD현대 채용연계형</a></li>
+      <li><a href="https://dhnews.co.kr/news/view/179521918028867">대학신문 (2020.10.7) · 2019 실습지원비 수령률</a></li>
+      <li><a href="https://www.kyosu.net/news/articleView.html?idxno=210898">교수신문 기고 (2026.10.6) · 참여 추이</a></li>
+      <li><a href="https://www.humanrights.go.kr/base/board/read?boardManagementNo=24&amp;boardNo=7610668&amp;menuLevel=3&amp;menuNo=91">국가인권위원회 (2024.10) · 자율 현장실습 의견</a></li>
+      <li><a href="https://www.mt.co.kr/policy/2026/08/28/2026082814214214455">머니투데이 (2026.8.28) · 첫 경력 프로젝트</a></li>
+      <li><a href="https://www.issueon.co.kr/news/articleView.html?idxno=13927">이슈온 · 첫 경력 프로젝트 쟁점</a></li>
+      <li><a href="https://supple.kr/news/cmtcnng2n007y10l4ehz2yroi">서플 · 첫 경력 프로젝트</a></li>
+      <li><a href="https://www.syworks.com/">싸이웍스 · WESS 2.0</a></li>
+    </ol>
+  </details>
+  <footer>대학 현장실습 이야기이며, 고등학생 대상 직업계고 현장실습은 다른 제도입니다. 금액과 일정은 학교 공지로 다시 확인하세요.</footer>
+</section>
 </main>
-
-<footer><div class="wrap">2026년 10월 29일에 공개 자료를 조사해 정리했습니다. 대학 현장실습 이야기이고, 고등학생 대상인 직업계고 현장실습은 다른 제도예요. 금액과 일정은 학교마다 다르니 지원 전에 학교 공지로 다시 확인하세요.</div></footer>
+</div>
 
 <script>
 const $ = id => document.getElementById(id);
@@ -408,7 +452,7 @@ const pick = r => {
   const amt = Math.round(WAGE * HOURS * (1 - r / 100));
   $("amt").textContent = won(amt);
   $("bar").style.width = (100 - r) + "%";
-  $("formula").textContent = `${won(WAGE)} × ${HOURS}시간 × ${100 - r}% = ${won(amt)}  (최저임금 100%는 ${won(WAGE * HOURS)})`;
+  $("formula").textContent = `${won(WAGE)} × ${HOURS}시간 × ${100 - r}% = ${won(amt)}`;
   $("seg").querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", b.dataset.r == r));
 };
 $("seg").addEventListener("click", e => { const b = e.target.closest("button"); if (b) pick(+b.dataset.r); });
@@ -527,6 +571,16 @@ const count = () => {
 };
 $("stages").addEventListener("change", count);
 count();
+
+/* 목차: 지금 보고 있는 섹션 표시 */
+const links = [...document.querySelectorAll(".toc ol a")];
+const io = new IntersectionObserver(es => es.forEach(e => {
+  if (!e.isIntersecting) return;
+  links.forEach(a => a.classList.toggle("on", a.hash === "#" + e.target.id));
+  const on = links.find(a => a.classList.contains("on"));
+  if (on && getComputedStyle(on.closest("ol")).display === "flex") on.closest("ol").scrollTo({ left: on.offsetLeft - 20, behavior: "smooth" });
+}), { rootMargin: "-30% 0px -60% 0px" });
+document.querySelectorAll("main section[id]").forEach(s => io.observe(s));
 </script>
 </body>
 </html>
