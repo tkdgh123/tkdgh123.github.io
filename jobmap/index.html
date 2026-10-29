@@ -205,12 +205,6 @@ footer ul { margin: 8px 0 0; padding-left: 18px }
 .quiz.intro p { font-size: 17px }
 .quiz.intro .safe { color: var(--on-acc); opacity: .85; font-size: 13.5px }
 .quiz.intro .safe::before { background: var(--on-acc) }
-.axes-pre { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px }
-.axes-pre div { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 6px; align-items: center; background: color-mix(in srgb, var(--on-acc) 12%, transparent); border-radius: 18px; padding: 10px 12px }
-.axes-pre span { display: grid; justify-items: center; font-size: 13.5px; text-align: center }
-.axes-pre b { font-family: var(--display); font-weight: 400; font-size: 24px; line-height: 1.1 }
-.axes-pre i { font-style: normal; font-size: 12px; opacity: .7 }
-@media (max-width: 560px) { .axes-pre { grid-template-columns: 1fr } }
 .go { justify-self: start; font: inherit; font-family: var(--display); font-size: 21px; padding: 10px 34px; border-radius: 99px; border: 0; background: var(--sign); color: #FFFFFF; cursor: pointer }
 .qbar { height: 8px; border-radius: 8px; background: var(--acc-soft); overflow: hidden }
 .qbar span { display: block; height: 100%; background: var(--acc); border-radius: 8px; transition: width .3s }
@@ -226,18 +220,7 @@ footer ul { margin: 8px 0 0; padding-left: 18px }
 .result { margin-top: 24px }
 .rhero { background: var(--acc); color: var(--on-acc); border-radius: 32px; padding: 28px clamp(18px, 4vw, 40px); display: grid; gap: 8px; justify-items: start }
 .rk { font-size: 14px; opacity: .85 }
-.code { display: flex; gap: 8px }
-.code span { font-family: var(--display); font-size: clamp(38px, 8vw, 60px); line-height: 1; width: 1.35em; height: 1.35em; display: grid; place-items: center; border-radius: 22px; background: var(--on-acc); color: var(--acc) }
 .rhero h2 { font-size: clamp(26px, 4.6vw, 38px); margin-top: 6px }
-.rstage { font-size: 14px; background: color-mix(in srgb, var(--on-acc) 16%, transparent); padding: 1px 12px; border-radius: 99px }
-.rblurb { font-size: 17px; max-width: 34em }
-.meters { margin-top: 14px; background: var(--card); border: 1px solid var(--rule); border-radius: 24px; padding: 16px 20px; display: grid; gap: 12px }
-.meter { display: grid; grid-template-columns: 96px minmax(0, 1fr) 96px; gap: 12px; align-items: center; font-size: 14px; color: var(--ink-2) }
-.meter span:last-child { text-align: right }
-.meter span.on { color: var(--ink); font-weight: 700 }
-.track { position: relative; height: 10px; border-radius: 10px; background: linear-gradient(90deg, var(--acc-soft), var(--sign-soft)) }
-.track i { position: absolute; top: 50%; width: 22px; height: 22px; border-radius: 50%; background: var(--card); border: 5px solid var(--acc); transform: translate(-50%, -50%) }
-@media (max-width: 480px) { .meter { grid-template-columns: 72px minmax(0, 1fr) 72px; font-size: 13px } }
 .rjobs { margin-top: 14px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px }
 @media (max-width: 760px) { .rjobs { grid-template-columns: 1fr } }
 .rjob { text-decoration: none; background: var(--card); border: 1px solid var(--rule); border-radius: 22px; padding: 16px 18px; display: grid; gap: 6px; align-content: start }
@@ -262,6 +245,58 @@ footer ul { margin: 8px 0 0; padding-left: 18px }
 .todo li::before { content: ""; position: absolute; left: 16px; top: 15px; width: 16px; height: 16px; border-radius: 6px; border: 2px solid var(--acc) }
 .result .prompt { margin-top: 14px }
 .again { margin-top: 28px; display: flex; justify-content: center }
+
+.secs { display: flex; flex-wrap: wrap; gap: 8px }
+.secs span { display: inline-flex; gap: 8px; align-items: center; font-size: 15px; background: color-mix(in srgb, var(--on-acc) 14%, transparent); border-radius: 99px; padding: 5px 14px 5px 6px }
+.secs b { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; background: var(--on-acc); color: var(--acc); font-size: 13px }
+.hint { font-size: 14px; color: var(--ink-2) }
+.quiz textarea { font: inherit; font-size: 16px; width: 100%; border-radius: 18px; border: 2px solid var(--rule); background: var(--bg); color: var(--ink); padding: 14px 16px; resize: vertical }
+.quiz textarea:focus { outline: none; border-color: var(--acc) }
+.qopts.grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) }
+.qopt.multi { position: relative; padding-left: 50px }
+.qopt.multi::before { content: ""; position: absolute; left: 18px; top: 50%; width: 18px; height: 18px; margin-top: -9px; border-radius: 6px; border: 2px solid var(--ink-2) }
+.qopt.multi[aria-pressed="true"]::before { background: var(--acc); border-color: var(--acc); box-shadow: inset 0 0 0 3px var(--acc-soft) }
+.go[disabled] { opacity: .4; cursor: default }
+.facts { display: flex; flex-wrap: wrap; gap: 6px }
+.facts span { font-size: 14.5px; background: var(--on-acc); color: var(--acc); border-radius: 99px; padding: 3px 12px }
+.rnote { font-size: 16px; opacity: .92 }
+.diags { margin-top: 14px; display: grid; gap: 12px }
+.diag { background: var(--sign-soft); border-radius: 24px; padding: 18px 20px; display: grid; gap: 8px }
+.diag b { font-family: var(--display); font-weight: 400; font-size: 21px }
+.diag .dwhy { font-size: 15.5px }
+.diag .dev { font-size: 13.5px; background: var(--card); border-radius: 14px; padding: 8px 12px; color: var(--ink-2) }
+.diag ol { margin: 0; padding-left: 22px; display: grid; gap: 4px; font-size: 15.5px }
+.diag a { text-decoration: none; border-bottom: 1px dotted currentColor }
+.rjob ul { margin: 2px 0 0; padding-left: 18px; font-size: 13.5px; color: var(--ink-2) }
+
+/* 진로 빈도 막대 */
+.path { display: grid; grid-template-columns: minmax(0, 1fr) 80px 44px; gap: 10px; align-items: center; background: var(--card); border: 1px solid var(--rule); border-radius: 14px; padding: 9px 12px }
+.path .pl { display: grid; min-width: 0 }
+.path .pl b { font-size: 15.5px }
+.path .pl span { font-size: 13px; color: var(--ink-2) }
+.pb { height: 8px; border-radius: 8px; background: var(--tint); overflow: hidden }
+.pb i { display: block; height: 100%; border-radius: 8px }
+.path.in .pb i { background: var(--acc) }
+.path.out .pb i { background: var(--sign) }
+.pk { font-size: 13px; color: var(--ink-2); text-align: right; white-space: nowrap }
+/* 사례 */
+.cases { margin-top: 14px; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; align-items: start }
+.case { background: var(--card); border: 1px solid var(--rule); border-radius: 20px; padding: 14px 16px; display: grid; gap: 6px }
+.case.in { box-shadow: inset 0 4px 0 var(--acc) }
+.case.out { box-shadow: inset 0 4px 0 var(--sign) }
+.ctop { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; justify-content: space-between }
+.ck { font-size: 12px; padding: 0 9px; border-radius: 99px }
+.case.in .ck { background: var(--acc-soft); color: var(--acc) }
+.case.out .ck { background: var(--sign-soft); color: var(--sign) }
+.cm { font-size: 12px; color: var(--ink-2) }
+.case b { font-size: 16px }
+.case ul { margin: 0; padding-left: 18px; font-size: 14px; color: var(--ink-2); display: grid; gap: 2px }
+.tips { margin: 14px 0 0; padding: 18px 22px 18px 42px; background: var(--tint); border-radius: 22px; display: grid; gap: 6px; font-size: 15.5px }
+.trends { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 8px }
+.trends li { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 12px; background: var(--card); border: 1px solid var(--rule); border-radius: 16px; padding: 10px 14px; font-size: 15px }
+.trends li > span { font-size: 13px; color: var(--sign); padding-top: 2px }
+.jfacts { margin: 0; padding-left: 18px; font-size: 14.5px; display: grid; gap: 4px }
+.rcases { margin-top: 14px; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; align-items: start }
 </style>
 </head>
 <body>
@@ -309,20 +344,19 @@ footer ul { margin: 8px 0 0; padding-left: 18px }
 </div></footer>
 
 <script src="data.js"></script>
-<script src="depts-hum.js"></script>
-<script src="depts-soc.js"></script>
-<script src="depts-eco.js"></script>
-<script src="depts-eng.js"></script>
-<script src="depts-sci.js"></script>
+<script src="depts-new.js"></script>
+<script src="depts-ssu.js"></script>
 <script src="jobs.js"></script>
 <script src="faq.js"></script>
+<script src="diag.js"></script>
 <script src="quiz.js"></script>
 
 <script>
 const D = window.JOBMAP;
 D.depts.sort((a, b) => D.collegeOrder.indexOf(a.college) - D.collegeOrder.indexOf(b.college));
+D.depts.forEach((d) => Object.assign(d, (D.ssuDept || {})[d.id] || {}));
 const colleges = D.collegeOrder.filter((c) => D.depts.some((d) => d.college === c));
-const st = { school: "ssu", college: D.depts[0].college, dept: D.depts[0].id, year: 1, dir: "아직 모름", worry: D.worries[0], place: "아직 모름" };
+const st = { school: "ssu", college: D.depts[0].college, dept: D.depts[0].id, year: 1, dir: "아직 모름", worry: D.quiz.questions.find((q) => q.id === "worry").options[0], place: "아직 모름" };
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const urls = (u) => String(u || "").split(/\s*,\s*(?=https?:)/).filter((x) => /^https?:|^\.\.\//.test(x));
@@ -330,8 +364,10 @@ const src = (u) => !u ? "" : urls(u).length
   ? urls(u).map((x) => ` <a class="src" href="${esc(x)}" target="_blank" rel="noopener">출처</a>`).join("")
   : ` <span class="srct">출처: ${esc(u)}</span>`;
 (D.jobs || []).forEach((j) => j.alias = D.quiz.jobAlias[j.key] || [j.name.split(/[·(\s]/)[0]]);
-const dictFor = (name) => (D.jobs || []).map((j) => [j, Math.max(0, ...j.alias.filter((a) => name.includes(a)).map((a) => a.length))])
+const dictFor = (name) => (D.jobs || []).filter((j) => !(D.quiz.jobExclude[j.key] || []).some((x) => name.includes(x)) && !(j.key === "ncs" && st.college === "공과대학"))
+  .map((j) => [j, Math.max(0, ...j.alias.filter((a) => name.includes(a)).map((a) => a.length))])
   .filter((x) => x[1] > 0).sort((a, b) => b[1] - a[1])[0]?.[0];
+const dictLink = (name) => { const k = dictFor(name); return k ? `<a class="dict" href="#jobs-${k.key}">직무 사전</a>` : ""; };
 
 function chips(el, items, key, after) {
   el.innerHTML = items.map((it) =>
@@ -344,38 +380,38 @@ function chips(el, items, key, after) {
   };
 }
 
+const caseCard = (c) => `<div class="case ${c.kind === "in" ? "in" : "out"}">
+  <div class="ctop"><span class="ck">${c.kind === "in" ? "전공 따라" : "전공 밖으로"}</span><span class="cm">${esc(c.type)} · ${esc(c.date)}${c.trust && c.trust !== "높음" ? ` · 신뢰 ${esc(c.trust)}` : ""}</span></div>
+  <b>${esc(c.to)}${dictLink(c.to)}</b>
+  ${c.how?.length ? `<ul>${c.how.map((h) => `<li>${esc(h)}</li>`).join("")}</ul>` : ""}
+  ${src(c.source)}
+</div>`;
+
 function render() {
   const out = $("out");
   if (st.school !== "ssu") {
-    out.innerHTML = `<div class="empty"><h2>이 학교는 아직 없어요</h2><p class="muted">지금은 숭실대학교만 정리돼 있어요. 학교마다 비교과·취업 지원이 달라서 한 곳씩 늘려 갈 예정이에요.</p><a class="chip" href="#jobs">직무 사전은 어느 학교든 볼 수 있어요</a></div>`;
+    out.innerHTML = `<div class="empty"><h2>이 학교는 아직 없어요</h2><p class="muted">학과 진로는 전국 대학 자료로 정리했지만, 학년별 할 일과 학교 프로그램은 지금 숭실대만 있어요.</p><a class="chip" href="#jobs">직무 사전 보기</a></div>`;
     return;
   }
   if (st.dept === "none") {
-    out.innerHTML = `<div class="empty"><h2>내 학과는 아직 없어요</h2><p class="muted">같은 단과대 학과를 먼저 보면 진출 직무가 많이 겹쳐요. 직무 사전도 함께 보세요.</p><div class="chips">${D.depts.filter((d) => d.college === st.college).map((d) => `<button type="button" class="chip" data-go="${d.id}">${esc(d.name)} 보기</button>`).join("")}</div></div>`;
-    out.querySelectorAll("[data-go]").forEach((b) => b.onclick = () => { st.dept = b.dataset.go; drawPick(); render(); });
+    out.innerHTML = `<div class="empty"><h2>내 학과는 아직 없어요</h2><p class="muted">지금은 ${D.depts.map((d) => d.name).join(", ")}를 깊게 조사해 두었어요. 계열이 비슷한 학과를 먼저 보고, 직무 사전도 함께 보세요.</p><div class="chips">${D.depts.map((d) => `<button type="button" class="chip" data-go="${d.id}">${esc(d.name)}</button>`).join("")}</div></div>`;
+    out.querySelectorAll("[data-go]").forEach((b) => b.onclick = () => { const d = D.depts.find((x) => x.id === b.dataset.go); st.college = d.college; st.dept = d.id; drawPick(); render(); });
     return;
   }
   const d = D.depts.find((x) => x.id === st.dept);
   const S = D.ssu;
-
-  const stats = [S.rate, D.fieldRate[d.college], ...(d.stats || [])].filter(Boolean).map((s) =>
+  const stats = [S.rate, (d.stats || []).some((x) => x.label.includes("계열")) ? null : D.fieldRate[d.college], ...(d.stats || [])].filter(Boolean).map((s) =>
     `<div class="stat"><b class="num">${esc(s.value)}</b><span>${esc(s.label)}</span><small>${esc(s.basis)}${src(s.source)}</small></div>`).join("");
-
-  const job = (j) => {
-    const n = j.name || j.job, k = dictFor(n);
-    return `<div class="job"><b>${esc(n)}${k ? `<a class="dict" href="#jobs-${k.key}">직무 사전</a>` : ""}</b><span>${esc(j.why)}${src(j.source)}</span></div>`;
-  };
-
-  const places = (d.employer_types || []).map((p) =>
-    `<div class="place"><b>${esc(p.type)}</b>${p.examples?.length ? `<div class="ex">${p.examples.map((x) => `<span>${esc(x)}</span>`).join("")}</div>` : ""}${p.source ? `<span>${src(p.source)}</span>` : ""}</div>`).join("");
-
+  const n = d.uni?.n || 1;
+  const bar = (p) => `<div class="path ${p.kind}"><div class="pl"><b>${esc(p.name)}${dictLink(p.name)}</b>${p.note ? `<span>${esc(p.note)}</span>` : ""}</div>
+    <div class="pb" aria-label="${p.k}개 대학"><i style="width:${Math.round(p.k / n * 100)}%"></i></div><span class="pk num">${p.k}/${n}</span></div>`;
+  const ins = (d.paths || []).filter((p) => p.kind === "in"), outs = (d.paths || []).filter((p) => p.kind !== "in");
+  const cases = d.cases || [];
   const years = [1, 2, 3, 4].map((y) => {
     const items = [...(S.roadmap[y] || []), ...((d.roadmap || {})[y] || [])];
-    return `<li class="${y === st.year ? "now" : ""}"><i>${y}</i><b>${y}학년</b><small class="stage">${S.stages[y]}</small><ul>${items.map((t) => `<li>${t.url ? `<a href="${esc(t.url)}" target="_blank" rel="noopener">${esc(t.text)}</a>` : esc(t.text)}</li>`).join("")}</ul></li>`;
+    return `<li class="${y === st.year ? "now" : ""}"><i>${y}</i><b>${y}학년</b><ul>${items.map((t) => `<li>${t.url ? `<a href="${esc(t.url)}" target="_blank" rel="noopener">${esc(t.text)}</a>` : esc(t.text)}</li>`).join("")}</ul></li>`;
   }).join("");
-
   const scenes = (d.ai || []).map((a) => `<div class="scene"><i>${esc(a.task)}</i><b>${esc(a.title)}</b><span>${esc(a.how)}</span></div>`).join("");
-
   const res = [...S.resources, ...(d.ssu_specific || [])].map((r) =>
     `<a href="${esc(r.url)}" target="_blank" rel="noopener"><b>${esc(r.name)}</b><span>${esc(r.desc)}</span></a>`).join("");
 
@@ -388,67 +424,47 @@ function render() {
   </div>
 
   <section>
-    <h2>두 갈래 길</h2>
-    <p class="sh">한국 직장인 절반 가까이가 전공과 다른 일을 해요. 둘 다 흔한 길이에요.${src(D.mismatch)}</p>
+    <h2>여러 대학이 꼽는 진로</h2>
+    <p class="sh">${n}개 대학 학과가 안내하는 진로를 세었어요. 막대가 길수록 많은 대학이 꼽았어요.${d.uni?.list ? ` (${esc(d.uni.list)})` : ""}</p>
     <div class="fork">
-      <svg viewBox="0 0 400 64" preserveAspectRatio="none" aria-hidden="true">
-        <path d="M200 4 C200 34 100 30 100 62" fill="none" stroke="var(--acc)" stroke-width="4" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
-        <path d="M200 4 C200 34 300 30 300 62" fill="none" stroke="var(--sign)" stroke-width="4" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
-      </svg>
-      <div class="lane in"><h3>전공 따라 <i>관련 직업</i></h3>${(d.related_jobs || []).map(job).join("")}</div>
-      <div class="lane out"><h3>${esc(d.laneOut || "전공 밖으로")} <i>열려 있는 길</i></h3>${(d.off_major_paths || []).map(job).join("")}</div>
+      <div class="lane in"><h3>전공 따라 <i>${ins.length}</i></h3>${ins.map(bar).join("")}</div>
+      <div class="lane out"><h3>전공 밖으로 <i>${outs.length}</i></h3>${outs.map(bar).join("")}</div>
     </div>
   </section>
 
-  ${places ? `<section><h2>어디서 일하나</h2><p class="sh">기업 이름은 출처에 실제로 나온 것만 적었어요.</p><div class="places">${places}</div>
-    ${d.certs?.length ? `<div class="certs"><b>많이 따는 자격</b>${d.certs.map((c) => `<span>${esc(c)}</span>`).join("")}</div>` : ""}</section>` : ""}
+  ${cases.length ? `<section>
+    <h2>실제로 이렇게 갔어요</h2>
+    <p class="sh">2024년 이후 공개된 졸업생 사례예요. 대학 공식 후기, 합격 자소서, 블로그·유튜브에서 모았어요.</p>
+    <div class="cases">${cases.map(caseCard).join("")}</div>
+  </section>` : ""}
+
+  ${d.tips?.length ? `<section>
+    <h2>사례에서 반복된 준비법</h2>
+    <ol class="tips">${d.tips.map((t) => `<li>${esc(t)}</li>`).join("")}</ol>
+    ${d.certs?.length ? `<div class="certs"><b>근거 있는 자격·점수</b>${d.certs.map((c) => `<span title="${esc(c.note)}">${esc(c.name)}</span>`).join("")}</div>` : ""}
+  </section>` : ""}
+
+  ${d.trends?.length ? `<section>
+    <h2>요즘 채용 분위기</h2>
+    <ul class="trends">${d.trends.map((t) => `<li><span class="num">${esc(t.date)}</span><p>${esc(t.text)}${src(t.source)}</p></li>`).join("")}</ul>
+  </section>` : ""}
 
   <section>
-    <h2>학년별로 해 볼 것</h2>
-    <p class="sh">정답 순서는 없어요. 지금 학년 칸부터 보세요. 깨움·키움·이룸은 숭실대 진로 지원 단계 이름이에요.${src(S.stageSource)}</p>
+    <h2>숭실대에서 학년별로 해 볼 것</h2>
+    <p class="sh">정답 순서는 없어요. 지금 학년 칸부터 보세요.</p>
     <div class="road"><ol class="steps">${years}</ol></div>
   </section>
 
-  <section>
+  ${scenes ? `<section>
     <h2>이 학과에서 AI 쓰는 장면</h2>
     <p class="sh">도구 이름보다 어떤 일에 쓰는지가 오래가요. 과제에 쓸 땐 수업 규칙부터 확인하세요.</p>
     <div class="ai">${scenes}</div>
-    <div class="prompt" id="prompt"></div>
-  </section>
+  </section>` : ""}
 
   <section>
     <h2>숭실대에서 쓸 수 있는 것</h2>
     <div class="res">${res}</div>
-  </section>
-
-  <div class="soon"><h2>선배 이야기</h2><p class="muted">실제 졸업생 인터뷰를 모으는 중이에요. 지어낸 후기는 싣지 않아요.</p></div>`;
-
-  drawPrompt(d);
-}
-
-function drawPrompt(d) {
-  const p = $("prompt");
-  const text = D.promptTemplate
-    .replaceAll("{학과}", d.promptName || d.name)
-    .replaceAll("{학년}", st.year)
-    .replaceAll("{방향}", st.dir)
-    .replaceAll("{걱정}", st.worry)
-    .replaceAll("{가고싶은곳}", st.place);
-  p.innerHTML = `
-    <h3>나에게 맞춘 질문 만들기</h3>
-    <div class="row"><span>방향</span><div class="chips" id="p-dir"></div></div>
-    <div class="row"><span>걱정</span><div class="chips" id="p-worry"></div></div>
-    <div class="row"><span>원하는 곳</span><div class="chips" id="p-place"></div></div>
-    <pre id="p-text">${esc(text)}</pre>
-    <div class="bar"><small>이름·학번·학교는 넣지 마세요. AI 답은 틀릴 수 있어요.</small><button type="button" class="copy" id="p-copy">복사하기</button></div>`;
-  const redo = () => drawPrompt(d);
-  chips($("p-dir"), D.dirs.map((v) => ({ v, label: v })), "dir", redo);
-  chips($("p-worry"), D.worries.map((v) => ({ v, label: v })), "worry", redo);
-  chips($("p-place"), D.places.map((v) => ({ v, label: v })), "place", redo);
-  $("p-copy").onclick = async (e) => {
-    try { await navigator.clipboard.writeText(text); e.target.textContent = "복사했어요"; }
-    catch { getSelection().selectAllChildren($("p-text")); e.target.textContent = "선택했어요, Ctrl+C"; }
-  };
+  </section>`;
 }
 
 function drawPick() {
@@ -462,15 +478,17 @@ function drawPick() {
 }
 
 function drawJobs() {
+  const list = (a) => (a || []).map((t) => `<li>${esc(t)}</li>`).join("");
   $("jds").innerHTML = (D.jobs || []).map((j) => `
     <details class="jd" id="job-${j.key}">
       <summary><b>${esc(j.name)}</b><span>${esc(j.does)}</span></summary>
       <div class="body">
-        <div><h4>하는 일</h4><ol>${j.tasks.map((t) => `<li>${esc(t)}</li>`).join("")}</ol></div>
-        <div><h4>필요한 힘</h4><div class="sk">${j.skills.map((t) => `<span>${esc(t)}</span>`).join("")}</div></div>
+        ${j.tasks?.length ? `<div><h4>하는 일</h4><ol>${list(j.tasks)}</ol></div>` : ""}
+        ${j.skills?.length ? `<div><h4>필요한 힘</h4><div class="sk">${j.skills.map((t) => `<span>${esc(t)}</span>`).join("")}</div></div>` : ""}
         ${j.open ? `<p class="open">${esc(j.open)}</p>` : ""}
         ${j.pay || j.outlook ? `<div class="nums">${[["임금", j.pay], ["전망", j.outlook]].filter((x) => x[1]).map(([l, v]) => `<div><small>${l}</small><b>${esc(v.value)}</b><small>${esc(v.basis)}${src(v.source)}</small></div>`).join("")}</div>` : ""}
-        <div><h4>신입이 준비하는 것</h4><ol>${j.prep.map((t) => `<li>${esc(t)}</li>`).join("")}</ol></div>
+        ${j.facts?.length ? `<ul class="jfacts">${j.facts.map((f) => `<li>${esc(f.text)}${src(f.source)}</li>`).join("")}</ul>` : ""}
+        ${j.tips?.length ? `<div><h4>합격자·현직자가 말하는 준비법</h4><ol>${list(j.tips)}</ol>${(j.tipSources || []).map((u) => src(u)).join("")}</div>` : ""}
         <small class="muted">직무 설명${src(j.source)}</small>
       </div>
     </details>`).join("");
@@ -497,11 +515,12 @@ function route() {
 
 $("checked").textContent = D.checked;
 const all = [
-  ...D.depts.flatMap((d) => [...(d.related_jobs || []), ...(d.off_major_paths || []), ...(d.employer_types || []), ...(d.stats || [])].map((x) => x.source)),
-  ...(D.jobs || []).flatMap((j) => [j.source, j.pay?.source, j.outlook?.source]),
+  ...D.depts.flatMap((d) => [...(d.cases || []), ...(d.trends || []), ...(d.stats || []), ...(d.certs || [])].map((x) => x.source).concat(d.sources || [])),
+  ...(D.jobs || []).flatMap((j) => [j.source, j.pay?.source, j.outlook?.source, ...(j.tipSources || []), ...(j.facts || []).map((f) => f.source)]),
   ...(D.faq || []).map((f) => f.source),
+  ...(D.diag || []).map((r) => r.evidence?.source),
   ...Object.values(D.fieldRate).map((r) => r.source),
-  D.mismatch, D.ssu.rate.source, D.ssu.stageSource
+  D.ssu.rate.source
 ];
 $("sources").innerHTML = [...new Set(all.flatMap(urls).filter((u) => /^https?:/.test(u)))].map((u) => `<li><a href="${esc(u)}" target="_blank" rel="noopener">${esc(u)}</a></li>`).join("");
 drawPick(); render(); drawJobs(); drawFaq();
