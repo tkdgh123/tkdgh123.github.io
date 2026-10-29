@@ -97,6 +97,20 @@ td.muted { color: var(--ink-2) }
 .fit i { font-style: normal; color: var(--rule) }
 tr.top th, tr.top td:first-of-type { color: var(--acc) }
 
+.terms { margin: 0 0 28px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 12px 28px; font-size: 14.5px }
+.terms div { display: grid; gap: 2px; border-top: 1px solid var(--rule); padding-top: 10px }
+.terms dt { font-weight: 600 }
+.terms dd { margin: 0; color: var(--ink-2) }
+
+.prog { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 12px }
+.prog article { background: var(--sheet); border: 1px solid var(--rule); border-radius: 12px; padding: 18px 20px; display: grid; gap: 10px; align-content: start; min-width: 0 }
+.prog h4 { margin: 0; font-family: var(--display); font-size: 18px; line-height: 1.35 }
+.prog h4 a { text-decoration-color: var(--rule); text-underline-offset: 4px }
+.prog p { font-size: 14.5px }
+.prog dl { margin: 0; display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 4px 10px; font-size: 13.5px; padding-top: 10px; border-top: 1px solid var(--rule) }
+.prog dt { color: var(--acc); font-weight: 600 }
+.prog dd { margin: 0; color: var(--ink-2) }
+
 /* 로드맵: 다섯 칸, 군 복무는 빗금 칸 */
 .road { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; counter-reset: r }
 .road > li { border: 1px solid var(--rule); background: var(--sheet); border-radius: 12px; padding: 16px 14px; display: grid; gap: 2px; align-content: start; min-width: 0 }
@@ -198,6 +212,14 @@ tr.top th, tr.top td:first-of-type { color: var(--acc) }
 <section id="where">
   <h2>입구는 채용연계형 인턴</h2>
   <p class="lead">2026년 게임사 신입 전형에 AI 활용 역량 평가가 들어왔다. 넥슨은 코딩 테스트를 빼고 이것으로 대신했다. 지금의 강점이 점수가 되는 시점이다.</p>
+  <dl class="terms">
+    <div><dt>공채 (공개채용)</dt><dd>정해진 시기에 신입을 한꺼번에 뽑는 것. 보통 1년에 1~2번 열린다.</dd></div>
+    <div><dt>수시채용</dt><dd>자리가 생길 때마다 그때그때 뽑는 것. 공고를 자주 확인해야 한다.</dd></div>
+    <div><dt>채용연계형 인턴</dt><dd>몇 달 동안 인턴으로 일해 보고, 잘하면 정직원으로 뽑아 주는 인턴. 채용전환형도 같은 뜻이다.</dd></div>
+    <div><dt>코딩 테스트</dt><dd>제한 시간 안에 알고리즘 문제를 코드로 푸는 시험. 개발 직군은 서류 다음에 보는 곳이 많다.</dd></div>
+    <div><dt>직군</dt><dd>회사 안의 일 묶음. 기획, 프로그래밍, 아트, 사업처럼 나뉜다.</dd></div>
+    <div><dt>졸업예정자</dt><dd>다음 졸업 시기에 졸업할 학생. 보통 4학년 2학기를 말한다.</dd></div>
+  </dl>
   <div class="tbl"><table>
     <thead><tr><th>곳</th><th>최근 채용 방식</th><th>맞는 직군</th></tr></thead>
     <tbody>
@@ -211,22 +233,51 @@ tr.top th, tr.top td:first-of-type { color: var(--acc) }
   </table></div>
 
   <h3>취업 전에 거칠 무료 프로그램</h3>
-  <div class="tbl"><table>
-    <thead><tr><th>프로그램</th><th>나는 언제</th><th>혜택</th></tr></thead>
-    <tbody>
-      <tr><th><a href="https://www.swmaestro.ai" target="_blank" rel="noopener">SW마에스트로</a></th><td>입대 전 기회는 2027년 1~2월 모집 한 번. 군 복무 중엔 지원 불가</td><td class="muted">월 100만 원 × 6개월 (2025 기준)</td></tr>
-      <tr><th><a href="https://jungle.krafton.com" target="_blank" rel="noopener">크래프톤 정글</a></th><td>게임랩 약 24주 합숙. 재학생 지원 가능 여부 미확인</td><td class="muted">참가비·기숙사비 무료</td></tr>
-      <tr><th><a href="../internship/">현장실습학기제</a></th><td>복학 후 3·4학년 학기 중</td><td class="muted">학점 + 최저임금 기반 지원비</td></tr>
-      <tr><th>SSAFY</th><td>졸업예정자부터</td><td class="muted">월 100만 원, 1년</td></tr>
-    </tbody>
-  </table></div>
+  <div class="prog">
+    <article>
+      <h4><a href="https://www.swmaestro.ai" target="_blank" rel="noopener">SW마에스트로</a></h4>
+      <p>정부(과학기술정보통신부)가 지원하는 소프트웨어 인재 과정. 뽑히면 팀을 짜서 현직 개발자 멘토와 함께 약 반년 동안 실제 서비스를 만든다.</p>
+      <dl><dt>언제</dt><dd>매년 1~2월 모집. 군 복무 중엔 지원할 수 없어서 입대 전 기회는 2027년 모집 한 번</dd><dt>얻는 것</dt><dd>월 100만 원 지원금(2025 기준), 멘토, 포트폴리오가 될 프로젝트</dd></dl>
+    </article>
+    <article>
+      <h4><a href="https://jungle.krafton.com" target="_blank" rel="noopener">크래프톤 정글</a></h4>
+      <p>게임 회사 크래프톤이 운영하는 부트캠프. 부트캠프는 몇 달 동안 하루 종일 몰아서 개발을 배우는 집중 교육이다. 게임랩은 그중 게임 개발 과정이다.</p>
+      <dl><dt>언제</dt><dd>재학생도 지원할 수 있는지는 확인하지 못했다. 지원 전에 자격을 확인해야 한다</dd><dt>얻는 것</dt><dd>약 24주 합숙 훈련. 참가비·기숙사비 무료</dd></dl>
+    </article>
+    <article>
+      <h4><a href="../internship/">현장실습학기제</a></h4>
+      <p>한 학기 동안 학교 대신 회사에 출근해 일하고 학점을 받는 대학 수업. 회사가 실습지원비를 준다.</p>
+      <dl><dt>언제</dt><dd>복학 후 3·4학년 학기 중</dd><dt>얻는 것</dt><dd>학점, 월 161만 원 이상(2026 최저임금 기준), 실무 경력</dd></dl>
+    </article>
+    <article>
+      <h4>SSAFY</h4>
+      <p>삼성이 운영하는 1년짜리 소프트웨어 교육(삼성 청년 SW·AI 아카데미). 전공과 상관없이 들을 수 있고, 수료할 때까지 취업 준비를 함께 한다.</p>
+      <dl><dt>언제</dt><dd>졸업예정자부터 지원 가능. 4학년 2학기에 지원하는 예비 카드</dd><dt>얻는 것</dt><dd>월 100만 원 교육지원금(15기 기준)</dd></dl>
+    </article>
+  </div>
 
   <h3>취업 대신 출시하는 길</h3>
-  <div class="rows">
-    <div><b><a href="https://partner.steamgames.com/doc/marketing/upcoming_events/nextfest/2026october?language=english" target="_blank" rel="noopener">Steam 넥스트 페스트</a></b><p>출시 전 게임만. 다음은 2027년 2월·6월</p></div>
-    <div><b><a href="https://www.gamemeca.com/en/view.php?gid=1774037" target="_blank" rel="noopener">BIC 페스티벌</a></b><p>2026년 856개 중 332개 전시. 신인용 루키 부문</p></div>
-    <div><b><a href="https://www.heraldk.com/article/2026022216110223057" target="_blank" rel="noopener">인디게임 데브캠프</a></b><p>콘진원, 개인 최대 8,500만 원. 2026년엔 2~3월 접수</p></div>
-    <div><b><a href="https://globalgamejam.org/ko/group/31725" target="_blank" rel="noopener">글로벌 게임잼</a></b><p>매년 1월 말, 판교에서도 열림</p></div>
+  <div class="prog">
+    <article>
+      <h4><a href="https://partner.steamgames.com/doc/marketing/upcoming_events/nextfest/2026october?language=english" target="_blank" rel="noopener">Steam 넥스트 페스트</a></h4>
+      <p>Steam은 세계에서 가장 큰 PC 게임 판매 사이트다. 넥스트 페스트는 1년에 세 번, 아직 출시하지 않은 게임의 무료 체험판을 일주일 동안 올려 두는 온라인 행사다. 플레이어 반응과 위시리스트(찜)를 모을 수 있다.</p>
+      <dl><dt>언제</dt><dd>다음은 2027년 2월·6월. 게임 하나당 한 번만 참가</dd><dt>비용</dt><dd>Steam에 게임을 등록하려면 게임당 등록비 100달러가 든다</dd></dl>
+    </article>
+    <article>
+      <h4><a href="https://www.gamemeca.com/en/view.php?gid=1774037" target="_blank" rel="noopener">BIC 페스티벌</a></h4>
+      <p>매년 여름 부산 벡스코에서 열리는 인디게임 전시회. 인디게임은 큰 회사 없이 개인이나 작은 팀이 만든 게임이다. 심사를 통과하면 부스에서 관람객과 업계 사람들에게 게임을 보여 줄 수 있다.</p>
+      <dl><dt>언제</dt><dd>2026년엔 8월 전시. 856개가 지원해 332개가 전시됐다</dd><dt>얻는 것</dt><dd>신인용 루키 부문, 업계 사람과 만날 기회</dd></dl>
+    </article>
+    <article>
+      <h4><a href="https://www.heraldk.com/article/2026022216110223057" target="_blank" rel="noopener">인디게임 데브캠프</a></h4>
+      <p>한국콘텐츠진흥원(게임·콘텐츠 산업을 지원하는 정부 기관)이 인디 개발자에게 개발비를 주는 사업. 오디션처럼 단계마다 심사해서 통과할수록 지원이 커진다.</p>
+      <dl><dt>언제</dt><dd>2026년엔 2~3월 접수</dd><dt>얻는 것</dt><dd>개인 부문 최대 8,500만 원</dd></dl>
+    </article>
+    <article>
+      <h4><a href="https://globalgamejam.org/ko/group/31725" target="_blank" rel="noopener">글로벌 게임잼</a></h4>
+      <p>전 세계에서 같은 주말에, 같은 주제로 48시간 안에 게임을 만드는 행사. 처음 만난 사람끼리 팀을 짜도 된다. 완성도보다 끝까지 만들어 보는 경험이 목적이다.</p>
+      <dl><dt>언제</dt><dd>매년 1월 말. 한국은 판교 등에서 열린다</dd><dt>얻는 것</dt><dd>게임 하나를 끝내 보는 경험, 함께 만들 사람</dd></dl>
+    </article>
   </div>
 </section>
 
