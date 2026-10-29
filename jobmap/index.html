@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>학과 진로 지도</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
+<style>
+/* 길 안내판: 위에서 학교·학과·학년을 고르면 바로 아래 결과가 바뀐다. 갈림길(전공 따라 / 전공 밖으로)을 중심 그림으로, 섹션마다 모양을 다르게 */
+:root {
+  --bg: #F5F4EF; --card: #FFFFFF; --ink: #1F2430; --ink-2: #5F6573; --rule: #E2DFD6;
+  --acc: #2F5DA8; --on-acc: #FFFFFF; --acc-soft: #DCE6F6; --sign: #D9792B; --sign-soft: #FBE6D3; --tint: #EEF2F8;
+  --display: "Jua", "Gowun Dodum", system-ui, sans-serif;
+  --body: "Gowun Dodum", "Pretendard", system-ui, "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+  --r: 22px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #14161B; --card: #1D2028; --ink: #ECEAE4; --ink-2: #A3A8B4; --rule: #2E323C;
+  --acc: #8DB0EC; --on-acc: #101828; --acc-soft: #243553; --sign: #F0A160; --sign-soft: #47301D; --tint: #1A212E; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #14161B; --card: #1D2028; --ink: #ECEAE4; --ink-2: #A3A8B4; --rule: #2E323C;
+  --acc: #8DB0EC; --on-acc: #101828; --acc-soft: #243553; --sign: #F0A160; --sign-soft: #47301D; --tint: #1A212E; color-scheme: dark }
+
+* { box-sizing: border-box }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.7 var(--body); word-break: keep-all; overflow-wrap: anywhere }
+a { color: inherit }
+p { margin: 0 }
+h1, h2, h3 { font-family: var(--display); font-weight: 400; margin: 0; text-wrap: balance }
+.wrap { max-width: 980px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)) }
+.muted { color: var(--ink-2) }
+.num { font-variant-numeric: tabular-nums }
+:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px }
+
+/* 머리 + 고르기 */
+header { padding-block: 22px 8px }
+.back { display: inline-flex; gap: 6px; font-size: 14px; color: var(--ink-2); text-decoration: none; padding: 4px 12px; border-radius: 99px; background: var(--card); border: 1px solid var(--rule) }
+h1 { font-size: clamp(36px, 6vw, 54px); line-height: 1.15; margin-top: 18px }
+.lead { font-size: 17px; color: var(--ink-2); margin-top: 6px }
+
+.pick { margin-top: 22px; background: var(--card); border: 1px solid var(--rule); border-radius: 28px; padding: 20px 22px; display: grid; gap: 14px }
+.row { display: grid; grid-template-columns: 64px minmax(0, 1fr); align-items: start; gap: 10px }
+.row > span { font-family: var(--display); font-size: 17px; padding-top: 5px }
+.chips { display: flex; flex-wrap: wrap; gap: 8px }
+.chip { font: inherit; font-size: 15px; padding: 6px 16px; border-radius: 99px; border: 1.5px solid var(--rule); background: var(--bg); color: var(--ink); cursor: pointer }
+.chip:hover { border-color: var(--acc) }
+.chip[aria-pressed="true"] { background: var(--acc); border-color: var(--acc); color: var(--on-acc) }
+.chip.ghost { border-style: dashed; color: var(--ink-2) }
+.safe { font-size: 13.5px; color: var(--ink-2); display: flex; gap: 6px; align-items: center }
+.safe::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--acc) }
+
+/* 결과 공통 */
+main { padding-bottom: 40px }
+section { margin-top: 34px }
+section > h2 { font-size: 26px }
+section > .sh { font-size: 14.5px; color: var(--ink-2); margin-top: 2px }
+.src { font-size: 12.5px; color: var(--ink-2); text-decoration: none; border-bottom: 1px dotted var(--ink-2); white-space: nowrap }
+.src:hover { color: var(--acc); border-color: var(--acc) }
+
+/* 학과 한 줄 + 숫자 */
+.dept { margin-top: 30px; display: grid; gap: 14px }
+.dept .tag { justify-self: start; font-size: 13px; color: var(--acc); background: var(--acc-soft); padding: 2px 12px; border-radius: 99px }
+.dept h2 { font-size: clamp(30px, 5vw, 40px) }
+.dept .intro { font-size: 17px; max-width: 40em }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px }
+.stat { background: var(--card); border: 1px solid var(--rule); border-radius: 18px; padding: 14px 16px; display: grid; gap: 2px; align-content: start }
+.stat b { font-family: var(--display); font-weight: 400; font-size: 30px; color: var(--acc); line-height: 1.2 }
+.stat span { font-size: 14.5px }
+.stat small { font-size: 12.5px; color: var(--ink-2) }
+
+/* 갈림길 */
+.fork { margin-top: 18px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 18px; position: relative }
+.fork svg { grid-column: 1 / -1; width: 100%; height: 64px; display: block }
+.lane { display: grid; gap: 10px; align-content: start; min-width: 0 }
+.lane h3 { font-size: 21px; display: flex; gap: 8px; align-items: center }
+.lane h3 i { font-style: normal; font-size: 12.5px; font-family: var(--body); padding: 1px 10px; border-radius: 99px }
+.lane.in h3 i { background: var(--acc-soft); color: var(--acc) }
+.lane.out h3 i { background: var(--sign-soft); color: var(--sign) }
+.job { background: var(--card); border: 1px solid var(--rule); border-radius: 16px; padding: 11px 15px; display: grid; gap: 2px }
+.lane.in .job { border-left: 0; box-shadow: inset 4px 0 0 var(--acc) }
+.lane.out .job { border-left: 0; box-shadow: inset 4px 0 0 var(--sign) }
+.job b { font-size: 16.5px }
+.job span { font-size: 14px; color: var(--ink-2) }
+@media (max-width: 680px) { .fork { grid-template-columns: 1fr; gap: 22px } .fork svg { display: none } }
+
+/* 어디로 */
+.places { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 14px }
+@media (max-width: 560px) { .places { grid-template-columns: 1fr } }
+.place { background: var(--tint); border-radius: 20px; padding: 14px 18px; display: grid; gap: 8px; align-content: start }
+.place b { font-family: var(--display); font-weight: 400; font-size: 18px }
+.place .ex { display: flex; flex-wrap: wrap; gap: 6px }
+.place .ex span { font-size: 13.5px; background: var(--card); border-radius: 99px; padding: 1px 10px }
+.certs { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center }
+.certs b { font-family: var(--display); font-weight: 400; font-size: 17px; margin-right: 4px }
+.certs span { font-size: 14px; border: 1.5px solid var(--rule); border-radius: 99px; padding: 2px 12px; background: var(--card) }
+
+/* 학년 길 */
+.road { margin-top: 14px; background: var(--card); border: 1px solid var(--rule); border-radius: 28px; padding: 22px }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; position: relative }
+.steps::before { content: ""; position: absolute; left: 12%; right: 12%; top: 16px; height: 4px; border-radius: 4px; background: var(--acc-soft) }
+.steps li { position: relative; display: grid; gap: 8px; align-content: start; justify-items: center; text-align: center; min-width: 0 }
+.steps i { width: 36px; height: 36px; border-radius: 50%; background: var(--card); border: 4px solid var(--acc-soft); display: grid; place-items: center; font-style: normal; font-family: var(--display); color: var(--acc); z-index: 1 }
+.steps li.now i { background: var(--acc); border-color: var(--acc); color: var(--on-acc); box-shadow: 0 0 0 6px var(--acc-soft) }
+.steps b { font-family: var(--display); font-weight: 400; font-size: 17px; line-height: 1.2 }
+.stage { font-size: 12px; color: var(--sign); background: var(--sign-soft); padding: 0 9px; border-radius: 99px }
+.steps ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; text-align: left; width: 100% }
+.steps ul li { display: block; font-size: 14px; background: var(--bg); border-radius: 12px; padding: 7px 10px; text-align: left; justify-items: start }
+.steps li.now ul li { background: var(--acc-soft) }
+.steps ul a { text-decoration: none; border-bottom: 1px dotted currentColor }
+@media (max-width: 760px) {
+  .steps { grid-template-columns: 1fr; gap: 16px }
+  .steps::before { left: 16px; right: auto; top: 10px; bottom: 10px; width: 4px; height: auto }
+  .steps > li { grid-template-columns: 36px minmax(0, 1fr); justify-items: start; text-align: left; column-gap: 12px }
+  .steps > li > i { grid-row: 1 / span 3 }
+  .steps > li > *:not(i) { grid-column: 2 }
+}
+
+/* AI */
+.ai { margin-top: 14px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px }
+.scene { background: var(--card); border: 1px solid var(--rule); border-radius: 20px; padding: 16px; display: grid; gap: 6px; align-content: start }
+.scene i { font-style: normal; justify-self: start; font-size: 12.5px; color: var(--sign); background: var(--sign-soft); padding: 1px 10px; border-radius: 99px }
+.scene b { font-size: 16.5px }
+.scene span { font-size: 14px; color: var(--ink-2) }
+@media (max-width: 760px) { .ai { grid-template-columns: 1fr } }
+
+.prompt { margin-top: 14px; background: var(--acc); color: var(--on-acc); border-radius: 28px; padding: 22px; display: grid; gap: 14px }
+.prompt h3 { font-size: 22px }
+.prompt .row > span { color: var(--on-acc) }
+.prompt .chip { background: transparent; color: var(--on-acc); border-color: color-mix(in srgb, var(--on-acc) 40%, transparent) }
+.prompt .chip[aria-pressed="true"] { background: var(--on-acc); color: var(--acc); border-color: var(--on-acc) }
+.prompt pre { margin: 0; white-space: pre-wrap; font: 14.5px/1.7 var(--body); background: var(--card); color: var(--ink); border-radius: 18px; padding: 16px 18px; max-height: 320px; overflow: auto }
+.prompt .bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between }
+.prompt .bar small { font-size: 13.5px; opacity: .9 }
+.copy { font: inherit; font-family: var(--display); font-size: 17px; padding: 8px 22px; border-radius: 99px; border: 0; background: var(--sign); color: #FFFFFF; cursor: pointer }
+
+/* 숭실대 자원 */
+.res { margin-top: 14px; display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 10px }
+.res a { text-decoration: none; background: var(--card); border: 1px solid var(--rule); border-radius: 18px; padding: 14px 16px; display: grid; gap: 4px; align-content: start }
+.res a:hover { border-color: var(--acc) }
+.res b { font-size: 16px }
+.res span { font-size: 13.5px; color: var(--ink-2) }
+
+.soon { margin-top: 34px; border: 2px dashed var(--rule); border-radius: 24px; padding: 18px 20px; display: grid; gap: 4px }
+.soon h2 { font-size: 21px }
+
+.empty { margin-top: 30px; background: var(--card); border: 1px solid var(--rule); border-radius: 28px; padding: 26px; display: grid; gap: 10px; justify-items: start }
+.empty h2 { font-size: 26px }
+
+footer { border-top: 1px solid var(--rule); padding-block: 20px 36px; font-size: 13px; color: var(--ink-2) }
+footer .wrap { display: grid; gap: 6px }
+footer details summary { cursor: pointer }
+footer ul { margin: 8px 0 0; padding-left: 18px }
+</style>
+</head>
+<body>
+
+<header class="wrap">
+  <a class="back" href="../">← 작업실</a>
+  <h1>학과 진로 지도</h1>
+  <p class="lead">내 학과를 나오면 어디로 가는지, 지금 학년에 뭘 해 볼지.</p>
+
+  <div class="pick" id="pick">
+    <div class="row"><span>학교</span><div class="chips" id="school"></div></div>
+    <div class="row"><span>학과</span><div class="chips" id="dept"></div></div>
+    <div class="row"><span>학년</span><div class="chips" id="year"></div></div>
+    <p class="safe">고른 내용은 이 화면에서만 쓰이고 어디에도 저장되지 않아요.</p>
+  </div>
+</header>
+
+<main class="wrap" id="out"></main>
+
+<footer><div class="wrap">
+  <p>비공식 학생 프로젝트예요. 학교와 관계없고, 정보는 <span id="checked"></span> 기준이에요. 정확한 내용은 원문 링크에서 확인하세요.</p>
+  <details><summary>출처 전체 보기</summary><ul id="sources"></ul></details>
+</div></footer>
+
+<script src="data.js"></script>
+<script>
+const D = window.JOBMAP;
+const st = { school: "ssu", dept: D.depts[0].id, year: 1, dir: "아직 모름", worry: D.worries[0], place: "아직 모름" };
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const src = (u) => u ? ` <a class="src" href="${esc(u)}" target="_blank" rel="noopener">출처</a>` : "";
+
+function chips(el, items, key, after) {
+  el.innerHTML = items.map((it) =>
+    `<button type="button" class="chip${it.ghost ? " ghost" : ""}" data-v="${esc(it.v)}" aria-pressed="${String(st[key]) === String(it.v)}">${esc(it.label)}</button>`).join("");
+  el.onclick = (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    st[key] = isNaN(b.dataset.v) || b.dataset.v === "" ? b.dataset.v : Number(b.dataset.v);
+    el.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", x === b));
+    after();
+  };
+}
+
+function render() {
+  const out = $("out");
+  if (st.school !== "ssu") {
+    out.innerHTML = `<div class="empty"><h2>이 학교는 아직 없어요</h2><p class="muted">지금은 숭실대학교만 정리돼 있어요. 학교마다 비교과·취업 지원이 달라서 한 곳씩 늘려 갈 예정이에요.</p></div>`;
+    return;
+  }
+  if (st.dept === "none") {
+    out.innerHTML = `<div class="empty"><h2>내 학과는 아직 없어요</h2><p class="muted">지금은 ${D.depts.map((d) => d.name).join(", ")}만 정리돼 있어요. 계열이 비슷한 학과를 먼저 보면 진출 직무가 많이 겹쳐요.</p><div class="chips">${D.depts.map((d) => `<button type="button" class="chip" data-go="${d.id}">${esc(d.name)} 보기</button>`).join("")}</div></div>`;
+    out.querySelectorAll("[data-go]").forEach((b) => b.onclick = () => { st.dept = b.dataset.go; drawPick(); render(); });
+    return;
+  }
+  const d = D.depts.find((x) => x.id === st.dept);
+  const S = D.ssu;
+
+  const stats = [S.rate, ...(d.stats || [])].map((s) =>
+    `<div class="stat"><b class="num">${esc(s.value)}</b><span>${esc(s.label)}</span><small>${esc(s.basis)}${src(s.source)}</small></div>`).join("");
+
+  const job = (j) => `<div class="job"><b>${esc(j.name || j.job)}</b><span>${esc(j.why)}${src(j.source)}</span></div>`;
+
+  const places = (d.employer_types || []).map((p) =>
+    `<div class="place"><b>${esc(p.type)}</b>${p.examples?.length ? `<div class="ex">${p.examples.map((x) => `<span>${esc(x)}</span>`).join("")}</div>` : ""}${p.source ? `<span>${src(p.source)}</span>` : ""}</div>`).join("");
+
+  const years = [1, 2, 3, 4].map((y) => {
+    const items = [...(S.roadmap[y] || []), ...((d.roadmap || {})[y] || [])];
+    return `<li class="${y === st.year ? "now" : ""}"><i>${y}</i><b>${y}학년</b><small class="stage">${S.stages[y]}</small><ul>${items.map((t) => `<li>${t.url ? `<a href="${esc(t.url)}" target="_blank" rel="noopener">${esc(t.text)}</a>` : esc(t.text)}</li>`).join("")}</ul></li>`;
+  }).join("");
+
+  const scenes = (d.ai || []).map((a) => `<div class="scene"><i>${esc(a.task)}</i><b>${esc(a.title)}</b><span>${esc(a.how)}</span></div>`).join("");
+
+  const res = [...S.resources, ...(d.ssu_specific || [])].map((r) =>
+    `<a href="${esc(r.url)}" target="_blank" rel="noopener"><b>${esc(r.name)}</b><span>${esc(r.desc)}</span></a>`).join("");
+
+  out.innerHTML = `
+  <div class="dept">
+    <span class="tag">${esc(d.college)}</span>
+    <h2>${esc(d.name)}</h2>
+    <p class="intro">${esc(d.intro)}</p>
+    ${stats ? `<div class="stats">${stats}</div>` : ""}
+  </div>
+
+  <section>
+    <h2>두 갈래 길</h2>
+    <p class="sh">한국 직장인 절반 가까이가 전공과 다른 일을 해요. 둘 다 흔한 길이에요.${src(D.mismatch)}</p>
+    <div class="fork">
+      <svg viewBox="0 0 400 64" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M200 4 C200 34 100 30 100 62" fill="none" stroke="var(--acc)" stroke-width="4" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+        <path d="M200 4 C200 34 300 30 300 62" fill="none" stroke="var(--sign)" stroke-width="4" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+      </svg>
+      <div class="lane in"><h3>전공 따라 <i>관련 직업</i></h3>${(d.related_jobs || []).map(job).join("")}</div>
+      <div class="lane out"><h3>${esc(d.laneOut)} <i>열려 있는 길</i></h3>${(d.off_major_paths || []).map(job).join("")}</div>
+    </div>
+  </section>
+
+  ${places ? `<section><h2>어디서 일하나</h2><p class="sh">기업 이름은 출처에 실제로 나온 것만 적었어요.</p><div class="places">${places}</div>
+    ${d.certs?.length ? `<div class="certs"><b>많이 따는 자격</b>${d.certs.map((c) => `<span>${esc(c)}</span>`).join("")}</div>` : ""}</section>` : ""}
+
+  <section>
+    <h2>학년별로 해 볼 것</h2>
+    <p class="sh">정답 순서는 없어요. 지금 학년 칸부터 보세요. 깨움·키움·이룸은 숭실대 진로 지원 단계 이름이에요.${src(S.stageSource)}</p>
+    <div class="road"><ol class="steps">${years}</ol></div>
+  </section>
+
+  <section>
+    <h2>이 학과에서 AI 쓰는 장면</h2>
+    <p class="sh">도구 이름보다 어떤 일에 쓰는지가 오래가요. 과제에 쓸 땐 수업 규칙부터 확인하세요.</p>
+    <div class="ai">${scenes}</div>
+    <div class="prompt" id="prompt"></div>
+  </section>
+
+  <section>
+    <h2>숭실대에서 쓸 수 있는 것</h2>
+    <div class="res">${res}</div>
+  </section>
+
+  <div class="soon"><h2>선배 이야기</h2><p class="muted">실제 졸업생 인터뷰를 모으는 중이에요. 지어낸 후기는 싣지 않아요.</p></div>`;
+
+  drawPrompt(d);
+}
+
+function drawPrompt(d) {
+  const p = $("prompt");
+  const text = D.promptTemplate
+    .replaceAll("{학과}", d.promptName || d.name)
+    .replaceAll("{학년}", st.year)
+    .replaceAll("{방향}", st.dir)
+    .replaceAll("{걱정}", st.worry)
+    .replaceAll("{가고싶은곳}", st.place);
+  p.innerHTML = `
+    <h3>나에게 맞춘 질문 만들기</h3>
+    <div class="row"><span>방향</span><div class="chips" id="p-dir"></div></div>
+    <div class="row"><span>걱정</span><div class="chips" id="p-worry"></div></div>
+    <div class="row"><span>원하는 곳</span><div class="chips" id="p-place"></div></div>
+    <pre id="p-text">${esc(text)}</pre>
+    <div class="bar"><small>이름·학번·학교는 넣지 마세요. AI 답은 틀릴 수 있어요.</small><button type="button" class="copy" id="p-copy">복사하기</button></div>`;
+  const redo = () => drawPrompt(d);
+  chips($("p-dir"), D.dirs.map((v) => ({ v, label: v })), "dir", redo);
+  chips($("p-worry"), D.worries.map((v) => ({ v, label: v })), "worry", redo);
+  chips($("p-place"), D.places.map((v) => ({ v, label: v })), "place", redo);
+  $("p-copy").onclick = async (e) => {
+    try { await navigator.clipboard.writeText(text); e.target.textContent = "복사했어요"; }
+    catch { getSelection().selectAllChildren($("p-text")); e.target.textContent = "선택했어요, Ctrl+C"; }
+  };
+}
+
+function drawPick() {
+  chips($("school"), [...D.schools.map((s) => ({ v: s.id, label: s.name })), { v: "etc", label: "다른 학교", ghost: true }], "school", () => { drawPick(); render(); });
+  chips($("dept"), [...D.depts.map((x) => ({ v: x.id, label: x.name })), { v: "none", label: "내 학과가 없어요", ghost: true }], "dept", render);
+  chips($("year"), [1, 2, 3, 4].map((y) => ({ v: y, label: `${y}학년` })), "year", render);
+  $("pick").querySelectorAll(".row:not(:first-child)").forEach((r) => r.hidden = st.school !== "ssu");
+}
+
+$("checked").textContent = D.checked;
+$("sources").innerHTML = [...new Set(D.depts.flatMap((d) => [...(d.related_jobs || []), ...(d.off_major_paths || []), ...(d.employer_types || []), ...(d.stats || [])].map((x) => x.source)).concat(D.mismatch, D.ssu.rate.source, D.ssu.stageSource).filter(Boolean))]
+  .map((u) => `<li><a href="${esc(u)}" target="_blank" rel="noopener">${esc(u)}</a></li>`).join("");
+drawPick();
+render();
+</script>
+</body>
+</html>
