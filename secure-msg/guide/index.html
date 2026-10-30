@@ -525,7 +525,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: s
     </div>
     <figure>
       <div class="fig">
-        <svg viewBox="0 0 760 300" role="img" aria-label="파일 구성: 내 노트북의 client.c는 crypto.c에 잠그기를 맡기고 net.c로 봉투를 보낸다. 서버 노트북의 server.c는 봉투를 중계하고 실험 때만 evil.c가 중계 직전에 장난친다. crypto.c는 네트워크를 모르고 net.c는 암호를 모른다">
+        <svg viewBox="0 0 760 300" role="img" aria-label="파일 구성: 내 노트북의 client.c는 crypto.c에 잠그기를 맡기고 net.c로 봉투를 보낸다. 서버 노트북의 server.c는 봉투를 중계하고, 실험 때는 중계 직전에 공격 명령도 처리한다. crypto.c는 네트워크를 모르고 net.c는 암호를 모른다">
           <defs><marker id="ar4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
           <g fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="4 4" opacity=".5"><rect x="10" y="28" width="350" height="262" rx="12"/><rect x="440" y="28" width="310" height="262" rx="12"/></g>
           <g fill="currentColor" font-size="12.5" opacity=".7"><text x="24" y="20">내 노트북 · client 프로그램</text><text x="454" y="20">서버 노트북 · server 프로그램</text></g>
@@ -533,19 +533,16 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: s
             <rect x="30" y="58" width="150" height="56" rx="8"/><rect x="200" y="58" width="140" height="56" rx="8"/>
             <rect x="30" y="206" width="150" height="56" rx="8" stroke="var(--steel)"/><rect x="200" y="206" width="140" height="56" rx="8"/>
             <rect x="455" y="58" width="130" height="56" rx="8"/><rect x="605" y="58" width="130" height="56" rx="8"/>
-            <rect x="605" y="206" width="130" height="56" rx="8" stroke="var(--void)"/>
           </g>
           <g fill="currentColor" font-family="var(--f-mono)" font-size="13.5" font-weight="500" text-anchor="middle">
             <text x="105" y="82">client.c</text><text x="270" y="82">net.c</text>
             <text x="105" y="230" fill="var(--steel)">crypto.c</text><text x="270" y="230">vault.c</text>
             <text x="520" y="82">net.c</text><text x="670" y="82">server.c</text>
-            <text x="670" y="230" fill="var(--void)">evil.c</text>
           </g>
           <g fill="currentColor" font-size="11.5" text-anchor="middle" opacity=".7">
             <text x="105" y="101">화면 · 명령어</text><text x="270" y="101">봉투 주고받기</text>
             <text x="105" y="249">자물쇠 · 도장 · 지문</text><text x="270" y="249">금고 흐름</text>
-            <text x="520" y="101">봉투 주고받기</text><text x="670" y="101">중계</text>
-            <text x="670" y="249">공격 실험실</text>
+            <text x="520" y="101">봉투 주고받기</text><text x="670" y="101">중계 · 공격 실험실</text>
           </g>
           <g stroke="currentColor" stroke-width="1.5" fill="none">
             <line x1="180" y1="86" x2="196" y2="86" marker-end="url(#ar4)"/>
@@ -554,12 +551,10 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: s
             <line x1="150" y1="114" x2="232" y2="202" marker-end="url(#ar4)"/>
             <line x1="340" y1="86" x2="451" y2="86" marker-end="url(#ar4)" stroke-width="2"/>
             <line x1="585" y1="86" x2="601" y2="86" marker-end="url(#ar4)"/>
-            <line x1="670" y1="114" x2="670" y2="202" marker-end="url(#ar4)" stroke="var(--void)"/>
           </g>
           <g fill="currentColor" font-size="11.5">
             <text x="112" y="162">잠가 줘</text><text x="196" y="150">금고 명령</text><text x="206" y="275" opacity=".7">봉인·도장 부탁</text>
             <text x="396" y="78" text-anchor="middle" font-weight="700">패킷</text><text x="396" y="104" text-anchor="middle" opacity=".7">TCP</text>
-            <text x="678" y="162" fill="var(--void)">중계 직전</text><text x="678" y="178" fill="var(--void)">(실험 때만)</text>
           </g>
         </svg>
       </div>

@@ -431,7 +431,7 @@ CK_n, MK_n 지움                                      <span class="d">열쇠는
   <h3>역할: 코드는 파일 단위, 발표는 1인 1덜미</h3>
   <div class="scroll"><table>
     <tr><th>팀 역할</th><th>맡는 코드</th><th>발표에서 맡는 덜미</th></tr>
-    <tr><td>서버</td><td><code>server.c</code>, <code>net.c</code>, <code>evil.c</code>(공격 콘솔, 서버의 눈)</td><td>변조·재전송·빼먹기: 서버가 바꾸거나 빼면 들킨다</td></tr>
+    <tr><td>서버</td><td><code>server.c</code>(중계, 공격 콘솔, 서버의 눈), <code>net.c</code></td><td>변조·재전송·빼먹기: 서버가 바꾸거나 빼면 들킨다</td></tr>
     <tr><td>암복호화</td><td><code>crypto.c</code>(신원 키, 서명, 래칫, 단어 지문)</td><td>끼어들기: 단어 8개가 막는다</td></tr>
     <tr><td>UI</td><td><code>client.c</code>(명령어, 경고 화면, 체크인, 화면 지우기)</td><td>위조: 서명이 없으면 무슨 일이 생기나 (두 단계 시연)</td></tr>
     <tr><td>총괄</td><td><code>vault.c</code>(금고 흐름), <code>tests/</code>, 시연 스크립트</td><td>몰래 열기: 두 열쇠 금고와 열쇠 전달 증명</td></tr>
@@ -472,10 +472,10 @@ CK_n, MK_n 지움                                      <span class="d">열쇠는
   <ul>
     <li><b>HELLO</b>: body를 kx 공개키 + 봉인용 공개키(64바이트)에서 신원 공개키(32) + 세션 kx 공개키(32) + 서명(64)으로 바꿉니다. 서버는 그대로 전달만 합니다.</li>
     <li><b>잠금 표 삭제</b>: LOCK 묶음을 보유자 둘에게 즉시 전달하고 보관하지 않습니다. OPEN_REQ와 SHARE는 <code>to</code>를 보고 중계만 합니다. 서버가 잠금 번호를 붙이지 않습니다(금고 ID = 묶음 해시).</li>
-    <li><b>시연 옵션을 공격 콘솔로</b>: <code>poll</code>에 stdin을 추가하고 <code>evil.c</code>에 명령 처리를 둡니다. 중계 직전에 <code>evil_apply()</code>를 호출하고, 서버의 눈(hex 출력)을 켭니다.</li>
+    <li><b>시연 옵션을 공격 콘솔로</b>: <code>poll</code>에 stdin을 추가하고 <code>server.c</code> 안에 명령 처리를 둡니다. 중계 직전에 공격을 적용하는 함수를 호출하고, 서버의 눈(hex 출력)을 켭니다.</li>
     <li>보유자가 접속해 있지 않을 때 금고를 보내면 SYS 오류를 보냅니다(서버가 대신 보관하지 않음).</li>
     <li>대화 기록(선택 4)은 클라이언트에만 있어서 서버는 바꿀 것이 없습니다.</li>
-    <li><b>문장 섞기 래칫</b>: 서버 기획서의 "순서번호가 건너뛰면 래칫을 최대 50개 앞으로 돌림"을 "끊김 경고"로 바꾸고, 래칫 식을 <a href="#mix">8절</a>의 것으로 고칩니다. 서버 중계는 그대로이고 <code>evil.c</code>에 <code>drop</code> 명령만 더합니다.</li>
+    <li><b>문장 섞기 래칫</b>: 서버 기획서의 "순서번호가 건너뛰면 래칫을 최대 50개 앞으로 돌림"을 "끊김 경고"로 바꾸고, 래칫 식을 <a href="#mix">8절</a>의 것으로 고칩니다. 서버 중계는 그대로이고 공격 명령에 <code>drop</code>만 더합니다.</li>
   </ul>
 </section>
 
