@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>덜미 설명서</title>
-<meta name="description" content="C를 몰라도 읽을 수 있는 덜미(프밍기2 암호화 메신저) 설명서. 직접 눌러 보는 금고, 열쇠, 공격 실험실.">
+<title>덜미</title>
+<meta name="description" content="프밍기2 암호화 메신저 덜미의 모든 것. 원리를 눌러 보는 설명, 계획과 발표, 서버를 만드는 설계와 코드 뼈대.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
@@ -308,12 +308,101 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: s
 .need li { margin: 0; padding-left: 26px; position: relative }
 .need li::before { content: ""; position: absolute; left: 0; top: 5px; width: 15px; height: 15px; border: 1.5px solid var(--seal); border-radius: 4px }
 
+/* ── 부 나눔 ── */
+.todo { padding-block: 0 8px }
+.todo .card { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 22px; align-items: start; background: var(--sheet); border: 1.5px solid var(--ink); border-radius: 14px; padding: 16px 20px; box-shadow: 0 3px 0 var(--ink) }
+@media (max-width: 620px) { .todo .card { grid-template-columns: 1fr } }
+.todo .when { font: 400 22px/1.15 var(--f-display); color: var(--void) }
+.todo .when small { display: block; font: 500 12px/1.6 var(--f-mono); color: var(--ink-2); letter-spacing: .08em }
+.todo ol { margin: 0; padding-left: 1.2em; font-size: 15px }
+.partnav { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: color-mix(in srgb, var(--paper) 90%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border-bottom: 1px solid var(--rule); margin-top: 28px }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--paper) }
+.partnav .wrap { display: flex; gap: 4px; overflow-x: auto; padding-block: 8px; scrollbar-width: none }
+.partnav a { flex: none; font: 500 14.5px/1 var(--f-body); color: var(--ink-2); text-decoration: none; padding: 9px 14px; border-radius: 99px }
+.partnav a b { font: 400 15px/1 var(--f-display); color: var(--steel); margin-right: 7px }
+.partnav a:hover { color: var(--ink); background: var(--sheet) }
+.part { background: var(--ink); color: var(--paper); padding-block: 64px 56px; scroll-margin-top: 60px }
+.part .num { font: 500 13px/1 var(--f-mono); letter-spacing: .16em; color: color-mix(in srgb, var(--paper) 62%, var(--ink)) }
+.part h2 { font-size: clamp(44px, 8vw, 76px); line-height: 1; margin: 12px 0 14px; color: var(--paper) }
+.part p { max-width: 40rem; margin: 0; color: color-mix(in srgb, var(--paper) 80%, var(--ink)) }
+.part .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 22px }
+.part .chips a { font-size: 13.5px; color: var(--paper); text-decoration: none; padding: 5px 13px; border-radius: 99px; border: 1px solid color-mix(in srgb, var(--paper) 30%, var(--ink)) }
+.part .chips a:hover { background: color-mix(in srgb, var(--paper) 12%, var(--ink)) }
+.part + .ch { border-top: 0 }
+.ch { scroll-margin-top: 60px }
+
+/* 표 */
+.tbl { overflow-x: auto; margin: 18px 0 10px; border: 1px solid var(--rule); border-radius: 12px; background: var(--sheet) }
+.tbl table { border-collapse: collapse; width: 100%; font-size: 14.5px; line-height: 1.6 }
+.tbl th, .tbl td { padding: 10px 14px; border-bottom: 1px solid var(--rule); text-align: left; vertical-align: top }
+.tbl tr:last-child td { border-bottom: 0 }
+.tbl th { font: 500 12.5px/1.4 var(--f-mono); color: var(--ink-2); letter-spacing: .04em; white-space: nowrap }
+.tbl td:first-child { font-weight: 700; white-space: nowrap }
+.tbl.wide table { min-width: 680px }
+@media (max-width: 560px) {
+  .tbl:not(.wide) td:first-child { white-space: normal; min-width: 7em }
+  .tbl.wide table:not(.matrix) { min-width: 0; table-layout: fixed; font-size: 13.5px }
+  .tbl.wide table:not(.matrix) td, .tbl.wide table:not(.matrix) th { padding: 9px 8px; overflow-wrap: anywhere; white-space: normal }
+  .tbl.wide table:not(.matrix) code { white-space: normal }
+  .part { padding-block: 40px 36px }
+  .partnav .wrap { padding-block: 4px }
+  .partnav a { padding: 8px 10px; font-size: 13.5px }
+}
+.tbl td .was { color: var(--ink-2) }
+.tbl code { white-space: nowrap }
+.tier { display: inline-block; font: 700 12px/1 var(--f-body); padding: 5px 9px; border-radius: 6px; color: var(--sheet); background: var(--steel); white-space: nowrap }
+.tier.base { background: var(--ink-2) } .tier.opt { background: transparent; color: var(--seal); box-shadow: inset 0 0 0 1.5px var(--seal) } .tier.cut { background: var(--void) }
+.sev { font: 500 12px/1 var(--f-mono); padding: 4px 8px; border-radius: 6px; white-space: nowrap; border: 1.5px solid currentColor }
+.sev.hi { color: var(--void) } .sev.mid { color: var(--steel) } .sev.lo { color: var(--ink-2) }
+
+/* 코드 */
+pre.code { margin: 14px 0; padding: 14px 16px; background: var(--term-bg); color: var(--term-ink); font: 12.5px/1.7 var(--f-mono); border-radius: 10px; overflow-x: auto; white-space: pre }
+pre.code .c { color: var(--t-dim) } pre.code .k { color: var(--t-blue) } pre.code .r { color: var(--t-red) } pre.code .g { color: var(--t-green) } pre.code .y { color: var(--t-yel) }
+.codehead { display: flex; justify-content: space-between; gap: 10px; margin: 22px 0 -8px; font: 500 13px/1.4 var(--f-mono); color: var(--steel) }
+.codehead span { color: var(--ink-2); font-family: var(--f-body); font-weight: 400 }
+
+/* 패킷 바이트 */
+.bytes { overflow-x: auto; margin: 18px 0 8px }
+.bytes .row { display: grid; grid-template-columns: 4fr 3fr 8fr 8fr 6fr 10fr 9fr; min-width: 720px; border: 1.5px solid var(--ink); border-radius: 10px; overflow: hidden; background: var(--sheet) }
+.bytes .row div { padding: 10px 8px; border-right: 1px solid var(--rule); text-align: center; min-width: 0 }
+.bytes .row div:last-child { border-right: 0; background: color-mix(in srgb, var(--steel) 10%, var(--sheet)) }
+.bytes b { display: block; font: 500 13px/1.3 var(--f-mono) }
+.bytes small { font: 11.5px/1.3 var(--f-mono); color: var(--ink-2) }
+.bytes .len { background: color-mix(in srgb, var(--void) 9%, var(--sheet)) }
+
+/* 발표 순서 */
+.flow { list-style: none; counter-reset: st; padding: 0; margin: 20px 0 8px; display: grid; gap: 10px }
+.flow li { counter-increment: st; display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 4px 14px; margin: 0; background: var(--sheet); border: 1px solid var(--rule); border-radius: 12px; padding: 14px 16px }
+.flow li::before { content: counter(st); grid-row: span 2; font: 400 30px/1 var(--f-display); color: var(--steel) }
+.flow li b { font-size: 16px }
+.flow li p { margin: 0; font-size: 14.5px; color: var(--ink-2) }
+
+/* 말 고르기 */
+.say2 { display: grid; gap: 0; margin: 18px 0 8px; border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; background: var(--sheet) }
+.say2 div { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); border-bottom: 1px solid var(--rule) }
+.say2 div:last-child { border-bottom: 0 }
+.say2 span { padding: 11px 14px 11px 40px; position: relative; font-size: 14.5px; min-width: 0 }
+.say2 span::before { position: absolute; left: 14px; top: 12px; font: 700 13px/1.5 var(--f-mono) }
+.say2 .yes { font-weight: 700 } .say2 .yes::before { content: "O"; color: var(--seal) }
+.say2 .no { color: var(--ink-2); border-left: 1px solid var(--rule) } .say2 .no::before { content: "X"; color: var(--void) }
+@media (max-width: 560px) { .say2 span { padding: 10px 8px 10px 28px; font-size: 13.5px } .say2 span::before { left: 9px; top: 10px } }
+
+/* 접기 */
+details.more { margin: 14px 0 0; border: 1px solid var(--rule); border-radius: 12px; background: var(--sheet) }
+details.more > summary { cursor: pointer; padding: 14px 18px; font-weight: 700; list-style: none; display: flex; justify-content: space-between; gap: 12px }
+details.more > summary::-webkit-details-marker { display: none }
+details.more > summary::after { content: "+"; font: 400 22px/1 var(--f-display); color: var(--steel) }
+details.more[open] > summary::after { content: "−" }
+details.more > div { padding: 0 18px 16px }
+details.more .tbl { background: var(--paper) }
+.matrix td { text-align: center; white-space: nowrap } .matrix td:first-child { text-align: left }
+
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important } }
 </style>
 </head>
 <body>
 
-<div class="wrap top"><a href="../../#make">← 작업실</a><span><a href="../proposal/">제안서</a> · <a href="../server/">서버 기획서</a></span></div>
+<div class="wrap top"><a href="../../#make">← 작업실</a><span><a href="#part-plan">계획</a> · <a href="#part-build">만들기</a></span></div>
 
 <header class="hero">
   <canvas id="rosette" aria-hidden="true"></canvas>
@@ -335,7 +424,29 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: s
   </div>
 </header>
 
+<div class="todo"><div class="wrap"><div class="card">
+  <div class="when">지금 할 일<small>9주차 · ~11/1</small></div>
+  <ol>
+    <li>WSL2 + libsodium 설치, <code>sodium_init()</code> 빌드 확인</li>
+    <li>GitHub 저장소 만들기, 파일 단위로 담당 정하기</li>
+    <li>단어 지문용 한글 단어 256개 고르기 (발음 비슷한 단어 빼기)</li>
+  </ol>
+</div></div></div>
+
+<nav class="partnav" aria-label="부 바로 가기"><div class="wrap">
+  <a href="#part-learn"><b>1</b>이해하기</a><a href="#part-plan"><b>2</b>계획</a><a href="#part-build"><b>3</b>만들기</a><a href="#server"><b>›</b>서버</a><a href="#steps"><b>›</b>단계와 확인</a>
+</div></nav>
+
 <main>
+<section class="part" id="part-learn">
+  <div class="wrap">
+    <div class="num">1부</div>
+    <h2>이해하기</h2>
+    <p>덜미가 무엇을 막고 어떻게 들키게 하는지, 직접 눌러 보며 이해하는 부분입니다. C를 몰라도 읽힙니다.</p>
+    <div class="chips"><a href="#idea">한 줄로</a><a href="#scene">장면</a><a href="#words">먼저 알 말</a><a href="#e2e">종단간 암호화</a><a href="#ratchet">래칫</a><a href="#fingerprint">단어 지문</a><a href="#vault">두 열쇠 금고</a><a href="#lab">공격 실험실</a><a href="#market">다른 프로그램</a><a href="#c">프로그램 구성</a><a href="#run">켜 보기 전에</a><a href="#limits">못 하는 것</a></div>
+  </div>
+</section>
+
 
 <section class="ch" id="idea">
   <div class="wrap"><div class="read">
@@ -794,6 +905,58 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: s
   </div></div>
 </section>
 
+<section class="part" id="part-plan">
+  <div class="wrap">
+    <div class="num">2부</div>
+    <h2>계획</h2>
+    <p>원래 기획서에서 무엇이 바뀌었고, 무엇을 언제 만들어 어떻게 보여 줄지 정리했습니다.</p>
+    <div class="chips"><a href="#change">바뀌는 것</a><a href="#features">기능 목록</a><a href="#plan">일정과 역할</a><a href="#demo">발표</a><a href="#cut">버린 것</a><a href="#how">어떻게 정했나</a></div>
+  </div>
+</section>
+
+<section class="ch" id="change">
+  <div class="wrap">
+    <div class="read">
+      <p class="eyebrow">기획서 수정본(10. 21.) → 덜미</p>
+      <h2>바뀌는 것</h2>
+      <p class="lead">원래 생각(래칫, 2인 잠금, 공격 시연)은 그대로 두고, 서버를 믿지 않아도 되게 다시 짰습니다.</p>
+    </div>
+    <div class="tbl wide"><table>
+      <tr><th></th><th>수정본</th><th>덜미</th></tr>
+      <tr><td>이름</td><td class="was">암호화 통신 프로그램</td><td><b>덜미</b>: 몰래 열 수 없고, 몰래 건드리면 덜미 잡히는 메신저</td></tr>
+      <tr><td>대화</td><td class="was">접속자 전원 대화만</td><td>전체 대화 + 1:1 대화 (<code>/dm 이름</code>, <code>/all</code>)</td></tr>
+      <tr><td>열쇠 바꾸기</td><td class="was">전 문장으로 새 열쇠를 만들어 보내기</td><td>문장을 지금 열쇠에 섞어 각자 계산. 열쇠는 보내지 않음</td></tr>
+      <tr><td>2인 잠금</td><td class="was">서버가 보관, 번호만 보임, 서명 없음</td><td><b>두 열쇠 금고</b>: 서버는 보관 안 함, 제목이 보임, 서명, 열쇠 전달 증명, 다음 접속에도 열림</td></tr>
+      <tr><td>안전번호</td><td class="was">숫자 12자리, 두 사람 키를 합친 해시</td><td>사람별 한글 단어 8개, 실행할 때마다 같음</td></tr>
+      <tr><td>공개키</td><td class="was">서버가 나눠 주는 키를 그대로 믿음</td><td>파일에 저장한 신원 키가 매 세션 키에 서명</td></tr>
+      <tr><td>공격 시연</td><td class="was">서버 실행 옵션 3개 (<code>--tamper</code> 등)</td><td>서버 창에서 치는 공격 명령 7개 + 암호문이 흐르는 "서버의 눈". 키보드는 심사위원에게</td></tr>
+      <tr><td>대화 기록</td><td class="was">저장 안 함</td><td>선택: 내 노트북에만 비밀번호로 잠가 저장</td></tr>
+      <tr><td>확장 아이디어</td><td class="was">AI 자동 잠금, 서명 기록, 마스킹, 자동 삭제, DH 래칫</td><td>서명 기록만 금고에 흡수하고 나머지는 버림 (<a href="#cut">버린 것</a>)</td></tr>
+      <tr><td>필수 마감선</td><td class="was">10주차</td><td>11주차 (대신 13주차는 기능 동결)</td></tr>
+    </table></div>
+  </div>
+</section>
+
+<section class="ch" id="features">
+  <div class="wrap">
+    <div class="read">
+      <p class="eyebrow">무엇을 만드나</p>
+      <h2>기능 목록</h2>
+      <p class="lead">기본은 시중 메신저에도 있는 바탕 품질이고, 핵심 셋이 덜미만의 것입니다.</p>
+    </div>
+    <div class="tbl"><table>
+      <tr><td><span class="tier base">기본</span></td><td>접속, 전체·1:1 대화, 문장 섞기 래칫 (복호화 성공 시에만 전진), 인증 암호(AEAD), 순서번호. 발표에서는 "기반 기술" 한 장</td></tr>
+      <tr><td><span class="tier">핵심</span></td><td><b>두 열쇠 금고</b>: 제목, 서명, 열쇠 전달 증명, 보유자 노트북에 저장, 열람 후 화면 지우기 (<code>/lock</code> <code>/open</code> <code>/approve</code> <code>/vault</code>)</td></tr>
+      <tr><td><span class="tier">핵심</span></td><td><b>신원 키와 한글 단어 지문</b>: 접속 체크인, <code>/verify</code>, 열쇠 바뀜 경보</td></tr>
+      <tr><td><span class="tier">핵심</span></td><td><b>공격 실험실</b>: 서버 창 공격 명령 (<code>tamper</code> <code>replay</code> <code>drop</code> <code>swap</code> <code>peek</code> <code>forge</code>)과 서버의 눈</td></tr>
+      <tr><td><span class="tier opt">선택 1</span></td><td>진짜 중간자 <code>mitm A B</code>: 서버 창에 평문이 보이다가 단어를 맞추는 순간 들킴. 11주차에 할지 판정</td></tr>
+      <tr><td><span class="tier opt">선택 2</span></td><td>키 탈취 극장 <code>/steal</code>: 훔친 체인 키로 지난 메시지를 열어 보지만 실패하고, 이후 메시지는 열림 (정직하게 표시)</td></tr>
+      <tr><td><span class="tier opt">선택 3</span></td><td>증명 단어 3개: 열쇠 전달 증명의 해시를 단어 3개로 보여 주고, 셋이 카톡에 붙여 넣어 대조</td></tr>
+      <tr><td><span class="tier opt">선택 4</span></td><td>잠긴 대화 기록 <code>/history</code> <code>/forget</code>: 읽은 메시지를 내 노트북에 암호화해 쌓아 둠 (<a href="#histcrypto">만드는 법</a>)</td></tr>
+    </table></div>
+  </div>
+</section>
+
 <section class="ch" id="plan">
   <div class="wrap">
     <div class="read">
@@ -809,12 +972,507 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: s
       <div><b>13주</b><em>기능 동결</em><p>버그 수정, 노트북 3대 리허설, 백업 영상</p></div>
       <div><b>14주</b><p>최종 발표: "교수님이 서버입니다"</p></div>
     </div>
+    <div class="tbl wide"><table>
+      <tr><th>역할</th><th>맡는 파일</th><th>발표에서 설명할 것</th></tr>
+      <tr><td>서버</td><td><code>server.c</code> <code>net.c</code></td><td>변조·재전송·빼먹기가 들키는 이유</td></tr>
+      <tr><td>암복호화</td><td><code>crypto.c</code></td><td>끼어들기를 단어 지문이 잡는 이유</td></tr>
+      <tr><td>UI</td><td><code>client.c</code> <code>history.c</code></td><td>서명이 없으면 위조가 통하는 장면</td></tr>
+      <tr><td>총괄</td><td><code>vault.c</code> <code>tests/</code></td><td>두 열쇠 금고와 열쇠 전달 증명</td></tr>
+    </table></div>
+  </div>
+</section>
+
+<section class="ch" id="demo">
+  <div class="wrap">
+    <div class="read">
+      <p class="eyebrow">14주차</p>
+      <h2>발표는 이렇게 합니다</h2>
+      <p class="lead">"교수님이 서버입니다." 말로 설명하지 않고 직접 공격해 보시게 합니다.</p>
+    </div>
+    <ol class="flow">
+      <li><b>받았던 질문에 정면으로 답하기</b><p>비교표 세 줄로 시작합니다. 카톡·Signal은 받은 사람이 혼자 열고, CyberArk·Vault는 서버 관리자가 원문을 보고, 덜미는 둘 다 안 됩니다.</p></li>
+      <li><b>동아리 회계 인수인계 시연</b><p>A가 맡기고, B가 요청하고, C가 승인하고, 증명이 뜨는 정상 흐름을 보여 줍니다.</p></li>
+      <li><b>"교수님이 서버입니다"</b><p>서버 노트북 키보드를 넘기고 "회비 비번을 훔쳐 보세요". peek은 실패하고, forge는 서명 경고, tamper·replay·drop은 경고, swap이나 mitm은 단어가 어긋나 들킵니다.</p></li>
+      <li><b>공격과 방어 한 쌍씩 설명 (각 2분)</b><p>코드 슬라이드는 "라이브러리 한 줄"과 "직접 짠 줄"(패킷 구조, 길이 접두, 순서번호 검사, XOR 분할, 금고 흐름, 단어 지문)을 색으로 나눕니다.</p></li>
+      <li><b>정직한 한계 한 장</b><p><a href="#limits">덜미가 못 하는 것</a>을 그대로 넣습니다. "패킷 유실·순서" 질문에는 TCP가 순서를 보장하고, 길이 접두로 메시지 경계를 나눈다고 답합니다.</p></li>
+      <li><b>Plan B</b><p>발표장 Wi-Fi가 기기끼리의 연결을 막으면 휴대폰 핫스팟. 그래도 안 되면 노트북 한 대에서 tmux 4분할, 마지막은 녹화 영상.</p></li>
+    </ol>
+    <h3>발표에서 쓰는 말</h3>
+    <div class="say2">
+      <div><span class="yes">서버가 건드리면 들킨다</span><span class="no">모든 공격을 막는다</span></div>
+      <div><span class="yes">다른 문제를 푼다</span><span class="no">Signal보다 안전하다</span></div>
+      <div><span class="yes">지난 메시지는 열쇠가 새도 안전하다</span><span class="no">열쇠가 새도 다 안전하다</span></div>
+      <div><span class="yes">빠진 건 순서번호가 잡고, 문장 섞기는 그 뒤를 잠근다</span><span class="no">문장을 섞어서 더 안전해졌다</span></div>
+      <div><span class="yes">단어를 맞춘 뒤부터 서버를 믿지 않아도 된다</span><span class="no">처음부터 서버를 믿을 필요가 없다</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="ch" id="cut">
+  <div class="wrap">
+    <div class="read">
+      <p class="eyebrow">하지 않기로 한 것</p>
+      <h2>버린 것</h2>
+    </div>
+    <div class="tbl"><table>
+      <tr><th>버린 것</th><th>이유</th></tr>
+      <tr><td>AI 자동 잠금</td><td>평문을 AI에 넘기는 순간 종단간 암호화가 깨지고, C로 5주 안에 하기 어렵고, MS Purview 같은 기업 제품에 이미 있음</td></tr>
+      <tr><td>DH 래칫</td><td>Signal 복제로 보이고, 1학년이 설명하기 어렵고, 일정을 위협함. 대신 "앞으로 올 메시지 보호는 안 됨"을 정직하게 적음</td></tr>
+      <tr><td>침입 시 자동 삭제</td><td>저장한 게 거의 없어 지울 것도 없음. 공격자가 마음대로 누를 수 있는 삭제 스위치가 되고, 오탐 한 번에 사용자가 손해를 봄</td></tr>
+      <tr><td>사라지는·마스킹 메시지</td><td>Signal, Telegram, Wickr, Confide에 이미 있음. "열람 후 지우기"만 금고에 남김</td></tr>
+      <tr><td>동시 공개 투표</td><td>신선했지만 콘셉트가 세 갈래로 흩어짐. 커밋-공개 방식 자체는 블록체인 투표에 흔함. 다음 확장 후보로 기록</td></tr>
+      <tr><td>타임아웃 승인</td><td>"두 사람이 동의해야 열린다"는 핵심 약속과 충돌함</td></tr>
+      <tr><td>금고 예외 처리, 건너뛴 키 저장</td><td>동시 요청이나 중복 승인은 정상 흐름만 구현. TCP라 순서가 바뀌지 않으므로 건너뛴 키는 저장할 필요가 없음</td></tr>
+      <tr><td>"Signal보다 안전하다"류의 말</td><td>사실이 아니고 질의응답에서 무너짐. Signal을 이기려는 게 아니라 다른 문제를 푼다</td></tr>
+    </table></div>
+  </div>
+</section>
+
+<section class="ch" id="how">
+  <div class="wrap">
+    <div class="read">
+      <p class="eyebrow">기록</p>
+      <h2>어떻게 정했나</h2>
+      <p class="lead">10. 29. 기획자, 실사용자, 보안 전문가, 구현 개발자, 교수·심사위원, 시장 분석가 여섯 관점에서 두 번 검토해 정했습니다. 근거는 팀 단톡방(9. 23.~10. 21.), 제안서(10. 7.), 기획서 수정본(10. 21.)입니다.</p>
+    </div>
+    <details class="more"><summary>기능별 평가표 (1차 검토)</summary><div>
+      <p class="fine">상·중·하. 개발 칸은 "난이도 / 인상", 보안 칸은 "보안 가치 / 참신성"입니다.</p>
+      <div class="tbl wide"><table class="matrix">
+        <tr><th>기능</th><th>기획 (창의성)</th><th>사용자 (쓰고 싶음)</th><th>보안</th><th>개발</th><th>교수 (점수)</th><th>시장</th></tr>
+        <tr><td>일반 채팅</td><td>하</td><td>중</td><td>-</td><td>중 / 하</td><td>하</td><td>있음</td></tr>
+        <tr><td>키 래칫</td><td>하</td><td>-</td><td>중 / 하</td><td>중 / 중</td><td>중</td><td>있음</td></tr>
+        <tr><td>안전번호</td><td>하</td><td>중</td><td>상 / 하</td><td>하 / 중</td><td>중</td><td>있음</td></tr>
+        <tr><td>AEAD·재전송 방어</td><td>하</td><td>-</td><td>상 / 하</td><td>하~중 / 중</td><td>중</td><td>있음</td></tr>
+        <tr><td>2인 합의 잠금</td><td>중</td><td><b>상</b></td><td>중 / 중상</td><td>상 / 중상</td><td><b>상</b></td><td>부분적 (서버 신뢰형만)</td></tr>
+        <tr><td>나쁜 서버 시연</td><td><b>상</b></td><td>하 (발표엔 필수)</td><td>상 / 중</td><td>하 / <b>상</b></td><td><b>상</b></td><td>제품 없음</td></tr>
+        <tr><td>AI 자동 잠금</td><td>하</td><td>하</td><td>하</td><td>중상 / 중</td><td>하</td><td>부분적</td></tr>
+        <tr><td>서명 승인 기록</td><td>중</td><td><b>상</b></td><td>상 / 상</td><td>하 / 중</td><td>하 → 2차 상</td><td>부분적</td></tr>
+        <tr><td>사라지는·마스킹 메시지</td><td>하</td><td>중상</td><td>하</td><td>중 / 하</td><td>하</td><td>있음</td></tr>
+        <tr><td>침입 시 자동 삭제</td><td>하</td><td>하</td><td>하</td><td>하 / 중</td><td>하</td><td>부분적</td></tr>
+        <tr><td>DH 래칫</td><td>하</td><td>하</td><td>중 / 하</td><td>상 / 중</td><td>하</td><td>있음</td></tr>
+      </table></div>
+    </div></details>
+    <details class="more"><summary>2차 검토에서 정한 것</summary><div>
+      <div class="tbl"><table>
+        <tr><th>쟁점</th><th>결정</th></tr>
+        <tr><td>서명 + 열람 영수증</td><td><b>서명은 핵심.</b> 영수증은 "열쇠 전달 증명 한 줄을 전원 화면에" 까지만 핵심, 기록 대조는 선택</td></tr>
+        <tr><td>동시 공개 투표</td><td><b>버림.</b> 콘셉트가 흐려짐</td></tr>
+        <tr><td>진짜 중간자</td><td><b>2단계.</b> 열쇠 바뀜 경보는 필수, 진짜 중간자는 11주차에 판정. 말은 "막는다"가 아니라 "들킨다"</td></tr>
+        <tr><td>사람별 한글 단어 8개</td><td><b>채택.</b> 4개씩 두 줄, 접속할 때 소리 내어 읽는 체크인. 발음이 비슷한 단어(바다/바지)는 뺌</td></tr>
+        <tr><td>5주 안에 되나</td><td>기록 대조, 진짜 중간자, 키 탈취 극장은 선택으로. 13주차 기능 동결</td></tr>
+        <tr><td>이름</td><td><b>제품 이름은 덜미, 간판 기능은 두 열쇠 금고.</b> 정직하게 약속할 수 있는 건 "막는다"보다 "들킨다"이고, 덜미는 변조·끼어들기·위조·몰래 열기를 한 단어로 묶음</td></tr>
+      </table></div>
+    </div></details>
+    <details class="more"><summary>시중 제품과 자세한 비교 (조사 2026. 10. 29.)</summary><div>
+      <div class="tbl wide"><table>
+        <tr><th>제품</th><th>이미 하는 것</th><th>안 하는 것</th></tr>
+        <tr><td>Signal</td><td>사라지는 메시지, 안전번호, 메시지마다 키 교체</td><td>합의해야 열리는 메시지</td></tr>
+        <tr><td>WhatsApp · Telegram</td><td>한 번 보기, 자동 삭제, 비밀채팅. WhatsApp은 키 투명성으로 키 바꿔치기를 자동 탐지</td><td>합의 열람, 사용자가 직접 공격해 보는 기능</td></tr>
+        <tr><td>카카오톡 비밀채팅</td><td>종단간 암호화</td><td>합의 열람, 공격 시연</td></tr>
+        <tr><td>AWS Wickr · Confide</td><td>읽으면 삭제, 캡처 방지, 한 줄씩 가려 보여 주기</td><td>합의 열람</td></tr>
+        <tr><td>CyberArk · HashiCorp Vault</td><td>승인자가 승인해야 비밀 열람, 감사 로그</td><td>메신저가 아님. 서버가 원문을 갖고 정책으로 막음, 로그도 서버가 보관</td></tr>
+        <tr><td>Trezor Shamir 백업 등</td><td>여러 명이 모여야 비밀 복원</td><td>대화 흐름, 요청·승인 절차 없음</td></tr>
+        <tr><td>Bitwarden 긴급 접근</td><td>승인하거나 대기 시간이 지나면 열림</td><td>최소 1일 대기, 서버가 시행</td></tr>
+        <tr><td>교육 실습</td><td>학생이 암호 채널에 끼어들거나 변조해 봄</td><td>실제로 쓰는 메신저가 아님</td></tr>
+      </table></div>
+      <p class="fine">"찾지 못함"은 없다는 증명이 아닙니다.</p>
+    </div></details>
+  </div>
+</section>
+
+<section class="part" id="part-build">
+  <div class="wrap">
+    <div class="num">3부</div>
+    <h2>만들기</h2>
+    <p>코드를 짤 때 펴 놓고 보는 부분입니다. 열쇠 구조, 금고 순서, 서버의 패킷과 처리 규칙, 코드 뼈대와 단계별 확인 방법을 모았습니다.</p>
+    <div class="chips"><a href="#keys">열쇠 구조</a><a href="#vaultflow">금고 순서</a><a href="#histcrypto">대화 기록</a><a href="#holes">막은 구멍</a><a href="#server">서버</a><a href="#console">공격 명령</a><a href="#code">코드 뼈대</a><a href="#steps">단계와 확인</a></div>
+  </div>
+</section>
+
+<section class="ch" id="keys">
+  <div class="wrap">
+    <div class="read">
+      <p class="eyebrow">crypto.c</p>
+      <h2>열쇠는 두 종류입니다</h2>
+      <p class="lead">한 번 만들어 계속 쓰는 신원 키와, 접속할 때마다 새로 만드는 세션 키. 신원 키가 세션 키에 도장을 찍어서 서버가 바꿔치기하지 못하게 합니다.</p>
+    </div>
+<pre class="code"><span class="y">~/.deolmi/id</span>  처음 실행할 때 한 번 만들고 저장 (Ed25519)
+ ├─ 지문   = 신원 공개키의 해시 → 한글 단어 8개 <span class="c">(실행할 때마다 같음)</span>
+ ├─ 서명   = 세션 키 · 금고 묶음 · 열람 요청 · 승인 · 열쇠 전달 증명
+ └─ 금고 키 = 신원 키를 X25519로 변환 → 금고 조각 봉인 <span class="c">(다음 접속에도 열 수 있게)</span>
+
+<span class="y">세션마다 새로</span>
+ └─ kx 키 쌍 → 신원 키로 서명해서 HELLO에 함께 보냄 → 방향별 시작 열쇠 CK0 (A→B, B→A)</pre>
+    <h3>문장 섞기 래칫</h3>
+<pre class="code"><span class="c">── 보낼 때 (n번째) ──</span>
+MK_n    = BLAKE2b(키 = CK_n, 내용 = "msg")             <span class="c">이 메시지만 잠그는 열쇠</span>
+암호문  = XChaCha20-Poly1305(MK_n, 평문_n, AD = 헤더의 type·from·to·seq)
+CK_n+1  = BLAKE2b(키 = CK_n, 내용 = "next" ‖ 평문_n)   <span class="c">방금 보낸 문장을 섞음</span>
+CK_n, MK_n 지움                                       <span class="c">열쇠는 보내지 않음</span>
+
+<span class="c">── 받을 때 ──</span>
+복사본으로 MK_n 계산 → 복호화 성공 → 같은 식으로 CK_n+1 → 반영하고 지움
+seq가 건너뛰면  <span class="r">[!] A→B #6이 오지 않음: 대화가 끊겼습니다. 다시 접속하세요</span></pre>
+    <div class="read">
+      <p>C에서는 <code>crypto_generichash(ck_next, 32, buf, len, ck, 32)</code> 한 줄입니다(마지막 두 인자가 키). 다시 접속하면 새 kx 키로 CK0부터 새로 시작합니다.</p>
+      <p class="fine">빠진 메시지를 알아채는 건 순서번호입니다. 문장 섞기는 그 뒤를 열리지 않게 잠급니다. 문장을 섞지 않는 일반 래칫과 보안상 차이는 거의 없습니다.</p>
+    </div>
+  </div>
+</section>
+
+<section class="ch" id="vaultflow">
+  <div class="wrap">
+    <div class="read">
+      <p class="eyebrow">vault.c</p>
+      <h2>금고는 이 순서로 움직입니다</h2>
+      <p class="lead">서버는 모든 단계에서 넘겨주기만 합니다. 조각은 B와 C의 신원에서 나온 키로만 열리고, 가짜 묶음이나 승인은 서명에서 걸립니다.</p>
+    </div>
+    <div class="tbl wide"><table>
+      <tr><th>#</th><th>누가 · 무엇을</th><th>서버가 보는 것</th></tr>
+      <tr><td>1 A</td><td>잠금 키 L 만들기 → 내용 암호화 → L = S1 ⊕ S2로 나누기 → (S1 + 제목 32바이트)를 B의 금고 키로, (S2 + 제목)을 C의 금고 키로 봉인 → 묶음 전체에 서명 → B, C에게 한 통씩 보내고 L, S1, S2 지움</td><td>암호문, 봉인 조각 2개, 서명</td></tr>
+      <tr><td>2 서버</td><td>to를 보고 B, C에게 넘겨줌. 보관하지 않음. 보유자가 접속해 있지 않으면 A에게 SYS 오류</td><td>지나가는 것만</td></tr>
+      <tr><td>3 B, C</td><td>A의 서명 확인 → 자기 조각만 열어 제목 확인 → 묶음을 <code>~/.deolmi/vault/</code>에 저장</td><td>-</td></tr>
+      <tr><td>4 B</td><td><code>/open</code> → 금고 해시에 서명한 열람 요청을 C에게</td><td>서명된 요청</td></tr>
+      <tr><td>5 C</td><td>B의 서명 확인 → <code>/approve</code> → 자기 조각 S2를 B의 금고 키로 다시 봉인 + 열쇠 전달 증명에 서명 → 자기 사본 지움, 승인한 해시 기억</td><td>B만 여는 조각, 증명</td></tr>
+      <tr><td>6 B</td><td>S1 ⊕ S2 = L → 복호화 → 보여 준 뒤 화면·스크롤 지움 → 묶음 지움 → 증명을 모두에게</td><td>증명</td></tr>
+    </table></div>
+    <p class="fine">금고 번호는 서버가 붙이지 않고 서명된 묶음의 해시(BLAKE2b 32바이트)를 씁니다.</p>
+  </div>
+</section>
+
+<section class="ch" id="histcrypto">
+  <div class="wrap">
+    <div class="read">
+      <p class="eyebrow">선택 4 · history.c</p>
+      <h2>잠긴 대화 기록</h2>
+      <p class="lead">서버는 그대로 아무것도 보관하지 않고, 각자 자기가 읽은 메시지만 자기 노트북에 잠가 둡니다. 기본은 꺼 둡니다.</p>
+    </div>
+    <div class="tbl"><table>
+      <tr><th>무엇</th><th>어떻게</th></tr>
+      <tr><td>열쇠</td><td>K = Argon2id(비밀번호, 무작위 소금 16바이트) (<code>crypto_pwhash</code>). K는 메모리에만 두고 끌 때 지움</td></tr>
+      <tr><td>파일</td><td><code>~/.deolmi/log/</code> 아래 대화마다 하나(<code>all.log</code>, <code>dm-B.log</code>)와 <code>salt</code>. 한 줄 = [길이 4][nonce 24][암호문 + 태그 16]</td></tr>
+      <tr><td>암호</td><td>XChaCha20-Poly1305. AD에 <b>대화 이름 + 줄 번호</b>를 넣어 줄을 바꾸거나 지우거나 옮기면 열 때 걸림</td></tr>
+      <tr><td>저장하는 것</td><td>복호화에 성공한 일반·1:1 메시지, 경고 줄, 열쇠 전달 증명</td></tr>
+      <tr><td>저장하지 않는 것</td><td>금고 내용, 모든 키</td></tr>
+      <tr><td>명령</td><td><code>/history [줄 수]</code> 지금 대화 기록 보기 · <code>/forget</code> salt와 기록 파일 지우기</td></tr>
+    </table></div>
+<pre class="code"><span class="c">── 처음 실행 ──</span>
+[*] 대화 기록을 저장할까요? 비밀번호를 정하면 켜집니다 (Enter = 저장 안 함)
+<span class="c">── 누가 기록 파일 1바이트를 고쳤다면 ──</span>
+<span class="r">[!] 기록 변조 감지: all.log #12</span></pre>
+  </div>
+</section>
+
+<section class="ch" id="holes">
+  <div class="wrap">
+    <div class="read">
+      <p class="eyebrow">보안 검토</p>
+      <h2>미리 막은 구멍</h2>
+      <p class="lead">처음 설계에서 찾은 구멍과 고친 방법입니다. 코드를 짤 때 이 줄을 빼먹으면 구멍이 다시 열립니다.</p>
+    </div>
+    <div class="tbl wide"><table>
+      <tr><th>심각도</th><th>구멍</th><th>막는 법</th></tr>
+      <tr><td><span class="sev hi">치명</span></td><td>봉인(sealed box)은 보낸 사람이 익명이라 서버가 "A의 금고"를 위조할 수 있음</td><td>A가 신원 키로 묶음 전체(보유자 2명, 봉인 조각 2개, 암호문, nonce, 제목 해시)에 서명. 금고 번호도 묶음 해시</td></tr>
+      <tr><td><span class="sev hi">치명</span></td><td>지문이 kx 키만 덮으면 서버가 봉인용 공개키를 바꿔치기해 두 조각을 다 엶</td><td>신원 키 하나만 지문으로 비교하고, 금고 키는 신원 키에서 변환. 세션 키는 신원 키로 서명</td></tr>
+      <tr><td><span class="sev mid">높음</span></td><td>숫자 12자리(40비트)는 생일 공격으로 수 분이면 깨짐</td><td>사람별 단어 8개(64비트). 특정인의 지문에 맞는 키를 찾아야 해서 2^64 수준</td></tr>
+      <tr><td><span class="sev mid">높음</span></td><td>세션 개인키가 메모리에 남아 "지금 키가 털려도 지난 대화는 안전"이 과장</td><td>말을 고침: "체인 키가 새도 지난 메시지는 안전. 프로그램 메모리 전체가 털리면 그 세션은 위험"</td></tr>
+      <tr><td><span class="sev mid">중간</span></td><td>승인자가 무엇을 승인하는지 모르고, 요청·승인에 서명이 없음</td><td>제목을 보유자 둘에게 봉인해서 보냄(길이 고정). 요청과 승인에 서명</td></tr>
+      <tr><td><span class="sev lo">참고</span></td><td>복호화가 실패해도 래칫이 전진하면 가짜 패킷 하나로 대화가 깨짐</td><td>복사본으로 복호화해 보고 성공했을 때만 반영</td></tr>
+      <tr><td><span class="sev lo">참고</span></td><td>서버가 예전 승인 요청을 다시 보냄</td><td>C가 이미 승인한 금고 해시를 기억해 두 번째 요청은 거절</td></tr>
+      <tr><td><span class="sev lo">참고</span></td><td>kx 키까지 신원 키에서 만들면 세션마다 같은 키가 나옴</td><td>kx 키는 세션마다 새로 만들고 신원 키로 서명만 함</td></tr>
+    </table></div>
+  </div>
+</section>
+
+<section class="ch" id="server">
+  <div class="wrap">
+    <div class="read">
+      <p class="eyebrow">server.c · net.c</p>
+      <h2>서버 만들기</h2>
+      <p class="lead">스레드 없이 <code>poll()</code> 하나로 도는 루프입니다. 접속한 사람들의 소켓과 키보드(공격 명령)를 한꺼번에 지켜보다가, 읽을 거리가 생긴 것만 처리합니다.</p>
+    </div>
+<pre class="code">main()
+ ├─ net_listen(9000)        <span class="c">소켓 · SO_REUSEADDR · bind(0.0.0.0) · listen</span>
+ └─ for (;;) poll(리스닝 소켓 + 키보드 + 클라이언트들)
+     ├─ 리스닝 소켓   → accept → 클라이언트 표에 추가
+     ├─ 키보드        → 공격 명령 한 줄 읽기 (tamper B, drop B …)
+     └─ 클라이언트    → recv → 그 사람 버퍼 뒤에 붙임
+          └─ 패킷이 통째로 모였으면 하나씩 꺼내 handle_packet()
+               ├─ HELLO → 등록 · 다른 사람들과 HELLO 주고받기 · SYS 입장
+               └─ 그 밖 → to에게 그대로 (중계 직전 공격 적용 · 서버의 눈 출력)</pre>
+    <div class="tbl"><table>
+      <tr><th>서버가 들고 있는 것</th><th>칸</th></tr>
+      <tr><td>클라이언트 표 (최대 16명)</td><td>소켓 fd, 받는 중인 버퍼와 길이, 이름 16, HELLO body 128, 등록 여부</td></tr>
+      <tr><td>공격 상태</td><td>사람별로 걸어 둔 공격(다음 한 통), 사람별 마지막으로 보낸 패킷(replay용), 서버 자신의 키(swap·forge용)</td></tr>
+    </table></div>
+    <p class="fine">금고 표는 없습니다. 고정 크기 배열이면 충분하고, 이름으로 찾을 때도 16칸을 처음부터 훑으면 됩니다.</p>
+
+    <h3>패킷 모양</h3>
+    <div class="read"><p>TCP는 바이트가 경계 없이 이어서 오기 때문에, 맨 앞 4바이트에 뒤따르는 길이를 적어 한 통씩 나눕니다.</p></div>
+    <div class="bytes"><div class="row">
+      <div class="len"><b>length</b><small>4B</small></div><div><b>type</b><small>1B</small></div><div><b>from</b><small>16B</small></div><div><b>to</b><small>16B</small></div><div><b>seq</b><small>8B</small></div><div><b>nonce</b><small>24B</small></div><div><b>body</b><small>최대 64KB</small></div>
+    </div></div>
+    <ul class="read">
+      <li>length = 헤더 65바이트 + body 길이. 네트워크 바이트 순서(<code>htonl</code>)</li>
+      <li>seq는 8바이트라 <code>htonl</code>이 없으니 시프트로 큰 자리부터 한 바이트씩</li>
+      <li>이름은 최대 15글자, 남는 칸은 0</li>
+      <li>구조체를 그대로 <code>send</code>하지 않음. 패딩이 끼어서 바이트 배열에 한 칸씩 복사</li>
+    </ul>
+    <div class="tbl wide"><table>
+      <tr><th>type</th><th>방향</th><th>body</th><th>서버</th></tr>
+      <tr><td>1 HELLO</td><td>클라 → 서버</td><td>신원 공개키 32 + 세션 kx 공개키 32 + 서명 64 (신원 키로 이름 + kx 공개키에 서명)</td><td>접속 후 첫 패킷이어야 함. 저장하고 다른 사람들에게 그대로 전달. 서명은 검사하지 않음</td></tr>
+      <tr><td>1 HELLO</td><td>서버 → 클라</td><td>같음, from = 키 주인</td><td>새 사람에게 기존 전원의 HELLO, 기존 전원에게 새 HELLO</td></tr>
+      <tr><td>2 MSG</td><td>클라 → 클라</td><td>암호문 + 태그 16. 전체/1:1 표시는 암호문 안 첫 바이트</td><td>to에게 그대로. 전체 대화는 보내는 쪽이 사람마다 따로 보냄</td></tr>
+      <tr><td>3 VAULT</td><td>A → B, A → C</td><td>금고 묶음: 보유자 이름 2 + 봉인 조각 2 (각 112 = 32 + 제목 32 + 48) + 제목 해시 32 + 암호문 + A 서명 64. nonce는 헤더 칸</td><td>to에게 그대로, 저장 안 함</td></tr>
+      <tr><td>4 OPEN_REQ</td><td>B → C</td><td>금고 해시 32 + B 서명 64</td><td>to에게 그대로</td></tr>
+      <tr><td>5 SHARE</td><td>C → B</td><td>B의 금고 키로 다시 봉인한 조각 112 + 증명 서명 64</td><td>to에게 그대로</td></tr>
+      <tr><td>6 PROOF</td><td>B → 접속자 한 명씩</td><td>열쇠 전달 증명: 금고 해시, 제목, 시각, A·B·C 서명</td><td>to에게 그대로</td></tr>
+      <tr><td>7 SYS</td><td>서버 → 클라</td><td>UTF-8 문장</td><td>입장·퇴장·오류 알림</td></tr>
+    </table></div>
+    <p class="fine">서버가 내용을 보는 건 HELLO와 SYS뿐입니다. 나머지는 type과 상관없이 to에게 넘기므로 금고를 만들어도 서버 코드는 거의 그대로입니다.</p>
+
+    <h3>처리 규칙</h3>
+    <div class="tbl"><table>
+      <tr><th>상황</th><th>서버 동작</th></tr>
+      <tr><td>등록 전에 HELLO 외의 패킷</td><td>SYS "먼저 HELLO" 보내고 연결 끊기</td></tr>
+      <tr><td>HELLO, 이름이 사용 중이거나 비어 있음</td><td>SYS "이름 사용 중" 보내고 연결 끊기</td></tr>
+      <tr><td>HELLO 정상</td><td>① HELLO body 저장 ② 새 사람에게 기존 전원의 HELLO ③ 기존 전원에게 새 HELLO ④ 전원에게 SYS "B 입장"</td></tr>
+      <tr><td>from이 등록한 이름과 다름</td><td>버리고 SYS 오류 (남의 이름으로 보내기 차단)</td></tr>
+      <tr><td>to가 없는 사람</td><td>보낸 사람에게 SYS "B는 접속해 있지 않습니다"</td></tr>
+      <tr><td>length가 65보다 작거나 65 + 64KB보다 큼</td><td>연결 끊기 (버퍼를 늘리지 않음)</td></tr>
+      <tr><td>연결 끊김 (recv 0 또는 오류)</td><td>표에서 지우고 전원에게 SYS "B 퇴장"</td></tr>
+      <tr><td>모르는 type</td><td>버리고 SYS 오류</td></tr>
+    </table></div>
+    <h3>서버의 눈</h3>
+    <div class="read"><p>중계할 때마다 서버 창에 한 줄씩 남깁니다. 발표에서 "서버에는 암호문만 보인다"를 보여 주는 화면이 바로 이것입니다.</p></div>
+<pre class="code">[join ] B (fd 5) 지문 고래-사과-호랑이-연필…
+[relay] A → B  MSG    seq=4  57B  8e 1f 0a 77 c2 d9 43 b5 …
+[relay] A → B  VAULT  seq=0  412B b0 7e 42 19 …
+<span class="r">[tamper] A → B  MSG  seq=5  마지막 바이트 ^= 0x01</span>
+[leave] C</pre>
+  </div>
+</section>
+
+<section class="ch" id="console">
+  <div class="wrap">
+    <div class="read">
+      <p class="eyebrow">공격 실험실 · server.c</p>
+      <h2>서버 창에서 치는 공격 명령</h2>
+      <p class="lead">대화 중에 서버 창에 명령을 치면 중계 직전에 그 공격을 적용합니다. 공격한 줄은 서버의 눈에 빨갛게 나옵니다.</p>
+    </div>
+    <div class="tbl wide"><table>
+      <tr><th>명령</th><th>서버가 하는 짓</th><th>덜미</th></tr>
+      <tr><td><code>tamper B</code></td><td>B에게 가는 다음 MSG 암호문 마지막 바이트를 <code>^= 0x01</code></td><td>B: [!] 변조 감지</td></tr>
+      <tr><td><code>replay B</code></td><td>B에게 마지막으로 보낸 패킷을 한 번 더 보냄</td><td>B: [!] 순서번호 불일치</td></tr>
+      <tr><td><code>drop B</code></td><td>B에게 가는 다음 MSG를 몰래 버림</td><td>그다음 메시지가 오면 B: [!] #6이 오지 않음: 대화 끊김</td></tr>
+      <tr><td><code>swap B</code></td><td>서버 키로 만든 가짜 B의 HELLO를 전원에게 뿌림</td><td>전원: [!] B의 열쇠가 바뀜 + 단어 비교</td></tr>
+      <tr><td><code>peek</code></td><td>마지막으로 지나간 금고 조각을 서버 키로 열어 봄</td><td>서버 창: 열기 실패 (조각이 B, C에게 봉인됨)</td></tr>
+      <tr><td><code>forge B C</code></td><td>남의 이름으로 서버 키가 서명한 가짜 금고를 B, C에게</td><td>B, C: [!] 서명 불일치</td></tr>
+      <tr><td><code>mitm A B</code> <span class="tier opt">선택</span></td><td>처음부터 양쪽과 따로 키를 맞춰 평문을 엿보고 다시 암호화</td><td>서버 창에 평문이 보임 → 단어를 비교하는 순간 들킴</td></tr>
+    </table></div>
+    <p class="fine"><code>swap</code>·<code>peek</code>·<code>forge</code>·<code>mitm</code> 때문에 서버도 libsodium을 링크합니다(키 만들기와 서명만). 단어를 맞추기 전에는 서버가 자기 키로 서명해서 <code>forge</code>가 통하고, 맞춘 뒤에는 실패합니다. 발표에서 이 두 장면을 차례로 보여 줍니다.</p>
+  </div>
+</section>
+
+<section class="ch" id="code">
+  <div class="wrap">
+    <div class="read">
+      <p class="eyebrow">뼈대</p>
+      <h2>코드 뼈대</h2>
+      <p class="lead">방향을 보여 주는 뼈대입니다. 오류 처리는 줄였고, 1단계부터 직접 빌드하면서 채웁니다.</p>
+    </div>
+    <div class="codehead">net.h <span>서버와 클라이언트가 같이 쓰는 부분</span></div>
+<pre class="code"><span class="k">#include</span> &lt;stdint.h&gt;
+<span class="k">#include</span> &lt;stddef.h&gt;
+
+<span class="k">#define</span> NAME_LEN   16
+<span class="k">#define</span> NONCE_LEN  24
+<span class="k">#define</span> HDR_LEN    (1 + NAME_LEN + NAME_LEN + 8 + NONCE_LEN)   <span class="c">/* 65 */</span>
+<span class="k">#define</span> MAX_BODY   65536
+<span class="k">#define</span> HELLO_LEN  (32 + 32 + 64)   <span class="c">/* 신원 공개키 + 세션 kx 공개키 + 서명 */</span>
+
+<span class="k">enum</span> { T_HELLO = 1, T_MSG, T_VAULT, T_OPEN_REQ, T_SHARE, T_PROOF, T_SYS };
+
+<span class="k">struct</span> packet {
+    uint8_t  type;
+    <span class="k">char</span>     from[NAME_LEN], to[NAME_LEN];
+    uint64_t seq;
+    uint8_t  nonce[NONCE_LEN];
+    uint32_t body_len;
+    uint8_t  body[MAX_BODY];
+};
+
+<span class="k">struct</span> conn {                 <span class="c">/* 받는 중인 바이트를 모아 두는 곳 */</span>
+    <span class="k">int</span>     fd;
+    uint8_t buf[4 + HDR_LEN + MAX_BODY];
+    size_t  len;
+};
+
+<span class="k">int</span> net_listen(<span class="k">int</span> port);
+<span class="k">int</span> net_connect(<span class="k">const char</span> *host, <span class="k">int</span> port);
+<span class="k">int</span> send_packet(<span class="k">int</span> fd, <span class="k">const struct</span> packet *p);
+<span class="k">int</span> conn_read(<span class="k">struct</span> conn *c);                    <span class="c">/* &gt;0 받음, 0 끊김, -1 오류 */</span>
+<span class="k">int</span> conn_take(<span class="k">struct</span> conn *c, <span class="k">struct</span> packet *p); <span class="c">/* 1 꺼냄, 0 덜 옴, -1 잘못된 길이 */</span></pre>
+
+    <div class="codehead">net.c <span>직렬화와 "덜 온 패킷" 처리</span></div>
+<pre class="code"><span class="k">int</span> send_packet(<span class="k">int</span> fd, <span class="k">const struct</span> packet *p)
+{
+    <span class="k">static</span> uint8_t out[4 + HDR_LEN + MAX_BODY];
+    uint32_t len = HDR_LEN + p-&gt;body_len;
+    uint32_t nlen = htonl(len);
+    uint8_t *q = out;
+
+    memcpy(q, &amp;nlen, 4);            q += 4;
+    *q++ = p-&gt;type;
+    memcpy(q, p-&gt;from, NAME_LEN);   q += NAME_LEN;
+    memcpy(q, p-&gt;to, NAME_LEN);     q += NAME_LEN;
+    <span class="k">for</span> (<span class="k">int</span> i = 7; i &gt;= 0; i--)     <span class="c">/* seq: 큰 자리부터 */</span>
+        *q++ = (uint8_t)(p-&gt;seq &gt;&gt; (i * 8));
+    memcpy(q, p-&gt;nonce, NONCE_LEN); q += NONCE_LEN;
+    memcpy(q, p-&gt;body, p-&gt;body_len);
+
+    size_t total = 4 + len, sent = 0;
+    <span class="k">while</span> (sent &lt; total) {          <span class="c">/* send는 일부만 보낼 수 있다 */</span>
+        ssize_t n = send(fd, out + sent, total - sent, MSG_NOSIGNAL);
+        <span class="k">if</span> (n &lt;= 0) <span class="k">return</span> -1;
+        sent += (size_t)n;
+    }
+    <span class="k">return</span> 0;
+}
+
+<span class="k">int</span> conn_take(<span class="k">struct</span> conn *c, <span class="k">struct</span> packet *p)
+{
+    uint32_t len;
+    <span class="k">if</span> (c-&gt;len &lt; 4) <span class="k">return</span> 0;
+    memcpy(&amp;len, c-&gt;buf, 4);
+    len = ntohl(len);
+    <span class="k">if</span> (len &lt; HDR_LEN || len &gt; HDR_LEN + MAX_BODY) <span class="k">return</span> -1;
+    <span class="k">if</span> (c-&gt;len &lt; 4 + len) <span class="k">return</span> 0;   <span class="c">/* 아직 덜 왔음: 다음 recv를 기다림 */</span>
+
+    <span class="k">const</span> uint8_t *q = c-&gt;buf + 4;
+    p-&gt;type = *q++;
+    memcpy(p-&gt;from, q, NAME_LEN); q += NAME_LEN;
+    memcpy(p-&gt;to, q, NAME_LEN);   q += NAME_LEN;
+    p-&gt;from[NAME_LEN - 1] = p-&gt;to[NAME_LEN - 1] = '\0';
+    p-&gt;seq = 0;
+    <span class="k">for</span> (<span class="k">int</span> i = 0; i &lt; 8; i++) p-&gt;seq = (p-&gt;seq &lt;&lt; 8) | *q++;
+    memcpy(p-&gt;nonce, q, NONCE_LEN); q += NONCE_LEN;
+    p-&gt;body_len = len - HDR_LEN;
+    memcpy(p-&gt;body, q, p-&gt;body_len);
+
+    c-&gt;len -= 4 + len;              <span class="c">/* 꺼낸 만큼 앞으로 당긴다 */</span>
+    memmove(c-&gt;buf, c-&gt;buf + 4 + len, c-&gt;len);
+    <span class="k">return</span> 1;
+}</pre>
+    <p class="fine read"><code>struct packet</code>은 64KB가 넘으니 함수 안 지역 변수로 두지 말고 <code>static</code>이나 전역으로 하나만 둡니다.</p>
+
+    <div class="codehead">server.c <span>poll 루프와 중계</span></div>
+<pre class="code"><span class="k">#define</span> MAX_CLIENTS 16
+
+<span class="k">struct</span> client {
+    <span class="k">struct</span> conn c;
+    <span class="k">char</span>    name[NAME_LEN];
+    uint8_t hello[HELLO_LEN];
+    <span class="k">int</span>     registered;
+};
+
+<span class="k">static struct</span> client clients[MAX_CLIENTS];
+<span class="k">static int</span> nclients;
+<span class="k">static struct</span> packet pkt;
+
+<span class="k">int</span> main(<span class="k">void</span>)
+{
+    <span class="k">int</span> lfd = net_listen(9000);
+    <span class="k">struct</span> pollfd fds[2 + MAX_CLIENTS];
+
+    signal(SIGPIPE, SIG_IGN);
+    printf(<span class="g">"[서버] 9000번에서 기다리는 중\n"</span>);
+    <span class="k">for</span> (;;) {
+        <span class="k">int</span> n = nclients;            <span class="c">/* 이번 바퀴에 지켜볼 사람 수 */</span>
+        fds[0] = (<span class="k">struct</span> pollfd){ .fd = lfd, .events = POLLIN };
+        fds[1] = (<span class="k">struct</span> pollfd){ .fd = 0,   .events = POLLIN };   <span class="c">/* 키보드 */</span>
+        <span class="k">for</span> (<span class="k">int</span> i = 0; i &lt; n; i++)
+            fds[2 + i] = (<span class="k">struct</span> pollfd){ .fd = clients[i].c.fd, .events = POLLIN };
+        poll(fds, 2 + n, -1);
+
+        <span class="k">for</span> (<span class="k">int</span> i = n - 1; i &gt;= 0; i--) {   <span class="c">/* 뒤에서부터: 도중에 지워도 안전 */</span>
+            <span class="k">if</span> (!(fds[2 + i].revents &amp; (POLLIN | POLLHUP | POLLERR))) <span class="k">continue</span>;
+            <span class="k">int</span> r;
+            <span class="k">if</span> (conn_read(&amp;clients[i].c) &lt;= 0) { drop_client(i); <span class="k">continue</span>; }
+            <span class="k">while</span> ((r = conn_take(&amp;clients[i].c, &amp;pkt)) == 1)
+                <span class="k">if</span> (handle_packet(i, &amp;pkt) &lt; 0) <span class="k">break</span>;   <span class="c">/* -1이면 이미 drop_client(i) */</span>
+            <span class="k">if</span> (r &lt; 0) drop_client(i);
+        }
+        <span class="k">if</span> (fds[1].revents &amp; POLLIN)
+            read_command();                  <span class="c">/* tamper B, drop B ... */</span>
+        <span class="k">if</span> (fds[0].revents &amp; POLLIN)
+            add_client(accept(lfd, NULL, NULL));   <span class="c">/* 꽉 찼으면 SYS 보내고 close */</span>
+    }
+}
+
+<span class="k">static void</span> relay(<span class="k">int</span> from, <span class="k">struct</span> packet *p)
+{
+    <span class="k">int</span> to = find_client(p-&gt;to);
+    <span class="k">if</span> (to &lt; 0) { send_sys(from, <span class="g">"%s는 접속해 있지 않습니다"</span>, p-&gt;to); <span class="k">return</span>; }
+    <span class="k">if</span> (apply_attack(to, p) == DROPPED) <span class="k">return</span>;   <span class="c">/* 공격 실험실 */</span>
+    show_eye(p);                                      <span class="c">/* 서버의 눈 한 줄 */</span>
+    send_packet(clients[to].c.fd, p);
+}</pre>
+    <div class="read">
+      <p class="fine"><code>drop_client(i)</code>는 소켓을 닫고 마지막 칸을 i번 자리로 옮깁니다. 루프를 뒤에서부터 돌아서 확인할 칸을 건너뛰지 않습니다. 새 접속은 클라이언트를 다 처리한 뒤에 받아서, 이번 바퀴에 지켜보지 않은 칸을 읽는 일이 없습니다. 중계하다 send가 실패해도 그 자리에서 지우지 말고 넘어가면, 다음 poll에서 끊김으로 잡혀 정상 경로로 지워집니다.</p>
+    </div>
+  </div>
+</section>
+
+<section class="ch" id="steps">
+  <div class="wrap">
+    <div class="read">
+      <p class="eyebrow">하나씩 쌓기</p>
+      <h2>단계와 확인 방법</h2>
+      <p class="lead">확인을 통과해야 다음 단계로 넘어갑니다. 어느 단계에서 멈춰도 돌아가는 버전이 남습니다.</p>
+    </div>
+    <div class="tbl wide"><table>
+      <tr><th>단계</th><th>할 일</th><th>확인 방법</th><th>주차</th></tr>
+      <tr><td>S1</td><td>에코 서버: 한 명이 보낸 걸 그대로 돌려줌</td><td><code>nc 127.0.0.1 9000</code>으로 친 글자가 돌아옴</td><td>10</td></tr>
+      <tr><td>S2</td><td><code>poll</code>로 여러 명, 한 명이 보낸 줄을 나머지에게 (아직 줄 단위)</td><td><code>nc</code> 3개로 평문 채팅. 하나를 Ctrl+C로 꺼도 서버가 살아 있음</td><td>10</td></tr>
+      <tr><td>S3</td><td><code>net.c</code> 길이 붙인 패킷 + <code>tests/test_net.c</code></td><td>① 1바이트씩 쪼개 보내기 ② 두 통을 한 번에 ③ 길이 0xFFFFFFFF → ①② 정상, ③ 그 연결만 끊김</td><td>10</td></tr>
+      <tr><td>S4</td><td>HELLO 등록·전달, to로 중계, 입장·퇴장 SYS</td><td>3명 접속 → 각자 나머지 2명의 HELLO를 받음. 같은 이름 거절. 없는 이름에게 보내면 SYS</td><td>10</td></tr>
+      <tr><td>S5</td><td>채팅 화면(입력하면서 받기) + 서버의 눈</td><td>노트북 1대에서 3명 평문 채팅, 서버 창에 hex</td><td>10</td></tr>
+      <tr><td>S6</td><td>암호화를 붙이고 공격 명령 <code>tamper</code> <code>replay</code> <code>drop</code></td><td>각 경고가 받는 쪽 화면에 뜸</td><td>11 ★</td></tr>
+      <tr><td>S7</td><td>신원 키·단어 지문 + <code>swap</code></td><td>전원에게 열쇠 바뀜 경보</td><td>11 ★</td></tr>
+      <tr><td>S8</td><td>금고 패킷 중계 + <code>peek</code> <code>forge</code></td><td>B 혼자 못 열고 C 승인 후 열림. 위조는 서명 경고, peek은 실패</td><td>12</td></tr>
+      <tr><td>S9</td><td><code>mitm</code> (선택)</td><td>단어를 맞추기 전에는 서버 창에 평문, 맞춘 뒤 들킴</td><td>12</td></tr>
+    </table></div>
+    <p class="fine">S1~S5는 암호 없이 끝낼 수 있습니다. body에 평문을 넣어 먼저 끝까지 돌려 보고, 암호화를 붙여도 서버 코드는 거의 바뀌지 않습니다. S3부터는 <code>nc</code>로 길이 붙은 바이트를 보내기 어려워서 <code>net.c</code>를 같이 쓰는 짧은 테스트 프로그램을 씁니다.</p>
+
+    <h3>자주 걸리는 함정</h3>
+    <div class="tbl wide"><table>
+      <tr><th>증상</th><th>원인</th><th>대처</th></tr>
+      <tr><td>한 명이 나가자 서버가 조용히 죽음</td><td>닫힌 소켓에 send하면 SIGPIPE로 종료</td><td><code>signal(SIGPIPE, SIG_IGN)</code> 또는 <code>MSG_NOSIGNAL</code></td></tr>
+      <tr><td>껐다 켜면 <code>bind: Address already in use</code></td><td>방금 닫은 포트가 잠깐 TIME_WAIT</td><td>bind 전에 <code>setsockopt(SO_REUSEADDR)</code></td></tr>
+      <tr><td>가끔 메시지가 깨지거나 두 통이 붙어서 옴</td><td>recv 한 번이 패킷 하나라고 가정함</td><td>항상 버퍼에 붙이고 <code>conn_take</code>로 꺼냄</td></tr>
+      <tr><td>다른 노트북에서 seq가 이상한 큰 수</td><td>바이트 순서 변환 없이 보냄</td><td>length는 <code>htonl</code>, seq는 시프트</td></tr>
+      <tr><td>packet 변수 선언하자마자 Segmentation fault</td><td>64KB 넘는 구조체를 지역 변수로 둠</td><td><code>static</code> 또는 전역</td></tr>
+      <tr><td>서버 창에 친 공격 명령이 안 먹음</td><td>서버를 <code>&amp;</code>로 백그라운드 실행해서 키보드가 없음</td><td>서버는 자기 터미널 창에서 그냥 실행</td></tr>
+      <tr><td>다른 노트북에서 접속이 안 됨</td><td>WSL 기본 네트워크, 방화벽, 학교 Wi-Fi</td><td>서버 노트북에 mirrored 설정 + 방화벽 9000 허용. 안 되면 휴대폰 핫스팟</td></tr>
+    </table></div>
+
+    <h3>정해 둔 값</h3>
+    <div class="tbl"><table>
+      <tr><th>무엇</th><th>값</th></tr>
+      <tr><td>포트 · 최대 인원</td><td>9000번 · 16명</td></tr>
+      <tr><td>이름</td><td>최대 15글자</td></tr>
+      <tr><td>MSG의 AD</td><td>헤더의 type · from · to · seq</td></tr>
+      <tr><td>금고 번호</td><td>서명된 묶음의 BLAKE2b 해시 32바이트</td></tr>
+      <tr><td>seq 검사</td><td>받는 클라이언트가 함 (서버는 안 봄)</td></tr>
+      <tr><td>금고를 누가 읽나</td><td>요청한 1명이 1번, 승인자는 못 읽음</td></tr>
+    </table></div>
   </div>
 </section>
 
 </main>
 
-<footer><div class="wrap"><span>덜미 · 프로그래밍기초2 팀 프로젝트 · 2026. 10.</span><span><a href="../proposal/">프로젝트 제안서</a> · <a href="../server/">중계 서버 기획서</a></span></div></footer>
+<footer><div class="wrap"><span>덜미 · 프로그래밍기초2 팀 프로젝트 · 2026. 10.</span><span><a href="#part-plan">계획</a> · <a href="#part-build">만들기</a></span></div></footer>
 
 <script>
 const $ = s => document.querySelector(s);
