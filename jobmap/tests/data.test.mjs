@@ -1,4 +1,4 @@
-// 데이터 무결성: 문항 구성, id·key, 흥미 코드, 출처, 학과 paths·사례, 2024년 이전 연도(C5), 직무 쏠림(M6).
+// 데이터 무결성: 문항 구성, id·key, 끌림 방향, 우리 말(5차), 출처, 학과 paths·사례, 2024년 이전 연도(C5), 직무 쏠림(M6).
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync, existsSync } from "node:fs";
@@ -48,13 +48,44 @@ test("문항 id 중복 없음, 흥미 문항 id 첫 글자가 영역 id", () => 
   for (const it of Q.interest.items) assert.ok(AREAS.includes(it.id[0]), it.id);
 });
 
-test("직무 key 중복 없음, 흥미 코드 형식, O*NET 주소 형식", () => {
+test("직무 key 중복 없음, 끌림 방향(riasec) 형식, O*NET 주소 형식", () => {
   const keys = D.jobs.map((j) => j.key);
   assert.equal(new Set(keys).size, keys.length);
   for (const j of D.jobs) {
     assert.match(j.riasec || "", /^[RIASEC]{1,3}$/, j.key);
     assert.equal(new Set(j.riasec).size, j.riasec.length, `${j.key}: 글자 중복`);
     assert.match(j.onet || "", /^https:\/\/www\.onetonline\.org\/link\/summary\/\d{2}-\d{4}\.\d{2}$/, j.key);
+  }
+});
+
+// 5차: 기존 검사 이름·꼴을 화면 글에 쓰지 않는다. 문항은 짧게(고객이 좋아함)
+test("화면 글에 기존 검사 이름(○○형·홀랜드·RIASEC·흥미 코드·육각형)이 없다", () => {
+  const bad = strings(D).filter(([, s]) => /(현실|탐구|예술|사회|진취|기업|관습)형|홀랜드|RIASEC|흥미 ?코드|육각형/i.test(s)).map(([p, s]) => `${p}: ${s.slice(0, 40)}`);
+  assert.deepEqual(bad, []);
+});
+
+test("끌림 6방향: 이름·한 줄·일상 예시가 있고 '○○형'이 아니다", () => {
+  assert.equal(AREAS.join(""), "RIASEC");
+  for (const x of Q.areas) {
+    for (const k of ["name", "short", "desc", "line"]) assert.ok(typeof x[k] === "string" && x[k].trim(), `${x.id}.${k}`);
+    assert.ok(!/형$/.test(x.name), x.name);
+    assert.ok(Array.isArray(x.daily) && x.daily.length >= 2 && x.daily.every((t) => t.trim()), `${x.id}.daily`);
+  }
+  assert.equal(new Set(Q.areas.map((x) => x.name)).size, Q.areas.length);
+});
+
+test("문항 길이: 이럴 때 20자, 요즘 나 24자 이하", () => {
+  for (const it of Q.interest.items) assert.ok([...it.q].length <= 20, it.q);
+  for (const it of Q.readyItems) assert.ok([...it.q].length <= 24, it.q);
+});
+
+test("챕터 안내: 묶음 순서대로 있고 '· N개/번'이 실제 문항 수와 같다", () => {
+  assert.equal(Q.chapters.map((c) => c.id).join(), "basics,interest,ready,values,sector");
+  const n = { basics: Q.basics.length, interest: Q.interest.items.length, ready: Q.readyItems.length, values: Q.pairs.length, sector: 1 };
+  for (const c of Q.chapters) {
+    assert.ok(c.tag && c.title && c.line, c.id);
+    const m = c.line.match(/· (\d+)(개|번)$/);
+    if (m) assert.equal(+m[1], n[c.id], c.id);
   }
 });
 

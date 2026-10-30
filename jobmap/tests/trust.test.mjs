@@ -25,7 +25,7 @@ function parse(html) {
     if (m[4] != null) cur.kids.push({ text: m[4] });
     else if (m[1] && m[2]) { let n = cur; while (n !== root && n.tag !== m[2].toLowerCase()) n = n.up; if (n !== root) cur = n.up; }
     else if (m[2]) {
-      const el = { tag: m[2].toLowerCase(), cls: ((m[3].match(/\bclass="([^"]*)"/) || [])[1] || "").split(/\s+/), kids: [], up: cur };
+      const el = { tag: m[2].toLowerCase(), cls: ((m[3].match(/\bclass="([^"]*)"/) || [])[1] || "").split(/\s+/), href: (m[3].match(/\bhref="([^"]*)"/) || [])[1], kids: [], up: cur };
       cur.kids.push(el);
       if (!VOID.has(el.tag) && !m[3].trim().endsWith("/")) cur = el;
     }
@@ -65,7 +65,8 @@ function randomSet(school = rnd() < 0.6 ? "ssu" : "etc") {
   () => (rnd() < low ? 1 + Math.floor(rnd() * 2) : 3 + Math.floor(rnd() * 3)));
 }
 const label = (r) => `${r.a.school}/${r.a.dept ?? "-"}/${r.a.year}/${r.sector.join("+")}`;
-const week = (r) => byCls(r.tree, "r-week")[0];
+// 5차: .r-week는 이번 주 목록·상담 한 줄·캘린더·학년 할 일(#r-todo)을 담은 카드가 됐다. '이번 주 할 일'은 카드 바로 아래 ol·p만 본다
+const week = (r) => { const c = byCls(r.tree, "r-week")[0]; return c && { kids: c.kids.filter((k) => k.tag === "ol" || k.tag === "p") }; };
 const weekLi = (r) => (week(r) ? all(week(r), (e) => e.tag === "li") : []);
 const mindOn = (a) => a.m4 <= 2 || MIND.reduce((s, it) => s + a[it.id], 0) / MIND.length <= 2;
 const textOut = (n) => n.text != null ? n.text : n.tag === "details" ? "" : (n.kids || []).map(textOut).join("");
@@ -74,8 +75,9 @@ const textOut = (n) => n.text != null ? n.text : n.tag === "details" ? "" : (n.k
 function counsel(r) {
   const hits = [];
   for (const li of all(r.tree, (e) => e.tag === "li")) {
-    // li > a는 할 일 링크만 세요. 결과 직무 카드(a.jobcard)의 직무 이름·설명은 상담 권유가 아니에요(결정 31, 4차 QA D1)
-    for (const k of li.kids) if ((k.tag === "b" || k.tag === "a") && /상담/.test(txt(k)) && !k.cls.includes("jobcard")) hits.push(k);
+    // li > a는 할 일 링크만 세요. 직무 사전으로 가는 직무 이름('진로 상담' 직무)은 상담 권유가 아니에요(결정 31, 4차 QA D1).
+    // 5차: 직무 카드(a.jobcard)가 색면 2·3위·'왜' 칸 링크로 바뀌어 클래스 대신 주소(#jobs-…)로 거른다
+    for (const k of li.kids) if ((k.tag === "b" || k.tag === "a") && /상담/.test(txt(k)) && !(k.href || "").startsWith("#jobs-")) hits.push(k);
     // 보충 목록 줄은 '→' 뒤 제목(b)만 본다(how 문장의 '채용상담회' 같은 말은 권유가 아님)
     if (within(li, (n) => n.cls.includes("fixes"))) for (const k of li.kids) if (k.tag && /^\s*→/.test(txt(k))) hits.push(...all(k, (b) => b.tag === "b" && /상담/.test(txt(b))));
   }

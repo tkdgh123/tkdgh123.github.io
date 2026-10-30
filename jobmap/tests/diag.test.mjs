@@ -1,4 +1,4 @@
-// 진단 규칙: 규칙별 켜짐·꺼짐 경계, 무작위 ctx 예외, why 문자열, id 중복, steps url 형식.
+// 진단 규칙: 규칙별 켜짐·꺼짐 경계, 무작위 ctx 예외, why 문자열(옛 '○○형' 이름 없음), id 중복, steps url 형식.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { load } from "./load.mjs";
@@ -53,7 +53,7 @@ test("무작위 1000개 ctx에서 when·why가 예외 없이 동작하고 why에
       if (!x.when(c)) continue;
       const why = typeof x.why === "function" ? x.why(c) : x.why;
       assert.equal(typeof why, "string", x.id);
-      assert.ok(!/undefined|NaN/.test(why), `${x.id}: ${why}`);
+      assert.ok(!/undefined|NaN|[가-힣]형'/.test(why), `${x.id}: ${why}`);
     }
   }
 });

@@ -4,7 +4,10 @@
   --bg: #F7F8FA; --surface: #FFFFFF; --surface-2: #F2F4F6; --line: #E5E8EB; --line-strong: #D1D6DB;
   --text: #191F28; --text-2: #4E5968; --text-3: #5F6B78;
   --acc: #3A4BD0; --acc-strong: #2F3DB0; --acc-soft: #EEF0FD; --on-acc: #FFFFFF;
-  --warn: #B45309; --warn-soft: #FEF3E2; --idle: #8D95A3;
+  --warn: #B45309; --warn-soft: #FEF3E2; --on-warn: #FFFFFF; --idle: #8D95A3;
+  /* 결과 맨 위 색면과 결과 바탕(5차): 흰 글/색면 6.78:1, 78% 흰 글 4.79:1 */
+  --hero: #3A4BD0; --on-hero: #FFFFFF; --on-hero-2: rgba(255,255,255,.78); --hero-chip: rgba(255,255,255,.14); --hero-tile: #FFFFFF; --on-hero-tile: #191F28;
+  --bg-result: #EEF1F5; --card-shadow: 0 1px 2px rgba(17,24,39,.04), 0 8px 24px rgba(17,24,39,.06);
   --font: "Pretendard Variable", Pretendard, "Pretendard Fallback", -apple-system, BlinkMacSystemFont, system-ui, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
   /* 크기/줄간격 (원티드 Montage 단계, 본문은 토스피드 17px). 화면마다 6가지 이하(E7): cap은 label, h3는 sec로 합쳤다(4차 C1) */
   --fs-display: 2.5rem; --lh-display: 3.25rem;
@@ -18,7 +21,7 @@
   --ls-tight: -0.02em;
   --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 20px; --s-6: 24px;
   --s-8: 32px; --s-10: 40px; --s-12: 48px; --s-16: 64px; --s-20: 80px;
-  --r-sm: 8px; --r-md: 12px; --r-lg: 16px; --r-xl: 20px; --r-full: 999px;
+  --r-sm: 8px; --r-md: 12px; --r-lg: 16px; --r-xl: 20px; --r-2xl: 28px; --r-full: 999px;
   --shadow-sm: 0 1px 2px rgba(17,24,39,.04), 0 1px 1px rgba(17,24,39,.03);
   --shadow-md: 0 6px 20px rgba(17,24,39,.07);
   --dur-1: 120ms; --dur-2: 200ms; --dur-3: 280ms; --dur-4: 360ms;
@@ -38,14 +41,18 @@
   --bg: #15171C; --surface: #1C1F27; --surface-2: #252935; --line: #2C303B; --line-strong: #3A3F4C;
   --text: #E9EBEF; --text-2: #B0B6C2; --text-3: #A1A9B6;
   --acc: #9BA6FF; --acc-strong: #B6BEFF; --acc-soft: #262B4A; --on-acc: #141833;
-  --warn: #F0B54A; --warn-soft: #3A2E17; --idle: #6B7280;
+  --warn: #F0B54A; --warn-soft: #3A2E17; --on-warn: #15171C; --idle: #6B7280;
+  --hero: #2B3590; --on-hero-2: rgba(255,255,255,.74); --hero-chip: rgba(255,255,255,.12); --hero-tile: #E9EBEF; --on-hero-tile: #141833;
+  --bg-result: #111318; --card-shadow: 0 0 0 1px rgba(255,255,255,.07), 0 8px 24px rgba(0,0,0,.45);
   --shadow-sm: 0 0 0 1px rgba(255,255,255,.06); --shadow-md: 0 0 0 1px rgba(255,255,255,.08), 0 8px 24px rgba(0,0,0,.5);
   color-scheme: dark } }
 :root[data-theme="dark"] {
   --bg: #15171C; --surface: #1C1F27; --surface-2: #252935; --line: #2C303B; --line-strong: #3A3F4C;
   --text: #E9EBEF; --text-2: #B0B6C2; --text-3: #A1A9B6;
   --acc: #9BA6FF; --acc-strong: #B6BEFF; --acc-soft: #262B4A; --on-acc: #141833;
-  --warn: #F0B54A; --warn-soft: #3A2E17; --idle: #6B7280;
+  --warn: #F0B54A; --warn-soft: #3A2E17; --on-warn: #15171C; --idle: #6B7280;
+  --hero: #2B3590; --on-hero-2: rgba(255,255,255,.74); --hero-chip: rgba(255,255,255,.12); --hero-tile: #E9EBEF; --on-hero-tile: #141833;
+  --bg-result: #111318; --card-shadow: 0 0 0 1px rgba(255,255,255,.07), 0 8px 24px rgba(0,0,0,.45);
   --shadow-sm: 0 0 0 1px rgba(255,255,255,.06); --shadow-md: 0 0 0 1px rgba(255,255,255,.08), 0 8px 24px rgba(0,0,0,.5);
   color-scheme: dark }
 
@@ -125,13 +132,17 @@ body[data-view="test"]:not(.inquiz) header.hero { display: grid }
 .meta a { color: inherit; text-decoration-color: var(--line-strong) }
 .sample { position: relative; width: 264px; padding: var(--s-5); border-radius: var(--r-xl); background: var(--surface); box-shadow: var(--shadow-md); display: grid; gap: var(--s-3) }
 .sample-tag { position: absolute; top: var(--s-3); right: var(--s-3); padding: 2px var(--s-2); border-radius: var(--r-sm); background: var(--surface-2); color: var(--text-2); font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600 }
-.sample svg { display: block; width: 168px; height: auto; justify-self: center }
+.sample svg { display: block; width: 216px; max-width: 100%; height: auto; justify-self: center }
+/* 미니 끌림 막대: 트랙 .tk, 1위 .f1, 2위 .f2, 나머지 .fn */
+.sample .tk { fill: var(--surface-2) } .sample .f1 { fill: var(--acc) } .sample .f2 { fill: color-mix(in srgb, var(--acc) 55%, var(--surface)) } .sample .fn { fill: var(--line-strong) }
+.sample svg text { font: 600 12px var(--font); fill: var(--text-2); text-anchor: middle }
 .sample ol { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-2) }
 .sample li { display: flex; align-items: center; gap: var(--s-2); padding: 6px var(--s-3); border-radius: var(--r-md); background: var(--surface-2); font-size: var(--fs-sm); line-height: var(--lh-sm); font-weight: 600 }
 .sample li img { width: 24px; height: 24px }
 .sample p { font-size: var(--fs-label); line-height: var(--lh-label); color: var(--text-2) }
 .sample p b { color: var(--acc); margin-right: var(--s-1) }
-@media (min-width: 900px) { header.top.hero { grid-template-columns: minmax(0, 1fr) 264px; gap: var(--s-8); align-items: start; padding: var(--s-16) 0 var(--s-12) } }
+@media (min-width: 900px) { header.top.hero { grid-template-columns: minmax(0, 1fr) 264px; gap: var(--s-8); align-items: start; padding: var(--s-16) 0 var(--s-12) }
+  .sample svg { margin-top: var(--s-6) } }
 @media (min-width: 1200px) { .hero .eb:not(.news) { display: none } }
 @media (max-width: 899px) {
   .hero .btns { display: grid; width: 100% }
@@ -152,6 +163,7 @@ body[data-view="test"]:not(.inquiz) header.hero { display: grid }
 .chip { display: inline-flex; align-items: center; min-height: 40px; padding: 0 var(--s-4); border: 0; border-radius: var(--r-full);
   background: var(--surface-2); color: var(--text); font-size: var(--fs-sm); font-weight: 600; text-decoration: none; cursor: pointer }
 .chip[aria-pressed="true"] { background: var(--acc); color: var(--on-acc) }
+.chip > img { width: 20px; height: 20px; margin: 0 6px 0 -6px }
 .chip.ghost { background: transparent; box-shadow: inset 0 0 0 1.5px var(--line-strong); color: var(--text-2) }
 .chip.ghost[aria-pressed="true"] { background: var(--acc); color: var(--on-acc); box-shadow: none }
 .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: var(--s-3) }
@@ -313,6 +325,8 @@ section > h2 { margin-bottom: var(--s-3) }
 .jd-title b { font-size: var(--fs-sec); line-height: var(--lh-sec); font-weight: 700 }
 .jd-title small { font-size: var(--fs-sm); line-height: var(--lh-sm); color: var(--text-2); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden }
 .jd[open] .jd-title small { display: block }
+.code, .jcode { display: inline-flex; align-items: center; gap: var(--s-1) }
+:is(.code, .jcode) img { width: 20px; height: 20px }
 .code { padding: var(--s-1) var(--s-3); border-radius: var(--r-full); background: var(--surface-2); color: var(--text-2); font-size: var(--fs-label); line-height: var(--lh-label); font-weight: 600; white-space: nowrap }
 .jd[open] .code { background: var(--acc-soft); color: var(--acc) }
 .jd .body { padding: 0 var(--s-6) var(--s-6) calc(var(--s-6) + 56px); display: grid; gap: var(--s-4) }
@@ -434,13 +448,15 @@ footer .in { max-width: calc(var(--main) + 2 * var(--gutter)); margin: 0 auto; p
 }
 
 @media print {
-  :root { --bg: #FFFFFF; --surface: #FFFFFF }
-  .toc, .noprint, footer a, header.hero, .pick, .pick-sum .chip, .jdtools, .onpage, .strip, .credit { display: none !important }
+  :root { --bg: #FFFFFF; --surface: #FFFFFF; --bg-result: #FFFFFF;
+    --hero: #FFFFFF; --on-hero: #191F28; --on-hero-2: #4E5968; --hero-chip: #F2F4F6; --hero-tile: #F2F4F6; --on-hero-tile: #191F28 }
+  .toc, .noprint, .r-jump, footer a, header.hero, .pick, .pick-sum .chip, .jdtools, .onpage, .strip, .credit { display: none !important }
   * { box-shadow: none !important }
   .page { display: block }
   main { min-height: 0; padding-bottom: 0 }
   h2, h3 { break-after: avoid-page }
-  .card, .case, .diag, .years > li, .jd, .qa, .todo li, .r-week, .r-care, .hcase { break-inside: avoid-page }
+  .card, .case, .diag, .years > li, .jd, .qa, .todo li, .r-week, .r-care, .hcase, .dbars, .r-two > div, .rwhy > li, .r-odd, .rtiles { break-inside: avoid-page }
+  .r-hero, .rcard { border: 1px solid #D1D6DB }
   /* 점·막대·번호는 바탕색이 곧 값이라 인쇄에도 남긴다 */
-  .pips i, .track > span, .pb i, .r-week li::before, .badge-code, .tips li::before, .method li::before { -webkit-print-color-adjust: exact; print-color-adjust: exact }
+  .pips i, .track > span, .pb i, .r-week ol > li::before, .db-col, .db-col i, .rtiles em, .tips li::before, .method li::before { -webkit-print-color-adjust: exact; print-color-adjust: exact }
 }

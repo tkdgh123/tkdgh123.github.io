@@ -32,6 +32,50 @@
   .qbody { padding-top: var(--s-8); gap: var(--s-8) }
 }
 
+/* 집중 모드(5차): 검사 틀이 있으면 메뉴·푸터를 숨기고 틀을 화면 한가운데에.
+   윗변은 내용 높이가 아니라 보통 카드 높이(--qh, 리커트 실측 550)로 정해 문항이 바뀌어도 틀이 그대로다(E8) */
+:root { --qh: 552px }
+@media (max-width: 899px) { :root { --qh: 536px } }
+body[data-view="test"]:has(#quiz) :is(.toc, footer) { display: none }
+body[data-view="test"]:has(#quiz) main { min-height: 100svh; padding-bottom: var(--s-8) }
+body[data-view="test"]:has(#quiz) .quiz { margin-top: max(var(--s-8), calc((100svh - var(--qh)) / 2)) }
+/* 1200 이상은 로고만 흐리게 남겨 나가는 길을 둔다 */
+@media (min-width: 1200px) {
+  body[data-view="test"]:has(#quiz) .toc { display: grid }
+  body[data-view="test"]:has(#quiz) .toc :is(ol, .back) { display: none }
+  body[data-view="test"]:has(#quiz) .toc .brand { opacity: .6 }
+}
+@media (max-width: 599px) {
+  body[data-view="test"]:has(#quiz) .quiz { margin-top: 0 }
+  body[data-view="test"]:has(#quiz) .qbody { padding-top: clamp(32px, 14svh, 120px) }
+}
+
+/* 진행 막대 5칸(기본·1장·2장·3장·마지막): <i style="--n:문항 수; --f:채운 비율"><b></b></i> */
+.qbar:has(> i > b) { display: flex; gap: 4px; background: none; overflow: visible }
+.qbar > i:has(> b) { flex: var(--n) 1 0; min-width: 16px; overflow: hidden; background: var(--surface-2) }
+.qbar > i > b { display: block; width: calc(var(--f) * 100%); height: 100%; border-radius: var(--r-full); background: var(--acc); transition: width var(--dur-4) var(--ease-out) }
+
+/* 챕터 카드: 장이 바뀔 때 질문 대신 한 장 */
+.chap { display: grid; justify-items: center; gap: var(--s-4); text-align: center }
+.chap-ic { width: 112px; height: 112px; border-radius: 50%; background: var(--acc-soft); display: grid; place-items: center }
+.chap-ic img { width: 64px; height: 64px }
+@media (prefers-reduced-motion: no-preference) { .chap-ic { animation: chap-in var(--dur-3) var(--ease-out) } }
+@keyframes chap-in { from { transform: scale(.8); opacity: 0 } }
+.chap-step { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: var(--s-2) }
+.chap-step li { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 var(--s-3); border-radius: var(--r-full); background: var(--surface-2); color: var(--text-3); font: 600 var(--fs-label)/1 var(--font) }
+.chap-step li.done { color: var(--acc) }
+.chap-step li.cur { background: var(--acc); color: var(--on-acc) }
+.chap .qtext { margin: 0 }
+.chap p { font: 400 var(--fs-body)/var(--lh-body) var(--font); color: var(--text-2) }
+.chap .qnav { justify-content: center }
+.chap .btn { min-width: 160px }
+@media (max-width: 599px) {
+  .chap-ic { width: 96px; height: 96px } .chap-ic img { width: 56px; height: 56px }
+  .chap-step li { font-size: var(--fs-body) }
+  .chap-step li:not(.cur) { width: 28px; padding: 0; justify-content: center }
+  .chap-step li:not(.cur) span { display: none }
+}
+
 /* 리커트: 양 끝 라벨 + 크기가 다른 동그라미 5개(벤치마크 3-4) */
 .scale { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: var(--s-4); width: 100%; max-width: 560px; justify-self: center }
 .end { font: 600 var(--fs-sm)/var(--lh-sm) var(--font); color: var(--text-3) }
@@ -102,35 +146,50 @@
 #q-text { width: 100%; min-height: 128px; border-radius: var(--r-lg); border: 2px solid transparent; background: var(--surface-2); color: var(--text); padding: var(--s-4); font: 400 var(--fs-body)/var(--lh-body) var(--font); resize: vertical }
 #q-text:focus { outline: none; border-color: var(--acc) }
 
-/* 결과: 한눈에 카드 */
-.result, .friend { margin-top: var(--s-8); display: grid; gap: var(--s-2) }
+/* 결과(5차): 바탕을 한 단계 내리고 칸마다 흰 카드 + 그림자, 맨 위는 진한 색면 블록 */
+body[data-view="test"]:has(.result, .friend) { --bg: var(--bg-result) }
+.result, .friend { margin-top: var(--s-8); display: grid; gap: var(--s-4) }
 @media (max-width: 899px) { .result, .friend { margin-top: var(--s-3) } }
-.r-hero { background: var(--surface); border-radius: var(--r-xl); box-shadow: var(--shadow-sm); padding: var(--s-8); display: grid; gap: var(--s-5) }
-.rtags { display: flex; flex-wrap: wrap; gap: var(--s-2) }
-.rtags span { display: inline-flex; align-items: center; height: 28px; padding: 0 var(--s-3); border-radius: var(--r-full); background: var(--acc-soft); color: var(--acc); font: 600 var(--fs-label)/var(--lh-label) var(--font) }
-#r-title { font: 700 var(--fs-h2)/var(--lh-h2) var(--font); outline: none }
-.r-codes { display: flex; gap: var(--s-3) }
-/* 600 이상: 코드 배지를 태그·제목 오른쪽에 두어 r-week를 첫 화면 안으로 올린다(M7①) */
-@media (min-width: 600px) {
-  .r-hero { grid-template-columns: minmax(0, 1fr) auto }
-  .r-hero > * { grid-column: 1 / -1 }
-  .r-hero > .rtags, .r-hero > #r-title { grid-column: 1 }
-  .r-hero > .r-codes { grid-column: 2; grid-row: 1 / span 2; align-self: center }
-}
-/* 900 이상: 1280×800 첫 화면에 결과 링크 버튼까지(결정 2 E15). 직무 설명은 390처럼 직무 사전에서, 캘린더 버튼은 점수 설명 오른쪽 */
-@media (min-width: 900px) {
-  .r-hero { padding: var(--s-6); gap: var(--s-4); grid-auto-flow: row dense }
-  .r-hero > .r-codes { justify-self: end }
-  .r-hero > .r-cal { grid-column: 2; align-self: center }
-  .r-hero > .r-scorenote { grid-column: 1 }
-  .r-hero .jdoes { display: none }
-  .r-hero .ring { width: 56px; height: 56px }
-  .r-hero > .r-week { padding: var(--s-4) var(--s-5) }
-}
-.r-codes .badge-code { width: 72px; height: 72px; border-radius: 50%; background: var(--acc); color: var(--on-acc); display: grid; place-content: center; justify-items: center }
-.r-codes .badge-code + .badge-code { background: var(--acc-soft); color: var(--acc) }
-.r-codes .badge-code b { font-size: var(--fs-h2); font-weight: 700; line-height: 1 }
-.r-codes .badge-code small { font: 600 var(--fs-label)/var(--lh-label) var(--font) }
+.r-hero { background: var(--hero); color: var(--on-hero); border-radius: var(--r-2xl); box-shadow: var(--card-shadow); padding: var(--s-8); display: grid; gap: var(--s-5) }
+.r-hero :focus-visible { outline-color: var(--on-hero) }
+.rh-who { font: 400 var(--fs-label)/var(--lh-label) var(--font); color: var(--on-hero-2) }
+.rh-main { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--s-4); align-items: center }
+.rh-icon { width: 88px; height: 88px; border-radius: var(--r-xl); background: var(--hero-tile); display: grid; place-items: center }
+.rh-icon img { width: 56px; height: 56px }
+.rh-job { display: grid; justify-items: start; min-width: 0 }
+.rh-job small { font: 600 var(--fs-sm)/var(--lh-sm) var(--font); color: var(--on-hero-2) }
+.rh-job h2 { font: 700 var(--fs-display)/var(--lh-display) var(--font); letter-spacing: -.025em; color: var(--on-hero) }
+#r-title { outline: none }
+.rh-score { display: inline-flex; align-items: center; height: 28px; margin-top: var(--s-1); padding: 0 var(--s-3); border-radius: var(--r-full); background: var(--hero-chip); font: 600 var(--fs-label)/1 var(--font); font-variant-numeric: tabular-nums }
+.rh-line { font: 600 var(--fs-sec)/var(--lh-sec) var(--font); color: var(--on-hero-2) }
+.rh-line b { color: var(--on-hero) }
+.rh-dirs { display: flex; flex-wrap: wrap; gap: var(--s-2) }
+.rh-dirs span { display: inline-flex; align-items: center; gap: var(--s-2); height: 40px; padding: 0 var(--s-4) 0 var(--s-2); border-radius: var(--r-full); background: var(--hero-tile); color: var(--on-hero-tile); font: 700 var(--fs-sm)/1 var(--font) }
+.rh-dirs img { width: 24px; height: 24px }
+.rh-next { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-2) }
+.rh-next a { height: 100%; display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: var(--s-3); align-items: center; min-height: 56px; padding: var(--s-3) var(--s-4); border-radius: var(--r-lg); background: var(--hero-chip); color: var(--on-hero); text-decoration: none; transition: background var(--dur-2) var(--ease-out) }
+.rh-next img { width: 28px; height: 28px }
+.rh-next b { font: 600 var(--fs-body)/var(--lh-body) var(--font) }
+.rh-next span { font: 600 var(--fs-sm)/1 var(--font); color: var(--on-hero); font-variant-numeric: tabular-nums }
+.rh-week { display: flex; gap: var(--s-3); align-items: center; min-height: 48px; padding: var(--s-3) var(--s-4); border-radius: var(--r-lg); background: var(--hero-chip); color: var(--on-hero); text-decoration: none; font: 400 var(--fs-sm)/var(--lh-sm) var(--font); }
+.rh-week b { flex: none; font-weight: 700 }
+.rh-act { display: flex; flex-wrap: wrap; gap: var(--s-2) }
+.rh-btn { background: var(--hero-tile); color: var(--hero) }
+.rh-btn.line { background: transparent; color: var(--on-hero); border: 1.5px solid rgba(255,255,255,.6) }
+.r-hero .rh-btn:not([disabled]):is(:hover, :active) { background: color-mix(in srgb, var(--hero-tile) 86%, var(--hero)) }
+.r-hero .rh-btn.line:not([disabled]):is(:hover, :active) { background: var(--hero-chip) }
+@media (hover: hover) { .rh-next a:hover, .rh-week:hover { background: rgba(255,255,255,.22) } }
+/* 마음 안내(109·1577-0199)와 고른 답 안내는 색면 안 흰 상자로, 접지 않는다 */
+.r-hero .r-care { background: var(--surface); color: var(--text-2) }
+.r-hero .verdict:not(.warn) { background: var(--surface); color: var(--text) }
+.r-hero > .verdict { margin: 0 }
+
+/* 목차 칩: 가로 스크롤, 오른쪽 끝 페이드 */
+.r-jump { display: flex; gap: var(--s-2); overflow-x: auto; scrollbar-width: none; margin: 0 -2px; padding: 2px 40px 2px 2px; mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent) }
+.r-jump::-webkit-scrollbar { display: none }
+.r-jump:focus-within { mask-image: none }
+.r-jump a { flex: none; height: 36px; display: inline-flex; align-items: center; padding: 0 var(--s-4); border-radius: var(--r-full); background: var(--surface); box-shadow: 0 1px 2px rgba(17,24,39,.06); color: var(--text-2); font: 600 var(--fs-label)/1 var(--font); text-decoration: none }
+@media (hover: hover) { .r-jump a:hover { color: var(--acc) } }
 
 /* 추천 직무 3개: 카드 + 겹침 점수 링 */
 .r-top3 { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-3) }
@@ -154,10 +213,10 @@
 /* 이번 주에 할 일 */
 .r-week { background: var(--acc-soft); border-radius: var(--r-lg); padding: var(--s-5); display: grid; gap: var(--s-3) }
 .r-week ol { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-3); counter-reset: wk }
-.r-week li { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 0 var(--s-3); counter-increment: wk }
-.r-week li::before { content: counter(wk); grid-row: span 2; width: 28px; height: 28px; border-radius: 50%; background: var(--acc); color: var(--on-acc); display: grid; place-items: center; font: 700 var(--fs-label)/var(--lh-label) var(--font) }
-.r-week b { grid-column: 2; font: 700 var(--fs-body)/var(--lh-body) var(--font) }
-.r-week li span { grid-column: 2; font: 400 var(--fs-label)/var(--lh-label) var(--font); color: var(--text-2) }
+.r-week ol > li { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 0 var(--s-3); counter-increment: wk }
+.r-week ol > li::before { content: counter(wk); grid-row: span 2; width: 28px; height: 28px; border-radius: 50%; background: var(--acc); color: var(--on-acc); display: grid; place-items: center; font: 700 var(--fs-label)/var(--lh-label) var(--font) }
+.r-week ol b { grid-column: 2; font: 700 var(--fs-body)/var(--lh-body) var(--font) }
+.r-week ol > li span { grid-column: 2; font: 400 var(--fs-label)/var(--lh-label) var(--font); color: var(--text-2) }
 .r-week > p { font: 400 var(--fs-label)/var(--lh-label) var(--font); color: var(--text-2) }
 .r-care { background: var(--surface-2); border-radius: var(--r-lg); padding: var(--s-4) var(--s-5); display: grid; gap: var(--s-2); font: 400 var(--fs-sm)/var(--lh-sm) var(--font); color: var(--text-2) }
 .r-care b { color: var(--text) }
@@ -168,20 +227,14 @@ details.r-scorenote summary { min-height: 44px; display: flex; align-items: cent
 .r-actions .safe { flex-basis: 100% }
 .safe { font: 400 var(--fs-label)/var(--lh-label) var(--font); color: var(--text-2) }
 @media (max-width: 599px) {
-  /* 코드 배지를 제목 오른쪽에 두어 동점 안내가 있어도 할 일 1번이 첫 화면(844) 안에(4차 QA D6). 흥미 답이 고른 결과(코드 대신 경고 칸)도 같은 기준 */
-  .r-hero { padding: var(--s-4); gap: var(--s-3) var(--s-2); grid-template-columns: minmax(0, 1fr) auto }
-  .r-hero > * { grid-column: 1 / -1 }
-  .r-hero > #r-title { grid-column: 1; align-self: center; margin: 0 }
-  .r-hero > .r-codes { grid-column: 2; gap: var(--s-2) }
-  .r-hero > .rtags { margin-bottom: calc(-1 * var(--s-1)) }
-  .r-hero > .verdict { padding: var(--s-3) var(--s-4) }
-  .r-hero > .r-tie { margin-top: calc(-1 * var(--s-1)) }
-  .r-hero > .r-week { padding: var(--s-3) var(--s-4) var(--s-4); gap: var(--s-2) }
-  /* B3 ②: 태그는 h2 위 한 줄 글자로 */
-  .rtags { display: block; line-height: var(--lh-label) }
-  .rtags span { display: inline; height: auto; padding: 0; background: none; color: var(--text-3); font-weight: 400 }
-  .rtags span + span::before { content: " · " }
-  .r-codes .badge-code { width: 56px; height: 56px }
+  /* 390 첫 화면(844)에 1위 직무·끌림·2·3위·이번 주·버튼까지(4차 D6 유지) */
+  .r-hero { padding: var(--s-5); gap: var(--s-4); border-radius: var(--r-xl) }
+  .rh-icon { width: 64px; height: 64px; border-radius: var(--r-lg) } .rh-icon img { width: 40px; height: 40px }
+  .rh-job h2 { font-size: var(--fs-title); line-height: var(--lh-title) }
+  .rh-next { grid-template-columns: minmax(0, 1fr) }
+  .rh-next a { min-height: 48px; padding: var(--s-2) var(--s-4) }
+  .rh-act { display: grid; grid-template-columns: 1fr 1fr }
+  .rh-act .btn { padding: 0 var(--s-2) }
   .r-top3 { grid-template-columns: minmax(0, 1fr); gap: var(--s-2) }
   .jobcard { grid-template-columns: 44px minmax(0, 1fr); gap: 0 var(--s-3); align-items: center; padding: var(--s-3) var(--s-4) }
   .ring { width: 44px; height: 44px; grid-row: span 2 }
@@ -193,20 +246,80 @@ details.r-scorenote summary { min-height: 44px; display: flex; align-items: cent
   .jwhy { grid-column: 2 }
 }
 
-/* 흥미 육각형 */
-.r-interest > .verdict { margin: 0 0 var(--s-4) }
-figure.hex { max-width: 320px; margin: 0 auto }
-.hexchart { display: block; width: 100%; height: auto; overflow: visible }
-.hexchart .grid, .hexchart .axis { fill: none; stroke: var(--line); stroke-width: 1 }
-.hexchart .area { fill: color-mix(in srgb, var(--acc) 18%, transparent); stroke: var(--acc); stroke-width: 2; stroke-linejoin: round; transform-origin: center; animation: area-in 400ms var(--ease-out) }
-@keyframes area-in { from { transform: scale(.6) } }
-.hexchart .lbl { font: 600 var(--fs-label) var(--font); fill: var(--text-2); dominant-baseline: middle }
-.hexchart .lbl.hi { font-weight: 700; fill: var(--text) }
-details.r-bars summary, details.allfit summary { min-height: 44px; display: flex; align-items: center; gap: var(--s-3); font: 600 var(--fs-sm)/var(--lh-sm) var(--font); color: var(--acc); cursor: pointer }
+/* 결과 칸: 흰 카드 + 아이콘 머리 */
+.rcard, :where(.result, .friend) > section:where(:not(.r-hero)) { background: var(--surface); border-radius: var(--r-2xl); box-shadow: var(--card-shadow); padding: var(--s-8); display: grid; gap: var(--s-5); align-content: start; min-width: 0 }
+:is(.result, .friend) > section > :is(h2, .lead, .verdict) { margin: 0 }
+.rcard > section { padding: var(--s-5) 0 0; border-top: 1px solid var(--line); display: grid; gap: var(--s-4) }
+.rc-head { display: flex; align-items: center; gap: var(--s-3) }
+.rc-head h2 { font: 700 var(--fs-sec)/var(--lh-sec) var(--font) }
+.rc-ic { flex: none; width: 44px; height: 44px; border-radius: var(--r-md); background: var(--acc-soft); display: grid; place-items: center }
+.rc-ic img { width: 28px; height: 28px }
+.rcard.r-week { background: var(--acc-soft) }
+.r-week .rc-ic, .r-week .todo li { background: var(--surface) }
+.rcard .diag { background: var(--surface-2); box-shadow: none }
+.rcard .v-rest { margin: 0 }
+details.allfit summary, .rcard details > summary:not(.muted) { min-height: 44px; display: flex; align-items: center; gap: var(--s-3); list-style: none; font: 600 var(--fs-sm)/var(--lh-sm) var(--font); color: var(--acc); cursor: pointer }
+.rcard details > summary::-webkit-details-marker { display: none }
 /* 꺾쇠: FAQ·만든 방법(style.css .qa summary::after)과 같은 모양 */
-details.r-bars summary::after, details.allfit summary::after { content: ""; flex: none; width: 9px; height: 9px; border-right: 2px solid; border-bottom: 2px solid;
+details.allfit summary::after, .rcard details > summary:not(.muted)::after { content: ""; flex: none; width: 9px; height: 9px; border-right: 2px solid; border-bottom: 2px solid;
   transform: translateY(-2px) rotate(45deg); transition: transform var(--dur-2) var(--ease-out) }
-details.r-bars[open] summary::after, details.allfit[open] summary::after { transform: translateY(2px) rotate(225deg) }
+details.allfit[open] summary::after, .rcard details[open] > summary:not(.muted)::after { transform: translateY(2px) rotate(225deg) }
+
+/* 끌림 막대(우리 그림): 높은 순 캡슐 6개. 색은 1·2위 강조에만, 방향은 아이콘 + 이름이 맡는다 */
+.dbars { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--s-3); align-items: end; margin: 0 }
+.db { display: grid; justify-items: center; gap: var(--s-2); min-width: 0 }
+.db-col { width: 100%; max-width: 64px; height: 168px; border-radius: var(--r-lg); background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--line); display: flex; align-items: flex-end; overflow: hidden }
+.db-col i { width: 100%; height: calc(var(--v) * 1%); min-height: 12px; border-radius: var(--r-lg); background: var(--line-strong); animation: db-in 600ms var(--ease-out) }
+@keyframes db-in { from { height: 12px } }
+.db.on1 .db-col i { background: var(--acc) }
+.db.on2 .db-col i { background: color-mix(in srgb, var(--acc) 55%, var(--surface)) }
+.db img { width: 32px; height: 32px }
+.db b { font: 700 var(--fs-sm)/var(--lh-sm) var(--font); text-align: center; white-space: nowrap; letter-spacing: var(--ls-tight) }
+.db:not(.on1, .on2) b { font-weight: 600; color: var(--text-2) }
+.db small { font: 600 var(--fs-label)/1 var(--font); color: var(--text-3); font-variant-numeric: tabular-nums }
+/* 흥미 답이 고르면 강조 없이 모두 회색 */
+.dbars.flat .db .db-col i { background: var(--line-strong) }
+/* 힘이 나는 일 / 덜 끌리는 일 */
+.r-two { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-3) }
+.r-two > div { border-radius: var(--r-xl); padding: var(--s-5); display: grid; gap: var(--s-2); align-content: start }
+.r-up { background: var(--acc-soft) }
+.r-down { background: var(--surface-2) }
+.r-two b { font: 700 var(--fs-body)/var(--lh-body) var(--font) }
+.r-two ul { margin: 0; padding-left: 18px; display: grid; gap: 2px; font: 400 var(--fs-sm)/var(--lh-sm) var(--font); color: var(--text-2) }
+
+/* 직무 3개 '왜' + 의외로 맞는 직무(점선) */
+.rwhy { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-3) }
+.rwhy > li, .r-odd { border-radius: var(--r-xl); background: var(--surface-2); padding: var(--s-5); display: grid; gap: var(--s-2); min-width: 0 }
+.rwhy > li.odd, .r-odd { background: none; border: 2px dashed var(--line-strong) }
+.rw-top { display: flex; align-items: center; gap: var(--s-3); color: inherit; text-decoration: none }
+.rw-top > img { flex: none; width: 40px; height: 40px }
+.rw-top b { font: 700 var(--fs-sec)/var(--lh-sec) var(--font) }
+.rw-dirs { margin-left: auto; display: flex; gap: var(--s-1) }
+.rw-dirs img { width: 20px; height: 20px }
+.rwhy p, .r-odd p { font: 400 var(--fs-sm)/var(--lh-sm) var(--font); color: var(--text-2) }
+.rw-because { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--s-1); font: 400 var(--fs-sm)/var(--lh-sm) var(--font); color: var(--text-2) }
+.rw-because b { color: var(--text) }
+
+/* 준비 상태 타일 5칸: 숫자 + 점, '채울 곳'·'든든해요' 글자 배지(색만으로 구분하지 않음) */
+.rtiles { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--s-2) }
+.rtiles li { position: relative; border-radius: var(--r-xl); background: var(--surface-2); padding: var(--s-4); display: grid; gap: var(--s-1); justify-items: start; align-content: start; min-width: 0 }
+.rtiles b { font: 600 var(--fs-sm)/var(--lh-sm) var(--font); color: var(--text-2) }
+.rt-num { font: 700 var(--fs-h2)/var(--lh-h2) var(--font); font-variant-numeric: tabular-nums }
+.rtiles .pips i { width: 10px; height: 10px; background: var(--surface) }
+.rtiles .pips i.on { background: var(--acc) }
+.rtiles em { margin-top: var(--s-1); padding: 2px var(--s-2); border-radius: var(--r-full); font: 600 var(--fs-label)/var(--lh-label) var(--font); font-style: normal }
+.rtiles .low { background: var(--warn-soft) } .rtiles .low em { background: var(--warn); color: var(--on-warn) }
+.rtiles .low .pips i.on { background: var(--warn); border-color: var(--warn) }
+.rtiles .best { background: var(--acc-soft) } .rtiles .best em { background: var(--acc); color: var(--on-acc) }
+@media (max-width: 599px) {
+  .rcard, :where(.result, .friend) > section:where(:not(.r-hero)) { padding: var(--s-5); border-radius: var(--r-xl) }
+  .dbars { gap: var(--s-1); margin: 0 calc(-1 * var(--s-3)) }
+  .db-col { height: 132px; border-radius: var(--r-md) } .db-col i { border-radius: var(--r-md) }
+  .db img { width: 24px; height: 24px }
+  .db b { font-size: var(--fs-label); line-height: var(--lh-label) }
+  .r-two { grid-template-columns: minmax(0, 1fr) }
+  .rtiles { grid-template-columns: repeat(3, minmax(0, 1fr)) }
+}
 
 /* 막대 */
 .meters { display: grid; gap: var(--s-3); padding: var(--s-2) 0 }
@@ -280,12 +393,12 @@ details.r-bars[open] summary::after, details.allfit[open] summary::after { trans
 
 @media (max-width: 599px) {
   /* 모바일 본문 16px 이상: 읽는 문단·목록만(style.css 334행과 같은 방식) */
-  p.qask, .hint, p.qpick, .r-tie, .r-week > p, p.r-scorenote, details.r-scorenote > p, p.safe, .dwhy, p.dev, .v-rest li, .vorder li, .r-week li span, .diag ol li span, .fixes li span span, .todo span span,
-  .r-care, .calm, p.jwhy {
+  p.qask, .hint, p.qpick, .r-tie, .r-week > p, p.r-scorenote, details.r-scorenote > p, p.safe, .dwhy, p.dev, .v-rest li, .vorder li, .r-week ol > li span, .diag ol li span, .fixes li span span, .todo span span,
+  .r-care, .calm, p.jwhy, p.rh-who, .r-two li, .rwhy p, .r-odd p, .rw-because li {
     font-size: var(--fs-body); line-height: var(--lh-body) }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ring .val, .hexchart .area { animation: none }
-  .quiz *, .result * { transition: none }
+  .ring .val, .db-col i { animation: none }
+  .quiz *, .result *, .friend * { transition: none }
 }

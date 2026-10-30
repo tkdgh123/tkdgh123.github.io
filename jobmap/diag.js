@@ -2,13 +2,13 @@
 // week: false인 규칙의 단계는 '이번 주 할 일'에 쓰지 않는다(정보 카드로만). 학교 프로그램 단계는 data.js STEP을 같이 쓴다.
 // a: 문항 id별 답(1~5), yearN, dept, sector(배열), ready(영역 평균 1~5), fit(직무 key별 흥미 겹침 0~100), top(흥미 겹침 상위 직무 key 3개)
 (function () {
-  // 5단계 답에서 2 이하(아니다·싫다)는 낮은 쪽. 영역 평균은 2.0 이하를 낮은 쪽으로 본다.
+  // 5단계 답에서 2 이하(아니에요·별로예요)는 낮은 쪽. 영역 평균은 2.0 이하를 낮은 쪽으로 본다.
   const Q = window.JOBMAP.quiz;
   const say = (a, id) => {
     const it = [...Q.interest.items, ...Q.readyItems].find((x) => x.id === id), t = Q.scaleOf(id)[a[id] - 1];
     return `'${it.q}'에 '${t}'${(t.charCodeAt(t.length - 1) - 0xAC00) % 28 ? "을" : "를"} 골랐어요.`;
   };
-  const avg = (a, g) => `${Q.ready.groups.find((x) => x.id === g).name} 4문항 평균이 5점 중 ${a.ready[g].toFixed(1)}점이에요.`;
+  const avg = (a, g) => `'${Q.ready.groups.find((x) => x.id === g).name}' 4문항 평균이 5점 중 ${a.ready[g].toFixed(1)}점이에요.`;
   const has = (a, v) => a.sector.includes(v);
 
   window.JOBMAP.diag = [

@@ -48,21 +48,11 @@
   </div>
   <figure class="sample" aria-label="결과 화면 예시">
     <span class="sample-tag">결과 예시</span>
-    <svg width="168" height="133" viewBox="-34 -4 288 228" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <g fill="none" stroke-linejoin="round" style="stroke:var(--line)">
-        <path d="M110 40v140M170.6 75 49.4 145M170.6 145 49.4 75"/>
-        <path d="M110 75l30.3 17.5v35L110 145l-30.3-17.5v-35z"/>
-        <path d="M110 40l60.6 35v70L110 180l-60.6-35V75z" style="stroke:var(--line-strong)"/>
-      </g>
-      <path d="M110 54l55.4 24-22.5 51L110 160l-53.7-19 24.3-48z" stroke-width="2" stroke-linejoin="round" style="fill:var(--acc-soft);stroke:var(--acc)"/>
-      <g stroke-width="2" style="fill:var(--surface);stroke:var(--acc)">
-        <circle cx="110" cy="54" r="4"/><circle cx="165.4" cy="78" r="4"/><circle cx="142.9" cy="129" r="4"/>
-        <circle cx="110" cy="160" r="4"/><circle cx="56.3" cy="141" r="4"/><circle cx="80.6" cy="93" r="4"/>
-      </g>
-      <g text-anchor="middle" dominant-baseline="central" font-weight="600" font-size="22" style="fill:var(--text-2)">
-        <text x="110" y="22">현실</text><text x="187.1" y="65.5">탐구</text><text x="187.1" y="154.5">예술</text>
-        <text x="110" y="198">사회</text><text x="32.9" y="154.5">진취</text><text x="32.9" y="65.5">관습</text>
-      </g>
+    <!-- 미니 끌림 막대(5차): 높은 순 캡슐 6개, 1·2위만 강조색 -->
+    <svg width="216" height="104" viewBox="0 0 216 104" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect class="tk" x="12" y="0" width="24" height="80" rx="12"/><rect class="tk" x="48" y="0" width="24" height="80" rx="12"/><rect class="tk" x="84" y="0" width="24" height="80" rx="12"/><rect class="tk" x="120" y="0" width="24" height="80" rx="12"/><rect class="tk" x="156" y="0" width="24" height="80" rx="12"/><rect class="tk" x="192" y="0" width="24" height="80" rx="12"/>
+      <rect class="f1" x="12" y="8" width="24" height="72" rx="12"/><rect class="f2" x="48" y="16" width="24" height="64" rx="12"/><rect class="fn" x="84" y="40" width="24" height="40" rx="12"/><rect class="fn" x="120" y="46" width="24" height="34" rx="12"/><rect class="fn" x="156" y="58" width="24" height="22" rx="12"/><rect class="fn" x="192" y="66" width="24" height="14" rx="12"/>
+      <text x="24" y="98">꼬치꼬치</text><text x="60" y="98">반짝</text><text x="96" y="98">토닥</text><text x="132" y="98">차곡</text><text x="168" y="98">으쌰</text><text x="204" y="98">뚝딱</text>
     </svg>
     <ol>
       <li><img src="img/j-data.svg" alt="" width="24" height="24">데이터 분석</li>
@@ -106,7 +96,7 @@
   <div id="v-jobs" hidden>
     <section>
       <h1 tabindex="-1">직무 사전</h1>
-      <p class="lead">신입이 많이 지원하는 직무 <span class="jobcount">24</span>개예요. 직무마다 흥미 코드와 AI가 바꾸는 점을 붙였어요.</p>
+      <p class="lead">신입이 많이 지원하는 직무 <span class="jobcount">24</span>개예요. 직무마다 끌림 방향과 AI가 바꾸는 점을 붙였어요.</p>
       <div class="jdtools chips" id="jdtools"></div>
       <p class="sr-only" role="status" id="jdcount"></p>
       <div class="jds" id="jds"></div>

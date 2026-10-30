@@ -86,7 +86,7 @@ for (const j of D.jobs) page(`jobs/${j.key}/`, {
 });
 page("jobs/", {
   tab: "직무 사전", title: "직무 사전", crumbs: [["직무 사전", B + "jobs/"]],
-  desc: `신입이 많이 지원하는 직무 ${D.jobs.length}개의 하는 일, 필요한 힘, 흥미 코드, AI가 바꾸는 점을 모았어요.`,
+  desc: `신입이 많이 지원하는 직무 ${D.jobs.length}개의 하는 일, 필요한 힘, 끌림 방향, AI가 바꾸는 점을 모았어요.`,
   body: `<section><h1>직무 사전</h1><p class="lead">신입이 많이 지원하는 직무 ${D.jobs.length}개예요.</p>${linkList(D.jobs.map((j) => [`${B}jobs/${j.key}/`, j.name, String(j.does || "").split(/(?<=[.!?])\s/)[0]]))}</section>`
 });
 

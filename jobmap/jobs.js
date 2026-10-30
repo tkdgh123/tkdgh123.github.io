@@ -308,7 +308,7 @@
       ],
       source: "https://www.career.go.kr/cnet/app/base/job/jobView.m?SEQ=262"
     },
-    // 아래 7개는 흥미 6영역마다 1순위 직무가 3개 이상 되도록 2026-10-30 추가(현실 2·예술 2·사회 3).
+    // 아래 7개는 흥미 6영역마다 1순위 직무가 3개 이상 되도록 2026-10-30 추가(뚝딱 R 2·반짝 A 2·토닥 S 3).
     // does·tasks·skills는 커리어넷 직업정보 원문(2026-10-30 열람). 2024년 이후 출처가 없는 칸은 비웠다.
     {
       key: "quality", name: "품질 검사(비파괴검사)", new: true, date: "2026-10",
@@ -540,7 +540,7 @@
     }
   ];
 
-  // 흥미 코드: 가장 가까운 O*NET 직업의 Interest Code (O*NET OnLine 2026-10 열람).
+  // 끌림 방향(riasec, 속 id R…C): 가장 가까운 O*NET 직업의 Interest Code (O*NET OnLine 2026-10 열람). 화면엔 Q.areas 이름으로만 보인다.
   // 미국에 같은 직업이 없는 해외영업(영업 준용)·공기업 사무·공무원은 가장 가까운 것을 골랐다. IT 기획·PM은 시스템 분석가(IC)와 PM(EC)을 합쳤다.
   const ONET = (soc) => `https://www.onetonline.org/link/summary/${soc}`;
   const CODES = {

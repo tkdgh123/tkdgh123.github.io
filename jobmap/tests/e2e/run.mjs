@@ -1,4 +1,4 @@
-// E2E 시나리오 E1~E20·E22~E26. `node run.mjs [E1 E7 …] [--root <작업실 또는 baseline 폴더>]`
+// E2E 시나리오 E1~E20·E22~E30. `node run.mjs [E1 E7 …] [--root <작업실 또는 baseline 폴더>]`
 // 시나리오마다 PASS/FAIL/WARN(CDN)과 이유를 출력하고, FAIL이 하나라도 있으면 exit 1.
 import { launch } from "./cdp.mjs";
 import { start } from "./serve.mjs";
@@ -24,8 +24,9 @@ const SSU_RE = new RegExp(readFileSync(new URL("../trust.test.mjs", import.meta.
 const LIB = `window.__vis = (e) => !!e && e.checkVisibility({ checkVisibilityCSS: true }) && (() => { const b = e.getBoundingClientRect(); return b.width * b.height > 1; })();
 window.__hero = () => { const h = document.querySelector("header.hero"); return h ? getComputedStyle(h).display : "없음"; }; 1`;
 const CLS = `new Promise((r) => { let s = 0; new PerformanceObserver((l) => l.getEntries().forEach((e) => { if (!e.hadRecentInput) s += e.value; })).observe({ type: "layout-shift", buffered: true }); setTimeout(() => r(+s.toFixed(4)), 500); })`;
+// 5차: 끌리는 곳 칩이 색면 .rtags에서 회사 기준 칸 .r-sector로 옮겨 tags는 .r-sector를 본다
 const SIG = `JSON.stringify({ jobs: [...document.querySelectorAll('.result a[href^="#jobs-"]')].map((a) => a.textContent.trim()),
-  tags: [...document.querySelectorAll(".rtags")].map((e) => e.textContent.trim()), diag: [...document.querySelectorAll(".diag b")].map((e) => e.textContent.trim()) })`;
+  tags: [...document.querySelectorAll(".r-sector")].map((e) => e.textContent.trim()), diag: [...document.querySelectorAll(".diag b")].map((e) => e.textContent.trim()) })`;
 const RECTS = `(() => { const r = (s) => { const e = document.querySelector(s); if (!e) return null; const b = e.getBoundingClientRect(); return { l: b.left, t: b.top, w: b.width, h: b.height }; };
   return { quiz: r(".quiz"), qbar: r(".qbar"), qtop: r(".qtop") }; })()`;
 const has = (p, sel) => p.eval(`!!document.querySelector(${JSON.stringify(sel)})`);
@@ -59,9 +60,15 @@ async function startQuiz(p) {
   await p.idle();
 }
 const kindOf = (p) => p.eval(`document.querySelector(".quiz")?.dataset.kind ?? null`);
-// 한 단계 답하고 다음 단계로 넘어갈 때까지 기다린다
+// 한 단계 답하고 다음 단계로 넘어갈 때까지 기다린다. 장 안내(5차)는 '시작하기'를 누르고 같은 단계의 질문이 나올 때까지
 async function answer(p, o, st) {
   const kind = await kindOf(p), i = await stepI(p);
+  if (kind === "chapter") {
+    await p.click("#q-next");
+    await p.waitFor(`document.querySelector(".quiz")?.dataset.kind !== "chapter"`, 4000);
+    await p.idle();
+    return kind;
+  }
   if (kind === "basic") {
     const opts = await p.eval(`[...document.querySelectorAll("#q-body .qopt")].map((b) => b.dataset.v)`);
     st.basics.push(opts);
@@ -77,6 +84,8 @@ async function answer(p, o, st) {
   return kind;
 }
 const DEF = { school: "ssu", dept: "aisw", year: "2학년" };
+// 5차: 기본 정보 3개 뒤에 1장 안내가 낀다. 장 안내면 '시작하기'를 눌러 질문으로
+const pastChap = async (p) => { if ((await kindOf(p)) === "chapter") await answer(p, DEF, {}); };
 async function finish(p, o = {}) {
   o = { ...DEF, ...o };
   const st = { likert: 0, kinds: [], basics: [], lastNum: null };
@@ -145,6 +154,12 @@ S.E2 = async (t) => {
       const k = s.opts.findIndex((v) => v === DEF.school || v === DEF.year);
       if (k < 0 || k > 8) throw new Error(`기본 정보 단계 숫자키를 정하지 못했어요: ${s.opts}`);
       await p.key(String(k + 1));
+    } else if (s.kind === "chapter") {
+      // 5차: 장 안내는 제목에 포커스가 있을 때 Enter로 시작한다(단계 번호는 그대로)
+      await p.key("Enter");
+      await p.waitFor(`document.querySelector(".quiz")?.dataset.kind !== "chapter"`, 4000);
+      await p.idle();
+      continue;
     } else if (s.kind === "likert") await p.key("4");
     else if (s.kind === "pairs") await p.key("1");
     else if (s.kind === "sector") {
@@ -347,7 +362,8 @@ S.E8 = async (t) => {
     await startQuiz(p);
     const st = { likert: 0, basics: [] };
     for (let k = 0; k < 3; k++) await answer(p, DEF, st);
-    if ((await kindOf(p)) !== "likert") throw new Error("기본 정보 뒤가 리커트가 아니에요");
+    await pastChap(p); // 5차: 1장 안내
+    if ((await kindOf(p)) !== "likert") throw new Error("기본 정보·1장 안내 뒤가 리커트가 아니에요");
     await p.eval(`window.__mon = { sy: [], frames: [], anims: 0, ls: 0, lsAll: 0 }; { const seen = new WeakSet();
       new PerformanceObserver((l) => l.getEntries().forEach((e) => { __mon.lsAll += e.value; if (!e.hadRecentInput) __mon.ls += e.value; })).observe({ type: "layout-shift" });
       (function f() { const q = document.getElementById("q-body"); const run = q ? q.getAnimations({ subtree: true }).filter((a) => a.playState === "running") : [];
@@ -417,6 +433,8 @@ S.E10 = async (t) => {
     await startQuiz(p); await shot(p, "quiz-basic", w, theme);
     const st = { likert: 0, basics: [] };
     for (let k = 0; k < 3; k++) await answer(p, DEF, st);
+    await shot(p, "quiz-chapter", w, theme); // 5차: 1장 안내
+    await pastChap(p);
     await shot(p, "quiz-likert", w, theme);
     await p.eval(() => { LIKERT.forEach((it, k) => (qa.a[it.id] = 1 + (k % 5))); qa.pairs = {}; qa.i = steps().findIndex((s) => s.kind === "pairs" || s.pairs); if (qa.i < 0) throw new Error("짝 단계를 찾지 못했어요"); drawTest(); return 1; });
     await p.idle(); await shot(p, "quiz-pairs", w, theme);
@@ -510,7 +528,8 @@ function contrast(nontext) {
   }
   const nt = {
     ".dot i": () => { const e = document.querySelector(".dot i"); return e && ratio(over(rgba(getComputedStyle(e).borderTopColor), tok("--surface")), tok("--surface")); },
-    ".qbar i": () => { const e = document.querySelector(".qbar i"); return e && ratio(over(rgba(getComputedStyle(e).backgroundColor), tok("--surface-2")), tok("--surface-2")); },
+    // 5차: 진행 막대가 장별 5칸(i = 칸 바탕, b = 채움)이라 채움 b를 본다
+    ".qbar b": () => { const e = document.querySelector(".qbar b"); return e && ratio(over(rgba(getComputedStyle(e).backgroundColor), tok("--surface-2")), tok("--surface-2")); },
     "체크(--on-acc/--acc)": () => getComputedStyle(document.documentElement).getPropertyValue("--on-acc").trim() ? ratio(tok("--on-acc"), tok("--acc")) : null,
     ".pips i.on": () => { const e = document.querySelector(".pips i.on"); return e && ratio(over(rgba(getComputedStyle(e).backgroundColor), tok("--surface")), tok("--surface")); }
   };
@@ -529,7 +548,9 @@ S.E12 = async (t) => {
     await startQuiz(p);
     const st = { likert: 0, basics: [] };
     for (let k = 0; k < 3; k++) await answer(p, DEF, st);
-    await run("quiz-likert", [".dot i", ".qbar i"]);
+    await run("quiz-chapter", []); // 5차: 1장 안내
+    await pastChap(p);
+    await run("quiz-likert", [".dot i", ".qbar b"]);
     await reload(p, "jobs");
     await run("jobs", []);
     await reload(p, "test");
@@ -541,7 +562,8 @@ S.E12 = async (t) => {
 S.E13 = async (t) => {
   const p = await open(t, "test", 1280, 800);
   await finish(p, { dept: "none" });
-  const r = await p.eval(`({ text: document.querySelector(".result")?.textContent.trim().length || 0, week: document.querySelectorAll(".r-week li").length,
+  // 5차: .r-week가 학년 할 일까지 담은 카드라 이번 주 목록(.r-week > ol > li)만 센다
+  const r = await p.eval(`({ text: document.querySelector(".result")?.textContent.trim().length || 0, week: document.querySelectorAll(".r-week > ol > li").length,
     map: !!document.querySelector('.nodept a[href="#map-none"]'), jobs: !!document.querySelector('.nodept a[href="#jobs"]') })`); // 4차 QA(페르소나 D1): '내 학과가 없어요' 지도 주소(결정 23 예외 ③)
   t.check(r.text > 0, "결과가 비어 있어요");
   t.check(r.week >= 2, `.r-week li ${r.week}개(2개 이상이어야 해요)`);
@@ -568,7 +590,8 @@ S.E14 = async (t) => {
   for (const w of [390, 1280]) for (const g of V1) await t.part(`${w} ${g.code.slice(0, 16)}`, async () => {
     const p = await open(t, "r=" + g.code, w, w < 600 ? 844 : 800);
     await p.waitFor(`!!document.querySelector(".result, .rfail")`, 4000);
-    const r = await p.eval(() => ({ ok: !!document.querySelector(".result"), fail: !!document.querySelector(".rfail"), hero: __hero(), jobs: document.querySelectorAll(".r-top3 .jobcard").length,
+    // 5차: 직무 카드 3장(.r-top3 .jobcard)이 '왜' 칸 3개(.rwhy .rw-top)로 바뀌었다
+    const r = await p.eval(() => ({ ok: !!document.querySelector(".result"), fail: !!document.querySelector(".rfail"), hero: __hero(), jobs: document.querySelectorAll(".rwhy > li > .rw-top").length,
       school: qa.a.school, dept: qa.a.dept ?? null, year: parseInt(qa.a.year), lk: LIKERT.map((it) => qa.a[it.id]).join("") }));
     t.check(r.ok && !r.fail && r.jobs === 3, `${w} ${g.code.slice(0, 16)}…: 결과가 안 열려요 ${JSON.stringify(r).slice(0, 80)}`);
     t.check(r.hero === "none", `${w}: 히어로가 보여요(${r.hero})`);
@@ -708,15 +731,16 @@ S.E18 = async (t) => {
   });
 };
 
-// E19: 친구용 링크는 답 없이 직무 3개와 육각형만, '나도 해 보기'가 검사를 시작한다(결정 13)
+// E19: 친구용 링크는 답 없이 직무 3개와 끌림 막대만, '나도 해 보기'가 검사를 시작한다(결정 13). 5차: 육각형(.hexchart) → 끌림 막대(.dbars)
 S.E19 = async (t) => {
   const p = await open(t, "test", 1280, 800);
   const code = await p.eval(() => { const a = { school: "ssu" }; LIKERT.forEach((it, k) => (a[it.id] = 1 + (k % 5))); return encodeFriend(compute(a, ["big"], {})); });
   t.check(code.length <= 40, `친구용 코드 ${code.length}자(40자 이하여야 해요)`);
   const q = await open(t, "s=" + code, 390, 844);
   await q.waitFor(`!!document.querySelector(".friend")`, 4000);
-  const r = await q.eval(() => ({ jobs: document.querySelectorAll(".friend .jobcard").length, hex: !!document.querySelector(".friend .hexchart"),
-    ready: !!document.querySelector(".r-ready, .gauges, #r-todo, #r-link"), hero: __hero() }));
+  // 5차: 1위는 색면 제목(#r-title), 2·3위는 링크(.rh-next)라 직무 3개 = 제목 1 + 링크 2
+  const r = await q.eval(() => ({ jobs: (document.querySelector(".friend #r-title")?.textContent.trim() ? 1 : 0) + document.querySelectorAll('.friend .rh-next a[href^="#jobs-"]').length, hex: !!document.querySelector(".friend .dbars"),
+    ready: !!document.querySelector("#r-ready, .rtiles, .gauges, #r-todo, #r-link"), hero: __hero() }));
   t.check(r.jobs === 3 && r.hex && !r.ready && r.hero === "none", `친구용 화면 ${JSON.stringify(r)}`);
   looks(t, "390 친구용", await q.eval(measure), 390);
   await q.click(".friend [data-start]");
@@ -910,6 +934,92 @@ S.E26 = async (t) => {
     t.check(b.bg === b.acc, `B6 ${w} ${theme} '다른 학교': ${b.bg} ≠ --acc ${b.acc}`);
     await p.close();
   });
+};
+
+// ---------- 5차 시나리오(E27~E30, 디자인 초안 3-7) ----------
+// E27: 검사 집중 모드. 리커트 카드가 세로 가운데(위·아래 빈 곳 차이 40 이하)이고 메뉴 목록(#tabs)이 안 보인다.
+// 600 미만은 카드 틀 없이 질문을 내리는 설계(디자인 초안 3-1)라 동그라미 줄 가운데가 화면 가운데 1/3 안인지 본다
+S.E27 = async (t) => {
+  for (const [w, h] of [[1280, 800], [1536, 900], [1920, 1080], [390, 844]]) await t.part(`${w}`, async () => {
+    const p = await open(t, "test", w, h);
+    await startQuiz(p);
+    const st = { likert: 0, basics: [] };
+    for (let k = 0; k < 3; k++) await answer(p, DEF, st);
+    await pastChap(p);
+    const r = await p.eval(() => { const b = document.querySelector(".quiz").getBoundingClientRect(), d = document.querySelector("#q-body .dots").getBoundingClientRect();
+      return { top: Math.round(b.top), gap: Math.round(innerHeight - b.bottom), dots: Math.round((d.top + d.bottom) / 2), tabs: __vis(document.getElementById("tabs")), foot: __vis(document.querySelector("footer")) }; });
+    if (w >= 600) t.check(Math.abs(r.top - r.gap) <= 40, `${w}×${h}: 카드 위 ${r.top} / 아래 ${r.gap}(차이 40 이하여야 해요)`);
+    else t.check(r.dots >= h / 3 && r.dots <= h * 2 / 3, `${w}×${h}: 동그라미 줄 가운데 y ${r.dots}(${Math.round(h / 3)}~${Math.round(h * 2 / 3)}이어야 해요)`);
+    t.check(!r.tabs && !r.foot, `${w}: 검사 중 메뉴 ${r.tabs ? "보임" : "숨김"}, 푸터 ${r.foot ? "보임" : "숨김"}`);
+    t.note(`${w}×${h}: 위 ${r.top} / 아래 ${r.gap}, 동그라미 줄 y ${r.dots}`);
+    noErr(t, p, `${w}`);
+  });
+};
+
+// E28: 장 안내는 장이 바뀔 때 한 번. 숫자키로 건너뛰지 않고, 뒤로 갔다 다시 와도 또 나오지 않는다. 단계 번호·분모는 그대로
+S.E28 = async (t) => {
+  const p = await open(t, "test", 1280, 800);
+  await startQuiz(p);
+  const st = { likert: 0, basics: [] };
+  for (let k = 0; k < 3; k++) await answer(p, DEF, st);
+  const c1 = await p.eval(`({ kind: document.querySelector(".quiz").dataset.kind, chap: document.querySelectorAll(".chap").length, i: qa.i, sec: document.getElementById("q-sec").textContent, focus: document.activeElement?.id })`);
+  t.check(c1.kind === "chapter" && c1.chap === 1 && c1.i === 3 && c1.focus === "q-title", `기본 정보 뒤 1장 안내 ${JSON.stringify(c1)}`);
+  await p.key("1"); await sleep(400);
+  const k1 = await p.eval(`({ kind: document.querySelector(".quiz").dataset.kind, a: qa.a[LIKERT[0].id] ?? null })`);
+  t.check(k1.kind === "chapter" && k1.a === null, `장 안내에서 숫자키 1이 답이 됐어요 ${JSON.stringify(k1)}`);
+  await p.key("Enter");
+  await p.waitFor(`document.querySelector(".quiz")?.dataset.kind === "likert"`, 3000);
+  await p.idle();
+  const n = await p.eval(`Q.interest.items.length`);
+  for (let k = 0; k < n; k++) await answer(p, DEF, st);
+  t.check((await kindOf(p)) === "chapter", "흥미 다음에 2장 안내가 없어요");
+  await p.eval("history.back(); 1");
+  await p.waitFor(`qa.i === ${3 + n - 1}`, 3000); await p.idle();
+  t.check(!(await has(p, ".chap")), "뒤로 간 화면에 장 안내가 있어요");
+  await answer(p, DEF, st);
+  const c2 = await p.eval(`({ kind: document.querySelector(".quiz").dataset.kind, i: qa.i })`);
+  t.check(c2.kind === "likert" && c2.i === 3 + n, `다시 앞으로 왔는데 장 안내가 또 나왔어요 ${JSON.stringify(c2)}`);
+  noErr(t, p, "E28");
+};
+
+// E29: 결과 첫 화면(1280×800·390×844)에 1위 직무 제목·끌림 1·2위·결과 링크 버튼, 390은 이번 주 줄까지
+S.E29 = async (t) => {
+  for (const [w, h] of [[1280, 800], [390, 844]]) await t.part(`${w}`, async () => {
+    const p = await open(t, "test", w, h);
+    await jumpResult(p, BOSS);
+    await p.eval("scrollTo(0, 0); 1");
+    const sels = ["#r-title", ".rh-dirs", "#r-link", ...(w < 600 ? [".rh-week"] : [])];
+    const r = await p.eval((sels) => sels.map((s) => { const e = document.querySelector(s); return [s, e && __vis(e) ? Math.round(e.getBoundingClientRect().bottom) : null]; }), sels);
+    const out = r.filter(([, b]) => b == null || b > h);
+    t.check(!out.length, `${w}×${h}: 첫 화면 밖 ${out.map(([s, b]) => `${s} ${b ?? "없음"}`).join(", ")}`);
+    t.note(`${w}: ${r.map(([s, b]) => `${s} ${b}`).join(", ")}`);
+    noErr(t, p, `${w}`);
+  });
+};
+
+// E30: 기존 검사 흔적이 없다. 첫 화면·결과·친구용·직무 사전·공유 카드 글자에 '○○형' 영역 이름, 글자 코드 배지(R·I·A…만 있는 칸), 육각형, '흥미 코드'가 없다
+S.E30 = async (t) => {
+  const TRACE = () => { const txt = document.body.innerText, bad = [];
+    const m = txt.match(/(현실|탐구|예술|사회|진취|관습|기업)형|흥미 코드|RIASEC/g); if (m) bad.push(...new Set(m));
+    const code = [...document.querySelectorAll("body *")].filter((e) => !e.children.length && __vis(e) && /^[RIASEC]{1,3}$/.test(e.textContent.trim())).map((e) => e.textContent.trim());
+    if (code.length) bad.push(`글자 코드 ${code.slice(0, 3).join(",")}`);
+    if (document.querySelector(".hexchart, figure.hex, .badge-code, .r-codes")) bad.push("육각형·코드 배지");
+    return bad; };
+  const p = await open(t, "test", 1280, 800);
+  const check = async (label) => { const bad = await p.eval(TRACE); t.check(!bad.length, `${label}: ${bad.join(", ")}`); };
+  await check("첫 화면");
+  await reload(p, "jobs"); await check("직무 사전");
+  await reload(p, "test"); await jumpResult(p, BOSS); await check("결과");
+  await p.eval(`document.querySelectorAll(".result details").forEach((d) => (d.open = true)); 1`); await check("결과(펼침)");
+  const canvas = await p.eval(async () => { const seen = [], f0 = CanvasRenderingContext2D.prototype.fillText;
+    CanvasRenderingContext2D.prototype.fillText = function (s, ...a) { seen.push(String(s)); return f0.call(this, s, ...a); };
+    try { await shareCanvas(compute(qa.a, qa.sector, qa.pairs)); } finally { CanvasRenderingContext2D.prototype.fillText = f0; }
+    return seen; });
+  const cbad = canvas.filter((s) => /형$|흥미 코드|^[RIASEC]{1,3}$/.test(s));
+  t.check(canvas.length > 5 && !cbad.length, `공유 카드 글자 ${canvas.length}개, 흔적 ${cbad.join(",")}`);
+  const code = await p.eval(() => encodeFriend(compute(qa.a, qa.sector, qa.pairs)));
+  await reload(p, "s=" + code); await p.waitFor(`!!document.querySelector(".friend")`, 4000); await check("친구용");
+  noErr(t, p, "E30");
 };
 
 // ---------- 실행 ----------

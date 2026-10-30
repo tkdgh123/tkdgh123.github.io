@@ -81,3 +81,19 @@ test("다른 회차의 history 항목으로 돌아오면 시작 전 화면이다
   assert.equal(qa.i, -1);
   assert.deepEqual({ ...qa.a }, {});
 });
+
+// 5차: 장이 바뀌는 첫 단계 앞에 장 안내(qa.chap)를 한 번 끼운다. 단계 수·history는 그대로, 뒤로 갈 땐 없고 같은 회차엔 다시 안 나온다
+test("장 안내: 앞으로 갈 때 장마다 한 번(흥미·준비 상태·짝·끌리는 곳), 뒤로·다시 앞으로는 없음. 진행 막대 칸 = 장별 문항 수", async () => {
+  const go = get("go");
+  get("reset")();
+  Object.assign(qa, { i: 0, a: { school: "ssu" } });
+  const ss = steps(), want = [...ss.keys()].filter((k) => k && ss[k].ch !== ss[k - 1].ch).map((k) => [k, ss[k].ch]), got = [];
+  for (let k = 1; k < ss.length; k++) { await go(k, false); if (qa.chap) got.push([k, qa.chap]); }
+  assert.deepEqual(got, want);
+  assert.deepEqual(want.map(([, c]) => c), [1, 2, 3, 4]);
+  const k2 = want[1][0];
+  await go(k2 - 1, false);
+  await go(k2, false);
+  assert.equal(qa.chap, 0, "같은 회차에 장 안내가 다시 나왔다");
+  assert.deepEqual([...get("parts")()].map((p) => p.length), [Q.basics.length, Q.interest.items.length, LIKERT.length - Q.interest.items.length, Q.pairs.length, 1]);
+});

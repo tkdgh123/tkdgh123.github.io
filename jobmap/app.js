@@ -75,16 +75,18 @@ const deptName = (d, ssu) => ssu ? d.name : d.promptName.replace(/ 전공$/, "")
 const noneName = (ssu) => ssu ? "내 학과가 없어요" : "비슷한 전공이 없어요";
 const statCard = (s) => `<div class="stat"><b class="num">${esc(s.value)}</b><span>${esc(s.label)}</span><small>${esc(s.basis)}${src(s.source)}</small></div>`;
 const AREA = Object.fromEntries(D.quiz.areas.map((x) => [x.id, x]));
-// 흥미 코드를 글자로도 풀어 쓴다(EC → EC 진취·관습). 터치 화면엔 툴팁이 안 보여서
-const codeName = (code) => `${code} ${code.split("").map((c) => AREA[c].name.replace("형", "")).join("·")}`;
-const codeTag = (j) => j.riasec ? `<span class="code">${esc(codeName(j.riasec))}</span>` : "";
+const icon = (f, n) => `<img src="img/${f}.svg" alt="" width="${n}" height="${n}">`;
+const aImg = (id, n) => icon("a-" + id, n);
+// 직무 끌림 방향(속 id EC)은 화면에 우리 이름으로만 쓴다(EC → 으쌰·차곡). 글자 코드는 보이지 않는다(5차)
+const codeName = (code) => code.split("").map((c) => AREA[c].name).join("·");
+const codeTag = (j) => j.riasec ? `<span class="code">${[...j.riasec].map((c) => aImg(c, 20)).join("")}${esc(codeName(j.riasec))}</span>` : "";
 const aIcon = (j) => `<img class="jd-ic" src="img/j-${j.key}.svg" alt="" width="40" height="40">`;
 // AI가 바꾸는 점: 직무 사전과 AI 화면이 같은 칸 이름을 쓴다(Q27)
 const aiDl = (a) => `<dl>${[["요즘 현장", a.now], ["바뀌는 일", a.change], ["신입이 갖출 것", a.need]].filter((x) => x[1]).map(([k, v]) => `<dt>${k}</dt><dd>${esc(v)}</dd>`).join("")}</dl>`;
 
 function chips(el, items, key, after) {
   el.innerHTML = items.map((it) =>
-    `<button type="button" class="chip${it.ghost ? " ghost" : ""}" data-v="${esc(it.v)}" aria-pressed="${String(st[key]) === String(it.v)}">${esc(it.label)}</button>`).join("");
+    `<button type="button" class="chip${it.ghost ? " ghost" : ""}" data-v="${esc(it.v)}" aria-pressed="${String(st[key]) === String(it.v)}">${it.img || ""}${esc(it.label)}</button>`).join("");
   el.onclick = (e) => {
     const b = e.target.closest("button"); if (!b) return;
     st[key] = isNaN(b.dataset.v) || b.dataset.v === "" ? b.dataset.v : Number(b.dataset.v);
@@ -252,10 +254,10 @@ const foldPick = (on) => {
 $("pick").insertAdjacentHTML("afterend", `<div class="pick-sum" id="pick-sum" hidden><span></span><button type="button" class="chip ghost">바꾸기</button></div>`);
 $("pick-sum").querySelector("button").onclick = () => { foldPick(false); ($("dept").querySelector('[aria-pressed="true"]') || $("school").querySelector('[aria-pressed="true"]'))?.focus(); };
 
-// 직무 사전: 흥미 영역으로 거를 수 있다
+// 직무 사전: 끌림 방향으로 거를 수 있다
 function drawJobs() {
   const list = (a) => (a || []).map((t) => `<li>${esc(t)}</li>`).join("");
-  chips($("jdtools"), [{ v: "", label: "전체" }, ...D.quiz.areas.map((x) => ({ v: x.id, label: `${x.short} ${x.id}` }))], "jobArea", drawJobs);
+  chips($("jdtools"), [{ v: "", label: "전체" }, ...D.quiz.areas.map((x) => ({ v: x.id, label: x.name, img: aImg(x.id, 20) }))], "jobArea", drawJobs);
   const jobs = (D.jobs || []).filter((j) => !st.jobArea || (j.riasec || "").includes(st.jobArea));
   $("jdcount").textContent = `직무 ${jobs.length}개`;
   $("jds").innerHTML = jobs.map((j) => `
@@ -269,7 +271,7 @@ function drawJobs() {
         ${j.pay || j.outlook ? `<div class="stats">${[["신입 임금", j.pay], ["전망", j.outlook]].filter((x) => x[1]).map(([l, v]) => `<div class="stat"><small>${l}</small><span>${esc(v.value)}</span><small>${esc(v.basis)}${src(v.source)}</small></div>`).join("")}</div>` : ""}
         ${j.facts?.length ? `<div><h3>채용 숫자</h3><ul class="jfacts">${j.facts.map((f) => `<li>${esc(f.text)}${src(f.source, f.date)}</li>`).join("")}</ul></div>` : ""}
         ${j.tips?.length ? `<div><h3>합격자·현직자가 말하는 준비법</h3><ol>${list(j.tips)}</ol>${src((j.tipSources || []).join(", "))}</div>` : ""}
-        <small class="muted">직무 설명${src(j.source)}${j.riasec ? ` · 흥미 코드는 O*NET 기준${src(j.onet)}` : ""}</small>
+        <small class="muted">직무 설명${src(j.source)}${j.riasec ? ` · 끌림 방향은 O*NET 직업 흥미 정보 기준${src(j.onet)}` : ""}</small>
       </div>
     </details>`).join("");
 }
@@ -366,7 +368,8 @@ function newsLine(now = new Date()) {
 }
 
 const VIEWS = ["test", "map", "jobs", "ai", "faq", "about"];
-const OFF = () => matchMedia("(max-width:1199px)").matches ? 68 : 24; // 1199 이하 sticky 탭 56 + 12
+// 1199 이하 sticky 탭 56 + 12. 검사 중(집중 모드)엔 메뉴가 숨어 12(5차)
+const OFF = () => document.body.dataset.view === "test" && $("quiz") ? 12 : matchMedia("(max-width:1199px)").matches ? 68 : 24;
 const jump = (el) => el && scrollTo({ top: el.getBoundingClientRect().top + scrollY - OFF(), behavior: "instant" });
 let shown = ""; // 직전에 보인 화면(첫 로드엔 페이드 없음)
 function route() {
