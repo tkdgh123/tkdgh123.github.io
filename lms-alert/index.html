@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>LMS 마감 알림</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap" rel="stylesheet">
+<style>
+/* 알림 창과 같은 말랑한 카드 세계: 위에서 아래로 "무엇이 오나 → 실제 화면 → 어떻게 → 관리" */
+:root {
+  --bg: #F2F5FB; --card: #FFFFFF; --ink: #1E2533; --sub: #6E778A; --line: #E3E8F2;
+  --today: #FF5A5F; --tmr: #FF9F43; --week: #4F7CFF; --soft: #E8EEFF; --soft-t: #FFECEC; --soft-m: #FFF3E3;
+  --display: "Jua", "Malgun Gothic", sans-serif; --body: "Gowun Dodum", "Malgun Gothic", sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #13161D; --card: #1C2029; --ink: #E9ECF3; --sub: #9AA3B5; --line: #2A303C;
+  --soft: #1F2A47; --soft-t: #3A2023; --soft-m: #3A2C1A; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #13161D; --card: #1C2029; --ink: #E9ECF3; --sub: #9AA3B5; --line: #2A303C;
+  --soft: #1F2A47; --soft-t: #3A2023; --soft-m: #3A2C1A; color-scheme: dark }
+
+* { box-sizing: border-box; margin: 0 }
+body { background: var(--bg); color: var(--ink); font: 16px/1.6 var(--body); word-break: keep-all; overflow-wrap: anywhere }
+.wrap { max-width: 980px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)) }
+h1, h2, h3, .num { font-family: var(--display); font-weight: 400; text-wrap: balance }
+a { color: var(--week) }
+.back { display: inline-block; margin-top: 22px; font-size: 14px; color: var(--sub); text-decoration: none }
+
+header { padding-block: 28px 8px; display: grid; gap: 32px; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); align-items: center }
+header h1 { font-size: clamp(38px, 7vw, 58px); line-height: 1.1 }
+header p { color: var(--sub); margin-top: 12px; font-size: 17px }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px }
+.chip { padding: 6px 14px; border-radius: 99px; background: var(--card); font-size: 14px; display: inline-flex; align-items: center; gap: 8px }
+.chip i { width: 9px; height: 9px; border-radius: 50% }
+.shots { display: flex; gap: 14px; align-items: flex-start; justify-content: center }
+.shot { background: var(--card); border-radius: 26px; padding: 10px; box-shadow: 0 10px 30px rgb(30 37 51 / .10); display: grid; gap: 8px; min-width: 0 }
+.shot img { display: block; width: 100%; border-radius: 18px }
+.shot span { text-align: center; font-size: 13px; color: var(--sub) }
+.shot.laptop { flex: 1.15 } .shot.phone { flex: 1; margin-top: 40px }
+
+section { padding-block: 52px 0 }
+h2 { font-size: 28px; margin-bottom: 18px }
+
+.day { background: var(--card); border-radius: 28px; padding: 26px 22px }
+.track { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px }
+.track::before { content: ""; position: absolute; left: 6%; right: 6%; top: 44px; height: 6px; border-radius: 3px; background: var(--line) }
+.ev { position: relative; display: grid; justify-items: center; align-content: start; gap: 8px; text-align: center }
+.ev .t { font: 15px/24px var(--display); height: 24px; color: var(--sub); white-space: nowrap }
+.ev .dot { width: 30px; height: 30px; border-radius: 50%; border: 6px solid var(--card); background: var(--c) }
+.ev b { font-size: 14px; line-height: 1.35 }
+.ev small { color: var(--sub); font-size: 12px; line-height: 1.35 }
+
+.levels { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px }
+.lv { border-radius: 24px; padding: 20px; display: grid; gap: 6px; background: var(--b) }
+.lv .num { font-size: 34px; color: var(--c); line-height: 1 }
+.lv b { font-size: 16px }
+.lv p { color: var(--sub); font-size: 14px }
+.bars { display: flex; gap: 4px; margin-top: 4px }
+.bars i { width: 22px; height: 8px; border-radius: 4px; background: var(--line) }
+.bars i.on { background: var(--c) }
+
+.flow { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; align-items: stretch }
+.step { background: var(--card); border-radius: 22px; padding: 16px 14px; display: grid; gap: 6px; align-content: start; position: relative }
+.step .num { width: 34px; height: 34px; border-radius: 50%; background: var(--soft); color: var(--week); display: grid; place-items: center; font-size: 17px }
+.step b { font-size: 15px }
+.step p { font-size: 13px; color: var(--sub); line-height: 1.5 }
+.step:not(:last-child)::after { content: "›"; position: absolute; right: -10px; top: 18px; font: 24px var(--display); color: var(--sub) }
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px }
+.src { border-radius: 20px; padding: 14px 16px; background: var(--card); font-size: 14px; display: grid; gap: 4px }
+.src b { font-family: var(--display); font-weight: 400; font-size: 16px }
+.src code { font-size: 12px; color: var(--sub); overflow-wrap: anywhere }
+
+.why { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px }
+.card { background: var(--card); border-radius: 24px; padding: 20px; display: grid; gap: 10px; align-content: start }
+.card h3 { font-size: 19px }
+.ba { display: grid; gap: 6px; font-size: 14px }
+.ba div { padding: 8px 12px; border-radius: 14px }
+.ba .no { background: var(--soft-t); color: var(--sub); text-decoration: line-through; text-decoration-color: var(--today) }
+.ba .yes { background: var(--soft) }
+
+.manage { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px }
+.cmd { display: grid; gap: 8px }
+.cmd div { display: grid; grid-template-columns: minmax(0, auto) minmax(0, 1fr); gap: 4px 12px; align-items: baseline }
+.cmd code { font-size: 13px; background: var(--bg); padding: 3px 10px; border-radius: 10px; overflow-wrap: anywhere }
+.cmd span { font-size: 14px; color: var(--sub) }
+.files { font-size: 14px; display: grid; gap: 6px }
+.files li { list-style: none; display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px dashed var(--line); padding-bottom: 6px }
+.files ul { padding: 0; display: grid; gap: 6px }
+.files code { font-size: 13px }
+.files span { color: var(--sub); text-align: right }
+
+.next { display: flex; flex-wrap: wrap; gap: 10px }
+.next div { background: var(--card); border-radius: 99px; padding: 10px 18px; font-size: 15px }
+footer { padding-block: 56px 64px; color: var(--sub); font-size: 13px }
+
+@media (max-width: 760px) {
+  header { grid-template-columns: 1fr }
+  .flow { grid-template-columns: 1fr 1fr } .step::after { display: none }
+  .track { grid-template-columns: 1fr 1fr; row-gap: 22px } .track::before { display: none }
+  .levels, .why, .manage, .split { grid-template-columns: 1fr }
+}
+@media (max-width: 420px) { .flow { grid-template-columns: 1fr } .cmd div { grid-template-columns: 1fr } }
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../#make">← 작업실</a>
+
+<header>
+  <div>
+    <h1>LMS 마감 알림</h1>
+    <p>숭실대 LMS 과제·영상 마감을 매일 아침 휴대폰으로, 노트북을 켤 때마다 화면으로 알려 줘요. 이미 낸 과제와 다 본 영상은 빠져요.</p>
+    <div class="chips">
+      <span class="chip"><i style="background:var(--today)"></i>오늘 마감</span>
+      <span class="chip"><i style="background:var(--tmr)"></i>내일 마감</span>
+      <span class="chip"><i style="background:var(--week)"></i>이번 주</span>
+      <span class="chip">2026.10.31 시작</span>
+    </div>
+  </div>
+  <div class="shots">
+    <figure class="shot laptop"><img src="img/laptop.webp" alt="노트북 알림 창: 오늘·내일 마감 1개, 7일 달력, D-1 카드와 날짜별 과제·영상 목록" width="500" height="860"><span>노트북 창</span></figure>
+    <figure class="shot phone"><img src="img/phone.webp" alt="휴대폰 ntfy 알림: LMS 마감 · 오늘·내일 1개와 마감 목록" width="390" height="605"><span>휴대폰 알림</span></figure>
+  </div>
+</header>
+
+<section>
+  <h2>하루에 언제 오나</h2>
+  <div class="day"><div class="track">
+    <div class="ev" style="--c:var(--week)"><span class="t">08:00</span><span class="dot"></span><b>휴대폰 알림</b><small>7일 안의 마감 목록<br>하루 한 번</small></div>
+    <div class="ev" style="--c:var(--week)"><span class="t">노트북 켤 때</span><span class="dot"></span><b>마감 창</b><small>로그인하면 바로</small></div>
+    <div class="ev" style="--c:var(--tmr)"><span class="t">잠금 풀 때</span><span class="dot"></span><b>또 마감 창</b><small>오늘·내일 마감이 남았으면<br>1시간에 한 번</small></div>
+    <div class="ev" style="--c:var(--today)"><span class="t">오늘·내일 마감 있으면</span><span class="dot"></span><b>카톡도</b><small>아침 알림 때 같이</small></div>
+  </div></div>
+</section>
+
+<section>
+  <h2>알림 세기</h2>
+  <div class="levels">
+    <div class="lv" style="--c:var(--today);--b:var(--soft-t)"><span class="num">D-0</span><b>가장 센 알림</b><div class="bars"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div><p>아주 긴 진동과 함께 화면 위에 떠요</p></div>
+    <div class="lv" style="--c:var(--tmr);--b:var(--soft-m)"><span class="num">D-1</span><b>높은 알림</b><div class="bars"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div><p>긴 진동과 알림음, 화면 위에 떠요</p></div>
+    <div class="lv" style="--c:var(--week);--b:var(--soft)"><span class="num">D-2+</span><b>보통 알림</b><div class="bars"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div><p>짧은 진동과 기본 알림음</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>마감을 어떻게 가져오나</h2>
+  <div class="flow">
+    <div class="step"><span class="num">1</span><b>LMS 토큰</b><p>내가 LMS 설정에서 만든 열쇠. 비밀번호는 저장하지 않아요</p></div>
+    <div class="step"><span class="num">2</span><b>과목 목록</b><p>이번 학기 듣는 과목을 LMS에서 받아요</p></div>
+    <div class="step"><span class="num">3</span><b>주차학습 열기</b><p>사람이 주차학습 탭을 누르듯 열어서 2시간짜리 출석 토큰을 받아요</p></div>
+    <div class="step"><span class="num">4</span><b>과제·영상 모으기</b><p>과목마다 과제·퀴즈·토론과 강의 영상의 마감일을 읽어요</p></div>
+    <div class="step"><span class="num">5</span><b>할 것만 남기기</b><p>낸 과제, 다 본 영상, 지난 마감은 빼고 마감 순으로 정렬</p></div>
+  </div>
+  <div class="split">
+    <div class="src"><b>과제·퀴즈·토론</b><span>제출했는지 함께 와요</span><code>/learningx/api/v1/courses/{과목}/allcomponents_db</code></div>
+    <div class="src"><b>강의 영상</b><span>출석 인정 마감과 다 봤는지 함께 와요</span><code>/learningx/api/v1/courses/{과목}/modules?include_detail=true</code></div>
+  </div>
+</section>
+
+<section>
+  <h2>이렇게 정한 이유</h2>
+  <div class="why">
+    <div class="card"><h3>휴대폰은 ntfy 앱</h3><div class="ba"><div class="no">카톡 나와의 채팅</div><div class="yes">ntfy 푸시: 진짜 알림음, 가입 없음, 무료</div></div></div>
+    <div class="card"><h3>로그인은 토큰으로</h3><div class="ba"><div class="no">학번·비밀번호 저장</div><div class="yes">LMS 토큰 하나. 설정에서 지우면 바로 끊겨요</div></div></div>
+    <div class="card"><h3>노트북은 크롬 앱 창</h3><div class="ba"><div class="no">파이썬 기본 창 (꾸미기 어려움)</div><div class="yes">웹페이지처럼 그린 창. 카드를 누르면 그 과제로 바로 가요</div></div></div>
+  </div>
+</section>
+
+<section>
+  <h2>관리</h2>
+  <div class="manage">
+    <div class="card cmd"><h3>바로 써 보기</h3>
+      <div><code>python lms_alert.py --show</code><span>지금 목록을 창으로</span></div>
+      <div><code>python lms_alert.py --test</code><span>휴대폰으로 시험 알림</span></div>
+      <div><code>python lms_alert.py setup</code><span>토큰 다시 붙여 넣기</span></div>
+      <div><code>schtasks /Change /TN "LMS 마감 알림" /DISABLE</code><span>잠시 끄기</span></div>
+    </div>
+    <div class="card files"><h3>파일</h3>
+      <ul>
+        <li><code>lms_alert.py</code><span>가져오기·알림</span></li>
+        <li><code>lms_alert.html</code><span>노트북 창 디자인</span></li>
+        <li><code>.lms_alert.json</code><span>토큰·알림 주소 (공개 금지)</span></li>
+        <li><code>.lms_alert.log</code><span>언제 무엇을 보냈는지</span></li>
+        <li><code>작업 스케줄러</code><span>8시 · 로그인 · 잠금 해제</span></li>
+      </ul>
+      <p style="font-size:14px;color:var(--sub)">연결이 끊기면 창과 휴대폰에 알려 줘요. 그때 Claude에게 "LMS 다시 연결해".</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>다음에 붙일 수 있는 것</h2>
+  <div class="next">
+    <div>저녁 6시, 오늘 마감 남은 것만 한 번 더</div>
+    <div>노트북이 꺼져 있어도 오는 아침 알림</div>
+    <div>새 과제가 올라오면 바로 알림</div>
+  </div>
+</section>
+
+<footer>숭실대 LMS(canvas.ssu.ac.kr) 기준 · 화면은 2026년 10월 31일 실제 실행 화면</footer>
+</div>
+</body>
+</html>
