@@ -20,10 +20,10 @@
   window.JOBMAP.ssuDept = {
     jp: {
       roadmap: {
-        1: [{ text: "학과 소모임 키라키라로 JLPT 목표 급수 정하기", url: JP_HOME }],
-        2: [{ text: "일본 대학 교환학생·연수 알아보기", url: JP_INTRO }],
-        3: [{ text: "학과 채용 게시판에서 일본어 우대 공고 보기", url: JP_HOME }],
-        4: [{ text: "JLPT·JPT 점수를 지원서용으로 정리", url: null }]
+        1: [{ text: "학과 소모임 키라키라로 JLPT 목표 급수 정하기", url: JP_HOME, how: "일어일문학과 누리집에서 소모임 키라키라 안내를 보고 JLPT 급수를 정해요." }],
+        2: [{ text: "일본 대학 교환학생·연수 알아보기", url: JP_INTRO, how: "일어일문학과 학과 소개 페이지에서 일본 대학 교환학생·연수 안내를 읽어요." }],
+        3: [{ text: "학과 채용 게시판에서 일본어 우대 공고 보기", url: JP_HOME, how: "일어일문학과 누리집 채용 게시판에서 일본어 우대 공고를 찾아요." }],
+        4: [{ text: "JLPT·JPT 점수를 지원서용으로 정리", url: null, how: "받은 성적표를 모아 시험 이름·점수·응시일을 한 문서에 적어 둬요." }]
       },
       ssu_specific: [
         { name: "일본 교환학생·연수", desc: "일본 대학 교환학생과 어학연수", url: JP_INTRO },
@@ -38,10 +38,10 @@
     },
     eng: {
       roadmap: {
-        1: [{ text: "영어 에세이 대회에 수업 과제로 도전해요", url: ENG_HOME }],
-        2: [{ text: "영어 프레젠테이션 대회에 나가 봐요", url: ENG_HOME }],
-        3: [{ text: "영어권 현장 체험 팀 프로젝트에 지원해요", url: ENG_SSU }],
-        4: [{ text: "졸업생 특강과 교사 임용 특강을 들어요", url: ENG_SSU }]
+        1: [{ text: "영어 에세이 대회에 수업 과제로 도전하기", url: ENG_HOME, how: "영어영문학과 누리집 학과 소개에서 에세이 대회 안내를 보고 과제를 내요." }],
+        2: [{ text: "영어 프레젠테이션 대회에 나가 봐요", url: ENG_HOME, how: "영어영문학과 누리집 학과 소개에서 프레젠테이션 대회 안내를 읽어요." }],
+        3: [{ text: "영어권 현장 체험 팀 프로젝트에 지원해요", url: ENG_SSU, how: "숭실대 누리집 영어영문학과 소개에서 현장 체험 프로젝트 안내를 읽어요." }],
+        4: [{ text: "졸업생 특강과 교사 임용 특강을 들어요", url: ENG_SSU, how: "숭실대 누리집 영어영문학과 소개에서 특강 안내를 보고 일정을 챙겨요." }]
       },
       ssu_specific: [
         { name: "영어 프레젠테이션 대회", desc: "2013년부터 열리고 한국어·외국어 화자 부문이 따로 있어요.", url: ENG_HOME },
@@ -57,10 +57,10 @@
     },
     biz: {
       roadmap: {
-        1: [{ text: "인사·마케팅·재무·회계 수업을 하나씩 들어 보기", url: null }],
-        2: [{ text: "회계사·세무사 같은 전문자격 준비 여부 정하기", url: BIZ + "bbs/list.do?bId=BBS_03_CERTIFICATE" }],
-        3: [{ text: "경영학부 경진대회에 나가 보기", url: BIZ + "bbs/list.do?bId=BBS_03_NEWS" }],
-        4: [{ text: "목표 직무에 맞는 자격·점수 정리", url: null }]
+        1: [{ text: "인사·마케팅·재무·회계 수업을 하나씩 들어 보기", url: null, how: "수강신청 때 경영학부 전공과목에서 분야별로 한 과목씩 골라 들어요." }],
+        2: [{ text: "회계사·세무사 같은 전문자격 준비 여부 정하기", url: BIZ + "bbs/list.do?bId=BBS_03_CERTIFICATE", how: "경영학부 누리집 자격증 게시판에서 시험 안내를 읽고 준비할지 정해요." }],
+        3: [{ text: "경영학부 경진대회에 나가 보기", url: BIZ + "bbs/list.do?bId=BBS_03_NEWS", how: "경영학부 누리집 소식 게시판에서 경진대회 공지를 보고 팀을 꾸려요." }],
+        4: [{ text: "목표 직무에 맞는 자격·점수 정리", url: null, how: "가고 싶은 공고 몇 개의 자격 요건을 모아 내게 빠진 것을 적어 둬요." }]
       },
       ssu_specific: [
         { name: "경영학부 경진대회", desc: "학부가 여는 공모전", url: BIZ + "bbs/list.do?bId=BBS_03_NEWS" },
@@ -74,10 +74,10 @@
     },
     pubadmin: {
       roadmap: {
-        1: [{ text: "행정실무워크숍에 참여해 분야를 탐색해요", url: PUB }],
-        2: [{ text: "모의 국무회의에서 정책 토론을 경험해요", url: PUB }],
-        3: [{ text: "행정기관 방문과 정책 모의갈등 조정회의에 나가요", url: PUB }],
-        4: [{ text: "5급 행정고시반이나 취업 멘토링으로 진로를 굳혀요", url: PUB }]
+        1: [{ text: "행정실무워크숍에 참여해 분야를 탐색해요", url: PUB, how: "행정학부 누리집에서 행정실무워크숍 안내를 찾아 참여 방법을 확인해요." }],
+        2: [{ text: "모의 국무회의에서 정책 토론을 경험해요", url: PUB, how: "행정학부 누리집에서 모의 국무회의 안내를 찾아 참여 방법을 확인해요." }],
+        3: [{ text: "행정기관 방문과 정책 모의갈등 조정회의에 나가요", url: PUB, how: "행정학부 누리집에서 기관 방문·모의갈등 조정회의 안내를 찾아봐요." }],
+        4: [{ text: "5급 행정고시반이나 취업 멘토링으로 진로를 굳혀요", url: PUB, how: "행정학부 누리집에서 행정고시반·취업 멘토링 안내를 보고 하나를 골라요." }]
       },
       ssu_specific: [
         { name: "행정실무워크숍·모의 국무회의", desc: "행정 실무와 정책 결정을 직접 체험해요.", url: PUB },
@@ -93,10 +93,10 @@
     },
     masscom: {
       roadmap: {
-        1: [{ text: "PR·광고·방송 학회 중 한 곳에 들어가요", url: MASS }],
-        2: [{ text: "SSV 실습실에서 영상 제작을 익혀요", url: MASS }],
-        3: [{ text: "언홍제 기획에 참여해 포트폴리오를 쌓아요", url: MASS }],
-        4: [{ text: "언론고시반 가온누리로 시험을 준비해요", url: MASS }]
+        1: [{ text: "PR·광고·방송 학회 중 한 곳에 들어가요", url: MASS, how: "언론홍보학과 누리집에서 학회 소개를 읽고 모집 시기를 확인해요." }],
+        2: [{ text: "SSV 실습실에서 영상 제작을 익혀요", url: MASS, how: "언론홍보학과 누리집에서 SSV 스튜디오 소개를 읽고 실습 수업을 찾아요." }],
+        3: [{ text: "언홍제 기획에 참여해 포트폴리오를 쌓아요", url: MASS, how: "언론홍보학과 누리집에서 언홍제 소식을 찾아보고 기획에 참여해요." }],
+        4: [{ text: "언론고시반 가온누리로 시험을 준비해요", url: MASS, how: "언론홍보학과 누리집에서 가온누리 안내를 읽고 모집 시기를 확인해요." }]
       },
       ssu_specific: [
         { name: "SSV 스튜디오", desc: "스튜디오와 편집실을 갖춘 영상 실습 공간이에요.", url: MASS },
@@ -112,10 +112,10 @@
     },
     mechanical: {
       roadmap: {
-        1: [{ text: "자동차·로봇·비행기 등 연구회를 둘러보고 하나 골라요", url: ME }],
-        2: [{ text: "연구회에서 설계·제작 프로젝트를 직접 해 봐요", url: ME }],
-        3: [{ text: "에너지 융합 전공 등 심화 과정을 검토하고 기계기사를 준비해요", url: ME }],
-        4: [{ text: "설계·생산관리·방산 중 방향을 정하고 자격을 갖춰요", url: MECOUNSEL }]
+        1: [{ text: "자동차·로봇·비행기 등 연구회를 둘러보고 하나 골라요", url: ME, how: "숭실대 누리집 기계공학부 소개에서 연구회 목록을 보고 하나 골라요." }],
+        2: [{ text: "연구회에서 설계·제작 프로젝트를 직접 해 봐요", url: ME, how: "들어간 연구회에서 설계부터 제작까지 맡을 작품 하나를 정해요." }],
+        3: [{ text: "에너지 융합 전공 등 심화 과정을 검토하고 기계기사를 준비해요", url: ME, how: "기계공학부 소개에서 융합전공을 보고, 기계기사 시험 일정을 확인해요." }],
+        4: [{ text: "설계·생산관리·방산 중 방향을 정하고 자격을 갖춰요", url: MECOUNSEL, how: "커리어넷 상담 답변을 읽고 한 방향을 골라 필요한 자격을 적어 둬요." }]
       },
       ssu_specific: [
         { name: "연구회 지원", desc: "자동차·로봇·비행기·설계·자동화·유동 분야 연구회를 지원해요.", url: ME },
@@ -129,10 +129,10 @@
     },
     math: {
       roadmap: {
-        1: [{ text: "수학과 진로탐색의 수학 관련 직업 소개를 읽어봐요", url: MJOB }],
-        2: [{ text: "순수·응용수학 중 끌리는 쪽을 정해 전공 수업을 골라요", url: MINTRO }],
-        3: [{ text: "교직·금융·대학원 중 한 길을 정해 준비를 시작해요", url: "https://math.ssu.ac.kr/?page_id=1308" }],
-        4: [{ text: "학과 채용추천·인턴 게시판을 확인하며 지원해요", url: "https://math.ssu.ac.kr/?page_id=1291" }]
+        1: [{ text: "수학과 진로탐색의 수학 관련 직업 소개를 읽어봐요", url: MJOB, how: "수학과 누리집 '진로탐색' 게시판에서 직업 소개 글을 읽어요." }],
+        2: [{ text: "순수·응용수학 중 끌리는 쪽을 정해 전공 수업을 골라요", url: MINTRO, how: "수학과 누리집 '학과소개'에서 전공 분야를 보고 수업을 골라요." }],
+        3: [{ text: "교직·금융·대학원 중 한 길을 정해 준비를 시작해요", url: "https://math.ssu.ac.kr/?page_id=1308", how: "수학과 누리집 '졸업후진로'에서 길별 준비를 보고 하나를 정해요." }],
+        4: [{ text: "학과 채용추천·인턴 게시판을 확인하며 지원해요", url: "https://math.ssu.ac.kr/?page_id=1291", how: "수학과 누리집 '취업정보' 게시판에서 채용추천·인턴 공고를 봐요." }]
       },
       ssu_specific: [
         { name: "Towson University 등 해외 대학 교류", desc: "해외 대학과 교류하는 프로그램이 있어요", url: MATH },
@@ -147,10 +147,10 @@
     },
     aisw: {
       roadmap: {
-        1: [{ text: "수업 과제 말고 작은 프로젝트 하나 끝내 보기", url: null }],
-        2: [{ text: "3학년 세부전공 네 개 미리 비교하기", url: AI_NEWS }],
-        3: [{ text: "Co-op 집중학기·현장실습 알아보기", url: AI_NEWS }],
-        4: [{ text: "졸업작품을 포트폴리오로 정리", url: AISW }]
+        1: [{ text: "수업 과제 말고 작은 프로젝트 하나 끝내 보기", url: null, how: "작은 주제를 하나 정해 끝까지 만들고 GitHub에 올려 둬요." }],
+        2: [{ text: "3학년 세부전공 네 개 미리 비교하기", url: AI_NEWS, how: "대학저널 기사에서 세부전공 네 개를 보고, 학부 교육과정과 함께 비교해요." }],
+        3: [{ text: "Co-op 집중학기·현장실습 알아보기", url: AI_NEWS, how: "대학저널 기사에서 Co-op 집중학기를 읽고, 현장실습지원센터(WESS) 공고도 봐요." }],
+        4: [{ text: "졸업작품을 포트폴리오로 정리", url: AISW, how: "졸업작품의 문제·맡은 일·결과를 정리해 포트폴리오 첫 장에 둬요." }]
       },
       ssu_specific: [
         { name: "SW중심대학", desc: "2024~2029년 재선정, 실무 교육 지원", url: "https://www.dhnews.co.kr/news/view/1065591141289614" },
@@ -164,4 +164,48 @@
       ]
     }
   };
+
+  // 기본판 39개: 이름·단과대·누리집·직무 사전 key(사이트 제안)만. 학과 목록은 2026학년도 정시모집요강 + 숭실대 누리집 대학소개.
+  // hide: 재직자 전담이라 고르기 칩에서만 숨김(주소로는 열림). 커리어넷 2020~21 자료는 넣지 않았다.
+  window.JOBMAP.depts.push(
+    { id: "christian", name: "기독교학과", college: "인문대학", url: "https://ssu.ac.kr/%ea%b5%90%ec%9c%a1-%c2%b7-%ec%97%b0%ea%b5%ac/%eb%8c%80%ed%95%99%ec%86%8c%ea%b0%9c/%ec%9d%b8%eb%ac%b8%eb%8c%80%ed%95%99/%ea%b8%b0%eb%8f%85%ea%b5%90%ed%95%99%ea%b3%bc/", jobs: ["teacher", "counsel"], basic: true },
+    { id: "korean", name: "국어국문학과", college: "인문대학", url: "https://ssu.ac.kr/%ea%b5%90%ec%9c%a1-%c2%b7-%ec%97%b0%ea%b5%ac/%eb%8c%80%ed%95%99%ec%86%8c%ea%b0%9c/%ec%9d%b8%eb%ac%b8%eb%8c%80%ed%95%99/%ea%b5%ad%ec%96%b4%ea%b5%ad%eb%ac%b8%ed%95%99%ea%b3%bc/", jobs: ["teacher", "media", "copy", "marketing"], basic: true },
+    { id: "german", name: "독어독문학과", college: "인문대학", url: "https://ssu.ac.kr/%ea%b5%90%ec%9c%a1-%c2%b7-%ec%97%b0%ea%b5%ac/%eb%8c%80%ed%95%99%ec%86%8c%ea%b0%9c/%ec%9d%b8%eb%ac%b8%eb%8c%80%ed%95%99/%eb%8f%85%ec%96%b4%eb%8f%85%eb%ac%b8%ed%95%99%ea%b3%bc/", jobs: ["trade", "sales", "marketing"], basic: true },
+    { id: "french", name: "불어불문학과", college: "인문대학", url: "https://ssu.ac.kr/%ea%b5%90%ec%9c%a1-%c2%b7-%ec%97%b0%ea%b5%ac/%eb%8c%80%ed%95%99%ec%86%8c%ea%b0%9c/%ec%9d%b8%eb%ac%b8%eb%8c%80%ed%95%99/%eb%b6%88%ec%96%b4%eb%b6%88%eb%ac%b8%ed%95%99%ea%b3%bc/", jobs: ["trade", "sales", "marketing"], basic: true },
+    { id: "chinese", name: "중어중문학과", college: "인문대학", url: "https://ssu.ac.kr/%ea%b5%90%ec%9c%a1-%c2%b7-%ec%97%b0%ea%b5%ac/%eb%8c%80%ed%95%99%ec%86%8c%ea%b0%9c/%ec%9d%b8%eb%ac%b8%eb%8c%80%ed%95%99/%ec%a4%91%ec%96%b4%ec%a4%91%eb%ac%b8%ed%95%99%ea%b3%bc/", jobs: ["trade", "sales", "teacher"], basic: true },
+    { id: "philosophy", name: "철학과", college: "인문대학", url: "https://ssu.ac.kr/%ea%b5%90%ec%9c%a1-%c2%b7-%ec%97%b0%ea%b5%ac/%eb%8c%80%ed%95%99%ec%86%8c%ea%b0%9c/%ec%9d%b8%eb%ac%b8%eb%8c%80%ed%95%99/%ec%b2%a0%ed%95%99%ea%b3%bc/", jobs: ["teacher", "media", "copy"], basic: true },
+    { id: "history", name: "사학과", college: "인문대학", url: "https://ssu.ac.kr/%ea%b5%90%ec%9c%a1-%c2%b7-%ec%97%b0%ea%b5%ac/%eb%8c%80%ed%95%99%ec%86%8c%ea%b0%9c/%ec%9d%b8%eb%ac%b8%eb%8c%80%ed%95%99/%ec%82%ac%ed%95%99%ea%b3%bc/", jobs: ["teacher", "media", "civil"], basic: true },
+    { id: "writing", name: "예술창작학부 문예창작전공", college: "인문대학", url: "https://ssu.ac.kr/%ea%b5%90%ec%9c%a1-%c2%b7-%ec%97%b0%ea%b5%ac/%eb%8c%80%ed%95%99%ec%86%8c%ea%b0%9c/%ec%9d%b8%eb%ac%b8%eb%8c%80%ed%95%99/%eb%ac%b8%ec%98%88%ec%b0%bd%ec%9e%91%ec%a0%84%ea%b3%b5/", jobs: ["copy", "media", "marketing"], basic: true },
+    { id: "film", name: "예술창작학부 영화예술전공", college: "인문대학", url: "https://ssu.ac.kr/%ea%b5%90%ec%9c%a1-%c2%b7-%ec%97%b0%ea%b5%ac/%eb%8c%80%ed%95%99%ec%86%8c%ea%b0%9c/%ec%9d%b8%eb%ac%b8%eb%8c%80%ed%95%99/%ec%98%81%ed%99%94%ec%98%88%ec%88%a0%ec%a0%84%ea%b3%b5/", jobs: ["video", "media"], basic: true },
+    { id: "sports", name: "스포츠학부", college: "인문대학", url: "https://ssu.ac.kr/%ea%b5%90%ec%9c%a1-%c2%b7-%ec%97%b0%ea%b5%ac/%eb%8c%80%ed%95%99%ec%86%8c%ea%b0%9c/%ec%9d%b8%eb%ac%b8%eb%8c%80%ed%95%99/%ec%8a%a4%ed%8f%ac%ec%b8%a0%ed%95%99%eb%b6%80/", jobs: ["teacher", "marketing"], basic: true },
+    { id: "physics", name: "물리학과", college: "자연과학대학", url: "https://ssu.ac.kr/%ea%b5%90%ec%9c%a1-%c2%b7-%ec%97%b0%ea%b5%ac/%eb%8c%80%ed%95%99%ec%86%8c%ea%b0%9c/%ec%9e%90%ec%97%b0%ea%b3%bc%ed%95%99%eb%8c%80%ed%95%99/%eb%ac%bc%eb%a6%ac%ed%95%99%ea%b3%bc/", jobs: ["rnd", "quality", "teacher"], basic: true },
+    { id: "chemistry", name: "화학과", college: "자연과학대학", url: "https://ssu.ac.kr/%ea%b5%90%ec%9c%a1-%c2%b7-%ec%97%b0%ea%b5%ac/%eb%8c%80%ed%95%99%ec%86%8c%ea%b0%9c/%ec%9e%90%ec%97%b0%ea%b3%bc%ed%95%99%eb%8c%80%ed%95%99/%ed%99%94%ed%95%99%ea%b3%bc/", jobs: ["rnd", "quality", "teacher"], basic: true },
+    { id: "stats", name: "정보통계·보험수리학과", college: "자연과학대학", url: "https://ssu.ac.kr/%ea%b5%90%ec%9c%a1-%c2%b7-%ec%97%b0%ea%b5%ac/%eb%8c%80%ed%95%99%ec%86%8c%ea%b0%9c/%ec%9e%90%ec%97%b0%ea%b3%bc%ed%95%99%eb%8c%80%ed%95%99/%ec%a0%95%eb%b3%b4%ed%86%b5%ea%b3%84-%c2%b7-%eb%b3%b4%ed%97%98%ec%88%98%eb%a6%ac%ed%95%99%ea%b3%bc/", jobs: ["data", "finance", "ai"], basic: true },
+    { id: "biomed", name: "의생명시스템학부", college: "자연과학대학", url: "https://ssu.ac.kr/%ea%b5%90%ec%9c%a1-%c2%b7-%ec%97%b0%ea%b5%ac/%eb%8c%80%ed%95%99%ec%86%8c%ea%b0%9c/%ec%9e%90%ec%97%b0%ea%b3%bc%ed%95%99%eb%8c%80%ed%95%99/%ec%9d%98%ec%83%9d%eb%aa%85%ec%8b%9c%ec%8a%a4%ed%85%9c%ed%95%99%eb%b6%80/", jobs: ["rnd", "quality", "data"], basic: true },
+    { id: "law", name: "법학과", college: "법과대학", url: "https://ssu.ac.kr/%ea%b5%90%ec%9c%a1-%c2%b7-%ec%97%b0%ea%b5%ac/%eb%8c%80%ed%95%99%ec%86%8c%ea%b0%9c/%eb%b2%95%ea%b3%bc%eb%8c%80%ed%95%99/%eb%b2%95%ed%95%99%ea%b3%bc/", jobs: ["civil", "ncs", "hr"], basic: true },
+    { id: "intlaw", name: "국제법무학과", college: "법과대학", url: "https://ssu.ac.kr/%ea%b5%90%ec%9c%a1-%c2%b7-%ec%97%b0%ea%b5%ac/%eb%8c%80%ed%95%99%ec%86%8c%ea%b0%9c/%eb%b2%95%ea%b3%bc%eb%8c%80%ed%95%99/%ea%b5%ad%ec%a0%9c%eb%b2%95%eb%ac%b4%ed%95%99%ea%b3%bc/", jobs: ["trade", "civil", "ncs"], basic: true },
+    { id: "welfare", name: "사회복지학부", college: "사회과학대학", url: "https://ssu.ac.kr/%ea%b5%90%ec%9c%a1-%c2%b7-%ec%97%b0%ea%b5%ac/%eb%8c%80%ed%95%99%ec%86%8c%ea%b0%9c/%ec%82%ac%ed%9a%8c%ea%b3%bc%ed%95%99%eb%8c%80%ed%95%99/%ec%82%ac%ed%9a%8c%eb%b3%b5%ec%a7%80%ed%95%99%eb%b6%80/", jobs: ["counsel", "civil", "ncs"], basic: true },
+    { id: "politics", name: "정치외교학과", college: "사회과학대학", url: "https://ssu.ac.kr/%ea%b5%90%ec%9c%a1-%c2%b7-%ec%97%b0%ea%b5%ac/%eb%8c%80%ed%95%99%ec%86%8c%ea%b0%9c/%ec%82%ac%ed%9a%8c%ea%b3%bc%ed%95%99%eb%8c%80%ed%95%99/%ec%a0%95%ec%b9%98%ec%99%b8%ea%b5%90%ed%95%99%ea%b3%bc/", jobs: ["civil", "ncs", "media", "trade"], basic: true },
+    { id: "infosoc", name: "정보사회학과", college: "사회과학대학", url: "https://ssu.ac.kr/%ea%b5%90%ec%9c%a1-%c2%b7-%ec%97%b0%ea%b5%ac/%eb%8c%80%ed%95%99%ec%86%8c%ea%b0%9c/%ec%82%ac%ed%9a%8c%ea%b3%bc%ed%95%99%eb%8c%80%ed%95%99/%ec%a0%95%eb%b3%b4%ec%82%ac%ed%9a%8c%ed%95%99%ea%b3%bc/", jobs: ["data", "media", "marketing", "civil"], basic: true },
+    { id: "lifelong", name: "평생교육학과", college: "사회과학대학", url: "https://lifelongedu.ssu.ac.kr/", jobs: ["edudesign", "counsel", "hr"], basic: true },
+    { id: "econ", name: "경제학과", college: "경제통상대학", url: "https://ssu.ac.kr/%ea%b5%90%ec%9c%a1-%c2%b7-%ec%97%b0%ea%b5%ac/%eb%8c%80%ed%95%99%ec%86%8c%ea%b0%9c/%ea%b2%bd%ec%a0%9c%ed%86%b5%ec%83%81%eb%8c%80%ed%95%99/%ea%b2%bd%ec%a0%9c%ed%95%99%ea%b3%bc/", jobs: ["finance", "data", "ncs", "strategy"], basic: true },
+    { id: "globaltrade", name: "글로벌통상학과", college: "경제통상대학", url: "https://ssu.ac.kr/%ea%b5%90%ec%9c%a1-%c2%b7-%ec%97%b0%ea%b5%ac/%eb%8c%80%ed%95%99%ec%86%8c%ea%b0%9c/%ea%b2%bd%ec%a0%9c%ed%86%b5%ec%83%81%eb%8c%80%ed%95%99/%ea%b8%80%eb%a1%9c%eb%b2%8c%ed%86%b5%ec%83%81%ed%95%99%ea%b3%bc/", jobs: ["trade", "scm", "sales"], basic: true },
+    { id: "fineco", name: "금융경제학과", college: "경제통상대학", url: "https://ssu.ac.kr/%ea%b5%90%ec%9c%a1-%c2%b7-%ec%97%b0%ea%b5%ac/%eb%8c%80%ed%95%99%ec%86%8c%ea%b0%9c/%ea%b2%bd%ec%a0%9c%ed%86%b5%ec%83%81%eb%8c%80%ed%95%99/%ea%b8%88%ec%9c%b5%ea%b2%bd%ec%a0%9c%ed%95%99%ea%b3%bc/", jobs: ["finance"], basic: true, hide: true },
+    { id: "inttrade", name: "국제무역학과", college: "경제통상대학", url: "https://ssu.ac.kr/%ea%b5%90%ec%9c%a1-%c2%b7-%ec%97%b0%ea%b5%ac/%eb%8c%80%ed%95%99%ec%86%8c%ea%b0%9c/%ea%b2%bd%ec%a0%9c%ed%86%b5%ec%83%81%eb%8c%80%ed%95%99/%ea%b5%ad%ec%a0%9c%eb%ac%b4%ec%97%ad%ed%95%99%ea%b3%bc/", jobs: ["trade", "scm", "sales"], basic: true, hide: true },
+    { id: "accounting", name: "회계학과", college: "경영대학", url: "https://ssu.ac.kr/%ea%b5%90%ec%9c%a1-%c2%b7-%ec%97%b0%ea%b5%ac/%eb%8c%80%ed%95%99%ec%86%8c%ea%b0%9c/%ea%b2%bd%ec%98%81%eb%8c%80%ed%95%99/%ed%9a%8c%ea%b3%84%ed%95%99%ea%b3%bc/", jobs: ["finance", "ncs"], basic: true },
+    { id: "venture", name: "벤처중소기업학과", college: "경영대학", url: "https://ssu.ac.kr/%ea%b5%90%ec%9c%a1-%c2%b7-%ec%97%b0%ea%b5%ac/%eb%8c%80%ed%95%99%ec%86%8c%ea%b0%9c/%ea%b2%bd%ec%98%81%eb%8c%80%ed%95%99/%eb%b2%a4%ec%b2%98%ec%a4%91%ec%86%8c%ea%b8%b0%ec%97%85%ed%95%99%ea%b3%bc/", jobs: ["strategy", "marketing", "sales", "itpm"], basic: true },
+    { id: "finance", name: "금융학부", college: "경영대학", url: "https://ssu.ac.kr/%ea%b5%90%ec%9c%a1-%c2%b7-%ec%97%b0%ea%b5%ac/%eb%8c%80%ed%95%99%ec%86%8c%ea%b0%9c/%ea%b2%bd%ec%98%81%eb%8c%80%ed%95%99/%ea%b8%88%ec%9c%b5%ed%95%99%eb%b6%80/", jobs: ["finance", "sales", "data"], basic: true },
+    { id: "chemeng", name: "화학공학과", college: "공과대학", url: "https://ssu.ac.kr/%ea%b5%90%ec%9c%a1-%c2%b7-%ec%97%b0%ea%b5%ac/%eb%8c%80%ed%95%99%ec%86%8c%ea%b0%9c/%ea%b3%b5%ea%b3%bc%eb%8c%80%ed%95%99/%ed%99%94%ed%95%99%ea%b3%b5%ed%95%99%ea%b3%bc/", jobs: ["rnd", "quality", "maint"], basic: true },
+    { id: "materials", name: "신소재공학과", college: "공과대학", url: "https://materials.ssu.ac.kr/", jobs: ["rnd", "quality", "mech"], basic: true },
+    { id: "electric", name: "전기공학부", college: "공과대학", url: "https://ssu.ac.kr/%ea%b5%90%ec%9c%a1-%c2%b7-%ec%97%b0%ea%b5%ac/%eb%8c%80%ed%95%99%ec%86%8c%ea%b0%9c/%ea%b3%b5%ea%b3%bc%eb%8c%80%ed%95%99/%ec%a0%84%ea%b8%b0%ea%b3%b5%ed%95%99%eb%b6%80/", jobs: ["maint", "rnd", "quality"], basic: true },
+    { id: "ie", name: "산업·정보시스템공학과", college: "공과대학", url: "https://ssu.ac.kr/%ea%b5%90%ec%9c%a1-%c2%b7-%ec%97%b0%ea%b5%ac/%eb%8c%80%ed%95%99%ec%86%8c%ea%b0%9c/%ea%b3%b5%ea%b3%bc%eb%8c%80%ed%95%99/%ec%82%b0%ec%97%85%c2%b7%ec%a0%95%eb%b3%b4%ec%8b%9c%ec%8a%a4%ed%85%9c%ea%b3%b5%ed%95%99%ea%b3%bc/", jobs: ["scm", "data", "quality", "itpm"], basic: true },
+    { id: "arch", name: "건축학부", college: "공과대학", url: "https://ssu.ac.kr/%ea%b5%90%ec%9c%a1-%c2%b7-%ec%97%b0%ea%b5%ac/%eb%8c%80%ed%95%99%ec%86%8c%ea%b0%9c/%ea%b3%b5%ea%b3%bc%eb%8c%80%ed%95%99/%ea%b1%b4%ec%b6%95%ed%95%99%eb%b6%80/", jobs: [], basic: true },
+    { id: "computer", name: "컴퓨터학부", college: "IT대학", url: "https://ssu.ac.kr/%ea%b5%90%ec%9c%a1-%c2%b7-%ec%97%b0%ea%b5%ac/%eb%8c%80%ed%95%99%ec%86%8c%ea%b0%9c/it%eb%8c%80%ed%95%99/%ec%bb%b4%ed%93%a8%ed%84%b0%ed%95%99%eb%b6%80/", jobs: ["sw", "ai", "data", "cloud", "security"], basic: true },
+    { id: "electronics", name: "전자정보공학부 전자공학전공", college: "IT대학", url: "https://ssu.ac.kr/%ea%b5%90%ec%9c%a1-%c2%b7-%ec%97%b0%ea%b5%ac/%eb%8c%80%ed%95%99%ec%86%8c%ea%b0%9c/it%eb%8c%80%ed%95%99/%ec%a0%84%ec%9e%90%ea%b3%b5%ed%95%99%ec%a0%84%ea%b3%b5/", jobs: ["rnd", "quality", "sw", "ai"], basic: true },
+    { id: "itconv", name: "전자정보공학부 IT융합전공", college: "IT대학", url: "https://ssu.ac.kr/%ea%b5%90%ec%9c%a1-%c2%b7-%ec%97%b0%ea%b5%ac/%eb%8c%80%ed%95%99%ec%86%8c%ea%b0%9c/it%eb%8c%80%ed%95%99/it%ec%9c%b5%ed%95%a9%ec%a0%84%ea%b3%b5/", jobs: ["sw", "cloud", "rnd", "ai"], basic: true },
+    { id: "gmedia", name: "글로벌미디어학부", college: "IT대학", url: "https://ssu.ac.kr/%ea%b5%90%ec%9c%a1-%c2%b7-%ec%97%b0%ea%b5%ac/%eb%8c%80%ed%95%99%ec%86%8c%ea%b0%9c/it%eb%8c%80%ed%95%99/%ea%b8%80%eb%a1%9c%eb%b2%8c%eb%af%b8%eb%94%94%ec%96%b4%ed%95%99%eb%b6%80/", jobs: ["video", "media", "uxui", "game", "sw"], basic: true },
+    { id: "digitalmedia", name: "디지털미디어학과", college: "IT대학", url: "https://ssu.ac.kr/%ea%b5%90%ec%9c%a1-%c2%b7-%ec%97%b0%ea%b5%ac/%eb%8c%80%ed%95%99%ec%86%8c%ea%b0%9c/it%eb%8c%80%ed%95%99/%eb%af%b8%eb%94%94%ec%96%b4%ea%b2%bd%ec%98%81%ed%95%99%ea%b3%bc-%ec%9e%ac%ec%a7%81%ec%9e%90%ec%a0%84%ed%98%95/", jobs: ["video", "uxui", "game", "sw"], basic: true, hide: true },
+    { id: "infosec", name: "정보보호학과", college: "AI대학", url: "https://ssu.ac.kr/%ea%b5%90%ec%9c%a1-%c2%b7-%ec%97%b0%ea%b5%ac/%eb%8c%80%ed%95%99%ec%86%8c%ea%b0%9c/ai%eb%8c%80%ed%95%99/%ec%a0%95%eb%b3%b4%eb%b3%b4%ed%98%b8%ed%95%99%ea%b3%bc/", jobs: ["security", "sw", "cloud"], basic: true },
+    { id: "free", name: "자유전공학부", college: "베어드학부대학", url: "https://ssu.ac.kr/%ea%b5%90%ec%9c%a1-%c2%b7-%ec%97%b0%ea%b5%ac/%eb%8c%80%ed%95%99%ec%86%8c%ea%b0%9c/%ec%9e%90%ec%9c%a0%ec%a0%84%ea%b3%b5%ed%95%99%eb%b6%80/%ec%9e%90%ec%9c%a0%ec%a0%84%ea%b3%b5%ed%95%99%eb%b6%80-%ec%86%8c%ea%b0%9c/", jobs: [], basic: true }
+  );
 })();

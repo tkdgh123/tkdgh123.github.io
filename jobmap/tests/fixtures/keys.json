@@ -1,0 +1,8 @@
+{
+  "depts": ["jp","eng","pubadmin","masscom","biz","mechanical","math","aisw","christian","korean","german","french","chinese","philosophy","history","writing","film","sports","law","intlaw","welfare","politics","infosoc","lifelong","econ","globaltrade","fineco","inttrade","accounting","venture","finance","chemeng","materials","electric","ie","arch","physics","chemistry","stats","biomed","computer","electronics","itconv","gmedia","digitalmedia","infosec","free"],
+  "jobs": ["sales","trade","marketing","hr","finance","strategy","scm","cs","itpm","data","ncs","civil","sw","ai","mech","rnd","media","quality","maint","copy","video","teacher","counsel","edudesign","security","game","cloud","uxui"],
+  "likert": ["R1","I1","A1","S1","E1","C1","I2","A2","S2","E2","C2","R2","A3","S3","E3","C3","R3","I3","S4","E4","C4","R4","I4","A4","E5","C5","R5","I5","A5","S5","p1","p2","p3","p4","n1","n2","n3","n4","x1","x2","x3","x4","a1","a2","a3","a4","m1","m2","m3","m4"],
+  "sectors": ["big","mid","public","gov","foreign","startup","grad","own","unsure"],
+  "values": ["stable","pay","grow","meaning"],
+  "pairs": [["stable","pay"],["grow","meaning"],["stable","grow"],["pay","meaning"],["stable","meaning"],["pay","grow"]]
+}

@@ -4,34 +4,77 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>학과 진로 지도</title>
-<meta name="description" content="대학생 1~4학년을 위한 진로 지도. 60문항 검사로 흥미·준비 상태·가치를 보고, 8개 학과 전국 졸업생 진로와 직무 17개, AI가 채용과 직무를 어떻게 바꾸는지 2024년 이후 자료로 정리했어요.">
+<meta name="description" content="대학생 1~4학년을 위한 진로 지도. 60문항 검사로 흥미·준비 상태·가치를 보고, 학과별 졸업생 진로와 직무 사전, AI가 채용과 직무를 바꾸는 모습을 2024년 이후 자료로 정리했어요.">
+<link rel="canonical" href="https://tkdgh123.github.io/jobmap/">
+<meta name="theme-color" content="#F7F8FA" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#15171C" media="(prefers-color-scheme: dark)">
 <meta property="og:title" content="학과 진로 지도">
-<meta property="og:description" content="60문항 진로 검사, 학과별 졸업생 진로, 직무 사전, AI와 취업. 로그인 없이, 답은 저장되지 않아요.">
+<meta property="og:description" content="60문항으로 먼저 알아볼 직무 3개와 이번 학기 할 일을 찾아요. 학과별 졸업생 진로, 직무 사전, AI와 취업까지.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://tkdgh123.github.io/jobmap/">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@500;700&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
+<meta property="og:image" content="https://tkdgh123.github.io/jobmap/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="학과 진로 지도: 내 흥미에 맞는 직무, 이번 학기 할 일까지">
+<meta property="og:site_name" content="학과 진로 지도">
+<meta property="og:locale" content="ko_KR">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" crossorigin media="print" onload="PerformanceObserver.supportedEntryTypes?.includes('paint') ? new PerformanceObserver((l, o) => { if (l.getEntriesByName('first-contentful-paint')[0]) { o.disconnect(); this.media = 'all'; } }).observe({ type: 'paint', buffered: true }) : this.media = 'all'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" crossorigin></noscript>
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="quiz.css">
 </head>
-<body>
+<body data-view="test">
+<script>(function(h){var m=h.match(/^#(map|jobs|ai|faq|about)(-|$)/);document.body.dataset.view=m?m[1]:'test';if(/^#[rs]=/.test(h))document.body.classList.add('inquiz')})(location.hash)</script>
 <a class="skip" href="#main">본문으로 건너뛰기</a>
 <div class="page">
 
-<header class="top">
-  <a class="mback" href="../">← 작업실</a>
-  <div class="eb">학과 진로 지도 · <span class="checked"></span> 기준</div>
-  <h1>학과 진로 지도</h1>
-  <p class="sub">내 학과를 나오면 어디로 가는지, <b>지금 학년에 무엇을 해 볼지</b>. 로그인 없이 쓰고, 답은 어디에도 저장되지 않아요.</p>
-  <ol class="picks">
-    <li><a href="#test"><small>60문항 · 10분쯤</small><b>진로 검사</b><span>흥미·준비 상태·가치로 맞는 직무와 이번 학기 할 일</span></a></li>
-    <li><a href="#map"><small>8개 학과 · 전국 대학</small><b>학과 지도</b><span>졸업생이 실제로 간 길과 학년별 할 일</span></a></li>
-    <li><a href="#ai"><small>구직자와 회사 양쪽에서</small><b>AI와 취업</b><span>채용에 쓰는 AI, 직무별로 바뀌는 일</span></a></li>
-  </ol>
+<header class="top hero">
+  <div class="hero-text">
+    <p class="eb" id="news">학과 진로 지도</p>
+    <h1 tabindex="-1">내 흥미에 맞는 직무,<br>이번 학기 할 일까지</h1>
+    <p class="hero-lede">60문항에 답하면 먼저 알아볼 직무 3개와 지금 할 일을 보여 줘요.</p>
+    <div class="btns">
+      <button class="btn big" type="button" data-start>내 직무 후보 찾기</button>
+      <a class="btn ghost big" href="#map">학과 먼저 둘러보기</a>
+    </div>
+    <ul class="meta">
+      <li>60문항</li><li>로그인 없음</li><li>답은 서버로 안 가요</li>
+      <li><a href="#about">자료 출처 <span class="num" data-srccount>338</span>개</a></li>
+    </ul>
+  </div>
+  <figure class="sample" aria-label="결과 화면 예시">
+    <span class="sample-tag">결과 예시</span>
+    <svg width="168" height="133" viewBox="-34 -4 288 228" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <g fill="none" stroke-linejoin="round" style="stroke:var(--line)">
+        <path d="M110 40v140M170.6 75 49.4 145M170.6 145 49.4 75"/>
+        <path d="M110 75l30.3 17.5v35L110 145l-30.3-17.5v-35z"/>
+        <path d="M110 40l60.6 35v70L110 180l-60.6-35V75z" style="stroke:var(--line-strong)"/>
+      </g>
+      <path d="M110 54l55.4 24-22.5 51L110 160l-53.7-19 24.3-48z" stroke-width="2" stroke-linejoin="round" style="fill:var(--acc-soft);stroke:var(--acc)"/>
+      <g stroke-width="2" style="fill:var(--surface);stroke:var(--acc)">
+        <circle cx="110" cy="54" r="4"/><circle cx="165.4" cy="78" r="4"/><circle cx="142.9" cy="129" r="4"/>
+        <circle cx="110" cy="160" r="4"/><circle cx="56.3" cy="141" r="4"/><circle cx="80.6" cy="93" r="4"/>
+      </g>
+      <g text-anchor="middle" dominant-baseline="central" font-weight="600" font-size="22" style="fill:var(--text-2)">
+        <text x="110" y="22">현실</text><text x="187.1" y="65.5">탐구</text><text x="187.1" y="154.5">예술</text>
+        <text x="110" y="198">사회</text><text x="32.9" y="154.5">진취</text><text x="32.9" y="65.5">관습</text>
+      </g>
+    </svg>
+    <ol>
+      <li><img src="img/j-data.svg" alt="" width="24" height="24">데이터 분석</li>
+      <li><img src="img/j-itpm.svg" alt="" width="24" height="24">IT 기획·PM</li>
+      <li><img src="img/j-marketing.svg" alt="" width="24" height="24">마케팅</li>
+    </ol>
+    <p><b>이번 주</b>직무 비교과 하나 들어 보기</p>
+  </figure>
 </header>
 
 <nav class="toc" aria-label="목차">
-  <a class="back" href="../">← 작업실</a>
+  <a class="brand" href="#test"><img src="favicon.svg" alt="" width="28" height="28"><span>학과 진로 지도</span></a>
   <ol id="tabs">
     <li><a href="#test">진로 검사</a></li>
     <li><a href="#map">학과 지도</a></li>
@@ -40,6 +83,7 @@
     <li><a href="#faq">많이 묻는 것</a></li>
     <li><a href="#about">만든 방법</a></li>
   </ol>
+  <a class="back" href="../">← 작업실</a>
 </nav>
 
 <main id="main" tabindex="-1">
@@ -47,7 +91,7 @@
 
   <div id="v-map" hidden>
     <section>
-      <h2>학과 지도</h2>
+      <h1 tabindex="-1">학과 지도</h1>
       <p class="lead">여러 대학이 안내하는 진로와 2024년 이후 졸업생 사례를 학과별로 모았어요.</p>
       <div class="pick" id="pick">
         <div class="row"><span>학교</span><div class="chips" id="school"></div></div>
@@ -61,9 +105,10 @@
 
   <div id="v-jobs" hidden>
     <section>
-      <h2>직무 사전</h2>
-      <p class="lead">신입이 많이 지원하는 직무 17개예요. 직무마다 흥미 코드와 AI가 바꾸는 점을 붙였어요.</p>
+      <h1 tabindex="-1">직무 사전</h1>
+      <p class="lead">신입이 많이 지원하는 직무 <span class="jobcount">24</span>개예요. 직무마다 흥미 코드와 AI가 바꾸는 점을 붙였어요.</p>
       <div class="jdtools chips" id="jdtools"></div>
+      <p class="sr-only" role="status" id="jdcount"></p>
       <div class="jds" id="jds"></div>
     </section>
   </div>
@@ -72,7 +117,7 @@
 
   <div id="v-faq" hidden>
     <section>
-      <h2>요즘 취업, 많이 묻는 것</h2>
+      <h1 tabindex="-1">요즘 취업, 많이 묻는 것</h1>
       <p class="lead">조사 기관과 대상을 같이 적었어요.</p>
       <div class="qas" id="qas"></div>
     </section>
@@ -86,21 +131,24 @@
 </main>
 </div>
 
-<footer><div class="in">
+<footer hidden><div class="in">
   <p>비공식 학생 프로젝트예요. 학교와 관계없고, 정보는 <span class="checked"></span> 기준이에요. 정확한 내용은 원문 링크에서 확인하세요.</p>
+  <p class="credit noprint"><a href="jobs/">직무 사전 전체</a> · <a href="depts/">학과별 진로</a> · <a href="faq/">많이 묻는 것</a> · <a href="ai/">AI와 취업</a></p>
+  <p class="credit noprint">숭실대 학생 1인 개발 · <a href="https://github.com/tkdgh123/tkdgh123.github.io/issues">문의는 GitHub 이슈</a></p>
+  <a class="back-foot" href="../">← 작업실로</a>
 </div></footer>
 
-<script src="data.js"></script>
-<script src="depts-new.js"></script>
-<script src="depts-ssu.js"></script>
-<script src="jobs.js"></script>
-<script src="faq.js"></script>
-<script src="ai.js"></script>
-<script src="quiz.js"></script>
-<script src="diag.js"></script>
+<script src="data.js" defer></script>
+<script src="depts-new.js" defer></script>
+<script src="depts-ssu.js" defer></script>
+<script src="jobs.js" defer></script>
+<script src="faq.js" defer></script>
+<script src="ai.js" defer></script>
+<script src="quiz.js" defer></script>
+<script src="diag.js" defer></script>
 
-<script src="app.js"></script>
-<script src="quiz-ui.js"></script>
-<script>drawTest(); route();</script>
+<script src="app.js" defer></script>
+<script src="quiz-ui.js" defer></script>
+<script>addEventListener("DOMContentLoaded", () => { drawTest(); route(); document.querySelector("footer").hidden = false; });</script>
 </body>
 </html>
