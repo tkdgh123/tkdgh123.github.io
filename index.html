@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>작업실</title>
+<script src="icons.js" defer></script>
 <script>
 /* 예전 첫 화면(C언어 복습)의 주소(#notes 등)로 들어오면 옮긴 자리로 보낸다 */
 if (/^#(notes|prog|quiz|wrong|code)$/.test(location.hash)) location.replace("study.html" + location.hash);
@@ -33,9 +34,13 @@ header p { margin: 0; color: var(--ink-2); max-width: 36rem }
 
 nav { position: sticky; top: 0; z-index: 2; background: color-mix(in srgb, var(--bg) 90%, transparent); backdrop-filter: blur(6px); border-bottom: 1px solid var(--rule) }
 nav .wrap { display: flex; gap: 6px; padding-block: 10px; overflow-x: auto }
-nav a { text-decoration: none; font-size: 14px; padding: 5px 14px; border-radius: 99px; border: 1px solid var(--rule); white-space: nowrap; background: var(--card) }
+nav a { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; font-size: 14px; padding: 5px 14px 5px 11px; border-radius: 99px; border: 1px solid var(--rule); white-space: nowrap; background: var(--card) }
 nav a:hover, nav a:focus-visible { border-color: var(--c, var(--ink-2)); outline: none }
-nav a i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--c); margin-right: 7px; vertical-align: 1px }
+
+/* AnimateIcons 자리: 스크립트가 늦게 와도 칸이 흔들리지 않게 크기를 먼저 잡는다 */
+.ic { display: inline-flex; width: 22px; height: 22px; flex: none; color: var(--c) }
+nav .ic { width: 16px; height: 16px }
+.card > .ic { margin-bottom: 2px }
 
 section { padding: 44px 0 8px; scroll-margin-top: 56px }
 section h2 { font-size: 24px; margin: 0 0 4px; display: flex; align-items: center; gap: 10px }
@@ -56,7 +61,8 @@ section > .wrap > p { margin: 0 0 18px; color: var(--ink-2); font-size: 15px }
 .card p { margin: 0; color: var(--ink-2); font-size: 14px }
 .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px }
 .tags span { font-size: 12px; padding: 1px 9px; border-radius: 99px; border: 1px solid var(--rule); color: var(--ink-2) }
-.go { font-size: 13px; color: var(--c); margin-top: 4px }
+.go { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; color: var(--c); margin-top: 4px }
+.go .ic { width: 14px; height: 14px }
 
 footer { padding: 56px 0 64px; color: var(--ink-2); font-size: 13px }
 </style>
@@ -70,10 +76,10 @@ footer { padding: 56px 0 64px; color: var(--ink-2); font-size: 13px }
 </div></header>
 
 <nav aria-label="분류"><div class="wrap">
-  <a href="#game" class="game"><i></i>게임</a>
-  <a href="#study" class="study"><i></i>공부</a>
-  <a href="#make" class="make"><i></i>프로젝트</a>
-  <a href="#etc" class="etc"><i></i>기타</a>
+  <a href="#game" class="game"><span class="ic" data-icon="gamepad" data-size="16"></span>게임</a>
+  <a href="#study" class="study"><span class="ic" data-icon="book-open" data-size="16"></span>공부</a>
+  <a href="#make" class="make"><span class="ic" data-icon="hammer" data-size="16"></span>프로젝트</a>
+  <a href="#etc" class="etc"><span class="ic" data-icon="sparkles" data-size="16"></span>기타</a>
 </div></nav>
 
 <main>
@@ -87,7 +93,7 @@ footer { padding: 56px 0 64px; color: var(--ink-2); font-size: 13px }
         <h3>넋굿 기획 도록</h3>
         <p>부서진 저승길 위에서 구미호 아이가 오행 술법으로 원귀를 풀어 주는 쿼터뷰 액션 로그라이트. 이야기, 한 판의 흐름, 전투, 원귀, 술법·보물, 신당까지 열두 거리로 정리했습니다.</p>
         <div class="tags"><span>Unity 6</span><span>액션 로그라이트</span><span>1인 개발</span></div>
-        <span class="go">도록 보기 →</span>
+        <span class="go">도록 보기 <span class="ic" data-icon="arrow-right" data-size="14">→</span></span>
       </div>
     </a>
     <a class="card big" href="brown-rogue/">
@@ -96,7 +102,7 @@ footer { padding: 56px 0 64px; color: var(--ink-2); font-size: 13px }
         <h3>브라운 로그 기획 도록</h3>
         <p>한·중·일의 영웅 열다섯 중 다섯을 골라 3×4 진형에 세우고, 라운드 사이마다 자리를 옮기며 찢긴 저승 명부를 돌려주러 가는 동양풍 배치 턴제 RPG. 영웅, 전투, 열 장의 보스, 성장, 원정 모드까지 열한 절로 정리했습니다.</p>
         <div class="tags"><span>Python · pygame-ce</span><span>배치 턴제 RPG</span><span>1인 개발</span></div>
-        <span class="go">도록 보기 →</span>
+        <span class="go">도록 보기 <span class="ic" data-icon="arrow-right" data-size="14">→</span></span>
       </div>
     </a>
   </div>
@@ -107,51 +113,61 @@ footer { padding: 56px 0 64px; color: var(--ink-2); font-size: 13px }
   <p>숭실대 AI소프트웨어학부 1학년 2학기 복습 노트</p>
   <div class="grid">
     <a class="card" href="human-bible/">
+      <span class="ic" data-icon="feather"></span>
       <h3>인간과 성서 서술형 답안</h3>
       <p>그리스와 기독교의 인간관, 구한말 기독교와 근대화, 혐오와 그 해결. 교재 쪽수를 근거로 쓴 글</p>
       <div class="tags"><span>2026.11.01</span><span>서술형</span></div>
     </a>
     <a class="card" href="daily/">
+      <span class="ic" data-icon="sunrise"></span>
       <h3>매일 AI 공부</h3>
       <p>아침 8시 카톡으로 오는 하루 한 주제. 컴퓨터 기초부터 AI학과 전공 기초까지, 퀴즈와 용어 사전</p>
       <div class="tags"><span>2026.10.29</span><span>매일</span></div>
     </a>
     <a class="card" href="lms/">
+      <span class="ic" data-icon="list-checks"></span>
       <h3>LMS 할 일</h3>
       <p>LMS 과제·공지·출석 기록에서 아직 안 한 것만 마감 순으로. 체크하면서 지우는 목록</p>
       <div class="tags"><span>2026.10.29</span><span>마감표</span></div>
     </a>
     <a class="card" href="study.html">
+      <span class="ic" data-icon="notebook-pen"></span>
       <h3>1학년 2학기 복습 노트</h3>
       <p>두 과목의 강의 정리, 퀴즈, 오답노트를 모은 첫 화면</p>
-      <span class="go">들어가기 →</span>
+      <span class="go">들어가기 <span class="ic" data-icon="arrow-right" data-size="14">→</span></span>
     </a>
     <a class="card" href="ai.html">
+      <span class="ic" data-icon="brain"></span>
       <h3>인공지능 입문</h3>
       <p>AI 이해와 역사 · 지능형 에이전트 · 탐색 · 제약 충족 문제(1~5장)</p>
       <div class="tags"><span>강의내용</span><span>퀴즈</span><span>오답노트</span></div>
     </a>
     <a class="card" href="study.html#notes">
+      <span class="ic" data-icon="code"></span>
       <h3>프로그래밍기초 (C언어)</h3>
       <p>자료형·연산자·조건문·반복문·함수·재귀(2~9장)</p>
       <div class="tags"><span>강의정리</span><span>퀴즈</span><span>코드 작성</span><span>오답노트</span></div>
     </a>
     <a class="card" href="motion/index.html">
+      <span class="ic" data-icon="clapperboard"></span>
       <h3>C 모션 강의</h3>
       <p>C언어 2~9장을 움직이는 그림으로 설명하는 영상</p>
       <div class="tags"><span>영상</span></div>
     </a>
     <a class="card" href="ai-motion/index.html">
+      <span class="ic" data-icon="route"></span>
       <h3>AI 3장 모션 강의</h3>
       <p>탐색으로 문제 풀기</p>
       <div class="tags"><span>영상</span></div>
     </a>
     <a class="card" href="ai-motion5/index.html">
+      <span class="ic" data-icon="puzzle"></span>
       <h3>AI 5장 모션 강의</h3>
       <p>제약 충족 문제</p>
       <div class="tags"><span>영상</span></div>
     </a>
     <a class="card" href="hanoi/index.html">
+      <span class="ic" data-icon="layers"></span>
       <h3>하노이의 탑 실행 추적</h3>
       <p>재귀 호출이 쌓이고 풀리는 과정을 한 단계씩 따라가기</p>
       <div class="tags"><span>영상</span></div>
@@ -165,11 +181,13 @@ footer { padding: 56px 0 64px; color: var(--ink-2); font-size: 13px }
   <h3 class="sub">개인</h3>
   <div class="grid">
     <a class="card" href="lms-alert/">
+      <span class="ic" data-icon="bell-ring"></span>
       <h3>LMS 마감 알림</h3>
       <p>숭실대 LMS 과제·영상 마감을 아침 8시 휴대폰으로, 노트북 켤 때 화면으로. 낸 것·본 것은 빼고 오늘·내일 마감은 세게</p>
       <div class="tags"><span>2026.10.31</span><span>자동 알림</span></div>
     </a>
     <a class="card" href="jobmap/">
+      <span class="ic" data-icon="compass"></span>
       <h3>학과 진로 지도</h3>
       <p>한 문항씩 넘기는 101문항 진로 검사로 흥미가 겹치는 직무·준비 상태·이번 학기 할 일을 보여 줘요. 숭실대 학과 44개·다른 학교 학과 지도, 직무 28개, AI와 취업(회사·구직자 양쪽)</p>
       <div class="tags"><span>2026.10.30</span><span>시제품</span></div>
@@ -178,16 +196,19 @@ footer { padding: 56px 0 64px; color: var(--ink-2); font-size: 13px }
   <h3 class="sub">창공설</h3>
   <div class="grid">
     <a class="card" href="ffb-wheel/srs-review/">
+      <span class="ic" data-icon="file-pen"></span>
       <h3>FFB 휠 펌웨어 SRS 첨삭</h3>
       <p>팀 SRS 문서 위에 고칠 곳을 빨간 펜으로 표시하고, 빠진 요구사항 초안을 붙였습니다</p>
       <div class="tags"><span>문서</span><span>첨삭</span></div>
     </a>
     <a class="card" href="ffb-wheel/sim/">
+      <span class="ic" data-icon="box"></span>
       <h3>FFB 휠 3D 설계도</h3>
       <p>부품 배치와 작동 방식을 돌려 보며 확인하는 3D 모델</p>
       <div class="tags"><span>3D</span></div>
     </a>
     <a class="card" href="ffb-wheel/">
+      <span class="ic" data-icon="gauge"></span>
       <h3>포스 피드백 레이싱 휠</h3>
       <p>아두이노로 만드는 FFB 레이싱 휠. 팀 발표 자료와 3D 시뮬레이션</p>
       <div class="tags"><span>발표 자료</span><span>3D</span></div>
@@ -196,6 +217,7 @@ footer { padding: 56px 0 64px; color: var(--ink-2); font-size: 13px }
   <h3 class="sub">프밍기</h3>
   <div class="grid">
     <a class="card" href="secure-msg/guide/">
+      <span class="ic" data-icon="message-square-lock"></span>
       <h3>덜미</h3>
       <p>프밍기2 암호화 메신저. 눌러 보며 이해하는 원리, 계획과 발표, 서버 설계와 코드 뼈대를 한 페이지에</p>
       <div class="tags"><span>설명서</span><span>설계</span><span>C</span></div>
@@ -208,26 +230,31 @@ footer { padding: 56px 0 64px; color: var(--ink-2); font-size: 13px }
   <p>노트북 관리, 학교 제도 조사 같은 잡다한 정리</p>
   <div class="grid">
     <a class="card" href="free-claude-code/">
+      <span class="ic" data-icon="square-terminal"></span>
       <h3>무료 모델 Claude Code</h3>
       <p>Claude Code에 NVIDIA 무료 모델을 꽂아 쓰는 법. 설치 순서, 모델 8개 테스트 결과, 언제 써도 되는지</p>
       <div class="tags"><span>2026.10.31</span><span>도구 설정</span></div>
     </a>
     <a class="card" href="career/">
+      <span class="ic" data-icon="target"></span>
       <h3>나의 적성과 취업 방향</h3>
       <p>지금까지 한 일로 본 적성, 맞는 직무, 게임사·AI 기업 채용 방식, 군 복무를 넣은 학년별 로드맵</p>
       <div class="tags"><span>2026.10.29</span><span>진로</span></div>
     </a>
     <a class="card" href="career/portfolio.html">
+      <span class="ic" data-icon="folder-open"></span>
       <h3>포트폴리오 설계</h3>
       <p>채용 기준 조사, 지금 가진 작업의 실제 상태, 대표작 배치, 새로 만들 AI 프로젝트, 여섯 관점 토론, 입대 전 일정</p>
       <div class="tags"><span>2026.10.29</span><span>진로</span></div>
     </a>
     <a class="card" href="internship/">
+      <span class="ic" data-icon="briefcase"></span>
       <h3>표준 현장실습학기제 한눈에</h3>
       <p>회사에서 일하며 학점 받는 수업. 실습지원비 계산기, 신청부터 학점까지의 흐름, 내 권리, 2027년 첫 경력 프로젝트까지</p>
       <div class="tags"><span>2026.10.29</span><span>조사 정리</span></div>
     </a>
     <a class="card" href="storage/">
+      <span class="ic" data-icon="hard-drive"></span>
       <h3>노트북 저장공간 정리</h3>
       <p>공간이 왜 또 부족해졌는지와 해결 방법, 메모리(RAM) 상태, C 드라이브 전체 내역</p>
       <div class="tags"><span>2026.10.31</span><span>정리 제안</span></div>
