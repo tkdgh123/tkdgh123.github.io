@@ -20,7 +20,9 @@ test("검색용 페이지가 최신이다", () => {
   const body = (f) => (readFileSync(join(tmp, f), "utf8").match(/<article[\s\S]*<\/article>/)?.[0] || "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
   const thin = files.filter((f) => /^jobs[\\/][\w-]+[\\/]/.test(f) && body(f).length < 500);
   assert.deepEqual(thin, [], "직무 페이지 본문 500자 미만");
-  const stale = files.filter((f) => !existsSync(join(DIR, f)) || readFileSync(join(DIR, f), "utf8") !== readFileSync(join(tmp, f), "utf8"));
+  // 윈도우 체크아웃(autocrlf)은 CRLF로 꺼내므로 줄바꿈 차이는 낡은 것으로 보지 않는다
+  const text = (p) => readFileSync(p, "utf8").replace(/\r/g, "");
+  const stale = files.filter((f) => !existsSync(join(DIR, f)) || text(join(DIR, f)) !== text(join(tmp, f)));
   assert.deepEqual(stale, [], "node tools/pages.mjs 로 다시 만드세요");
   const locs = (readFileSync(join(DIR, "sitemap.xml"), "utf8").match(/<loc>/g) || []).length;
   assert.equal(locs, files.length + 1, "sitemap 주소 수 = 페이지 수 + 1(/jobmap/)");
