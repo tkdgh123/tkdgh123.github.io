@@ -1,0 +1,459 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  initializeFirestore, persistentLocalCache, persistentMultipleTabManager,
+  doc, getDoc, setDoc, updateDoc, deleteDoc, collection, onSnapshot, deleteField
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const CONFIG = {
+  apiKey: "AIzaSyA4VJvIM9DwMB4D2KzhDwcekCIGMRSrmwI",
+  authDomain: "uridal-43133.firebaseapp.com",
+  projectId: "uridal-43133",
+  storageBucket: "uridal-43133.firebasestorage.app",
+  messagingSenderId: "704081943105",
+  appId: "1:704081943105:web:aff91a36dae41a6bd5c4c0"
+};
+
+const fb = initializeApp(CONFIG);
+let db;
+try { db = initializeFirestore(fb, { localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }) }); }
+catch { db = initializeFirestore(fb, {}); }
+
+/* ---------- 작은 도구 ---------- */
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const pad = n => String(n).padStart(2, "0");
+const ymd = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const parse = s => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
+const addDays = (s, n) => { const d = parse(s); d.setDate(d.getDate() + n); return ymd(d); };
+const diff = (a, b) => Math.round((parse(b) - parse(a)) / 864e5);
+const today = () => ymd(new Date());
+const WEEK = ["일", "월", "화", "수", "목", "금", "토"];
+const md = s => { const d = parse(s); return `${d.getMonth() + 1}월 ${d.getDate()}일`; };
+const full = s => { const d = parse(s); return `${d.getFullYear()}년 ${md(s)} ${WEEK[d.getDay()]}요일`; };
+const FACES = ["🥰", "😆", "😊", "🙂", "😐", "😢", "😠", "😴"];
+const KIND = { place: "장소", food: "맛집", todo: "할 것" };
+const ABC = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+
+const KEY = "uridal";
+const loadLocal = () => { try { return JSON.parse(localStorage.getItem(KEY)); } catch { return null; } };
+const saveLocal = v => { try { v ? localStorage.setItem(KEY, JSON.stringify(v)) : localStorage.removeItem(KEY); } catch {} };
+
+let toastT;
+function toast(msg) {
+  const t = $("toast"); t.textContent = msg; t.hidden = false;
+  clearTimeout(toastT); toastT = setTimeout(() => (t.hidden = true), 2400);
+}
+const fail = () => toast("저장하지 못했어요. 인터넷 연결을 확인해 주세요.");
+
+/* 두 번 눌러야 지워지는 버튼 */
+function armed(btn) {
+  if (btn.classList.contains("arm")) return true;
+  const old = btn.textContent;
+  btn.classList.add("arm"); btn.textContent = "한 번 더";
+  setTimeout(() => { btn.classList.remove("arm"); btn.textContent = old; }, 3000);
+  return false;
+}
+
+/* ---------- 상태 ---------- */
+const now = new Date();
+const S = { room: null, me: "a", info: null, events: [], wishes: [], annivs: [], days: {},
+            y: now.getFullYear(), m: now.getMonth(), sel: today(), unsub: [], kind: "place" };
+const other = w => (w === "a" ? "b" : "a");
+const name = w => S.info?.[w]?.name || (w === "a" ? "A" : "B");
+const col = (...p) => collection(db, "rooms", S.room, ...p);
+const ref = (...p) => doc(db, "rooms", S.room, ...p);
+const link = code => `${location.origin}${location.pathname}#${code}`;
+
+function newCode() {
+  const r = crypto.getRandomValues(new Uint8Array(20));
+  return [...r].map(v => ABC[v % 32]).join("").match(/.{4}/g).join("-");
+}
+function normCode(t) {
+  const s = String(t || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+  return s.length === 20 && [...s].every(c => ABC.includes(c)) ? s.match(/.{4}/g).join("-") : null;
+}
+
+/* ---------- 기념일 계산 ---------- */
+function marksOn(d) {
+  const out = [], st = S.info?.start;
+  if (!st) return out;
+  const n = diff(st, d) + 1;
+  if (n > 0 && n % 100 === 0) out.push(`${n}일`);
+  if (d > st && d.slice(5) === st.slice(5)) out.push(`${+d.slice(0, 4) - +st.slice(0, 4)}주년`);
+  for (const a of S.annivs) if (a.md === d.slice(5)) out.push(a.title);
+  return out;
+}
+function upcoming(k) {
+  const out = [], t = today();
+  for (let i = 0; i < 800 && out.length < k; i++) {
+    const d = addDays(t, i);
+    for (const title of marksOn(d)) out.push({ d, title, left: i });
+  }
+  return out.slice(0, k);
+}
+const eventsOn = d => S.events
+  .filter(e => e.date <= d && d <= (e.end || e.date))
+  .sort((x, y) => (x.time || "99").localeCompare(y.time || "99") || (x.at || 0) - (y.at || 0));
+const dLabel = d => { const n = diff(S.info.start, d) + 1; return n > 0 ? `D+${n}` : `D-${1 - n}`; };
+
+/* ---------- 그리기 ---------- */
+function render() {
+  if (!S.info) return;
+  renderHead(); renderCal(); renderAgenda(); renderWish(); renderUs();
+}
+
+function renderHead() {
+  $("hA").textContent = name("a");
+  $("hB").textContent = name("b");
+  $("hD").textContent = dLabel(today());
+  const n = upcoming(1)[0];
+  $("hNext").textContent = n ? (n.left ? `${n.title}까지 ${n.left}일` : `오늘은 ${n.title}`) : "";
+}
+
+function renderCal() {
+  const { y, m } = S;
+  $("mTitle").textContent = `${y}. ${pad(m + 1)}`;
+  const first = new Date(y, m, 1), days = new Date(y, m + 1, 0).getDate();
+  const cells = Math.ceil((first.getDay() + days) / 7) * 7, t = today();
+  let html = "";
+  for (let i = 0; i < cells; i++) {
+    const dt = new Date(y, m, 1 - first.getDay() + i), d = ymd(dt);
+    const evs = eventsOn(d), dd = S.days[d] || {};
+    const moods = (dd.a?.mood || "") + (dd.b?.mood || "");
+    const cls = ["day", dt.getMonth() !== m && "out", dt.getDay() === 0 && "sun", d === t && "today", d === S.sel && "sel"].filter(Boolean).join(" ");
+    html += `<button type="button" class="${cls}" data-d="${d}" aria-label="${md(d)}"><span class="n">${dt.getDate()}</span>`
+      + (moods ? `<span class="moods">${esc(moods)}</span>` : "")
+      + (marksOn(d).length ? `<span class="heart">♥</span>` : "")
+      + evs.slice(0, 2).map(e => `<span class="bar ${e.who}">${esc(e.title)}</span>`).join("")
+      + (evs.length > 2 ? `<span class="more">+${evs.length - 2}</span>` : "")
+      + `</button>`;
+  }
+  $("grid").innerHTML = html;
+}
+
+function moodCard(w, v) {
+  const mine = w === S.me;
+  const tag = mine ? `button type="button" data-mood` : "div";
+  return `<${tag} class="mood ${mine ? "mine" : ""}"><span class="who by ${w}">${esc(name(w))}${mine ? " (나)" : ""}</span>`
+    + (v?.mood ? `<span class="face">${v.mood}</span>` : "")
+    + (v?.memo ? `<p>${esc(v.memo)}</p>` : `<p class="empty">${mine ? "기분·한 줄 남기기" : "아직 없어요"}</p>`)
+    + `</${mine ? "button" : "div"}>`;
+}
+
+function renderAgenda() {
+  const d = S.sel, dt = parse(d), n = diff(S.info.start, d) + 1;
+  const evs = eventsOn(d), marks = marksOn(d), dd = S.days[d] || {};
+  $("agenda").innerHTML =
+    `<div class="ahead"><h3>${md(d)} ${WEEK[dt.getDay()]}요일</h3>${n > 0 ? `<small>${n}일째</small>` : ""}</div>`
+    + (marks.length ? `<div class="tags">${marks.map(t => `<span class="tag">♥ ${esc(t)}</span>`).join("")}</div>` : "")
+    + (evs.length ? evs.map(e => {
+        const sub = [e.time, e.end && e.end !== e.date ? `~ ${md(e.end)}` : "", e.memo].filter(Boolean).map(esc).join(" · ");
+        return `<button type="button" class="ev ${e.who}" data-e="${e.id}">`
+          + `<span><b>${esc(e.title)}</b>${sub ? `<small>${sub}</small>` : ""}</span>`
+          + `<span class="by ${e.who}">${e.who === "both" ? "함께" : esc(name(e.who))}</span></button>`;
+      }).join("") : `<p class="empty">이 날은 아직 일정이 없어요.</p>`)
+    + `<button type="button" class="addbtn" data-add>+ 일정 추가</button>`
+    + `<div class="moodrow">${moodCard("a", dd.a)}${moodCard("b", dd.b)}</div>`;
+}
+
+function renderWish() {
+  const groups = [["want", "아직"], ["planned", "날짜 잡음"], ["done", "다녀옴"]];
+  const sorted = [...S.wishes].sort((x, y) => (y.at || 0) - (x.at || 0));
+  const html = groups.map(([st, label]) => {
+    const list = sorted.filter(w => (w.status || "want") === st);
+    if (!list.length) return "";
+    return `<div class="wgroup"><h4>${label} ${list.length}</h4>` + list.map(w => {
+      const btns = st === "want" ? `<button type="button" class="go" data-plan="${w.id}">날짜 잡기</button><button type="button" data-wdel="${w.id}">삭제</button>`
+        : st === "planned" ? `<button type="button" class="go" data-wdone="${w.id}">다녀옴</button><button type="button" data-wgo="${w.id}">달력</button>`
+        : `<button type="button" data-wback="${w.id}">되돌리기</button>`;
+      const sub = [esc(name(w.by)), w.date && st !== "want" ? `${md(w.date)}${st === "planned" ? " 예정" : ""}` : ""].filter(Boolean).join(" · ");
+      return `<div class="wish ${st}"><span class="k">${KIND[w.kind] || "할 것"}</span><div><b>${esc(w.title)}</b><small>${sub}</small></div><div class="wbtns">${btns}</div></div>`;
+    }).join("") + `</div>`;
+  }).join("");
+  $("wishList").innerHTML = html || `<p class="empty">가고 싶은 곳, 먹고 싶은 것, 같이 해 보고 싶은 걸 적어 두세요. 날짜를 잡으면 달력에 들어가요.</p>`;
+}
+
+function renderUs() {
+  const n = diff(S.info.start, today()) + 1;
+  $("usD").textContent = n > 0 ? `${n}일` : dLabel(today());
+  $("usSince").textContent = `${full(S.info.start)}부터`;
+  $("soonList").innerHTML = upcoming(8).map(u =>
+    `<li><b>${esc(u.title)}</b><small>${full(u.d)}</small><span class="left">${u.left ? `D-${u.left}` : "오늘"}</span></li>`).join("");
+  $("annivList").innerHTML = S.annivs.map(a =>
+    `<li><button type="button" data-an="${a.id}">${esc(a.title)} · ${+a.md.slice(0, 2)}/${+a.md.slice(3)}</button></li>`).join("");
+  const set = (id, v) => { if (document.activeElement !== $(id)) $(id).value = v; };
+  set("sMe", name(S.me)); set("sYou", name(other(S.me))); set("sStart", S.info.start);
+  $("sCode").textContent = S.room;
+}
+
+/* ---------- 아래 창 ---------- */
+const sheet = $("sheet"), sheetForm = $("sheetForm");
+let onSheetSubmit = null;
+function openSheet(html, onSubmit, init) {
+  sheetForm.innerHTML = html;
+  onSheetSubmit = onSubmit;
+  init?.();
+  sheet.showModal();
+}
+sheetForm.addEventListener("submit", e => {
+  e.preventDefault();
+  if (onSheetSubmit?.() !== false) sheet.close();
+});
+sheet.addEventListener("click", e => { if (e.target === sheet) sheet.close(); });
+function seg(box, attr) {
+  box.addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    box.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b));
+    box.dataset.v = b.dataset[attr];
+  });
+}
+
+function openEvent(id) {
+  const e = id ? S.events.find(x => x.id === id) : { date: S.sel, who: S.me };
+  if (!e) return;
+  openSheet(`<h3>${id ? "일정 고치기" : "일정 추가"}</h3>
+    <label>무엇을 <input id="fT" required maxlength="40" autocomplete="off"></label>
+    <div class="seg" id="fW">${["a", "both", "b"].map(w =>
+      `<button type="button" class="${w}" data-w="${w}">${w === "both" ? "함께" : esc(name(w))}</button>`).join("")}</div>
+    <div class="two"><label>날짜 <input type="date" id="fD" required></label><label>끝나는 날 <input type="date" id="fE"></label></div>
+    <label>시간 <input type="time" id="fH"></label>
+    <label>메모 <input id="fM" maxlength="80" autocomplete="off"></label>
+    <div class="acts">${id ? `<button type="button" class="del" id="fDel">삭제</button>` : ""}<button class="big" type="submit">저장</button></div>`,
+  () => {
+    const date = $("fD").value, end = $("fE").value;
+    const data = { title: $("fT").value.trim(), date, end: end > date ? end : "", time: $("fH").value,
+                   memo: $("fM").value.trim(), who: $("fW").dataset.v };
+    if (!data.title) return false;
+    if (id) {
+      updateDoc(ref("events", id), data).catch(fail);
+      if (e.wishId) updateDoc(ref("wishes", e.wishId), { date }).catch(() => {});
+    } else {
+      setDoc(doc(col("events")), { ...data, by: S.me, at: Date.now() }).catch(fail);
+    }
+    S.sel = date; render();
+  }, () => {
+    $("fT").value = e.title || ""; $("fD").value = e.date; $("fE").value = e.end || "";
+    $("fH").value = e.time || ""; $("fM").value = e.memo || "";
+    const box = $("fW"); seg(box, "w"); box.querySelector(`[data-w="${e.who}"]`).click();
+    $("fDel")?.addEventListener("click", ev => {
+      if (!armed(ev.currentTarget)) return;
+      deleteDoc(ref("events", id)).catch(fail);
+      if (e.wishId) updateDoc(ref("wishes", e.wishId), { status: "want", date: deleteField(), eventId: deleteField() }).catch(() => {});
+      sheet.close();
+    });
+    if (!id) $("fT").focus();
+  });
+}
+
+function openMood() {
+  const cur = S.days[S.sel]?.[S.me] || {};
+  openSheet(`<h3>${md(S.sel)}의 나</h3>
+    <div class="faces" id="fF">${FACES.map(f => `<button type="button" data-f="${f}">${f}</button>`).join("")}</div>
+    <label>한 줄 <input id="fN" maxlength="60" autocomplete="off" placeholder="오늘 하고 싶은 말"></label>
+    <div class="acts"><button type="button" class="del" id="fClr">지우기</button><button class="big" type="submit">남기기</button></div>`,
+  () => {
+    const mood = $("fF").dataset.v || "", memo = $("fN").value.trim();
+    if (!mood && !memo) return false;
+    setDoc(ref("days", S.sel), { [S.me]: { mood, memo } }, { merge: true }).catch(fail);
+  }, () => {
+    seg($("fF"), "f");
+    if (cur.mood) $("fF").querySelector(`[data-f="${cur.mood}"]`)?.click();
+    $("fN").value = cur.memo || "";
+    $("fClr").addEventListener("click", () => {
+      setDoc(ref("days", S.sel), { [S.me]: deleteField() }, { merge: true }).catch(fail);
+      sheet.close();
+    });
+  });
+}
+
+function openPlan(wid) {
+  const w = S.wishes.find(x => x.id === wid);
+  if (!w) return;
+  openSheet(`<h3>${esc(w.title)}</h3>
+    <div class="two"><label>언제 <input type="date" id="pD" required></label><label>시간 <input type="time" id="pH"></label></div>
+    <div class="acts"><button class="big" type="submit">달력에 넣기</button></div>`,
+  () => {
+    const date = $("pD").value, ev = doc(col("events"));
+    setDoc(ev, { title: w.title, date, end: "", time: $("pH").value, memo: "", who: "both", by: S.me, at: Date.now(), wishId: wid }).catch(fail);
+    updateDoc(ref("wishes", wid), { status: "planned", date, eventId: ev.id }).catch(fail);
+    toast(`${md(date)}에 넣었어요`);
+  }, () => { $("pD").value = S.sel >= today() ? S.sel : today(); });
+}
+
+function openAnniv(id) {
+  const a = id ? S.annivs.find(x => x.id === id) : null;
+  openSheet(`<h3>${a ? "기념일 고치기" : "기념일·생일 추가"}</h3>
+    <label>이름 <input id="aT" required maxlength="20" placeholder="예: 지은 생일" autocomplete="off"></label>
+    <label>날짜 (해마다 표시돼요) <input type="date" id="aD" required></label>
+    <div class="acts">${a ? `<button type="button" class="del" id="aDel">삭제</button>` : ""}<button class="big" type="submit">저장</button></div>`,
+  () => {
+    const data = { title: $("aT").value.trim(), md: $("aD").value.slice(5) };
+    if (!data.title) return false;
+    (a ? updateDoc(ref("annivs", id), data) : setDoc(doc(col("annivs")), data)).catch(fail);
+  }, () => {
+    $("aT").value = a?.title || "";
+    $("aD").value = a ? `${new Date().getFullYear()}-${a.md}` : today();
+    $("aDel")?.addEventListener("click", ev => {
+      if (!armed(ev.currentTarget)) return;
+      deleteDoc(ref("annivs", id)).catch(fail); sheet.close();
+    });
+  });
+}
+
+/* ---------- 연결 ---------- */
+function enter(room, me) {
+  S.room = room; S.me = me; saveLocal({ room, me });
+  $("setup").hidden = true; $("boot").hidden = false;
+  const slow = setTimeout(() => toast("연결이 느려요. 잠시만요…"), 8000);
+  S.unsub.push(onSnapshot(doc(db, "rooms", room), s => {
+    if (!s.exists()) {
+      if (!s.metadata.fromCache) { toast("달력을 찾을 수 없어요."); leave(); }
+      return;
+    }
+    clearTimeout(slow);
+    S.info = s.data();
+    $("boot").hidden = true; $("app").hidden = false;
+    render();
+  }, err => { clearTimeout(slow); toast(`불러오지 못했어요 (${err.code})`); }));
+  for (const c of ["events", "wishes", "annivs"]) {
+    S.unsub.push(onSnapshot(col(c), s => { S[c] = s.docs.map(d => ({ id: d.id, ...d.data() })); render(); }));
+  }
+  S.unsub.push(onSnapshot(col("days"), s => { S.days = Object.fromEntries(s.docs.map(d => [d.id, d.data()])); render(); }));
+}
+function leave() {
+  S.unsub.forEach(u => u()); saveLocal(null); location.reload();
+}
+
+async function share(code) {
+  const url = link(code);
+  if (navigator.share) {
+    try { await navigator.share({ title: "우리달", text: "우리 달력에 들어와 줘", url }); return; }
+    catch (e) { if (e.name === "AbortError") return; }
+  }
+  try { await navigator.clipboard.writeText(url); toast("링크를 복사했어요"); }
+  catch { toast("코드를 길게 눌러 복사해 주세요"); }
+}
+
+/* ---------- 처음 시작 화면 ---------- */
+const STEPS = ["setupChoose", "newForm", "shareBox", "joinForm", "pickBox"];
+const step = id => STEPS.forEach(s => ($(s).hidden = s !== id));
+document.querySelectorAll(".back").forEach(b => b.addEventListener("click", () => step("setupChoose")));
+$("goNew").onclick = () => { step("newForm"); $("nA").focus(); };
+$("goJoin").onclick = () => { step("joinForm"); $("jCode").focus(); };
+$("newForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const code = newCode(), btn = e.submitter;
+  btn.disabled = true;
+  try {
+    await setDoc(doc(db, "rooms", code), { a: { name: $("nA").value.trim() }, b: { name: $("nB").value.trim() }, start: $("nStart").value, at: Date.now() });
+    $("shareCode").textContent = code;
+    $("copyLink").onclick = () => share(code);
+    $("startApp").onclick = () => enter(code, "a");
+    step("shareBox");
+  } catch { fail(); }
+  btn.disabled = false;
+});
+$("joinForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const err = $("jErr"), code = normCode($("jCode").value);
+  err.hidden = true;
+  if (!code) { err.textContent = "코드는 영문·숫자 20글자예요."; err.hidden = false; return; }
+  try {
+    const s = await getDoc(doc(db, "rooms", code));
+    if (!s.exists()) { err.textContent = "그런 코드가 없어요. 다시 확인해 주세요."; err.hidden = false; return; }
+    const info = s.data();
+    $("pickWho").innerHTML = ["a", "b"].map(w => `<button type="button" class="${w}" data-w="${w}">${esc(info[w]?.name)}</button>`).join("");
+    $("pickWho").onclick = ev => { const b = ev.target.closest("button"); if (b) enter(code, b.dataset.w); };
+    step("pickBox");
+  } catch { err.textContent = "연결하지 못했어요. 인터넷을 확인해 주세요."; err.hidden = false; }
+});
+
+/* ---------- 앱 화면 동작 ---------- */
+document.querySelector(".tabbar").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (b) showTab(b.dataset.tab);
+});
+function showTab(t) {
+  document.querySelectorAll(".tabbar button").forEach(b => b.classList.toggle("on", b.dataset.tab === t));
+  ["cal", "wish", "us"].forEach(x => ($(`tab-${x}`).hidden = x !== t));
+  scrollTo(0, 0);
+}
+function goMonth(dm) {
+  const d = new Date(S.y, S.m + dm, 1); S.y = d.getFullYear(); S.m = d.getMonth(); renderCal();
+}
+$("prevM").onclick = () => goMonth(-1);
+$("nextM").onclick = () => goMonth(1);
+$("todayBtn").onclick = () => { const t = new Date(); S.y = t.getFullYear(); S.m = t.getMonth(); S.sel = today(); renderCal(); renderAgenda(); };
+let tx = null;
+$("grid").addEventListener("touchstart", e => (tx = e.touches[0].clientX), { passive: true });
+$("grid").addEventListener("touchend", e => {
+  if (tx === null) return;
+  const dx = e.changedTouches[0].clientX - tx; tx = null;
+  if (Math.abs(dx) > 60) goMonth(dx < 0 ? 1 : -1);
+});
+$("grid").addEventListener("click", e => {
+  const b = e.target.closest(".day"); if (!b) return;
+  S.sel = b.dataset.d;
+  const d = parse(S.sel);
+  if (d.getMonth() !== S.m) { S.y = d.getFullYear(); S.m = d.getMonth(); }
+  renderCal(); renderAgenda();
+});
+$("agenda").addEventListener("click", e => {
+  const ev = e.target.closest("[data-e]"); if (ev) return openEvent(ev.dataset.e);
+  if (e.target.closest("[data-add]")) return openEvent(null);
+  if (e.target.closest("[data-mood]")) openMood();
+});
+
+$("wishKinds").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  S.kind = b.dataset.k;
+  $("wishKinds").querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b));
+});
+$("wishForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const title = $("wishIn").value.trim(); if (!title) return;
+  setDoc(doc(col("wishes")), { title, kind: S.kind, by: S.me, status: "want", at: Date.now() }).catch(fail);
+  $("wishIn").value = "";
+});
+$("wishList").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  const { plan, wdel, wdone, wgo, wback } = b.dataset;
+  if (plan) openPlan(plan);
+  else if (wdel) { if (armed(b)) deleteDoc(ref("wishes", wdel)).catch(fail); }
+  else if (wdone) updateDoc(ref("wishes", wdone), { status: "done" }).catch(fail);
+  else if (wback) updateDoc(ref("wishes", wback), { status: "want", date: deleteField(), eventId: deleteField() }).catch(fail);
+  else if (wgo) {
+    const w = S.wishes.find(x => x.id === wgo); if (!w?.date) return;
+    S.sel = w.date; const d = parse(w.date); S.y = d.getFullYear(); S.m = d.getMonth();
+    render(); showTab("cal");
+  }
+});
+
+$("addAnniv").onclick = () => openAnniv(null);
+$("annivList").addEventListener("click", e => { const b = e.target.closest("[data-an]"); if (b) openAnniv(b.dataset.an); });
+$("saveSet").onclick = () => {
+  const me = $("sMe").value.trim(), you = $("sYou").value.trim(), start = $("sStart").value;
+  if (!me || !you || !start) return toast("이름과 날짜를 모두 적어 주세요");
+  updateDoc(doc(db, "rooms", S.room), { [`${S.me}.name`]: me, [`${other(S.me)}.name`]: you, start }).catch(fail);
+  toast("저장했어요");
+};
+$("sCopy").onclick = () => share(S.room);
+$("leave").onclick = e => { if (armed(e.currentTarget)) leave(); };
+
+let installEv = null;
+addEventListener("beforeinstallprompt", e => { e.preventDefault(); installEv = e; $("installBtn").hidden = false; });
+$("installBtn").onclick = async () => { if (!installEv) return; installEv.prompt(); await installEv.userChoice; installEv = null; $("installBtn").hidden = true; };
+const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone;
+$("iosHint").hidden = !(/iphone|ipad|ipod/i.test(navigator.userAgent) && !standalone);
+
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+
+/* ---------- 시작 ---------- */
+const saved = loadLocal();
+const hashCode = normCode(decodeURIComponent(location.hash.slice(1)));
+if (location.hash) history.replaceState(null, "", location.pathname);
+if (saved?.room) enter(saved.room, saved.me);
+else {
+  $("boot").hidden = true; $("setup").hidden = false;
+  if (hashCode) { step("joinForm"); $("jCode").value = hashCode; }
+  else step("setupChoose");
+}

@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>우리달</title>
+<meta name="description" content="둘이 같이 쓰는 달력">
+<meta name="theme-color" content="#2F5BEA">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="우리달">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="style.css">
+<script type="module" src="app.js"></script>
+</head>
+<body>
+
+<div id="boot" class="boot"><b>우리달</b></div>
+
+<!-- 처음 시작 -->
+<section id="setup" class="setup" hidden>
+  <div class="setup-top">
+    <h1>우리달</h1>
+    <p>둘이 같이 쓰는 달력</p>
+  </div>
+
+  <div class="setup-body" id="setupChoose">
+    <button class="big" id="goNew" type="button">새 달력 만들기</button>
+    <button class="big ghost" id="goJoin" type="button">받은 코드로 들어가기</button>
+  </div>
+
+  <form class="setup-body" id="newForm" hidden>
+    <label>내 이름 <input id="nA" required maxlength="12" autocomplete="off"></label>
+    <label>상대 이름 <input id="nB" required maxlength="12" autocomplete="off"></label>
+    <label>사귄 날 <input id="nStart" type="date" required></label>
+    <button class="big" type="submit">만들기</button>
+    <button class="link back" type="button">뒤로</button>
+  </form>
+
+  <div class="setup-body" id="shareBox" hidden>
+    <p class="lead">이 코드를 상대에게 보내 주세요. 코드를 아는 사람만 달력을 볼 수 있어요.</p>
+    <output class="code" id="shareCode"></output>
+    <button class="big" id="copyLink" type="button">링크 복사</button>
+    <button class="big ghost" id="startApp" type="button">시작하기</button>
+  </div>
+
+  <form class="setup-body" id="joinForm" hidden>
+    <label>받은 코드 <input id="jCode" required autocomplete="off" autocapitalize="characters" placeholder="XXXX-XXXX-XXXX-XXXX-XXXX"></label>
+    <button class="big" type="submit">들어가기</button>
+    <p class="err" id="jErr" hidden></p>
+    <button class="link back" type="button">뒤로</button>
+  </form>
+
+  <div class="setup-body" id="pickBox" hidden>
+    <p class="lead">나는 누구예요?</p>
+    <div class="pick" id="pickWho"></div>
+  </div>
+</section>
+
+<!-- 앱 -->
+<div id="app" class="app" hidden>
+  <header class="band">
+    <span class="nm a" id="hA"></span>
+    <div class="dd"><b id="hD"></b><span id="hNext"></span></div>
+    <span class="nm b" id="hB"></span>
+  </header>
+
+  <main>
+    <section id="tab-cal" class="tab">
+      <div class="mhead">
+        <button class="icon" id="prevM" type="button" aria-label="이전 달">‹</button>
+        <h2 id="mTitle"></h2>
+        <button class="icon" id="nextM" type="button" aria-label="다음 달">›</button>
+        <button class="pill" id="todayBtn" type="button">오늘</button>
+      </div>
+      <div class="week"><span class="sun">일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span class="sat">토</span></div>
+      <div class="grid" id="grid"></div>
+      <div class="agenda" id="agenda"></div>
+    </section>
+
+    <section id="tab-wish" class="tab" hidden>
+      <h2 class="ttl">하고 싶은 것</h2>
+      <form class="addrow" id="wishForm">
+        <div class="kinds" id="wishKinds">
+          <button type="button" class="on" data-k="place">장소</button>
+          <button type="button" data-k="food">맛집</button>
+          <button type="button" data-k="todo">할 것</button>
+        </div>
+        <div class="inline">
+          <input id="wishIn" required maxlength="60" placeholder="예: 서울숲 산책" autocomplete="off">
+          <button class="add" type="submit">추가</button>
+        </div>
+      </form>
+      <div id="wishList"></div>
+    </section>
+
+    <section id="tab-us" class="tab" hidden>
+      <div class="hero-d"><small>우리가 함께한 날</small><b id="usD"></b><span id="usSince"></span></div>
+      <h2 class="ttl">다가오는 날</h2>
+      <ol class="soon" id="soonList"></ol>
+      <button class="pill wide" id="addAnniv" type="button">+ 기념일·생일 추가</button>
+      <ul class="annivs" id="annivList"></ul>
+
+      <h2 class="ttl">설정</h2>
+      <div class="settings">
+        <label>내 이름 <input id="sMe" maxlength="12"></label>
+        <label>상대 이름 <input id="sYou" maxlength="12"></label>
+        <label>사귄 날 <input id="sStart" type="date"></label>
+        <button class="pill" id="saveSet" type="button">저장</button>
+        <div class="coderow"><span>커플 코드</span><output class="code small" id="sCode"></output><button class="pill" id="sCopy" type="button">링크 복사</button></div>
+        <button class="pill" id="installBtn" type="button" hidden>홈 화면에 앱 설치</button>
+        <p class="hint" id="iosHint" hidden>Safari 아래 공유 버튼 → 홈 화면에 추가하면 앱처럼 열려요.</p>
+        <button class="link danger" id="leave" type="button">이 기기에서 나가기</button>
+      </div>
+    </section>
+  </main>
+
+  <nav class="tabbar" aria-label="메뉴">
+    <button type="button" data-tab="cal" class="on"><span class="ti">▦</span>달력</button>
+    <button type="button" data-tab="wish"><span class="ti">☆</span>하고 싶은 것</button>
+    <button type="button" data-tab="us"><span class="ti">♡</span>우리</button>
+  </nav>
+</div>
+
+<dialog id="sheet"><form method="dialog" id="sheetForm"></form></dialog>
+<div class="toast" id="toast" role="status" hidden></div>
+</body>
+</html>
