@@ -81,13 +81,84 @@ footer { padding: 48px 0 64px; color: var(--ink-2); font-size: 13px }
 <div class="wrap"><a class="back" href="../">← 작업실</a></div>
 
 <header><div class="wrap">
-  <div class="kick">기타 · 2026년 10월 29일 기준</div>
+  <div class="kick">기타 · 2026년 10월 31일 갱신</div>
   <h1>노트북 저장공간 정리</h1>
-  <p>C 드라이브 하나에 무엇이 얼마나 들어 있는지 여덟 갈래로 묶었습니다. 파일은 그대로 두고 목록만 만들었고, 맨 아래에 지워도 되는 것들을 따로 모았습니다.</p>
+  <p>이틀 만에 남은 공간이 절반으로 줄어든 원인과 해결 방법을 맨 위에 두고, 메모리(RAM) 상태도 같이 봤습니다. 아래쪽은 10월 29일에 잰 전체 내역입니다.</p>
 </div></header>
 
 <main>
 <section style="padding-top:8px"><div class="wrap">
+  <h2>10월 31일 · 왜 또 부족해졌나</h2>
+  <div class="hero">
+    <div><b>29.6 GB</b><span>10월 29일 남은 공간</span></div>
+    <div class="low"><b>14.1 GB</b><span>지금 남은 공간 (3.1%)</span></div>
+    <div><b>+20.5 GB</b><span>Claude 작업 임시 파일</span></div>
+  </div>
+  <div class="cats">
+    <div class="cat" style="--c:var(--bad)"><h3>늘어난 것<small>+29.2 GB</small></h3>
+      <p>대부분 Claude가 작업하며 남긴 임시 파일</p>
+      <ul class="rows">
+        <li><span>Claude 작업 임시 파일 — 학과 진로 지도 화면 테스트 때 띄운 크롬 프로필 354개(17.2 GB)가 대부분</span><em>+20.5</em><i style="width:100%"></i></li>
+        <li><span>Visual Studio 설치 후 남은 파일 (%temp% 안 폴더 2개)</span><em>+3.9</em><i style="width:19%"></i></li>
+        <li><span>그 밖의 임시 파일 (WSL·VS Code 설치 파일 등)</span><em>+2.5</em><i style="width:12%"></i></li>
+        <li><span>Visual Studio 업데이트</span><em>+2.3</em><i style="width:11%"></i></li>
+      </ul></div>
+    <div class="cat" style="--c:var(--good)"><h3>이미 줄어든 것<small>−17.2 GB</small></h3>
+      <p>지난번 제안대로 정리된 부분</p>
+      <ul class="rows">
+        <li><span>넋굿 (테스트 로그 등)</span><em>−7.4</em><i style="width:100%"></i></li>
+        <li><span>다운로드</span><em>−3.2</em><i style="width:43%"></i></li>
+        <li><span>휴지통</span><em>−3.0</em><i style="width:41%"></i></li>
+        <li><span>uv 캐시</span><em>−2.1</em><i style="width:28%"></i></li>
+        <li><span>npm 캐시</span><em>−1.5</em><i style="width:20%"></i></li>
+      </ul></div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <h2>해결 방법</h2>
+  <p>● 세 개만 해도 약 39 GB가 비어서 14.1 GB → 약 53 GB(12%)가 됩니다.</p>
+  <div class="tips">
+    <div class="tipcard"><h3><span class="lv ok">● 바로 가능</span>Claude 작업 임시 폴더 비우기</h3><div class="gb">21.0 GB</div><p><code>Win+R</code> → <code>%temp%\claude</code> 열고 안의 폴더 전체 삭제. 켜져 있는 Claude 창을 다 닫고 하거나, Claude에게 "임시 파일 정리해줘"라고 하면 됩니다.</p></div>
+    <div class="tipcard"><h3><span class="lv ok">● 바로 가능</span>Visual Studio 설치 남은 폴더</h3><div class="gb">3.9 GB</div><p><code>%temp%</code> 안의 <code>h51dio3d</code>, <code>5iv3pjxz</code>. 설치가 끝난 뒤 남은 파일이라 지워도 됩니다.</p></div>
+    <div class="tipcard"><h3><span class="lv ok">● 바로 가능</span>나머지 임시 파일</h3><div class="gb">14.5 GB</div><p>설정 → 시스템 → 저장소 → 임시 파일에서 한 번에.</p></div>
+    <div class="tipcard"><h3><span class="lv chk">▲ 확인 후</span>넋굿 작업 사본(worktree)</h3><div class="gb">11.7 GB</div><p>아직 남아 있어요. 본 프로젝트에 합쳐졌으면 Claude에게 정리를 맡기면 됩니다.</p></div>
+    <div class="tipcard"><h3><span class="lv ok">● 다시 안 쌓이게</span>테스트용 브라우저 바로 지우기</h3><div class="gb">—</div><p>화면 테스트가 끝나면 쓴 크롬 프로필을 바로 지우도록 Claude 작업 규칙에 넣었습니다.</p></div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <h2>메모리(RAM)는?</h2>
+  <p>지금은 모자라지 않지만, C 드라이브가 꽉 차면 "메모리 부족" 경고가 뜰 수 있어요. RAM이 넘칠 때 쓰는 가상 메모리가 C 드라이브에 있어서, 공간이 없으면 늘어나지 못하기 때문입니다.</p>
+  <div class="hero">
+    <div><b>11.8 / 16 GB</b><span>RAM 사용 (76%)</span></div>
+    <div><b>18.9 / 27.1 GB</b><span>가상 메모리 포함</span></div>
+    <div><b>18개</b><span>켤 때 같이 뜨는 프로그램</span></div>
+  </div>
+  <div class="cats">
+    <div class="cat" style="--c:var(--c1)"><h3>RAM을 많이 쓰는 것<small>GB</small></h3>
+      <p>지금 켜져 있는 프로그램 기준</p>
+      <ul class="rows">
+        <li><span>Windows 서비스 (99개)</span><em>1.3</em><i style="width:100%"></i></li>
+        <li><span>Edge</span><em>0.7</em><i style="width:56%"></i></li>
+        <li><span>ChatGPT 앱</span><em>0.7</em><i style="width:51%"></i></li>
+        <li><span>Chrome</span><em>0.6</em><i style="width:49%"></i></li>
+        <li><span>Copilot 앱</span><em>0.6</em><i style="width:43%"></i></li>
+        <li><span>Discord</span><em>0.5</em><i style="width:36%"></i></li>
+        <li><span>Claude</span><em>0.3</em><i style="width:25%"></i></li>
+        <li><span>위젯</span><em>0.3</em><i style="width:22%"></i></li>
+      </ul></div>
+    <div class="tips">
+      <div class="tipcard"><h3><span class="lv ok">● 바로 가능</span>시작 프로그램 끄기</h3><div class="gb">—</div><p>작업 관리자(<code>Ctrl+Shift+Esc</code>) → 시작 앱. Teams, Filmora, SOOP, Steam, Riot 클라이언트, Edge·Avast 브라우저 자동 실행, Acrobat 동기화를 "사용 안 함"으로.</p></div>
+      <div class="tipcard"><h3><span class="lv ok">● 바로 가능</span>브라우저는 하나만</h3><div class="gb">0.7</div><p>Edge와 Chrome이 같이 켜져 있어요.</p></div>
+      <div class="tipcard"><h3><span class="lv ok">● 바로 가능</span>안 쓰는 AI 앱·위젯 닫기</h3><div class="gb">1.6</div><p>ChatGPT·Copilot 앱은 창을 닫아도 뒤에서 돌아요. 위젯은 작업 표시줄 설정에서 끄기.</p></div>
+      <div class="tipcard"><h3><span class="lv no">■ 하지 말 것</span>가상 메모리 끄기</h3><div class="gb">—</div><p>공간이 늘어 보여도 프로그램이 갑자기 꺼질 수 있어요.</p></div>
+    </div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <h2>10월 29일 전체 내역</h2>
   <div class="hero">
     <div><b>454 GB</b><span>전체 용량</span></div>
     <div><b>424 GB</b><span>사용 중</span></div>
