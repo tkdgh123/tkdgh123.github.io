@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
 <link rel="stylesheet" href="style.css">
+<script src="../icons.js" defer></script>
 </head>
 <body>
 <div class="wrap" id="app"><p>불러오는 중…</p></div>
@@ -96,7 +97,11 @@ function paint() {
   document.querySelectorAll("[data-done]").forEach(el => {
     const ok = done.has(+el.dataset.done);
     el.classList.toggle("ok", ok);
-    if (el.tagName === "BUTTON") el.textContent = ok ? "✓ 학습 완료 (누르면 취소)" : "학습 완료";
+    if (el.tagName === "BUTTON" && el.dataset.ok !== String(ok)) { // 상태가 바뀔 때만 다시 그려야 체크 애니메이션이 끊기지 않는다
+      el.dataset.ok = ok;
+      el.innerHTML = ok ? '<span class="ic" data-icon="circle-check" data-size="20">✓</span>학습 완료 (누르면 취소)' : "학습 완료";
+      if (ok) window.aniIcons?.(el);
+    }
   });
 }
 
@@ -121,6 +126,7 @@ fetch("lessons.json").then(r => r.json()).then(data => {
       const id = +d.dataset.done, was = done.has(id);
       was ? done.delete(id) : done.add(id);
       paint();
+      if (!was) d.querySelector(".ic")?.ani?.startAnimation();
       d.disabled = true;
       sync(`?${was ? "undo" : "done"}=${id}`)
         .catch(() => { was ? done.add(id) : done.delete(id); paint(); d.textContent = "저장 실패, 다시 눌러 주세요"; })

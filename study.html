@@ -83,13 +83,12 @@ code{font-family:var(--f-mono);font-size:.88em;background:var(--code-bg);border:
 .home-btn:hover{border-color:var(--ink);color:var(--ink)}
 .tabs{display:flex;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px}
 .tab{padding:8px 17px;border-radius:999px;display:flex;align-items:center;gap:8px;font-weight:700;font-size:.95rem;color:var(--muted);white-space:nowrap}
-@media (max-width:480px){.tab{padding:8px 11px;gap:6px;font-size:.88rem}.tab .dot{width:8px;height:8px}}
+@media (max-width:480px){.tab{padding:8px 11px;gap:6px;font-size:.88rem}}
 .tab:hover{color:var(--ink)}
-.tab .dot{width:10px;height:10px;border-radius:50%;border:2px solid var(--dc)}
+.tab .ic{display:inline-flex;width:16px;height:16px;flex:none;color:var(--dc)}
 .tab[data-t="notes"]{--dc:var(--notes)} .tab[data-t="quiz"]{--dc:var(--quiz)} .tab[data-t="wrong"]{--dc:var(--wrong)} .tab[data-t="code"]{--dc:var(--info)}
 .tab[aria-selected="true"]{background:var(--ink);color:var(--paper)}
 a.vtab{text-decoration:none;--dc:var(--warn)} a.vtab:hover{color:var(--ink)} a.btn{text-decoration:none}
-.tab[aria-selected="true"] .dot{background:var(--dc)}
 .badge{font-family:var(--f-mono);font-size:.72rem;font-weight:600;background:var(--wrong);color:var(--on-wrong);border-radius:999px;padding:0 7px;line-height:1.7;min-width:20px;text-align:center}
 .badge[hidden]{display:none}
 main{padding-block:28px 80px}
@@ -435,9 +434,10 @@ body:has(.qwrap.ai) .wrap{max-width:1440px}
   .pre code{padding:14px 14px}
   .opt{padding:12px 14px;font-size:1rem}
 }
-@media (max-width:540px){.tabs{overflow-x:auto;scrollbar-width:none}.tab .dot{display:none}.tab{padding:8px 4px;font-size:.86rem;gap:4px}}
+@media (max-width:540px){.tabs{overflow-x:auto;scrollbar-width:none}.tab .ic{display:none!important}.tab{padding:8px 4px;font-size:.86rem;gap:4px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
 </style>
+<script src="icons.js" defer></script>
 </head>
 <body>
 
@@ -450,11 +450,11 @@ body:has(.qwrap.ai) .wrap{max-width:1440px}
       <div><b>프로그래밍기초</b><div class="sub">C언어 · 2~9장 복습</div></div>
     </div>
     <nav class="tabs" role="tablist" aria-label="페이지">
-      <button class="tab" role="tab" data-t="notes"><i class="dot"></i>강의정리</button>
-      <button class="tab" role="tab" data-t="quiz"><i class="dot"></i>퀴즈</button>
-      <button class="tab" role="tab" data-t="code"><i class="dot"></i>코드 작성</button>
-      <button class="tab" role="tab" data-t="wrong"><i class="dot"></i>오답노트<span class="badge" id="wbadge" hidden>0</span></button>
-      <a class="tab vtab" href="motion/index.html"><i class="dot"></i>영상</a>
+      <button class="tab" role="tab" data-t="notes"><span class="ic" data-icon="notebook-pen" data-size="16"></span>강의정리</button>
+      <button class="tab" role="tab" data-t="quiz"><span class="ic" data-icon="circle-question-mark" data-size="16"></span>퀴즈</button>
+      <button class="tab" role="tab" data-t="code"><span class="ic" data-icon="code" data-size="16"></span>코드 작성</button>
+      <button class="tab" role="tab" data-t="wrong"><span class="ic" data-icon="rotate-ccw" data-size="16"></span>오답노트<span class="badge" id="wbadge" hidden>0</span></button>
+      <a class="tab vtab" href="motion/index.html"><span class="ic" data-icon="clapperboard" data-size="16"></span>영상</a>
     </nav>
   </div>
 </header>

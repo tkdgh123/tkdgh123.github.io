@@ -41,8 +41,9 @@ html{overflow-anchor:none}
 .mq{margin-top:10px;background:var(--paper);border:1px dashed var(--line);border-radius:10px;padding:8px 12px;font-size:.93rem}
 .mq summary{cursor:pointer;font-weight:600;color:var(--ink)}.mq>div{margin-top:6px;color:var(--ink)}
 @media (max-width:540px){.mcard{padding:14px 14px 12px}}
-@media (max-width:540px){nav.tabs{overflow-x:auto;gap:2px}nav.tabs .tab{white-space:nowrap;padding:7px 7px;font-size:.82rem;gap:5px;flex:1 1 auto;justify-content:center}nav.tabs .tab .dot{display:none}nav.tabs .tab .lg{display:none}}
-</style></head><body>
+@media (max-width:540px){nav.tabs{overflow-x:auto;gap:2px}nav.tabs .tab{white-space:nowrap;padding:7px 7px;font-size:.82rem;gap:5px;flex:1 1 auto;justify-content:center}nav.tabs .tab .ic{display:none!important}nav.tabs .tab .lg{display:none}}
+</style><script src="icons.js" defer></script>
+</head><body>
 <title>인공지능입문 복습 노트</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -91,9 +92,8 @@ sub,sup{line-height:0}
 .brand span{color:var(--muted);font-size:.8rem;white-space:nowrap}
 .tabs{display:flex;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px}
 .tab{border:0;background:none;padding:6px 14px;border-radius:999px;display:flex;align-items:center;gap:7px;font-weight:600;font-size:.92rem;color:var(--muted)}
-.tab .dot{width:9px;height:9px;border-radius:50%;border:2px solid currentColor}
+.tab .ic{display:inline-flex;width:16px;height:16px;flex:none;color:var(--dc,currentColor)}
 .tab[aria-selected="true"]{background:var(--ink);color:var(--paper)}
-.tab[aria-selected="true"] .dot{background:var(--frontier);border-color:var(--frontier)}
 .badge{font-family:var(--f-mono);font-size:.72rem;background:var(--goal);color:#fff;border-radius:999px;padding:0 7px;line-height:1.6}
 .badge[hidden]{display:none}
 main{padding-block:24px 64px}
@@ -436,13 +436,11 @@ body{background-image:radial-gradient(var(--grid) 1px,transparent 1.2px);backgro
 .secbar h2{font-size:1.75rem;line-height:1.2}
 .result h2{font-size:3rem;line-height:1.1;color:var(--frontier)}
 
-/* tab dots carry the logo colors */
+/* tab icons carry the logo colors */
 .tab[data-page="notes"]{--dc:var(--expanded)}
 .tab[data-page="quiz"]{--dc:var(--frontier)}
 .tab[data-page="wrong"]{--dc:var(--goal)}
 .tab[data-page="mid"]{--dc:var(--warn)}
-.tab .dot{border-color:var(--dc)}
-.tab[aria-selected="true"] .dot{background:var(--dc);border-color:var(--dc)}
 
 /* chapter accents */
 .chbtn[data-ch="1"]{--cc:var(--expanded);--cs:var(--expanded-soft)}
@@ -525,11 +523,11 @@ body{background-image:radial-gradient(var(--grid) 1px,transparent 1.2px);backgro
       <b>인공지능입문 복습 노트</b><span>1 · 2 · 3 · 4 · 5장</span>
     </div>
     <nav class="tabs" role="tablist" aria-label="페이지">
-      <button class="tab" role="tab" id="tab-notes" data-page="notes"><i class="dot"></i>강의내용</button>
-      <button class="tab" role="tab" id="tab-orig" data-page="orig"><i class="dot"></i>원본<span class="lg"> 강의안</span></button>
-      <button class="tab" role="tab" id="tab-quiz" data-page="quiz"><i class="dot"></i>퀴즈</button>
-      <button class="tab" role="tab" id="tab-wrong" data-page="wrong"><i class="dot"></i>오답노트<span class="badge" id="wbadge" hidden>0</span></button>
-      <button class="tab" role="tab" id="tab-mid" data-page="mid"><i class="dot"></i>중간고사<span class="lg"> 정리</span></button>
+      <button class="tab" role="tab" id="tab-notes" data-page="notes"><span class="ic" data-icon="notebook-pen" data-size="16"></span>강의내용</button>
+      <button class="tab" role="tab" id="tab-orig" data-page="orig"><span class="ic" data-icon="presentation" data-size="16"></span>원본<span class="lg"> 강의안</span></button>
+      <button class="tab" role="tab" id="tab-quiz" data-page="quiz"><span class="ic" data-icon="circle-question-mark" data-size="16"></span>퀴즈</button>
+      <button class="tab" role="tab" id="tab-wrong" data-page="wrong"><span class="ic" data-icon="rotate-ccw" data-size="16"></span>오답노트<span class="badge" id="wbadge" hidden>0</span></button>
+      <button class="tab" role="tab" id="tab-mid" data-page="mid"><span class="ic" data-icon="graduation-cap" data-size="16"></span>중간고사<span class="lg"> 정리</span></button>
     </nav>
   </div>
 </header>

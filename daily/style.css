@@ -104,4 +104,5 @@ p { margin: 0 }
 
 .donebtn { padding: 14px; border-radius: 18px; border: 2px solid var(--good); background: var(--card); color: var(--good); font-family: var(--title); font-size: 17px; cursor: pointer }
 .donebtn.ok { background: var(--good); color: var(--card) }
+.donebtn .ic { display: inline-flex; width: 20px; height: 20px; vertical-align: -4px; margin-right: 6px }
 .list a.ok b::after { content: " ✓"; color: var(--good) }
