@@ -16,7 +16,7 @@ const rnd = (n) => 1 + Math.floor(Math.random() * n);
 const V1 = JSON.parse(readFileSync(join(DIR, "tests/fixtures/links-v1.json"), "utf8"));
 const SSU = [...D.depts.map((d) => d.id), "none", undefined], ETC = [...D.depts.filter((d) => d.promptName).map((d) => d.id), "none", undefined];
 const fill = ({ school = "ssu", dept, year = 2, done = [], ym = "2610" } = {}) => {
-  Object.assign(qa, { a: { school, year: years[year - 1], ...(dept ? { dept } : {}), ...Object.fromEntries(LIKERT.map((it) => [it.id, rnd(5)])) },
+  Object.assign(qa, { sc: 7, a: { school, year: years[year - 1], ...(dept ? { dept } : {}), ...Object.fromEntries(LIKERT.map((it) => [it.id, rnd(7)])) },
     sector: ["big"], pairs: Object.fromEntries(Q.pairs.map((_, k) => [k, rnd(2) - 1])), done, ym });
 };
 const encode = () => get("encode()");
@@ -27,7 +27,7 @@ test("U1 v1: 공개 판 링크 8개가 열리고 학교·학과·학년·끌리�
     const r = parseCode(g.code);
     assert.ok(r, g.code);
     assert.deepEqual([r.school, r.dept ?? null, r.year, [...r.sector].sort().join()], [g.school, g.dept, g.year, [...g.sector].sort().join()], g.code);
-    assert.equal(LIKERT.map((it) => r.a[it.id]).join(""), g.code.split(".")[4]);
+    assert.equal(LIKERT.slice(0, 50).map((it) => r.a[it.id]).join(""), g.code.split(".")[4]);
     assert.deepEqual([...r.done], []);
     assert.equal(r.ym, "0000");
   }
@@ -59,12 +59,12 @@ test("U3 v2 왕복 300세트(다른 학교 + 전공 포함): 지금 할 일에 �
   }
 });
 
-test("U4 v2 거부: 칸 수, 연월, 체크 모양, 버전 3, 없는 학과, 다른 학교 + 기본판 학과", () => {
+test("U4 v3 거부: 칸 수, 연월, 체크 모양, 버전 4, 없는 학과, 다른 학교 + 기본판 학과", () => {
   fill({ dept: "aisw" });
   const c = encode().split("."), at = (k, v) => c.map((x, i) => (i === k ? v : x)).join(".");
   const basic = D.depts.find((d) => d.basic).id;
   const bad = { "칸 7개": c.slice(0, 7).join("."), "칸 10개": c.join(".") + ".1", "연월 2613": at(8, "2613"), "연월 26": at(8, "26"),
-    "체크 abc": at(7, "abc"), "체크 빈 값": at(7, ""), "버전 3": at(0, "3"), "없는 학과 id": at(2, "zz"), "다른 학교 + 기본판": at(1, "etc").replace(".aisw.", `.${basic}.`) };
+    "체크 abc": at(7, "abc"), "체크 빈 값": at(7, ""), "버전 4": at(0, "4"), "답 8": at(4, "8".repeat(LIKERT.length)), "없는 학과 id": at(2, "zz"), "다른 학교 + 기본판": at(1, "etc").replace(".aisw.", `.${basic}.`) };
   for (const [k, v] of Object.entries(bad)) assert.equal(parseCode(v), null, k);
   assert.ok(parseCode(at(1, "etc")), "다른 학교 + 전공(aisw)은 받아야 한다");
 });
@@ -93,11 +93,11 @@ test("U6 결과 화면: 링크의 체크가 체크 상자로 돌아온다(숭실
 test("U7 친구용 링크: 300세트 왕복, 점수는 5 단위, 답이 없고 40자 이하. 거부 7종", () => {
   for (let n = 0; n < 300; n++) {
     fill({ dept: "aisw" });
-    const r = compute(qa.a, qa.sector, qa.pairs);
-    assert.ok(Object.values(r.riasec).every((v) => v % 5 === 0 && v >= 0 && v <= 100));
+    const r = compute(get("ans()"), qa.sector, qa.pairs);
+    assert.ok(Object.values(r.riasec).every((v) => v >= 0 && v <= 100));
     const code = encodeFriend(r), f = parseFriend(code);
     assert.ok(f, code);
-    assert.deepEqual({ ...f.riasec }, { ...r.riasec });
+    assert.deepEqual({ ...f.riasec }, Object.fromEntries(Object.entries(r.riasec).map(([k, v]) => [k, Math.round(v / 5) * 5])));
     assert.deepEqual([...f.jobs.map((j) => j.key)], [...r.top]);
     assert.ok(code.length <= 40 && !code.includes(LIKERT.map((it) => qa.a[it.id]).join("")), code);
   }

@@ -12,7 +12,8 @@ const { get, els } = load(process.env.JOBMAP_DIR);
 const D = get("D"), Q = get("Q"), qa = get("qa"), LIKERT = get("LIKERT");
 const steps = get("steps"), compute = get("compute"), parseCode = get("parseCode"), showShared = get("showShared");
 const rnd = (n) => 1 + Math.floor(Math.random() * n);
-const code = (o = {}) => ["1", "ssu", "-", "2", "3".repeat(LIKERT.length), "0".repeat(Q.pairs.length), "1"].map((x, k) => o[k] ?? x).join(".");
+// v1 링크 모양(6차: 답 50자리 = OLD, 짝 6쌍 = pairsOld)
+const code = (o = {}) => ["1", "ssu", "-", "2", "3".repeat(get("OLD")), "0".repeat(Q.pairsOld.length), "1"].map((x, k) => o[k] ?? x).join(".");
 
 test("drawTest가 전역 함수이고 index.html이 'drawTest(); route();'를 부른다", () => {
   assert.equal(get("typeof drawTest"), "function");
@@ -26,7 +27,8 @@ test("한 단계 한 질문: 숭실대는 기본 3 + 리커트 + 짝 + 2, 다른
   assert.equal(steps().length, n);
   const lk = [...steps()].filter((s) => s.kind === "likert");
   assert.equal(lk.length, LIKERT.length);
-  assert.deepEqual(lk.map((s) => s.it.id), [...LIKERT].map((it) => it.id));
+  // 6차: 화면 순서는 흥미 → 이런 하루 → 준비 상태(링크 자리 순서와 다름)
+  assert.deepEqual(lk.map((s) => s.it.id), [...Q.interest.items, ...Q.scene.items, ...Q.readyItems].map((it) => it.id));
   qa.a = { school: "etc" };
   assert.equal(steps().length, n);
 });
@@ -35,11 +37,11 @@ test("결과 링크: 무작위 300세트 encode → parseCode 왕복", () => {
   const depts = [...D.depts.map((d) => d.id), "none", undefined];
   for (let n = 0; n < 300; n++) {
     const school = Math.random() < 0.8 ? "ssu" : "etc", year = rnd(4);
-    const a = Object.fromEntries(LIKERT.map((it) => [it.id, rnd(5)]));
+    const a = Object.fromEntries(LIKERT.map((it) => [it.id, rnd(7)]));
     const dept = school === "ssu" ? depts[rnd(depts.length) - 1] : undefined;
     const sector = Math.random() < 0.2 ? ["unsure"] : Q.sectors.options.map((o) => o.v).filter((v) => v !== "unsure" && Math.random() < 0.3);
     const pairs = Object.fromEntries(Q.pairs.map((_, k) => [k, rnd(2) - 1]));
-    Object.assign(qa, { a: { ...a, school, year: Q.basics.find((q) => q.id === "year").options[year - 1], ...(dept ? { dept } : {}) }, sector: [...sector], pairs: { ...pairs } });
+    Object.assign(qa, { sc: 7, a: { ...a, school, year: Q.basics.find((q) => q.id === "year").options[year - 1], ...(dept ? { dept } : {}) }, sector: [...sector], pairs: { ...pairs } });
     const c = get("encode()"), r = parseCode(c);
     assert.ok(r, c);
     assert.deepEqual([r.school, r.dept, r.year], [school, dept, year], c);
@@ -90,10 +92,10 @@ test("장 안내: 앞으로 갈 때 장마다 한 번(흥미·준비 상태·짝
   const ss = steps(), want = [...ss.keys()].filter((k) => k && ss[k].ch !== ss[k - 1].ch).map((k) => [k, ss[k].ch]), got = [];
   for (let k = 1; k < ss.length; k++) { await go(k, false); if (qa.chap) got.push([k, qa.chap]); }
   assert.deepEqual(got, want);
-  assert.deepEqual(want.map(([, c]) => c), [1, 2, 3, 4]);
+  assert.deepEqual(want.map(([, c]) => c), [1, 2, 3, 4, 5]);
   const k2 = want[1][0];
   await go(k2 - 1, false);
   await go(k2, false);
   assert.equal(qa.chap, 0, "같은 회차에 장 안내가 다시 나왔다");
-  assert.deepEqual([...get("parts")()].map((p) => p.length), [Q.basics.length, Q.interest.items.length, LIKERT.length - Q.interest.items.length, Q.pairs.length, 1]);
+  assert.deepEqual([...get("parts")()].map((p) => p.length), [Q.basics.length, Q.interest.items.length, Q.scene.items.length, Q.readyItems.length, Q.pairs.length, 1]);
 });

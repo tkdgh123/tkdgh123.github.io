@@ -37,7 +37,7 @@ test("문항 구성: 영역마다 흥미 문항 수가 같고, 준비 영역마�
   assert.equal(per.reduce((s, n) => s + n, 0), Q.interest.items.length);
   const groups = Q.ready.groups.map((g) => g.items.length);
   assert.ok(groups[0] > 0 && groups.every((n) => n === groups[0]), groups.join(","));
-  assert.equal(LIKERT.length, Q.interest.items.length + Q.readyItems.length);
+  assert.equal(LIKERT.length, Q.interest.items.length + Q.readyItems.length + Q.scene.items.length);
   qa.a = {};
   assert.equal(get("total()"), Q.basics.length + LIKERT.length + Q.pairs.length + 1);
 });
@@ -80,13 +80,30 @@ test("문항 길이: 이럴 때 20자, 요즘 나 24자 이하", () => {
 });
 
 test("챕터 안내: 묶음 순서대로 있고 '· N개/번'이 실제 문항 수와 같다", () => {
-  assert.equal(Q.chapters.map((c) => c.id).join(), "basics,interest,ready,values,sector");
-  const n = { basics: Q.basics.length, interest: Q.interest.items.length, ready: Q.readyItems.length, values: Q.pairs.length, sector: 1 };
+  assert.equal(Q.chapters.map((c) => c.id).join(), "basics,interest,scene,ready,values,sector");
+  const n = { basics: Q.basics.length, interest: Q.interest.items.length, scene: Q.scene.items.length, ready: Q.readyItems.length, values: Q.pairs.length, sector: 1 };
   for (const c of Q.chapters) {
     assert.ok(c.tag && c.title && c.line, c.id);
     const m = c.line.match(/· (\d+)(개|번)$/);
     if (m) assert.equal(+m[1], n[c.id], c.id);
   }
+});
+
+// 6차: 이런 하루 장면은 실제 직무에 붙고, 직무마다 장면이 2개 이상(근거가 한 문항에 기대지 않게)
+test("이런 하루: 장면의 jobs가 실제 직무 key이고, 직무마다 장면 2개 이상", () => {
+  const keys = new Set(D.jobs.map((j) => j.key));
+  for (const it of Q.scene.items) assert.ok(it.jobs.length && it.jobs.every((k) => keys.has(k)), it.id);
+  for (const j of D.jobs.filter((x) => x.riasec)) assert.ok(Q.scene.items.filter((it) => it.jobs.includes(j.key)).length >= 2, j.key);
+});
+
+// 6차: 회사 기준 짝은 6가지 기준의 모든 짝 15번, 기준마다 5번 나오고 키워드는 겹치지 않는다
+test("회사 기준 짝: 모든 짝 한 번씩, 기준마다 같은 횟수, 키워드 중복 없음", () => {
+  const ids = Q.values.map((v) => v.id), seen = new Set(Q.pairs.map(([x, y]) => [x, y].sort().join()));
+  assert.equal(seen.size, ids.length * (ids.length - 1) / 2);
+  for (const id of ids) assert.equal(Q.pairs.flat().filter((x) => x === id).length, ids.length - 1, id);
+  const kw = Q.pairKeys.flat();
+  assert.equal(new Set(kw).size, kw.length);
+  Q.pairs.forEach(([x, y], k) => { assert.ok(Q.values.find((v) => v.id === x).keys.includes(Q.pairKeys[k][0])); assert.ok(Q.values.find((v) => v.id === y).keys.includes(Q.pairKeys[k][1])); });
 });
 
 test("jobAlias·jobExclude의 key가 모두 실제 직무 key", () => {

@@ -27,16 +27,22 @@ test("점수 변환: 흥미 모두 1이면 0, 모두 5면 100, C만 5면 C 100·
 
 test("C만 5일 때 ncs 58점, civil 53점", () => {
   const r = compute({ school: "ssu", ...answers((it) => (isInterest(it) && it.id[0] === "C" ? 5 : 1)) }, [], {});
-  assert.equal(r.fit.ncs, 58);
-  assert.equal(r.fit.civil, 53);
+  // 6차: 방향 겹침(dir)만 본다. 직무 점수는 dir과 이런 하루 장면의 평균
+  const dir = (k) => r.fits.find((f) => f.job.key === k).dir;
+  assert.equal(dir("ncs"), 58);
+  assert.equal(dir("civil"), 53);
 });
 
 test("짧은 코드(1~2글자)는 빈 자리를 내 평균으로 채운다", () => {
   const short = D.jobs.filter((j) => j.riasec && j.riasec.length < 3);
   assert.ok(short.length > 0, "짧은 코드 직무가 없다");
   for (let n = 0; n < 100; n++) {
-    const r = compute({ school: "ssu", ...answers(() => rnd(5)) }, [], {});
-    for (const j of D.jobs.filter((x) => x.riasec)) assert.equal(r.fit[j.key], scoreOf(r.riasec, j.riasec), j.key);
+    const r_a = { school: "ssu", ...answers(() => rnd(5)) }, r = compute(r_a, [], {});
+    for (const f of r.fits) {
+      assert.equal(f.dir, scoreOf(r.riasec, f.job.riasec), f.job.key);
+      const sc = Q.scene.items.filter((it) => it.jobs.includes(f.job.key)), s = sc.reduce((t, it) => t + (r_a[it.id] - 1) / 4 * 100, 0) / sc.length;
+      assert.equal(f.score, Math.round((f.dir + s) / 2), f.job.key);
+    }
   }
 });
 
@@ -87,12 +93,12 @@ test("결과 링크: 무작위 500세트 encode → showShared 왕복", () => {
   const years = Q.basics.find((q) => q.id === "year").options;
   for (let n = 0; n < 500; n++) {
     const school = Math.random() < 0.8 ? "ssu" : "etc";
-    const a = { school, year: years[rnd(years.length) - 1], ...answers(() => rnd(5)), note: "고민" };
+    const a = { school, year: years[rnd(years.length) - 1], ...answers(() => rnd(7)), note: "고민" };
     if (school === "ssu" && (a.dept = depts[rnd(depts.length) - 1]) === undefined) delete a.dept;
     const sector = Q.sectors.options.map((o) => o.v).filter((v) => v !== "unsure" && Math.random() < 0.25);
     if (!sector.length) sector.push("unsure");
     const pairs = Object.fromEntries(Q.pairs.map((_, k) => [k, rnd(2) - 1]));
-    Object.assign(qa, { a: { ...a }, sector: [...sector], pairs: { ...pairs } });
+    Object.assign(qa, { sc: 7, a: { ...a }, sector: [...sector], pairs: { ...pairs } });
     const code = get("encode()");
     qa.a = {}; qa.sector = []; qa.pairs = {};
     showShared(code);

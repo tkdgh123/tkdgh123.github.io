@@ -583,7 +583,8 @@ const noErr = (t, p, label, from = 0) => { const e = p.errors().slice(from).filt
 const READY4 = "/^[a-z]/.test(it.id) ? 4 : 1 + (k % 5)"; // 준비 문항(소문자 id)은 4, 흥미는 1~5 돌림
 const M4 = "it.id === 'm4' ? 2 : /^[a-z]/.test(it.id) ? 4 : 1 + (k % 5)";
 // 사장 경로: 숭실대 AI소프트웨어 2학년·대기업, 흥미 R2 I5 A3 S2 E3 C4, 준비 모두 4(기획 s-aisw.json과 같은 답)
-const BOSS = { f: "({ R: 2, I: 5, A: 3, S: 2, E: 3, C: 4 })[it.id[0]] ?? 4", pairs: { 0: 1, 1: 0, 2: 1, 3: 0, 4: 0, 5: 1 } };
+// 6차: 회사 기준 짝 15번
+const BOSS = { f: "({ R: 2, I: 5, A: 3, S: 2, E: 3, C: 4 })[it.id[0]] ?? 4", pairs: Object.fromEntries([1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1].map((v, k) => [k, v])) };
 
 // E14(사장 조건): 공개 판이 만든 v1 링크가 열리고 답·학교·학과·학년이 같다. 다시 복사하면 v2이고 같은 결과가 열린다(결정 12)
 S.E14 = async (t) => {
@@ -627,7 +628,7 @@ S.E15 = async (t) => {
   await p.click("#r-link");
   await p.waitFor("!!window.__copied", 3000);
   const url = await p.eval("window.__copied");
-  t.check(/#r=2\./.test(url) && !/\.-\.\d{4}$/.test(url), `복사한 링크에 체크가 없어요 …${url.slice(-20)}`);
+  t.check(/#r=3\./.test(url) && !/\.-\.\d{4}$/.test(url), `복사한 링크에 체크가 없어요 …${url.slice(-20)}`);
   const q = await open(t, url.split("#")[1], 390, 844);
   await q.waitFor(`!!document.querySelector("#r-todo input")`, 4000);
   const on = await q.eval(`[...document.querySelectorAll("#r-todo input")].map((x) => x.checked)`);

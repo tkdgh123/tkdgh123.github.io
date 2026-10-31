@@ -77,7 +77,7 @@ const statCard = (s) => `<div class="stat"><b class="num">${esc(s.value)}</b><sp
 const AREA = Object.fromEntries(D.quiz.areas.map((x) => [x.id, x]));
 const icon = (f, n) => `<img src="img/${f}.svg" alt="" width="${n}" height="${n}">`;
 const aImg = (id, n) => icon("a-" + id, n);
-// 직무 끌림 방향(속 id EC)은 화면에 우리 이름으로만 쓴다(EC → 으쌰·차곡). 글자 코드는 보이지 않는다(5차)
+// 직무 끌림 방향(속 id EC)은 화면에 우리 이름으로만 쓴다(EC → 추진·체계). 글자 코드는 보이지 않는다(5차)
 const codeName = (code) => code.split("").map((c) => AREA[c].name).join("·");
 const codeTag = (j) => j.riasec ? `<span class="code">${[...j.riasec].map((c) => aImg(c, 20)).join("")}${esc(codeName(j.riasec))}</span>` : "";
 const aIcon = (j) => `<img class="jd-ic" src="img/j-${j.key}.svg" alt="" width="40" height="40">`;

@@ -63,7 +63,7 @@ ${headLines}
 <main id="main">
 <nav class="crumb" aria-label="현재 위치">${trail.map(([n, p], i) => i < trail.length - 1 ? `<a href="${p}">${esc(n)}</a>` : esc(n)).join(" › ")}</nav>
 <div>${fix(body)}</div>
-<div class="go"><b>내 흥미에 맞는 직무가 궁금하다면</b><a class="btn" href="${B}">60문항 검사 해 보기</a></div>
+<div class="go"><b>내 흥미에 맞는 직무가 궁금하다면</b><a class="btn" href="${B}">101문항 검사 해 보기</a></div>
 </main>
 </div>
 <script>matchMedia("(max-width:1199px)").matches&&document.querySelector(".toc a.on")?.scrollIntoView({inline:"center",block:"nearest"})</script>

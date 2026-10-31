@@ -26,8 +26,9 @@ test("U11 학과 id·직무 key는 줄지 않고, v1 링크 문항 순서(리커
   const depts = new Set(D.depts.map((d) => d.id)), jobs = new Set(D.jobs.map((j) => j.key));
   assert.deepEqual(KEYS.depts.filter((id) => !depts.has(id)), [], "사라진 학과 id");
   assert.deepEqual(KEYS.jobs.filter((k) => !jobs.has(k)), [], "사라진 직무 key");
-  assert.deepEqual(plain(LIKERT.map((it) => it.id)), KEYS.likert, "리커트 순서");
-  assert.deepEqual(plain(Q.pairs), KEYS.pairs, "짝 6쌍");
+  // 6차: 이런 하루 장면은 v1 자리 뒤에 붙고, v1 짝 6쌍은 Q.pairsOld로 남긴다
+  assert.deepEqual(plain(LIKERT.slice(0, KEYS.likert.length).map((it) => it.id)), KEYS.likert, "리커트 순서");
+  assert.deepEqual(plain(Q.pairsOld), KEYS.pairs, "짝 6쌍");
   assert.deepEqual(plain(Q.sectors.options.map((o) => o.v).slice(0, KEYS.sectors.length)), KEYS.sectors, "끌리는 곳 순서");
   assert.deepEqual(plain(Q.values.map((v) => v.id).slice(0, KEYS.values.length)), KEYS.values, "가치 순서");
 });

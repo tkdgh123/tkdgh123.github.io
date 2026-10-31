@@ -5,7 +5,8 @@
   // 5단계 답에서 2 이하(아니에요·별로예요)는 낮은 쪽. 영역 평균은 2.0 이하를 낮은 쪽으로 본다.
   const Q = window.JOBMAP.quiz;
   const say = (a, id) => {
-    const it = [...Q.interest.items, ...Q.readyItems].find((x) => x.id === id), t = Q.scaleOf(id)[a[id] - 1];
+    // 판단은 1~5 눈금(a[id])으로, 글자는 고른 칸 그대로(a.raw, 답 칸 a.sc개). raw가 없으면 5칸 답이다
+    const it = [...Q.interest.items, ...Q.readyItems].find((x) => x.id === id), t = a.raw ? Q.scaleOf(id, a.sc)[a.raw[id] - 1] : Q.scaleOf(id, 5)[a[id] - 1];
     return `'${it.q}'에 '${t}'${(t.charCodeAt(t.length - 1) - 0xAC00) % 28 ? "을" : "를"} 골랐어요.`;
   };
   const avg = (a, g) => `'${Q.ready.groups.find((x) => x.id === g).name}' 4문항 평균이 5점 중 ${a.ready[g].toFixed(1)}점이에요.`;

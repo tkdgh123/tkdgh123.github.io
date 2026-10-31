@@ -1,26 +1,30 @@
 // 검사 화면과 결과. app.js의 D, st, $, esc, src, link, colleges, drawPick, render, caseCard, codeName, icon, aImg, OFF, jump, route를 쓴다.
 const Q = D.quiz;
 const qa = { i: -1, a: {}, sector: [], pairs: {}, done: [], ym: null, chap: 0, seen: [] };
-const LIKERT = [...Q.interest.items, ...Q.readyItems];
+// 결과 링크 자리 순서: 흥미 30 + 준비 20(v1·v2와 같음) 뒤에 이런 하루 장면(v3부터)
+const OLD = Q.interest.items.length + Q.readyItems.length;
+const LIKERT = [...Q.interest.items, ...Q.readyItems, ...Q.scene.items];
 const PER = 6; // 흥미 30문항은 6개씩 점 줄로 위치를 보여 준다
-const DOT = ["e n", "m n", "c", "m y", "e y"];
+const DOT = ["e n", "m n", "s n", "c", "s y", "m y", "e y"];
 // 장(5차): 흥미·준비 상태·가치 짝·가고 싶은 곳. 장이 바뀌면 질문 앞에 안내 한 장을 끼운다.
 // 기본 정보(step 없음)는 시작 버튼 바로 뒤라 안내를 끼우지 않는다(디자인 초안 3-2)
 const CHAPS = Q.chapters.filter((c) => c.step);
-const CHAP_IC = { interest: "c-like", ready: "c-ready", values: "c-pair", sector: "c-sector" };
+const CHAP_IC = { interest: "c-like", scene: "j-strategy", ready: "c-ready", values: "c-pair", sector: "c-sector" };
+const CH = Object.fromEntries(CHAPS.map((c, k) => [c.id, k + 1]));
 const sec = (c) => `${c}/${CHAPS.length} · ${CHAPS[c - 1].title}`;
 
 // 한 단계 = 한 질문. 기본 정보 → 흥미 → 준비 상태(그룹 순) → 가치 짝 → 끌리는 곳 → 고민(선택). ch는 장 번호(기본 정보 0)
 // 다른 학교도 전공 문항을 묻는다(4차 결정 9)
 function steps() {
-  const basics = Q.basics, it = Q.interest.items;
+  const basics = Q.basics, it = Q.interest.items, sc = Q.scene.items;
   return [
     ...basics.map((q, k) => ({ kind: "basic", q, ch: 0, sec: Q.chapters[0].title, dotsOf: { n: basics.length, k } })),
-    ...it.map((x, k) => ({ kind: "likert", it: x, ch: 1, sec: sec(1), ask: Q.interest.ask, dotsOf: { n: Math.min(PER, it.length - k + k % PER), k: k % PER } })),
-    ...Q.ready.groups.flatMap((g) => g.items.map((x, k) => ({ kind: "likert", it: x, ch: 2, sec: sec(2), ask: Q.ready.ask, dotsOf: { n: g.items.length, k } }))),
-    ...Q.pairs.map((p, k) => ({ kind: "pairs", p, k, ch: 3, sec: sec(3), dotsOf: { n: Q.pairs.length, k } })),
-    { kind: "sector", ch: 4, sec: sec(4), dotsOf: { n: 1, k: 0 } },
-    { kind: "note", ch: 4, sec: sec(4), dotsOf: { n: 1, k: 0 } }
+    ...it.map((x, k) => ({ kind: "likert", it: x, ch: CH.interest, sec: sec(CH.interest), ask: Q.interest.ask, dotsOf: { n: Math.min(PER, it.length - k + k % PER), k: k % PER } })),
+    ...sc.map((x, k) => ({ kind: "likert", it: x, ch: CH.scene, sec: sec(CH.scene), ask: Q.scene.ask, dotsOf: { n: Math.min(PER, sc.length - k + k % PER), k: k % PER } })),
+    ...Q.ready.groups.flatMap((g) => g.items.map((x, k) => ({ kind: "likert", it: x, ch: CH.ready, sec: sec(CH.ready), ask: Q.ready.ask, dotsOf: { n: g.items.length, k } }))),
+    ...Q.pairs.map((p, k) => ({ kind: "pairs", p, k, ch: CH.values, sec: sec(CH.values), dotsOf: { n: Q.pairs.length, k } })),
+    { kind: "sector", ch: CH.sector, sec: sec(CH.sector), dotsOf: { n: 1, k: 0 } },
+    { kind: "note", ch: CH.sector, sec: sec(CH.sector), dotsOf: { n: 1, k: 0 } }
   ];
 }
 const total = () => steps().filter((s) => s.kind !== "note").length;
@@ -40,7 +44,12 @@ function optionsFor(q) {
 // 코드가 1~2글자면 빈 자리는 내 평균으로 채워, 짧은 코드가 한 영역 점수로만 극단적으로 나오지 않게 한다.
 const fitScore = (job, riasec) => { const mean = Object.values(riasec).reduce((s, x) => s + x, 0) / 6;
   return Math.round([0, 1, 2].reduce((s, k) => s + [3, 2, 1][k] * (job.riasec[k] ? riasec[job.riasec[k]] : mean), 0) / 6); };
-// 결과 계산. 규준이 없으니 원점수와 내 안의 순서만 낸다.
+// 답 칸이 7개(예전 링크는 5개)라도 계산은 1~5 눈금으로 맞춰서 한다. 진단 기준(2 이하 등)도 이 눈금이다
+const ans = (a = qa.a, n = qa.sc || 7) => n === 5 ? a : Object.fromEntries(Object.entries(a).map(([k, v]) => [k, LIKERT.some((it) => it.id === k) ? 1 + (v - 1) * 4 / (n - 1) : v]));
+// 이런 하루 장면 점수(0~100): 그 직무를 근거로 단 장면들의 평균. 장면 답이 없으면(예전 링크) null
+const sceneScore = (job, a) => { const its = Q.scene.items.filter((it) => it.jobs.includes(job.key));
+  return its.length && its.every((it) => a[it.id] != null) ? its.reduce((s, it) => s + (a[it.id] - 1) / 4 * 100, 0) / its.length : null; };
+// 결과 계산. a는 1~5 눈금(ans). 규준이 없으니 원점수와 내 안의 순서만 낸다.
 function compute(a, sector, pairs) {
   const riasec = Object.fromEntries(Q.areas.map((x) => {
     const sum = Q.interest.items.filter((it) => it.id[0] === x.id).reduce((s, it) => s + a[it.id], 0);
@@ -49,7 +58,9 @@ function compute(a, sector, pairs) {
   // 동점이면 내 학과 진로(여러 대학이 꼽는 진로)에 있는 직무를 앞에 둔다.
   const d = D.depts.find((x) => x.id === a.dept);
   const near = (job) => (d?.paths || []).some((p) => pathIs(job, p.name, d.college)) ? 1 : 0;
-  const fits = (D.jobs || []).filter((j) => j.riasec).map((job) => ({ job, score: fitScore(job, riasec), near: near(job) }))
+  // 직무 점수 = 끌림 방향 겹침(dir)과 이런 하루 장면(scene)의 평균
+  const fits = (D.jobs || []).filter((j) => j.riasec).map((job) => { const dir = fitScore(job, riasec), scene = sceneScore(job, a);
+    return { job, dir, scene: scene == null ? null : Math.round(scene), score: scene == null ? dir : Math.round((dir + scene) / 2), near: near(job) }; })
     .sort((x, y) => y.score - x.score || y.near - x.near);
   // 위 3개는 흥미 코드가 서로 다른 직무로 고르고, 같은 코드 직무는 '비슷한 직무'로 붙인다
   const top3 = [];
@@ -61,13 +72,17 @@ function compute(a, sector, pairs) {
   const shown = new Set(top3.flatMap((t) => [t.job, ...t.alike]));
   const tieMore = fits.filter((f) => !shown.has(f.job) && f.score === top3[top3.length - 1]?.score).length;
   const ready = Object.fromEntries(Q.ready.groups.map((g) => [g.id, g.items.reduce((s, it) => s + a[it.id], 0) / g.items.length]));
-  const wins = Object.fromEntries(Q.values.map((v) => [v.id, 0]));
-  Q.pairs.forEach(([x, y], k) => { if (pairs[k] != null) wins[pairs[k] ? y : x]++; });
-  const values = Q.values.slice().sort((x, y) => wins[y.id] - wins[x.id]);
+  // 예전 링크(pairs.old)는 네 가지 기준의 짝 6번으로 센다
+  const P = pairs.old ? Q.pairsOld : Q.pairs, onP = Q.values.filter((v) => P.flat().includes(v.id));
+  const wins = Object.fromEntries(onP.map((v) => [v.id, 0]));
+  P.forEach(([x, y], k) => { if (pairs[k] != null) wins[pairs[k] ? y : x]++; });
+  const values = onP.slice().sort((x, y) => wins[y.id] - wins[x.id]);
+  // 고른 키워드(기준 id별). 예전 링크는 키워드가 없다
+  const picked = pairs.old ? {} : Object.fromEntries(onP.map((v) => [v.id, Q.pairs.flatMap((p, k) => pairs[k] != null && p[pairs[k]] === v.id ? [Q.pairKeys[k][pairs[k]]] : [])]));
   const iv = Q.interest.items.map((it) => a[it.id]), ivMean = iv.reduce((s, x) => s + x, 0) / iv.length;
   const flat = Math.sqrt(iv.reduce((s, x) => s + (x - ivMean) ** 2, 0) / iv.length) < 0.6;
   const fitMean = fits.reduce((s, f) => s + f.score, 0) / fits.length;
-  return { riasec, fits, top3, tieMore, ready, wins, values, flat, fitMean, top: top3.map((r) => r.job.key), fit: Object.fromEntries(fits.map((r) => [r.job.key, r.score])) };
+  return { riasec, fits, top3, tieMore, ready, wins, values, picked, rounds: P.length * 2 / onP.length, flat, fitMean, top: top3.map((r) => r.job.key), fit: Object.fromEntries(fits.map((r) => [r.job.key, r.score])) };
 }
 
 // 첫 화면 사례 띠: 다른 대학이 공개한 사례 중 home으로 고른 것(결정 16). 카드 하나가 링크 하나라 출처는 글자로만
@@ -107,15 +122,15 @@ function bodyHTML(s) {
   }
   if (s.kind === "likert") {
     const id = s.it.id, cur = qa.a[id], sc = Q.scaleOf(id), { n, k } = s.dotsOf;
-    return head(s.ask, s.it.q) + `<div class="scale" role="radiogroup" aria-labelledby="q-title"><span class="end n">${sc[0]}</span><div class="dots">${sc.map((t, j) =>
-      `<button type="button" class="dot ${DOT[j]}" role="radio" aria-checked="${cur === j + 1}" aria-label="${t}" data-v="${j + 1}" tabindex="${(cur || 1) === j + 1 ? 0 : -1}"><i></i></button>`).join("")}</div><span class="end y">${sc[4]}</span></div>
+    return head(s.ask, s.it.q) + `<div class="scale s${sc.length}" role="radiogroup" aria-labelledby="q-title"><span class="end n">${sc[0]}</span><div class="dots">${sc.map((t, j) =>
+      `<button type="button" class="dot ${DOT[j]}" role="radio" aria-checked="${cur === j + 1}" aria-label="${t}" data-v="${j + 1}" tabindex="${(cur || 1) === j + 1 ? 0 : -1}"><i></i></button>`).join("")}</div><span class="end y">${sc[sc.length - 1]}</span></div>
       <p class="qpick" id="q-pick" aria-live="polite">${cur ? sc[cur - 1] : ""}</p>
       <ol class="qdots" aria-hidden="true">${Array.from({ length: n }, (_, j) => `<li${j < k ? ` class="done"` : j === k ? ` class="cur"` : ""}></li>`).join("")}</ol>${cur ? next("다음", "btn line") : ""}`;
   }
   if (s.kind === "pairs") {
     const V = Object.fromEntries(Q.values.map((v) => [v.id, v])), cur = qa.pairs[s.k];
     return head("둘 다 좋아도 하나만 골라요", Q.valueAsk) + `<div class="pair">${(s.k % 2 ? [1, 0] : [0, 1]).map((side, n) => { const v = V[s.p[side]];
-      return `${n ? `<span class="or">또는</span>` : ""}<button type="button" class="pick2" data-side="${side}" aria-pressed="${cur === side}"><img src="img/v-${v.id}.svg" alt="" width="56" height="56"><b>${esc(v.name)}</b><span>${esc(v.desc)}</span></button>`; }).join("")}</div>`
+      return `${n ? `<span class="or">또는</span>` : ""}<button type="button" class="pick2" data-side="${side}" aria-pressed="${cur === side}"><img src="img/v-${v.id}.svg" alt="" width="56" height="56"><b>${esc(Q.pairKeys[s.k][side])}</b></button>`; }).join("")}</div>`
       + (cur != null ? next("다음", "btn line") : "");
   }
   if (s.kind === "sector") return head("여러 개 골라도 돼요", Q.sectors.q) + `<div class="qopts">${Q.sectors.options.map((o) =>
@@ -157,27 +172,30 @@ const todoOf = (a) => { const y = yearNum(a), d = D.depts.find((x) => x.id === a
 const tid = (t) => { let h = 2166136261; for (const c of t.text) h = Math.imul(h ^ c.codePointAt(0), 16777619) >>> 0; return (h % 36 ** 4).toString(36).padStart(4, "0"); };
 const ymNow = (d = new Date()) => String(d.getFullYear() % 100).padStart(2, "0") + String(d.getMonth() + 1).padStart(2, "0");
 // 결과 링크 v2: v1 일곱 칸 + 체크한 할 일 + 연월(YYMM, 0000은 모름). 끝이 숫자라 메신저가 꼬리를 떼지 않는다. 서버에 아무것도 보내지 않는다.
+// 예전 링크(답 칸 5개)로 연 결과를 다시 복사하면 v2 그대로 낸다
 function encode() {
+  const old = qa.sc === 5;
   const mask = Q.sectors.options.reduce((m, o, k) => m | (qa.sector.includes(o.v) ? 1 << k : 0), 0);
   const ids = todoOf(qa.a).map(tid), done = qa.done.filter((x) => ids.includes(x));
-  return ["2", qa.a.school, qa.a.dept || "-", yearNum(), LIKERT.map((it) => qa.a[it.id]).join(""), Q.pairs.map((_, k) => qa.pairs[k]).join(""), mask.toString(36),
+  return [old ? "2" : "3", qa.a.school, qa.a.dept || "-", yearNum(), LIKERT.slice(0, old ? OLD : LIKERT.length).map((it) => qa.a[it.id]).join(""), (old ? Q.pairsOld : Q.pairs).map((_, k) => qa.pairs[k]).join(""), mask.toString(36),
     done.join("_") || "-", qa.ym || ymNow()].join(".");
 }
 // v1(공개 판 링크)은 계속 읽는다. 메신저가 붙이는 %2E·&fbclid·공백 꼬리는 받아 주고, 나머지는 하나라도 어긋나면 null
 function parseCode(raw) {
   let c;
   try { c = decodeURIComponent(raw); } catch { return null; }
-  const f = c.trim().split(/[&\s]/)[0].split("."), [ver, school, dept, year, lk, pb, mask, done, ym] = f, v2 = ver === "2";
+  // v3(6차): v2와 같은 칸, 답은 7칸(1~7)이고 이런 하루 장면이 뒤에 붙는다
+  const f = c.trim().split(/[&\s]/)[0].split("."), [ver, school, dept, year, lk, pb, mask, done, ym] = f, v3 = ver === "3", v2 = ver === "2" || v3;
   const O = Q.sectors.options, m = /^[0-9a-z]+$/.test(mask || "") ? parseInt(mask, 36) : -1, u = 1 << O.findIndex((o) => o.v === "unsure");
   // 다른 학교 학과는 v2부터, 전공 8개(promptName)만 받는다
   const ok = f.length === (v2 ? 9 : 7) && (v2 || ver === "1") && ["ssu", "etc"].includes(school)
     && (dept === "-" || (v2 || school === "ssu") && (dept === "none" || D.depts.some((d) => d.id === dept && (school === "ssu" || d.promptName))))
-    && /^[1-4]$/.test(year) && new RegExp(`^[1-5]{${LIKERT.length}}$`).test(lk) && new RegExp(`^[01]{${Q.pairs.length}}$`).test(pb)
+    && /^[1-4]$/.test(year) && new RegExp(v3 ? `^[1-7]{${LIKERT.length}}$` : `^[1-5]{${OLD}}$`).test(lk) && new RegExp(`^[01]{${(v3 ? Q.pairs : Q.pairsOld).length}}$`).test(pb)
     && m >= 0 && m <= 2 ** O.length - 1 && !(m & u && m !== u)
     && (!v2 || /^(-|[0-9a-z]{4}(_[0-9a-z]{4})*)$/.test(done) && /^(0000|\d\d(0[1-9]|1[0-2]))$/.test(ym));
   if (!ok) return null;
-  return { school, dept: dept === "-" ? undefined : dept, year: +year, a: Object.fromEntries(LIKERT.map((it, k) => [it.id, +lk[k]])),
-    pairs: Object.fromEntries([...pb].map((b, k) => [k, +b])), sector: O.filter((_, k) => m & (1 << k)).map((o) => o.v),
+  return { school, dept: dept === "-" ? undefined : dept, year: +year, sc: v3 ? 7 : 5, a: Object.fromEntries([...lk].map((x, k) => [LIKERT[k].id, +x])),
+    pairs: Object.assign(Object.fromEntries([...pb].map((b, k) => [k, +b])), v3 ? {} : { old: true }), sector: O.filter((_, k) => m & (1 << k)).map((o) => o.v),
     done: v2 && done !== "-" ? done.split("_") : [], ym: v2 ? ym : "0000" };
 }
 function showShared(code) {
@@ -186,14 +204,15 @@ function showShared(code) {
   if (r) {
     qa.a = { school: r.school, year: Q.basics.find((q) => q.id === "year").options[r.year - 1], ...r.a };
     if (r.dept) qa.a.dept = r.dept;
-    Object.assign(qa, { pairs: r.pairs, sector: r.sector, done: r.done, ym: r.ym, shared: true, i: steps().length });
+    Object.assign(qa, { pairs: r.pairs, sector: r.sector, done: r.done, ym: r.ym, sc: r.sc, shared: true, i: steps().length });
   } else qa.fail = true;
   drawTest();
   scrollTo({ top: 0, behavior: "instant" });
 }
 
 // 친구용 링크 #s=1.<6영역 점수/5 한 글자씩>.<직무 key 3개>: 답·학교·학과·준비 상태는 넣지 않는다(결정 12·13)
-const encodeFriend = (r) => ["1", Q.areas.map((x) => (r.riasec[x.id] / 5).toString(36)).join(""), ...r.top].join(".");
+// 점수는 5 단위로 반올림해 한 글자로(6차: 7칸 답은 5 단위로 떨어지지 않는다)
+const encodeFriend = (r) => ["1", Q.areas.map((x) => Math.round(r.riasec[x.id] / 5).toString(36)).join(""), ...r.top].join(".");
 function parseFriend(raw) {
   let c;
   try { c = decodeURIComponent(raw); } catch { return null; }
@@ -331,9 +350,10 @@ const gcal = (e) => `https://calendar.google.com/calendar/render?action=TEMPLATE
 const saveBlob = (blob, name) => { const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000); };
 
 function testResult() {
-  const a = qa.a, d = D.depts.find((x) => x.id === a.dept), year = yearNum();
+  // raw: 고른 칸 그대로(글자 표시용), a: 1~5 눈금(계산·진단용)
+  const raw = qa.a, a = ans(), d = D.depts.find((x) => x.id === a.dept), year = yearNum(), say = (it) => Q.scaleOf(it.id, qa.sc)[raw[it.id] - 1];
   const r = compute(a, qa.sector, qa.pairs);
-  const ctx = { ...a, yearN: year, dept: a.dept, sector: qa.sector, ready: r.ready, fit: r.fit, fitMean: r.fitMean, top: r.top };
+  const ctx = { ...a, raw, sc: qa.sc || 7, yearN: year, dept: a.dept, sector: qa.sector, ready: r.ready, fit: r.fit, fitMean: r.fitMean, top: r.top };
   const ssu = a.school === "ssu", none = a.dept === "none";
   const found = (D.diag || []).filter((x) => { try { return x.when(ctx); } catch { return false; } }).map((x) => ({ ...x, steps: forSchool(x.steps || [], ssu) }));
   // 마음 안내는 진단 카드 대신 r-hero의 .r-care 한 칸에만 그린다(결정 2)
@@ -374,9 +394,14 @@ function testResult() {
     const c = [...x.job.riasec], on = c.filter((k) => r.riasec[k] >= mean);
     return `<p class="jwhy">${esc(codeName((on.length ? on : [c.sort((p, q) => r.riasec[q] - r.riasec[p])[0]]).join("")))} 쪽 흥미와 겹쳐요${x.near ? " · 내 학과 진로에도 있어요" : ""}</p>`;
   };
+  // 근거(6차): 점수가 어디서 왔는지(방향 겹침·이런 하루) + 이 직무 장면과 방향 문항 중 '좋아요' 이상으로 답한 것 + 학과 진로
   const because = (x) => {
-    const its = [...x.job.riasec].flatMap((c) => Q.interest.items.filter((it) => it.id[0] === c && a[it.id] >= 4)).sort((p, q) => a[q.id] - a[p.id]).slice(0, 2);
-    return its.length ? `<ul class="rw-because">${its.map((it) => `<li>‘${esc(it.q)}’에 <b>${esc(Q.scales.like[a[it.id] - 1])}</b>라고 했어요</li>`).join("")}${x.near ? "<li>내 학과 진로에도 있어요</li>" : ""}</ul>` : jwhy(x);
+    const hi = (its) => its.filter((it) => a[it.id] >= 4).sort((p, q) => a[q.id] - a[p.id]);
+    const sc = hi(Q.scene.items.filter((it) => it.jobs.includes(x.job.key))).slice(0, 3);
+    const dir = hi([...x.job.riasec].flatMap((c) => Q.interest.items.filter((it) => it.id[0] === c))).slice(0, 4 - sc.length);
+    const its = [...sc, ...dir];
+    return `<p class="rw-score">방향 겹침 <b>${x.dir}</b>${x.scene == null ? "" : ` · 이런 하루 <b>${x.scene}</b>`}</p>`
+      + (its.length ? `<ul class="rw-because">${its.map((it) => `<li>‘${esc(it.q)}’에 <b>${esc(say(it))}</b>라고 했어요</li>`).join("")}${x.near ? "<li>내 학과 진로에도 있어요</li>" : ""}</ul>` : jwhy(x));
   };
   const jtop = (j) => `<a class="rw-top" href="#jobs-${j.key}">${icon("j-" + j.key, 40)}<b>${esc(j.name)}</b><span class="rw-dirs">${[...j.riasec].map((c) => aImg(c, 20)).join("")}<span class="sr-only">${esc(codeName(j.riasec))}</span></span></a>`;
   // 의외로 맞는 직무: 위 3개·비슷한 직무 밖에서, 첫 방향이 내 1·2위가 아니고 점수가 평균 이상인 가장 높은 직무
@@ -447,13 +472,13 @@ function testResult() {
         return `<li${cls ? ` class="${cls}"` : ""}><b>${esc(g.name)}</b><span class="rt-num">${v.toFixed(1)}</span><span class="pips" role="img" aria-label="5칸 중 ${on}칸">${[1, 2, 3, 4, 5].map((k) => `<i${k <= on ? ` class="on"` : ""}></i>`).join("")}</span>${cls ? `<em>${cls === "low" ? "채울 곳" : "든든해요"}</em>` : ""}</li>`; }).join("")}</ul>
       ${year >= 3 && Q.ready.groups.filter((g) => r.ready[g.id] <= 2).length >= 2 ? `<p class="calm">채울 곳이 여럿이어도 늦은 게 아니에요. 한 번에 다 하지 말고 이번 주에 할 일 하나부터 시작해요.</p>` : ""}
       ${low.length ? `<details><summary class="muted">'아니에요' 쪽으로 답한 문항 ${low.length}개와 해 볼 것 보기</summary>
-        <ul class="fixes">${fixes.map((g) => `<li><span>${g.its.map((it) => `${esc(it.q)} <em>${Q.scaleOf(it.id)[a[it.id] - 1]}</em>`).join("<br>")}</span>${g.fix ? `<span>→ ${how(g.fix)}</span>` : ""}</li>`).join("")}</ul></details>` : ""}
+        <ul class="fixes">${fixes.map((g) => `<li><span>${g.its.map((it) => `${esc(it.q)} <em>${say(it)}</em>`).join("<br>")}</span>${g.fix ? `<span>→ ${how(g.fix)}</span>` : ""}</li>`).join("")}</ul></details>` : ""}
     </section>
 
     <section class="rcard" id="r-values">
       ${rhead(vImg(v1, 28), "회사를 고를 때 중요한 순서")}
-      <div class="v-first">${vImg(v1, 56)}<b>${esc(v1.name)}</b><span>${esc(v1.desc)} · 짝 비교에서 ${r.wins[v1.id]}번 골랐어요${vTie ? " (공동 1위)" : ""}</span></div>
-      <ol class="v-rest">${r.values.slice(1).map((v) => `<li data-rank="${rank(v)}">${vImg(v, 20)}<b>${rank(v)}위 ${esc(v.name)}</b></li>`).join("")}</ol>
+      <div class="v-first">${vImg(v1, 56)}<b>${esc(v1.name)}</b><span>${esc(v1.desc)} · ${r.rounds}번 중 ${r.wins[v1.id]}번 골랐어요${vTie ? " (공동 1위)" : ""}</span></div>
+      <ol class="v-all">${r.values.map((v) => `<li data-rank="${rank(v)}"><span class="v-name">${vImg(v, 20)}<b>${rank(v)}위 ${esc(v.name)}</b></span><span class="pips" role="img" aria-label="${r.rounds}번 중 ${r.wins[v.id]}번">${Array.from({ length: r.rounds }, (_, k) => `<i${k < r.wins[v.id] ? ` class="on"` : ""}></i>`).join("")}</span>${(r.picked[v.id] || []).length ? `<span class="v-keys">${r.picked[v.id].map((k) => `<em>${esc(k)}</em>`).join("")}</span>` : ""}</li>`).join("")}</ol>
       ${sectorNames.length ? `<p class="lead">가 보고 싶은 곳</p><ul class="v-rest r-sector">${sectorNames.map((t) => `<li>${esc(t)}</li>`).join("")}</ul>` : ""}
     </section>
 
@@ -550,7 +575,7 @@ function drawResult() {
   $("r-pk").addEventListener("click", (e) => {
     const b = e.target.closest("button"); if (!b) return;
     const d = D.depts.find((x) => x.id === qa.a.dept);
-    $("r-text").textContent = prompts(qa.a, compute(qa.a, qa.sector, qa.pairs), d)[+b.dataset.k].text;
+    $("r-text").textContent = prompts(ans(), compute(ans(), qa.sector, qa.pairs), d)[+b.dataset.k].text;
     $("r-pk").querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", x === b));
     $("r-copy").textContent = "복사하기";
   });
@@ -561,13 +586,13 @@ function drawResult() {
     catch { say("r-msg", url); }
   });
   $("r-friend").addEventListener("click", async () => {
-    const url = `${location.origin}${location.pathname}#s=${encodeFriend(compute(qa.a, qa.sector, qa.pairs))}`;
+    const url = `${location.origin}${location.pathname}#s=${encodeFriend(compute(ans(), qa.sector, qa.pairs))}`;
     try { await navigator.clipboard.writeText(url); say("r-msg2", "친구용 링크를 복사했어요. 답은 들어가지 않아요. 끌림 점수와 직무 3개만 담겨요."); }
     catch { say("r-msg2", url); }
   });
   // 카드 이미지: 공유할 수 있으면 공유 창, 아니면 파일로 내려받는다
   $("r-card").addEventListener("click", async () => {
-    const cv = await shareCanvas(compute(qa.a, qa.sector, qa.pairs));
+    const cv = await shareCanvas(compute(ans(), qa.sector, qa.pairs));
     const blob = await new Promise((ok) => cv.toBlob(ok, "image/png"));
     const file = new File([blob], "학과진로지도-결과.png", { type: "image/png" });
     const save = () => saveBlob(blob, file.name);
@@ -583,7 +608,7 @@ function drawResult() {
 // ---- 넘김: 틀은 그대로 두고 #q-body만 나갔다 들어온다(결정 4) ----
 let busy = false, timer = 0, run = Date.now();
 const calm = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
-const reset = () => Object.assign(qa, { i: -1, a: {}, sector: [], pairs: {}, done: [], ym: null, chap: 0, seen: [], shared: false, fail: false, friend: null });
+const reset = () => Object.assign(qa, { i: -1, a: {}, sc: 7, sector: [], pairs: {}, done: [], ym: null, chap: 0, seen: [], shared: false, fail: false, friend: null });
 const enter = (dir, el = $("q-body")) => el.animate(calm() ? [{ opacity: 0 }, { opacity: 1 }]
   : [{ opacity: 0, transform: `translateX(${24 * dir}px)` }, { opacity: 1, transform: "none" }], { duration: calm() ? 120 : 280, easing: "cubic-bezier(.2,0,0,1)" });
 
@@ -685,7 +710,7 @@ $("v-test").addEventListener("keydown", (e) => {
   const btns = [...$("q-body").querySelectorAll(".qopt, .dot, .pick2")], n = /^[1-9]$/.test(e.key) ? +e.key : 0;
   if (s.kind === "likert" && /^Arrow/.test(e.key)) {
     e.preventDefault(); clearTimeout(timer);
-    const d = /Left|Up/.test(e.key) ? -1 : 1, b = btns[Math.min(5, Math.max(1, (qa.a[s.it.id] || (d > 0 ? 0 : 6)) + d)) - 1];
+    const d = /Left|Up/.test(e.key) ? -1 : 1, b = btns[Math.min(btns.length, Math.max(1, (qa.a[s.it.id] || (d > 0 ? 0 : btns.length + 1)) + d)) - 1];
     qa.a[s.it.id] = +b.dataset.v; mark(s, b); b.focus();
   } else if (s.kind === "basic" && s.q.id === "dept" && /^Arrow/.test(e.key) && e.target.matches(".qopt")) {
     // 학과 문항: 방향키는 같은 묶음 안에서만 옮긴다(고르지는 않음)

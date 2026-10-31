@@ -402,3 +402,17 @@ details.allfit[open] summary::after, .rcard details[open] > summary:not(.muted):
   .ring .val, .db-col i { animation: none }
   .quiz *, .result *, .friend * { transition: none }
 }
+
+/* 6차: 답 칸 7개 */
+.dot.s { --d: 36px }
+@media (max-width: 599px) { .dot.s { --d: 33px } }
+/* 6차: 회사 기준 6가지 순서 + 고른 키워드 */
+.v-all { list-style: none; margin: var(--s-3) 0 0; padding: 0; display: grid; gap: var(--s-2) }
+.v-all li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--s-2) var(--s-3); align-items: center; padding: var(--s-3) var(--s-4); border-radius: var(--r-lg); background: var(--surface-2) }
+.v-name { display: inline-flex; align-items: center; gap: var(--s-2) }
+.v-name img { width: 20px; height: 20px }
+.v-keys { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: var(--s-1) }
+.v-keys em { font: 400 var(--fs-label)/var(--lh-label) var(--font); font-style: normal; padding: 2px var(--s-2); border-radius: var(--r-full); background: var(--surface); color: var(--text-2) }
+/* 6차: 직무 근거 점수 줄 */
+.rw-score { font: 600 var(--fs-label)/var(--lh-label) var(--font); color: var(--text-2) }
+.rw-score b { color: var(--acc) }
