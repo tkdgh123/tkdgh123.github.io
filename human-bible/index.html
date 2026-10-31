@@ -56,6 +56,22 @@ article { background: var(--paper); border: 1px solid var(--line); border-radius
 .q p { margin: 0; font-size: 16px; font-weight: 600; line-height: 1.6; min-width: 0 }
 .essay p { margin: 0 0 1.1em; font-family: var(--serif); font-size: 17px; line-height: 1.95; text-indent: 1em }
 .essay p:last-child { margin-bottom: 0 }
+.one { margin: 0 0 28px; font-family: var(--serif); font-size: 19px; font-weight: 700; line-height: 1.7; color: var(--teal); text-wrap: pretty }
+article h3 { margin: 28px 0 12px; font-size: 13px; font-weight: 600; letter-spacing: .06em; color: var(--ink-2) }
+.one + h3 { margin-top: 0 }
+.flow { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; counter-reset: f }
+.flow li { counter-increment: f; display: grid; grid-template-columns: 28px 1fr; column-gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line) }
+.flow li:last-child { border-bottom: 0 }
+.flow li::before { content: counter(f); grid-row: span 2; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-size: 13px; font-weight: 600; color: var(--paper); background: var(--purple) }
+.flow b { font-size: 14px; color: var(--purple) }
+.flow span { min-width: 0; font-family: var(--serif); font-size: 16px; line-height: 1.8 }
+.flow em { font-style: normal; font-weight: 700; background: linear-gradient(transparent 60%, var(--q-bg) 60%) }
+.kw { display: flex; flex-wrap: wrap; gap: 8px }
+.kw span { font-size: 14px; padding: 6px 12px; border-radius: 999px; background: var(--q-bg); color: var(--ink) }
+.nums { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; margin: 0 }
+.nums div { border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px }
+.nums dt { font-size: 17px; font-weight: 600; color: var(--teal); font-variant-numeric: tabular-nums }
+.nums dd { margin: 2px 0 0; font-size: 13px; color: var(--ink-2) }
 .pg { font-family: var(--sans); font-size: 12px; color: var(--teal); white-space: nowrap }
 footer { padding-bottom: 48px; font-size: 13px; color: var(--ink-2) }
 </style>
@@ -73,6 +89,7 @@ footer { padding-bottom: 48px; font-size: 13px; color: var(--ink-2) }
   <div class="tabs" role="tablist" aria-label="버전">
     <button type="button" role="tab" data-v="me">내 말투</button>
     <button type="button" role="tab" data-v="book">교재 정리본</button>
+    <button type="button" role="tab" data-v="memo">외우기</button>
   </div>
 </header>
 
@@ -137,18 +154,62 @@ footer { padding-bottom: 48px; font-size: 13px; color: var(--ink-2) }
       <p>또 하나 중요하다고 생각하는 건 말하는 습관이다. 혐오 표현은 처음부터 누군가를 미워하려고 쓰기보다는 친구들끼리 장난처럼 '~충' 같은 말을 붙이면서 시작되는 경우가 많은데, 그런 말을 아무렇지 않게 쓰다 보면 그 집단을 정말 그런 사람들로 보게 된다. 그리고 누구나 어떤 상황에서는 소수가 될 수 있다는 걸 기억할 필요가 있다고 본다. 나도 외국에 가면 이주민이 되고, 언젠가는 노인이 되며, 사고나 병으로 장애를 갖게 될 수도 있다. 결국 혐오는 사람의 약함에서 시작되지만 그 약함은 모두가 가지고 있는 것이기 때문에, 나 스스로는 어떤 집단을 뭉뚱그려 판단하지 않고 한 사람 한 사람으로 보려고 노력하고, 내가 쓰는 말부터 조심하면서 누군가에게 먼저 이웃이 되어 주는 사람이 되고 싶다.</p>
     </div>
   </article>
+  <article data-id="k1" hidden>
+    <div class="q"><p>그리스 인간관과 기독교 인간관을 비교하고 자신이 생각하는 인간은 무엇인지 쓰시오.</p></div>
+    <p class="one">그리스는 이성으로 올라가는 인간, 기독교는 관계 속에서 응답하는 인간. 나는 인간을 관계 속에서 만들어져 가는 미완성의 존재로 본다.</p>
+    <h3>흐름</h3>
+    <ol class="flow">
+      <li><b>출발점</b><span>신을 어떻게 봤나에서 갈린다. 그리스는 신을 <em>질서·힘</em>으로, 기독교는 <em>사랑·관계</em>로 봤다.</span></li>
+      <li><b>비교</b><span>그리스: 플라톤 <em>이데아</em>, 영혼이 육체에서 벗어남, 아리스토텔레스 <em>부동의 동자</em> → 이성과 스스로의 상승. 기독교: <em>하나님의 형상</em>을 관계로 풀이, 흙에서 온 유한·타락한 존재가 은혜로 새로워짐, 육체도 선함 → 관계와 약함 속의 응답.</span></li>
+      <li><b>내 생각 ①</b><span>그리스 인간관은 <em>성적·스펙·연봉</em>으로 사람을 재는 지금 사회와 닮았다. 기준에 못 미치면 덜 인간적으로 보이고, 약함이 설 자리가 없다.</span></li>
+      <li><b>내 생각 ②</b><span>기독교는 약함을 출발점으로 인정해서 더 현실적이다. <em>AI</em>는 계산은 앞서도 부족함을 느끼고 기대거나 책임지지 않는다. 이것이 인간과 기계를 가르는 지점이다.</span></li>
+      <li><b>결론</b><span>인간은 <em>관계 속 미완성의 존재</em>다. 불완전함은 관계를 맺게 하는 이유이고, 이성은 관계를 위한 도구다.</span></li>
+    </ol>
+    <h3>핵심 키워드</h3>
+    <div class="kw"><span>코스모스·힘</span><span>사랑·관계</span><span>이데아</span><span>영혼↔육체</span><span>부동의 동자</span><span>하나님의 형상</span><span>흙·유한</span><span>타락과 은혜</span><span>육체도 선함</span><span>스펙 사회</span><span>AI와 인간</span><span>미완성의 존재</span></div>
+  </article>
+  <article data-id="k2" hidden>
+    <div class="q"><p>구한말 기독교의 전래와 한국의 수용에 대해 근대화의 관점에서 쓰고 평가하시오.</p></div>
+    <p class="one">기독교는 근대의 문을 열었지만 주체적인 사회까지는 가지 못한 절반의 성공이다. 그래도 그때 뿌린 교육의 씨앗이 숭실로 이어졌다.</p>
+    <h3>흐름</h3>
+    <ol class="flow">
+      <li><b>전래</b><span>선교사보다 <em>한국인이 먼저</em> 움직였다. 천주교는 사신단이 가져온 <em>천주실의</em>를 서학으로 연구하다 신앙이 됐고, 개신교는 만주에서 <em>로스</em>와 의주 청년들이 성경을 번역했다. 천주교는 제사 금지로 <em>진산사건</em> 후 박해를 받았다. 1885년 언더우드·아펜젤러는 <em>간접 선교</em>(학교·병원)를 택했다.</span></li>
+      <li><b>근대화 통로</b><span><em>광혜원</em>, 배재·이화·숭실학당, 숭실대학(최초 근대 대학). 교회 학교가 관공립보다 훨씬 많았다. <em>한글</em> 성경·신문, <em>여성 교육</em>·축첩 반대로 평등 의식이 퍼졌고, <em>3·1운동</em>으로 민족운동과도 이어졌다.</span></li>
+      <li><b>비판</b><span><em>근대화 = 서구화</em> → 전통은 뒤처진 것이라는 인식이 생겼다. 네비우스 정책의 서구 우월주의, 대부흥운동 이후 <em>정교분리</em>, <em>신사참배</em>가 문제다.</span></li>
+      <li><b>내 기준</b><span>근대화란 <em>스스로 판단하고 선택하는 힘</em>이다. 가장 큰 유산은 건물보다 <em>글을 읽고 생각하게 된 사람들</em>이다. 자발적 수용, 번역 참여, 숭실의 조선어 교육은 <em>주체적 소화</em>의 증거다.</span></li>
+      <li><b>결론</b><span><em>절반의 성공</em>. 문은 열었지만 주체적 사회까지는 못 갔다. 지금 내가 다니는 <em>숭실</em>로 이어진 교육의 씨앗이다.</span></li>
+    </ol>
+    <h3>핵심 키워드</h3>
+    <div class="kw"><span>한국인이 먼저</span><span>천주실의·서학</span><span>로스 성경 번역</span><span>간접 선교</span><span>광혜원</span><span>숭실학당</span><span>한글 보급</span><span>여성 교육</span><span>근대화 = 서구화?</span><span>정교분리</span><span>신사참배</span><span>절반의 성공</span></div>
+    <h3>숫자</h3>
+    <dl class="nums"><div><dt>1791</dt><dd>진산사건</dd></div><div><dt>1885</dt><dd>언더우드·아펜젤러 입국</dd></div><div><dt>1887</dt><dd>예수셩교젼셔</dd></div><div><dt>1897</dt><dd>숭실학당</dd></div><div><dt>1906</dt><dd>숭실대학</dd></div><div><dt>950 : 60</dt><dd>교회 학교 : 관공립</dd></div><div><dt>33인 중 16명</dt><dd>3·1운동 기독교인</dd></div><div><dt>1907</dt><dd>대부흥운동</dd></div><div><dt>1938</dt><dd>신사참배</dd></div></dl>
+  </article>
+  <article data-id="k3" hidden>
+    <div class="q"><p>왜 사람들은 타인을 혐오하는가. 그 해결책은.</p></div>
+    <p class="one">혐오는 자기 안의 약함과 불안을 약한 타인에게 떠넘기는 것이다. 해결은 누가 이웃인지 고르는 대신 내가 먼저 이웃이 되어 주는 것이다.</p>
+    <h3>흐름</h3>
+    <ol class="flow">
+      <li><b>문제</b><span>혐오가 <em>일상</em>이 됐다. 예멘 난민 반대, 특수학교 반대, 댓글·커뮤니티의 성별·지역·세대·출신 혐오가 그 예다.</span></li>
+      <li><b>원인 (책)</b><span><em>누스바움</em>: 역겨움과 자기 약함에 대한 <em>수치심</em> → 약한 집단에 낙인을 찍는다. <em>지라르</em>: <em>모방 욕망</em> → 갈등을 한 대상에 몬다(<em>희생양</em>). 둘 다 혐오하는 사람 자신의 불안에서 시작된다.</span></li>
+      <li><b>원인 (내 생각)</b><span>혐오를 키우는 구조 세 가지: <em>경쟁</em>(입시·취업·집값), <em>알고리즘</em>(자극적인 것이 더 추천됨), <em>만날 기회 감소</em>(화면 속 이미지로 뭉뚱그림).</span></li>
+      <li><b>해결 ①</b><span><em>선한 사마리아인</em>: “내 이웃이 누구냐” → “누가 이웃이 되어 주었느냐”. 편 가르기를 멈추고, 장애인·이주민·다른 세대를 <em>직접 만나는</em> 활동을 늘린다.</span></li>
+      <li><b>해결 ②</b><span><em>말하는 습관</em>('~충' 같은 장난)부터 조심한다. <em>누구나 소수</em>가 될 수 있다(외국에선 이주민, 언젠가 노인, 사고로 장애). 약함은 모두에게 있다 → 한 사람씩 보고, <em>먼저 이웃</em>이 되어 준다.</span></li>
+    </ol>
+    <h3>핵심 키워드</h3>
+    <div class="kw"><span>혐오의 일상화</span><span>누스바움</span><span>역겨움·수치심</span><span>낙인</span><span>지라르</span><span>모방 욕망</span><span>희생양</span><span>경쟁 구조</span><span>직접 만남</span><span>선한 사마리아인</span><span>말하는 습관</span><span>누구나 소수</span></div>
+  </article>
 </main>
 
 <script>
 (() => {
   let q = '1', v = 'me';
   try { v = localStorage.getItem('hb-tab') || 'me' } catch (e) {}
-  const m = location.hash.match(/^#([qm])([123])$/);
-  if (m) { q = m[2]; v = m[1] === 'm' ? 'me' : 'book' }
+  const m = location.hash.match(/^#([qmk])([123])$/);
+  if (m) { q = m[2]; v = { m: 'me', q: 'book', k: 'memo' }[m[1]] }
   function show() {
     document.querySelectorAll('nav button').forEach(b => b.setAttribute('aria-selected', b.dataset.q === q));
     document.querySelectorAll('.tabs button').forEach(b => b.setAttribute('aria-selected', b.dataset.v === v));
-    const id = (v === 'me' ? 'm' : 'q') + q;
+    const id = { me: 'm', book: 'q', memo: 'k' }[v] + q;
     document.querySelectorAll('main article').forEach(a => a.hidden = a.dataset.id !== id);
     history.replaceState(null, '', '#' + id);
     try { localStorage.setItem('hb-tab', v) } catch (e) {}
