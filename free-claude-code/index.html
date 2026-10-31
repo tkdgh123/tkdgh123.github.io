@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>무료 모델 Claude Code</title>
+<meta name="description" content="free-claude-code로 Claude Code에 NVIDIA 무료 모델을 꽂아 쓰는 법과 직접 해 본 결과">
+<style>
+:root {
+  --bg: #FFFFFF; --panel: #F3F3F3; --ink: #111111; --ink-2: #5B5B5B; --rule: #DADADA;
+  --green: #76B900; --green-ink: #4E7A00; --bad: #C8312F; --warn: #A86F00;
+  --term: #0B0B0B; --term-ink: #E6E6E6; --term-dim: #8A8A8A;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #111111; --panel: #1B1B1B; --ink: #EDEDED; --ink-2: #A3A3A3; --rule: #2C2C2C;
+  --green-ink: #8BD100; --bad: #F06A67; --warn: #F0B23C; --term: #000000; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #111111; --panel: #1B1B1B; --ink: #EDEDED; --ink-2: #A3A3A3; --rule: #2C2C2C;
+  --green-ink: #8BD100; --bad: #F06A67; --warn: #F0B23C; --term: #000000; color-scheme: dark }
+
+* { box-sizing: border-box }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.65 "Pretendard", system-ui, "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; word-break: keep-all; overflow-wrap: anywhere }
+a { color: inherit }
+code, .mono { font-family: "Cascadia Code", Consolas, "D2Coding", ui-monospace, monospace; font-size: .92em }
+.wrap { max-width: 1040px; margin: 0 auto; padding: 0 max(16px, env(safe-area-inset-left)) 0 max(16px, env(safe-area-inset-right)) }
+
+/* 머리: NVIDIA 검정 띠 */
+.top { background: #000; color: #fff; border-bottom: 4px solid var(--green) }
+.back { display: inline-block; margin-top: 20px; font-size: 14px; color: #9A9A9A; text-decoration: none }
+.back:hover { color: #fff }
+.hero { padding-top: 36px; padding-bottom: 44px }
+.eyebrow { font-size: 13px; font-weight: 700; letter-spacing: .12em; color: var(--green); text-transform: uppercase }
+h1 { font-size: clamp(30px, 5vw, 46px); line-height: 1.2; margin: 10px 0 14px; letter-spacing: -.02em }
+.hero p { margin: 0; color: #C9C9C9; max-width: 640px }
+
+/* 흐름도 */
+.flow { display: grid; grid-template-columns: 1fr auto 1.2fr auto 1fr; align-items: stretch; gap: 0; margin-top: 32px }
+.node { border: 1px solid #333; background: #0D0D0D; padding: 16px 18px }
+.node b { display: block; font-size: 17px }
+.node span { display: block; font-size: 13px; color: #9A9A9A; margin-top: 4px }
+.node.mid { border-color: var(--green) }
+.node.mid b { color: var(--green) }
+.arrow { display: grid; place-items: center; padding: 0 10px; color: var(--green); font-size: 22px }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px }
+.chips i { font-style: normal; font-size: 12px; border: 1px solid #333; padding: 1px 7px; color: #CFCFCF }
+@media (max-width: 760px) {
+  .flow { grid-template-columns: 1fr }
+  .arrow { transform: rotate(90deg); padding: 6px 0 }
+}
+
+section { padding: 52px 0; border-bottom: 1px solid var(--rule) }
+h2 { font-size: 26px; margin: 0 0 22px; letter-spacing: -.01em; display: flex; align-items: center; gap: 12px }
+h2::before { content: ""; width: 10px; height: 26px; background: var(--green) }
+
+/* 판단 */
+.verdict { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--rule); border: 1px solid var(--rule) }
+.verdict div { background: var(--bg); padding: 20px }
+.verdict h3 { margin: 0 0 8px; font-size: 16px }
+.verdict p { margin: 0; color: var(--ink-2); font-size: 15px }
+.verdict .ok h3 { color: var(--green-ink) }
+.verdict .no h3 { color: var(--bad) }
+.verdict .use h3 { color: var(--ink) }
+.use-line { margin-top: 18px; padding: 14px 18px; background: var(--panel); border-left: 4px solid var(--green); font-weight: 600 }
+@media (max-width: 760px) { .verdict { grid-template-columns: 1fr } }
+
+/* 설치 단계 */
+.steps { list-style: none; margin: 0; padding: 0; counter-reset: s; display: grid; gap: 14px }
+.steps li { counter-increment: s; display: grid; grid-template-columns: 48px 1fr; gap: 16px; align-items: start }
+.steps li::before { content: counter(s, decimal-leading-zero); font: 700 15px/48px "Cascadia Code", Consolas, monospace; text-align: center; background: var(--ink); color: var(--bg); height: 48px }
+.steps li > div, .two > div, .node { min-width: 0 }
+.steps h3 { margin: 10px 0 6px; font-size: 17px }
+.steps p { margin: 0 0 8px; color: var(--ink-2); font-size: 15px }
+.term { background: var(--term); color: var(--term-ink); padding: 12px 16px; overflow-x: auto; white-space: pre; font: 14px/1.6 "Cascadia Code", Consolas, monospace; border-top: 2px solid #2A2A2A }
+.term .p { color: var(--green) }
+.term .d { color: var(--term-dim) }
+.note { font-size: 14px; color: var(--warn); margin-top: 6px }
+
+/* 모델 결과 */
+.models { display: grid; gap: 8px }
+.m { display: grid; grid-template-columns: 210px 1fr 84px; align-items: center; gap: 14px }
+.m .name { font-weight: 600; font-size: 15px }
+.m .name small { display: block; font-weight: 400; color: var(--ink-2); font-size: 12px }
+.bar { height: 22px; background: var(--panel); position: relative }
+.bar i { position: absolute; inset: 0 auto 0 0; background: var(--green) }
+.m.fail .bar { background: repeating-linear-gradient(135deg, var(--panel) 0 6px, transparent 6px 12px) }
+.m .t { font: 600 14px "Cascadia Code", Consolas, monospace; text-align: right }
+.m.fail .t { color: var(--bad) }
+.tag { display: inline-block; font-size: 11px; font-weight: 700; padding: 0 6px; margin-left: 6px; background: var(--green); color: #000; vertical-align: 2px }
+@media (max-width: 600px) { .m { grid-template-columns: 1fr 70px } .m .bar { grid-column: 1 / -1; order: 3 } }
+
+/* 쓰는 법 */
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 20px }
+.box { background: var(--panel); padding: 20px }
+.box h3 { margin: 0 0 10px; font-size: 16px }
+.box ul { margin: 0; padding-left: 18px; color: var(--ink-2); font-size: 15px }
+.box li + li { margin-top: 6px }
+@media (max-width: 760px) { .two { grid-template-columns: 1fr } }
+
+footer { padding: 28px 0 48px; font-size: 13px; color: var(--ink-2) }
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="wrap"><a class="back" href="../">← 작업실</a></div>
+  <header class="wrap hero">
+    <div class="eyebrow">free-claude-code · 2026.10.31 설치</div>
+    <h1>Claude Code를 무료 모델로 돌리기</h1>
+    <p>Claude가 공짜가 되는 게 아니에요. Claude Code 화면은 그대로 쓰고, 뒤에서 답하는 모델만 다른 회사의 무료 모델로 바꿔요.</p>
+    <div class="flow" aria-label="Claude Code에서 중계 서버를 거쳐 다른 회사 모델로 가는 흐름">
+      <div class="node"><b>Claude Code</b><span>평소 쓰는 터미널 화면</span></div>
+      <div class="arrow" aria-hidden="true">→</div>
+      <div class="node mid"><b>FCC 중계 서버</b><span class="mono">127.0.0.1 · 내 컴퓨터만</span><span>Opus·Sonnet·Haiku 자리마다 모델 지정, 실패하면 예비 모델로</span></div>
+      <div class="arrow" aria-hidden="true">→</div>
+      <div class="node"><b>다른 회사 모델</b><div class="chips"><i>NVIDIA NIM</i><i>OpenRouter</i><i>Groq</i><i>Gemini</i><i>DeepSeek</i><i>Ollama</i><i>+55</i></div></div>
+    </div>
+  </header>
+</div>
+
+<section><div class="wrap">
+  <h2>써도 될까</h2>
+  <div class="verdict">
+    <div class="ok"><h3>좋은 점</h3><p>돈이 들지 않아요. 간단한 파일 수정이나 실행은 잘해요. 모델 61곳 중에서 골라 쓸 수 있어요.</p></div>
+    <div class="no"><h3>아쉬운 점</h3><p>진짜 Claude만큼 잘하지는 않아서 큰 프로젝트에는 약해요. 무료 한도는 업체 사정에 따라 바뀌어요.</p></div>
+    <div class="use"><h3>알고 쓸 것</h3><p>내 키와 코드가 이 프로그램을 거쳐 가요. Anthropic이 만든 게 아닌 개인 오픈소스예요(AGPL-3.0, GitHub 스타 약 6.5만).</p></div>
+  </div>
+  <div class="use-line">중요한 작업은 진짜 Claude로 하고, 한도가 찼을 때 쉬운 작업에만 보조로 써요.</div>
+</div></section>
+
+<section><div class="wrap">
+  <h2>설치한 순서</h2>
+  <ol class="steps">
+    <li><div>
+      <h3>설치 스크립트를 먼저 읽기</h3>
+      <p>공식 스크립트를 그냥 실행하면 Codex·Grok 같은 도구 10개가 같이 깔려요. 그래서 본체만 따로 설치했어요. uv가 0.12면 설치가 안 돼서 0.13.6으로 올렸어요.</p>
+      <div class="term"><span class="p">&gt;</span> uv tool install free-claude-code==6.18.5 --python cpython-3.14.10-windows-x86_64-none</div>
+    </div></li>
+    <li><div>
+      <h3>NVIDIA 무료 API 키 받기</h3>
+      <p>build.nvidia.com 로그인 → 휴대폰 인증(+82) → API 키 만들기(12개월)</p>
+      <div class="note">키는 만들 때 한 번만 보여요. 바로 저장해 두세요.</div>
+    </div></li>
+    <li><div>
+      <h3>설정 파일에 키와 모델 적기</h3>
+      <p><code>~/.fcc/.env</code></p>
+      <div class="term"><span class="d"># 키 줄은 생략</span>
+MODEL=nvidia_nim/nvidia/nemotron-3-ultra-550b-a55b
+MODEL_HAIKU=nvidia_nim/deepseek-ai/deepseek-v4.1-flash
+MODEL_FALLBACKS=nvidia_nim/deepseek-ai/deepseek-v4.1-flash
+HOST=127.0.0.1             <span class="d"># 기본값 0.0.0.0은 같은 와이파이에 열려요</span></div>
+    </div></li>
+    <li><div>
+      <h3>실행</h3>
+      <p>작업할 폴더에서 <code>fcc-claude</code>를 입력해요. 평소처럼 <code>claude</code>를 입력하면 진짜 Claude가 그대로 열려요.</p>
+      <div class="term"><span class="p">&gt;</span> fcc-claude
+<span class="d">  hello.py 만들어서 1~100 합 실행해 줘</span>
+  hello.py 작성 → python hello.py
+  5050                      <span class="d"># 22초</span></div>
+    </div></li>
+  </ol>
+</div></section>
+
+<section><div class="wrap">
+  <h2>NVIDIA 무료 모델 테스트</h2>
+  <div class="models">
+    <div class="m"><div class="name">Nemotron 3 Ultra<span class="tag">기본</span></div><div class="bar"><i style="width:3%"></i></div><div class="t">~1초</div></div>
+    <div class="m"><div class="name">DeepSeek V4.1 Flash<span class="tag">예비</span></div><div class="bar"><i style="width:43%"></i></div><div class="t">~15초</div></div>
+    <div class="m"><div class="name">GLM 5.3 Flash</div><div class="bar"><i style="width:63%"></i></div><div class="t">22초</div></div>
+    <div class="m"><div class="name">MiniMax M3.1 Flash</div><div class="bar"><i style="width:100%"></i></div><div class="t">35초</div></div>
+    <div class="m fail"><div class="name">Kimi K2.6</div><div class="bar"></div><div class="t">404</div></div>
+    <div class="m fail"><div class="name">Qwen3 Coder</div><div class="bar"></div><div class="t">410</div></div>
+    <div class="m fail"><div class="name">Nemotron 3 Super</div><div class="bar"></div><div class="t">404</div></div>
+    <div class="m fail"><div class="name">Nemotron 3.5 Lightning</div><div class="bar"></div><div class="t">시간 초과</div></div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <h2>쓸 때 알아 둘 것</h2>
+  <div class="two">
+    <div class="box"><h3>헷갈리는 점</h3><ul>
+      <li>모델이 자기를 "Claude Opus"라고 소개해도 실제로는 다른 모델이에요. 안내문 때문에 그렇게 말해요.</li>
+      <li>실제로 어떤 모델이 답했는지는 <code>~/.fcc/logs/server.log</code>에서 볼 수 있어요.</li>
+      <li>중계 서버는 창을 닫아도 계속 켜져 있어요.</li>
+    </ul></div>
+    <div class="box"><h3>지우기</h3>
+      <div class="term"><span class="p">&gt;</span> uv tool uninstall free-claude-code
+<span class="p">&gt;</span> rm -r ~/.fcc</div>
+    </div>
+  </div>
+</div></section>
+
+<footer class="wrap">출처: GitHub Alishahryar1/free-claude-code · 모델 결과는 2026-10-31 내 노트북에서 잰 값</footer>
+</body>
+</html>
