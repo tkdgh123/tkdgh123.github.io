@@ -65,7 +65,7 @@ function armed(btn) {
 /* ---------- 상태 ---------- */
 const now = new Date();
 const S = { room: null, me: "a", info: null, events: [], wishes: [], annivs: [], days: {},
-            y: now.getFullYear(), m: now.getMonth(), sel: today(), unsub: [], kind: "place" };
+            y: now.getFullYear(), m: now.getMonth(), sel: today(), unsub: [], kind: "place", photos: [], pic: 0 };
 const name = w => S.info?.[w]?.name || (w === "a" ? "A" : "B");
 const col = (...p) => collection(db, "rooms", S.room, ...p);
 const ref = (...p) => doc(db, "rooms", S.room, ...p);
@@ -113,6 +113,11 @@ function renderHead() {
   $("hA").textContent = name("a");
   $("hB").textContent = name("b");
   $("hD").textContent = dLabel(today());
+  const ph = S.photos, pic = $("hPic");
+  if (ph.length) {
+    const p = ph[((diff("2026-01-01", today()) + S.pic) % ph.length + ph.length) % ph.length];
+    pic.style.backgroundImage = `url("${p.data}")`; pic.classList.add("has");
+  } else { pic.style.backgroundImage = ""; pic.classList.remove("has"); }
   const n = upcoming(1)[0];
   $("hNext").textContent = n ? (n.left ? `${n.title}까지 ${n.left}일` : `오늘은 ${n.title}`) : "";
 }
@@ -189,6 +194,8 @@ function renderUs() {
   const set = (id, v) => { if (document.activeElement !== $(id)) $(id).value = v; };
   set("sA", name("a")); set("sB", name("b")); set("sStart", S.info.start);
   $("sCode").textContent = S.room;
+  $("picList").innerHTML = S.photos.map(p =>
+    `<button type="button" class="pic" data-pic="${p.id}" style="background-image:url('${p.data}')" aria-label="사진 지우기"></button>`).join("");
 }
 
 /* ---------- 아래 창 ---------- */
@@ -311,14 +318,60 @@ function openAnniv(id) {
 }
 
 /* ---------- 연결 ---------- */
-/* 남자친구는 하늘색, 여자친구는 분홍색 화면 */
-function theme(me) {
-  document.documentElement.dataset.me = me;
-  document.querySelector('meta[name="theme-color"]').content = me === "a" ? "#E2EEFF" : "#FFE6EE";
+/* 화면: 남자친구(하늘) · 여자친구(분홍) · 헬로키티. 기기마다 따로 고른다 */
+const SKINS = { sky: ["남자친구", "#E2EEFF"], pink: ["여자친구", "#FFE6EE"], kitty: ["헬로키티", "#FFE9EF"] };
+const SKIN_KEY = "uridal-skin";
+const skinFor = me => (me === "a" ? "sky" : "pink");
+function getSkin() {
+  try { const v = localStorage.getItem(SKIN_KEY); if (SKINS[v]) return v; } catch {}
+  return skinFor(S.me);
+}
+function applySkin(skin) {
+  document.documentElement.dataset.skin = skin;
+  document.querySelector('meta[name="theme-color"]').content = SKINS[skin][1];
+  if (skin === "kitty") watchPhotos();
+  if (S.info) { renderHead(); renderUs(); }
+}
+let photoUnsub = null;
+function watchPhotos() {
+  if (photoUnsub || !S.room) return;
+  photoUnsub = onSnapshot(col("photos"), s => {
+    S.photos = s.docs.map(d => ({ id: d.id, ...d.data() })).sort((x, y) => (x.at || 0) - (y.at || 0));
+    if (S.info) { renderHead(); renderUs(); }
+  });
+  S.unsub.push(photoUnsub);
+}
+function openSkins() {
+  const cur = document.documentElement.dataset.skin;
+  openSheet(`<h3>화면 고르기</h3>
+    <div class="skins">${Object.entries(SKINS).map(([k, [label]]) =>
+      `<button type="button" class="skin-card ${k}${k === cur ? " on" : ""}" data-skin="${k}"><span class="sw"></span>${label}</button>`).join("")}</div>
+    <p class="hint">이 휴대폰에서만 바뀌어요.</p>`, null, () => {
+    sheetForm.querySelector(".skins").addEventListener("click", e => {
+      const b = e.target.closest("[data-skin]"); if (!b) return;
+      try { localStorage.setItem(SKIN_KEY, b.dataset.skin); } catch {}
+      applySkin(b.dataset.skin);
+      b.parentElement.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b));
+    });
+  });
+}
+async function shrink(file) {
+  const img = await createImageBitmap(file);
+  const k = Math.min(1, 640 / Math.max(img.width, img.height));
+  const c = document.createElement("canvas");
+  c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+  const g = c.getContext("2d");
+  g.drawImage(img, 0, 0, c.width, c.height);
+  let url = c.toDataURL("image/webp", 0.8);
+  if (!url.startsWith("data:image/webp")) {
+    g.globalCompositeOperation = "destination-over"; g.fillStyle = "#fff"; g.fillRect(0, 0, c.width, c.height);
+    url = c.toDataURL("image/jpeg", 0.82);
+  }
+  return url;
 }
 
 function enter(room, me) {
-  S.room = room; S.me = me; saveLocal({ room, me }); theme(me);
+  S.room = room; S.me = me; saveLocal({ room, me }); applySkin(getSkin());
   $("setup").hidden = true; $("boot").hidden = false;
   const slow = setTimeout(() => toast("연결이 느려요. 잠시만요…"), 8000);
   S.unsub.push(onSnapshot(doc(db, "rooms", room), s => {
@@ -356,9 +409,9 @@ async function share(code) {
 const STEPS = ["setupChoose", "newForm", "shareBox", "joinForm", "pickBox"];
 const step = id => { STEPS.forEach(s => ($(s).hidden = s !== id)); appear($(id)); };
 seg($("nMe"), "w");
-$("nMe").addEventListener("click", () => theme($("nMe").dataset.v));
-document.querySelectorAll(".back").forEach(b => b.addEventListener("click", () => { delete document.documentElement.dataset.me; step("setupChoose"); }));
-$("goNew").onclick = () => { theme($("nMe").dataset.v || "a"); step("newForm"); $("nA").focus(); };
+$("nMe").addEventListener("click", () => applySkin(skinFor($("nMe").dataset.v)));
+document.querySelectorAll(".back").forEach(b => b.addEventListener("click", () => { delete document.documentElement.dataset.skin; step("setupChoose"); }));
+$("goNew").onclick = () => { applySkin(skinFor($("nMe").dataset.v || "a")); step("newForm"); $("nA").focus(); };
 $("goJoin").onclick = () => { step("joinForm"); $("jCode").focus(); };
 $("newForm").addEventListener("submit", async e => {
   e.preventDefault();
@@ -461,6 +514,27 @@ $("saveSet").onclick = () => {
 };
 $("sCopy").onclick = () => share(S.room);
 $("leave").onclick = e => { if (armed(e.currentTarget)) leave(); };
+$("skinBtn").onclick = openSkins;
+$("skinBtn2").onclick = openSkins;
+$("hPic").onclick = () => {
+  if (!S.photos.length) { showTab("us"); return $("album").scrollIntoView({ behavior: "smooth" }); }
+  S.pic++; renderHead(); appear($("hPic"));
+};
+$("picIn").addEventListener("change", async e => {
+  const files = [...e.target.files].slice(0, Math.max(0, 12 - S.photos.length));
+  e.target.value = "";
+  if (!files.length) return toast("사진은 12장까지 넣을 수 있어요");
+  toast("사진 넣는 중…");
+  for (const f of files) {
+    try { await setDoc(doc(col("photos")), { data: await shrink(f), by: S.me, at: Date.now() }); }
+    catch { toast("사진을 넣지 못했어요"); return; }
+  }
+  toast("사진을 넣었어요");
+});
+$("picList").addEventListener("click", e => {
+  const b = e.target.closest("[data-pic]"); if (!b) return;
+  if (armed(b)) deleteDoc(ref("photos", b.dataset.pic)).catch(fail);
+});
 
 let installEv = null;
 addEventListener("beforeinstallprompt", e => { e.preventDefault(); installEv = e; $("installBtn").hidden = false; });

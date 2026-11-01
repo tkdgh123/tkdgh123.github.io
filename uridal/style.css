@@ -7,6 +7,7 @@
   --both: #D5C2FF; --both-ink: #8A5BDB;
   --sun: #F0698C;
   --shadow: 0 8px 24px rgb(240 120 160 / .12);
+  --bow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 44'%3E%3Cpath d='M29 22C24 8 14 2 7 6S1 26 9 34s16 2 20-12z' fill='%23EE4B67' stroke='%233B2A30' stroke-width='2.6' stroke-linejoin='round'/%3E%3Cpath d='M35 22c5-14 15-20 22-16s6 20-2 28-16 2-20-12z' fill='%23EE4B67' stroke='%233B2A30' stroke-width='2.6' stroke-linejoin='round'/%3E%3Cellipse cx='32' cy='22' rx='7.5' ry='8.5' fill='%23EE4B67' stroke='%233B2A30' stroke-width='2.6'/%3E%3Cpath d='M12 14c2-3 5-4 8-3' stroke='%23fff' stroke-width='2.4' fill='none' stroke-linecap='round' opacity='.8'/%3E%3C/svg%3E");
   --round: "Jua", "Pretendard Variable", Pretendard, sans-serif;
   --font: "Pretendard Variable", Pretendard, -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
   color-scheme: light;
@@ -17,14 +18,21 @@
     --both: #55407F; --both-ink: #D5C2FF; --sun: #FF8FA8; --shadow: 0 8px 24px rgb(0 0 0 / .3); color-scheme: dark; }
 }
 /* 남자친구가 보는 화면: 같은 결, 하늘색 */
-:root[data-me="a"] {
+:root[data-skin="sky"] {
   --bg: #F4F8FF; --hero: #E2EEFF; --ink: #2E3446; --soft: #8F9AAE; --line: #E0E9F7;
   --acc: #6EA6F5; --acc-ink: #3A76D4; --acc-soft: #A9CBFF;
   --shadow: 0 8px 24px rgb(90 140 220 / .14);
 }
 @media (prefers-color-scheme: dark) {
-  :root[data-me="a"] { --bg: #181C24; --panel: #232A36; --hero: #283447; --ink: #EEF3FB; --soft: #9CA8BB; --line: #333E50;
+  :root[data-skin="sky"] { --bg: #181C24; --panel: #232A36; --hero: #283447; --ink: #EEF3FB; --soft: #9CA8BB; --line: #333E50;
     --acc: #7FB0FF; --acc-ink: #A9CBFF; --acc-soft: #3F5A86; --shadow: 0 8px 24px rgb(0 0 0 / .3); }
+}
+/* 헬로키티 화면: 빨간 리본, 분홍 물방울 바탕. 어두운 모드에서도 밝은 그대로 */
+:root[data-skin="kitty"] {
+  --bg: #FFF7F9; --panel: #FFFFFF; --hero: #FFE9EF; --ink: #3B2A30; --soft: #A88E97; --line: #F7DDE4;
+  --acc: #EE4B67; --acc-ink: #D7264A; --acc-soft: #FFC2CF; --sun: #E33D5C;
+  --a: #BCD7FF; --a-ink: #3D7BD9; --b: #FFC2CF; --b-ink: #D7264A; --both: #E3D4FF; --both-ink: #8A5BDB;
+  --shadow: 0 8px 24px rgb(230 70 100 / .14); color-scheme: light;
 }
 :root { transition: background-color .4s; }
 body, .top, .setup, .boot { transition: background-color .4s, color .4s; }
@@ -219,3 +227,37 @@ dialog[open]::backdrop { animation: fade .3s ease; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
 @media (min-width: 560px) { .day { min-height: 84px; } .bar { font-size: 11.5px; } }
+
+/* 화면 고르기 */
+.top { position: relative; }
+.skinbtn { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 12px); right: max(14px, env(safe-area-inset-right, 0px));
+  display: flex; gap: 2px; padding: 8px 9px; border: 0; border-radius: 999px; background: var(--panel); box-shadow: var(--shadow); }
+.skinbtn i { width: 9px; height: 9px; border-radius: 50%; }
+.skinbtn i:nth-child(1) { background: #6EA6F5; } .skinbtn i:nth-child(2) { background: #FF7FA7; } .skinbtn i:nth-child(3) { background: #EE4B67; }
+.skins { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.skin-card { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 8px 8px 12px; border: 0; border-radius: 24px; background: var(--bg); font: 15px var(--round); color: var(--ink); }
+.skin-card.on { box-shadow: inset 0 0 0 3px var(--acc); }
+.skin-card .sw { width: 100%; aspect-ratio: 1; border-radius: 18px; }
+.skin-card.sky .sw { background: radial-gradient(circle at 50% 50%, #6EA6F5 0 17%, transparent 18%), radial-gradient(circle at 50% 50%, #fff 0 30%, transparent 31%), #E2EEFF; }
+.skin-card.pink .sw { background: radial-gradient(circle at 50% 50%, #FF7FA7 0 17%, transparent 18%), radial-gradient(circle at 50% 50%, #fff 0 30%, transparent 31%), #FFE6EE; }
+.skin-card.kitty .sw { background: var(--bow) center / 62% no-repeat, radial-gradient(#F4A9BA 2.2px, transparent 2.8px) 0 0 / 13px 13px, #FFF1F4; }
+
+/* 헬로키티 꾸밈 */
+.hpic, .album { display: none !important; }
+[data-skin="kitty"] .album { display: flex !important; flex-direction: column; gap: 10px; }
+[data-skin="kitty"] .hpic { display: block !important; position: relative; width: 86px; height: 86px; margin-bottom: 6px; border: 4px solid #fff; border-radius: 50%;
+  background: var(--bow) center / 60% no-repeat, var(--hero); background-size: cover; box-shadow: var(--shadow); }
+[data-skin="kitty"] .hpic:not(.has) { background: var(--bow) center / 62% no-repeat, #fff; }
+[data-skin="kitty"] .hpic::after { content: ""; position: absolute; top: -14px; right: -22px; width: 48px; height: 33px; background: var(--bow) center / contain no-repeat; }
+[data-skin="kitty"] body { background-color: var(--bg);
+  background-image: radial-gradient(color-mix(in srgb, var(--acc) 13%, transparent) 2.6px, transparent 3.2px), radial-gradient(color-mix(in srgb, var(--acc) 13%, transparent) 2.6px, transparent 3.2px);
+  background-size: 28px 28px; background-position: 0 0, 14px 14px; }
+[data-skin="kitty"] .top { background: var(--hero); }
+[data-skin="kitty"] .tabbar button.on { position: relative; }
+[data-skin="kitty"] .tabbar button.on::before { content: ""; position: absolute; top: -9px; left: 50%; width: 26px; height: 18px; margin-left: 4px; background: var(--bow) center / contain no-repeat; }
+[data-skin="kitty"] .ahead h3::after, [data-skin="kitty"] .ttl::after { content: ""; display: inline-block; width: 28px; height: 19px; margin-left: 6px; vertical-align: -2px; background: var(--bow) center / contain no-repeat; }
+.pics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.pics:empty { display: none; }
+.pic { position: relative; aspect-ratio: 1; border: 3px solid #fff; border-radius: 20px; background: var(--hero) center / cover no-repeat; box-shadow: var(--shadow); font: 12px var(--round); color: transparent; }
+.pic.arm { color: #fff; background-blend-mode: multiply; background-color: rgb(0 0 0 / .45); }
+.addpic { position: relative; text-align: center; cursor: pointer; }

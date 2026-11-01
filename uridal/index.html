@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&display=swap">
 <link rel="stylesheet" href="style.css">
-<script>try { const v = JSON.parse(localStorage.getItem("uridal")); if (v && v.me) document.documentElement.dataset.me = v.me; } catch {}</script>
+<script>try { const v = JSON.parse(localStorage.getItem("uridal")), k = localStorage.getItem("uridal-skin") || (v && v.me ? (v.me === "a" ? "sky" : "pink") : ""); if (k) document.documentElement.dataset.skin = k; } catch {}</script>
 <script type="module" src="app.js"></script>
 </head>
 <body>
@@ -70,6 +70,8 @@
 <!-- 앱 -->
 <div id="app" class="app" hidden>
   <header class="top">
+    <button class="skinbtn" id="skinBtn" type="button" aria-label="화면 고르기"><i></i><i></i><i></i></button>
+    <button class="hpic" id="hPic" type="button" aria-label="키티 사진"></button>
     <div class="couple"><span class="chip a" id="hA"></span><span class="beat" aria-hidden="true">♥</span><span class="chip b" id="hB"></span></div>
     <b class="dnum" id="hD"></b>
     <span class="next" id="hNext"></span>
@@ -111,12 +113,20 @@
       <button class="pill wide" id="addAnniv" type="button">+ 기념일·생일 추가</button>
       <ul class="annivs" id="annivList"></ul>
 
+      <section class="album" id="album">
+        <h2 class="ttl">키티 사진</h2>
+        <div class="pics" id="picList"></div>
+        <label class="pill wide addpic">+ 사진 넣기<input type="file" id="picIn" accept="image/*" multiple hidden></label>
+        <p class="hint">맨 위 동그라미에 하루 한 장씩 나와요. 누르면 다음 사진.</p>
+      </section>
+
       <h2 class="ttl">설정</h2>
       <div class="settings">
         <label>남자친구 이름 <input id="sA" maxlength="12"></label>
         <label>여자친구 이름 <input id="sB" maxlength="12"></label>
         <label>사귄 날 <input id="sStart" type="date"></label>
         <button class="pill" id="saveSet" type="button">저장</button>
+        <button class="pill" id="skinBtn2" type="button">화면 고르기</button>
         <div class="coderow"><span>커플 코드</span><output class="code small" id="sCode"></output><button class="pill" id="sCopy" type="button">링크 보내기</button></div>
         <button class="pill" id="installBtn" type="button" hidden>홈 화면에 앱 설치</button>
         <p class="hint" id="iosHint" hidden>Safari 아래 공유 버튼 → 홈 화면에 추가하면 앱처럼 열려요.</p>
