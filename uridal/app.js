@@ -124,8 +124,8 @@ function renderHead() {
 function renderCal() {
   const { y, m } = S;
   $("mTitle").textContent = `${y}. ${pad(m + 1)}`;
-  const first = new Date(y, m, 1), days = new Date(y, m + 1, 0).getDate();
-  const cells = Math.ceil((first.getDay() + days) / 7) * 7, t = today();
+  const first = new Date(y, m, 1);
+  const cells = 42, t = today();
   let html = "";
   for (let i = 0; i < cells; i++) {
     const dt = new Date(y, m, 1 - first.getDay() + i), d = ymd(dt);
@@ -477,19 +477,33 @@ function showTab(t) {
   scrollTo({ top: 0, behavior: "instant" });
   appear($(`tab-${t}`));
 }
-function goMonth(dm) {
-  const d = new Date(S.y, S.m + dm, 1); S.y = d.getFullYear(); S.m = d.getMonth(); renderCal();
-  appear($("grid"), dm * 28); appear($("mTitle"), dm * 12);
+let monthOut = null;
+function goMonth(dm, from = 0) {
+  const d = new Date(S.y, S.m + dm, 1); S.y = d.getFullYear(); S.m = d.getMonth();
+  const g = $("grid");
+  if (calm.matches || !g.animate) return renderCal();
+  monthOut?.cancel();
+  monthOut = g.animate([{ transform: `translateX(${from}px)`, opacity: 1 }, { transform: `translateX(${-dm * 28}px)`, opacity: 0 }], { duration: 120, easing: "ease-in", fill: "forwards" });
+  monthOut.onfinish = () => { monthOut.cancel(); monthOut = null; renderCal(); appear(g, dm * 28); appear($("mTitle"), dm * 12); };
 }
 $("prevM").onclick = () => goMonth(-1);
 $("nextM").onclick = () => goMonth(1);
 $("todayBtn").onclick = () => { const t = new Date(); S.y = t.getFullYear(); S.m = t.getMonth(); S.sel = today(); renderCal(); renderAgenda(); };
-let tx = null;
-$("grid").addEventListener("touchstart", e => (tx = e.touches[0].clientX), { passive: true });
+let tx = null, ty = 0, drag = 0;
+$("grid").addEventListener("touchstart", e => { tx = e.touches[0].clientX; ty = e.touches[0].clientY; drag = 0; }, { passive: true });
+$("grid").addEventListener("touchmove", e => {
+  if (tx === null || calm.matches) return;
+  const dx = e.touches[0].clientX - tx;
+  if (Math.abs(dx) < Math.abs(e.touches[0].clientY - ty)) return;
+  drag = dx * .5; $("grid").style.transform = `translateX(${drag}px)`;
+}, { passive: true });
+$("grid").addEventListener("touchcancel", () => { tx = null; $("grid").style.transform = ""; });
 $("grid").addEventListener("touchend", e => {
   if (tx === null) return;
-  const dx = e.changedTouches[0].clientX - tx; tx = null;
-  if (Math.abs(dx) > 60) goMonth(dx < 0 ? 1 : -1);
+  const g = $("grid"), t = e.changedTouches[0], dx = t.clientX - tx, dy = t.clientY - ty;
+  tx = null; g.style.transform = "";
+  if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) goMonth(dx < 0 ? 1 : -1, drag);
+  else if (drag && g.animate) g.animate([{ transform: `translateX(${drag}px)` }, { transform: "none" }], { duration: 200, easing: "ease-out" });
 });
 $("grid").addEventListener("click", e => {
   const b = e.target.closest(".day"); if (!b) return;
