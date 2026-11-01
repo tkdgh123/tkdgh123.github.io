@@ -79,12 +79,12 @@ figcaption { margin-top: 10px; color: var(--muted) }
 .dark .intro, .dark .meta { color: var(--on-dark-soft) }
 .more { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; text-underline-offset: 6px; text-decoration-thickness: 1px }
 
-/* 01 게임: 먹색 반전, 큰 그림 위로 제목이 겹친다 */
-.game { padding-top: 140px; padding-bottom: 160px }
-.game .head { align-items: end }
-.game .num { grid-column: 1 / 4 }
-.game h2 { grid-column: 4 / 8; font-size: clamp(44px, 5vw, 84px); font-weight: 500 }
-.game .intro { grid-column: 9 / 13; color: var(--on-dark-soft) }
+/* 01 게임·03 프로젝트: 먹색 반전, 큰 그림 위로 제목이 겹친다 */
+.show { padding-top: 140px; padding-bottom: 160px }
+.show .head { align-items: end }
+.show .num { grid-column: 1 / 4 }
+.show h2 { grid-column: 4 / 8; font-size: clamp(44px, 5vw, 84px); font-weight: 500 }
+.show .intro { grid-column: 9 / 13; color: var(--on-dark-soft) }
 .g1 { margin-top: 96px; align-items: end }
 .g1 .art { grid-column: 1 / 10; grid-row: 1 }
 .g1 .txt { grid-column: 10 / 13; grid-row: 1; position: relative; z-index: 2 }
@@ -93,13 +93,19 @@ figcaption { margin-top: 10px; color: var(--muted) }
 .g2 .art { grid-column: 5 / 12; grid-row: 1 }
 .g2 .txt { grid-column: 1 / 5; grid-row: 1; padding-top: 18%; padding-right: var(--g) }
 .g2 h3 { font-size: clamp(40px, 4.4vw, 76px); font-weight: 600 }
-.game .art { display: block; overflow: hidden }
-.game .art img { width: 100%; transition: transform .9s cubic-bezier(.2, .7, .2, 1) }
-.game .art:hover img { transform: scale(1.03) }
-.g1 .art img, .g1 .art:hover img { transform: scale(1.1); transition: none }
-.game .txt p { margin-top: 16px; max-width: 26em }
-.game .meta { margin-top: 18px }
-.game .more { margin-top: 22px }
+.g2.flip .art { grid-column: 2 / 9 }
+.g2.flip .txt { grid-column: 9 / 13; padding-right: 0 }
+/* 밝은 스크린샷 위에선 흰 제목이 묻히니 겹치지 않는다 */
+.make .g1 h3 { font-size: clamp(56px, 6.4vw, 108px); margin-left: 0; text-shadow: none }
+.make .g2 h3 { font-size: clamp(36px, 3.6vw, 60px) }
+.show .txt p a { color: var(--on-dark); font-weight: 600; text-underline-offset: 4px }
+.show .art { display: block; overflow: hidden }
+.show .art img { width: 100%; transition: transform .9s cubic-bezier(.2, .7, .2, 1) }
+.show .art:hover img { transform: scale(1.03) }
+.g1 .art[data-par] img, .g1 .art[data-par]:hover img { transform: scale(1.1); transition: none }
+.show .txt p { margin-top: 16px; max-width: 26em }
+.show .meta { margin-top: 18px }
+.show .more { margin-top: 22px }
 
 /* 02 공부: 왼쪽 목차는 붙어 있고, 오른쪽 판이 바뀐다 */
 .study { background: var(--tone); padding-top: 120px; padding-bottom: 120px; align-items: start }
@@ -130,21 +136,6 @@ figcaption { margin-top: 10px; color: var(--muted) }
 .go-list li:last-child a { border-bottom: 1px solid var(--rule) }
 .go-list a:hover { padding-left: 8px; color: var(--blue) }
 
-/* 03 프로젝트: 번호 붙은 목록, 오른쪽 그림이 따라 바뀐다 */
-.make { padding-top: 150px; padding-bottom: 150px; align-items: start }
-.make h2 { grid-column: 1 / 8; grid-row: 1; font-size: clamp(56px, 8vw, 136px); font-weight: 250; align-self: end }
-.make .num { grid-column: 10 / 13; grid-row: 1; text-align: right; color: var(--blue) }
-.make .intro { grid-column: 1 / 6; margin-top: 22px; color: var(--muted) }
-.poster { grid-column: 1 / 9; margin-top: 72px; counter-reset: p }
-.poster li { display: grid; grid-template-columns: 4.5em 1fr; column-gap: var(--g); padding: 26px 0 30px; border-top: 1px solid var(--rule) }
-.poster li::before { counter-increment: p; content: "03." counter(p); font: 12.5px var(--mono); color: var(--muted); padding-top: .9em }
-.poster .name { font: 500 clamp(32px, 3.8vw, 62px)/1.1 var(--serif); letter-spacing: -.015em; text-decoration: underline 1px transparent; text-underline-offset: 10px; transition: text-decoration-color .2s, color .2s }
-.poster li:hover .name, .poster .name:focus-visible { text-decoration-color: currentColor; outline: none }
-.poster .fact { grid-column: 2; margin-top: 10px; color: var(--muted); max-width: 34em }
-.poster .fact a { color: var(--ink); font-weight: 600; text-underline-offset: 4px }
-.peek { grid-column: 9 / 13; margin-top: 72px; position: sticky; top: 12vh }
-.peek .frame { overflow: hidden }
-.peek img { width: 100% }
 
 /* 04 기타: 큰 그림 하나 + 작은 목록 */
 .etc { background: var(--tone); padding-top: 120px; padding-bottom: 140px; align-items: end }
@@ -187,15 +178,16 @@ figcaption { margin-top: 10px; color: var(--muted) }
   .hero .side { grid-column: 1 / 13; grid-row: 4; flex-direction: row; align-items: flex-end; padding-top: 40px }
   .cover { grid-column: 1 / 13; margin-top: calc(var(--h1) * -.55) }
   .hero h1 { font-size: var(--h1) }
-  .game .head { row-gap: 18px }
-  .game .num { grid-column: 1 / 6 } .game h2 { grid-column: 6 / 13 } .game .intro { grid-column: 1 / 13 }
-  .g1 .art, .g2 .art { grid-column: 1 / 13 }
+  .show .head { row-gap: 18px }
+  .show .num { grid-column: 1 / 6 } .show h2 { grid-column: 6 / 13 } .show .intro { grid-column: 1 / 13 }
+  .g1 .art, .g2 .art, .g2.flip .art { grid-column: 1 / 13 }
+  .g2.flip .txt { grid-column: 1 / 13 }
   .g1 .txt, .g2 .txt { grid-column: 1 / 13; grid-row: 2; padding: 0 }
   .g1 h3 { margin: -.42em 0 20px 0 }
+  .make .g1 h3 { margin: 24px 0 0; font-size: clamp(40px, 11vw, 76px) }
   .g2 h3 { margin-top: 24px }
   .study .aside { grid-column: 1 / 13; position: static }
   .plates { grid-column: 1 / 13; margin-top: 40px }
-  .poster { grid-column: 1 / 13 } .peek { display: none }
   .feat, .rest { grid-column: 1 / 13 } .rest { margin-top: 48px }
   .etc .intro { grid-column: 1 / 13; margin-top: 18px }
   .etc h2 { grid-column: 1 / 13 }
@@ -212,7 +204,7 @@ figcaption { margin-top: 10px; color: var(--muted) }
   .cover figcaption { padding-inline: var(--m) }
   .hero .side { display: block }
   .hero .side .small { margin-top: 40px; width: 62% ; margin-left: auto }
-  .game { padding-top: 96px; padding-bottom: 110px }
+  .show { padding-top: 96px; padding-bottom: 110px }
   .g1 { margin-top: 56px } .g2 { margin-top: 88px }
   .g1 .art, .g2 .art { margin-inline: calc(-1 * var(--m)) }
   .g1 h3 { font-size: 18vw }
@@ -222,14 +214,6 @@ figcaption { margin-top: 10px; color: var(--muted) }
   .tabs button i { width: auto }
   .count { display: none }
   .plate .body { grid-template-columns: 1fr }
-  .make { padding-top: 96px; padding-bottom: 96px }
-  .make h2 { grid-column: 1 / 10; font-size: 15vw } .make .num { grid-column: 9 / 13; font-size: 18vw }
-  .make .intro { grid-column: 1 / 13 }
-  .poster { margin-top: 44px }
-  .poster li { grid-template-columns: 1fr; padding: 20px 0 24px }
-  .poster li::before { padding-top: 0; margin-bottom: 6px }
-  .poster .fact { grid-column: 1 }
-  .poster .name { font-size: 9vw }
   .etc { padding-top: 88px; padding-bottom: 96px }
   .feat { margin-top: 40px; margin-inline: calc(-1 * var(--m)) }
   .feat .label { padding-inline: var(--m) }
@@ -240,7 +224,7 @@ figcaption { margin-top: 10px; color: var(--muted) }
   html { scroll-behavior: auto }
   .js .mask, .js .rise { clip-path: none; opacity: 1; transform: none; transition: none }
   .cover img { transform: none }
-  .btn, .go-list a, .game .art img, .plate .pic img, .feat img { transition: none }
+  .btn, .go-list a, .show .art img, .plate .pic img, .feat img { transition: none }
 }
 </style>
 </head>
@@ -276,7 +260,7 @@ figcaption { margin-top: 10px; color: var(--muted) }
   </div>
 </section>
 
-<section class="sec game dark" id="game" aria-labelledby="h-game">
+<section class="sec show game dark" id="game" aria-labelledby="h-game">
   <div class="head grid">
     <span class="num rise" aria-hidden="true">01</span>
     <h2 id="h-game" class="rise" style="--i:1">게임</h2>
@@ -358,26 +342,62 @@ figcaption { margin-top: 10px; color: var(--muted) }
   </div>
 </section>
 
-<section class="sec make grid" id="make" aria-labelledby="h-make">
-  <h2 id="h-make" class="rise">프로젝트</h2>
-  <span class="num rise" style="--i:1" aria-hidden="true">03</span>
-  <p class="intro rise" style="--i:2">수업 팀 과제와, 생활에서 불편했던 걸 직접 고친 것들.</p>
-  <ol class="poster">
-    <li class="rise" data-shot="hub/shots/uridal.webp" data-cap="우리달 달력·하고 싶은 것·기념일 화면"><a class="name" href="uridal/">우리달</a>
-      <p class="fact">여자친구랑 같이 쓰는 달력 앱. 둘의 일정이 색으로 나뉘고, 날마다 기분 한 줄, 가고 싶은 곳 목록, 100일·주년 D-day까지. 휴대폰 홈 화면에 앱처럼 설치해요.</p></li>
-    <li class="rise" data-shot="hub/shots/lmsalert.webp" data-cap="LMS 할 일·마감 알림"><a class="name" href="lms/">LMS 할 일·알림</a>
-      <p class="fact">숭실대 LMS에서 아직 안 한 과제·영상·공지만 마감 순으로 모아 체크하며 지우고, 아침 8시엔 휴대폰으로, 노트북을 켜면 화면으로 알려 줘요. 신청할 수 있는 비교과도 함께. <a href="lms/">할 일 목록</a> · <a href="lms-alert/">알림 설명</a></p></li>
-    <li class="rise" data-shot="hub/shots/dulmi.webp" data-cap="덜미 설명서"><a class="name" href="secure-msg/guide/">덜미</a>
-      <p class="fact">프밍기2 팀 과제. C로 만드는 암호화 메신저의 원리, 계획과 발표, 서버 설계와 코드 뼈대를 한 페이지에.</p></li>
-    <li class="rise" data-shot="hub/shots/jobmap-cover.webp" data-cap="학과 진로 지도"><a class="name" href="jobmap/">학과 진로 지도</a>
-      <p class="fact">한 문항씩 넘기는 101문항 진로 검사로 흥미가 겹치는 직무, 준비 상태, 이번 학기 할 일을 보여 줘요.</p></li>
-    <li class="rise" data-shot="hub/shots/ffb-cover.webp" data-cap="포스 피드백 레이싱 휠 발표 첫 장"><a class="name" href="ffb-wheel/">레이싱 휠</a>
-      <p class="fact">창공설 팀, 아두이노로 만드는 포스 피드백 레이싱 휠. 발표 자료와 <a href="ffb-wheel/sim/">3D 설계도</a>, <a href="ffb-wheel/srs-review/">SRS 첨삭</a>.</p></li>
-  </ol>
-  <figure class="peek">
-    <div class="frame mask"><img id="peek" src="hub/shots/uridal.webp" alt="우리달 달력·하고 싶은 것·기념일 화면" width="1280" height="800" loading="lazy"></div>
-    <figcaption class="mono" id="peekCap">우리달 달력·하고 싶은 것·기념일 화면</figcaption>
-  </figure>
+<section class="sec show make dark" id="make" aria-labelledby="h-make">
+  <div class="head grid">
+    <span class="num rise" aria-hidden="true">03</span>
+    <h2 id="h-make" class="rise" style="--i:1">프로젝트</h2>
+    <p class="intro rise" style="--i:2">수업 팀 과제와, 생활에서 불편했던 걸 직접 고친 것들.</p>
+  </div>
+
+  <article class="g1 grid">
+    <a class="art mask" href="uridal/"><img src="hub/shots/uridal.webp" alt="우리달 달력·하고 싶은 것·기념일 화면" width="1280" height="800" loading="lazy"></a>
+    <div class="txt">
+      <h3 class="rise">우리달</h3>
+      <p class="rise" style="--i:1">여자친구랑 같이 쓰는 달력 앱. 둘의 일정이 색으로 나뉘고, 날마다 기분 한 줄, 가고 싶은 곳 목록, 100일·주년 D-day까지. 휴대폰 홈 화면에 앱처럼 설치해요.</p>
+      <p class="meta mono rise" style="--i:2">PWA · Firebase · 함께 쓰는 달력</p>
+      <a class="more rise" style="--i:3" href="uridal/">열어 보기 <span class="ic" data-icon="arrow-right" data-size="18">→</span></a>
+    </div>
+  </article>
+
+  <article class="g2 grid">
+    <a class="art mask" href="lms/"><img src="hub/shots/lmsalert.webp" alt="LMS 할 일·마감 알림" width="1280" height="800" loading="lazy"></a>
+    <div class="txt">
+      <h3 class="rise">LMS 할 일·알림</h3>
+      <p class="rise" style="--i:1">숭실대 LMS에서 아직 안 한 과제·영상·공지만 마감 순으로 모아 체크하며 지우고, 아침 8시엔 휴대폰으로, 노트북을 켜면 화면으로 알려 줘요. 신청할 수 있는 비교과도 함께. <a href="lms-alert/">알림 설명</a></p>
+      <p class="meta mono rise" style="--i:2">Python · Canvas API · 생활 자동화</p>
+      <a class="more rise" style="--i:3" href="lms/">할 일 목록 <span class="ic" data-icon="arrow-right" data-size="18">→</span></a>
+    </div>
+  </article>
+
+  <article class="g1 grid">
+    <a class="art mask" href="secure-msg/guide/"><img src="hub/shots/dulmi.webp" alt="덜미 설명서 첫 화면" width="1280" height="800" loading="lazy"></a>
+    <div class="txt">
+      <h3 class="rise">덜미</h3>
+      <p class="rise" style="--i:1">프밍기2 팀 과제. C로 만드는 암호화 메신저의 원리, 계획과 발표, 서버 설계와 코드 뼈대를 한 페이지에.</p>
+      <p class="meta mono rise" style="--i:2">C · 암호화 메신저 · 팀 과제</p>
+      <a class="more rise" style="--i:3" href="secure-msg/guide/">설명서 보기 <span class="ic" data-icon="arrow-right" data-size="18">→</span></a>
+    </div>
+  </article>
+
+  <article class="g2 flip grid">
+    <a class="art mask" href="jobmap/"><img src="hub/shots/jobmap-cover.webp" alt="학과 진로 지도 첫 장" width="1200" height="630" loading="lazy"></a>
+    <div class="txt">
+      <h3 class="rise">학과 진로 지도</h3>
+      <p class="rise" style="--i:1">한 문항씩 넘기는 101문항 진로 검사로 흥미가 겹치는 직무, 준비 상태, 이번 학기 할 일을 보여 줘요.</p>
+      <p class="meta mono rise" style="--i:2">101문항 · 진로 검사</p>
+      <a class="more rise" style="--i:3" href="jobmap/">검사 해 보기 <span class="ic" data-icon="arrow-right" data-size="18">→</span></a>
+    </div>
+  </article>
+
+  <article class="g2 grid">
+    <a class="art mask" href="ffb-wheel/"><img src="hub/shots/ffb-cover.webp" alt="포스 피드백 레이싱 휠 발표 첫 장" width="1280" height="721" loading="lazy"></a>
+    <div class="txt">
+      <h3 class="rise">레이싱 휠</h3>
+      <p class="rise" style="--i:1">창공설 팀, 아두이노로 만드는 포스 피드백 레이싱 휠. 발표 자료와 <a href="ffb-wheel/sim/">3D 설계도</a>, <a href="ffb-wheel/srs-review/">SRS 첨삭</a>.</p>
+      <p class="meta mono rise" style="--i:2">Arduino · 팀 과제</p>
+      <a class="more rise" style="--i:3" href="ffb-wheel/">발표 보기 <span class="ic" data-icon="arrow-right" data-size="18">→</span></a>
+    </div>
+  </article>
 </section>
 
 <section class="sec etc grid" id="etc" aria-labelledby="h-etc">
@@ -454,13 +474,6 @@ function show(i, anim) {
   if (anim) { const pic = plates[i].querySelector(".pic"); pic.classList.add("in"); unfold(pic); }
 }
 show(0);
-
-// 프로젝트 칸: 이름에 올리면 옆 그림이 그 작업으로 바뀐다
-const peek = $("#peek"), cap = $("#peekCap");
-document.querySelectorAll(".poster li").forEach(li => {
-  const set = () => { if (peek.getAttribute("src") === li.dataset.shot) return; peek.src = li.dataset.shot; peek.alt = cap.textContent = li.dataset.cap; unfold(peek.parentNode); };
-  li.addEventListener("mouseenter", set); li.addEventListener("focusin", set);
-});
 
 // 화면에 들어오면: 그림은 펼쳐지고 글은 차례로 오른다
 const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { rootMargin: "0px 0px -8% 0px" });
