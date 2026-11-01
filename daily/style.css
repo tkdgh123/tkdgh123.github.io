@@ -1,108 +1,159 @@
-/* 아침 카톡에서 여는 한 장짜리 수업 노트: 휴대폰 한 손 폭, 둥근 카드, 핵심은 카톡 노랑 판 */
+/* 아침 카톡에서 여는 하루 한 장: 작업실과 같은 색 넷, 왼쪽에 제목 오른쪽에 내용, 끝낸 표시만 차분한 초록 */
 :root {
-  --bg: #F2F5FA; --card: #FFFFFF; --ink: #1E2638; --ink-2: #5C667C; --line: #DDE3EE;
-  --acc: #3E63DD; --acc-soft: #E5EBFC; --key: #FFE97A; --key-ink: #3A3000; --good: #1F8A55; --bad: #C2413A;
-  --title: "Jua", "Gowun Dodum", "Malgun Gothic", sans-serif;
-  --body: "Gowun Dodum", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+  --paper: #f5f5f2; --tone: #e6e6e1; --dark: #16171b; --ink: #111; --muted: #55554f;
+  --on-dark: #f2f2ef; --on-dark-soft: #a9aab0; --accent: #2f4fb5; --accent-ink: #fff; --good: #1f6b45;
+  --m: clamp(16px, 2.6vw, 40px); --cut: 5vw;
+  --s-small: 14px; --s-body: clamp(17px, 1rem + .2vw, 19px); --s-lead: clamp(21px, 1.1rem + .7vw, 28px);
+  --s-display: clamp(40px, 5.4vw, 84px);
   color-scheme: light;
 }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --bg: #12161F; --card: #1B2130; --ink: #E8ECF4; --ink-2: #A3ACBF; --line: #2B3346;
-  --acc: #8FA8FF; --acc-soft: #252F4D; --key: #5A4D10; --key-ink: #FFF3B8; --good: #5CD39A; --bad: #FF8A80; color-scheme: dark } }
-:root[data-theme="dark"] {
-  --bg: #12161F; --card: #1B2130; --ink: #E8ECF4; --ink-2: #A3ACBF; --line: #2B3346;
-  --acc: #8FA8FF; --acc-soft: #252F4D; --key: #5A4D10; --key-ink: #FFF3B8; --good: #5CD39A; --bad: #FF8A80; color-scheme: dark }
-
 * { box-sizing: border-box }
-body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.75 var(--body); word-break: keep-all; overflow-wrap: anywhere }
-.wrap { max-width: 680px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 20px 56px; display: grid; gap: 18px }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 var(--s-body)/1.6 "Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif; word-break: keep-all; overflow-wrap: anywhere; -webkit-font-smoothing: antialiased }
 a { color: inherit }
 button { font: inherit; color: inherit }
-:focus-visible { outline: 3px solid var(--acc); outline-offset: 2px }
-
-nav { display: flex; gap: 8px; flex-wrap: wrap }
-.pill { display: inline-flex; align-items: center; gap: 6px; padding: 7px 16px; border-radius: 999px; background: var(--card); border: 1px solid var(--line); text-decoration: none; font-size: 15px; cursor: pointer }
-.pill.on { background: var(--acc); border-color: var(--acc); color: #fff }
-
-.meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 6px }
-.day { font-family: var(--title); font-size: 15px; background: var(--acc); color: #fff; padding: 3px 12px; border-radius: 999px }
-.unit { font-size: 14px; color: var(--ink-2) }
-h1 { font-family: var(--title); font-weight: 400; font-size: clamp(30px, 7vw, 40px); line-height: 1.3; margin: 0; text-wrap: balance }
-h2 { font-family: var(--title); font-weight: 400; font-size: 22px; line-height: 1.4; margin: 0 0 6px }
+h1, h2 { margin: 0; font-weight: 900; letter-spacing: -.04em; line-height: 1.08 }
 p { margin: 0 }
+:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px }
+.dark { background: var(--dark); color: var(--on-dark) }
+.dark :focus-visible { outline-color: var(--on-dark) }
+.wrap { padding-bottom: 0 }
+.wrap > p { padding: 120px var(--m) }
 
-.card { background: var(--card); border-radius: 24px; padding: 20px 22px; border: 1px solid var(--line) }
-.key { background: var(--key); color: var(--key-ink); border: 0 }
-.key h2 { font-size: 18px; opacity: .8 }
-.key ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; counter-reset: k }
-.key li { counter-increment: k; display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 10px; font-size: 18px; line-height: 1.55 }
-.key li::before { content: counter(k); width: 28px; height: 28px; border-radius: 50%; background: var(--key-ink); color: var(--key); display: grid; place-items: center; font-family: var(--title); font-size: 15px; margin-top: 1px }
+/* 위 막대 */
+.top { display: flex; justify-content: space-between; align-items: center; gap: 12px 24px; flex-wrap: wrap; padding: 20px var(--m) 18px }
+.mark { font-weight: 900; font-size: var(--s-lead); letter-spacing: -.04em; text-decoration: none }
+.top nav { display: flex; gap: clamp(16px, 2vw, 28px); font-weight: 700 }
+.top nav a { text-decoration: underline 2px transparent; text-underline-offset: 6px; padding: 6px 0; transition: text-decoration-color .2s }
+.top nav a.on, .top nav a:hover { text-decoration-color: currentColor }
 
-.quiz h2 small { font-family: var(--body); font-size: 14px; color: var(--ink-2); margin-left: 6px }
-.quiz .q { margin-bottom: 12px }
-.opts { display: grid; gap: 8px }
-.opts button { text-align: left; padding: 10px 16px; border-radius: 16px; border: 1.5px solid var(--line); background: var(--bg); cursor: pointer; font-size: 16px }
-.opts button.right { border-color: var(--good); color: var(--good); font-weight: 700 }
-.opts button.wrong { border-color: var(--bad); color: var(--bad); text-decoration: line-through }
+/* 첫 면: 먹색 바탕, 윗변을 비스듬히 잘라 위 막대와 맞물린다 */
+.lead { clip-path: polygon(0 var(--cut), 100% 0, 100% 100%, 0 100%); padding: calc(var(--cut) + 72px) var(--m) 96px }
+.lead h1 { font-size: var(--s-display); max-width: 16em; text-wrap: balance; animation: rise .7s cubic-bezier(.2, .7, .2, 1) both }
+.lead .meta { margin-top: 24px; display: flex; gap: 6px 14px; flex-wrap: wrap; font-size: var(--s-lead); font-weight: 800; letter-spacing: -.03em; animation: rise .7s .08s cubic-bezier(.2, .7, .2, 1) both }
+.lead .unit { color: var(--on-dark-soft) }
+.lead .key { margin-top: 72px; animation: rise .7s .16s cubic-bezier(.2, .7, .2, 1) both }
+.hero { display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 16px; align-items: end }
+.hero h1 { grid-column: 1 / 8; font-size: clamp(48px, 7vw, 120px) }
+.hero p { grid-column: 8 / 13; font-size: var(--s-lead); line-height: 1.45; animation: rise .7s .1s cubic-bezier(.2, .7, .2, 1) both }
+@keyframes rise { from { opacity: 0; transform: translateY(22px) } }
+
+/* 한 줄 = 왼쪽 제목, 오른쪽 내용 */
+.row { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: clamp(24px, 4vw, 64px); padding: 0 var(--m); margin-top: clamp(64px, 7vw, 104px) }
+.row > * { grid-column: 2 }
+.row > h2, .row > a:first-child { grid-column: 1; grid-row: 1 / span 6; align-self: start; font-size: var(--s-lead) }
+.row > p, .row > ul, .row > ol { max-width: 40em }
+.lead .row { padding: 0; margin-top: 72px }
+
+.key ol { margin: 0; padding: 0; list-style: none; display: grid; gap: 20px }
+.key li { font-size: var(--s-lead); font-weight: 700; line-height: 1.35; letter-spacing: -.02em }
+
+.quiz h2 small { display: block; margin-top: 8px; font-size: var(--s-small); font-weight: 700; letter-spacing: 0; color: var(--muted) }
+.quiz .q { font-size: var(--s-lead); font-weight: 800; letter-spacing: -.02em; line-height: 1.35; margin-bottom: 24px }
+.opts { display: grid; gap: 6px; max-width: 40em }
+.opts button { text-align: left; min-height: 56px; padding: 12px 20px; border: 0; background: var(--tone); cursor: pointer; font-weight: 600; transition: background-color .2s, color .2s, transform .15s }
+.opts button:hover:not(:disabled) { background: var(--ink); color: var(--paper) }
+.opts button:active:not(:disabled) { transform: scale(.99) }
+.opts button.right { background: var(--good); color: #fff; font-weight: 800 }
+.opts button.wrong { color: var(--muted); text-decoration: line-through 2px }
 .opts button:disabled { cursor: default }
-.why { margin-top: 10px; font-size: 15.5px; color: var(--ink-2) }
+.why { margin-top: 20px }
 
-.steps { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px }
-.steps li { background: var(--acc-soft); color: var(--ink); padding: 8px 14px; border-radius: 16px; font-size: 15.5px }
-.steps li + li::before { content: "→"; color: var(--acc); margin: 0 10px 0 -2px; font-weight: 700 }
-.steps li + li { background: none; padding: 0 }
-.steps li + li span { display: inline-block; background: var(--acc-soft); padding: 8px 14px; border-radius: 16px }
+.fig > * { grid-column: 1 / -1 }
+.steps { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 0 }
+.steps li { background: var(--ink); color: var(--paper); padding: 14px 20px; font-weight: 700 }
+.steps li + li { background: none; color: var(--ink); padding: 0 }
+.steps li + li::before { content: "→"; color: var(--accent); margin: 0 14px; font-weight: 900 }
+.steps li + li span { display: inline-block; background: var(--tone); padding: 14px 20px }
+.bars { display: grid; gap: 20px; max-width: 1200px }
+.bar { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: clamp(24px, 4vw, 64px); align-items: center }
+.bar div:first-child { display: grid; gap: 2px }
+.bar b { font-size: var(--s-lead); font-weight: 900; letter-spacing: -.03em; line-height: 1.2 }
+.track { height: 40px; background: var(--tone) }
+.track i { display: block; height: 100%; background: var(--accent); min-width: 12px; transform-origin: 0 50% }
+.rise .track i { transform: scaleX(0); transition: transform .9s .2s cubic-bezier(.2, .7, .2, 1) }
+.rise.in .track i { transform: none }
+.fignote { margin-top: 16px; font-size: var(--s-small); color: var(--muted) }
 
-.bars { display: grid; gap: 12px }
-.bar { display: grid; gap: 4px }
-.bar div { display: flex; justify-content: space-between; gap: 10px; font-size: 15px }
-.bar b { font-weight: 700 }
-.bar span { color: var(--ink-2) }
-.track { height: 14px; border-radius: 999px; background: var(--bg) }
-.track i { display: block; height: 100%; border-radius: 999px; background: var(--acc); min-width: 14px }
-.fignote { font-size: 13.5px; color: var(--ink-2); margin-top: 10px }
+/* 내 노트북 / 직접 해 보기: 한 단계 어두운 면 */
+.mine { background: var(--tone); padding-top: 56px; padding-bottom: 56px }
+.mine + .mine { margin-top: 0; padding-top: 0 }
+.mine h2 { display: grid; gap: 14px }
+.mine svg { width: 40px; height: 40px }
 
-.sec { display: grid; gap: 4px; padding: 0 4px }
-.sec p { font-size: 17px }
-
-.mine { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 14px; align-items: start; background: var(--acc-soft); border: 0 }
-.mine svg { width: 44px; height: 44px }
-.mine h2 { font-size: 18px; margin: 0 }
-.mine p { font-size: 16px }
-
-.terms { display: flex; flex-wrap: wrap; gap: 8px }
-.terms details { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 6px 14px }
-.terms summary { cursor: pointer; font-family: var(--title); font-size: 16px; list-style: none }
+.terms { display: flex; flex-wrap: wrap; gap: 6px }
+.terms details { background: var(--tone) }
+.terms summary { cursor: pointer; list-style: none; padding: 10px 18px; font-weight: 800 }
 .terms summary::-webkit-details-marker { display: none }
-.terms details[open] { flex-basis: 100% }
-.terms details p { font-size: 15.5px; color: var(--ink-2); padding: 2px 0 6px }
+.terms details[open] { flex-basis: 100%; background: var(--ink); color: var(--paper) }
+.terms details p { padding: 0 18px 16px }
+.terms details:not([open]) p { display: none }
 
-.pager { display: flex; justify-content: space-between; gap: 10px }
-.pager a { flex: 1; text-align: center; padding: 14px; border-radius: 18px; background: var(--card); border: 1px solid var(--line); text-decoration: none; font-family: var(--title); font-size: 16px }
-.pager a.next { background: var(--acc); border-color: var(--acc); color: #fff }
+/* 끝: 학습 완료와 다음 날 */
+.close { margin-top: calc(clamp(64px, 7vw, 104px) + 24px); clip-path: polygon(0 var(--cut), 100% 0, 100% 100%, 0 100%); padding: calc(var(--cut) + 72px) var(--m) 72px; display: grid; gap: 56px }
+.donebtn { justify-self: start; min-height: 64px; padding: 0 30px; border: 0; background: var(--on-dark); color: var(--dark); font-weight: 800; cursor: pointer; transition: background-color .2s, color .2s, transform .15s }
+.donebtn:hover { background: #fff }
+.donebtn:active { transform: scale(.97) }
+.donebtn.ok { background: var(--good); color: #fff }
+.donebtn .ic { display: inline-flex; width: 20px; height: 20px; vertical-align: -4px; margin-right: 10px }
+.pager { display: flex; justify-content: space-between; align-items: end; gap: 16px }
+.pager a { font-weight: 800; font-size: var(--s-lead); text-decoration: underline 3px transparent; text-underline-offset: 8px; transition: text-decoration-color .2s }
+.pager a.next { margin-left: auto; font-size: clamp(48px, 7vw, 120px); font-weight: 900; letter-spacing: -.05em; line-height: 1 }
+.pager a:hover { text-decoration-color: currentColor }
 
-.hero { display: grid; gap: 8px; padding: 6px 4px }
-.hero p { color: var(--ink-2) }
-.unitbox { display: grid; gap: 10px }
-.unitbox h2 { padding: 0 4px }
-.list { display: grid; gap: 8px }
-.list a { display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 12px; align-items: center; padding: 12px 16px; border-radius: 20px; background: var(--card); border: 1px solid var(--line); text-decoration: none }
-.list a b { font-family: var(--title); font-weight: 400; color: var(--acc); font-size: 17px }
-.soon { display: flex; flex-wrap: wrap; gap: 8px }
-.soon span { padding: 6px 14px; border-radius: 999px; border: 1.5px dashed var(--line); color: var(--ink-2); font-size: 15px }
+/* 목록 */
+.unitbox h2 { position: sticky; top: 24px }
+.list { display: grid; max-width: 40em }
+.list a { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 12px; align-items: baseline; padding: 10px 0; text-decoration: none }
+.list a b { color: var(--muted); font-weight: 800 }
+.list a span { font-size: var(--s-lead); font-weight: 800; letter-spacing: -.03em; line-height: 1.3; text-decoration: underline 2px transparent; text-underline-offset: 6px; transition: text-decoration-color .2s }
+.list a:hover span { text-decoration-color: currentColor }
+.list a.ok b { color: var(--good) }
+.list a.ok b::after { content: " ✓" } /* taste-skill-ignore: 끝낸 레슨 표시, 글자 체크(✓) */
+.soon { display: flex; flex-wrap: wrap; gap: 8px 28px; max-width: 40em }
+.plan { background: var(--dark); color: var(--on-dark); margin-top: 0; padding-top: 40px; padding-bottom: 40px }
+.unitbox:not(.plan) + .plan { margin-top: clamp(64px, 7vw, 104px); clip-path: polygon(0 var(--cut), 100% 0, 100% 100%, 0 100%); padding-top: calc(var(--cut) + 80px) }
+.plan:last-child { padding-bottom: 120px }
+.plan .soon span { color: var(--on-dark) }
+.plan + .plan { margin-top: -1px }
 
-.search { width: 100%; padding: 12px 18px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--card); font: inherit; color: var(--ink) }
-.dict { display: grid; gap: 8px }
-.dict div { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 12px 16px; display: grid; gap: 2px }
-.dict b { font-family: var(--title); font-weight: 400; font-size: 18px }
-.dict p { font-size: 15.5px; color: var(--ink-2) }
-.dict a { font-size: 13.5px; color: var(--acc); text-decoration: none }
+/* 용어 사전 */
+.search { animation: rise .7s .1s cubic-bezier(.2, .7, .2, 1) both; display: block; margin-top: 40px; width: 100%; max-width: 640px; min-height: 64px; padding: 0 22px; border: 0; background: var(--paper); color: var(--ink); font-family: inherit; font-size: var(--s-lead); font-weight: 700 }
+.search::placeholder { color: var(--muted) }
+.dict { padding: clamp(64px, 7vw, 104px) var(--m) 120px; columns: 3 300px; column-gap: clamp(24px, 4vw, 64px) }
+.dict div { break-inside: avoid; padding-bottom: 32px; display: grid; gap: 4px }
+.dict div[hidden] { display: none }
+.dict b { font-size: var(--s-lead); font-weight: 900; letter-spacing: -.03em; line-height: 1.2 }
+.dict a { font-size: var(--s-small); font-weight: 700; color: var(--accent); text-underline-offset: 4px }
 
-.rv { display: grid; gap: 6px }
-.rv a { font-family: var(--title); font-size: 19px; text-decoration: none }
-.rv ul { margin: 0; padding-left: 20px; color: var(--ink-2); font-size: 16px }
+/* 한 주 정리 */
+.rv > a:first-child { font-weight: 900; letter-spacing: -.03em; line-height: 1.25; text-underline-offset: 6px }
+.rv ul { margin: 0; padding-left: 1.1em; display: grid; gap: 6px }
+.subhead { margin-top: clamp(96px, 10vw, 160px); padding: 0 var(--m); font-size: clamp(40px, 5.4vw, 84px) }
+.subhead ~ .quiz:last-child { margin-bottom: 120px }
 
-.donebtn { padding: 14px; border-radius: 18px; border: 2px solid var(--good); background: var(--card); color: var(--good); font-family: var(--title); font-size: 17px; cursor: pointer }
-.donebtn.ok { background: var(--good); color: var(--card) }
-.donebtn .ic { display: inline-flex; width: 20px; height: 20px; vertical-align: -4px; margin-right: 6px }
-.list a.ok b::after { content: " ✓"; color: var(--good) }
+/* 줄이 화면에 들어오면 떠오른다 */
+.rise { opacity: 0; transform: translateY(26px); transition: opacity .7s ease, transform .7s cubic-bezier(.2, .7, .2, 1) }
+.rise.in { opacity: 1; transform: none }
+
+@media (max-width: 760px) {
+  :root { --cut: 10vw }
+  .row, .bar { grid-template-columns: minmax(0, 1fr) }
+  .row > *, .row > h2, .row > a:first-child { grid-column: 1; grid-row: auto }
+  .row > h2, .row > a:first-child { margin-bottom: 16px }
+  .unitbox h2 { position: static }
+  .hero { display: block }
+  .hero h1 { font-size: 15vw }
+  .hero p { margin-top: 24px }
+  .lead { padding-top: calc(var(--cut) + 48px); padding-bottom: 72px }
+  .lead .key, .lead .row { margin-top: 48px }
+  .bar b { margin-bottom: 4px }
+  .steps { display: grid; gap: 6px }
+  .steps li + li::before { content: "↓"; display: block; margin: 0 0 6px 20px }
+  .steps li + li span { display: block }
+  .close { gap: 40px }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lead h1, .lead .meta, .lead .key, .hero p, .search { animation: none }
+  .rise, .rise .track i { opacity: 1; transform: none; transition: none }
+  .opts button, .donebtn, .pager a { transition: none }
+}

@@ -4,38 +4,85 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>포스 피드백 레이싱 휠</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
-:root { --ink:#111; --soft:#777; --rule:#d6d6d6; --bg:#fff; --stage:#f4f4f4; --font:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif; }
-* { box-sizing:border-box; }
-html,body { height:100%; margin:0; }
-body { background:var(--bg); color:var(--ink); font-family:var(--font); display:flex; flex-direction:column; }
-header { display:flex; align-items:flex-end; gap:32px; padding:18px max(24px,env(safe-area-inset-right)) 0 max(24px,env(safe-area-inset-left)); border-bottom:1px solid var(--ink); flex-wrap:wrap; }
-header h1 { margin:0 0 14px; font-size:20px; font-weight:700; letter-spacing:-.01em; }
-nav { display:flex; gap:24px; }
-nav button { font:inherit; font-size:15px; background:none; border:0; padding:0 0 13px; color:var(--soft); cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; }
-nav button[aria-selected="true"] { color:var(--ink); font-weight:700; border-bottom-color:var(--ink); }
-nav button:focus-visible, .bar button:focus-visible, .bar a:focus-visible { outline:2px solid var(--ink); outline-offset:3px; }
-main { flex:1; min-height:0; position:relative; }
-section { position:absolute; inset:0; display:flex; flex-direction:column; }
-section[hidden] { display:none; }
-#slides .stage { flex:1; min-height:0; container-type:size; display:flex; align-items:center; justify-content:center; padding:24px; background:var(--stage); }
-#slides img { width:min(100cqw, 100cqh * 16 / 9); height:auto; display:block; background:#fff; box-shadow:0 1px 2px rgba(0,0,0,.08),0 8px 24px rgba(0,0,0,.06); }
-#slides .stage:fullscreen { padding:0; background:#fff; }
-#slides .stage:fullscreen img { box-shadow:none; }
-.bar { display:flex; align-items:center; gap:16px; padding:12px max(24px,env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) max(24px,env(safe-area-inset-left)); border-top:1px solid var(--rule); font-size:14px; flex-wrap:wrap; }
-.bar button, .bar a { font:inherit; font-size:14px; background:none; border:1px solid var(--rule); color:var(--ink); padding:7px 14px; cursor:pointer; text-decoration:none; }
-.bar button:disabled { color:#bbb; cursor:default; }
-.bar .count { font-variant-numeric:tabular-nums; color:var(--soft); min-width:48px; text-align:center; }
-.bar .spacer { flex:1; }
-.notes { border-top:1px solid var(--rule); padding:14px max(24px,env(safe-area-inset-right)) 18px max(24px,env(safe-area-inset-left)); font-size:15px; line-height:1.7; color:#333; max-height:30vh; overflow:auto; }
-.notes p { margin:0; max-width:70ch; }
-#sim iframe { flex:1; width:100%; border:0; display:block; }
-@media (max-width:600px) { header { gap:12px; } header h1 { font-size:17px; margin-bottom:10px; } #slides .stage { padding:12px; } .bar { gap:8px; } .hint { display:none; } }
+/* 작업실과 같은 색 넷: 밝은 바탕, 먹색 무대, 글자, 강조 하나 */
+:root {
+  --paper: #f5f5f2; --tone: #e6e6e1; --dark: #16171b; --ink: #111; --muted: #55554f;
+  --on-dark: #f2f2ef; --on-dark-soft: #a9aab0; --accent: #2f4fb5; --accent-ink: #fff;
+  --m: clamp(16px, 2.2vw, 32px); --cut: clamp(18px, 3vw, 44px);
+  color-scheme: light;
+}
+* { box-sizing: border-box }
+html, body { height: 100%; margin: 0 }
+body { background: var(--paper); color: var(--ink); font: 400 17px/1.55 "Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif; word-break: keep-all; -webkit-font-smoothing: antialiased; display: flex; flex-direction: column }
+button { font: inherit; color: inherit }
+
+/* 위 막대: 작업실로 돌아가는 이름, 제목, 보기 두 칸 */
+header { display: flex; align-items: center; flex-wrap: wrap; gap: 6px clamp(20px, 3vw, 44px); padding: 16px max(var(--m), env(safe-area-inset-right)) 14px max(var(--m), env(safe-area-inset-left)) }
+.back { font-weight: 700; text-decoration: none; display: inline-flex; gap: 8px; align-items: center; padding: 6px 0; color: var(--muted); transition: color .2s }
+.back:hover { color: var(--ink) }
+header h1 { margin: 0; font-size: clamp(22px, 1.4rem + .5vw, 30px); font-weight: 900; letter-spacing: -.04em; line-height: 1.1 }
+nav { display: flex; gap: 22px; margin-left: auto }
+nav button { border: 0; background: none; padding: 8px 0; font-weight: 700; color: var(--muted); cursor: pointer; border-bottom: 3px solid transparent; transition: color .2s, border-color .2s }
+nav button[aria-selected="true"] { color: var(--ink); border-color: var(--ink) }
+nav button:hover { color: var(--ink) }
+:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px }
+
+/* 무대: 먹색 면, 윗변을 비스듬히 잘라 위 막대와 맞물린다 */
+main { flex: 1; min-height: 0; position: relative }
+section { position: absolute; inset: 0; display: flex; flex-direction: column }
+section[hidden] { display: none }
+#slides { background: var(--dark); color: var(--on-dark); clip-path: polygon(0 var(--cut), 100% 0, 100% 100%, 0 100%) }
+#slides :focus-visible { outline-color: var(--on-dark) }
+#slides .stage { flex: 1; min-height: 0; container-type: size; display: flex; align-items: center; justify-content: center; padding: calc(var(--cut) + 20px) var(--m) 20px; cursor: pointer }
+#slides img { width: min(100cqw, 100cqh * 16 / 9); height: auto; display: block; background: #fff }
+#slides .stage:fullscreen { padding: 0; background: var(--dark) }
+
+.notes { padding: 4px max(var(--m), env(safe-area-inset-right)) 8px max(var(--m), env(safe-area-inset-left)); max-height: 30vh; overflow: auto }
+.notes p { margin: 0 auto; max-width: 62em; font-size: 18px; line-height: 1.7 }
+
+.bar { display: flex; align-items: center; gap: 10px 14px; flex-wrap: wrap; padding: 14px max(var(--m), env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom)) max(var(--m), env(safe-area-inset-left)) }
+.bar button { min-height: 44px; padding: 0 20px; border: 0; background: none; font-weight: 700; cursor: pointer; transition: background-color .2s, color .2s, transform .15s }
+.bar button:hover { background: rgba(242, 242, 239, .1) }
+.bar button:active { transform: scale(.97) }
+.bar #next { background: var(--accent); color: var(--accent-ink) }
+.bar #next:hover { background: #233d93 }
+.bar button:disabled, .bar #next:disabled { background: none; color: var(--on-dark-soft); opacity: .5; cursor: default; transform: none }
+.bar .count { font-variant-numeric: tabular-nums; font-weight: 800; font-size: 18px; min-width: 56px; text-align: center }
+.bar .spacer { flex: 1 }
+.bar .hint { color: var(--on-dark-soft); font-size: 14px; margin-right: 6px }
+.bar #toggleNotes[aria-expanded="true"] { background: var(--on-dark); color: var(--dark) }
+
+#sim iframe { flex: 1; width: 100%; border: 0; display: block }
+
+/* 처음 열릴 때 무대가 아래에서 올라온다 */
+#slides { animation: lift .7s cubic-bezier(.2, .7, .2, 1) both }
+header > * { animation: rise .6s cubic-bezier(.2, .7, .2, 1) both }
+header > :nth-child(2) { animation-delay: 60ms } header > :nth-child(3) { animation-delay: 120ms }
+@keyframes lift { from { transform: translateY(40px); opacity: 0 } }
+@keyframes rise { from { transform: translateY(12px); opacity: 0 } }
+#slide.turn { animation: turn .35s ease both }
+@keyframes turn { from { opacity: .3 } }
+
+@media (max-width: 640px) {
+  header { padding-top: 12px; padding-bottom: 10px }
+  nav { margin-left: 0; width: 100% }
+  .bar { gap: 4px }
+  .bar button { padding: 0 10px }
+  .bar .count { min-width: 44px }
+  .hint { display: none }
+}
+@media (prefers-reduced-motion: reduce) {
+  #slides, header > *, #slide.turn { animation: none }
+  .bar button { transition: none }
+}
 </style>
 </head>
 <body>
 <header>
+  <a class="back" href="../#make">← 작업실</a>
   <h1>포스 피드백 레이싱 휠</h1>
   <nav role="tablist" aria-label="보기 선택">
     <button role="tab" id="tab-slides" aria-controls="slides" aria-selected="true">발표 자료</button>
@@ -51,7 +98,7 @@ section[hidden] { display:none; }
       <span class="count" id="count">1 / 3</span>
       <button id="next" type="button">다음</button>
       <span class="spacer"></span>
-      <span class="hint" style="color:var(--soft)">← → 키로 넘기기</span>
+      <span class="hint">← → 키로 넘기기</span>
       <button id="toggleNotes" type="button" aria-expanded="false" aria-controls="notes">대본 보기</button>
       <button id="full" type="button">전체 화면</button>
     </div>
@@ -68,6 +115,7 @@ const imgs = Array.from({ length: N }, (_, k) => { const im = new Image(); im.sr
 let cur = 0;
 function show(n) {
   cur = Math.max(0, Math.min(N - 1, n));
+  if ($("slide").src !== imgs[cur].src) { $("slide").classList.remove("turn"); void $("slide").offsetWidth; $("slide").classList.add("turn"); }
   $("slide").src = imgs[cur].src;
   $("slide").alt = `발표 자료 ${cur + 1}번 슬라이드`;
   $("count").textContent = `${cur + 1} / ${N}`;
