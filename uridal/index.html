@@ -5,25 +5,29 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>우리달</title>
 <meta name="description" content="둘이 같이 쓰는 달력">
-<meta name="theme-color" content="#2F5BEA">
+<meta name="theme-color" content="#FFE6EE">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-180.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="우리달">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&display=swap">
 <link rel="stylesheet" href="style.css">
 <script type="module" src="app.js"></script>
 </head>
 <body>
 
-<div id="boot" class="boot"><b>우리달</b></div>
+<div id="boot" class="boot"><img src="icon-192.png" alt="" width="84" height="84"><b>우리달</b></div>
 
 <!-- 처음 시작 -->
 <section id="setup" class="setup" hidden>
   <div class="setup-top">
+    <img class="logo" src="icon-192.png" alt="" width="88" height="88">
     <h1>우리달</h1>
     <p>둘이 같이 쓰는 달력</p>
   </div>
@@ -34,9 +38,10 @@
   </div>
 
   <form class="setup-body" id="newForm" hidden>
-    <label>내 이름 <input id="nA" required maxlength="12" autocomplete="off"></label>
-    <label>상대 이름 <input id="nB" required maxlength="12" autocomplete="off"></label>
+    <label class="who-in a">남자친구 : <input id="nA" required maxlength="12" autocomplete="off" placeholder="이름"></label>
+    <label class="who-in b">여자친구 : <input id="nB" required maxlength="12" autocomplete="off" placeholder="이름"></label>
     <label>사귄 날 <input id="nStart" type="date" required></label>
+    <div class="me-pick"><span>나는</span><div class="seg two-way" id="nMe" data-v="a"><button type="button" class="a on" data-w="a">남자친구</button><button type="button" class="b" data-w="b">여자친구</button></div></div>
     <button class="big" type="submit">만들기</button>
     <button class="link back" type="button">뒤로</button>
   </form>
@@ -44,7 +49,7 @@
   <div class="setup-body" id="shareBox" hidden>
     <p class="lead">이 코드를 상대에게 보내 주세요. 코드를 아는 사람만 달력을 볼 수 있어요.</p>
     <output class="code" id="shareCode"></output>
-    <button class="big" id="copyLink" type="button">링크 복사</button>
+    <button class="big" id="copyLink" type="button">링크 보내기</button>
     <button class="big ghost" id="startApp" type="button">시작하기</button>
   </div>
 
@@ -63,10 +68,10 @@
 
 <!-- 앱 -->
 <div id="app" class="app" hidden>
-  <header class="band">
-    <span class="nm a" id="hA"></span>
-    <div class="dd"><b id="hD"></b><span id="hNext"></span></div>
-    <span class="nm b" id="hB"></span>
+  <header class="top">
+    <div class="couple"><span class="chip a" id="hA"></span><span class="beat" aria-hidden="true">♥</span><span class="chip b" id="hB"></span></div>
+    <b class="dnum" id="hD"></b>
+    <span class="next" id="hNext"></span>
   </header>
 
   <main>
@@ -99,7 +104,7 @@
     </section>
 
     <section id="tab-us" class="tab" hidden>
-      <div class="hero-d"><small>우리가 함께한 날</small><b id="usD"></b><span id="usSince"></span></div>
+      <div class="hero-d"><small>우리가 사귄 날</small><b id="usSince"></b></div>
       <h2 class="ttl">다가오는 날</h2>
       <ol class="soon" id="soonList"></ol>
       <button class="pill wide" id="addAnniv" type="button">+ 기념일·생일 추가</button>
@@ -107,11 +112,11 @@
 
       <h2 class="ttl">설정</h2>
       <div class="settings">
-        <label>내 이름 <input id="sMe" maxlength="12"></label>
-        <label>상대 이름 <input id="sYou" maxlength="12"></label>
+        <label>남자친구 이름 <input id="sA" maxlength="12"></label>
+        <label>여자친구 이름 <input id="sB" maxlength="12"></label>
         <label>사귄 날 <input id="sStart" type="date"></label>
         <button class="pill" id="saveSet" type="button">저장</button>
-        <div class="coderow"><span>커플 코드</span><output class="code small" id="sCode"></output><button class="pill" id="sCopy" type="button">링크 복사</button></div>
+        <div class="coderow"><span>커플 코드</span><output class="code small" id="sCode"></output><button class="pill" id="sCopy" type="button">링크 보내기</button></div>
         <button class="pill" id="installBtn" type="button" hidden>홈 화면에 앱 설치</button>
         <p class="hint" id="iosHint" hidden>Safari 아래 공유 버튼 → 홈 화면에 추가하면 앱처럼 열려요.</p>
         <button class="link danger" id="leave" type="button">이 기기에서 나가기</button>

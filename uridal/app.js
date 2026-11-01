@@ -45,6 +45,14 @@ function toast(msg) {
 }
 const fail = () => toast("저장하지 못했어요. 인터넷 연결을 확인해 주세요.");
 
+/* 화면이 바뀔 때 살짝 떠오르며 나타나기 */
+const calm = matchMedia("(prefers-reduced-motion: reduce)");
+function appear(el, dx = 0) {
+  if (calm.matches || !el?.animate) return;
+  el.animate([{ opacity: 0, transform: `translate(${dx}px, ${dx ? 0 : 10}px) scale(${dx ? 1 : .985})` }, { opacity: 1, transform: "none" }],
+             { duration: 320, easing: "cubic-bezier(.22,1,.36,1)" });
+}
+
 /* 두 번 눌러야 지워지는 버튼 */
 function armed(btn) {
   if (btn.classList.contains("arm")) return true;
@@ -58,7 +66,6 @@ function armed(btn) {
 const now = new Date();
 const S = { room: null, me: "a", info: null, events: [], wishes: [], annivs: [], days: {},
             y: now.getFullYear(), m: now.getMonth(), sel: today(), unsub: [], kind: "place" };
-const other = w => (w === "a" ? "b" : "a");
 const name = w => S.info?.[w]?.name || (w === "a" ? "A" : "B");
 const col = (...p) => collection(db, "rooms", S.room, ...p);
 const ref = (...p) => doc(db, "rooms", S.room, ...p);
@@ -174,15 +181,13 @@ function renderWish() {
 }
 
 function renderUs() {
-  const n = diff(S.info.start, today()) + 1;
-  $("usD").textContent = n > 0 ? `${n}일` : dLabel(today());
-  $("usSince").textContent = `${full(S.info.start)}부터`;
+  $("usSince").textContent = full(S.info.start);
   $("soonList").innerHTML = upcoming(8).map(u =>
     `<li><b>${esc(u.title)}</b><small>${full(u.d)}</small><span class="left">${u.left ? `D-${u.left}` : "오늘"}</span></li>`).join("");
   $("annivList").innerHTML = S.annivs.map(a =>
     `<li><button type="button" data-an="${a.id}">${esc(a.title)} · ${+a.md.slice(0, 2)}/${+a.md.slice(3)}</button></li>`).join("");
   const set = (id, v) => { if (document.activeElement !== $(id)) $(id).value = v; };
-  set("sMe", name(S.me)); set("sYou", name(other(S.me))); set("sStart", S.info.start);
+  set("sA", name("a")); set("sB", name("b")); set("sStart", S.info.start);
   $("sCode").textContent = S.room;
 }
 
@@ -195,11 +200,16 @@ function openSheet(html, onSubmit, init) {
   init?.();
   sheet.showModal();
 }
+function closeSheet() {
+  if (calm.matches || !sheet.animate) return sheet.close();
+  sheet.animate([{ transform: "none", opacity: 1 }, { transform: "translateY(60px)", opacity: 0 }], { duration: 200, easing: "ease-in" })
+    .finished.then(() => sheet.close());
+}
 sheetForm.addEventListener("submit", e => {
   e.preventDefault();
-  if (onSheetSubmit?.() !== false) sheet.close();
+  if (onSheetSubmit?.() !== false) closeSheet();
 });
-sheet.addEventListener("click", e => { if (e.target === sheet) sheet.close(); });
+sheet.addEventListener("click", e => { if (e.target === sheet) closeSheet(); });
 function seg(box, attr) {
   box.addEventListener("click", e => {
     const b = e.target.closest("button"); if (!b) return;
@@ -239,7 +249,7 @@ function openEvent(id) {
       if (!armed(ev.currentTarget)) return;
       deleteDoc(ref("events", id)).catch(fail);
       if (e.wishId) updateDoc(ref("wishes", e.wishId), { status: "want", date: deleteField(), eventId: deleteField() }).catch(() => {});
-      sheet.close();
+      closeSheet();
     });
     if (!id) $("fT").focus();
   });
@@ -261,7 +271,7 @@ function openMood() {
     $("fN").value = cur.memo || "";
     $("fClr").addEventListener("click", () => {
       setDoc(ref("days", S.sel), { [S.me]: deleteField() }, { merge: true }).catch(fail);
-      sheet.close();
+      closeSheet();
     });
   });
 }
@@ -283,7 +293,7 @@ function openPlan(wid) {
 function openAnniv(id) {
   const a = id ? S.annivs.find(x => x.id === id) : null;
   openSheet(`<h3>${a ? "기념일 고치기" : "기념일·생일 추가"}</h3>
-    <label>이름 <input id="aT" required maxlength="20" placeholder="예: 지은 생일" autocomplete="off"></label>
+    <label>이름 <input id="aT" required maxlength="20" placeholder="예: 여자친구 생일" autocomplete="off"></label>
     <label>날짜 (해마다 표시돼요) <input type="date" id="aD" required></label>
     <div class="acts">${a ? `<button type="button" class="del" id="aDel">삭제</button>` : ""}<button class="big" type="submit">저장</button></div>`,
   () => {
@@ -295,7 +305,7 @@ function openAnniv(id) {
     $("aD").value = a ? `${new Date().getFullYear()}-${a.md}` : today();
     $("aDel")?.addEventListener("click", ev => {
       if (!armed(ev.currentTarget)) return;
-      deleteDoc(ref("annivs", id)).catch(fail); sheet.close();
+      deleteDoc(ref("annivs", id)).catch(fail); closeSheet();
     });
   });
 }
@@ -312,8 +322,10 @@ function enter(room, me) {
     }
     clearTimeout(slow);
     S.info = s.data();
-    $("boot").hidden = true; $("app").hidden = false;
-    render();
+    if (!$("boot").hidden) {
+      $("boot").hidden = true; $("app").hidden = false;
+      render(); appear($("app"));
+    } else render();
   }, err => { clearTimeout(slow); toast(`불러오지 못했어요 (${err.code})`); }));
   for (const c of ["events", "wishes", "annivs"]) {
     S.unsub.push(onSnapshot(col(c), s => { S[c] = s.docs.map(d => ({ id: d.id, ...d.data() })); render(); }));
@@ -336,7 +348,8 @@ async function share(code) {
 
 /* ---------- 처음 시작 화면 ---------- */
 const STEPS = ["setupChoose", "newForm", "shareBox", "joinForm", "pickBox"];
-const step = id => STEPS.forEach(s => ($(s).hidden = s !== id));
+const step = id => { STEPS.forEach(s => ($(s).hidden = s !== id)); appear($(id)); };
+seg($("nMe"), "w");
 document.querySelectorAll(".back").forEach(b => b.addEventListener("click", () => step("setupChoose")));
 $("goNew").onclick = () => { step("newForm"); $("nA").focus(); };
 $("goJoin").onclick = () => { step("joinForm"); $("jCode").focus(); };
@@ -348,7 +361,8 @@ $("newForm").addEventListener("submit", async e => {
     await setDoc(doc(db, "rooms", code), { a: { name: $("nA").value.trim() }, b: { name: $("nB").value.trim() }, start: $("nStart").value, at: Date.now() });
     $("shareCode").textContent = code;
     $("copyLink").onclick = () => share(code);
-    $("startApp").onclick = () => enter(code, "a");
+    const me = $("nMe").dataset.v || "a";
+    $("startApp").onclick = () => enter(code, me);
     step("shareBox");
   } catch { fail(); }
   btn.disabled = false;
@@ -362,7 +376,7 @@ $("joinForm").addEventListener("submit", async e => {
     const s = await getDoc(doc(db, "rooms", code));
     if (!s.exists()) { err.textContent = "그런 코드가 없어요. 다시 확인해 주세요."; err.hidden = false; return; }
     const info = s.data();
-    $("pickWho").innerHTML = ["a", "b"].map(w => `<button type="button" class="${w}" data-w="${w}">${esc(info[w]?.name)}</button>`).join("");
+    $("pickWho").innerHTML = ["a", "b"].map(w => `<button type="button" class="${w}" data-w="${w}"><small>${w === "a" ? "남자친구" : "여자친구"}</small>${esc(info[w]?.name)}</button>`).join("");
     $("pickWho").onclick = ev => { const b = ev.target.closest("button"); if (b) enter(code, b.dataset.w); };
     step("pickBox");
   } catch { err.textContent = "연결하지 못했어요. 인터넷을 확인해 주세요."; err.hidden = false; }
@@ -375,10 +389,12 @@ document.querySelector(".tabbar").addEventListener("click", e => {
 function showTab(t) {
   document.querySelectorAll(".tabbar button").forEach(b => b.classList.toggle("on", b.dataset.tab === t));
   ["cal", "wish", "us"].forEach(x => ($(`tab-${x}`).hidden = x !== t));
-  scrollTo(0, 0);
+  scrollTo({ top: 0, behavior: "instant" });
+  appear($(`tab-${t}`));
 }
 function goMonth(dm) {
   const d = new Date(S.y, S.m + dm, 1); S.y = d.getFullYear(); S.m = d.getMonth(); renderCal();
+  appear($("grid"), dm * 28); appear($("mTitle"), dm * 12);
 }
 $("prevM").onclick = () => goMonth(-1);
 $("nextM").onclick = () => goMonth(1);
@@ -395,7 +411,7 @@ $("grid").addEventListener("click", e => {
   S.sel = b.dataset.d;
   const d = parse(S.sel);
   if (d.getMonth() !== S.m) { S.y = d.getFullYear(); S.m = d.getMonth(); }
-  renderCal(); renderAgenda();
+  renderCal(); renderAgenda(); appear($("agenda"));
 });
 $("agenda").addEventListener("click", e => {
   const ev = e.target.closest("[data-e]"); if (ev) return openEvent(ev.dataset.e);
@@ -431,9 +447,9 @@ $("wishList").addEventListener("click", e => {
 $("addAnniv").onclick = () => openAnniv(null);
 $("annivList").addEventListener("click", e => { const b = e.target.closest("[data-an]"); if (b) openAnniv(b.dataset.an); });
 $("saveSet").onclick = () => {
-  const me = $("sMe").value.trim(), you = $("sYou").value.trim(), start = $("sStart").value;
-  if (!me || !you || !start) return toast("이름과 날짜를 모두 적어 주세요");
-  updateDoc(doc(db, "rooms", S.room), { [`${S.me}.name`]: me, [`${other(S.me)}.name`]: you, start }).catch(fail);
+  const a = $("sA").value.trim(), b = $("sB").value.trim(), start = $("sStart").value;
+  if (!a || !b || !start) return toast("이름과 날짜를 모두 적어 주세요");
+  updateDoc(doc(db, "rooms", S.room), { "a.name": a, "b.name": b, start }).catch(fail);
   toast("저장했어요");
 };
 $("sCopy").onclick = () => share(S.room);
