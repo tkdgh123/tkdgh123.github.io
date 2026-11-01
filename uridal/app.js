@@ -146,7 +146,7 @@ function moodCard(w, v) {
   const mine = w === S.me;
   const tag = mine ? `button type="button" data-mood` : "div";
   return `<${tag} class="mood ${mine ? "mine" : ""}"><span class="who by ${w}">${esc(name(w))}${mine ? " (나)" : ""}</span>`
-    + (v?.mood ? `<span class="face">${v.mood}</span>` : "")
+    + (v?.mood ? `<span class="face">${esc(v.mood)}</span>` : "")
     + (v?.memo ? `<p>${esc(v.memo)}</p>` : `<p class="empty">${mine ? "기분·한 줄 남기기" : "아직 없어요"}</p>`)
     + `</${mine ? "button" : "div"}>`;
 }
@@ -195,7 +195,7 @@ function renderUs() {
   $("sCode").textContent = S.room;
   const on = curPhoto()?.id;
   $("picList").innerHTML = S.photos.map(p =>
-    `<div class="pic${p.id === on ? " on" : ""}" style="background-image:url('${p.data}')">`
+    `<div class="pic${p.id === on ? " on" : ""}" style="background-image:url('${esc(p.data)}')">`
     + `<button type="button" data-pic="${p.id}" aria-label="맨 위에 걸기"></button>`
     + `<button type="button" class="x" data-pdel="${p.id}" aria-label="사진 지우기">×</button></div>`).join("");
 }

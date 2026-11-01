@@ -211,6 +211,7 @@ dialog[open]::backdrop { animation: fade .3s ease; }
 .two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
 .two label, .two input { min-width: 0; }
 .two input { padding-inline: 12px; }
+@media (max-width: 340px) { .two { grid-template-columns: minmax(0, 1fr); } }
 .seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
 .seg.two-way { grid-template-columns: 1fr 1fr; }
 .seg button { padding: 11px 6px; border: 0; border-radius: 999px; background: var(--bg); font-weight: 800; color: var(--soft); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -283,9 +284,9 @@ dialog[open]::backdrop { animation: fade .3s ease; }
 .props i { position: absolute; background: center / contain no-repeat; }
 .props .bowbig { top: -24px; right: -10px; width: 52px; height: 36px; background-image: var(--bow); }
 [data-skin="kitty"] .week { margin-bottom: 10px; }
-.props .wh { top: 44%; width: 28px; height: 28px; background-image: var(--whisk); }
-.props .wh.l { left: -13px; }
-.props .wh.r { right: -13px; transform: scaleX(-1); }
+.props .wh { top: 44%; width: 22px; height: 24px; background-image: var(--whisk); }
+.props .wh.l { left: -14px; }
+.props .wh.r { right: -14px; transform: scaleX(-1); }
 .props .apple { bottom: -30px; left: 4px; width: 40px; height: 42px; background-image: var(--apple); }
 .props .apple.s { bottom: -26px; left: 38px; width: 30px; height: 32px; }
 .props .milk { bottom: -30px; right: 44px; width: 26px; height: 46px; background-image: var(--milk); }
