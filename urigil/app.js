@@ -268,14 +268,14 @@ async function findPlace(type, ctx, t) {
   const area = AREAS[ctx.area], wd = parse(ctx.date).getDay(), dark = t >= ctx.sun;
   const pool = type === "view" ? [area, ...area.near.map(n => AREAS[n])].flatMap(a => a.spots) : area.spots;
   let spots = pool.filter(s => (s[1] === type || (type === "view" && s[1] === "walk" && s[3].n))
-    && !ctx.used.has(s[0]) && opensAt(s[3], t, s[2], wd) && (!dark || s[3].n || s[3].i));
+    && !ctx.used.has(s[0]) && !ctx.used.has(s[3].label) && opensAt(s[3], t, s[2], wd) && (!dark || s[3].n || s[3].i));
   if (spots.length) {
     const far = type === "view" ? 3000 : 1600;
     const found = (await Promise.all(spots.map(s => anchor(s).then(p => p && { p, s })))).filter(x => x && (!ctx.pos || dist(ctx.pos, x.p) <= far));
     if (found.length) {
       const near = ctx.pos ? found.sort((x, y) => dist(ctx.pos, x.p) - dist(ctx.pos, y.p)) : found.sort(() => Math.random() - .5);
       const { p, s } = near[0];
-      ctx.used.add(s[0]);
+      ctx.used.add(s[0]); ctx.used.add(p.name);
       return { ...p, stay: s[2], name: p.name };
     }
   }
