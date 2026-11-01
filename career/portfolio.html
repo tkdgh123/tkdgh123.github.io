@@ -4,72 +4,113 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>포트폴리오 설계</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@500;700&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
+<script>document.documentElement.classList.add("js")</script>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <link rel="stylesheet" href="style.css">
 <style>
-/* 포트폴리오 쪽에만 쓰는 것: 상태 꼬리표, 파이프라인, 자리 배치 */
-.tag { display: inline-block; font-size: 12px; font-weight: 600; padding: 1px 8px; border-radius: 999px; background: var(--tint); color: var(--acc); white-space: nowrap; vertical-align: 2px; margin-left: 6px }
-.tag.new { background: color-mix(in srgb, var(--warn) 18%, transparent); color: var(--warn) }
-.prog h4 .tag { font-family: var(--body) }
-.pipe { list-style: none; margin: 0 0 8px; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; counter-reset: p }
-.pipe li { counter-increment: p; background: var(--sheet); border: 1px solid var(--rule); border-radius: 12px; padding: 14px; display: grid; gap: 4px; align-content: start; min-width: 0 }
-.pipe li.new { border: 2px solid var(--warn) }
-.pipe li::before { content: counter(p); font-family: var(--display); font-size: 13px; color: var(--ink-2) }
-.pipe b { font-family: var(--display); font-size: 16px; line-height: 1.35 }
-.pipe span { font-size: 13.5px; color: var(--ink-2) }
-@media (max-width: 760px) { .pipe { grid-template-columns: 1fr 1fr } }
-@media (max-width: 420px) { .pipe { grid-template-columns: 1fr } }
-.tiers { display: grid; gap: 10px }
-.tiers > div { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 4px 20px; padding: 16px 18px; border-radius: 12px; background: var(--sheet); border: 1px solid var(--rule) }
-.tiers > div.top { border: 2px solid var(--acc) }
-.tiers > div.out { background: none; border-style: dashed }
-.tiers small { font-size: 12.5px; font-weight: 600; color: var(--acc); letter-spacing: .04em }
-.tiers b { font-family: var(--display); font-size: 18px }
-.tiers p { font-size: 14.5px; color: var(--ink-2) }
-.tiers ul { margin: 6px 0 0; padding-left: 18px; font-size: 14.5px; display: grid; gap: 3px }
-@media (max-width: 560px) { .tiers > div { grid-template-columns: 1fr } }
-.blank { background: color-mix(in srgb, var(--warn) 16%, transparent); color: var(--warn); border-radius: 4px; padding: 0 5px; font-weight: 600 }
-.qa { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; font-size: 14.5px }
-.qa li { padding-left: 14px; border-left: 2px solid var(--rule); color: var(--ink-2) }
-.qa b { color: var(--ink); font-weight: 600 }
+/* 포트폴리오 쪽에만 쓰는 것: 빈칸 셋, 상태 꼬리표, 재료 그림, 파이프라인 계단, 자리 배치, 한 장 견본 */
+.picks.even li b { font-size: var(--s-head) }
+.tag { font-size: var(--s-small); font-weight: 800; letter-spacing: 0; color: var(--accent); margin-left: 10px; vertical-align: .35em; white-space: nowrap }
+.tag.new { color: var(--paper); background: var(--ink); padding: 3px 9px }
+
+.mats { grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 16px; row-gap: 88px }
+.mats article:nth-child(n) { margin-top: 0 }
+.mats article.pic { grid-column: 1 / -1; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 16px; align-items: center }
+.mats .pic figure { grid-column: 1 / 8; margin: 0; transform: rotate(-1.6deg) }
+.mats .pic .txt { grid-column: 9 / 13; display: grid; gap: 14px }
+.mats .pic.flip figure { grid-column: 6 / 13; grid-row: 1; transform: rotate(1.6deg) }
+.mats .pic.flip .txt { grid-column: 1 / 5; grid-row: 1 }
+.mats article:nth-child(4), .mats article:nth-child(5) { grid-column: span 6 }
+.mats article:nth-child(5) { margin-top: 64px }
+.mats article:nth-child(n+6) { grid-column: span 4 }
+.mats article:nth-child(7) { margin-top: 64px }
+
+.pipe { list-style: none; margin: 56px 0 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; align-items: start }
+.pipe li { background: var(--paper); padding: 24px 22px 26px; display: grid; gap: 6px; min-width: 0 }
+.pipe li:nth-child(1) { margin-top: 160px } .pipe li:nth-child(2) { margin-top: 120px } .pipe li:nth-child(3) { margin-top: 80px } .pipe li:nth-child(4) { margin-top: 40px }
+.pipe li.new { background: var(--accent); color: var(--accent-ink) }
+.pipe b { font-size: var(--s-lead); font-weight: 900; letter-spacing: -.03em; line-height: 1.2 }
+.ch > .rows { margin-top: 72px; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px 56px }
+
+.tiers { margin-top: 64px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 40px; align-items: start }
+.tiers > div { display: grid; gap: 10px; padding: clamp(24px, 3vw, 40px) }
+.tiers > div:nth-child(2), .tiers > div:nth-child(4) { margin-top: 72px }
+.tiers > div.top { background: var(--paper); color: var(--ink) }
+.tiers > div.out { grid-column: 1 / -1; color: var(--on-dark-soft); max-width: 46em }
+.tiers small { font-size: var(--s-body); font-weight: 800; color: var(--on-dark-soft) }
+.tiers .top small { color: var(--accent) }
+.tiers b { font-size: var(--s-lead); font-weight: 900; letter-spacing: -.03em; line-height: 1.25 }
+.tiers p { margin-top: 8px }
+.tiers ul { margin: 14px 0 0; padding-left: 20px; display: grid; gap: 6px }
+.dark tr.top th, .dark tr.top td:first-of-type { color: var(--on-dark) }
+.dark tr.top th { text-decoration: underline 2px; text-underline-offset: 5px }
+.dark .verdict b { color: inherit; text-decoration: underline 3px; text-underline-offset: 6px }
+
+.sheet { margin: 64px 0 0 auto; max-width: 1040px; background: var(--paper); padding: clamp(24px, 4vw, 64px); transform: rotate(-1.2deg) }
+.sheet img { width: 100%; margin-bottom: 48px }
+.sheet .rows { gap: 22px }
+.sheet .rows > div { grid-template-columns: 8em minmax(0, 1fr); gap: 4px 28px }
+.sheet .rows b { font-size: var(--s-body); font-weight: 800 }
+.blank { background: var(--tone); padding: 1px 8px; font-weight: 700 }
+.qa { margin: 40px 0 0; padding: 0; list-style: none; display: grid; gap: 20px; max-width: 52em; font-size: var(--s-lead); line-height: 1.45 }
+.qa b { font-weight: 900; letter-spacing: -.02em }
+@media (max-width: 1100px) {
+  .mats .pic figure, .mats .pic.flip figure { grid-column: 1 / -1; grid-row: auto; transform: none }
+  .mats .pic .txt, .mats .pic.flip .txt { grid-column: 1 / -1; grid-row: auto; margin-top: 32px }
+  .pipe { grid-template-columns: repeat(2, minmax(0, 1fr)) }
+  .pipe li:nth-child(n) { margin-top: 0 }
+  .pipe li.new { grid-column: 1 / -1 }
+}
+@media (max-width: 760px) {
+  .mats article:nth-child(n) { grid-column: 1 / -1; margin-top: 0 }
+  .ch > .rows, .tiers { grid-template-columns: 1fr }
+  .tiers > div:nth-child(n) { margin-top: 0 }
+  .sheet { transform: none }
+  .sheet .rows > div { grid-template-columns: 1fr }
+}
+@media (max-width: 640px) {
+  .picks.even li b { font-size: 9vw }
+  #what h2 { font-size: 7.4vw }
+  .pipe { grid-template-columns: 1fr }
+  .qa { font-size: var(--s-body) }
+}
 </style>
 </head>
 <body>
-<div class="page">
-
-<header class="top">
+<header class="bar">
   <a class="mback" href="./">← 진로 수첩</a>
-  <div class="eb">진로 수첩 · 포트폴리오 · 2026년 10월 29일 기준</div>
-  <h1>포트폴리오 설계</h1>
-  <p class="sub">보여 줄 것은 하나다. <b>AI를 지휘해 만들되, 검증하고 내 말로 설명할 수 있는 사람.</b> 재료는 이미 많고, 빈칸은 세 개다.</p>
-  <ol class="picks">
-    <li><small>빈칸 1</small><b>LLM을 넣은 제품</b><span>1순위가 AI 응용인데 아직 하나도 없다</span></li>
-    <li><small>빈칸 2</small><b>남이 써 본 기록</b><span>공개·출시해서 반응과 숫자 남기기</span></li>
-    <li><small>빈칸 3</small><b>손으로 설명할 코드</b><span>프로젝트마다 핵심 하나는 직접 다시 짜기</span></li>
-  </ol>
+  <nav class="toc" aria-label="목차">
+    <ol>
+      <li><a href="#what">뽑는 쪽 기준</a></li>
+      <li><a href="#have">가진 재료</a></li>
+      <li><a href="#tier">자리 배치</a></li>
+      <li><a href="#new">새로 만들 것</a></li>
+      <li><a href="#ai">AI 밝히기</a></li>
+      <li><a href="#format">형식</a></li>
+      <li><a href="#page">한 장 구조</a></li>
+      <li><a href="#views">여러 관점</a></li>
+      <li><a href="#road">일정</a></li>
+      <li><a href="#todo">지금 할 일</a></li>
+    </ol>
+  </nav>
 </header>
 
-<nav class="toc" aria-label="목차">
-  <a class="back" href="./">← 진로 수첩</a>
-  <ol>
-    <li><a href="#what">뽑는 쪽 기준</a></li>
-    <li><a href="#have">가진 재료</a></li>
-    <li><a href="#tier">자리 배치</a></li>
-    <li><a href="#new">새로 만들 것</a></li>
-    <li><a href="#ai">AI 밝히기</a></li>
-    <li><a href="#format">형식</a></li>
-    <li><a href="#page">한 장 구조</a></li>
-    <li><a href="#views">여러 관점</a></li>
-    <li><a href="#road">일정</a></li>
-    <li><a href="#todo">지금 할 일</a></li>
-  </ol>
-</nav>
-
 <main>
+<div class="hero">
+  <h1>포트폴리오<br>설계</h1>
+  <p class="sub">보여 줄 것은 하나다. <b>AI를 지휘해 만들되, 검증하고 내 말로 설명할 수 있는 사람.</b> 재료는 이미 많고, 빈칸은 세 개다.</p>
+  <p class="when">진로 수첩 · 포트폴리오 · 2026년 10월 29일 기준</p>
+</div>
 
-<section id="what">
+<ol class="picks even ch dark" aria-label="빈칸 셋">
+  <li><b>LLM을 넣은 제품</b><p><small>빈칸 1</small><span>1순위가 AI 응용인데 아직 하나도 없다</span></p></li>
+  <li><b>남이 써 본 기록</b><p><small>빈칸 2</small><span>공개·출시해서 반응과 숫자 남기기</span></p></li>
+  <li><b>손으로 설명할 코드</b><p><small>빈칸 3</small><span>프로젝트마다 핵심 하나는 직접 다시 짜기</span></p></li>
+</ol>
+
+
+<section id="what" class="ch tone rev">
   <h2>2026년 채용은 ‘AI로 어떻게 풀고 검증했나’를 본다</h2>
   <p class="lead">AI 사용을 막는 대신 평가 항목으로 넣는 회사가 늘었다. 결과물보다 과정과 설명이 점수가 된다.</p>
   <div class="tbl"><table>
@@ -92,24 +133,33 @@
   </ul>
 </section>
 
-<section id="have">
+<section id="have" class="ch paper">
   <h2>재료는 1학년치고 많다</h2>
   <p class="lead">2026년 10월 29일에 폴더를 직접 열어 확인한 상태. 공개된 건 작업실 사이트 하나뿐이다.</p>
-  <div class="prog">
-    <article>
+  <div class="prog mats">
+    <article class="pic">
+      <figure><img src="../neokgut/img/bg_boss.webp" alt="넋굿의 보스 전장 풍경, 오행 깃발이 꽂힌 산" width="1600" height="900" loading="lazy"></figure>
+      <div class="txt">
       <h4>넋굿 <span class="tag">진행 중</span></h4>
       <p>Unity 6 동양풍 로그라이트. 오행 상생·상극 체인 전투, 방 이동 맵, 보스 3종, 먹 붓 술법.</p>
       <dl><dt>규모</dt><dd>C# 약 2만 5,800줄, 커밋 233개 (10.13 ~ 10.29)</dd><dt>있음</dt><dd>실행 빌드, 트레일러 v1~v3, 규칙 검사 약 263건, 자동 플레이 시나리오 10종, AI 에셋 기록(AI_ASSETS.md)</dd><dt>없음</dt><dd>README, GitHub, 남이 해 본 기록</dd><dt>주의</dt><dd>Art 폴더 3.6GB는 그대로 못 올린다. Mixamo 약관 확인</dd></dl>
+      </div>
     </article>
-    <article>
+    <article class="pic flip">
+      <figure><img src="../brown-rogue/img/s_formation.webp" alt="Brown Rogue 3×4 진형 배치 화면" width="1280" height="720" loading="lazy"></figure>
+      <div class="txt">
       <h4>Brown Rogue <span class="tag">거의 준비</span></h4>
       <p>Python·pygame-ce 동양풍 진형 턴제 RPG. 영웅 15명, 25스테이지, 3×4 진형, 오행 상성, 보스 예고 공격.</p>
       <dl><dt>규모</dt><dd>게임 3만 1,400줄 + 테스트 1만 3,100줄(테스트 920개), 커밋 128개 (10.4 ~ 10.12)</dd><dt>있음</dt><dd>전투 로직과 화면 분리, 스크린샷 약 25장, 전투 GIF, 웹 빌드, 출처표(CREDITS.md), 밸런스 문서</dd><dt>없음</dt><dd>GitHub, 영상, 실행 파일 배포본</dd><dt>주의</dt><dd>refs 폴더의 다른 게임 스크린샷 10장, 중복 폴더. 이름이 브라운더스트를 떠올리게 한다</dd></dl>
+      </div>
     </article>
-    <article>
+    <article class="pic">
+      <figure><img src="../hub/shots/daily.webp" alt="매일 AI 공부 레슨 화면" width="1280" height="800" loading="lazy"></figure>
+      <div class="txt">
       <h4>매일 AI 공부 카톡 <span class="tag">작동 중</span></h4>
       <p>아침 8시 카톡 레슨 → 웹 상세 → 퀴즈 → 학습 완료 기록 → 다음 날 안 끝낸 레슨부터.</p>
       <dl><dt>규모</dt><dd>Python 약 200줄 + 웹 페이지 + Apps Script</dd><dt>있음</dt><dd>카카오 OAuth 토큰 자동 갱신, 작업 스케줄러, 절전 후 재시도, 휴대폰 ↔ 노트북 완료 동기화</dd><dt>없음</dt><dd>README, 구조 그림, 사용 기록 숫자</dd><dt>주의</dt><dd>키 파일(.kakao_me.json)은 절대 올리지 않기</dd></dl>
+      </div>
     </article>
     <article>
       <h4>강의 받아쓰기 <span class="tag">정리 필요</span></h4>
@@ -139,7 +189,7 @@
   </div>
 </section>
 
-<section id="tier">
+<section id="tier" class="ch dark rev">
   <h2>대표작 둘, 보조 둘, 나머지는 한 줄</h2>
   <p class="lead">프로젝트 수를 늘리지 않는다. 지원처에 따라 같은 재료의 순서만 바꾼 두 판을 만든다.</p>
   <div class="tiers">
@@ -153,7 +203,7 @@
   </div>
 </section>
 
-<section id="new">
+<section id="new" class="ch tone">
   <h2>새로 만들 것: 강의 복습 도우미</h2>
   <p class="lead">1순위 직무가 AI 응용 개발인데, LLM을 제품 안에 넣어 본 프로젝트가 없다. Claude Code를 잘 쓰는 것과 LLM 제품을 만드는 것은 다른 능력이다. 이미 가진 세 도구를 이어 하나로 만든다.</p>
   <ol class="pipe">
@@ -172,7 +222,7 @@
   </div>
 </section>
 
-<section id="ai">
+<section id="ai" class="ch paper rev">
   <h2>AI로 만든 것은 숨기지 말고 나눠서 밝힌다</h2>
   <p class="lead">숨기면 면접 한 질문에 무너지고, 밝히면 평가 항목이 된다. 무기는 ‘AI를 믿지 않고 검증하는 장치를 만든 것’이다.</p>
   <div class="tbl"><table>
@@ -191,7 +241,7 @@
   </ul>
 </section>
 
-<section id="format">
+<section id="format" class="ch dark">
   <h2>원본은 노션, 제출은 PDF, 증거는 GitHub</h2>
   <p class="lead">한 곳에 다 넣지 않고 역할을 나눈다.</p>
   <div class="tbl"><table>
@@ -206,9 +256,11 @@
   <p class="verdict">노션으로 만드는 방법은 사실이고 많이 쓴다. 단, <b>노션 링크만 내는 것은 피한다.</b> 노션에서 PDF로 내보내면 모양이 흐트러질 수 있다는 지적이 있어서, 제출용 PDF는 내보낸 뒤 쪽마다 직접 확인한다.</p>
 </section>
 
-<section id="page">
+<section id="page" class="ch tone rev">
   <h2>프로젝트 한 장은 배경 → 의도 → 선택 → 결과</h2>
   <p class="lead">넥슨 현직자가 말한 완결성의 흐름에, 역할과 검증을 더한다. 넋굿으로 채운 예시. 빈칸은 아직 모르는 값이다.</p>
+  <div class="sheet">
+  <img src="../neokgut/img/bg_gate.webp" alt="넋굿의 저승 입구 풍경" width="1600" height="900" loading="lazy">
   <div class="rows">
     <div><b>한 줄</b><p>오행 상생·상극을 이어 붙이는 체인 전투의 3D 쿼터뷰 로그라이트</p></div>
     <div><b>배경</b><p><span class="blank">왜 이 게임을 시작했나, 직접 쓰기</span></p></div>
@@ -220,6 +272,7 @@
     <div><b>배운 점</b><p><span class="blank">다음에 다르게 할 것 하나</span></p></div>
     <div><b>링크</b><p>1분 영상 · itch.io · GitHub · 도록</p></div>
   </div>
+  </div>
   <h3>면접에서 나올 질문 (넋굿)</h3>
   <ul class="qa">
     <li><b>“체인 판정 코드를 지금 설명해 보세요.”</b> 손으로 다시 짠 버전으로 답한다.</li>
@@ -228,7 +281,7 @@
   </ul>
 </section>
 
-<section id="views">
+<section id="views" class="ch paper">
   <h2>여섯 관점의 토론</h2>
   <p class="lead">‘재료는 충분하다, 빈칸 세 개를 채워라’에 모두 동의했다. 갈린 건 무엇을 앞에 세우느냐다.</p>
   <ul class="views">
@@ -248,7 +301,7 @@
   <p class="verdict">아직 남은 이견은 게임과 AI 중 무엇이 주력이냐다. 이건 포트폴리오가 아니라 진로의 문제라, <a href="./#road">진로 수첩</a>대로 2학년 끝에 넋굿과 복습 도우미의 진척을 보고 정한다. 그 전까지 두 판을 함께 키운다.</p>
 </section>
 
-<section id="road">
+<section id="road" class="ch dark rev">
   <h2>첫 마감은 2027년 SW마에스트로 지원</h2>
   <p class="lead">입대 전에 1판, 복학 뒤에 인턴용 2판. 군 복무 중엔 노션으로 문장만 다듬는다.</p>
   <ol class="road">
@@ -261,7 +314,7 @@
   <p>18기 공고는 아직 없다. 17기 일정을 기준으로 잡았고, 공고가 뜨면 고친다.</p>
 </section>
 
-<section id="todo">
+<section id="todo" class="ch tone">
   <h2>이번 겨울까지 할 일</h2>
   <p class="lead">위에서부터 순서대로. 시간은 Claude와 같이 할 때의 대략적인 예상이다.</p>
   <ul class="todo">
@@ -277,7 +330,6 @@
 </section>
 
 </main>
-</div>
 
 <script>
 /* 체크 상태는 이 브라우저에만 저장 */
@@ -294,6 +346,16 @@ const io = new IntersectionObserver(es => es.forEach(e => {
   if (on && getComputedStyle(on.closest("ol")).display === "flex") on.closest("ol").scrollTo({ left: on.offsetLeft - 20, behavior: "smooth" });
 }), { rootMargin: "-30% 0px -60% 0px" });
 document.querySelectorAll("main section[id]").forEach(s => io.observe(s));
+
+/* 휴대폰에서 표를 줄마다 풀 때 쓸 칸 이름 */
+document.querySelectorAll("table").forEach(t => {
+  const h = [...t.querySelectorAll("thead th")].map(th => th.textContent);
+  t.querySelectorAll("tbody tr").forEach(tr => [...tr.children].forEach((c, i) => { if (i && h[i]) c.dataset.l = h[i]; }));
+});
+
+/* 면 안의 덩어리가 화면에 들어오면 떠오른다 */
+const rise = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); rise.unobserve(e.target); } }), { rootMargin: "0px 0px -6% 0px" });
+document.querySelectorAll(".ch > *, .hero > *").forEach(el => rise.observe(el));
 </script>
 </body>
 </html>
