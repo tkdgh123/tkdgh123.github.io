@@ -232,6 +232,11 @@ dialog[open]::backdrop { animation: fade .3s ease; }
 .top { position: relative; }
 .skinbtn { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 12px); right: max(14px, env(safe-area-inset-right, 0px));
   display: flex; gap: 2px; padding: 8px 9px; border: 0; border-radius: 999px; background: var(--panel); box-shadow: var(--shadow); }
+.codebtn { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 12px); left: max(14px, env(safe-area-inset-left, 0px));
+  padding: 6px 13px; border: 0; border-radius: 999px; background: var(--panel); box-shadow: var(--shadow); font-size: 12px; font-weight: 700; color: var(--acc-ink); }
+#sheetForm .code { margin: 4px 0 12px; }
+#sheetForm .danger { display: block; margin: 8px auto 2px; }
+#sheetForm .hint { text-align: center; }
 .skinbtn i { width: 9px; height: 9px; border-radius: 50%; }
 .skinbtn i:nth-child(1) { background: #6EA6F5; } .skinbtn i:nth-child(2) { background: #FF7FA7; } .skinbtn i:nth-child(3) { background: #EE4B67; }
 .skins { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }

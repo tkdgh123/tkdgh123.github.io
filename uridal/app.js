@@ -373,7 +373,7 @@ async function shrink(file) {
 function enter(room, me) {
   S.room = room; S.me = me; saveLocal({ room, me }); applySkin(getSkin());
   $("setup").hidden = true; $("boot").hidden = false;
-  const slow = setTimeout(() => toast("연결이 느려요. 잠시만요…"), 8000);
+  const slow = setTimeout(() => { toast("연결이 느려요. 잠시만요…"); $("bootReset").hidden = false; }, 8000);
   S.unsub.push(onSnapshot(doc(db, "rooms", room), s => {
     if (!s.exists()) {
       if (!s.metadata.fromCache) { toast("달력을 찾을 수 없어요."); leave(); }
@@ -385,7 +385,7 @@ function enter(room, me) {
       $("boot").hidden = true; $("app").hidden = false;
       render(); appear($("app"));
     } else render();
-  }, err => { clearTimeout(slow); toast(`불러오지 못했어요 (${err.code})`); }));
+  }, err => { clearTimeout(slow); toast(`불러오지 못했어요 (${err.code})`); $("bootReset").hidden = false; }));
   for (const c of ["events", "wishes", "annivs"]) {
     S.unsub.push(onSnapshot(col(c), s => { S[c] = s.docs.map(d => ({ id: d.id, ...d.data() })); render(); }));
   }
@@ -393,6 +393,18 @@ function enter(room, me) {
 }
 function leave() {
   S.unsub.forEach(u => u()); saveLocal(null); location.reload();
+}
+
+/* 달력 화면에서 바로: 커플 코드 보기, 링크 보내기, 초기화 */
+function openRoom() {
+  openSheet(`<h3>커플 코드</h3>
+    <output class="code">${S.room}</output>
+    <button type="button" class="pill wide" data-r="share">링크 보내기</button>
+    <button type="button" class="link danger" data-r="reset">초기화 (처음 화면으로)</button>
+    <p class="hint">초기화해도 달력 내용은 그대로예요. 코드로 다시 들어오면 돼요.</p>`, null, () => {
+    sheetForm.querySelector("[data-r=share]").onclick = () => share(S.room);
+    sheetForm.querySelector("[data-r=reset]").onclick = e => { if (armed(e.currentTarget)) leave(); };
+  });
 }
 
 async function share(code) {
@@ -515,6 +527,8 @@ $("saveSet").onclick = () => {
 $("sCopy").onclick = () => share(S.room);
 $("leave").onclick = e => { if (armed(e.currentTarget)) leave(); };
 $("skinBtn").onclick = openSkins;
+$("codeBtn").onclick = openRoom;
+$("bootReset").onclick = leave;
 $("skinBtn2").onclick = openSkins;
 $("hPic").onclick = () => {
   if (!S.photos.length) { showTab("us"); return $("album").scrollIntoView({ behavior: "smooth" }); }

@@ -23,7 +23,7 @@
 </head>
 <body>
 
-<div id="boot" class="boot"><img src="icon-192.png" alt="" width="84" height="84"><b>우리달</b></div>
+<div id="boot" class="boot"><img src="icon-192.png" alt="" width="84" height="84"><b>우리달</b><button class="link" id="bootReset" type="button" hidden>처음 화면으로</button></div>
 
 <!-- 처음 시작 -->
 <section id="setup" class="setup" hidden>
@@ -70,6 +70,7 @@
 <!-- 앱 -->
 <div id="app" class="app" hidden>
   <header class="top">
+    <button class="codebtn" id="codeBtn" type="button">코드</button>
     <button class="skinbtn" id="skinBtn" type="button" aria-label="화면 고르기"><i></i><i></i><i></i></button>
     <button class="hpic" id="hPic" type="button" aria-label="키티 사진"></button>
     <div class="couple"><span class="chip a" id="hA"></span><span class="beat" aria-hidden="true">♥</span><span class="chip b" id="hB"></span></div>
@@ -130,7 +131,7 @@
         <div class="coderow"><span>커플 코드</span><output class="code small" id="sCode"></output><button class="pill" id="sCopy" type="button">링크 보내기</button></div>
         <button class="pill" id="installBtn" type="button" hidden>홈 화면에 앱 설치</button>
         <p class="hint" id="iosHint" hidden>Safari 아래 공유 버튼 → 홈 화면에 추가하면 앱처럼 열려요.</p>
-        <button class="link danger" id="leave" type="button">이 기기에서 나가기</button>
+        <button class="link danger" id="leave" type="button">초기화 (처음 화면으로)</button>
       </div>
     </section>
   </main>
