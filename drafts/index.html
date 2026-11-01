@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>첫 화면 시안</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@200..800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+:root { --paper: #f2f1ec; --tone: #e4e2da; --ink: #151514; --muted: #5a5954; --rule: #c9c6bc; --blue: #2b44a6; --m: clamp(16px, 3.2vw, 52px); color-scheme: light }
+* { box-sizing: border-box }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 17px/1.65 "Pretendard Variable", Pretendard, system-ui, sans-serif; word-break: keep-all; -webkit-font-smoothing: antialiased }
+a { color: inherit }
+img { display: block; width: 100%; height: auto }
+h1, h2 { margin: 0; font-family: "Hahmlet", serif; letter-spacing: -.015em; line-height: 1.1 }
+p { margin: 0 }
+.mono { font: 12.5px/1.5 "IBM Plex Mono", "Pretendard Variable", monospace; letter-spacing: .02em; color: var(--muted) }
+header { display: flex; justify-content: space-between; align-items: baseline; padding: 26px var(--m) }
+header a { font: 600 22px/1 "Hahmlet", serif; text-decoration: none }
+.top { padding: 64px var(--m) 72px; display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 20px; align-items: end }
+.top h1 { grid-column: 1 / 8; font-size: clamp(48px, 7vw, 112px); font-weight: 250 }
+.top h1 b { font-weight: 700 }
+.top p { grid-column: 9 / 13; color: var(--muted) }
+ol { list-style: none; margin: 0; padding: 0 var(--m) 120px; display: grid; gap: 96px }
+li { display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 20px; align-items: end; padding-top: 28px; border-top: 1px solid var(--rule) }
+li .shot { grid-column: 1 / 9; overflow: hidden; box-shadow: 0 30px 60px -30px rgba(0,0,0,.35) }
+li .shot img { transition: transform .7s cubic-bezier(.2,.7,.2,1) }
+li .shot:hover img { transform: scale(1.02) }
+li .txt { grid-column: 9 / 13; display: grid; gap: 12px; padding-bottom: 6px }
+li h2 { font-size: clamp(32px, 3.4vw, 54px); font-weight: 500 }
+li .score { font: 200 clamp(56px, 6vw, 96px)/.9 "Hahmlet", serif }
+li .score small { font-size: .3em; color: var(--muted) }
+li.win .score { color: var(--blue) }
+.tag { justify-self: start; background: var(--blue); color: #fff; font-weight: 700; font-size: 14px; padding: 6px 12px }
+li .txt > a { font-weight: 600; text-underline-offset: 5px; text-decoration-thickness: 1px }
+a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px }
+@media (max-width: 800px) {
+  .top h1, .top p, li .shot, li .txt { grid-column: 1 / -1 }
+  .top p { margin-top: 20px }
+  li .txt { margin-top: 22px }
+  ol { gap: 64px }
+}
+</style>
+</head>
+<body>
+<header><a href="../">작업실</a><span class="mono">11.01</span></header>
+<main>
+<section class="top">
+  <h1>첫 화면 <b>시안</b></h1>
+  <p>심사 두 번(Codex·Claude)과 디자인팀 세 곳. A를 다듬어 지금 첫 화면에 걸었습니다.</p>
+</section>
+<ol>
+  <li class="win">
+    <a class="shot" href="../"><img src="shots/a.webp" alt="시안 A 편집 저널 첫 화면" width="1440" height="900"></a>
+    <div class="txt">
+      <span class="tag">적용 중</span>
+      <span class="score">8.5<small> / 10</small></span>
+      <h2>A 편집 저널</h2>
+      <p>가는 세리프 제목에 강조어만 굵게. 비대칭 편집 그리드, 큰 번호, 펼쳐지는 그림.</p>
+      <p class="mono">Hahmlet · Pretendard · IBM Plex Mono</p>
+      <a href="a.html">처음 시안 보기</a>
+    </div>
+  </li>
+  <li>
+    <a class="shot" href="b.html"><img src="shots/b.webp" alt="시안 B 인덱스 아카이브 첫 화면" width="1440" height="900" loading="lazy"></a>
+    <div class="txt">
+      <span class="score">8<small> / 10</small></span>
+      <h2>B 인덱스 아카이브</h2>
+      <p>왼쪽 고정 목차와 진행 표시, 게임 가로 넘김, 흐르는 오늘 공부, 표 행에 따라오는 그림.</p>
+      <p class="mono">Wanted Sans · IBM Plex Mono</p>
+      <a href="b.html">시안 보기</a>
+    </div>
+  </li>
+  <li>
+    <a class="shot" href="c.html"><img src="shots/c.webp" alt="시안 C 전시장 첫 화면" width="1440" height="900" loading="lazy"></a>
+    <div class="txt">
+      <span class="score">7.5<small> / 10</small></span>
+      <h2>C 전시장</h2>
+      <p>겹쳐 쌓인 그림, 스크롤로 화면 가득 커지는 게임, 위로 쌓이는 공부 판, 크기가 다른 작품 벽.</p>
+      <p class="mono">Paperlogy · SUIT · IBM Plex Mono</p>
+      <a href="c.html">시안 보기</a>
+    </div>
+  </li>
+  <li>
+    <a class="shot" href="0.html"><img src="shots/0.webp" alt="이전 첫 화면" width="1440" height="900" loading="lazy"></a>
+    <div class="txt">
+      <span class="score">7<small> / 10</small></span>
+      <h2>이전 첫 화면</h2>
+      <p>분류마다 한 색, 대각선으로 맞물린 면, 비스듬히 흐르는 작업 그림.</p>
+      <p class="mono">Pretendard</p>
+      <a href="0.html">보기</a>
+    </div>
+  </li>
+</ol>
+</main>
+</body>
+</html>
