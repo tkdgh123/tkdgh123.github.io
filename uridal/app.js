@@ -99,18 +99,16 @@ function upcoming(k) {
   return out.slice(0, k);
 }
 /* 반복(매주 w·매달 m) 포함, 날짜 d에 걸친 회차의 시작일. 없으면 null */
-const spanOf = e => (e.end ? diff(e.date, e.end) : 0);
+const spanOf = e => (!e.rep && e.end ? diff(e.date, e.end) : 0);
+const wdays = e => e.days || [parse(e.date).getDay()];
+const mday = e => e.mday || +e.date.slice(8);
 function startOf(e, d) {
   if (!e.rep) return e.date <= d && d <= (e.end || e.date) ? e.date : null;
-  for (let k = 0, span = Math.min(spanOf(e), 31); k <= span; k++) {
-    const s = addDays(d, -k);
-    if (s < e.date) break;
-    if ((e.until && s > e.until) || e.skip?.includes(s)) continue;
-    if (e.rep === "w" ? diff(e.date, s) % 7 === 0 : s.slice(8) === e.date.slice(8)) return s;
-  }
-  return null;
+  if (d < e.date || (e.until && d > e.until) || e.skip?.includes(d)) return null;
+  const t = parse(d), last = new Date(t.getFullYear(), t.getMonth() + 1, 0).getDate();
+  return (e.rep === "w" ? wdays(e).includes(t.getDay()) : t.getDate() === Math.min(mday(e), last)) ? d : null;
 }
-const repLabel = e => (e.rep ? (e.rep === "w" ? `매주 ${WEEK[parse(e.date).getDay()]}요일` : `매달 ${+e.date.slice(8)}일`) + (e.until ? ` (${md(e.until)}까지)` : "") : "");
+const repLabel = e => (e.rep ? (e.rep === "w" ? `매주 ${[...wdays(e)].sort().map(i => WEEK[i]).join("·")}` : `매달 ${mday(e)}일`) + (e.until ? ` (${md(e.until)}까지)` : "") : "");
 const eventsOn = d => S.events
   .filter(e => startOf(e, d))
   .sort((x, y) => (x.time || "99").localeCompare(y.time || "99") || (x.at || 0) - (y.at || 0));
@@ -248,31 +246,45 @@ function openEvent(id) {
     <label>무엇을 <input id="fT" required maxlength="40" autocomplete="off"></label>
     <div class="seg" id="fW">${["a", "both", "b"].map(w =>
       `<button type="button" class="${w}" data-w="${w}">${w === "both" ? "함께" : esc(name(w))}</button>`).join("")}</div>
-    <div class="two"><label>날짜 <input type="date" id="fD" required></label><label>끝나는 날 <input type="date" id="fE"></label></div>
-    <label>시간 <input type="time" id="fH"></label>
     <div class="seg rep" id="fR"><button type="button" data-r="">반복 안 함</button><button type="button" data-r="w">매주</button><button type="button" data-r="m">매달</button></div>
+    <div class="two" id="fOnce"><label>날짜 <input type="date" id="fD" required></label><label>끝나는 날 <input type="date" id="fE"></label></div>
+    <div class="wk" id="fWk" hidden>${WEEK.map((w, i) => `<button type="button" data-i="${i}"${i === 0 ? ' class="sun"' : ""}>${w}</button>`).join("")}</div>
+    <label id="fMd" hidden>매달 며칠 <select id="fDay">${Array.from({ length: 31 }, (_, i) => `<option value="${i + 1}">${i + 1}일</option>`).join("")}</select></label>
+    <label>시간 <input type="time" id="fH"></label>
     <label id="fUw" hidden>언제까지 (비워 두면 계속) <input type="date" id="fU"></label>
     <label>메모 <input id="fM" maxlength="80" autocomplete="off"></label>
     ${id && e.rep ? `<div class="acts"><button type="button" class="del grow" id="fSkip">이 날만 삭제</button><button type="button" class="del grow" id="fDel">전부 삭제</button></div>` : ""}
     <div class="acts">${id && !e.rep ? `<button type="button" class="del" id="fDel">삭제</button>` : ""}<button class="big" type="submit">저장</button></div>`,
   () => {
     const date = $("fD").value, end = $("fE").value, rep = $("fR").dataset.v || "", until = $("fU").value;
-    const data = { title: $("fT").value.trim(), date, end: end > date ? end : "", time: $("fH").value,
-                   memo: $("fM").value.trim(), who: $("fW").dataset.v, rep, until: rep && until >= date ? until : "" };
+    const days = [...$("fWk").querySelectorAll(".on")].map(b => +b.dataset.i);
+    const data = { title: $("fT").value.trim(), date, end: !rep && end > date ? end : "", time: $("fH").value,
+                   memo: $("fM").value.trim(), who: $("fW").dataset.v, rep, until: rep && until >= date ? until : "",
+                   days: rep === "w" ? days : deleteField(), mday: rep === "m" ? +$("fDay").value : deleteField() };
     if (!data.title) return false;
+    if (rep === "w" && !days.length) { toast("요일을 골라 주세요"); return false; }
     if (id) {
       updateDoc(ref("events", id), data).catch(fail);
       if (e.wishId) updateDoc(ref("wishes", e.wishId), { date }).catch(() => {});
     } else {
+      for (const k of ["days", "mday"]) if (typeof data[k] !== "number" && !Array.isArray(data[k])) delete data[k];
       setDoc(doc(col("events")), { ...data, by: S.me, at: Date.now() }).catch(fail);
     }
-    S.sel = date; render();
+    if (!rep) S.sel = date;
+    render();
   }, () => {
     $("fT").value = e.title || ""; $("fD").value = e.date; $("fE").value = e.end || "";
     $("fH").value = e.time || ""; $("fM").value = e.memo || "";
     const box = $("fW"); seg(box, "w"); box.querySelector(`[data-w="${e.who}"]`).click();
     const rb = $("fR"); seg(rb, "r");
-    rb.addEventListener("click", () => { $("fUw").hidden = !rb.dataset.v; });
+    rb.addEventListener("click", () => {
+      const r = rb.dataset.v;
+      $("fOnce").hidden = !!r; $("fWk").hidden = r !== "w"; $("fMd").hidden = r !== "m"; $("fUw").hidden = !r;
+    });
+    const wk = $("fWk"), on = e.rep === "w" ? wdays(e) : [parse(e.date).getDay()];
+    wk.querySelectorAll("button").forEach(b => b.classList.toggle("on", on.includes(+b.dataset.i)));
+    wk.addEventListener("click", ev => ev.target.closest("button")?.classList.toggle("on"));
+    $("fDay").value = e.rep === "m" ? mday(e) : +e.date.slice(8);
     rb.querySelector(`[data-r="${e.rep || ""}"]`).click(); $("fU").value = e.until || "";
     $("fSkip")?.addEventListener("click", ev => {
       if (!armed(ev.currentTarget)) return;
