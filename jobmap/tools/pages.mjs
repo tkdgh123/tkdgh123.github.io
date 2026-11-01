@@ -24,7 +24,7 @@ const footer = index.match(/<footer[\s\S]*?<\/footer>/)[0].replace("<footer hidd
 // 앱 안 링크(#jobs-키 등)를 정적 주소로 바꾼다. 화면 안 위치(#map-s-…)는 그대로 둔다
 const fix = (h) => h.replace(/href="#jobs-([\w-]+)"/g, `href="${B}jobs/$1/"`).replace(/href="#map-(?!s-)(?:etc-)?(\w+)"/g, `href="${B}depts/$1/"`)
   .replace(/href="#(ai-[\w-]+)"/g, `href="${B}ai/#$1"`).replace(/href="#(ai|faq)"/g, `href="${B}$1/"`).replace(/href="#map"/g, `href="${B}depts/"`)
-  .replace(/href="#jobs"/g, `href="${B}jobs/"`).replace(/href="#(test|about)"/g, `href="${B}#$1"`).replace(/src="img\//g, `src="${B}img/`).replaceAll(' tabindex="-1"', "");
+  .replace(/href="#jobs"/g, `href="${B}jobs/"`).replace(/href="#(test|about)"/g, `href="${B}#$1"`).replace(/src="img\//g, `src="${B}img/`).replaceAll(' tabindex="-1"', "").replaceAll('href="../internship/"', 'href="/internship/"');
 
 const TABS = [["진로 검사", B], ["학과 지도", B + "depts/"], ["직무 사전", B + "jobs/"], ["AI와 취업", B + "ai/"], ["많이 묻는 것", B + "faq/"], ["만든 방법", B + "#about"]];
 const pages = [];

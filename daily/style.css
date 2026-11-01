@@ -142,7 +142,7 @@ p { margin: 0 }
 .dict > div[hidden] { display: none }
 .dict b { font: 500 21px/1.3 var(--serif) }
 .dict p { font-size: 16px; line-height: 1.65 }
-.dict a { justify-self: start; font: 400 12.5px/1.6 var(--mono); color: var(--blue); text-underline-offset: 4px }
+.dict a { justify-self: start; font: 500 13.5px/1.6 var(--sans); color: var(--blue); text-underline-offset: 4px }
 
 /* 한 주 정리 */
 .rv > a { display: block; margin-bottom: 12px; font: 400 clamp(22px, 1.2rem + .5vw, 28px)/1.3 var(--serif); text-decoration: none }
