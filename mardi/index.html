@@ -128,6 +128,9 @@ section.s { padding-block: clamp(72px, 9vw, 128px) }
 .steps li { display: grid; grid-template-columns: 96px minmax(0, 1.2fr) minmax(0, 1fr); gap: 8px 36px; padding-block: 28px; border-top: 1px solid var(--rule); counter-increment: st }
 .steps li::before { content: counter(st); font: 300 clamp(48px, 5vw, 68px)/0.9 var(--display); color: var(--rule) }
 .steps li.now::before { color: var(--joint) }
+.steps li.ok { counter-increment: none }
+.steps li.ok::before { content: "✓"; color: var(--ink) }
+.steps h3 a { text-decoration-thickness: 2px }
 .steps h3 { font-size: 22px; font-weight: 700 }
 .steps .do { margin-top: 6px; color: var(--muted); font-size: 15.5px }
 .steps .done { font-size: 15px }
@@ -228,7 +231,7 @@ footer { padding-block: 40px 56px; font-size: 13px; color: var(--muted); border-
     <p class="sub">노트북은 Intel Arc 내장 그래픽과 RAM 16GB. 무거운 엔진보다 가볍게 자주 돌려 보는 쪽을 골랐습니다.</p>
     <div class="flow">
       <div class="node"><div class="dot"></div><p class="step mono">몸 만들기</p><h3>Blender</h3><p>관절 마네킹 모델을 파이썬 스크립트로 생성해 FBX로 내보냄.</p><p class="why">손으로 깎지 않아도 돼서 처음부터 비율·관절 위치를 숫자로 고칠 수 있음.</p><span class="free">무료 · 상업 OK</span></div>
-      <div class="node"><div class="dot"></div><p class="step mono">뼈와 기본 동작</p><h3>Mixamo</h3><p>자동 리깅, 걷기·달리기·점프 같은 기본 동작 수천 개.</p><p class="why">기본기는 받아 쓰고 시간은 내 동작에 쓰기 위해.</p><span class="free">무료 · 상업 OK</span></div>
+      <div class="node"><div class="dot"></div><p class="step mono">뼈와 기본 동작</p><h3>Mixamo</h3><p>걷기·달리기·점프 같은 기본 동작 수천 개. 뼈는 직접 넣고 동작만 받음.</p><p class="why">자동 리깅은 조각난 마네킹을 거부하거나 살처럼 휘게 만들 수 있어서. 동작은 Unity가 마네킹에 옮겨 입힘.</p><span class="free">무료 · 상업 OK</span></div>
       <div class="node"><div class="dot"></div><p class="step mono">내 동작</p><h3>Blender · QuickMagic</h3><p>발차기·내려찍기는 키프레임으로. 폰으로 찍은 내 동작은 AI 모션캡처로.</p><p class="why">손으로 만든 것과 찍은 것을 나란히 놓고 비교하는 게 공부가 됨.</p><span class="free">무료 · QuickMagic은 비상업</span></div>
       <div class="node"><div class="dot"></div><p class="step mono">움직이고 들여다보기</p><h3>Unity 6</h3><p>조작, 동작 섞기, 발 IK, 관찰 도구, 미니게임.</p><p class="why">이미 설치돼 있고, C# 코드라 Claude가 직접 만들고 자동으로 검사할 수 있음.</p><span class="free">무료</span></div>
     </div>
@@ -281,7 +284,7 @@ footer { padding-block: 40px 56px; font-size: 13px; color: var(--muted); border-
             </g>
           </svg>
         </div>
-        <p class="fig-note"><b>뼈 이름은 Mixamo 표준 그대로.</b> 그래서 Unity가 사람형(Humanoid)으로 인식하고, Mixamo·모션캡처 동작이 바로 입혀집니다.</p>
+        <p class="fig-note"><b>뼈 이름은 Mixamo 표준 그대로, 조각은 정점 그룹 100%로 뼈에.</b> 그래서 Unity가 사람형(Humanoid)으로 인식하고, Mixamo·모션캡처 동작이 바로 입혀집니다.</p>
       </div>
       <div class="rom">
         <h3>관절이 움직일 수 있는 범위</h3>
@@ -316,8 +319,9 @@ footer { padding-block: 40px 56px; font-size: 13px; color: var(--muted); border-
     <h2>회색 바닥 위에서 하나씩.</h2>
     <p class="sub">한 단계가 끝나면 Claude가 자동 검사와 스크린샷으로 확인하고, 마지막 판단은 직접 눈으로 봅니다.</p>
     <ol class="steps">
-      <li class="now"><div><h3>준비</h3><p class="do">Unity 6 새 프로젝트(바탕화면 Mardi), Blender 설치, Mixamo 로그인.</p><span class="who">Claude · 로그인만 나</span></div><p class="done">빈 회색 격자 맵이 열리고 자동 검사가 통과.</p></li>
-      <li><div><h3>마네킹</h3><p class="do">Blender 스크립트로 관절 마네킹 생성 → Mixamo 뼈 이름으로 연결 → Unity에 사람형으로 가져오기.</p><span class="who">Claude</span></div><p class="done">T자 자세와 Mixamo 동작 하나를 입힌 스크린샷.</p></li>
+      <li class="ok"><div><h3><a href="learn/">공부</a></h3><p class="do">뼈대 넣기, 자연스러운 움직임, Blender, Unity, 고퀄리티 게임 사례. 조사 다섯 갈래를 한 교재로.</p><span class="who">조사는 Claude · 읽기는 나</span></div><p class="done">공부해서 정한 것 열한 가지를 이 기획서에 반영. <a href="learn/#decide">정한 것 보기</a></p></li>
+      <li class="now"><div><h3>준비</h3><p class="do">Unity 6 새 프로젝트(바탕화면 Mardi), Blender 5.2 LTS 설치, Mixamo 로그인, 자동 리깅 한 번 시험.</p><span class="who">Claude · 로그인만 나</span></div><p class="done">빈 회색 격자 맵이 열리고 자동 검사가 통과.</p></li>
+      <li><div><h3>마네킹</h3><p class="do">Blender 스크립트로 관절 마네킹과 Mixamo 이름 뼈를 생성 → 큐브·액션 두 개로 내보내기 시험 → Unity에 사람형으로 가져오기.</p><span class="who">Claude</span></div><p class="done">T자 자세와 Mixamo 동작 하나를 입힌 스크린샷.</p></li>
       <li><div><h3>걷고 뛰기</h3><p class="do">3인칭 조작, 카메라, 속도에 따라 걷기↔달리기를 섞는 블렌드 트리, 점프·착지.</p><span class="who">Claude · 조작감은 나</span></div><p class="done">자동 걷기 테스트 통과, 발 미끄러짐 수치 기록.</p></li>
       <li><div><h3>관찰 도구</h3><p class="do">느리게 보기, 궤적, 관절 각도·가동 범위 경고, 무게중심, 고스트.</p><span class="who">Claude</span></div><p class="done">키 하나로 켜고 끄는 화면 스크린샷 여섯 장.</p></li>
       <li><div><h3>자연스럽게</h3><p class="do">계단·경사에서 발 IK, 대상 쪽으로 고개 돌리기, 방향 틀 때 몸 기울기, 착지 충격.</p><span class="who">Claude · 어색한 곳 찾기는 나</span></div><p class="done">같은 계단을 IK 켜고·끄고 비교한 화면.</p></li>
