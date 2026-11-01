@@ -96,6 +96,7 @@ section.s { padding-block: clamp(72px, 9vw, 128px) }
 .body-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(32px, 5vw, 80px); margin-top: 56px; align-items: start }
 .figure { background: var(--vp); border-radius: 6px; padding: 20px 10px 10px }
 .figure svg { display: block; width: 100%; height: auto; max-width: 100% }
+.real { margin: 14px 0 0 } .real img { display: block; width: 100%; height: auto; border-radius: 6px } .real figcaption { margin-top: 6px; font: 500 12px var(--mono); color: var(--muted) }
 .fig-note { margin-top: 14px; font-size: 15px; color: var(--muted) }
 .fig-note b { color: var(--ink) }
 .rom h3 { font-size: 22px; font-weight: 700 }
@@ -128,8 +129,9 @@ section.s { padding-block: clamp(72px, 9vw, 128px) }
 .steps li { display: grid; grid-template-columns: 96px minmax(0, 1.2fr) minmax(0, 1fr); gap: 8px 36px; padding-block: 28px; border-top: 1px solid var(--rule); counter-increment: st }
 .steps li::before { content: counter(st); font: 300 clamp(48px, 5vw, 68px)/0.9 var(--display); color: var(--rule) }
 .steps li.now::before { color: var(--joint) }
-.steps li.ok { counter-increment: none }
-.steps li.ok::before { content: "✓"; color: var(--ink) }
+.steps li.ok::before { color: var(--ink) }
+.steps li.ok.study { counter-increment: none }
+.steps li.ok.study::before { content: "✓" }
 .steps h3 a { text-decoration-thickness: 2px }
 .steps h3 { font-size: 22px; font-weight: 700 }
 .steps .do { margin-top: 6px; color: var(--muted); font-size: 15.5px }
@@ -284,6 +286,7 @@ footer { padding-block: 40px 56px; font-size: 13px; color: var(--muted); border-
             </g>
           </svg>
         </div>
+        <figure class="real"><img src="img/mannequin.webp" alt="Unity에서 렌더한 실제 마네킹. 왼쪽 T자 자세, 오른쪽 근육값으로 만든 걸음 자세" width="1100" height="800" loading="lazy"><figcaption>실제로 만든 마네킹 · Unity · T자 자세와 근육값으로 만든 걸음 자세</figcaption></figure>
         <p class="fig-note"><b>뼈 이름은 Mixamo 표준 그대로, 조각은 정점 그룹 100%로 뼈에.</b> 그래서 Unity가 사람형(Humanoid)으로 인식하고, Mixamo·모션캡처 동작이 바로 입혀집니다.</p>
       </div>
       <div class="rom">
@@ -319,9 +322,9 @@ footer { padding-block: 40px 56px; font-size: 13px; color: var(--muted); border-
     <h2>회색 바닥 위에서 하나씩.</h2>
     <p class="sub">한 단계가 끝나면 Claude가 자동 검사와 스크린샷으로 확인하고, 마지막 판단은 직접 눈으로 봅니다.</p>
     <ol class="steps">
-      <li class="ok"><div><h3><a href="learn/">공부</a></h3><p class="do">뼈대 넣기, 자연스러운 움직임, Blender, Unity, 고퀄리티 게임 사례. 조사 다섯 갈래를 한 교재로.</p><span class="who">조사는 Claude · 읽기는 나</span></div><p class="done">공부해서 정한 것 열한 가지를 이 기획서에 반영. <a href="learn/#decide">정한 것 보기</a></p></li>
-      <li class="now"><div><h3>준비</h3><p class="do">Unity 6 새 프로젝트(바탕화면 Mardi), Blender 5.2 LTS 설치, Mixamo 로그인, 자동 리깅 한 번 시험.</p><span class="who">Claude · 로그인만 나</span></div><p class="done">빈 회색 격자 맵이 열리고 자동 검사가 통과.</p></li>
-      <li><div><h3>마네킹</h3><p class="do">Blender 스크립트로 관절 마네킹과 Mixamo 이름 뼈를 생성 → 큐브·액션 두 개로 내보내기 시험 → Unity에 사람형으로 가져오기.</p><span class="who">Claude</span></div><p class="done">T자 자세와 Mixamo 동작 하나를 입힌 스크린샷.</p></li>
+      <li class="ok study"><div><h3><a href="learn/">공부</a></h3><p class="do">뼈대 넣기, 자연스러운 움직임, Blender, Unity, 고퀄리티 게임 사례. 조사 다섯 갈래를 한 교재로.</p><span class="who">조사는 Claude · 읽기는 나</span></div><p class="done">공부해서 정한 것 열한 가지를 이 기획서에 반영. <a href="learn/#decide">정한 것 보기</a></p></li>
+      <li class="ok"><div><h3>준비</h3><p class="do">Unity 6 새 프로젝트(바탕화면 Mardi), Blender 5.2 LTS 설치, 계단·경사·벽이 있는 회색 실험실.</p><span class="who">Claude</span></div><p class="done">빈 회색 격자 맵이 열리고 자동 검사가 통과.</p></li>
+      <li class="now"><div><h3>마네킹</h3><p class="do">Blender 스크립트로 관절 마네킹과 Mixamo 이름 뼈를 생성 → 큐브·액션 두 개로 내보내기 시험 → Unity에 사람형으로 가져오기 → Mixamo 동작 입히기, 자동 리깅 한 번 시험.</p><span class="who">Claude · Mixamo 로그인만 나</span></div><p class="done">T자 자세와 Mixamo 동작 하나를 입힌 스크린샷.</p></li>
       <li><div><h3>걷고 뛰기</h3><p class="do">3인칭 조작, 카메라, 속도에 따라 걷기↔달리기를 섞는 블렌드 트리, 점프·착지.</p><span class="who">Claude · 조작감은 나</span></div><p class="done">자동 걷기 테스트 통과, 발 미끄러짐 수치 기록.</p></li>
       <li><div><h3>관찰 도구</h3><p class="do">느리게 보기, 궤적, 관절 각도·가동 범위 경고, 무게중심, 고스트.</p><span class="who">Claude</span></div><p class="done">키 하나로 켜고 끄는 화면 스크린샷 여섯 장.</p></li>
       <li><div><h3>자연스럽게</h3><p class="do">계단·경사에서 발 IK, 대상 쪽으로 고개 돌리기, 방향 틀 때 몸 기울기, 착지 충격.</p><span class="who">Claude · 어색한 곳 찾기는 나</span></div><p class="done">같은 계단을 IK 켜고·끄고 비교한 화면.</p></li>

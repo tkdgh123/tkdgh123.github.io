@@ -509,17 +509,18 @@ details p { margin: 10px 0 0 38px; color: var(--muted); font-size: 15.5px }
       <thead><tr><th>옵션</th><th>값</th><th>이유</th></tr></thead>
       <tbody>
         <tr><td>Limit to Selected</td><td>켬 (뼈대 + 몸만 선택)</td><td>카메라·조명 빼기</td></tr>
-        <tr><td>Apply Scalings</td><td>FBX Units Scale부터 시험</td><td>자료마다 의견이 갈려서 큐브로 시험 <span class="tag t-guess">미확인</span></td></tr>
-        <tr><td>Forward / Up</td><td>-Z / Y (기본)</td><td><span class="tag t-ok">확인</span></td></tr>
+        <tr><td>Apply Scalings</td><td>FBX Units Scale</td><td>FBX All과 결과가 같았음 (크기 1) <span class="tag t-ok">직접 시험</span></td></tr>
+        <tr><td>Forward / Up</td><td>-Z / Y (기본)</td><td>Blender 정면 → Unity 정면 <span class="tag t-ok">직접 시험</span></td></tr>
+        <tr><td>Unity: Bake Axis Conversion</td><td>끔</td><td>켜면 앞뒤가 뒤집힘 <span class="tag t-ok">직접 시험</span></td></tr>
         <tr><td>Apply Transform</td><td>끔</td><td>매뉴얼: 뼈대·애니메이션과 깨짐</td></tr>
         <tr><td>Add Leaf Bones</td><td><b>끔</b> (기본이 켜짐)</td><td>뼈 끝 <code>_end</code> 가짜 뼈 방지</td></tr>
         <tr><td>Bake Animation</td><td>켬</td><td>IK·규칙 결과를 키로</td></tr>
-        <tr><td>All Actions</td><td>켬</td><td>액션 하나 = Unity 클립 하나</td></tr>
+        <tr><td>All Actions</td><td>켬</td><td>액션 하나 = Unity 클립 하나 <span class="tag t-ok">직접 시험</span></td></tr>
         <tr><td>NLA Strips</td><td>끔</td><td>클립 중복 방지</td></tr>
         <tr><td>Smoothing</td><td>Normals Only</td><td>매뉴얼 권장</td></tr>
       </tbody>
     </table></div>
-    <p class="note">첫 내보내기는 이 순서로 시험: ① 큐브 + 뼈 1개로 크기·회전 ② 액션 2개가 Unity에서 클립 2개로 나뉘는지 ③ 그다음 마네킹.</p>
+    <p class="note">첫 내보내기는 큐브 + 뼈 1개 + 액션 2개로 시험했고, 위 표의 "직접 시험" 표시가 그 결과예요 (Blender 5.2.3 → Unity 6000.3).</p>
   </div>
 
   <div class="blk">
