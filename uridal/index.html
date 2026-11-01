@@ -87,7 +87,10 @@
         <button class="pill" id="todayBtn" type="button">오늘</button>
       </div>
       <div class="week"><span class="sun">일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span class="sat">토</span></div>
-      <div class="grid" id="grid"></div>
+      <div class="gwrap">
+        <div class="grid" id="grid"></div>
+        <div class="props" aria-hidden="true"><i class="bowbig"></i><i class="wh l"></i><i class="wh r"></i><i class="apple"></i><i class="apple s"></i><i class="milk"></i><i class="bear"></i></div>
+      </div>
       <div class="agenda" id="agenda"></div>
     </section>
 
@@ -118,7 +121,7 @@
         <h2 class="ttl">키티 사진</h2>
         <div class="pics" id="picList"></div>
         <label class="pill wide addpic">+ 사진 넣기<input type="file" id="picIn" accept="image/*" multiple hidden></label>
-        <p class="hint">맨 위 동그라미에 하루 한 장씩 나와요. 누르면 다음 사진.</p>
+        <p class="hint">누른 사진이 맨 위 동그라미에 걸려요. ×는 두 번 누르면 지워져요.</p>
       </section>
 
       <h2 class="ttl">설정</h2>

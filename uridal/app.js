@@ -65,7 +65,7 @@ function armed(btn) {
 /* ---------- 상태 ---------- */
 const now = new Date();
 const S = { room: null, me: "a", info: null, events: [], wishes: [], annivs: [], days: {},
-            y: now.getFullYear(), m: now.getMonth(), sel: today(), unsub: [], kind: "place", photos: [], pic: 0 };
+            y: now.getFullYear(), m: now.getMonth(), sel: today(), unsub: [], kind: "place", photos: [] };
 const name = w => S.info?.[w]?.name || (w === "a" ? "A" : "B");
 const col = (...p) => collection(db, "rooms", S.room, ...p);
 const ref = (...p) => doc(db, "rooms", S.room, ...p);
@@ -113,9 +113,8 @@ function renderHead() {
   $("hA").textContent = name("a");
   $("hB").textContent = name("b");
   $("hD").textContent = dLabel(today());
-  const ph = S.photos, pic = $("hPic");
-  if (ph.length) {
-    const p = ph[((diff("2026-01-01", today()) + S.pic) % ph.length + ph.length) % ph.length];
+  const p = curPhoto(), pic = $("hPic");
+  if (p) {
     pic.style.backgroundImage = `url("${p.data}")`; pic.classList.add("has");
   } else { pic.style.backgroundImage = ""; pic.classList.remove("has"); }
   const n = upcoming(1)[0];
@@ -194,8 +193,11 @@ function renderUs() {
   const set = (id, v) => { if (document.activeElement !== $(id)) $(id).value = v; };
   set("sA", name("a")); set("sB", name("b")); set("sStart", S.info.start);
   $("sCode").textContent = S.room;
+  const on = curPhoto()?.id;
   $("picList").innerHTML = S.photos.map(p =>
-    `<button type="button" class="pic" data-pic="${p.id}" style="background-image:url('${p.data}')" aria-label="사진 지우기"></button>`).join("");
+    `<div class="pic${p.id === on ? " on" : ""}" style="background-image:url('${p.data}')">`
+    + `<button type="button" data-pic="${p.id}" aria-label="맨 위에 걸기"></button>`
+    + `<button type="button" class="x" data-pdel="${p.id}" aria-label="사진 지우기">×</button></div>`).join("");
 }
 
 /* ---------- 아래 창 ---------- */
@@ -333,6 +335,17 @@ function applySkin(skin) {
   if (S.info) { renderHead(); renderUs(); }
 }
 let photoUnsub = null;
+/* 맨 위 동그라미 사진: 고른 사진(기기별), 없으면 날마다 바뀜 */
+const PIC_KEY = "uridal-pic";
+function curPhoto() {
+  const ph = S.photos; if (!ph.length) return null;
+  let id; try { id = localStorage.getItem(PIC_KEY); } catch {}
+  return ph.find(p => p.id === id) || ph[diff("2026-01-01", today()) % ph.length];
+}
+function showPhoto(id) {
+  try { localStorage.setItem(PIC_KEY, id); } catch {}
+  renderHead(); renderUs(); appear($("hPic"));
+}
 function watchPhotos() {
   if (photoUnsub || !S.room) return;
   photoUnsub = onSnapshot(col("photos"), s => {
@@ -532,22 +545,27 @@ $("bootReset").onclick = leave;
 $("skinBtn2").onclick = openSkins;
 $("hPic").onclick = () => {
   if (!S.photos.length) { showTab("us"); return $("album").scrollIntoView({ behavior: "smooth" }); }
-  S.pic++; renderHead(); appear($("hPic"));
+  const ph = S.photos;
+  showPhoto(ph[(ph.indexOf(curPhoto()) + 1) % ph.length].id);
 };
 $("picIn").addEventListener("change", async e => {
-  const files = [...e.target.files].slice(0, Math.max(0, 12 - S.photos.length));
+  const files = [...e.target.files].slice(0, Math.max(0, 30 - S.photos.length));
   e.target.value = "";
-  if (!files.length) return toast("사진은 12장까지 넣을 수 있어요");
+  if (!files.length) return toast("사진은 30장까지 넣을 수 있어요");
   toast("사진 넣는 중…");
+  let last;
   for (const f of files) {
-    try { await setDoc(doc(col("photos")), { data: await shrink(f), by: S.me, at: Date.now() }); }
+    last = doc(col("photos"));
+    try { await setDoc(last, { data: await shrink(f), by: S.me, at: Date.now() }); }
     catch { toast("사진을 넣지 못했어요"); return; }
   }
+  showPhoto(last.id);
   toast("사진을 넣었어요");
 });
 $("picList").addEventListener("click", e => {
-  const b = e.target.closest("[data-pic]"); if (!b) return;
-  if (armed(b)) deleteDoc(ref("photos", b.dataset.pic)).catch(fail);
+  const b = e.target.closest("[data-pic], [data-pdel]"); if (!b) return;
+  if (b.dataset.pic) { showPhoto(b.dataset.pic); scrollTo({ top: 0, behavior: "smooth" }); }
+  else if (armed(b)) deleteDoc(ref("photos", b.dataset.pdel)).catch(fail);
 });
 
 let installEv = null;
