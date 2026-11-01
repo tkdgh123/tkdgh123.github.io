@@ -43,7 +43,7 @@ p { margin: 0 }
 .lede { margin-top: 28px; font-size: clamp(18px, 1.6vw, 21px); line-height: 1.6; max-width: 30ch; color: var(--on-vp) }
 .tag { margin-top: 22px; font-size: 13px; color: var(--on-vp-soft); letter-spacing: .02em }
 .viewport { position: relative; background: var(--vp-2); border-radius: 6px; overflow: hidden; min-width: 0 }
-.viewport canvas { display: block; width: 100%; aspect-ratio: 16 / 10; max-width: 100% }
+.viewport canvas { display: block; width: 100%; aspect-ratio: 16 / 10; max-width: 100%; cursor: grab; touch-action: pan-y }
 .vp-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding: 12px 14px; border-top: 1px solid rgb(255 255 255 / .06); font-size: 12.5px; color: var(--on-vp-soft) }
 .vp-bar button { font: 500 12.5px var(--mono); color: var(--on-vp); background: rgb(255 255 255 / .06); border: 0; border-radius: 4px; padding: 6px 10px; cursor: pointer }
 .vp-bar button[aria-pressed="true"] { background: var(--joint); color: #17120e }
@@ -178,8 +178,8 @@ footer { padding-block: 40px 56px; font-size: 13px; color: var(--muted); border-
         <p class="tag mono">Unity 6 · Blender · Mixamo · 단독 프로젝트 · 가제</p>
       </div>
       <figure class="viewport" style="margin:0">
-        <span class="vp-label">SIDE · 걷기 1주기</span>
-        <canvas id="vp" aria-label="옆에서 본 마네킹이 걷는 모습. 관절 각도가 실시간으로 표시된다." role="img"></canvas>
+        <span class="vp-label">3D · 걷기 1주기</span>
+        <canvas id="vp" aria-label="3D 마네킹이 걷는 모습. 끌어서 돌려 볼 수 있고, 관절 각도가 실시간으로 표시된다." role="img"></canvas>
         <div class="vp-bar">
           <button id="play" type="button" aria-pressed="false">재생</button>
           <button id="slow" type="button" aria-pressed="false">0.25×</button>
@@ -342,6 +342,7 @@ footer { padding-block: 40px 56px; font-size: 13px; color: var(--muted); border-
 
 <footer><div class="wrap">마디 (가제) · 김창식 · 기획서 v1</div></footer>
 
+<script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
 <script>
 // 가동 범위 막대: 축 −90° ~ 180°
 const ROM = [["어깨", -60, 180], ["팔꿈치", 0, 150], ["손목", -70, 80], ["엉덩이", -30, 120], ["무릎", 0, 135], ["발목", -20, 50]];
@@ -351,104 +352,135 @@ document.getElementById("bars").innerHTML = ROM.map(([n, a, b]) =>
   (a < 0 ? `<em style="left:calc(${pct(a)}% - 6px);transform:translateX(-100%)">${-a}</em>` : "") +
   `<em style="left:calc(${pct(b)}% + 6px)">${b}</em></div></div>`).join("");
 
-// 옆에서 본 걷기: 각도로 관절을 이어 그리는 순운동학
-const cv = document.getElementById("vp"), ctx = cv.getContext("2d");
-const D = Math.PI / 180, pos = x => Math.max(0, x);
-let W = 0, H = 0, S = 1, phase = 0.6, speed = 1, playing = false, showTrail = true, travel = 0, last = 0;
-let prevX = [null, null], trail = [];
+// 3D 마네킹 걷기: 각도로 관절을 돌리는 순운동학 (조각마다 뼈 하나)
+(function () {
+  const cv = document.getElementById("vp");
+  if (!window.THREE) return;
+  const T = THREE, D = Math.PI / 180, pos = x => Math.max(0, x);
+  const renderer = new T.WebGLRenderer({ canvas: cv, antialias: true });
+  renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = T.PCFSoftShadowMap;
+  const scene = new T.Scene(); scene.background = new T.Color(0x26292e); scene.fog = new T.Fog(0x26292e, 6, 13);
+  const cam = new T.PerspectiveCamera(30, 1.6, 0.1, 40);
+  scene.add(new T.HemisphereLight(0xe8eef6, 0x2a2d33, 0.7));
+  const sun = new T.DirectionalLight(0xffffff, 0.75); sun.position.set(2.5, 5, 3); sun.castShadow = true;
+  sun.shadow.mapSize.set(1024, 1024); Object.assign(sun.shadow.camera, { left: -2, right: 2, top: 3, bottom: -1, near: 1, far: 12 });
+  scene.add(sun);
+  const floor = new T.Mesh(new T.PlaneGeometry(30, 30), new T.ShadowMaterial({ opacity: 0.35 }));
+  floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor);
+  const grid = new T.GridHelper(16, 32, 0x626873, 0x3a3e45); scene.add(grid);
 
-function size() {
-  const r = cv.getBoundingClientRect(), d = window.devicePixelRatio || 1;
-  cv.width = r.width * d; cv.height = r.height * d; ctx.setTransform(d, 0, 0, d, 0, 0);
-  W = r.width; H = r.height; S = H * 0.62;
-}
-// 한 다리의 각도(도). φ: 0~2π 걷기 주기
-function leg(p) {
-  const hip = 8 + 22 * Math.sin(p);
-  const knee = 4 + 60 * Math.pow(pos(Math.cos(p + 0.35)), 2.2) + 14 * Math.pow(pos(Math.cos(p - 2.2)), 6);
-  const toeOff = 22 * Math.pow(pos(Math.cos(p + 1.7)), 6), heel = 10 * Math.pow(pos(Math.cos(p - 1.5)), 6);
-  return { hip, knee, shin: hip - knee, plantar: toeOff - heel };
-}
-const dir = (a, l) => [Math.sin(a * D) * l * S, Math.cos(a * D) * l * S];
-function pose(p) {
-  const out = { legs: [], arms: [] };
-  for (const k of [0, 1]) {
-    const q = p + k * Math.PI, L = leg(q);
-    const [kx, ky] = dir(L.hip, .245), [ax, ay] = dir(L.shin, .246);
-    const [fx, fy] = dir(90 - L.plantar, .11);
-    out.legs.push({ L, knee: [kx, ky], ankle: [kx + ax, ky + ay], toe: [kx + ax + fx, ky + ay + fy] });
-    const sh = -18 * Math.sin(q), el = 16 + 14 * pos(-Math.sin(q));
-    const [ux, uy] = dir(sh, .17), [lx, ly] = dir(sh + el, .16), [hx, hy] = dir(sh + el, .07);
-    out.arms.push({ sh, el, elbow: [ux, uy], wrist: [ux + lx, uy + ly], hand: [ux + lx + hx, uy + ly + hy] });
+  const wood = new T.MeshStandardMaterial({ color: 0xb9c0ca, roughness: 0.6 });
+  const orange = new T.MeshStandardMaterial({ color: 0xf06a1d, roughness: 0.4 });
+  const node = (p, x, y, z) => { const g = new T.Group(); g.position.set(x, y, z); p.add(g); return g; };
+  const mesh = (p, geo, mat, x, y, z) => { const m = new T.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = true; p.add(m); return m; };
+  const seg = (p, len, r, up) => mesh(p, new T.CapsuleGeometry(r, Math.max(0.001, len - 2 * r), 6, 16), wood, 0, (up ? 1 : -1) * len / 2, 0);
+  const jnt = (p, r) => mesh(p, new T.SphereGeometry(r, 20, 14), orange, 0, 0, 0);
+  const blob = (p, r, sx, sy, sz, y) => { const m = mesh(p, new T.SphereGeometry(r, 24, 16), wood, 0, y, 0); m.scale.set(sx, sy, sz); return m; };
+
+  // 몸: 캐릭터는 +z를 바라봄, 왼쪽이 +x
+  const root = node(scene, 0, 0, 0);
+  const hips = node(root, 0, 0.95, 0);
+  blob(hips, 0.1, 1.6, 0.9, 1.05, -0.02);
+  const spine = node(hips, 0, 0.09, 0); jnt(spine, 0.05); seg(spine, 0.16, 0.085, true);
+  const chest = node(spine, 0, 0.17, 0); blob(chest, 0.1, 1.75, 1.45, 1.1, 0.13);
+  const neck = node(chest, 0, 0.29, 0); jnt(neck, 0.035); seg(neck, 0.08, 0.035, true);
+  const head = node(neck, 0, 0.08, 0); blob(head, 0.1, 0.85, 1.12, 0.95, 0.1);
+  const legs = [], arms = [];
+  for (const s of [1, -1]) {
+    const hip = node(hips, 0.095 * s, -0.06, 0); jnt(hip, 0.05); seg(hip, 0.43, 0.065);
+    const knee = node(hip, 0, -0.43, 0); jnt(knee, 0.045); seg(knee, 0.42, 0.05);
+    const ankle = node(knee, 0, -0.42, 0); jnt(ankle, 0.035);
+    const foot = mesh(ankle, new T.CapsuleGeometry(0.038, 0.15, 6, 12), wood, 0, -0.035, 0.055); foot.rotation.x = Math.PI / 2;
+    legs.push({ hip, knee, ankle, toe: node(ankle, 0, -0.073, 0.17), heel: node(ankle, 0, -0.073, -0.05) });
+    const sh = node(chest, 0.19 * s, 0.23, 0); jnt(sh, 0.045); seg(sh, 0.28, 0.043);
+    const el = node(sh, 0, -0.29, 0); jnt(el, 0.036); seg(el, 0.25, 0.037);
+    const wr = node(el, 0, -0.26, 0); jnt(wr, 0.027); blob(wr, 0.05, 0.7, 1.6, 1, -0.08);
+    arms.push({ sh, el, wr, tip: node(wr, 0, -0.14, 0), s });
   }
-  return out;
-}
-function seg(a, b, w, col) { ctx.strokeStyle = col; ctx.lineWidth = w; ctx.lineCap = "round"; ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke(); }
-function joint(p, r) { ctx.fillStyle = "#f06a1d"; ctx.strokeStyle = "#26292e"; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(p[0], p[1], r, 0, 7); ctx.fill(); ctx.stroke(); }
 
-function frame(t) {
-  const dt = last ? Math.min(0.05, (t - last) / 1000) : 0; last = t;
-  if (playing) phase = (phase + dt * speed * 2 * Math.PI / 1.1) % (2 * Math.PI);
-  const P = pose(phase), gy = H * 0.86, cx = W * 0.5;
-  // 가장 낮은 발 끝이 바닥에 닿도록 골반 높이 결정
-  const low = Math.max(...P.legs.flatMap(l => [l.ankle[1], l.toe[1]]));
-  const hipY = gy - low;
-  const stance = (Math.max(P.legs[0].ankle[1], P.legs[0].toe[1]) >= Math.max(P.legs[1].ankle[1], P.legs[1].toe[1])) ? 0 : 1;
-  const sx = P.legs[stance].ankle[0];
-  if (playing && prevX[stance] !== null) travel += prevX[stance] - sx;
-  prevX = [P.legs[0].ankle[0], P.legs[1].ankle[0]];
+  // 걷기 각도(도). 한 주기 φ: 0~2π
+  function leg(p) {
+    const hip = 8 + 22 * Math.sin(p);
+    const knee = 4 + 60 * Math.pow(pos(Math.cos(p + 0.35)), 2.2) + 14 * Math.pow(pos(Math.cos(p - 2.2)), 6);
+    const plantar = 22 * Math.pow(pos(Math.cos(p + 1.7)), 6) - 10 * Math.pow(pos(Math.cos(p - 1.5)), 6);
+    return { hip, knee, plantar };
+  }
 
-  ctx.clearRect(0, 0, W, H);
-  ctx.strokeStyle = "rgb(220 226 234 / .07)"; ctx.lineWidth = 1;
-  const step = 40, off = ((-travel % step) + step) % step;
-  for (let x = off; x < W; x += step) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, gy); ctx.stroke(); }
-  for (let y = gy; y > 0; y -= step) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
-  ctx.strokeStyle = "rgb(220 226 234 / .35)"; ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(W, gy); ctx.stroke();
-  for (let x = off; x < W; x += step) { ctx.beginPath(); ctx.moveTo(x, gy); ctx.lineTo(x - 14, gy + 12); ctx.stroke(); }
+  // 궤적: 왼발 끝, 왼손 끝
+  const N = 160, trails = [0.85, 0.45].map(o => {
+    const g = new T.BufferGeometry(); g.setAttribute("position", new T.BufferAttribute(new Float32Array(N * 3), 3)); g.setDrawRange(0, 0);
+    const l = new T.Line(g, new T.LineBasicMaterial({ color: 0xf06a1d, transparent: true, opacity: o })); l.frustumCulled = false; scene.add(l); return { l, pts: [] };
+  });
 
-  const hip = [cx, hipY], lean = 4;
-  const shoulder = [cx + Math.sin(lean * D) * .29 * S, hipY - Math.cos(lean * D) * .29 * S];
-  const neck = [shoulder[0] + .01 * S, shoulder[1] - .05 * S], head = [neck[0] + .01 * S, neck[1] - .075 * S];
-  const A = (o, v) => [o[0] + v[0], o[1] + v[1]];
+  let phase = 0.6, speed = 1, playing = false, showTrail = true, travel = 0, last = 0, prevZ = [null, null];
+  let yaw = 0.95, pitch = 0.2, spin = true, drag = null, visible = true;
+  const v = new T.Vector3(), w = new T.Vector3(), target = new T.Vector3(0, 0.88, 0);
+  const rd = ["hip", "knee", "ankle", "elbow"].map(k => document.getElementById("r-" + k));
 
-  // 궤적: 가까운 쪽 발끝·손목을 세계 좌표로 기록
-  const near = 0, Ln = P.legs[near], An = P.arms[near];
-  if (playing) { trail.push([A(hip, Ln.toe), A(shoulder, An.wrist)].map(p => [p[0] + travel, p[1]])); if (trail.length > 160) trail.shift(); }
-  if (showTrail && trail.length > 1) {
-    for (const k of [0, 1]) {
-      ctx.strokeStyle = k ? "rgb(240 106 29 / .45)" : "rgb(240 106 29 / .8)"; ctx.lineWidth = 1.6; ctx.setLineDash(k ? [3, 4] : []);
-      ctx.beginPath(); trail.forEach((p, i) => { const x = p[k][0] - travel, y = p[k][1]; i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }); ctx.stroke();
+  function pose() {
+    for (let k = 0; k < 2; k++) {
+      const q = phase + k * Math.PI, L = leg(q), g = legs[k], a = arms[k];
+      g.hip.rotation.x = -L.hip * D; g.knee.rotation.x = L.knee * D; g.ankle.rotation.x = (L.hip - L.knee + L.plantar) * D;
+      const sh = -18 * Math.sin(q), el = 16 + 14 * pos(-Math.sin(q));
+      a.sh.rotation.set(-sh * D, 0, 0.1 * a.s); a.el.rotation.x = -el * D;
+      if (k === 0) { rd[0].textContent = Math.round(L.hip); rd[1].textContent = Math.round(L.knee); rd[2].textContent = Math.round(L.plantar); rd[3].textContent = Math.round(el); }
     }
-    ctx.setLineDash([]);
+    hips.rotation.y = -5 * D * Math.sin(phase); chest.rotation.y = 8 * D * Math.sin(phase);
+    spine.rotation.x = 4 * D; neck.rotation.x = -3 * D;
+    // 가장 낮은 발 끝이 바닥에 닿게
+    root.position.y = 0; root.updateMatrixWorld(true);
+    const low = legs.map(g => Math.min(v.setFromMatrixPosition(g.toe.matrixWorld).y, w.setFromMatrixPosition(g.heel.matrixWorld).y));
+    root.position.y = -Math.min(low[0], low[1]); root.updateMatrixWorld(true);
+    const st = low[0] <= low[1] ? 0 : 1;
+    const z = legs.map(g => v.setFromMatrixPosition(g.ankle.matrixWorld).z);
+    if (playing && prevZ[st] !== null) travel += prevZ[st] - z[st];
+    prevZ = z;
+    grid.position.z = -(travel % 0.5);
+  }
+  function trail() {
+    [legs[0].toe, arms[0].tip].forEach((n, i) => {
+      const t = trails[i]; v.setFromMatrixPosition(n.matrixWorld);
+      if (playing) { t.pts.push([v.x, v.y, v.z + travel]); if (t.pts.length > N) t.pts.shift(); }
+      const arr = t.l.geometry.attributes.position.array;
+      t.pts.forEach((p, j) => { arr[j * 3] = p[0]; arr[j * 3 + 1] = p[1]; arr[j * 3 + 2] = p[2] - travel; });
+      t.l.geometry.attributes.position.needsUpdate = true; t.l.geometry.setDrawRange(0, t.pts.length); t.l.visible = showTrail;
+    });
+  }
+  function size() {
+    const r = cv.getBoundingClientRect(); if (!r.width) return;
+    renderer.setSize(r.width, r.height, false); cam.aspect = r.width / r.height; cam.updateProjectionMatrix();
+  }
+  function frame(t) {
+    const dt = last ? Math.min(0.05, (t - last) / 1000) : 0; last = t;
+    if (visible) {
+      if (playing) phase = (phase + dt * speed * 2 * Math.PI / 1.1) % (2 * Math.PI);
+      if (spin && playing) yaw += dt * 0.18;
+      pose(); trail();
+      const d = 4.2; cam.position.set(target.x + d * Math.cos(pitch) * Math.sin(yaw), target.y + d * Math.sin(pitch), target.z + d * Math.cos(pitch) * Math.cos(yaw));
+      cam.lookAt(target); renderer.render(scene, cam);
+    }
+    requestAnimationFrame(frame);
   }
 
-  const far = "#7d838c", wood = "#d9dde3", w = S * .055;
-  const drawLeg = (l, c) => { const k = A(hip, l.knee), a = A(hip, l.ankle), t2 = A(hip, l.toe); seg(hip, k, w * 1.05, c); seg(k, a, w * .85, c); seg(a, t2, w * .6, c); return [k, a]; };
-  const drawArm = (a, c) => { const e = A(shoulder, a.elbow), r = A(shoulder, a.wrist), h = A(shoulder, a.hand); seg(shoulder, e, w * .75, c); seg(e, r, w * .65, c); seg(r, h, w * .7, c); return [e, r]; };
-  drawArm(P.arms[1], far); drawLeg(P.legs[1], far);
-  seg(hip, shoulder, w * 2.1, wood); seg(shoulder, neck, w * .55, wood);
-  ctx.fillStyle = wood; ctx.beginPath(); ctx.ellipse(head[0], head[1], S * .052, S * .066, 0.1, 0, 7); ctx.fill();
-  const [kn, an] = drawLeg(Ln, wood); const [el, wr] = drawArm(An, wood);
-  joint(hip, 5); joint(shoulder, 4.5); joint(neck, 3.5); joint(kn, 4.5); joint(an, 3.5); joint(el, 4); joint(wr, 3);
+  cv.addEventListener("pointerdown", e => { drag = [e.clientX, e.clientY]; spin = false; cv.setPointerCapture(e.pointerId); cv.style.cursor = "grabbing"; });
+  cv.addEventListener("pointermove", e => {
+    if (!drag) return;
+    yaw -= (e.clientX - drag[0]) * 0.008; pitch = Math.min(1.2, Math.max(0.02, pitch + (e.clientY - drag[1]) * 0.006)); drag = [e.clientX, e.clientY];
+  });
+  const end = () => { drag = null; cv.style.cursor = ""; };
+  cv.addEventListener("pointerup", end); cv.addEventListener("pointercancel", end);
+  new IntersectionObserver(es => { visible = es[0].isIntersecting; }).observe(cv);
 
-  // 무릎 각도 표시
-  ctx.fillStyle = "#e8eaed"; ctx.font = "500 11px 'IBM Plex Mono', monospace";
-  ctx.fillText(Math.round(Ln.L.knee) + "°", kn[0] + 10, kn[1] + 4);
-  ctx.fillText(Math.round(Ln.L.hip) + "°", hip[0] + 10, hip[1] + 4);
-
-  rd.hip.textContent = Math.round(Ln.L.hip); rd.knee.textContent = Math.round(Ln.L.knee);
-  rd.ankle.textContent = Math.round(Ln.L.plantar); rd.elbow.textContent = Math.round(An.el);
+  const bPlay = document.getElementById("play"), bSlow = document.getElementById("slow"), bTrail = document.getElementById("trail");
+  function setPlay(on) { playing = on; bPlay.textContent = on ? "멈춤" : "재생"; bPlay.setAttribute("aria-pressed", on); }
+  bPlay.onclick = () => setPlay(!playing);
+  bSlow.onclick = () => { speed = speed === 1 ? 0.25 : 1; bSlow.setAttribute("aria-pressed", speed !== 1); };
+  bTrail.onclick = () => { showTrail = !showTrail; bTrail.setAttribute("aria-pressed", showTrail); };
+  size(); new ResizeObserver(size).observe(cv);
+  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) setPlay(true);
   requestAnimationFrame(frame);
-}
-const rd = { hip: document.getElementById("r-hip"), knee: document.getElementById("r-knee"), ankle: document.getElementById("r-ankle"), elbow: document.getElementById("r-elbow") };
-const bPlay = document.getElementById("play"), bSlow = document.getElementById("slow"), bTrail = document.getElementById("trail");
-function setPlay(v) { playing = v; bPlay.textContent = v ? "멈춤" : "재생"; bPlay.setAttribute("aria-pressed", v); }
-bPlay.onclick = () => setPlay(!playing);
-bSlow.onclick = () => { speed = speed === 1 ? .25 : 1; bSlow.setAttribute("aria-pressed", speed !== 1); };
-bTrail.onclick = () => { showTrail = !showTrail; bTrail.setAttribute("aria-pressed", showTrail); };
-size(); new ResizeObserver(size).observe(cv);
-if (!matchMedia("(prefers-reduced-motion: reduce)").matches) setPlay(true);
-requestAnimationFrame(frame);
+})();
 </script>
 </body>
 </html>
