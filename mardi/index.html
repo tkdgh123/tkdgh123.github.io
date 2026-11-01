@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>마디 기획서</title>
+<meta name="description" content="관절이 다 보이는 마네킹을 사람처럼 자연스럽게 움직이게 만드는 3D 액션 실험 — 도구, 설계, 단계">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@300;500;700&display=swap">
+<style>
+/* 애니메이션 작업 화면처럼: 회색 작업대(종이) 위에 어두운 뷰포트 하나, 관절·선택은 주황 하나로만 */
+:root {
+  --paper: #eceef0; --tone: #dfe2e6; --ink: #15171a; --muted: #5b6068; --rule: #c4c8ce;
+  --vp: #1c1e22; --vp-2: #26292e; --vp-grid: rgb(220 226 234 / .07); --on-vp: #e8eaed; --on-vp-soft: #8d939c;
+  --joint: #f06a1d; --joint-ink: #b7470a;
+  --m: clamp(16px, 4vw, 64px);
+  --display: "IBM Plex Sans KR", "Pretendard Variable", Pretendard, system-ui, sans-serif;
+  --sans: "Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif;
+  --mono: "IBM Plex Mono", "Pretendard Variable", ui-monospace, monospace;
+  color-scheme: light;
+}
+* { box-sizing: border-box }
+html { scroll-behavior: smooth }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 17px/1.7 var(--sans); word-break: keep-all; overflow-wrap: anywhere; -webkit-font-smoothing: antialiased; overflow-x: clip }
+a { color: inherit }
+h1, h2, h3 { margin: 0; font-family: var(--display); letter-spacing: -.02em; line-height: 1.15; text-wrap: balance }
+p { margin: 0 }
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums }
+.wrap { max-width: 1240px; margin: 0 auto; padding-left: max(var(--m), env(safe-area-inset-left, 0px)); padding-right: max(var(--m), env(safe-area-inset-right, 0px)) }
+:focus-visible { outline: 2px solid var(--joint); outline-offset: 3px }
+
+/* ── 첫 화면: 뷰포트 ── */
+.hero { background: var(--vp); color: var(--on-vp); padding-block: 28px 56px }
+.top { display: flex; justify-content: space-between; gap: 16px; font-size: 13px; color: var(--on-vp-soft) }
+.top a { text-decoration: none }
+.top a:hover { color: var(--on-vp) }
+.hero-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(24px, 4vw, 64px); align-items: center; margin-top: clamp(32px, 6vw, 72px) }
+.hero h1 { font-size: clamp(88px, 13vw, 200px); font-weight: 300; letter-spacing: -.04em; line-height: .9 }
+.hero h1 b { font-weight: 700; color: var(--joint) }
+.lede { margin-top: 28px; font-size: clamp(18px, 1.6vw, 21px); line-height: 1.6; max-width: 30ch; color: var(--on-vp) }
+.tag { margin-top: 22px; font-size: 13px; color: var(--on-vp-soft); letter-spacing: .02em }
+.viewport { position: relative; background: var(--vp-2); border-radius: 6px; overflow: hidden; min-width: 0 }
+.viewport canvas { display: block; width: 100%; aspect-ratio: 16 / 10; max-width: 100% }
+.vp-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding: 12px 14px; border-top: 1px solid rgb(255 255 255 / .06); font-size: 12.5px; color: var(--on-vp-soft) }
+.vp-bar button { font: 500 12.5px var(--mono); color: var(--on-vp); background: rgb(255 255 255 / .06); border: 0; border-radius: 4px; padding: 6px 10px; cursor: pointer }
+.vp-bar button[aria-pressed="true"] { background: var(--joint); color: #17120e }
+.read { display: flex; gap: 14px; margin-left: auto; flex-wrap: wrap }
+.read span b { color: var(--on-vp); font-weight: 500 }
+.vp-label { position: absolute; left: 14px; top: 10px; font: 500 11px var(--mono); letter-spacing: .08em; color: var(--on-vp-soft) }
+
+/* ── 공통 섹션 ── */
+section.s { padding-block: clamp(72px, 9vw, 128px) }
+.eyebrow { font: 500 12.5px var(--mono); letter-spacing: .08em; color: var(--joint-ink); text-transform: uppercase }
+.s h2 { font-size: clamp(32px, 4vw, 54px); font-weight: 500; margin-top: 14px; max-width: 18ch }
+.s .sub { margin-top: 16px; color: var(--muted); max-width: 52ch }
+
+/* 만드는 것: 네 단어 */
+.four { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(20px, 3vw, 44px); margin-top: 56px }
+.four div { border-top: 3px solid var(--ink); padding-top: 18px }
+.four h3 { font-size: clamp(30px, 3vw, 42px); font-weight: 700 }
+.four p { margin-top: 10px; color: var(--muted); font-size: 16px }
+.four .last { border-top-color: var(--joint) }
+
+/* 영상 네 개 */
+.refs { background: var(--tone) }
+.ref-list { margin-top: 48px; display: grid }
+.ref { display: grid; grid-template-columns: 170px minmax(0, 1fr) minmax(0, 1.1fr); gap: 12px 36px; padding-block: 26px; border-top: 1px solid var(--rule); align-items: baseline }
+.ref:last-child { border-bottom: 1px solid var(--rule) }
+.ref .who { font: 500 13px var(--mono); color: var(--muted) }
+.ref .what b { display: block; font-family: var(--display); font-size: 20px; font-weight: 700; margin-bottom: 4px }
+.ref .what span { color: var(--muted); font-size: 15px }
+.ref .take { font-size: 16px }
+.ref .take::before { content: "가져올 것"; display: block; font: 500 11.5px var(--mono); letter-spacing: .06em; color: var(--joint-ink); margin-bottom: 4px }
+
+/* 도구 흐름 */
+.flow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: 56px; position: relative }
+.node { position: relative; padding: 0 22px 0 0 }
+.node .dot { width: 18px; height: 18px; border-radius: 50%; background: var(--paper); border: 4px solid var(--joint); position: relative; z-index: 1 }
+.flow::before { content: ""; position: absolute; left: 9px; right: calc(25% - 18px); top: 8px; height: 2px; background: var(--ink) }
+.node .step { margin-top: 20px; font: 500 12px var(--mono); color: var(--muted) }
+.node h3 { font-size: 26px; font-weight: 700; margin-top: 4px }
+.node p { margin-top: 8px; font-size: 15.5px; color: var(--muted) }
+.node .why { margin-top: 12px; font-size: 15px; color: var(--ink) }
+.free { display: inline-block; margin-top: 12px; font: 500 11.5px var(--mono); padding: 3px 8px; border-radius: 3px; background: var(--ink); color: var(--paper) }
+.skip { margin-top: 64px; display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 10px 36px }
+.skip h3 { font: 500 13px var(--mono); color: var(--muted); padding-top: 4px }
+.skip ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px }
+.skip li { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 4px 24px; font-size: 15.5px }
+.skip li s { font-weight: 600; text-decoration-thickness: 2px; text-decoration-color: var(--joint) }
+.skip li span { color: var(--muted) }
+
+/* 마네킹 설계 */
+.body-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(32px, 5vw, 80px); margin-top: 56px; align-items: start }
+.figure { background: var(--vp); border-radius: 6px; padding: 20px 10px 10px }
+.figure svg { display: block; width: 100%; height: auto; max-width: 100% }
+.fig-note { margin-top: 14px; font-size: 15px; color: var(--muted) }
+.fig-note b { color: var(--ink) }
+.rom h3 { font-size: 22px; font-weight: 700 }
+.rom .sub { margin-top: 6px; font-size: 15px }
+.bars { margin-top: 26px; display: grid; gap: 14px }
+.bar { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 14px; align-items: center }
+.bar .name { font-weight: 600; font-size: 15px }
+.track { position: relative; height: 30px; margin-right: 40px; background: linear-gradient(to right, transparent calc(33.333% - 1px), var(--ink) calc(33.333% - 1px), var(--ink) calc(33.333% + 1px), transparent calc(33.333% + 1px)) }
+.track i { position: absolute; top: 9px; height: 12px; background: var(--joint); border-radius: 2px }
+.track em { position: absolute; top: 4px; white-space: nowrap; font: 500 12px/22px var(--mono); font-style: normal; color: var(--muted) }
+.axis { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 14px; margin-top: 4px }
+.axis div { position: relative; height: 34px; margin-right: 40px; border-top: 1px solid var(--rule); font: 500 11.5px var(--mono); color: var(--muted) }
+.axis span { position: absolute; top: 6px; transform: translateX(-50%); white-space: nowrap }
+.axis span:first-child { transform: none }
+.axis span:last-child { transform: translateX(-100%) }
+.src { margin-top: 10px; font-size: 13px; color: var(--muted) }
+
+/* 자연스러움 재기 */
+.nat { background: var(--vp); color: var(--on-vp) }
+.nat .eyebrow { color: var(--joint) }
+.nat .sub { color: var(--on-vp-soft) }
+.checks { margin-top: 56px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 clamp(32px, 5vw, 80px) }
+.check { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 20px; padding-block: 24px; border-top: 1px solid rgb(255 255 255 / .1) }
+.check h3 { font-size: 21px; font-weight: 700 }
+.check .meter { font: 500 12.5px var(--mono); color: var(--joint); text-align: right; white-space: nowrap }
+.check p { grid-column: 1 / -1; color: var(--on-vp-soft); font-size: 15.5px }
+
+/* 단계 */
+.steps { margin-top: 56px; list-style: none; padding: 0; display: grid; gap: 0; counter-reset: st -1 }
+.steps li { display: grid; grid-template-columns: 96px minmax(0, 1.2fr) minmax(0, 1fr); gap: 8px 36px; padding-block: 28px; border-top: 1px solid var(--rule); counter-increment: st }
+.steps li::before { content: counter(st); font: 300 clamp(48px, 5vw, 68px)/0.9 var(--display); color: var(--rule) }
+.steps li.now::before { color: var(--joint) }
+.steps h3 { font-size: 22px; font-weight: 700 }
+.steps .do { margin-top: 6px; color: var(--muted); font-size: 15.5px }
+.steps .done { font-size: 15px }
+.steps .done::before { content: "끝났다는 확인"; display: block; font: 500 11.5px var(--mono); letter-spacing: .06em; color: var(--joint-ink); margin-bottom: 4px }
+.steps .who { display: inline-block; margin-top: 10px; font: 500 11.5px var(--mono); color: var(--muted) }
+
+/* 역할 */
+.roles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(24px, 4vw, 56px); margin-top: 48px }
+.role { padding: clamp(24px, 3vw, 36px); border-radius: 6px }
+.role.me { background: var(--joint); color: #1a0f07 }
+.role.ai { background: var(--tone) }
+.role h3 { font-size: 26px; font-weight: 700 }
+.role ul { margin: 16px 0 0; padding-left: 1.1em; display: grid; gap: 8px; font-size: 16px }
+
+footer { padding-block: 40px 56px; font-size: 13px; color: var(--muted); border-top: 1px solid var(--rule) }
+
+@media (max-width: 900px) {
+  .hero-grid, .body-grid { grid-template-columns: minmax(0, 1fr) }
+  .four { grid-template-columns: repeat(2, minmax(0, 1fr)) }
+  .ref { grid-template-columns: minmax(0, 1fr) }
+  .flow { grid-template-columns: minmax(0, 1fr); gap: 36px }
+  .flow::before { left: 8px; right: auto; top: 8px; bottom: 8px; width: 2px; height: auto }
+  .node { padding: 0 0 0 40px }
+  .node .dot { position: absolute; left: 0; top: 0 }
+  .node .step { margin-top: 0 }
+  .skip, .skip li { grid-template-columns: minmax(0, 1fr) }
+  .checks { grid-template-columns: minmax(0, 1fr) }
+  .steps li { grid-template-columns: 56px minmax(0, 1fr) }
+  .steps li .done { grid-column: 2 }
+  .roles { grid-template-columns: minmax(0, 1fr) }
+  .read { margin-left: 0 }
+}
+@media (max-width: 520px) {
+  .four { grid-template-columns: minmax(0, 1fr) }
+  .bar, .axis { grid-template-columns: 56px minmax(0, 1fr); gap: 10px }
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="top mono"><a href="../#game">← 작업실</a><span>기획서 v1 · 2026-11-01</span></div>
+    <div class="hero-grid">
+      <div>
+        <h1>마<b>·</b>디</h1>
+        <p class="lede">관절이 다 보이는 마네킹 하나를 사람처럼 자연스럽게 움직이게 만드는 3D 액션 실험.</p>
+        <p class="tag mono">Unity 6 · Blender · Mixamo · 단독 프로젝트 · 가제</p>
+      </div>
+      <figure class="viewport" style="margin:0">
+        <span class="vp-label">SIDE · 걷기 1주기</span>
+        <canvas id="vp" aria-label="옆에서 본 마네킹이 걷는 모습. 관절 각도가 실시간으로 표시된다." role="img"></canvas>
+        <div class="vp-bar">
+          <button id="play" type="button" aria-pressed="false">재생</button>
+          <button id="slow" type="button" aria-pressed="false">0.25×</button>
+          <button id="trail" type="button" aria-pressed="true">궤적</button>
+          <div class="read mono" aria-live="off">
+            <span>엉덩이 <b id="r-hip">0</b>°</span><span>무릎 <b id="r-knee">0</b>°</span><span>발목 <b id="r-ankle">0</b>°</span><span>팔꿈치 <b id="r-elbow">0</b>°</span>
+          </div>
+        </div>
+      </figure>
+    </div>
+  </div>
+</header>
+
+<main>
+<section class="s">
+  <div class="wrap">
+    <p class="eyebrow">만드는 것</p>
+    <h2>캐릭터는 하나, 볼 것은 관절.</h2>
+    <p class="sub">얼굴도 옷도 없는 마네킹이라 움직임이 어색하면 바로 티가 납니다. 그 어색함을 찾아서 고치는 게 이 프로젝트의 전부예요.</p>
+    <div class="four">
+      <div><h3>몸</h3><p>공 모양 관절이 보이는 데생 인형. 조각마다 뼈 하나.</p></div>
+      <div><h3>움직임</h3><p>걷기·달리기·점프부터 발차기·내려찍기·밧줄 휘두르기까지.</p></div>
+      <div><h3>들여다보기</h3><p>느리게 보기, 궤적, 관절 각도, 무게중심을 게임 안에서 켜고 끔.</p></div>
+      <div class="last"><h3>놀이</h3><p>날아오는 공을 타이밍 맞춰 차 내는 미니게임 한 판.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="s refs">
+  <div class="wrap">
+    <p class="eyebrow">참고한 영상 네 개</p>
+    <h2>도구는 달라도 공통점은 손으로 다듬은 타이밍.</h2>
+    <div class="ref-list">
+      <div class="ref"><p class="who">tomsilf_motion</p><p class="what"><b>성문 틈의 손</b><span>Blender로 모델링·조각·애니메이션 후 렌더한 영상. 게임 아님.</span></p><p class="take">회색 덩어리로 먼저 움직임을 잡고 나중에 재질을 입히는 순서.</p></div>
+      <div class="ref"><p class="who">jankyanims</p><p class="what"><b>공 튕겨내기 시제품</b><span>격자 바닥 위 실제 게임 화면. 언리얼 기본 맵으로 보임(추정).</span></p><p class="take">타이밍 판정 미니게임. 회색 격자 맵에서 움직임부터 완성하는 방식.</p></div>
+      <div class="ref"><p class="who">Arthur Munoz</p><p class="what"><b>No Rest for the Wicked 직업 공격</b><span>전문 애니메이터가 Maya에서 키프레임으로 만든 출시작 모션.</span></p><p class="take">예비 동작 → 타격 → 회복의 박자, 바닥 파편까지 같이 움직이는 무게감.</p></div>
+      <div class="ref"><p class="who">Rotem Ninyo</p><p class="what"><b>밧줄 철퇴</b><span>Maya + Kiel Figgins 리그로 만든 게임 애니메이션 연습작.</span></p><p class="take">몸보다 늦게 따라오는 밧줄(2차 동작). 무기가 몸을 끌고 가는 느낌.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="s">
+  <div class="wrap">
+    <p class="eyebrow">도구</p>
+    <h2>전부 무료, 이 노트북에서 돌아가는 것만.</h2>
+    <p class="sub">노트북은 Intel Arc 내장 그래픽과 RAM 16GB. 무거운 엔진보다 가볍게 자주 돌려 보는 쪽을 골랐습니다.</p>
+    <div class="flow">
+      <div class="node"><div class="dot"></div><p class="step mono">몸 만들기</p><h3>Blender</h3><p>관절 마네킹 모델을 파이썬 스크립트로 생성해 FBX로 내보냄.</p><p class="why">손으로 깎지 않아도 돼서 처음부터 비율·관절 위치를 숫자로 고칠 수 있음.</p><span class="free">무료 · 상업 OK</span></div>
+      <div class="node"><div class="dot"></div><p class="step mono">뼈와 기본 동작</p><h3>Mixamo</h3><p>자동 리깅, 걷기·달리기·점프 같은 기본 동작 수천 개.</p><p class="why">기본기는 받아 쓰고 시간은 내 동작에 쓰기 위해.</p><span class="free">무료 · 상업 OK</span></div>
+      <div class="node"><div class="dot"></div><p class="step mono">내 동작</p><h3>Blender · QuickMagic</h3><p>발차기·내려찍기는 키프레임으로. 폰으로 찍은 내 동작은 AI 모션캡처로.</p><p class="why">손으로 만든 것과 찍은 것을 나란히 놓고 비교하는 게 공부가 됨.</p><span class="free">무료 · QuickMagic은 비상업</span></div>
+      <div class="node"><div class="dot"></div><p class="step mono">움직이고 들여다보기</p><h3>Unity 6</h3><p>조작, 동작 섞기, 발 IK, 관찰 도구, 미니게임.</p><p class="why">이미 설치돼 있고, C# 코드라 Claude가 직접 만들고 자동으로 검사할 수 있음.</p><span class="free">무료</span></div>
+    </div>
+    <div class="skip">
+      <h3>고르지 않은 것</h3>
+      <ul>
+        <li><s>Unreal Engine 5</s><span>기본 마네킹·모션 매칭 예제가 훌륭하지만 내장 그래픽 노트북엔 무겁고, 블루프린트는 Claude가 글로 고치기 어려움.</span></li>
+        <li><s>Maya</s><span>영상 두 개가 쓴 도구. 학생판은 무료지만 상업적 이용 금지라 나중을 생각해 Blender로.</span></li>
+        <li><s>Cascadeur 무료판</s><span>물리 기반 보정은 좋지만 무료판은 자기 형식(.casc)으로만 저장돼 Unity로 못 가져옴.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="s" style="padding-top:0">
+  <div class="wrap">
+    <p class="eyebrow">마네킹 설계</p>
+    <h2>조각 하나에 뼈 하나.</h2>
+    <p class="sub">마네킹은 살이 휘지 않아서, 뼈마다 몸 조각을 하나씩 붙이면 끝입니다. 사람 캐릭터에서 가장 어려운 피부 가중치 작업이 통째로 사라져요.</p>
+    <div class="body-grid">
+      <div>
+        <div class="figure">
+          <svg viewBox="0 0 340 470" role="img" aria-label="마네킹 정면도. 목, 어깨, 팔꿈치, 손목, 허리, 엉덩이, 무릎, 발목 관절이 주황 점으로 표시됨.">
+            <g fill="#d9dde3" stroke="none">
+              <ellipse cx="170" cy="40" rx="22" ry="28"/>
+              <rect x="124" y="84" width="92" height="80" rx="24"/>
+              <rect x="136" y="186" width="68" height="44" rx="18"/>
+              <rect x="109" y="104" width="18" height="62" rx="9"/><rect x="213" y="104" width="18" height="62" rx="9"/>
+              <rect x="110" y="182" width="16" height="58" rx="8"/><rect x="214" y="182" width="16" height="58" rx="8"/>
+              <ellipse cx="118" cy="266" rx="9" ry="14"/><ellipse cx="222" cy="266" rx="9" ry="14"/>
+              <rect x="142" y="246" width="20" height="86" rx="10"/><rect x="178" y="246" width="20" height="86" rx="10"/>
+              <rect x="144" y="349" width="16" height="80" rx="8"/><rect x="180" y="349" width="16" height="80" rx="8"/>
+              <ellipse cx="148" cy="450" rx="14" ry="6"/><ellipse cx="192" cy="450" rx="14" ry="6"/>
+            </g>
+            <g fill="#f06a1d" stroke="#1c1e22" stroke-width="2.5">
+              <circle cx="170" cy="76" r="6"/><circle cx="118" cy="96" r="8"/><circle cx="222" cy="96" r="8"/>
+              <circle cx="118" cy="174" r="6"/><circle cx="222" cy="174" r="6"/><circle cx="170" cy="176" r="7"/>
+              <circle cx="118" cy="246" r="5"/><circle cx="222" cy="246" r="5"/>
+              <circle cx="152" cy="238" r="8"/><circle cx="188" cy="238" r="8"/>
+              <circle cx="152" cy="340" r="7"/><circle cx="188" cy="340" r="7"/>
+              <circle cx="152" cy="436" r="6"/><circle cx="188" cy="436" r="6"/>
+            </g>
+            <g stroke="#8d939c" stroke-width="1" fill="none">
+              <path d="M44 76H162"/><path d="M44 96H108"/><path d="M44 174H110"/><path d="M44 246H111"/><path d="M44 340H143"/>
+              <path d="M290 176H179"/><path d="M290 238H198"/><path d="M290 436H196"/>
+            </g>
+            <g fill="#e8eaed" font-family="IBM Plex Mono, Pretendard, monospace" font-size="12">
+              <text x="6" y="80">목</text><text x="6" y="100">어깨</text><text x="6" y="178">팔꿈치</text><text x="6" y="250">손목</text><text x="6" y="344">무릎</text>
+              <text x="334" y="180" text-anchor="end">허리</text><text x="334" y="242" text-anchor="end">엉덩이</text><text x="334" y="440" text-anchor="end">발목</text>
+            </g>
+          </svg>
+        </div>
+        <p class="fig-note"><b>뼈 이름은 Mixamo 표준 그대로.</b> 그래서 Unity가 사람형(Humanoid)으로 인식하고, Mixamo·모션캡처 동작이 바로 입혀집니다.</p>
+      </div>
+      <div class="rom">
+        <h3>관절이 움직일 수 있는 범위</h3>
+        <p class="sub">이 범위를 넘으면 관찰 모드에서 그 관절이 빨갛게 바뀝니다. 부자연스러움을 숫자로 잡는 첫 번째 기준.</p>
+        <div class="bars" id="bars"></div>
+        <div class="axis"><i></i><div><span style="left:0">−90° 펴기</span><span style="left:33.333%">0°</span><span style="left:66.667%">90°</span><span style="left:100%">180° 굽히기</span></div></div>
+        <p class="src">성인 정상 가동 범위 참고값(AAOS). 발목은 왼쪽이 발등 쪽, 오른쪽이 발바닥 쪽.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="s nat">
+  <div class="wrap">
+    <p class="eyebrow">자연스러움을 재는 법</p>
+    <h2>“어색하다”를 화면에 띄우기.</h2>
+    <p class="sub">게임 안에서 켜고 끄는 관찰 도구 여섯 개. 느낌으로만 보던 걸 선과 숫자로 봅니다.</p>
+    <div class="checks">
+      <div class="check"><h3>발 미끄러짐</h3><span class="meter">디딘 발 속도 ≈ 0 cm/s</span><p>땅을 디딘 발이 미끄러지면 스케이트 타는 것처럼 보임. 디딘 동안의 발 속도를 바닥에 표시.</p></div>
+      <div class="check"><h3>무게중심</h3><span class="meter">점이 발 사이 면 안</span><p>몸의 무게중심을 바닥에 점으로 찍고, 두 발이 만드는 면을 그림. 점이 밖으로 나가면 넘어져야 정상.</p></div>
+      <div class="check"><h3>궤적</h3><span class="meter">손끝·발끝이 곡선</span><p>사람 손발은 호를 그리며 움직임. 직선으로 꺾이면 로봇처럼 보임. 위 첫 화면의 주황 선이 이것.</p></div>
+      <div class="check"><h3>가동 범위</h3><span class="meter">넘으면 관절 빨강</span><p>옆 표의 범위를 넘는 순간 그 관절을 표시. 모션캡처가 팔꿈치를 거꾸로 꺾는 경우를 바로 잡아냄.</p></div>
+      <div class="check"><h3>박자</h3><span class="meter">예비 · 타격 · 회복 프레임</span><p>공격 하나를 세 구간으로 나눠 프레임 수를 막대로 표시. 예비가 길면 무겁고, 너무 길면 굼뜸.</p></div>
+      <div class="check"><h3>느리게 · 한 프레임씩</h3><span class="meter">0.1× ~ 1×</span><p>슬로모션과 프레임 넘기기, 이전 자세를 반투명하게 겹쳐 보기. 빠른 동작의 어색함은 느리게 봐야 보임.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="s">
+  <div class="wrap">
+    <p class="eyebrow">단계</p>
+    <h2>회색 바닥 위에서 하나씩.</h2>
+    <p class="sub">한 단계가 끝나면 Claude가 자동 검사와 스크린샷으로 확인하고, 마지막 판단은 직접 눈으로 봅니다.</p>
+    <ol class="steps">
+      <li class="now"><div><h3>준비</h3><p class="do">Unity 6 새 프로젝트(바탕화면 Mardi), Blender 설치, Mixamo 로그인.</p><span class="who">Claude · 로그인만 나</span></div><p class="done">빈 회색 격자 맵이 열리고 자동 검사가 통과.</p></li>
+      <li><div><h3>마네킹</h3><p class="do">Blender 스크립트로 관절 마네킹 생성 → Mixamo 뼈 이름으로 연결 → Unity에 사람형으로 가져오기.</p><span class="who">Claude</span></div><p class="done">T자 자세와 Mixamo 동작 하나를 입힌 스크린샷.</p></li>
+      <li><div><h3>걷고 뛰기</h3><p class="do">3인칭 조작, 카메라, 속도에 따라 걷기↔달리기를 섞는 블렌드 트리, 점프·착지.</p><span class="who">Claude · 조작감은 나</span></div><p class="done">자동 걷기 테스트 통과, 발 미끄러짐 수치 기록.</p></li>
+      <li><div><h3>관찰 도구</h3><p class="do">느리게 보기, 궤적, 관절 각도·가동 범위 경고, 무게중심, 고스트.</p><span class="who">Claude</span></div><p class="done">키 하나로 켜고 끄는 화면 스크린샷 여섯 장.</p></li>
+      <li><div><h3>자연스럽게</h3><p class="do">계단·경사에서 발 IK, 대상 쪽으로 고개 돌리기, 방향 틀 때 몸 기울기, 착지 충격.</p><span class="who">Claude · 어색한 곳 찾기는 나</span></div><p class="done">같은 계단을 IK 켜고·끄고 비교한 화면.</p></li>
+      <li><div><h3>내 동작</h3><p class="do">발차기·내려찍기는 Blender 키프레임, 같은 동작을 폰으로 찍어 QuickMagic으로 변환.</p><span class="who">촬영은 나 · 다듬기는 함께</span></div><p class="done">손으로 만든 것과 찍은 것을 나란히 재생.</p></li>
+      <li><div><h3>튕겨내기</h3><p class="do">날아오는 공을 타이밍 맞춰 차거나 쳐 내면 점수. 늦으면 맞고 휘청.</p><span class="who">Claude · 재미 판단은 나</span></div><p class="done">한 판 처음부터 끝까지 자동 플레이 통과.</p></li>
+      <li><div><h3>도전</h3><p class="do">맞으면 물리로 휘청였다가 돌아오는 반응(액티브 랙돌), 동작을 자동으로 이어 붙이는 모션 매칭(MotionMatching, MIT).</p><span class="who">함께</span></div><p class="done">맞을 때마다 다르게 휘청이는 영상.</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="s" style="padding-top:0">
+  <div class="wrap">
+    <p class="eyebrow">역할</p>
+    <h2>코드는 Claude, 눈은 나.</h2>
+    <div class="roles">
+      <div class="role me"><h3>내가 할 것</h3><ul><li>Mixamo·QuickMagic 로그인과 다운로드</li><li>동작을 폰으로 찍기 (발차기, 내려찍기, 걷기)</li><li>직접 해 보고 어색한 곳 말하기</li><li>재미있는지 판단하기</li></ul></div>
+      <div class="role ai"><h3>Claude가 할 것</h3><ul><li>Blender 마네킹 스크립트, Unity C# 전부</li><li>단계마다 자동 검사와 스크린샷</li><li>어색함을 숫자로 재는 관찰 도구</li><li>막히면 쉬운 말로 설명</li></ul></div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer><div class="wrap">마디 (가제) · 김창식 · 기획서 v1</div></footer>
+
+<script>
+// 가동 범위 막대: 축 −90° ~ 180°
+const ROM = [["어깨", -60, 180], ["팔꿈치", 0, 150], ["손목", -70, 80], ["엉덩이", -30, 120], ["무릎", 0, 135], ["발목", -20, 50]];
+const pct = v => (v + 90) / 270 * 100;
+document.getElementById("bars").innerHTML = ROM.map(([n, a, b]) =>
+  `<div class="bar"><span class="name">${n}</span><div class="track"><i style="left:${pct(a)}%;width:${pct(b) - pct(a)}%"></i>` +
+  (a < 0 ? `<em style="left:calc(${pct(a)}% - 6px);transform:translateX(-100%)">${-a}</em>` : "") +
+  `<em style="left:calc(${pct(b)}% + 6px)">${b}</em></div></div>`).join("");
+
+// 옆에서 본 걷기: 각도로 관절을 이어 그리는 순운동학
+const cv = document.getElementById("vp"), ctx = cv.getContext("2d");
+const D = Math.PI / 180, pos = x => Math.max(0, x);
+let W = 0, H = 0, S = 1, phase = 0.6, speed = 1, playing = false, showTrail = true, travel = 0, last = 0;
+let prevX = [null, null], trail = [];
+
+function size() {
+  const r = cv.getBoundingClientRect(), d = window.devicePixelRatio || 1;
+  cv.width = r.width * d; cv.height = r.height * d; ctx.setTransform(d, 0, 0, d, 0, 0);
+  W = r.width; H = r.height; S = H * 0.62;
+}
+// 한 다리의 각도(도). φ: 0~2π 걷기 주기
+function leg(p) {
+  const hip = 8 + 22 * Math.sin(p);
+  const knee = 4 + 60 * Math.pow(pos(Math.cos(p + 0.35)), 2.2) + 14 * Math.pow(pos(Math.cos(p - 2.2)), 6);
+  const toeOff = 22 * Math.pow(pos(Math.cos(p + 1.7)), 6), heel = 10 * Math.pow(pos(Math.cos(p - 1.5)), 6);
+  return { hip, knee, shin: hip - knee, plantar: toeOff - heel };
+}
+const dir = (a, l) => [Math.sin(a * D) * l * S, Math.cos(a * D) * l * S];
+function pose(p) {
+  const out = { legs: [], arms: [] };
+  for (const k of [0, 1]) {
+    const q = p + k * Math.PI, L = leg(q);
+    const [kx, ky] = dir(L.hip, .245), [ax, ay] = dir(L.shin, .246);
+    const [fx, fy] = dir(90 - L.plantar, .11);
+    out.legs.push({ L, knee: [kx, ky], ankle: [kx + ax, ky + ay], toe: [kx + ax + fx, ky + ay + fy] });
+    const sh = -18 * Math.sin(q), el = 16 + 14 * pos(-Math.sin(q));
+    const [ux, uy] = dir(sh, .17), [lx, ly] = dir(sh + el, .16), [hx, hy] = dir(sh + el, .07);
+    out.arms.push({ sh, el, elbow: [ux, uy], wrist: [ux + lx, uy + ly], hand: [ux + lx + hx, uy + ly + hy] });
+  }
+  return out;
+}
+function seg(a, b, w, col) { ctx.strokeStyle = col; ctx.lineWidth = w; ctx.lineCap = "round"; ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke(); }
+function joint(p, r) { ctx.fillStyle = "#f06a1d"; ctx.strokeStyle = "#26292e"; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(p[0], p[1], r, 0, 7); ctx.fill(); ctx.stroke(); }
+
+function frame(t) {
+  const dt = last ? Math.min(0.05, (t - last) / 1000) : 0; last = t;
+  if (playing) phase = (phase + dt * speed * 2 * Math.PI / 1.1) % (2 * Math.PI);
+  const P = pose(phase), gy = H * 0.86, cx = W * 0.5;
+  // 가장 낮은 발 끝이 바닥에 닿도록 골반 높이 결정
+  const low = Math.max(...P.legs.flatMap(l => [l.ankle[1], l.toe[1]]));
+  const hipY = gy - low;
+  const stance = (Math.max(P.legs[0].ankle[1], P.legs[0].toe[1]) >= Math.max(P.legs[1].ankle[1], P.legs[1].toe[1])) ? 0 : 1;
+  const sx = P.legs[stance].ankle[0];
+  if (playing && prevX[stance] !== null) travel += prevX[stance] - sx;
+  prevX = [P.legs[0].ankle[0], P.legs[1].ankle[0]];
+
+  ctx.clearRect(0, 0, W, H);
+  ctx.strokeStyle = "rgb(220 226 234 / .07)"; ctx.lineWidth = 1;
+  const step = 40, off = ((-travel % step) + step) % step;
+  for (let x = off; x < W; x += step) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, gy); ctx.stroke(); }
+  for (let y = gy; y > 0; y -= step) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+  ctx.strokeStyle = "rgb(220 226 234 / .35)"; ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(W, gy); ctx.stroke();
+  for (let x = off; x < W; x += step) { ctx.beginPath(); ctx.moveTo(x, gy); ctx.lineTo(x - 14, gy + 12); ctx.stroke(); }
+
+  const hip = [cx, hipY], lean = 4;
+  const shoulder = [cx + Math.sin(lean * D) * .29 * S, hipY - Math.cos(lean * D) * .29 * S];
+  const neck = [shoulder[0] + .01 * S, shoulder[1] - .05 * S], head = [neck[0] + .01 * S, neck[1] - .075 * S];
+  const A = (o, v) => [o[0] + v[0], o[1] + v[1]];
+
+  // 궤적: 가까운 쪽 발끝·손목을 세계 좌표로 기록
+  const near = 0, Ln = P.legs[near], An = P.arms[near];
+  if (playing) { trail.push([A(hip, Ln.toe), A(shoulder, An.wrist)].map(p => [p[0] + travel, p[1]])); if (trail.length > 160) trail.shift(); }
+  if (showTrail && trail.length > 1) {
+    for (const k of [0, 1]) {
+      ctx.strokeStyle = k ? "rgb(240 106 29 / .45)" : "rgb(240 106 29 / .8)"; ctx.lineWidth = 1.6; ctx.setLineDash(k ? [3, 4] : []);
+      ctx.beginPath(); trail.forEach((p, i) => { const x = p[k][0] - travel, y = p[k][1]; i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }); ctx.stroke();
+    }
+    ctx.setLineDash([]);
+  }
+
+  const far = "#7d838c", wood = "#d9dde3", w = S * .055;
+  const drawLeg = (l, c) => { const k = A(hip, l.knee), a = A(hip, l.ankle), t2 = A(hip, l.toe); seg(hip, k, w * 1.05, c); seg(k, a, w * .85, c); seg(a, t2, w * .6, c); return [k, a]; };
+  const drawArm = (a, c) => { const e = A(shoulder, a.elbow), r = A(shoulder, a.wrist), h = A(shoulder, a.hand); seg(shoulder, e, w * .75, c); seg(e, r, w * .65, c); seg(r, h, w * .7, c); return [e, r]; };
+  drawArm(P.arms[1], far); drawLeg(P.legs[1], far);
+  seg(hip, shoulder, w * 2.1, wood); seg(shoulder, neck, w * .55, wood);
+  ctx.fillStyle = wood; ctx.beginPath(); ctx.ellipse(head[0], head[1], S * .052, S * .066, 0.1, 0, 7); ctx.fill();
+  const [kn, an] = drawLeg(Ln, wood); const [el, wr] = drawArm(An, wood);
+  joint(hip, 5); joint(shoulder, 4.5); joint(neck, 3.5); joint(kn, 4.5); joint(an, 3.5); joint(el, 4); joint(wr, 3);
+
+  // 무릎 각도 표시
+  ctx.fillStyle = "#e8eaed"; ctx.font = "500 11px 'IBM Plex Mono', monospace";
+  ctx.fillText(Math.round(Ln.L.knee) + "°", kn[0] + 10, kn[1] + 4);
+  ctx.fillText(Math.round(Ln.L.hip) + "°", hip[0] + 10, hip[1] + 4);
+
+  rd.hip.textContent = Math.round(Ln.L.hip); rd.knee.textContent = Math.round(Ln.L.knee);
+  rd.ankle.textContent = Math.round(Ln.L.plantar); rd.elbow.textContent = Math.round(An.el);
+  requestAnimationFrame(frame);
+}
+const rd = { hip: document.getElementById("r-hip"), knee: document.getElementById("r-knee"), ankle: document.getElementById("r-ankle"), elbow: document.getElementById("r-elbow") };
+const bPlay = document.getElementById("play"), bSlow = document.getElementById("slow"), bTrail = document.getElementById("trail");
+function setPlay(v) { playing = v; bPlay.textContent = v ? "멈춤" : "재생"; bPlay.setAttribute("aria-pressed", v); }
+bPlay.onclick = () => setPlay(!playing);
+bSlow.onclick = () => { speed = speed === 1 ? .25 : 1; bSlow.setAttribute("aria-pressed", speed !== 1); };
+bTrail.onclick = () => { showTrail = !showTrail; bTrail.setAttribute("aria-pressed", showTrail); };
+size(); new ResizeObserver(size).observe(cv);
+if (!matchMedia("(prefers-reduced-motion: reduce)").matches) setPlay(true);
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
