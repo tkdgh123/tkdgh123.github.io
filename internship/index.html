@@ -7,319 +7,334 @@
 <script>document.documentElement.classList.add("js")</script>
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/wanteddev/wanted-sans@v1.0.3/packages/wanted-sans/fonts/webfonts/variable/split/WantedSansVariable.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&display=swap">
 <style>
-/* 현장실습 수첩: 작업실 첫 화면과 같은 틀. 밝은 바탕, 먹색 면, 비스듬한 이음매, 강조 하나. 설명은 막대·흐름·계단으로 보여 준다 */
+/* 현장실습 수첩: 잘 만든 공공 안내 책자. 원티드 산스 굵은 제목과 프리텐다드 가는 본문의 대비,
+   왼쪽 여백 단에 장 번호·시기·연도를 두고 오른쪽에서 읽는다. 사진은 원래 비율 그대로 */
 :root {
-  --paper: #f5f5f2; --tone: #e6e6e1; --dark: #16171b; --ink: #111; --muted: #55554f;
-  --on-dark: #f2f2ef; --on-dark-soft: #a9aab0; --accent: #2f4fb5; --accent-ink: #fff;
-  --m: clamp(16px, 2.6vw, 40px);
-  --cut: 6vw;
-  --s-small: 16px; --s-body: clamp(17px, 1rem + .2vw, 19px); --s-lead: clamp(21px, 1.1rem + .7vw, 28px);
-  --s-sub: clamp(28px, 2.7vw, 44px); --s-head: clamp(38px, 4.8vw, 80px);
+  --paper: #f2f1ec; --tone: #e4e2da; --ink: #151514; --muted: #5a5954; --rule: #c9c6bc;
+  --dark: #151618; --on-dark: #eeece6; --on-dark-soft: #9e9d97;
+  --accent: #1f5a48; --accent-ink: #fff; --acc: var(--accent); --co: var(--ink);
+  --m: clamp(16px, 3.2vw, 52px); --g: clamp(12px, 1.6vw, 24px);
+  --display: "Wanted Sans Variable", "Wanted Sans", "Pretendard Variable", Pretendard, system-ui, sans-serif;
+  --sans: "Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
   color-scheme: light;
 }
 * { box-sizing: border-box }
 html { scroll-behavior: smooth; scroll-padding-top: 72px }
-body { margin: 0; background: var(--paper); color: var(--ink); font: 400 var(--s-body)/1.6 "Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif; word-break: keep-all; overflow-wrap: anywhere; -webkit-font-smoothing: antialiased }
-a { color: inherit; text-underline-offset: 4px }
-b, strong { font-weight: 800 }
-p { margin: 0 }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 17px/1.7 var(--sans); word-break: keep-all; overflow-wrap: anywhere; -webkit-font-smoothing: antialiased; counter-reset: chap }
+a { color: inherit; text-underline-offset: 4px; text-decoration-thickness: 1px }
+b, strong { font-weight: 700 }
+p, figure { margin: 0 }
 img { display: block; max-width: 100%; height: auto }
-h1, h2, h3 { margin: 0; font-weight: 900; letter-spacing: -.04em; line-height: 1.08; text-wrap: balance }
-a:focus-visible, button:focus-visible, summary:focus-visible, input:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px }
-.dark a:focus-visible, .dark button:focus-visible, .dark input:focus-visible { outline-color: var(--on-dark) }
+h1, h2, h3 { margin: 0; font-family: var(--display); font-weight: 700; letter-spacing: -.025em; line-height: 1.15; text-wrap: balance }
+a:focus-visible, button:focus-visible, summary:focus-visible, input:focus-visible { outline: 2px solid currentColor; outline-offset: 4px }
 .muted { color: var(--muted) }
 .dark .muted { color: var(--on-dark-soft) }
 .num { font-variant-numeric: tabular-nums }
 main { overflow-x: clip }
+.paper { background: var(--paper); --line: var(--rule) }
+.tone { background: var(--tone); --line: var(--rule) }
+.dark { background: var(--dark); color: var(--on-dark); --line: rgba(238, 236, 230, .2) }
 
 /* 위 막대 */
-.topbar { position: sticky; top: 0; z-index: 20; background: var(--paper); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 32px; padding: 14px var(--m) }
-.back { font-weight: 900; font-size: var(--s-lead); letter-spacing: -.04em; text-decoration: none; white-space: nowrap }
-.back:hover { text-decoration: underline 3px; text-underline-offset: 6px }
-.toc ol { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 2px 18px; font-size: var(--s-small); font-weight: 700 }
-.toc a { display: block; padding: 6px 0; text-decoration: none; color: var(--muted); border-bottom: 3px solid transparent; white-space: nowrap; transition: color .2s, border-color .2s }
+.topbar { position: sticky; top: 0; z-index: 20; background: var(--paper); display: flex; justify-content: space-between; align-items: baseline; gap: 8px 32px; padding: 16px var(--m) 12px; border-bottom: 1px solid var(--rule) }
+.back { font: 700 18px/1 var(--display); letter-spacing: -.02em; text-decoration: none; white-space: nowrap }
+.back:hover { color: var(--accent) }
+.toc { min-width: 0 }
+.toc ol { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 2px 18px; font-size: 14.5px; font-weight: 500 }
+.toc a { display: block; padding: 4px 0; text-decoration: none; color: var(--muted); border-bottom: 2px solid transparent; white-space: nowrap; transition: color .2s, border-color .2s }
 .toc a:hover { color: var(--ink) }
-.toc a.on { color: var(--ink); border-color: var(--ink) }
+.toc a.on { color: var(--ink); border-color: var(--accent) }
 
 /* 첫 화면 */
-.hero { padding: clamp(48px, 6vw, 96px) var(--m) calc(var(--cut) + clamp(64px, 7vw, 112px)); display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 16px; align-items: start }
-.hero h1 { grid-column: 1 / -1; font-size: clamp(44px, 8.6vw, 150px); line-height: 1 }
-.hero .sub { grid-column: 1 / 7; margin-top: 44px; font-size: var(--s-lead); line-height: 1.45 }
-.hero .when { grid-column: 1 / 7; margin-top: 20px; font-size: var(--s-small); color: var(--muted) }
-.go { grid-column: 8 / 13; grid-row: 2 / span 2; margin-top: 44px; display: grid; gap: 8px }
-.go a { display: grid; gap: 2px; padding: 16px 22px; background: var(--tone); text-decoration: none; transition: transform .15s, background-color .2s }
-.go a:first-child { background: var(--ink); color: var(--paper) }
-.go a:hover { transform: translateX(6px) }
-.go a:active { transform: scale(.98) }
-.go b { font-size: var(--s-lead); font-weight: 900; letter-spacing: -.03em }
-.go b::after { content: " →" }
-.go span { font-size: var(--s-small) }
+.hero { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--g); padding: clamp(64px, 8vw, 128px) var(--m) clamp(72px, 8vw, 120px); align-items: start }
+.hero .when { grid-column: 1 / -1; grid-row: 1; margin-bottom: 28px; font-size: 14px; font-weight: 600; color: var(--muted) }
+.hero h1 { grid-column: 1 / -1; grid-row: 2; font-size: clamp(46px, 8.2vw, 144px); font-weight: 800; line-height: 1; letter-spacing: -.045em }
+.hero h1 span { font-weight: 400 }
+.hero .sub { grid-column: 1 / 7; grid-row: 3; margin-top: 52px; font: 300 clamp(20px, 1.6vw, 25px)/1.55 var(--sans) }
+.go { grid-column: 8 / 13; grid-row: 3; margin-top: 52px; display: grid; border-top: 2px solid var(--ink) }
+.go a { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 16px; padding: 16px 0 18px; border-bottom: 1px solid var(--rule); text-decoration: none; transition: padding .25s, color .2s }
+.go a::after { content: "→"; grid-column: 2; grid-row: 1 / span 2; align-self: center; font: 400 22px var(--display) }
+.go a:hover { padding-left: 8px; color: var(--accent) }
+.go b { font: 700 21px/1.3 var(--display); letter-spacing: -.02em }
+.go span { font-size: 15px; color: var(--muted) }
 
-/* 면: 윗변을 비스듬히 잘라 앞 면 위에 겹친다 */
-.ch { position: relative; margin-top: calc(-1 * var(--cut)); padding: calc(var(--cut) + clamp(64px, 7vw, 112px)) var(--m) calc(var(--cut) + clamp(64px, 7vw, 112px)); clip-path: polygon(0 var(--cut), 100% 0, 100% 100%, 0 100%) }
-.ch.rev { clip-path: polygon(0 0, 100% var(--cut), 100% 100%, 0 100%) }
-main > :last-child { padding-bottom: clamp(64px, 7vw, 112px) }
-.paper { background: var(--paper) }
-.tone { background: var(--tone) }
-.dark { background: var(--dark); color: var(--on-dark) }
+/* 장: 왼쪽 여백 단에 번호, 오른쪽에서 읽는다 */
+.ch { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--g); align-items: start; padding: clamp(80px, 9vw, 136px) var(--m) }
+.ch > * { grid-column: 4 / 13; min-width: 0 }
+section.ch::before { counter-increment: chap; content: counter(chap, decimal-leading-zero); grid-column: 1 / 4; grid-row: 1; font: 800 clamp(34px, 3.4vw, 56px)/1 var(--display); letter-spacing: -.03em; font-variant-numeric: tabular-nums; color: var(--accent) }
+section.dark::before { color: var(--on-dark-soft) }
 section { scroll-margin-top: 24px }
-h2 { font-size: var(--s-head); max-width: 15em }
-.lead { margin-top: 24px; font-size: var(--s-lead); line-height: 1.45; max-width: 30em }
-h3 { font-size: var(--s-lead); line-height: 1.25; letter-spacing: -.03em }
-.ch > h3 { font-size: var(--s-sub); margin-top: 96px }
-.note { margin-top: 28px; font-size: var(--s-small); color: var(--muted); max-width: 46em }
+h2 { font-size: clamp(36px, 4.4vw, 74px); font-weight: 800; letter-spacing: -.04em; line-height: 1.06; max-width: 14em }
+.lead { margin-top: 22px; max-width: 30em; font: 300 clamp(20px, 1.6vw, 25px)/1.55 var(--sans) }
+.lead b { font-weight: 600 }
+h3 { font-size: clamp(20px, 1.6vw, 24px); line-height: 1.3 }
+.ch > h3 { margin-top: 120px; font-size: clamp(26px, 2.4vw, 38px); font-weight: 800; letter-spacing: -.03em }
+.note { margin-top: 32px; max-width: 46em; font-size: 15px; color: var(--muted) }
 .dark .note { color: var(--on-dark-soft) }
 
 /* 큰 숫자 넷 */
-.pills { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 40px 32px; align-items: start }
-.pills div { display: grid; gap: 4px }
-.pills div:nth-child(even) { margin-top: 56px }
-.pills b { font-size: var(--s-sub); font-weight: 900; letter-spacing: -.04em; line-height: 1.1; font-variant-numeric: tabular-nums; margin-bottom: 8px }
-.pills span { font-weight: 800 }
-.pills small { font-size: var(--s-small); color: var(--on-dark-soft) }
+.ch.pills { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 40px var(--g); padding-block: clamp(56px, 6vw, 88px) }
+.ch.pills > * { grid-column: auto }
+.pills div { display: grid; gap: 2px; align-content: start; padding-top: 18px; border-top: 1px solid var(--line) }
+.pills b { margin-bottom: 10px; font: 800 clamp(28px, 2.8vw, 46px)/1.1 var(--display); letter-spacing: -.035em; font-variant-numeric: tabular-nums }
+.pills span { font-weight: 600 }
+.pills small { font-size: 14.5px; color: var(--on-dark-soft) }
 
-/* 낱말 하나를 크게 세운 묶음 (수업·돈·보호처럼) */
-.grid { margin-top: 56px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 96px 40px; align-items: start }
-.grid.two { grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)) }
-.grid > .card:nth-child(even) { margin-top: 48px }
-.card { display: grid; gap: 10px; align-content: start; min-width: 0 }
-.badge { font-size: var(--s-head); font-weight: 900; letter-spacing: -.05em; line-height: 1; margin-bottom: 8px }
-.card ul { margin: 4px 0 0; padding-left: 20px; display: grid; gap: 6px }
+/* 낱말 하나를 크게 세운 묶음 */
+.grid { margin-top: 64px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 56px var(--g); align-items: start }
+.grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)) }
+.card { display: grid; gap: 10px; align-content: start; min-width: 0; padding-top: 20px; border-top: 2px solid currentColor }
+.badge { margin-bottom: 10px; font: 800 clamp(40px, 4vw, 64px)/1 var(--display); letter-spacing: -.045em; color: var(--accent) }
+.card ul { margin: 4px 0 0; padding-left: 18px; display: grid; gap: 6px }
 
 /* 표준 vs 자율 막대 */
 .ratio { margin-top: 56px }
-.ratio .bar { display: flex; height: 72px }
-.ratio .bar i { display: grid; place-items: center; font-style: normal; font-weight: 900; font-size: var(--s-lead); letter-spacing: -.03em }
+.ratio .bar { display: flex; height: 64px }
+.ratio .bar i { display: grid; place-items: center; font: normal 700 19px var(--display) }
 .ratio .z { width: 16.67%; background: var(--tone) }
 .ratio .s { width: 25%; background: var(--accent); color: var(--accent-ink) }
 .ratio .f { flex: 1; background: var(--ink); color: var(--paper) }
-.ticks { position: relative; height: 32px; font-size: var(--s-small); font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums }
-.ticks span { position: absolute; top: 8px; transform: translateX(-50%); white-space: nowrap }
-.vs .card:nth-child(n) { margin-top: 0 }
+.ticks { position: relative; height: 36px; font-size: 13.5px; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums }
+.ticks span { position: absolute; top: 10px; transform: translateX(-50%); white-space: nowrap }
 .vs .card h3 { display: flex; align-items: center; gap: 12px }
-.vs .card h3::before { content: ""; width: 18px; height: 18px; background: var(--c); flex: none }
+.vs .card h3::before { content: ""; width: 14px; height: 14px; background: var(--c); flex: none }
 
 /* 계산기: 바탕에서 한 단계 밝은 판 */
-.calc { margin-top: 48px; background: var(--paper); color: var(--ink); padding: clamp(24px, 4vw, 56px); display: grid; gap: 22px; max-width: 980px }
+.calc { margin-top: 56px; background: var(--paper); color: var(--ink); padding: clamp(24px, 3.6vw, 52px); display: grid; gap: 22px; max-width: 920px }
 .seg { display: flex; flex-wrap: wrap; gap: 8px }
-.seg button, .who button { font: inherit; font-weight: 700; cursor: pointer; transition: background-color .2s, color .2s, border-color .2s }
-.seg button { min-height: 48px; padding: 0 18px; border: 0; background: var(--tone); color: var(--ink) }
-.seg button:hover { background: #d6d6d0 }
-.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink) }
+.seg button, .who button { font: inherit; cursor: pointer; transition: background-color .2s, color .2s, border-color .2s }
+.seg button { min-height: 46px; padding: 0 18px; border: 1px solid var(--rule); background: transparent; color: var(--ink); font-weight: 600; font-size: 15px; font-variant-numeric: tabular-nums }
+.seg button:hover { border-color: var(--ink) }
+.seg button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink) }
 .out { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 16px }
-.out b { font-size: clamp(44px, 6vw, 96px); font-weight: 900; letter-spacing: -.045em; line-height: 1; font-variant-numeric: tabular-nums }
-.out .muted { font-weight: 700; color: var(--muted) }
-.meter { height: 14px; background: var(--tone) }
+.out b { font: 800 clamp(44px, 5.6vw, 88px)/1 var(--display); letter-spacing: -.045em; font-variant-numeric: tabular-nums }
+.out .muted { font-weight: 600; color: var(--muted) }
+.meter { height: 10px; background: var(--tone) }
 .meter i { display: block; height: 100%; background: var(--accent); transition: width .3s cubic-bezier(.2, .7, .2, 1) }
-.formula { color: var(--muted); font-variant-numeric: tabular-nums }
+.formula { font-size: 15px; color: var(--muted); font-variant-numeric: tabular-nums }
 
 /* 돈의 흐름 */
-.flow { margin-top: 64px; display: grid; grid-template-columns: minmax(0, 1fr) 150px minmax(0, 1fr) 150px minmax(0, 1fr); align-items: center; gap: 12px; max-width: 1180px }
-.flow .node { padding: 24px 16px; text-align: center; background: var(--on-dark); color: var(--ink) }
-.flow .node b { display: block; font-size: var(--s-sub); font-weight: 900; letter-spacing: -.04em; line-height: 1.1 }
-.flow .node.me { background: var(--accent); color: var(--accent-ink) }
-.flow .node small { font-size: var(--s-small); font-weight: 700 }
-.flow .arrow { display: grid; justify-items: center; gap: 4px; font-size: var(--s-small); text-align: center; color: var(--on-dark-soft) }
-.flow .arrow b { font-size: var(--s-body); color: var(--on-dark) }
-.flow .arrow i { display: block; width: 100%; height: 4px; background: var(--on-dark); position: relative }
-.flow .arrow i::after { content: ""; position: absolute; top: -6px; border: 8px solid transparent }
-.flow .arrow.r i::after { right: -6px; border-left-color: var(--on-dark) }
-.flow .arrow.l i::after { left: -6px; border-right-color: var(--on-dark) }
+.flow { margin-top: 72px; display: grid; grid-template-columns: minmax(0, 1fr) 140px minmax(0, 1fr) 140px minmax(0, 1fr); align-items: center; gap: 12px; max-width: 1000px }
+.flow .node { padding: 22px 14px; text-align: center; border: 1px solid rgba(238, 236, 230, .35) }
+.flow .node.me { background: var(--on-dark); color: var(--ink); border-color: var(--on-dark) }
+.flow .node b { display: block; font: 800 clamp(24px, 2.2vw, 34px)/1.1 var(--display); letter-spacing: -.03em }
+.flow .node small { font-size: 14px; font-weight: 600 }
+.flow .arrow { display: grid; justify-items: center; gap: 4px; font-size: 14px; text-align: center; color: var(--on-dark-soft) }
+.flow .arrow b { font-size: 16px; color: var(--on-dark) }
+.flow .arrow i { display: block; width: 100%; height: 2px; background: var(--on-dark); position: relative }
+.flow .arrow i::after { content: ""; position: absolute; top: -7px; border: 8px solid transparent }
+.flow .arrow.r i::after { right: -7px; border-left-color: var(--on-dark) }
+.flow .arrow.l i::after { left: -7px; border-right-color: var(--on-dark) }
 .back-flow { margin-top: 28px; max-width: 40em; color: var(--on-dark-soft) }
 
-/* 신청부터 학점까지: 오르는 계단 */
-.phases { list-style: none; margin: 64px 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; align-items: start }
-.phases li { background: var(--tone); padding: 26px 24px 30px; display: grid; gap: 8px; align-content: start }
-.phases li:nth-child(1) { margin-top: 150px } .phases li:nth-child(2) { margin-top: 100px } .phases li:nth-child(3) { margin-top: 50px }
-.phases li:last-child { background: var(--accent); color: var(--accent-ink) }
-.phases small { font-size: var(--s-small); font-weight: 800 }
-.phases h3 { order: -1 }
-.phases h3 { font-size: var(--s-sub) }
-.credit { margin-top: 48px; display: grid; gap: 14px }
-.credit div { display: flex; flex-wrap: wrap; align-items: center; gap: 8px }
-.credit span.lab { font-weight: 800; margin-right: 8px }
-.chip { background: var(--tone); padding: 6px 14px; font-variant-numeric: tabular-nums }
-.chip b { font-weight: 900; color: var(--accent) }
+/* 신청부터 학점까지: 곧은 선 위의 네 시점 */
+.phases { list-style: none; margin: 72px 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 40px var(--g) }
+.phases li { position: relative; display: flex; flex-direction: column; gap: 8px; padding-top: 26px; border-top: 2px solid var(--ink) }
+.phases li::before { content: ""; position: absolute; top: -8px; left: 0; width: 14px; height: 14px; border-radius: 50%; background: var(--paper); border: 2px solid var(--ink) }
+.phases li:last-child { border-top-color: var(--accent) }
+.phases li:last-child::before { background: var(--accent); border-color: var(--accent) }
+.phases small { order: -2; font-size: 14px; font-weight: 600; color: var(--accent) }
+.phases h3 { order: -1; font-size: clamp(26px, 2.4vw, 36px); font-weight: 800; letter-spacing: -.03em }
+.credit { margin-top: 64px; display: grid; gap: 14px }
+.credit div { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px }
+.credit span.lab { min-width: 15em; margin-right: 8px; font-weight: 600 }
+.chip { padding: 3px 12px; border: 1px solid var(--rule); font-size: 15px; font-variant-numeric: tabular-nums }
+.chip b { color: var(--accent) }
 
 /* 공기업 vs 사기업 */
-.sides { margin-top: 64px; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 16px; align-items: end }
-.sides figure { margin: 0 }
-.sides figure:first-child { grid-column: 1 / 6; transform: rotate(-1.8deg) }
-.sides figure:last-child { grid-column: 8 / 13; transform: rotate(1.8deg) }
-figcaption { margin-top: 14px; font-size: var(--s-small); color: var(--muted); max-width: 40em }
+.ch > .sides { grid-column: 1 / -1; margin-top: 80px; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--g); align-items: end }
+.sides figure:first-child { grid-column: 1 / 8 }
+.sides figure:last-child { grid-column: 9 / 13 }
+figcaption { margin-top: 12px; max-width: 40em; font-size: 14px; color: var(--muted) }
 .dark figcaption { color: var(--on-dark-soft) }
-figcaption b { color: var(--ink); margin-right: 6px }
+figcaption b { display: block; font-weight: 600; color: var(--ink) }
 .dark figcaption b { color: var(--on-dark) }
-.duel { margin-top: 104px; display: grid; gap: 4px }
-.duel .hd, .duel .row { display: grid; grid-template-columns: minmax(0, 1fr) 150px minmax(0, 1fr); gap: 12px }
-.duel .hd b { font-size: var(--s-sub); font-weight: 900; letter-spacing: -.04em; padding: 10px 0 18px }
+.duel { margin-top: 104px; display: grid }
+.duel .hd, .duel .row { display: grid; grid-template-columns: minmax(0, 1fr) 140px minmax(0, 1fr); gap: 12px var(--g) }
+.duel .hd { border-bottom: 2px solid currentColor }
+.duel .hd b { padding-bottom: 14px; font: 800 clamp(26px, 2.4vw, 38px)/1.1 var(--display); letter-spacing: -.03em }
 .duel .hd b:last-child { text-align: right }
-.duel .row { padding: 14px 0 }
+.duel .row { padding: 16px 0; border-bottom: 1px solid var(--line) }
 .duel .row p:last-child { text-align: right }
-.duel .row span { display: grid; place-items: center; text-align: center; font-weight: 900; font-size: var(--s-lead); letter-spacing: -.03em; line-height: 1.2; color: var(--on-dark-soft) }
-.persona { margin-top: 14px; font-size: var(--s-lead); line-height: 1.45; max-width: 34em }
+.duel .row span { display: grid; place-items: center; text-align: center; font-size: 15px; font-weight: 600; line-height: 1.3; color: var(--on-dark-soft) }
+.persona { margin-top: 16px; max-width: 34em; font: 300 clamp(19px, 1.5vw, 23px)/1.55 var(--sans) }
 .cmp { margin-top: 40px; overflow-x: auto }
-.cmp table { width: 100%; border-collapse: collapse }
-.cmp th, .cmp td { text-align: left; vertical-align: top; padding: 16px 20px 16px 0; border-bottom: 1px solid rgba(242, 242, 239, .16) }
-.cmp thead th { font-size: var(--s-lead); font-weight: 900; letter-spacing: -.03em; line-height: 1.25; border-bottom: 3px solid currentColor }
-.cmp tbody th { font-weight: 800; color: var(--on-dark-soft); white-space: nowrap }
-.cmp td small { display: block; font-size: var(--s-small); color: var(--on-dark-soft) }
-.dots { display: flex; flex-wrap: wrap; gap: 6px; max-width: 380px; margin: 8px 0 4px }
-.dots i { width: 20px; height: 20px; background: rgba(242, 242, 239, .18) }
+.cmp table { width: 100%; border-collapse: collapse; font-size: 16px; line-height: 1.6 }
+.cmp th, .cmp td { text-align: left; vertical-align: top; padding: 14px 20px 14px 0; border-bottom: 1px solid var(--line) }
+.cmp thead th { font: 700 18px/1.3 var(--display); letter-spacing: -.02em; border-bottom: 2px solid currentColor }
+.cmp tbody th { font-weight: 600; color: var(--on-dark-soft); white-space: nowrap }
+.cmp td small { display: block; font-size: 14px; color: var(--on-dark-soft) }
+.dots { display: flex; flex-wrap: wrap; gap: 5px; max-width: 340px; margin: 8px 0 4px }
+.dots i { width: 18px; height: 18px; background: rgba(238, 236, 230, .18) }
 .dots i.on { background: var(--on-dark) }
-.mine { list-style: none; margin: 40px 0 0; padding: 0; display: grid; gap: 28px; max-width: 1000px }
-.mine li { display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; gap: 4px 20px; align-items: baseline }
-.mine i { font-style: normal; font-size: var(--s-sub); font-weight: 900; line-height: 1 }
+.mine { list-style: none; margin: 40px 0 0; padding: 0; display: grid }
+.mine li { display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; gap: 4px 20px; align-items: baseline; padding: 20px 0; border-top: 1px solid var(--line) }
+.mine i { font: normal 800 clamp(28px, 2.6vw, 40px)/1 var(--display) }
 .mine li.side { color: var(--on-dark-soft) }
-.mine b { font-size: var(--s-lead); font-weight: 900; letter-spacing: -.03em }
+.mine b { font: 700 22px/1.3 var(--display); letter-spacing: -.02em }
 .mine p { margin-top: 2px }
-.mine span { font-weight: 800; white-space: nowrap }
+.mine span { font-weight: 600; white-space: nowrap }
 .first { margin-top: 40px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 16px }
-.first b { font-size: var(--s-lead); font-weight: 900; letter-spacing: -.03em; text-decoration: underline 3px; text-underline-offset: 7px }
+.first b { font: 700 21px/1.3 var(--display); text-decoration: underline 2px; text-underline-offset: 7px }
 
 /* 나라면?: 처지 고르기 + 질문 묶음 */
-.who { margin-top: 48px; display: flex; flex-wrap: wrap; gap: 4px 24px }
-.who button { border: 0; background: none; padding: 6px 0; font-size: var(--s-body); color: var(--muted); border-bottom: 3px solid transparent }
+.who { margin-top: 48px; display: flex; flex-wrap: wrap; gap: 4px 22px }
+.who button { border: 0; border-bottom: 2px solid transparent; background: none; padding: 6px 0; font-size: 16px; font-weight: 600; color: var(--muted) }
 .who button:hover { color: var(--ink) }
-.who button[aria-selected="true"] { color: var(--ink); border-color: var(--ink) }
+.who button[aria-selected="true"] { color: var(--ink); border-color: var(--accent) }
 #persona { margin-top: 32px }
-.qa { list-style: none; margin: 40px 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 48px 56px; align-items: start }
-.qa li { display: grid; gap: 10px; align-content: start }
-.qa li:nth-child(even) { margin-top: 56px }
-.qa b { font-size: var(--s-lead); font-weight: 900; letter-spacing: -.03em; line-height: 1.25 }
-.qa small { justify-self: start; font-size: var(--s-small); color: var(--muted) }
-.qa small.ask { color: var(--ink); font-weight: 800; background: var(--tone); padding: 2px 10px }
+.qa { list-style: none; margin: 40px 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 48px clamp(24px, 3vw, 48px); align-items: start }
+.qa li { display: grid; gap: 10px; align-content: start; padding-top: 18px; border-top: 1px solid var(--line) }
+.qa b { font: 700 21px/1.35 var(--display); letter-spacing: -.02em }
+.qa small { justify-self: start; font-size: 14px; color: var(--muted) }
+.qa small.ask { padding: 2px 10px; background: var(--tone); color: var(--ink); font-weight: 600 }
 
-/* 내가 할 일 */
-.stages { margin-top: 56px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 72px clamp(32px, 5vw, 96px); align-items: start }
-.stage h3 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 16px; font-size: var(--s-sub) }
-.stage h3 span { font-size: var(--s-body); font-weight: 700; letter-spacing: 0; color: var(--on-dark-soft) }
-.check { list-style: none; margin: 20px 0 0; padding: 0; display: grid; gap: 4px }
-.check label { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 18px; padding: 12px 0; cursor: pointer; font-weight: 700; line-height: 1.45 }
-.check input { appearance: none; width: 30px; height: 30px; margin: 2px 0 0; border: 3px solid var(--on-dark); background: transparent; display: grid; place-items: center; cursor: pointer; transition: background-color .15s }
-.check label:hover input:not(:checked) { background: rgba(242, 242, 239, .15) }
+/* 내가 할 일: 시기 표시는 왼쪽 단에 붙어 따라온다 */
+.ch > .stages { grid-column: 1 / -1; margin-top: 72px; display: grid }
+.stage { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--g); align-items: start; padding: 32px 0 40px; border-top: 1px solid var(--line) }
+.stage h3 { grid-column: 1 / 4; position: sticky; top: 88px; display: grid; gap: 6px; padding-right: var(--g); font-size: clamp(24px, 2.2vw, 34px); font-weight: 800; letter-spacing: -.03em }
+.stage h3 span { font: 600 14px/1.4 var(--sans); letter-spacing: 0; color: var(--on-dark-soft) }
+.check { grid-column: 4 / 13; list-style: none; margin: 0; padding: 0; display: grid }
+.check li + li { border-top: 1px solid var(--line) }
+.check label { display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 18px; padding: 14px 0; cursor: pointer; font-weight: 600; line-height: 1.5 }
+.check input { appearance: none; width: 26px; height: 26px; margin: 1px 0 0; border: 1.5px solid var(--on-dark); background: transparent; display: grid; place-items: center; cursor: pointer; transition: background-color .15s }
+.check label:hover input:not(:checked) { background: rgba(238, 236, 230, .15) }
 .check input:checked { background: var(--on-dark) }
-.check input:checked::after { content: ""; width: 8px; height: 15px; border: solid var(--dark); border-width: 0 3px 3px 0; transform: translateY(-2px) rotate(45deg) }
-.check input:checked + span { opacity: .55; text-decoration: line-through }
-.check small { display: block; margin-top: 4px; color: var(--on-dark-soft); font-size: var(--s-small); font-weight: 400; line-height: 1.5 }
-.progress { margin-top: 48px; display: flex; align-items: center; gap: 18px; font-weight: 800; font-variant-numeric: tabular-nums }
-.progress .meter { flex: 1; max-width: 420px; background: rgba(242, 242, 239, .18) }
+.check input:checked::after { content: ""; width: 7px; height: 13px; border: solid var(--dark); border-width: 0 2px 2px 0; transform: translateY(-2px) rotate(45deg) }
+.check input:checked + span { opacity: .5; text-decoration: line-through }
+.check small { display: block; margin-top: 4px; color: var(--on-dark-soft); font-size: 15px; font-weight: 400; line-height: 1.5 }
+.progress { margin-top: 48px; display: flex; align-items: center; gap: 18px; font-weight: 600; font-variant-numeric: tabular-nums }
+.progress .meter { flex: 1; max-width: 420px; background: rgba(238, 236, 230, .18) }
 .progress .meter i { background: var(--on-dark) }
 
 /* 숭실대라면 */
-.wide { margin: 64px 0 0; max-width: 1180px; transform: rotate(-1deg) }
-.road { margin-top: 128px }
-.road h3 { font-size: var(--s-sub) }
+.ch > .wide { grid-column: 1 / -1; margin-top: 72px }
+.road { margin-top: 120px }
+.road h3 { font-size: clamp(26px, 2.4vw, 38px); font-weight: 800; letter-spacing: -.03em }
 .road > p { margin-top: 6px; color: var(--muted) }
-.nodes { list-style: none; margin: 40px 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px }
-.nodes li { display: grid; gap: 6px; align-content: start; padding-top: 22px; border-top: 8px solid var(--paper) }
-.nodes li.now { border-top-color: var(--accent) }
-.nodes i { font-style: normal; font-weight: 900; color: var(--muted) }
-.nodes em { justify-self: start; font-style: normal; font-weight: 800; font-size: var(--s-small); background: var(--accent); color: var(--accent-ink); padding: 2px 10px }
-.nodes b { font-size: var(--s-lead); font-weight: 900; letter-spacing: -.03em }
+.nodes { list-style: none; margin: 40px 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 32px var(--g) }
+.nodes li { display: grid; gap: 6px; align-content: start; padding-top: 18px; border-top: 2px solid var(--ink) }
+.nodes li.now { padding-top: 16px; border-top: 4px solid var(--accent) }
+.nodes i { font: normal 500 13px var(--mono); color: var(--muted) }
+.nodes em { justify-self: start; padding: 2px 10px; font-style: normal; font-weight: 600; font-size: 13.5px; background: var(--accent); color: var(--accent-ink) }
+.nodes b { font: 700 21px/1.3 var(--display); letter-spacing: -.02em }
 .ssu dl { margin: 18px 0 0; display: grid; grid-template-columns: 4em minmax(0, 1fr); gap: 12px 16px }
-.ssu dt { font-weight: 900 }
+.ssu dt { font-weight: 700 }
 .ssu dd { margin: 0 }
-.ssu a { font-weight: 700 }
+.ssu a { font-weight: 600; color: var(--accent) }
 ol.small { margin: 18px 0 0; padding-left: 24px; display: grid; gap: 8px }
 
-/* 지금까지 */
-.tl { list-style: none; margin: 56px 0 0; padding: 0; display: grid; gap: 28px; max-width: 880px }
-.tl li { display: grid; grid-template-columns: 11em minmax(0, 1fr); gap: 24px; align-items: baseline }
-.tl time { white-space: nowrap; font-size: var(--s-sub); font-weight: 900; letter-spacing: -.04em; color: var(--accent); font-variant-numeric: tabular-nums; line-height: 1 }
-.tl b { display: block; font-size: var(--s-lead); font-weight: 900; letter-spacing: -.03em; line-height: 1.25 }
-.tl span { display: block; margin-top: 4px }
-.chart { margin-top: 88px; max-width: 1000px }
-.chart h3 { font-size: var(--s-sub) }
-.bars { list-style: none; margin: 28px 0 0; padding: 0; display: grid; gap: 12px }
-.bars li { display: grid; grid-template-columns: 4em minmax(0, 1fr); gap: 16px; align-items: center; font-weight: 800; font-variant-numeric: tabular-nums }
+/* 지금까지: 연도는 왼쪽 단 */
+.ch > .tl { grid-column: 1 / -1; list-style: none; margin: 64px 0 0; padding: 0; display: grid }
+.tl li { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--g); align-items: baseline; padding: 22px 0; border-top: 1px solid var(--line) }
+.tl li:last-child { border-bottom: 1px solid var(--line) }
+.tl time { grid-column: 1 / 4; font: 500 clamp(22px, 2vw, 30px)/1 var(--mono); letter-spacing: -.02em; color: var(--accent); white-space: nowrap }
+.tl div { grid-column: 4 / 13 }
+.tl b { display: block; font: 700 21px/1.35 var(--display); letter-spacing: -.02em }
+.tl span { display: block; margin-top: 4px; color: var(--muted) }
+.chart { margin-top: 96px; max-width: 900px }
+.chart h3 { font-size: clamp(24px, 2vw, 30px); font-weight: 800 }
+.bars { list-style: none; margin: 28px 0 0; padding: 0; display: grid; gap: 10px }
+.bars li { display: grid; grid-template-columns: 3.4em minmax(0, 1fr); gap: 16px; align-items: center; font-weight: 600; font-variant-numeric: tabular-nums }
+.bars li > span { font: 500 15px var(--mono) }
 .bars .track { display: flex; align-items: center; gap: 14px }
-.bars i { display: block; height: 44px; background: var(--accent) }
-.bars i:hover { background: #233d93 }
+.bars i { display: block; height: 36px; background: var(--accent) }
+.bars i:hover { background: #17463a }
 .bars em { font-style: normal; white-space: nowrap }
 
 /* 2027년 변화 */
-.split { display: flex; height: 88px; margin: 24px 0 0; max-width: 980px }
-.split i { flex: 1; display: grid; place-items: center; font-style: normal; font-weight: 900; font-size: var(--s-lead); letter-spacing: -.03em }
-.split i:first-child { background: var(--accent); color: var(--accent-ink) }
-.split i:last-child { background: var(--on-dark); color: var(--ink) }
-.tag { font-size: var(--s-small); font-weight: 800; letter-spacing: 0; background: var(--on-dark); color: var(--ink); padding: 2px 9px; vertical-align: .2em; margin-left: 6px }
-#next { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 16px }
-#next > * { grid-column: 1 / -1 }
-#next > h2, #next > .lead { grid-column: 1 / 8 }
-#next > figure { grid-column: 9 / 13; grid-row: 1 / span 2; margin: 0; align-self: center; transform: rotate(2deg) }
-#next > h3 { margin-top: 88px; font-size: var(--s-sub) }
+.split { display: flex; height: 72px; margin: 24px 0 0; max-width: 920px }
+.split i { flex: 1; display: grid; place-items: center; font: normal 700 20px var(--display) }
+.split i:first-child { background: var(--on-dark); color: var(--ink) }
+.split i:last-child { background: rgba(238, 236, 230, .16); color: var(--on-dark) }
+.tag { margin-left: 6px; padding: 2px 9px; font: 600 13px/1.4 var(--sans); letter-spacing: 0; background: var(--on-dark); color: var(--ink); vertical-align: .2em }
+#next > h2, #next > .lead { grid-column: 4 / 10 }
+#next > h2 { grid-row: 1 }
+#next > .lead { grid-row: 2 }
+#next > figure { grid-column: 10 / 13; grid-row: 1 / span 2; align-self: end }
+#next > h3 { margin-top: 96px }
 
 /* 아직 확인하지 못한 것 · 출처 */
-.unknown { margin: 40px 0 0; padding-left: 24px; display: grid; gap: 10px; font-size: var(--s-lead); line-height: 1.4; max-width: 34em }
-details { margin-top: 56px }
-summary { cursor: pointer; display: inline-flex; align-items: center; min-height: 56px; padding: 0 24px; background: var(--ink); color: var(--paper); font-weight: 800; list-style: none; transition: transform .15s }
-summary:active { transform: scale(.98) }
+.unknown { margin: 40px 0 0; padding-left: 24px; display: grid; gap: 10px; max-width: 34em; font: 300 clamp(19px, 1.5vw, 23px)/1.5 var(--sans) }
+details { margin-top: 64px }
+summary { cursor: pointer; display: inline-flex; align-items: center; gap: 12px; min-height: 52px; padding: 0 22px; border: 1px solid var(--ink); font-weight: 600; list-style: none; transition: background-color .2s, color .2s }
+summary::after { content: "+"; font: 400 20px var(--display) }
+details[open] summary::after { content: "−" }
+summary:hover { background: var(--ink); color: var(--paper) }
 summary::-webkit-details-marker { display: none }
-.src { margin: 28px 0 0; padding-left: 24px; display: grid; gap: 6px; max-width: 64em }
-.src a { text-underline-offset: 4px }
+.src { margin: 28px 0 0; padding-left: 24px; display: grid; gap: 6px; max-width: 64em; font-size: 15.5px }
 .src a:hover { color: var(--accent) }
-footer { margin-top: 56px; font-size: var(--s-small); color: var(--muted); max-width: 46em }
+footer { margin-top: 64px; max-width: 46em; font-size: 14px; color: var(--muted) }
 
 /* 들어올 때 차례로 떠오르기: 스크립트가 없으면 처음부터 보인다 */
-.js .ch > *, .js .hero > * { opacity: 0; translate: 0 26px; transition: opacity .7s ease, translate .7s cubic-bezier(.2, .7, .2, 1) }
+.js .ch > *, .js .hero > * { opacity: 0; translate: 0 18px; transition: opacity .8s ease, translate .8s cubic-bezier(.2, .7, .2, 1) }
 .js .ch > .in, .js .hero > .in { opacity: 1; translate: none }
 
-@media (max-width: 1280px) { .topbar { position: static } }
+@media (max-width: 1280px) { .topbar { position: static } .stage h3 { top: 24px } }
 @media (max-width: 1100px) {
-  .pills { grid-template-columns: repeat(2, minmax(0, 1fr)) }
-  .phases { grid-template-columns: repeat(2, minmax(0, 1fr)) }
-  .phases li:nth-child(n) { margin-top: 0 }
-  .flow { grid-template-columns: minmax(0, 1fr) 110px minmax(0, 1fr) 110px minmax(0, 1fr) }
-  .nodes { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 32px }
-  .stages { grid-template-columns: 1fr }
+  .ch > *, #next > h2, #next > .lead, #next > figure { grid-column: 1 / -1; grid-row: auto }
+  section.ch::before { grid-column: 1 / -1; margin-bottom: 20px }
+  #next > figure { margin-top: 48px; max-width: 520px }
+  .ch.pills { grid-template-columns: repeat(2, minmax(0, 1fr)) }
+  .phases { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 48px }
+  .flow { grid-template-columns: minmax(0, 1fr) 100px minmax(0, 1fr) 100px minmax(0, 1fr) }
+  .nodes { grid-template-columns: repeat(2, minmax(0, 1fr)) }
+  .stage h3 { grid-column: 1 / 5 }
+  .check { grid-column: 5 / 13 }
 }
 @media (max-width: 900px) {
-  .hero .sub, .hero .when, .go { grid-column: 1 / -1; grid-row: auto }
-  .go { margin-top: 36px }
+  .hero .sub, .go { grid-column: 1 / -1 }
+  .go { grid-row: 4; margin-top: 40px }
   .qa { grid-template-columns: 1fr }
-  .qa li:nth-child(n) { margin-top: 0 }
-  #next > h2, #next > .lead, #next > figure { grid-column: 1 / -1; grid-row: auto }
-  #next > figure { margin-top: 48px; max-width: 560px }
+  .sides figure:first-child { grid-column: 1 / -1 }
+  .sides figure:last-child { grid-column: 4 / -1; margin-top: 32px }
+  .stage h3 { grid-column: 1 / -1; position: static; margin-bottom: 12px }
+  .check { grid-column: 1 / -1 }
 }
 @media (max-width: 640px) {
-  :root { --cut: 12vw }
   html { scroll-padding-top: 16px }
-  .ch { padding-top: calc(var(--cut) + 64px); padding-bottom: calc(var(--cut) + 64px) }
-  .hero h1 { font-size: 12vw }
-  h2 { font-size: 9vw }
-  .pills { grid-template-columns: 1fr }
-  .pills div:nth-child(n) { margin-top: 0 }
-  .grid > .card:nth-child(n) { margin-top: 0 }
-  .ratio .bar { height: 56px }
-  .ratio .bar i { font-size: var(--s-body) }
+  .topbar { display: block; padding-bottom: 0 }
+  .toc { margin: 10px calc(-1 * var(--m)) 0 }
+  .toc ol { flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; padding: 0 var(--m) 10px; scrollbar-width: none }
+  .hero { padding-top: 48px }
+  .hero h1 { font-size: 13vw }
+  .ch { padding-top: 72px; padding-bottom: 80px }
+  h2 { font-size: 9.4vw }
+  .ch.pills, .grid.two { grid-template-columns: 1fr; gap: 28px }
+  .ratio .bar { height: 52px }
+  .ratio .bar i { font-size: 16px }
   .flow { grid-template-columns: 1fr }
-  .flow .arrow i { width: 4px; height: 32px }
-  .flow .arrow.r i::after, .flow .arrow.l i::after { left: -6px; right: auto; top: auto; border-left-color: transparent; border-right-color: transparent }
+  .flow .arrow i { width: 2px; height: 32px }
+  .flow .arrow.r i::after, .flow .arrow.l i::after { left: -7px; right: auto; top: auto; border-left-color: transparent; border-right-color: transparent }
   .flow .arrow.r i::after { bottom: -12px; border-top-color: var(--on-dark) }
   .flow .arrow.l i::after { top: -12px; border-bottom-color: var(--on-dark) }
   .phases { grid-template-columns: 1fr }
-  .sides figure:nth-child(n) { grid-column: 1 / -1; transform: none }
-  .sides figure + figure { margin-top: 32px }
+  .credit span.lab { min-width: 0; width: 100% }
+  .sides figure:last-child { grid-column: 1 / -1 }
   .duel .hd { display: none }
-  .duel .row { grid-template-columns: 1fr 1fr; padding: 10px 0 }
-  .duel .row span { grid-column: 1 / -1; grid-row: 1; justify-self: start; place-items: start; text-align: left; color: var(--on-dark) }
+  .duel .row { grid-template-columns: 1fr 1fr; padding: 12px 0 }
+  .duel .row span { grid-column: 1 / -1; grid-row: 1; justify-self: start; place-items: start; text-align: left; color: var(--on-dark); font-size: 17px }
   .duel .row p:last-child { text-align: left }
-  .duel .row p::before { display: block; font-size: var(--s-small); font-weight: 800; color: var(--on-dark-soft); content: "공기업" }
+  .duel .row p::before { display: block; font-size: 13.5px; font-weight: 600; color: var(--on-dark-soft); content: "공기업" }
   .duel .row p:last-child::before { content: "사기업" }
   .cmp table, .cmp tbody, .cmp tr, .cmp th, .cmp td { display: block; width: auto }
   .cmp thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%) }
-  .cmp tbody tr { padding: 18px 0; border-bottom: 1px solid rgba(242, 242, 239, .16) }
+  .cmp tbody tr { padding: 18px 0; border-bottom: 1px solid var(--line) }
   .cmp th, .cmp td { border: 0; padding: 3px 0 }
-  .cmp tbody th { font-size: var(--s-lead); color: var(--on-dark); letter-spacing: -.03em }
-  .cmp td[data-l]::before { content: attr(data-l); display: block; font-size: var(--s-small); font-weight: 800; color: var(--on-dark-soft) }
+  .cmp tbody th { font: 700 20px var(--display); color: var(--on-dark) }
+  .cmp td[data-l]::before { content: attr(data-l); display: block; font-size: 13.5px; font-weight: 600; color: var(--on-dark-soft) }
   .mine li { grid-template-columns: 40px minmax(0, 1fr) }
   .mine span { grid-column: 2; justify-self: start }
   .nodes { grid-template-columns: 1fr }
-  .wide { transform: none }
-  .tl li { grid-template-columns: 1fr; gap: 6px }
-  .unknown { font-size: var(--s-body) }
+  .tl time, .tl div { grid-column: 1 / -1 }
+  .tl time { margin-bottom: 8px }
+  .split i { font-size: 16px }
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto }
@@ -352,7 +367,7 @@ footer { margin-top: 56px; font-size: var(--s-small); color: var(--muted); max-w
 
 <main>
 <div class="hero">
-  <h1>표준 현장실습학기제</h1>
+  <h1><span>표준</span> 현장실습학기제</h1>
   <p class="sub">회사에서 일하면서 학점을 받는 대학 수업. 얼마를 받고, 어떻게 신청하고, 언제 무엇을 하면 되는지.</p>
   <p class="when">현장실습 수첩 · 2026년 10월 29일 기준</p>
   <div class="go">
@@ -369,7 +384,7 @@ footer { margin-top: 56px; font-size: var(--s-small); color: var(--muted); max-w
   <div><b>230만 원</b><span>2027 첫 경력 프로젝트</span><small>월 실습비 · 예산 심의 중</small></div>
 </div>
 
-<section id="what" class="ch tone rev">
+<section id="what" class="ch tone">
   <h2>회사가 교실이 되는 수업</h2>
   <p class="lead">교육부 고시 「대학생 현장실습학기제 운영규정」(제2025-36호)은 현장실습을 일자리가 아닌 <b>학교 밖으로 연장된 수업</b>으로 봅니다.</p>
   <div class="grid">
@@ -393,7 +408,7 @@ footer { margin-top: 56px; font-size: var(--s-small); color: var(--muted); max-w
   <p class="note">어느 쪽이든 모집과 선발은 학교 센터를 거칩니다. 내가 직접 구했거나 회사가 학교 밖에서 따로 뽑은 실습은 인정되지 않아요.</p>
 </section>
 
-<section id="money" class="ch dark rev">
+<section id="money" class="ch dark">
   <h2>얼마를 받나</h2>
   <p class="lead">최저선 = 최저시급 × 한 달 실습시간 × (1 − 교육시간 비율). 내 비율은 운영계획서에 적혀 있어요.</p>
   <div class="calc" data-ui>
@@ -429,7 +444,7 @@ footer { margin-top: 56px; font-size: var(--s-small); color: var(--muted); max-w
   <p class="note">학점은 실제 출근한 날 수로 셉니다. 주말·공휴일·연차·병가는 빠져요.</p>
 </section>
 
-<section id="rights" class="ch tone rev">
+<section id="rights" class="ch tone">
   <h2>실습생으로서 내 권리</h2>
   <p class="lead">어기면 학교에 알리세요. 학교가 시정을 요청하거나 실습을 멈추고 복귀시킵니다.</p>
   <div class="grid two">
@@ -496,7 +511,7 @@ footer { margin-top: 56px; font-size: var(--s-small); color: var(--muted); max-w
   <div class="first"><b>공기업으로 마음이 바뀌면</b><span>NCS 필기 준비 · 정보처리기사 (가점 주는 곳 있음) · 체험형 인턴 수료 가점</span></div>
 </section>
 
-<section id="me" class="ch paper rev">
+<section id="me" class="ch paper">
   <h2>나라면?</h2>
   <p class="lead">전공과 처지에 따라 궁금한 게 다릅니다.</p>
   <div class="who" role="tablist" aria-label="학생 상황" id="who"></div>
@@ -511,7 +526,7 @@ footer { margin-top: 56px; font-size: var(--s-small); color: var(--muted); max-w
   <div class="progress"><div class="meter"><i id="pbar"></i></div><span id="progress"></span></div>
 </section>
 
-<section id="ssu" class="ch tone rev">
+<section id="ssu" class="ch tone">
   <h2>숭실대 학생이라면</h2>
   <p class="lead">2026학년도 현장실습 안내문과 리플렛 원문을 기준으로 정리했습니다.</p>
   <figure class="wide"><img src="img/ssu-gate.webp" alt="가을 단풍 속 숭실대학교 정문" width="1400" height="643"><figcaption><b>숭실대학교 정문</b>사진 Benlikeshotchocolate, <a href="https://commons.wikimedia.org/wiki/File:Soongsil_University.jpg">CC BY-SA 4.0</a></figcaption></figure>
@@ -581,7 +596,7 @@ footer { margin-top: 56px; font-size: var(--s-small); color: var(--muted); max-w
   </div>
 </section>
 
-<section id="next" class="ch dark rev">
+<section id="next" class="ch dark">
   <h2>2027년, 대학생 첫 경력 프로젝트</h2>
   <p class="lead">교육부가 2026년 8월 28일 발표했습니다. 2027년 3월 시작이 목표이고, 예산은 12월 국회에서 확정돼요.</p>
   <figure><img src="img/sejong.webp" alt="태극기가 늘어선 정부세종청사 정문" width="1400" height="788"><figcaption><b>교육부가 있는 정부세종청사</b>사진 *Youngjin, <a href="https://commons.wikimedia.org/wiki/File:Government_Complex_Sejong_20190611_Main_Entrance.jpg">CC BY-SA 3.0</a></figcaption></figure>

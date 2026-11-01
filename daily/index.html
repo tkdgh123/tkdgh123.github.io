@@ -5,7 +5,10 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>매일 AI 공부</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@200..700&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="style.css">
 <script src="../icons.js" defer></script>
 </head>
@@ -48,15 +51,16 @@ function lessonView(data, id) {
   const prev = L.find(l => l.id === id - 1), next = L.find(l => l.id === id + 1), u = unitOf(data, id);
   document.title = `D${id} ${x.title}`;
   return `${nav()}
-    <header class="lead dark"><h1>${esc(x.title)}</h1>
-    <p class="meta"><span class="day">D${id}</span><span class="unit">${u ? esc(u.name) : ""}</span></p>
-    <section class="row key"><h2>오늘의 핵심</h2><ol>${x.key.map(k => `<li>${esc(k)}</li>`).join("")}</ol></section></header>
+    <div class="page"><aside class="side"><p class="dnum"><small>D</small>${id}</p>
+    <p class="meta">${u ? `<span>${esc(u.name)}</span><span>${id - u.from + 1} / ${u.to - u.from + 1}</span>` : ""}</p></aside>
+    <article class="read"><header class="lead"><h1>${esc(x.title)}</h1></header>
+    <section class="row key"><h2>오늘의 핵심</h2><ol>${x.key.map(k => `<li>${esc(k)}</li>`).join("")}</ol></section>
     ${prev ? quizHTML(prev.quiz, "어제 퀴즈", prev.id) : ""}
     ${figHTML(x.fig)}
     ${x.body.map(([h, p]) => `<section class="row sec"><h2>${esc(h)}</h2><p>${esc(p)}</p></section>`).join("")}
     ${x.mine ? `<section class="row mine"><h2>${LAPTOP}내 노트북으로 보면</h2><p>${esc(x.mine)}</p></section>` : ""}
     ${x.try ? `<section class="row mine"><h2>${HAND}직접 해 보기</h2><p>${esc(x.try)}</p></section>` : ""}
-    <section class="row sec"><h2>오늘 나온 말</h2><div class="terms">${x.terms.map(([t, d]) => `<details><summary>${esc(t)}</summary><p>${esc(d)}</p></details>`).join("")}</div></section>
+    <section class="row sec"><h2>오늘 나온 말</h2><div class="terms">${x.terms.map(([t, d]) => `<details><summary>${esc(t)}</summary><p>${esc(d)}</p></details>`).join("")}</div></section></article></div>
     <footer class="close dark"><button type="button" class="donebtn" data-done="${id}"></button>
     <div class="pager">${prev ? `<a href="?d=${prev.id}">← D${prev.id}</a>` : ""}${next ? `<a class="next" href="?d=${next.id}">D${next.id} →</a>` : ""}</div></footer>`;
 }
@@ -65,17 +69,18 @@ function reviewView(data, a, b) {
   const ls = data.lessons.filter(l => l.id >= a && l.id <= b);
   document.title = "한 주 정리";
   return `${nav()}
-    <header class="lead dark"><h1>이번 주에 배운 ${ls.length}가지</h1>
-    <p class="meta"><span class="day">한 주 정리</span><span class="unit">D${a} ~ D${b}</span></p></header>
-    ${ls.map(l => `<section class="row rv"><a href="?d=${l.id}">D${l.id} · ${esc(l.title)}</a><ul>${l.key.map(k => `<li>${esc(k)}</li>`).join("")}</ul></section>`).join("")}
+    <div class="page"><aside class="side"><p class="dnum"><small>D</small>${a}<i>–</i>${b}</p>
+    <p class="meta"><span>한 주 정리</span><span>D${a} ~ D${b}</span></p></aside>
+    <article class="read"><header class="lead"><h1>이번 주에 배운 <b>${ls.length}가지</b></h1></header>
+    ${ls.map(l => `<section class="row rv"><a href="?d=${l.id}"><i>D${l.id}</i>${esc(l.title)}</a><ul>${l.key.map(k => `<li>${esc(k)}</li>`).join("")}</ul></section>`).join("")}
     <h2 class="subhead">퀴즈로 확인하기</h2>
-    ${ls.map(l => quizHTML(l.quiz, esc(l.title), l.id)).join("")}`;
+    ${ls.map(l => quizHTML(l.quiz, esc(l.title), l.id)).join("")}</article></div>`;
 }
 
 function termsView(data) {
   const all = data.lessons.flatMap(l => l.terms.map(([t, d]) => ({ t, d, id: l.id }))).sort((x, y) => x.t.localeCompare(y.t, "ko"));
   document.title = "용어 사전";
-  return `${nav("terms")}<header class="lead dark"><h1>용어 사전</h1>
+  return `${nav("terms")}<header class="lead hero"><h1>용어 <b>사전</b></h1><p class="meta">${all.length}개</p>
     <input class="search" id="q" type="search" placeholder="찾을 말 입력" aria-label="용어 찾기"></header>
     <div class="dict" id="dict">${all.map(x => `<div data-k="${esc((x.t + x.d).toLowerCase())}"><b>${esc(x.t)}</b><p>${esc(x.d)}</p><a href="?d=${x.id}">D${x.id}에서 배움</a></div>`).join("")}</div>`;
 }
@@ -83,10 +88,10 @@ function termsView(data) {
 function homeView(data) {
   document.title = "매일 AI 공부";
   return `${nav("home")}
-    <header class="lead dark hero"><h1>매일 AI 공부</h1><p>아침 8시, 카톡으로 하루 한 주제. 컴퓨터 기초부터 AI학과 전공 기초까지 차례대로.</p></header>
-    ${data.units.map(u => {
+    <header class="lead hero"><h1>매일 <b>AI</b> 공부</h1><p>아침 8시, 카톡으로 하루 한 주제. 컴퓨터 기초부터 AI학과 전공 기초까지 차례대로.</p></header>
+    ${data.units.map((u, i) => {
       const ls = u.from ? data.lessons.filter(l => l.id >= u.from && l.id <= u.to) : [];
-      return `<section class="row unitbox${ls.length ? "" : " plan"}"><h2>${esc(u.name)}</h2>${ls.length ? `<div class="list">${ls.map(l => `<a href="?d=${l.id}" data-done="${l.id}"><b>D${l.id}</b><span>${esc(l.title)}</span></a>`).join("")}</div>` : ""}
+      return `<section class="row unitbox${ls.length ? "" : " plan"}"><h2><i>${String(i + 1).padStart(2, "0")}</i>${esc(u.name)}</h2>${ls.length ? `<div class="list">${ls.map(l => `<a href="?d=${l.id}" data-done="${l.id}"><b>D${l.id}</b><span>${esc(l.title)}</span></a>`).join("")}</div>` : ""}
         ${u.plan ? `<div class="soon">${u.plan.map(p => `<span>${esc(p)}</span>`).join("")}</div>` : ""}</section>`;
     }).join("")}`;
 }
