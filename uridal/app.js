@@ -311,8 +311,14 @@ function openAnniv(id) {
 }
 
 /* ---------- 연결 ---------- */
+/* 남자친구는 하늘색, 여자친구는 분홍색 화면 */
+function theme(me) {
+  document.documentElement.dataset.me = me;
+  document.querySelector('meta[name="theme-color"]').content = me === "a" ? "#E2EEFF" : "#FFE6EE";
+}
+
 function enter(room, me) {
-  S.room = room; S.me = me; saveLocal({ room, me });
+  S.room = room; S.me = me; saveLocal({ room, me }); theme(me);
   $("setup").hidden = true; $("boot").hidden = false;
   const slow = setTimeout(() => toast("연결이 느려요. 잠시만요…"), 8000);
   S.unsub.push(onSnapshot(doc(db, "rooms", room), s => {
@@ -350,8 +356,9 @@ async function share(code) {
 const STEPS = ["setupChoose", "newForm", "shareBox", "joinForm", "pickBox"];
 const step = id => { STEPS.forEach(s => ($(s).hidden = s !== id)); appear($(id)); };
 seg($("nMe"), "w");
-document.querySelectorAll(".back").forEach(b => b.addEventListener("click", () => step("setupChoose")));
-$("goNew").onclick = () => { step("newForm"); $("nA").focus(); };
+$("nMe").addEventListener("click", () => theme($("nMe").dataset.v));
+document.querySelectorAll(".back").forEach(b => b.addEventListener("click", () => { delete document.documentElement.dataset.me; step("setupChoose"); }));
+$("goNew").onclick = () => { theme($("nMe").dataset.v || "a"); step("newForm"); $("nA").focus(); };
 $("goJoin").onclick = () => { step("joinForm"); $("jCode").focus(); };
 $("newForm").addEventListener("submit", async e => {
   e.preventDefault();
