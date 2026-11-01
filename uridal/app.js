@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
   initializeFirestore, persistentLocalCache, persistentMultipleTabManager,
-  doc, getDoc, setDoc, updateDoc, deleteDoc, collection, onSnapshot, deleteField
+  doc, getDoc, setDoc, updateDoc, deleteDoc, collection, onSnapshot, deleteField, arrayUnion
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const CONFIG = {
@@ -98,8 +98,21 @@ function upcoming(k) {
   }
   return out.slice(0, k);
 }
+/* 반복(매주 w·매달 m) 포함, 날짜 d에 걸친 회차의 시작일. 없으면 null */
+const spanOf = e => (e.end ? diff(e.date, e.end) : 0);
+function startOf(e, d) {
+  if (!e.rep) return e.date <= d && d <= (e.end || e.date) ? e.date : null;
+  for (let k = 0, span = Math.min(spanOf(e), 31); k <= span; k++) {
+    const s = addDays(d, -k);
+    if (s < e.date) break;
+    if ((e.until && s > e.until) || e.skip?.includes(s)) continue;
+    if (e.rep === "w" ? diff(e.date, s) % 7 === 0 : s.slice(8) === e.date.slice(8)) return s;
+  }
+  return null;
+}
+const repLabel = e => (e.rep ? (e.rep === "w" ? `매주 ${WEEK[parse(e.date).getDay()]}요일` : `매달 ${+e.date.slice(8)}일`) + (e.until ? ` (${md(e.until)}까지)` : "") : "");
 const eventsOn = d => S.events
-  .filter(e => e.date <= d && d <= (e.end || e.date))
+  .filter(e => startOf(e, d))
   .sort((x, y) => (x.time || "99").localeCompare(y.time || "99") || (x.at || 0) - (y.at || 0));
 const dLabel = d => { const n = diff(S.info.start, d) + 1; return n > 0 ? `D+${n}` : `D-${1 - n}`; };
 
@@ -158,7 +171,8 @@ function renderAgenda() {
     `<div class="ahead"><h3>${md(d)} ${WEEK[dt.getDay()]}요일</h3>${n > 0 ? `<small>${n}일째</small>` : ""}</div>`
     + (marks.length ? `<div class="tags">${marks.map(t => `<span class="tag">♥ ${esc(t)}</span>`).join("")}</div>` : "")
     + (evs.length ? evs.map(e => {
-        const sub = [e.time, e.end && e.end !== e.date ? `~ ${md(e.end)}` : "", e.memo].filter(Boolean).map(esc).join(" · ");
+        const span = spanOf(e), oe = span ? `~ ${md(addDays(startOf(e, d), span))}` : "";
+        const sub = [e.time, oe, repLabel(e), e.memo].filter(Boolean).map(esc).join(" · ");
         return `<button type="button" class="ev ${e.who}" data-e="${e.id}">`
           + `<span><b>${esc(e.title)}</b>${sub ? `<small>${sub}</small>` : ""}</span>`
           + `<span class="by ${e.who}">${e.who === "both" ? "함께" : esc(name(e.who))}</span></button>`;
@@ -236,12 +250,15 @@ function openEvent(id) {
       `<button type="button" class="${w}" data-w="${w}">${w === "both" ? "함께" : esc(name(w))}</button>`).join("")}</div>
     <div class="two"><label>날짜 <input type="date" id="fD" required></label><label>끝나는 날 <input type="date" id="fE"></label></div>
     <label>시간 <input type="time" id="fH"></label>
+    <div class="seg rep" id="fR"><button type="button" data-r="">반복 안 함</button><button type="button" data-r="w">매주</button><button type="button" data-r="m">매달</button></div>
+    <label id="fUw" hidden>언제까지 (비워 두면 계속) <input type="date" id="fU"></label>
     <label>메모 <input id="fM" maxlength="80" autocomplete="off"></label>
-    <div class="acts">${id ? `<button type="button" class="del" id="fDel">삭제</button>` : ""}<button class="big" type="submit">저장</button></div>`,
+    ${id && e.rep ? `<div class="acts"><button type="button" class="del grow" id="fSkip">이 날만 삭제</button><button type="button" class="del grow" id="fDel">전부 삭제</button></div>` : ""}
+    <div class="acts">${id && !e.rep ? `<button type="button" class="del" id="fDel">삭제</button>` : ""}<button class="big" type="submit">저장</button></div>`,
   () => {
-    const date = $("fD").value, end = $("fE").value;
+    const date = $("fD").value, end = $("fE").value, rep = $("fR").dataset.v || "", until = $("fU").value;
     const data = { title: $("fT").value.trim(), date, end: end > date ? end : "", time: $("fH").value,
-                   memo: $("fM").value.trim(), who: $("fW").dataset.v };
+                   memo: $("fM").value.trim(), who: $("fW").dataset.v, rep, until: rep && until >= date ? until : "" };
     if (!data.title) return false;
     if (id) {
       updateDoc(ref("events", id), data).catch(fail);
@@ -254,6 +271,14 @@ function openEvent(id) {
     $("fT").value = e.title || ""; $("fD").value = e.date; $("fE").value = e.end || "";
     $("fH").value = e.time || ""; $("fM").value = e.memo || "";
     const box = $("fW"); seg(box, "w"); box.querySelector(`[data-w="${e.who}"]`).click();
+    const rb = $("fR"); seg(rb, "r");
+    rb.addEventListener("click", () => { $("fUw").hidden = !rb.dataset.v; });
+    rb.querySelector(`[data-r="${e.rep || ""}"]`).click(); $("fU").value = e.until || "";
+    $("fSkip")?.addEventListener("click", ev => {
+      if (!armed(ev.currentTarget)) return;
+      updateDoc(ref("events", id), { skip: arrayUnion(startOf(e, S.sel)) }).catch(fail);
+      closeSheet();
+    });
     $("fDel")?.addEventListener("click", ev => {
       if (!armed(ev.currentTarget)) return;
       deleteDoc(ref("events", id)).catch(fail);

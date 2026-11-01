@@ -223,6 +223,8 @@ dialog[open]::backdrop { animation: fade .3s ease; }
 .acts .big { flex: 1; padding: 14px; }
 .acts .del { flex: none; padding: 14px 18px; border: 0; border-radius: 999px; background: var(--bg); color: var(--sun); font-weight: 800; }
 .acts .del.arm { background: var(--sun); color: #fff; }
+.acts .del.grow { flex: 1; }
+.seg.rep button.on { background: var(--acc); color: #fff; }
 
 .toast { position: fixed; left: 50%; bottom: calc(96px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 20;
   padding: 11px 18px; border-radius: 999px; background: var(--ink); color: var(--bg); font-weight: 700; font-size: 14px; white-space: nowrap; animation: pop .3s cubic-bezier(.3,1.6,.5,1); }
