@@ -2,333 +2,36 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>LMS 마감 알림</title>
-<script>document.documentElement.classList.add("js")</script>
-<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>잠긴 페이지</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@250;600&display=swap">
 <style>
-/* 작업실 첫 화면과 같은 색·글자. 주제 색은 숭실 LMS 파랑 하나만: 짙은 쪽은 글자·면, 밝은 쪽은 어두운 면 위 막대에만 */
-:root {
-  --paper: #f5f5f2; --tone: #e6e6e1; --dark: #16171b; --ink: #111; --muted: #55554f;
-  --on-dark: #f2f2ef; --on-dark-soft: #a9aab0;
-  --ssu: #0b5e86; --ssu-hover: #084a6a; --ssu-light: #3fb3dc;
-  --m: clamp(16px, 2.6vw, 40px);
-  --cut: 7vw;
-  --s-small: 14px; --s-body: clamp(17px, 1rem + .2vw, 19px); --s-lead: clamp(21px, 1.1rem + .7vw, 28px);
-  --s-h3: clamp(30px, 3.4vw, 52px); --s-head: clamp(48px, 7vw, 120px); --s-display: clamp(44px, 5.6vw, 92px);
-  color-scheme: light;
-}
+:root { --paper: #f2f1ec; --ink: #151514; --muted: #5a5954; --rule: #c9c6bc; --blue: #2b44a6 }
 * { box-sizing: border-box }
-html { scroll-behavior: smooth }
-body { margin: 0; background: var(--paper); color: var(--ink); font: 400 var(--s-body)/1.6 "Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif; word-break: keep-all; overflow-wrap: anywhere; -webkit-font-smoothing: antialiased; font-variant-numeric: tabular-nums; overflow-x: clip }
-a { color: inherit }
-img { display: block; max-width: 100%; height: auto }
-h1, h2, h3 { margin: 0; font-weight: 900; letter-spacing: -.04em; line-height: 1.04 }
-p, figure, ul { margin: 0 }
-code { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: .86em }
-a:focus-visible { outline: 3px solid var(--ssu); outline-offset: 3px }
-.dark a:focus-visible { outline-color: var(--on-dark) }
-
-/* 위 막대 */
-.topbar { position: absolute; inset: 0 0 auto; z-index: 6; display: flex; justify-content: space-between; align-items: center; padding: 22px var(--m) }
-.topbar a { font-weight: 900; font-size: var(--s-lead); letter-spacing: -.04em; text-decoration: underline 2px transparent; text-underline-offset: 6px; padding: 6px 0; transition: text-decoration-color .2s }
-.topbar a:hover, .topbar a:focus-visible { text-decoration-color: currentColor; outline: none }
-.live { display: inline-flex; align-items: center; gap: 10px; font-weight: 700; color: var(--on-dark) }
-.live i { width: 9px; height: 9px; border-radius: 50%; background: var(--on-dark); animation: blink 2.4s ease-in-out infinite }
-@keyframes blink { 50% { opacity: .25 } }
-
-/* 첫 화면: 왼쪽 제목, 오른쪽 숭실 파랑 면에 실제 실행 화면 두 장이 비스듬히 겹친다 */
-.band { position: relative; overflow: hidden; display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 16px; align-items: center; min-height: 100svh; padding: 120px var(--m) 72px }
-.band::before { content: ""; position: absolute; inset: 0 0 0 auto; width: 50%; background: var(--ssu); clip-path: polygon(22% 0, 100% 0, 100% 100%, 0 100%) }
-.hero { grid-column: 1 / 7; position: relative }
-.hero h1 { font-size: var(--s-display) }
-.hero .lede { margin-top: 32px; font-size: var(--s-lead); line-height: 1.45; max-width: 23em }
-.hero .note { margin-top: 18px; color: var(--muted); font-weight: 700 }
-.facts { display: flex; flex-wrap: wrap; gap: 20px clamp(24px, 3vw, 48px); margin-top: 40px }
-.facts div { display: grid; gap: 4px }
-.facts b { font-size: var(--s-h3); font-weight: 900; letter-spacing: -.04em; line-height: 1 }
-.facts span { color: var(--muted) }
-.btn { display: inline-flex; align-items: center; gap: 10px; min-height: 60px; margin-top: 40px; padding: 0 26px; background: var(--ssu); color: #fff; font-weight: 800; text-decoration: none; transition: transform .15s, background-color .2s }
-.btn:hover { background: var(--ssu-hover) } .btn:active { transform: scale(.97) }
-.stage { grid-column: 8 / 13; position: relative; display: flex; align-items: flex-end; justify-content: center; padding-left: 4%; min-height: 0 }
-.device { flex: none }
-.device.laptop { width: min(25vw, 360px); background: var(--paper); transform: rotate(-4deg) }
-.device .chrome { display: flex; align-items: center; gap: 6px; padding: 9px 12px; background: var(--tone); font-size: var(--s-small); color: var(--muted) }
-.device .chrome i { width: 9px; height: 9px; border-radius: 50%; background: #c4c4be }
-.device .chrome span { margin-left: 6px }
-.device.phone { width: min(17vw, 250px); margin: 0 0 -40px -5vw; padding: 7px; background: var(--dark); border-radius: 22px; transform: rotate(5deg); position: relative; z-index: 1 }
-.device.phone img { border-radius: 15px }
-.js .device { opacity: 0; animation: drop .9s cubic-bezier(.2, .7, .2, 1) forwards }
-.js .device.laptop { --r: -4deg; animation-delay: .15s } .js .device.phone { --r: 5deg; animation-delay: .35s }
-@keyframes drop { from { opacity: 0; transform: translateY(60px) rotate(0deg) } to { opacity: 1; transform: rotate(var(--r)) } }
-
-/* 탭 */
-.tabs { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--paper) }
-body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--paper) }
-.tabs .wrap { display: flex; flex-wrap: wrap; gap: 2px clamp(16px, 2.4vw, 32px); padding: 12px var(--m) }
-.tabs a { padding: 6px 0; font-weight: 700; color: var(--muted); text-decoration: none; border-bottom: 3px solid transparent; transition: color .15s, border-color .15s }
-.tabs a:hover { color: var(--ink) }
-.tabs a.on { color: var(--ink); border-bottom-color: var(--ssu) }
-
-/* 칸: 화면 폭 가득 한 면, 윗변을 비스듬히 잘라 앞 칸 위에 겹친다 */
-main section { position: relative; scroll-margin-top: 56px; padding: 104px var(--m) calc(var(--cut) + 104px) }
-.ch { margin-top: calc(-1 * var(--cut)); padding-top: calc(var(--cut) + 104px); clip-path: polygon(0 var(--cut), 100% 0, 100% 100%, 0 100%) }
-.ch.rev { clip-path: polygon(0 0, 100% var(--cut), 100% 100%, 0 100%) }
-.dark { background: var(--dark); color: var(--on-dark) }
-.tone { background: var(--tone) }
-.paper { background: var(--paper) }
-#when { z-index: 1 } #level { z-index: 2 } #flow { z-index: 3 } #why { z-index: 4 } #manage { z-index: 5 } #next { z-index: 6 }
-.head h2 { font-size: var(--s-head) }
-.head span { display: block; margin-top: 16px; font-size: var(--s-lead); font-weight: 700 }
-.head span em { font-style: normal; color: var(--ssu) }
-.dark .head span em { color: var(--ssu-light) }
-
-/* 언제 오나: 하루를 따라 비스듬히 내려간다 */
-.axis .events { margin-top: 64px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: clamp(20px, 3vw, 48px); align-items: start }
-.ev { display: grid; gap: 8px; align-content: start }
-.ev:nth-child(2) { margin-top: 56px } .ev:nth-child(3) { margin-top: 112px } .ev:nth-child(4) { margin-top: 168px }
-.ev .when { font-weight: 800; color: var(--ssu) }
-.ev b { font-size: var(--s-lead); font-weight: 900; letter-spacing: -.03em; line-height: 1.2 }
-
-/* 알림 세기: 계단처럼 한 칸씩 내려간다 */
-.levels { margin-top: 72px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: clamp(24px, 4vw, 64px); align-items: start }
-.lv { display: grid; gap: 14px; align-content: start }
-.lv:nth-child(2) { margin-top: 80px } .lv:nth-child(3) { margin-top: 160px }
-.lv .d { font-size: clamp(72px, 9vw, 150px); font-weight: 900; line-height: .9; letter-spacing: -.05em }
-.lv b { font-size: var(--s-lead); letter-spacing: -.02em }
-.meter { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; height: 12px; max-width: 220px }
-.meter i { background: rgb(242 242 239 / .12) }
-.meter i.on { background: var(--ssu-light) }
-.lv small { order: 1; font-size: var(--s-small); color: var(--on-dark-soft) }
-.lv .d, .lv b { order: 0 } .lv .meter, .lv p { order: 2 }
-
-/* 가져오는 방법 */
-.pipe { margin-top: 64px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); column-gap: clamp(16px, 2.4vw, 40px); align-items: start }
-.node { position: relative; display: grid; gap: 8px; align-content: start }
-.node:nth-child(2) { margin-top: 36px } .node:nth-child(3) { margin-top: 72px } .node:nth-child(4) { margin-top: 108px } .node:nth-child(5) { margin-top: 144px }
-.node b { font-size: var(--s-lead); font-weight: 900; letter-spacing: -.03em; line-height: 1.2 }
-.node:not(:last-child) b::after { content: " →"; color: var(--ssu) }
-.api { margin-top: 88px; display: grid; gap: 28px; padding: clamp(24px, 3vw, 40px); background: var(--dark); color: var(--on-dark); max-width: 920px; margin-left: auto }
-.api div { display: grid; gap: 4px; min-width: 0 }
-.api b { font-size: var(--s-lead); letter-spacing: -.02em }
-.api span { color: var(--on-dark-soft) }
-.api code { margin-top: 6px; color: var(--ssu-light); overflow-wrap: anywhere }
-
-/* 정한 이유: 줄 대신 한 칸씩 바탕을 바꾼다 */
-.tbl { margin-top: 56px; overflow-x: auto }
-table { width: 100%; border-collapse: collapse; min-width: 620px }
-th { text-align: left; font-size: var(--s-small); font-weight: 700; color: var(--muted); padding: 0 20px 12px }
-td { padding: 20px; vertical-align: top }
-.why tbody tr:nth-child(odd) { background: var(--tone) }
-td:first-child { font-weight: 800; white-space: nowrap }
-td s { color: var(--muted) }
-td.pick { font-weight: 800; color: var(--ssu) }
-td.pick::before { content: "→ " }
-
-/* 관리 */
-.manage { margin-top: 56px; display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: clamp(32px, 4vw, 64px); align-items: start }
-.manage h3 { font-size: var(--s-lead) }
-.manage .tbl { margin-top: 16px }
-.manage table { min-width: 0 }
-.manage tbody tr:nth-child(odd) { background: rgb(242 242 239 / .07) }
-.manage td { padding: 14px 16px }
-.manage td:first-child { font-weight: 400; white-space: normal }
-.manage td:last-child { color: var(--on-dark-soft) }
-.manage code { color: var(--on-dark) }
-.alert { margin-top: 72px; display: grid; gap: 6px; font-size: var(--s-lead); line-height: 1.4 }
-.alert b { font-size: var(--s-h3); letter-spacing: -.04em; line-height: 1.1; color: var(--ssu-light) }
-
-/* 다음 할 일: 주차학습 진행 막대처럼 */
-.todo { margin-top: 56px; max-width: 880px }
-.todo .bar { display: flex; align-items: center; gap: 14px; padding: 16px 22px; background: var(--dark); color: var(--on-dark); font-weight: 800 }
-.todo .bar .cnt { margin-left: auto }
-.todo .bar .cnt em { font-style: normal; color: var(--ssu-light) }
-.todo .bar .track { width: 88px; height: 10px; border-radius: 5px; background: rgb(242 242 239 / .16) }
-.todo ul { padding: 0 }
-.todo li { list-style: none; display: flex; gap: 14px; align-items: baseline; padding: 18px 22px; background: var(--paper); margin-top: 6px; font-size: var(--s-lead); font-weight: 700; letter-spacing: -.02em; line-height: 1.35 }
-.todo li::before { content: ""; flex: none; width: 18px; height: 18px; border: 2px solid var(--muted); border-radius: 3px; transform: translateY(3px) }
-.todo li span { margin-left: auto; font-size: var(--s-body); font-weight: 400; letter-spacing: 0; color: var(--muted); white-space: nowrap }
-
-/* 끝 */
-.end { position: relative; z-index: 7; margin-top: calc(-1 * var(--cut)); clip-path: polygon(0 var(--cut), 100% 0, 100% 100%, 0 100%); padding: calc(var(--cut) + 96px) var(--m) 0; overflow: hidden }
-.end p { color: var(--on-dark-soft) }
-.end .word { display: block; margin-top: 64px; font-size: 25.5vw; line-height: .78; font-weight: 900; letter-spacing: -.06em; white-space: nowrap; height: .66em; overflow: hidden; text-decoration: none; transition: color .2s }
-.end .word:hover, .end .word:focus-visible { color: var(--ssu-light); outline: none }
-
-/* 들어올 때 차례로 떠오르기 */
-.js .rise { opacity: 0; transform: translateY(26px); transition: opacity .7s ease, transform .7s cubic-bezier(.2, .7, .2, 1); transition-delay: calc(var(--i, 0) * 80ms) }
-.js .rise.in { opacity: 1; transform: none }
-
-@media (max-width: 900px) {
-  .band { min-height: 0; padding-bottom: 72px }
-  .band::before { inset: auto 0 0 0; width: auto; height: 640px; clip-path: polygon(0 14%, 100% 0, 100% 100%, 0 100%) }
-  .hero, .stage { grid-column: 1 / -1 }
-  .stage { margin-top: 96px; align-items: flex-end; padding-bottom: 40px }
-  .device.laptop { width: 280px } .device.phone { width: 200px; margin-left: -60px }
-  .live { color: var(--ink) } .live i { background: var(--ssu) }
-  .axis .events, .pipe { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 40px }
-  .ev:nth-child(n), .node:nth-child(n) { margin-top: 0 }
-  .ev:nth-child(even), .node:nth-child(even) { margin-top: 40px }
-  .levels { grid-template-columns: minmax(0, 1fr); row-gap: 104px }
-  .lv:nth-child(2) { margin: 0 0 0 12vw } .lv:nth-child(3) { margin: 0 0 0 24vw }
-  .manage { grid-template-columns: minmax(0, 1fr) }
-}
-@media (max-width: 640px) {
-  :root { --cut: 12vw }
-  .topbar a { font-size: var(--s-body) }
-  .band { padding-top: 96px }
-  .hero h1 { font-size: 13vw }
-  main section { padding: 72px var(--m) calc(var(--cut) + 72px) }
-  .ch { padding-top: calc(var(--cut) + 72px) }
-  .head h2 { font-size: 15vw }
-  .band::before { height: 520px }
-  .stage { margin-top: 72px; padding-left: 0 }
-  .tabs .wrap { gap: 0 14px; padding: 8px var(--m) }
-  .tabs a { font-size: 15px; padding: 4px 0 }
-  .manage tr { display: grid; padding: 12px 14px } .manage td { padding: 0 }
-  .device.laptop { width: 210px } .device.phone { width: 150px; margin-left: -48px; padding: 5px; border-radius: 16px }
-  .axis .events, .pipe { grid-template-columns: minmax(0, 1fr) }
-  .ev:nth-child(n), .node:nth-child(n) { margin-top: 0 }
-  .lv:nth-child(2) { margin-left: 8vw } .lv:nth-child(3) { margin-left: 16vw }
-  .todo li { flex-wrap: wrap; font-size: var(--s-body) }
-  .todo li span { margin-left: 32px; width: 100% }
-  .why table { min-width: 0 } .why thead { display: none }
-  .why tr { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 12px; padding: 18px 16px }
-  .why td { padding: 0 } .why td:first-child { grid-column: 1 / -1 } .why td:last-child { grid-column: 1 / -1 }
-}
-@media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto }
-  .live i { animation: none }
-  .js .device { opacity: 1; animation: none }
-  .js .device.laptop { transform: rotate(-4deg) } .js .device.phone { transform: rotate(5deg) }
-  .js .rise { opacity: 1; transform: none; transition: none }
-  .btn, .tabs a, .end .word { transition: none }
-}
+body { margin: 0; min-height: 100svh; display: grid; grid-template-rows: auto 1fr; background: var(--paper); color: var(--ink); font: 400 17px/1.6 "Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif }
+header { padding: 26px clamp(16px, 3.2vw, 52px) }
+header a { font: 600 22px/1 Hahmlet, serif; text-decoration: none; color: inherit }
+form { align-self: center; justify-self: center; width: min(100% - 32px, 420px); display: grid; gap: 14px; padding-bottom: 12vh }
+body:not(.ask) form { visibility: hidden }
+h1 { margin: 0 0 18px; font: 250 clamp(44px, 9vw, 72px)/1.05 Hahmlet, serif; letter-spacing: -.02em }
+h1 b { font-weight: 600 }
+input { font: inherit; padding: 14px 16px; border: 0; border-bottom: 2px solid var(--ink); background: transparent; outline: none }
+input:focus-visible { border-color: var(--blue) }
+button { font: 700 16px/1 inherit; min-height: 54px; border: 0; background: var(--blue); color: #fff; cursor: pointer }
+button:disabled { opacity: .6 }
+button:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px }
+#msg { min-height: 1.6em; margin: 0; color: #a3261d; font-size: 15px }
 </style>
 </head>
 <body>
-<header class="topbar"><a href="../#make">← 작업실</a><span class="live"><i></i>작동 중</span></header>
-
-<div class="band">
-  <div class="hero">
-    <h1 class="rise">LMS 마감 알림</h1>
-    <p class="lede rise" style="--i:1">과제·퀴즈·토론과 강의 영상의 마감을 매일 아침 휴대폰으로, 노트북을 켤 때 화면으로 알려 줍니다. 제출한 과제와 다 본 영상은 빠집니다.</p>
-    <p class="note rise" style="--i:2">SOONGSIL LMS · 2026-2</p>
-    <div class="facts rise" style="--i:3">
-      <div><b>08:00</b><span>휴대폰 알림</span></div>
-      <div><b>13</b><span>과목 확인</span></div>
-      <div><b>65</b><span>항목 확인</span></div>
-      <div><b>7일</b><span>미리 보는 기간</span></div>
-    </div>
-    <a class="btn rise" style="--i:4" href="#manage">관리 명령 보기 →</a>
-  </div>
-  <div class="stage" aria-label="실행 화면">
-    <figure class="device laptop"><div class="chrome"><i></i><i></i><i></i><span>노트북 창</span></div><img src="img/laptop.webp" alt="노트북 알림 창: 오늘·내일 마감 1개, 7일 달력, D-1 카드와 날짜별 과제·영상 목록" width="500" height="860"></figure>
-    <figure class="device phone"><img src="img/phone.webp" alt="휴대폰 ntfy 알림: LMS 마감 · 오늘·내일 1개와 마감 목록" width="390" height="605"></figure>
-  </div>
-</div>
-
-<nav class="tabs" aria-label="목차"><div class="wrap">
-  <a href="#when" class="on">언제 오나</a><a href="#level">알림 세기</a><a href="#flow">가져오는 방법</a><a href="#why">정한 이유</a><a href="#manage">관리</a><a href="#next">다음 할 일</a>
-</div></nav>
-
-<main>
-  <section id="when" class="paper">
-    <div class="head rise"><h2>언제 오나</h2><span>하루 <em>4</em>가지</span></div>
-    <div class="axis">
-      <div class="events">
-        <div class="ev rise" style="--c:var(--ssu)"><span class="when">08:00 · 휴대폰</span><b>마감 목록 알림</b><p>7일 안의 과제·영상을 마감 순으로. 하루 한 번</p></div>
-        <div class="ev rise" style="--c:var(--ssu);--i:1"><span class="when">로그인 · 노트북</span><b>마감 창</b><p>그날 처음 켤 때 항상 뜹니다</p></div>
-        <div class="ev rise" style="--c:var(--tmr);--i:2"><span class="when">잠금 해제 · 노트북</span><b>마감 창 다시</b><p>오늘·내일 마감이 남았으면 1시간에 한 번</p></div>
-        <div class="ev rise" style="--c:var(--today);--i:3"><span class="when">08:00 · 카카오톡</span><b>급한 것만 한 번 더</b><p>오늘·내일 마감이 있을 때만</p></div>
-      </div>
-    </div>
-  </section>
-
-  <section id="level" class="ch dark">
-    <div class="head rise"><h2>알림 세기</h2><span>마감까지 남은 날로 <em>3</em>단계</span></div>
-    <div class="levels">
-      <div class="lv rise"><span class="d">D-0</span><b>오늘 마감 있음</b><div class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div><p>아주 긴 진동, 화면 위 팝업</p><small>ntfy 5단계 · 카톡 함께</small></div>
-      <div class="lv rise" style="--i:1"><span class="d">D-1</span><b>내일 마감 있음</b><div class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div><p>긴 진동과 알림음, 화면 위 팝업</p><small>ntfy 4단계 · 카톡 함께</small></div>
-      <div class="lv rise" style="--i:2"><span class="d">D-2+</span><b>급한 것 없음</b><div class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div><p>짧은 진동과 기본 알림음</p><small>ntfy 3단계</small></div>
-    </div>
-  </section>
-
-  <section id="flow" class="ch tone rev">
-    <div class="head rise"><h2>가져오는 방법</h2><span>매번 <em>5</em>단계</span></div>
-    <div class="pipe">
-      <div class="node rise"><b>토큰으로 접속</b><p>LMS 설정에서 만든 액세스 토큰. 비밀번호는 저장하지 않습니다</p></div>
-      <div class="node rise" style="--i:1"><b>과목 받기</b><p>이번 학기 수강 과목 목록</p></div>
-      <div class="node rise" style="--i:2"><b>주차학습 열기</b><p>메뉴를 누를 때처럼 열어 2시간짜리 학습 토큰을 받습니다</p></div>
-      <div class="node rise" style="--i:3"><b>마감 읽기</b><p>과목마다 과제·퀴즈·토론과 강의 영상</p></div>
-      <div class="node rise" style="--i:4"><b>남은 것만</b><p>낸 것, 다 본 것, 지난 것을 빼고 마감 순 정렬</p></div>
-    </div>
-    <div class="api rise" data-ui>
-      <div><b>과제 · 퀴즈 · 토론</b><span>제출 여부가 함께 옵니다</span><code>/learningx/api/v1/courses/{과목}/allcomponents_db</code></div>
-      <div><b>강의 영상</b><span>출석 인정 마감과 시청 완료 여부가 함께 옵니다</span><code>/learningx/api/v1/courses/{과목}/modules?include_detail=true</code></div>
-    </div>
-  </section>
-
-  <section id="why" class="ch paper">
-    <div class="head rise"><h2>정한 이유</h2><span>바꾼 것 <em>3</em>건</span></div>
-    <div class="tbl why rise"><table>
-      <thead><tr><th>항목</th><th>처음 생각</th><th>고른 것</th><th>이유</th></tr></thead>
-      <tbody>
-        <tr><td>휴대폰 알림</td><td><s>카톡 나와의 채팅</s></td><td class="pick">ntfy 앱 푸시</td><td>나와의 채팅은 알림이 울리지 않음. ntfy는 무료, 가입 없음, 세기 조절</td></tr>
-        <tr><td>LMS 로그인</td><td><s>학번·비밀번호 저장</s></td><td class="pick">액세스 토큰</td><td>비밀번호가 노트북에 남지 않음. LMS 설정에서 지우면 바로 끊김</td></tr>
-        <tr><td>노트북 창</td><td><s>파이썬 기본 창</s></td><td class="pick">크롬 앱 창</td><td>웹페이지처럼 그릴 수 있고, 항목을 누르면 해당 과제로 이동</td></tr>
-      </tbody>
-    </table></div>
-  </section>
-
-  <section id="manage" class="ch dark rev">
-    <div class="head rise"><h2>관리</h2><span>노트북 <em>C:\Users\user</em></span></div>
-    <div class="manage">
-      <div class="rise"><h3>명령</h3><div class="tbl" data-ui><table><tbody>
-        <tr><td><code>python lms_alert.py --show</code></td><td>지금 목록을 창으로</td></tr>
-        <tr><td><code>python lms_alert.py --test</code></td><td>휴대폰으로 시험 알림</td></tr>
-        <tr><td><code>python lms_alert.py setup</code></td><td>토큰 다시 넣기</td></tr>
-        <tr><td><code>schtasks /Change /TN "LMS 마감 알림" /DISABLE</code></td><td>잠시 끄기</td></tr>
-      </tbody></table></div></div>
-      <div class="rise" style="--i:1"><h3>파일</h3><div class="tbl"><table><tbody>
-        <tr><td><code>lms_alert.py</code></td><td>가져오기 · 알림</td></tr>
-        <tr><td><code>lms_alert.html</code></td><td>노트북 창 디자인</td></tr>
-        <tr><td><code>.lms_alert.json</code></td><td>토큰 · 알림 주소 (공개 금지)</td></tr>
-        <tr><td><code>.lms_alert.log</code></td><td>보낸 기록</td></tr>
-      </tbody></table></div></div>
-    </div>
-    <div class="alert rise"><b>연결이 끊기면</b><span>창과 휴대폰에 안내가 뜹니다. Claude에게 "LMS 다시 연결해"라고 하면 됩니다.</span></div>
-  </section>
-
-  <section id="next" class="ch tone">
-    <div class="head rise"><h2>다음 할 일</h2><span>아직 안 함</span></div>
-    <div class="todo rise">
-      <div class="bar">후보<span class="cnt"><em>0</em>/3</span><span class="track"></span></div>
-      <ul>
-        <li>저녁 6시, 오늘 마감 남은 것만 한 번 더<span>휴대폰</span></li>
-        <li>노트북이 꺼져 있어도 오는 아침 알림<span>클라우드 실행</span></li>
-        <li>새 과제가 올라오면 바로 알림<span>휴대폰</span></li>
-      </ul>
-    </div>
-  </section>
-</main>
-
-<footer class="end dark">
-  <p>숭실대 LMS(canvas.ssu.ac.kr) 기준 · 실행 화면은 2026년 10월 31일 캡처</p>
-  <a class="word" href="../" aria-label="작업실로 돌아가기">작업실</a>
-</footer>
-<script>
-// 보고 있는 칸의 탭 표시
-const tabs = [...document.querySelectorAll(".tabs a")];
-const io = new IntersectionObserver(es => es.forEach(e => {
-  if (e.isIntersecting) tabs.forEach(a => a.classList.toggle("on", a.hash === "#" + e.target.id));
-}), { rootMargin: "-70px 0px -65% 0px" });
-document.querySelectorAll("main section").forEach(s => io.observe(s));
-
-// 칸이 화면에 들어오면 차례로 떠오른다
-const rise = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); rise.unobserve(e.target); } }), { rootMargin: "0px 0px -8% 0px" });
-document.querySelectorAll(".rise").forEach(el => rise.observe(el));
-</script>
+<header><a href="/">작업실</a></header>
+<form id="f">
+  <h1>잠긴 <b>페이지</b></h1>
+  <input id="pw" type="password" autocomplete="current-password" aria-label="비밀번호" placeholder="비밀번호" required autofocus>
+  <button id="go">열기</button>
+  <p id="msg" role="alert"></p>
+</form>
+<script src="/lock/gate.js"></script>
 </body>
 </html>

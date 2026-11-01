@@ -2,226 +2,36 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>인간과 성서 서술형 답안</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;600&display=swap">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>잠긴 페이지</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@250;600&display=swap">
 <style>
-/* 교재 『인간과 성서』의 결: 청록 쪽표시, 보라 Part 표지, 명조 본문. 한 줄 읽기 폭 */
-:root {
-  --bg: #f5f7f7;
-  --paper: #ffffff;
-  --ink: #1d2626;
-  --ink-2: #5b6b6b;
-  --line: #dde5e5;
-  --teal: #13777a;
-  --purple: #3d2a6e;
-  --q-bg: #eaf3f3;
-  --serif: "Gowun Batang", "Noto Serif KR", "Batang", serif;
-  --sans: "IBM Plex Sans KR", "Pretendard", system-ui, "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #121818; --paper: #182121; --ink: #e3ecec; --ink-2: #93a6a6; --line: #2a3636;
-    --teal: #5cc2c4; --purple: #b8a6f0; --q-bg: #1d2c2d; color-scheme: dark;
-  }
-}
-:root[data-theme="dark"] {
-  --bg: #121818; --paper: #182121; --ink: #e3ecec; --ink-2: #93a6a6; --line: #2a3636;
-  --teal: #5cc2c4; --purple: #b8a6f0; --q-bg: #1d2c2d; color-scheme: dark;
-}
+:root { --paper: #f2f1ec; --ink: #151514; --muted: #5a5954; --rule: #c9c6bc; --blue: #2b44a6 }
 * { box-sizing: border-box }
-body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); word-break: keep-all; overflow-wrap: anywhere }
-.wrap { max-width: 720px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)) }
-header { padding-block: 40px 28px }
-.back { font-size: 14px; color: var(--ink-2); text-decoration: none }
-.back:hover { color: var(--ink) }
-.book { display: block; margin-top: 28px; font-size: 13px; font-weight: 600; letter-spacing: .04em; color: var(--teal) }
-h1 { margin: 6px 0 0; font-size: clamp(26px, 5vw, 34px); font-weight: 600; letter-spacing: -.01em; text-wrap: balance }
-.tabs { display: inline-flex; gap: 4px; padding: 4px; background: var(--q-bg); border-radius: 8px }
-.tabs button { font: inherit; font-size: 14px; font-weight: 600; color: var(--ink-2); background: none; border: 0; border-radius: 6px; padding: 7px 14px; cursor: pointer }
-.tabs button[aria-selected="true"] { background: var(--paper); color: var(--teal); box-shadow: 0 1px 2px rgba(0,0,0,.08) }
-.tabs button:focus-visible { outline: 2px solid var(--teal); outline-offset: 1px }
-nav { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px }
-nav button { font: inherit; font-size: 14px; cursor: pointer; color: var(--ink); text-decoration: none; padding: 6px 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--paper) }
-nav button:hover, nav button:focus-visible { border-color: var(--teal); color: var(--teal); outline: none }
-nav b { color: var(--teal); margin-right: 6px }
-nav button[aria-selected="true"] { background: var(--teal); border-color: var(--teal); color: var(--paper) }
-nav button[aria-selected="true"] b { color: var(--paper) }
-.tabs { margin-top: 14px }
-main { display: grid; gap: 28px; padding-bottom: 64px }
-article { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding-block: 28px 32px; padding-inline: clamp(18px, 5vw, 44px); scroll-margin-top: 16px }
-.q { display: flex; gap: 14px; align-items: flex-start; background: var(--q-bg); border-radius: 6px; padding: 14px 16px; margin-bottom: 26px }
-.q p { margin: 0; font-size: 16px; font-weight: 600; line-height: 1.6; min-width: 0 }
-.essay p { margin: 0 0 1.1em; font-family: var(--serif); font-size: 17px; line-height: 1.95; text-indent: 1em }
-.essay p:last-child { margin-bottom: 0 }
-.one { margin: 0 0 28px; font-family: var(--serif); font-size: 19px; font-weight: 700; line-height: 1.7; color: var(--teal); text-wrap: pretty }
-article h3 { margin: 28px 0 12px; font-size: 13px; font-weight: 600; letter-spacing: .06em; color: var(--ink-2) }
-.one + h3 { margin-top: 0 }
-.flow { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; counter-reset: f }
-.flow li { counter-increment: f; display: grid; grid-template-columns: 28px 1fr; column-gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line) }
-.flow li:last-child { border-bottom: 0 }
-.flow li::before { content: counter(f); grid-row: span 2; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-size: 13px; font-weight: 600; color: var(--paper); background: var(--purple) }
-.flow b { font-size: 14px; color: var(--purple) }
-.flow span { min-width: 0; font-family: var(--serif); font-size: 16px; line-height: 1.8 }
-.flow em { font-style: normal; font-weight: 700; background: linear-gradient(transparent 60%, var(--q-bg) 60%) }
-.kw { display: flex; flex-wrap: wrap; gap: 8px }
-.kw span { font-size: 14px; padding: 6px 12px; border-radius: 999px; background: var(--q-bg); color: var(--ink) }
-.nums { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; margin: 0 }
-.nums div { border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px }
-.nums dt { font-size: 17px; font-weight: 600; color: var(--teal); font-variant-numeric: tabular-nums }
-.nums dd { margin: 2px 0 0; font-size: 13px; color: var(--ink-2) }
-.pg { font-family: var(--sans); font-size: 12px; color: var(--teal); white-space: nowrap }
-footer { padding-bottom: 48px; font-size: 13px; color: var(--ink-2) }
+body { margin: 0; min-height: 100svh; display: grid; grid-template-rows: auto 1fr; background: var(--paper); color: var(--ink); font: 400 17px/1.6 "Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif }
+header { padding: 26px clamp(16px, 3.2vw, 52px) }
+header a { font: 600 22px/1 Hahmlet, serif; text-decoration: none; color: inherit }
+form { align-self: center; justify-self: center; width: min(100% - 32px, 420px); display: grid; gap: 14px; padding-bottom: 12vh }
+body:not(.ask) form { visibility: hidden }
+h1 { margin: 0 0 18px; font: 250 clamp(44px, 9vw, 72px)/1.05 Hahmlet, serif; letter-spacing: -.02em }
+h1 b { font-weight: 600 }
+input { font: inherit; padding: 14px 16px; border: 0; border-bottom: 2px solid var(--ink); background: transparent; outline: none }
+input:focus-visible { border-color: var(--blue) }
+button { font: 700 16px/1 inherit; min-height: 54px; border: 0; background: var(--blue); color: #fff; cursor: pointer }
+button:disabled { opacity: .6 }
+button:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px }
+#msg { min-height: 1.6em; margin: 0; color: #a3261d; font-size: 15px }
 </style>
 </head>
 <body>
-<header class="wrap">
-  <a class="back" href="../">← 작업실</a>
-  <div class="book">인간과 성서</div>
-  <h1>서술형 답안</h1>
-  <nav role="tablist" aria-label="문제">
-    <button type="button" role="tab" data-q="1"><b>1</b>그리스와 기독교의 인간관</button>
-    <button type="button" role="tab" data-q="2"><b>2</b>구한말 기독교와 근대화</button>
-    <button type="button" role="tab" data-q="3"><b>3</b>혐오와 그 해결</button>
-  </nav>
-  <div class="tabs" role="tablist" aria-label="버전">
-    <button type="button" role="tab" data-v="me">내 말투</button>
-    <button type="button" role="tab" data-v="book">교재 정리본</button>
-    <button type="button" role="tab" data-v="memo">외우기</button>
-  </div>
-</header>
-
-<main class="wrap">
-  <article data-id="q1">
-    <div class="q"><p>그리스 인간관과 기독교 인간관을 비교하고 자신이 생각하는 인간은 무엇인지 쓰시오.</p></div>
-    <div class="essay">
-      <p>한 문명이 신을 어떻게 이해했는가는 곧 그 문명이 인간을 어떻게 이해했는가와 맞닿아 있다<span class="pg">(86쪽)</span>. 그래서 그리스와 기독교의 인간관이 어떻게 다른지는 두 문명이 신을 무엇으로 보았는지에서부터 살펴야 한다. 그리스 철학에서 신은 잘 짜인 질서, 곧 코스모스이자 힘이었다. 반면 히브리·기독교 사유에서 신은 인격적인 관계 속에서 이루어지는 사랑이었다.</p>
-      <p>플라톤은 눈에 보이는 감각 세계를 변하고 사라지는 곳으로, 보이지 않는 이데아를 영원한 실재로 보았다. 그래서 그에게 철학은 영혼이 육체로부터 벗어나 참된 실재를 향해 나아가는 연습이었고, 인간은 신적 질서를 우러러보며 그것을 닮아 가야 할 존재였다<span class="pg">(89쪽)</span>. 아리스토텔레스의 신도 세계를 돌보거나 명령하는 존재가 아니라 '부동의 동자', 곧 완전한 질서 그 자체였다. 인간은 그 질서를 인식하고 자신을 거기에 맞추어 가는 존재였고, 인간의 변화는 관계 속에서 일어나는 사건이 아니라 인식과 수련을 통한 상승이었다<span class="pg">(90쪽)</span>. 정리하면 그리스에서 인간은 이성으로 질서를 깨닫고 스스로 위로 올라가야 하는 존재였고, 육체와 감정은 넘어서야 할 것에 가까웠다.</p>
-      <p>기독교는 인간을 하나님의 형상대로 지어진 존재로 본다(창 1:26-27). 교재는 하나님의 형상을 이성이나 지배권보다 관계로 풀어서, 인간이 하나님과 자연과 타자와 사랑의 관계 속에서 살아가도록 만들어졌다고 설명한다<span class="pg">(68쪽)</span>. 또 인간은 흙에서 온 유한한 존재이고 하나님에게서 멀어진 타락한 존재이지만, 그리스도 안에서 새로운 인간으로 변화할 수 있다<span class="pg">(67, 81쪽)</span>. 기독교는 육체를 낮추어 보지도 않는다. 창조된 생명과 그 육체가 선하다고 인정하고 육신의 부활을 믿는다<span class="pg">(69쪽)</span>. 아우구스티누스는 인간의 문제가 아는 것이 부족해서가 아니라 사랑의 방향이 비뚤어져서 생긴다고 보았다<span class="pg">(92쪽)</span>.</p>
-      <p>두 인간관을 나란히 놓으면 차이가 분명하다. 그리스는 인간다움의 기준을 이성에 두었고, 기독교는 관계에 두었다. 그리스에서 육체는 벗어나야 할 것이었지만, 기독교에서 육체는 하나님이 지은 선한 것이다. 무엇보다 그리스의 인간은 스스로 수련해 질서를 향해 올라가는 반면, 기독교의 인간은 자신의 약함 가운데서 먼저 받은 사랑에 응답하며 변화해 간다<span class="pg">(92쪽)</span>. 교재의 표현대로 기독교는 그리스 철학의 힘의 논리를 뒤집었다고 할 수 있다<span class="pg">(93쪽)</span>.</p>
-      <p>나는 인간을 관계 속에서 완성되어 가는 미완성의 존재라고 생각한다. AI를 공부하다 보면 계산하고 추론하는 능력은 이미 기계가 사람을 앞서는 경우가 많다. 인간을 이성만으로 정의하면 기계가 발전할수록 인간다움이 설 자리는 줄어들 수밖에 없다. 물론 이성은 여전히 중요하다. 하지만 인간을 인간답게 만드는 것은 혼자 완벽해지는 능력보다, 자신의 약함을 인정하고 다른 사람과 서로 사랑하고 책임지는 관계를 맺는 데 있다고 본다. 교재가 말하듯 겸손과 존엄은 서로 대립하지 않는다<span class="pg">(82쪽)</span>. 내가 불완전하다는 것을 인정할 때 오히려 다른 사람에게 손을 내밀 수 있고, 그때 더 인간다워진다고 생각한다.</p>
-    </div>
-  </article>
-  <article data-id="q2">
-    <div class="q"><p>구한말 기독교의 전래와 한국의 수용에 대해 근대화의 관점에서 쓰고 평가하시오.</p></div>
-    <div class="essay">
-      <p>한국에 기독교가 들어온 과정은 천주교와 개신교가 서로 달랐다. 천주교는 선교사가 먼저 들어온 것이 아니라 한국인이 스스로 찾아 받아들였다는 특징이 있다. 중국에 간 사신단을 통해 『천주실의』와 『교우론』 같은 책이 들어왔고, 지식인들이 이를 서학으로 연구하다가 신앙으로 받아들였다. 이들은 천주교가 유교를 보완한다는 보유론의 입장을 취했다<span class="pg">(297쪽)</span>. 그러나 1791년 진산사건처럼 제사를 금지한 것이 조선 사회의 질서와 부딪치면서 천주교는 큰 박해를 받았다.</p>
-      <p>개신교는 선교사보다 성경이 먼저 들어왔다. 로스 선교사와 의주 출신 청년들이 만주에서 성경을 번역해 1887년 『예수셩교젼셔』를 펴냈고, 이수정은 일본에서 번역을 했다<span class="pg">(28~29쪽)</span>. 1885년 언더우드와 아펜젤러가 제물포로 들어왔지만 직접 전도할 자유가 없었기 때문에 학교와 병원을 세우는 간접 선교를 택했다<span class="pg">(30쪽)</span>. 알렌은 최초의 국립병원인 광혜원(제중원)을 세웠고, 배재학당과 이화학당, 경신학당, 평양의 숭실학당이 차례로 문을 열었다. 1906년 세워진 숭실대학은 한국 최초의 근대 대학이었다. 1909년까지 교회가 세운 학교는 약 950개였는데, 같은 시기 관공립학교는 60개에 불과했다<span class="pg">(31쪽)</span>.</p>
-      <p>근대화의 관점에서 보면 기독교는 조선이 근대로 들어가는 중요한 통로였다. 근대식 학교와 서양 의학이 들어왔고, 한글 성경과 신문은 민중이 글을 읽을 수 있게 했다. 여성을 위한 학교가 세워지고 교회 안에서 축첩 반대 운동이 일어났으며, 기독교적 인권 사상과 민주주의가 교회를 통해 퍼져 나갔다<span class="pg">(32쪽)</span>. 이 흐름은 민족운동으로도 이어졌다. 105인 사건에서 많은 기독교인이 탄압을 받았고, 3·1운동 때는 민족대표 33인 가운데 16명이 기독교인이었다. 교재는 이를 통해 한국 사람들이 기독교를 외래종교가 아닌 민족종교로 이해하기 시작했다고 설명한다<span class="pg">(36쪽)</span>.</p>
-      <p>하지만 한계도 분명했다. 1907년 대부흥운동은 교회를 크게 성장시켰지만, 지나친 정교분리로 민족 문제를 소홀히 하고 내세 중심의 신앙으로 기울게 했다는 비판을 받는다<span class="pg">(33~34쪽)</span>. 1938년에는 신사참배를 가결하며 일제에 굴복했다<span class="pg">(37쪽)</span>. 네비우스 선교 정책은 한국교회의 자립을 도왔지만, 선교사들의 서구 우월주의를 넘어서지 못했다는 지적도 있다<span class="pg">(32쪽)</span>.</p>
-      <p>나는 근대화를 사람들이 스스로 판단하고 선택하는 힘을 기르는 과정이라고 생각한다. 그렇게 보면 기독교는 근대의 문을 여는 열쇠 역할은 분명히 했지만, 일제 강점이 길어지고 교회가 갈라지면서 사회를 바꾸는 힘을 끝까지 이어 가지는 못했다. 그래도 천주교를 한국인이 먼저 찾아 받아들였고, 숭실처럼 조선어로 가르치며 민족의식을 키운 학교가 있었다는 점은 의미가 크다. 바깥에서 들어온 문물을 우리 것으로 소화하려 한 주체적인 근대화의 시도였다는 점에서, 구한말 기독교의 수용은 한계에도 불구하고 긍정적으로 평가할 만하다.</p>
-    </div>
-  </article>
-  <article data-id="q3">
-    <div class="q"><p>왜 사람들은 타인을 혐오하는가. 그 해결책은.</p></div>
-    <div class="essay">
-      <p>교재는 오늘의 한국 사회를 공동체의 위기, 혐오의 시대라고 진단한다. 예멘 난민 입국 반대 시위, 장애인 특수학교 설립 반대, 같은 아파트 안에서 임대 세대를 차별하는 일, 온라인 커뮤니티에 퍼지는 혐오 표현이 그 예다<span class="pg">(239쪽)</span>. 그렇다면 사람들은 왜 타인을 혐오하는 것일까.</p>
-      <p>마사 누스바움은 혐오를 분노와 구별한다. 분노가 부당함에 대한 반응이라면, 혐오는 불결함과 역겨움에 대한 감각적인 반응이다. 그 뿌리에는 인간이 자신의 약함에서 느끼는 원초적인 수치심이 있고, 사람들은 그 불편함을 약한 집단에 불결하다거나 비정상이라는 낙인을 찍는 방식으로 풀어낸다. 그렇게 해서 혐오라는 감정은 법률과 도덕이라는 그럴듯한 옷을 입고 차별을 제도로 만든다<span class="pg">(240~241쪽)</span>.</p>
-      <p>르네 지라르는 사회 쪽에서 원인을 찾는다. 인간은 남이 원하는 것을 따라 원하는 모방 욕망을 지니고 있어서, 관계가 가까울수록 경쟁과 긴장이 커진다. 공동체는 이렇게 쌓인 내부의 폭력을 한 대상에게 몰아서 해소하는데, 이것이 희생양 메커니즘이다<span class="pg">(241~242쪽)</span>. 결국 사람들은 자기 안의 불안과 수치, 집단 안의 갈등을 약한 타인에게 떠넘기기 위해 혐오한다. 요즘은 자극적인 혐오 콘텐츠로 돈을 버는 사람들이 있고 추천 알고리즘이 그런 콘텐츠를 더 많이 보여 주기 때문에, 혐오가 퍼지는 속도는 더 빨라졌다.</p>
-      <p>해결의 실마리는 선한 사마리아인의 비유에서 찾을 수 있다. 율법 교사는 예수에게 "내 이웃이 누구입니까?"라고 묻는다. 교재는 이 질문을 사랑할 사람과 혐오해도 되는 사람을 나눠 달라는 혐오의 논리로 읽는다. 예수는 유대인들이 부정하다고 여기던 사마리아 사람이 강도 만난 사람을 도운 이야기를 들려주고, "너도 가서 이웃이 되어 주라"고 말한다<span class="pg">(243~244쪽)</span>. 누가 내 이웃인지 가려내는 질문을, 내가 누구의 이웃이 되어 줄 것인가라는 질문으로 바꾸는 것이 혐오를 넘어서는 출발점이다.</p>
-      <p>사회적으로는 돌봄의 윤리와 상호문화주의가 방향을 보여 준다. 돌봄의 윤리는 도덕적 관심에서 시작해 공감을 통한 이해와 관계의 발견, 수용을 거쳐 책임감 있는 대답으로 나아간다. 상호문화주의는 다른 문화를 하나로 녹여 없애지 않고, 다양성을 인정한 채 함께 사는 길을 찾는다<span class="pg">(264~266쪽)</span>. 내가 할 수 있는 일은 집단에 붙은 낙인이 아니라 한 사람을 직접 만나 보는 것, 혐오 표현을 쓰거나 퍼뜨리지 않는 것, 혐오가 제도가 되지 않도록 목소리를 내는 것이다. 교재의 결론처럼 혐오를 멈추게 하는 것은 거창한 이론보다 서로에게 이웃이 되어 주는 작은 실천이라고 생각한다<span class="pg">(245쪽)</span>.</p>
-    </div>
-  </article>
-  <article data-id="m1" hidden>
-    <div class="q"><p>그리스 인간관과 기독교 인간관을 비교하고 자신이 생각하는 인간은 무엇인지 쓰시오.</p></div>
-    <div class="essay">
-      <p>그리스와 기독교의 인간관 차이는 결국 신을 어떻게 봤는지에서 시작된다고 생각한다. 그리스 철학자들에게 신은 세상이 무너지지 않게 붙잡고 있는 거대한 질서 같은 것이었고, 기독교에서 신은 사람에게 말을 걸고 사랑하는 상대였다. 신을 질서로 보면 인간은 그 질서를 알아내야 하는 존재가 되고, 신을 사랑으로 보면 인간은 그 사랑에 응답하는 존재가 되는데, 두 인간관은 바로 여기서 갈린다고 본다.</p>
-      <p>플라톤은 눈에 보이는 것들은 결국 변하고 없어지니까 진짜가 아니고, 변하지 않는 이데아가 진짜라고 봤다. 그래서 그에게 철학은 몸에 묶인 영혼이 그 진짜 세계 쪽으로 가도록 훈련하는 일이었다. 아리스토텔레스가 말한 신인 '부동의 동자'도 자기는 움직이지 않으면서 모든 것을 움직이게 하는 원인일 뿐, 사람을 돌보거나 말을 걸지는 않는다. 그러니 사람이 할 일은 그 질서를 잘 알아보고 거기에 맞춰 사는 것이었다. 한마디로 그리스에서 더 나은 사람이 된다는 건 머리로 깨닫고 스스로를 단련해 한 단계씩 올라가는 일이었고, 몸과 감정은 그 길을 방해하는 쪽에 가까웠다.</p>
-      <p>반대로 기독교는 사람이 하나님의 형상대로 지어졌다고 한다. 여기서 형상은 사람이 머리가 좋아서 하나님을 닮았다는 뜻이 아니라, 하나님과, 자연과, 다른 사람과 사랑으로 이어져 살도록 만들어졌다는 뜻에 가깝다. 또 사람은 흙으로 빚어져 언젠가 죽고 하나님에게서 멀어지기도 하지만, 거기서 끝나지 않고 다시 새로워질 수 있다. 몸도 하나님이 만든 것이니 버려야 할 것이 아니라 좋은 것이다. 아우구스티누스는 사람이 잘못되는 건 몰라서가 아니라 사랑이 엉뚱한 곳을 향해서라고 했는데, 나는 이 말이 두 인간관의 차이를 가장 잘 보여 준다고 생각한다. 그리스에서는 더 알면 나아지지만, 기독교에서는 사랑이 바로잡혀야 나아진다. 정리하면 두 인간관은 인간다움의 기준을 이성에 두느냐 관계에 두느냐, 육체를 넘어서야 할 것으로 보느냐 선한 것으로 보느냐, 스스로 올라가느냐 먼저 받은 사랑에 응답하느냐에서 갈린다.</p>
-      <p>두 관점을 비교하면서 든 생각은 그리스 인간관의 구조가 지금 우리 사회와 많이 닮아 있다는 것이다. 물론 플라톤이 성적이나 연봉을 말한 것은 아니지만, 사람을 능력으로 평가하고 스스로 노력해서 더 높은 곳에 올라가야 한다고 믿는 분위기는 이성과 수련으로 상승하는 그리스의 인간상과 닮았다. 이 관점은 인간의 가능성을 높이 본다는 장점이 있지만, 그 기준에 못 미치는 사람을 덜 인간적인 존재처럼 보이게 만든다는 위험이 있다고 생각한다. 노력해도 안 되는 순간이 오면 사람은 자기 자신을 실패한 존재로 여기기 쉬운데, 그리스 인간관 안에서는 그런 약함이 설 자리가 별로 없다.</p>
-      <p>반면 기독교 인간관은 약함을 인간의 출발점으로 인정한다는 점에서 더 현실적이라고 본다. 바울은 자기 약점을 숨기지 않고 오히려 자랑하겠다고 했는데, 약할 때 비로소 하나님의 능력이 드러난다고 믿었기 때문이다. 나는 AI를 공부하고 있는데, 계산하고 추론하는 능력은 이미 많은 부분에서 기계가 사람을 앞서고 있다. 만약 인간을 이성으로만 정의한다면 AI가 발전할수록 인간이 설 자리는 계속 줄어들 수밖에 없고, 언젠가는 기계가 인간보다 더 인간다운 존재라는 이상한 결론이 나올 수도 있다. 그런데 AI는 자기가 부족하다는 걸 느끼고 다른 존재에게 기대거나, 반대로 누군가의 부족함을 보고 책임감을 느끼지는 않는다. 나는 서로의 불완전함을 알고 관계를 맺는 이 능력이 인간과 기계를 가르는 지점이라고 생각한다.</p>
-      <p>그래서 내가 생각하는 인간은 관계 속에서 계속 만들어져 가는 미완성의 존재다. 혼자서 완벽해지는 것이 인간의 목표라면 인간은 영원히 실패할 수밖에 없지만, 서로의 부족함을 채워 주는 것이 인간다움이라면 불완전함은 오히려 관계를 맺게 하는 이유가 된다. 교재가 죄를 자신의 한계를 인정하지 않고 다른 존재가 필요하다는 사실을 거부하는 것으로 설명하는 것도 같은 맥락이라고 생각한다. 물론 이성이 중요하지 않다는 뜻은 아니고, 이성은 그 관계를 더 잘 맺기 위한 도구라고 생각한다. 결국 나는 얼마나 뛰어난가보다 다른 사람과 어떤 관계를 맺고 사는가가 그 사람을 더 인간답게 만든다고 믿는다.</p>
-    </div>
-  </article>
-  <article data-id="m2" hidden>
-    <div class="q"><p>구한말 기독교의 전래와 한국의 수용에 대해 근대화의 관점에서 쓰고 평가하시오.</p></div>
-    <div class="essay">
-      <p>한국에 기독교가 들어온 과정에서 가장 인상적이었던 건 천주교와 개신교 모두 선교사가 조선에 들어오기 전에 한국인이 먼저 움직였다는 점이다. 천주교는 청나라에 다녀온 사신들이 들고 온 『천주실의』 같은 책을 조선 학자들이 처음에는 서양 학문으로 공부하다가, 읽다 보니 믿게 된 경우였다. 개신교도 선교사가 조선에 들어오기 전부터 한국인이 성경 번역에 함께했다. 만주에서는 의주 청년들이 로스 선교사를 도와 1887년 『예수셩교젼셔』를 냈고, 일본에서는 이수정이 스스로 기독교인이 된 뒤 성경을 우리말로 옮겼다. 하지만 조상 제사를 지내지 말라는 천주교의 가르침은 효를 가장 중요하게 여기던 조선에서 받아들여지기 어려웠고, 1791년 진산사건 이후 큰 박해로 이어졌다. 1885년 들어온 언더우드와 아펜젤러도 조선 정부가 아직 선교를 허락하지 않아 대놓고 전도할 수는 없었기 때문에, 먼저 학교와 병원을 세워 사람들 곁으로 다가가는 방법을 택했다.</p>
-      <p>이 간접 선교가 결과적으로 근대화의 통로가 됐다고 생각한다. 알렌의 광혜원, 배재학당과 이화학당, 평양의 숭실학당이 이때 세워졌고, 1906년 숭실대학은 한국 최초의 근대 대학이 됐다. 1909년까지 교회가 세운 학교가 약 950개였던 반면 관공립학교는 60개뿐이었다는 걸 보면 당시 근대 교육의 대부분을 교회가 맡고 있었다고 해도 과언이 아니다. 한글로 된 성경과 신문 덕분에 양반이 아닌 사람들도 글을 읽게 됐고, 여자아이를 학교에 보내고 첩을 두지 말자는 운동은 신분이나 성별과 상관없이 사람은 똑같이 귀하다는 생각을 퍼뜨렸다. 3·1운동 때 민족대표 33인 중 16명이 기독교인이었을 만큼 민족운동과도 깊이 연결돼 있었다.</p>
-      <p>이 과정을 평가하려면 근대화가 무엇인지부터 정해야 한다고 생각한다. 내가 생각하는 근대화는 새로운 기술이나 제도를 들여오는 것보다 사람들이 스스로 판단하고 선택할 수 있는 힘을 갖게 되는 과정이다. 이 기준으로 보면 구한말 기독교가 남긴 가장 큰 유산은 학교나 병원 건물보다 글을 읽고 생각할 수 있게 된 사람들이다. 또 한국인이 선교사보다 먼저 천주교를 찾아갔고 성경 번역에도 참여했다는 점, 숭실처럼 조선어로 가르치면서 민족의식을 키운 학교가 있었다는 점은 기독교를 일방적으로 받아들인 게 아니라 우리에게 필요한 방식으로 소화하려 했다는 증거라고 본다.</p>
-      <p>하지만 같은 기준으로 보면 한계도 분명하다. 근대화와 서구화가 한꺼번에 들어오면서, 근대적인 것은 곧 서양적인 것이고 전통적인 것은 뒤처진 것이라는 인식도 함께 퍼졌다. 무엇을 받아들일지 스스로 판단하기보다 서양의 것을 그대로 기준으로 삼은 셈이다. 제사 문제로 일어난 충돌도 그렇고, 한국교회가 스스로 서도록 돕겠다는 네비우스 정책을 쓰면서도 선교사들이 서양이 더 낫다는 생각은 버리지 못했다는 비판도 같은 문제를 보여 준다. 또 1907년 대부흥운동으로 교회는 크게 늘었지만, 그 뒤로 신앙은 마음과 죽은 뒤의 문제라며 나라 문제에서는 한발 물러서는 분위기가 생겼고, 일제의 협박 속이었다고는 해도 1938년에는 신사참배까지 가결한 것을 보면, 근대 교육으로 깨어난 사람들의 힘이 사회를 바꾸는 쪽으로 끝까지 이어지지 못했다.</p>
-      <p>그래서 나는 구한말 기독교의 수용을 절반의 성공이라고 평가하고 싶다. 근대의 문을 연 것은 분명하지만, 그 문을 지나 주체적인 사회를 만드는 데까지는 이르지 못했다. 그래도 교회가 신사참배를 가결하던 그때, 숭실은 끝까지 신사참배를 거부하다 결국 문을 닫아야 했다. 스스로 판단하고 선택하는 힘이라는 근대화의 의미를 끝까지 지킨 학교가 있었고, 그 학교가 지금 내가 다니는 숭실로 이어지고 있다는 점에서 그 의미는 결코 작지 않다고 생각한다.</p>
-    </div>
-  </article>
-  <article data-id="m3" hidden>
-    <div class="q"><p>왜 사람들은 타인을 혐오하는가. 그 해결책은.</p></div>
-    <div class="essay">
-      <p>요즘 한국 사회에서 혐오는 특별한 일이 아니라 일상이 된 것 같다. 교재에서 예로 든 예멘 난민 반대 시위나 장애인 특수학교 설립 반대뿐 아니라, 인터넷 댓글이나 커뮤니티를 조금만 봐도 성별, 지역, 세대, 출신을 이유로 서로를 깎아내리는 말이 너무 쉽게 보인다. 그렇다면 사람들은 왜 이렇게 타인을 혐오하는 걸까.</p>
-      <p>교재는 혐오의 원인을 두 가지로 설명한다. 마사 누스바움에 따르면 혐오는 '더럽다, 역겹다' 하는 몸의 반응에 가깝다. 사람은 누구나 약하고 언젠가 늙고 죽는다는 데서 오는 원초적인 수치심을 안고 사는데, 그 불편함을 자기보다 약한 집단에 떠넘기면서 '저 사람들은 더럽다'고 선을 긋는다는 것이다. 르네 지라르는 사람이 무언가를 원하는 이유가 대개 남이 그걸 원하기 때문이라고 보는데, 이것이 모방 욕망이다. 다들 같은 걸 원하니 부딪힐 수밖에 없고, 그 갈등이 쌓이면 공동체는 만만한 한 사람이나 한 집단을 '다 저들 탓'으로 몰아서 터뜨린다. 이것을 희생양 메커니즘이라고 한다. 두 설명 모두 혐오가 상대방의 문제가 아니라 혐오하는 사람 자신의 불안에서 시작된다는 점에서 공통적이라고 본다.</p>
-      <p>나는 지금 한국 사회가 이 불안을 키우는 구조를 가지고 있다고 생각한다. 첫째는 경쟁이다. 입시, 취업, 집값처럼 한정된 자리를 두고 모두가 같은 것을 원하는 사회는 지라르가 말한 모방 욕망이 극단적으로 커진 모습이라고 볼 수 있다. 이런 구조에서는 다른 사람이 쉽게 경쟁자로 보이고, 내가 힘든 이유를 누군가의 탓으로 돌리고 싶어진다. 둘째는 알고리즘이다. 추천 시스템은 사용자가 오래 머무는 콘텐츠를 더 보여 주도록 만들어지는데, 분노나 혐오를 자극하는 콘텐츠일수록 반응이 크니까 결국 혐오가 더 많이 추천되고, 사람들은 비슷한 생각만 보면서 상대 집단을 실제보다 훨씬 나쁘게 상상하게 된다. 셋째는 직접 만날 기회가 줄었다는 점이다. 화면 속에서만 보는 집단은 쉽게 하나의 이미지로 뭉뚱그려지고, 그 이미지가 혐오의 대상이 된다.</p>
-      <p>그래서 해결책은 개인과 사회 두 차원에서 함께 찾아야 한다고 생각한다. 먼저 개인 차원에서는 질문을 바꾸는 것이 출발점이다. 선한 사마리아인 비유에서 율법 교사는 “내 이웃이 누구입니까?”라고 묻는다. 예수는 유대인들이 상종도 하지 않던 사마리아 사람이 강도 만난 사람을 도운 이야기를 들려준 뒤, “누가 강도 만난 자의 이웃이 되겠느냐”고 되묻는다. 누가 내 편인지 따지는 순간 편 가르기가 시작되지만, 내가 누군가의 이웃이 되어 주겠다고 생각하면 상대가 어떤 집단인지는 덜 중요해진다. 이 태도는 누구나 어떤 상황에서는 소수가 될 수 있다는 걸 기억할 때 쉬워진다. 나도 외국에 가면 이주민이 되고, 언젠가는 노인이 되며, 사고나 병으로 장애를 갖게 될 수도 있다. 그리고 이런 태도는 말하는 습관에서 드러난다. 혐오 표현은 처음부터 누군가를 미워하려고 쓰기보다는 친구들끼리 장난처럼 '~충' 같은 말을 붙이면서 시작되는 경우가 많은데, 그런 말을 아무렇지 않게 쓰다 보면 그 집단을 정말 그런 사람들로 보게 되기 때문에 내가 쓰는 말부터 조심해야 한다.</p>
-      <p>하지만 개인의 결심만으로는 앞에서 말한 구조를 바꾸기 어렵기 때문에, 사회 차원에서는 세 가지 원인에 맞춘 해결책이 필요하다. 만날 기회가 줄어든 문제에는 학교나 지역에서 장애인, 이주민, 다른 세대와 함께하는 활동을 늘리는 것이 답이 될 수 있다. 교재에 나오는 상호문화주의도 결국 이주민이 한쪽으로만 맞춰 가는 게 아니라, 서로의 문화를 직접 겪고 배우면서 같이 사는 법을 찾자는 이야기다. 화면 속 이미지가 아니라 실제 사람으로 만나면 그만큼 혐오가 설 자리는 줄어든다. 알고리즘 문제에는 플랫폼이 머무는 시간만 기준으로 삼지 말고, 혐오 표현이 담긴 콘텐츠는 추천에서 빼거나 덜 보여 주도록 기준을 바꾸는 것이 필요하다. 경쟁 문제는 하루아침에 풀 수 없지만, 한 번의 시험이나 하나의 기준으로만 사람을 줄 세우지 않는 제도가 늘어날수록 다른 사람을 경쟁자가 아닌 이웃으로 볼 여유도 생긴다고 생각한다.</p>
-      <p>결국 혐오가 사람의 약함에서 시작된다면, 해결은 그 약함이 모두에게 있다는 것을 인정하는 데서 시작된다. 내가 먼저 누군가의 이웃이 되어 주려는 태도와, 그런 태도가 가능하도록 서로 만나고 덜 경쟁하게 만드는 사회가 함께 있을 때 혐오는 줄어들 수 있다고 생각한다.</p>
-    </div>
-  </article>
-  <article data-id="k1" hidden>
-    <div class="q"><p>그리스 인간관과 기독교 인간관을 비교하고 자신이 생각하는 인간은 무엇인지 쓰시오.</p></div>
-    <p class="one">그리스는 이성으로 올라가는 인간, 기독교는 관계 속에서 응답하는 인간. 나는 인간을 관계 속에서 만들어져 가는 미완성의 존재로 본다.</p>
-    <h3>흐름</h3>
-    <ol class="flow">
-      <li><b>출발점</b><span>신을 어떻게 봤나에서 갈린다. 그리스는 신을 <em>질서·힘</em>으로, 기독교는 <em>사랑·관계</em>로 봤다.</span></li>
-      <li><b>그리스</b><span>플라톤 <em>이데아</em>, 영혼이 육체에서 벗어남. 아리스토텔레스 <em>부동의 동자</em>(돌보지 않는 질서). → 이성으로 깨닫고 <em>스스로 상승</em>, 육체·감정은 넘어설 것.</span></li>
-      <li><b>기독교</b><span><em>하나님의 형상</em>을 관계로 풀이, 흙에서 온 유한·타락한 존재가 은혜로 새로워짐, <em>육체도 선함</em>. <em>아우구스티누스</em>: 문제는 몰라서가 아니라 <em>사랑의 방향</em>. → 비교 세 축: 이성↔관계, 육체 극복↔육체 선함, 스스로 상승↔받은 사랑에 응답.</span></li>
-      <li><b>내 생각 ①</b><span>그리스 인간관의 <em>구조</em>는 능력으로 사람을 재는 지금 사회와 닮았다(플라톤이 연봉을 말한 건 아님). 기준에 못 미치면 덜 인간적으로 보이고, 약함이 설 자리가 없다.</span></li>
-      <li><b>내 생각 ②</b><span>기독교는 약함을 출발점으로 인정해서 더 현실적이다. <em>AI</em>는 계산은 앞서도 부족함을 느끼고 기대거나 책임지지 않는다. 이것이 인간과 기계를 가르는 지점이다.</span></li>
-      <li><b>결론</b><span>인간은 <em>관계 속 미완성의 존재</em>다. 불완전함은 관계를 맺게 하는 이유이고, 이성은 관계를 위한 도구다.</span></li>
-    </ol>
-    <h3>핵심 키워드</h3>
-    <div class="kw"><span>코스모스·힘</span><span>사랑·관계</span><span>이데아</span><span>영혼↔육체</span><span>부동의 동자</span><span>하나님의 형상</span><span>흙·유한</span><span>타락과 은혜</span><span>육체도 선함</span><span>사랑의 방향</span><span>능력 사회</span><span>AI와 인간</span><span>미완성의 존재</span></div>
-  </article>
-  <article data-id="k2" hidden>
-    <div class="q"><p>구한말 기독교의 전래와 한국의 수용에 대해 근대화의 관점에서 쓰고 평가하시오.</p></div>
-    <p class="one">기독교는 근대의 문을 열었지만 주체적인 사회까지는 가지 못한 절반의 성공이다. 그래도 그때 뿌린 교육의 씨앗이 숭실로 이어졌다.</p>
-    <h3>흐름</h3>
-    <ol class="flow">
-      <li><b>전래</b><span>선교사보다 <em>한국인이 먼저</em> 움직였다. 천주교는 사신단이 가져온 <em>천주실의</em>를 서학으로 연구하다 신앙이 됐고, 개신교는 의주 청년들이 <em>로스</em>를 도와, <em>이수정</em>은 일본에서 성경을 번역했다. 천주교는 제사 금지로 <em>진산사건</em> 후 박해를 받았다. 1885년 언더우드·아펜젤러는 <em>간접 선교</em>(학교·병원)를 택했다.</span></li>
-      <li><b>근대화 통로</b><span><em>광혜원</em>, 배재·이화·숭실학당, 숭실대학(최초 근대 대학). 교회 학교가 관공립보다 훨씬 많았다. <em>한글</em> 성경·신문, <em>여성 교육</em>·축첩 반대로 평등 의식이 퍼졌고, <em>3·1운동</em>으로 민족운동과도 이어졌다.</span></li>
-      <li><b>내 기준 + 긍정</b><span>근대화란 <em>스스로 판단하고 선택하는 힘</em>이다. 가장 큰 유산은 건물보다 <em>글을 읽고 생각하게 된 사람들</em>이다. 자발적 수용, 번역 참여, 숭실의 조선어 교육은 <em>주체적 소화</em>의 증거다.</span></li>
-      <li><b>같은 기준으로 한계</b><span><em>근대화 = 서구화</em> → 스스로 판단하기보다 서양을 그대로 기준으로 삼았다(제사 충돌, 네비우스의 서구 우월주의). 대부흥운동 이후 <em>정교분리</em>, <em>신사참배</em> 가결 → 사회를 바꾸는 힘이 끊겼다.</span></li>
-      <li><b>결론</b><span><em>절반의 성공</em>. 문은 열었지만 주체적 사회까지는 못 갔다. 그래도 <em>숭실은 신사참배를 거부하다 폐교</em>(37쪽) → 그 학교가 지금 내가 다니는 숭실로 이어진다.</span></li>
-    </ol>
-    <h3>핵심 키워드</h3>
-    <div class="kw"><span>한국인이 먼저</span><span>천주실의·서학</span><span>로스 성경 번역</span><span>간접 선교</span><span>광혜원</span><span>숭실학당</span><span>한글 보급</span><span>여성 교육</span><span>근대화 = 서구화?</span><span>정교분리</span><span>신사참배</span><span>절반의 성공</span></div>
-    <h3>숫자</h3>
-    <dl class="nums"><div><dt>1791</dt><dd>진산사건</dd></div><div><dt>1885</dt><dd>언더우드·아펜젤러 입국</dd></div><div><dt>1887</dt><dd>예수셩교젼셔</dd></div><div><dt>1897</dt><dd>숭실학당</dd></div><div><dt>1906</dt><dd>숭실대학</dd></div><div><dt>950 : 60</dt><dd>교회 학교 : 관공립</dd></div><div><dt>33인 중 16명</dt><dd>3·1운동 기독교인</dd></div><div><dt>1907</dt><dd>대부흥운동</dd></div><div><dt>1938</dt><dd>신사참배 가결 · 숭실 폐교</dd></div></dl>
-  </article>
-  <article data-id="k3" hidden>
-    <div class="q"><p>왜 사람들은 타인을 혐오하는가. 그 해결책은.</p></div>
-    <p class="one">혐오는 자기 안의 약함과 불안을 약한 타인에게 떠넘기는 것이다. 해결은 내가 먼저 이웃이 되어 주는 태도와, 그게 가능하도록 만나고 덜 경쟁하게 하는 사회가 함께 가는 것이다.</p>
-    <h3>흐름</h3>
-    <ol class="flow">
-      <li><b>문제</b><span>혐오가 <em>일상</em>이 됐다. 예멘 난민 반대, 특수학교 반대, 댓글·커뮤니티의 성별·지역·세대·출신 혐오가 그 예다.</span></li>
-      <li><b>원인 (책)</b><span><em>누스바움</em>: 역겨움과 자기 약함에 대한 <em>수치심</em> → 약한 집단에 낙인을 찍는다. <em>지라르</em>: <em>모방 욕망</em> → 갈등을 한 대상에 몬다(<em>희생양</em>). 둘 다 혐오하는 사람 자신의 불안에서 시작된다.</span></li>
-      <li><b>원인 (내 생각)</b><span>불안을 키우는 구조 세 가지: <em>경쟁</em>(입시·취업·집값 = 지라르의 모방 욕망이 커진 모습), <em>알고리즘</em>(자극적인 것이 더 추천됨), <em>만날 기회 감소</em>(화면 속 이미지로 뭉뚱그림).</span></li>
-      <li><b>해결 (개인)</b><span><em>선한 사마리아인</em>: “내 이웃이 누구냐” → “누가 이웃이 되겠느냐”. <em>누구나 소수</em>가 될 수 있다(외국에선 이주민, 언젠가 노인, 사고로 장애). <em>말하는 습관</em>('~충')부터 조심.</span></li>
-      <li><b>해결 (사회)</b><span>원인 세 개에 하나씩: 만남 감소 → <em>함께하는 활동</em>(<em>상호문화주의</em>), 알고리즘 → 혐오 콘텐츠 <em>추천 기준</em> 바꾸기, 경쟁 → 하나의 기준으로 <em>줄 세우지 않는</em> 제도.</span></li>
-      <li><b>결론</b><span>약함은 모두에게 있다. <em>먼저 이웃</em>이 되어 주는 태도 + 그게 가능한 사회가 <em>함께</em> 필요하다.</span></li>
-    </ol>
-    <h3>핵심 키워드</h3>
-    <div class="kw"><span>혐오의 일상화</span><span>누스바움</span><span>역겨움·수치심</span><span>낙인</span><span>지라르</span><span>모방 욕망 = 경쟁</span><span>희생양</span><span>알고리즘</span><span>선한 사마리아인</span><span>누구나 소수</span><span>상호문화주의</span><span>개인 + 사회</span></div>
-  </article>
-</main>
-
-<script>
-(() => {
-  let q = '1', v = 'me';
-  try { v = localStorage.getItem('hb-tab') || 'me' } catch (e) {}
-  const m = location.hash.match(/^#([qmk])([123])$/);
-  if (m) { q = m[2]; v = { m: 'me', q: 'book', k: 'memo' }[m[1]] }
-  function show() {
-    document.querySelectorAll('nav button').forEach(b => b.setAttribute('aria-selected', b.dataset.q === q));
-    document.querySelectorAll('.tabs button').forEach(b => b.setAttribute('aria-selected', b.dataset.v === v));
-    const id = { me: 'm', book: 'q', memo: 'k' }[v] + q;
-    document.querySelectorAll('main article').forEach(a => a.hidden = a.dataset.id !== id);
-    history.replaceState(null, '', '#' + id);
-    try { localStorage.setItem('hb-tab', v) } catch (e) {}
-  }
-  document.querySelectorAll('nav button').forEach(b => b.onclick = () => { q = b.dataset.q; show() });
-  document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => { v = b.dataset.v; show() });
-  show();
-})();
-</script>
+<header><a href="/">작업실</a></header>
+<form id="f">
+  <h1>잠긴 <b>페이지</b></h1>
+  <input id="pw" type="password" autocomplete="current-password" aria-label="비밀번호" placeholder="비밀번호" required autofocus>
+  <button id="go">열기</button>
+  <p id="msg" role="alert"></p>
+</form>
+<script src="/lock/gate.js"></script>
 </body>
 </html>
