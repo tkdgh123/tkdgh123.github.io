@@ -91,7 +91,7 @@ const AREAS = {
     spots: [["여의도한강공원", "walk", 50, { n: 1 }], ["더현대 서울", "shop", 70, { o: H(10) + 30, c: H(20), i: 1 }], ["여의도공원", "walk", 30, { n: 1 }]] },
   sinsa: { name: "신사·압구정", q: "가로수길", in: 1, food: 2, near: ["banpo"], season: [3, 12],
     spots: [["신사동 가로수길", "sight", 40, { n: 1, at: [37.5207, 127.0229] }], ["도산공원", "walk", 30, { n: 1 }], ["압구정로데오거리", "sight", 30, { n: 1 }]] },
-  hyehwa: { name: "혜화·대학로", q: "대학로", in: 0, food: 1, near: ["ikseon"], season: [5, 10, 11],
+  hyehwa: { name: "혜화·대학로", q: "대학로", play: ["소극장 연극"], in: 0, food: 1, near: ["ikseon"], season: [5, 10, 11],
     spots: [["마로니에공원", "walk", 20, { n: 1 }], ["낙산공원", "view", 40, { n: 1 }], ["이화마을", "sight", 30, { o: H(10), c: H(18) }]] },
   mullae: { name: "문래", q: "문래동", in: 1, food: 1, near: ["yeouido"], season: [5, 9],
     spots: [["문래창작촌", "sight", 40, { n: 1 }], ["선유도공원", "walk", 50, { o: H(6), c: H(24), n: 1 }], ["타임스퀘어", "shop", 60, { o: H(10) + 30, c: H(22), i: 1 }]] },
@@ -105,17 +105,39 @@ const AREAS = {
     spots: [["커먼그라운드", "shop", 40, { o: H(11), c: H(22) }], ["서울어린이대공원", "walk", 50, { o: H(5), c: H(22) }]] }
 };
 
+/* 동네별 추천 (2026-11): 기사·블로그 조사 + 카카오맵 별점·후기 + 네이버 최근 1달 글쓴이 수 + 유튜브·인스타, 광고 의심은 뺌.
+   [이름, 종류, 이유, 요즘 뜨는 곳이면 1, 위도, 경도, 카카오 ID, 분류] */
+const PICKS = {
+  banpo: [["육갑식당 서래마을직영점","meal","통창뷰와 계란찜 무한리필 고깃집",1,37.498122,126.998168,"27344652","육류,고기"],["미국식 방배본점","meal","줄 서는 토시살버거",0,37.489144,126.995114,"1233735165","햄버거"],["마얘","cafe","딱뜨오쇼콜라 추천",0,37.498918,126.997634,"26965232","디저트카페"],["르뺑아쎄르","dessert","프랑스 빵 테라스",0,37.496672,126.998104,"2052007459","제과,베이커리"],["반포한강공원 달빛광장","walk","강변·무지개분수",0,37.511355,126.997629,"7813554","광장"],["세빛섬","view","물 위 야경",0,37.512332,126.995889,"12322745","문화시설"]],
+  bukchon: [["오레노라멘 인사점","meal","진한 닭육수의 깔끔한 라멘",0,37.576457,126.984559,"1179567185","일본식라면"],["일월카츠 안국점","meal","히레카츠 추천",1,37.57734,126.985156,"1263230815","돈까스,우동"],["비움안국","meal","비움 김치볶음밥 추천",0,37.579082,126.98567,"1697703245","양식"],["잭잭 안국점","meal","한식",0,37.576515,126.984575,"1806869446","한식"],["도트블랭킷","cafe","아보카도파스타샐러드 추천",1,37.577026,126.984097,"320882660","카페"],["미완성식탁","dessert","제과·베이커리",0,37.57779,126.983936,"27373298","제과,베이커리"]],
+  euljiro: [["우래옥 본점","meal","평양냉면 대표 노포",0,37.568212,126.998719,"8025375","냉면"],["이멜다분식","meal","분식",1,37.56805,126.995368,"773937767","분식"],["진작","meal","후토마끼 추천",0,37.564018,126.990838,"2029456983","일식"],["동경우동","meal","튀김우동 추천",1,37.56523,126.99296,"8264592","돈까스,우동"],["종로계림닭도리탕 본점","meal","닭도리탕(소) 추천",0,37.570158,126.994503,"8758064","종로계림닭도리탕"],["수잔나의앞치마","cafe","피콜로라떼 크림쇼콜라 추천",1,37.563305,126.99961,"1254228746","카페"],["알렉스룸","cafe","을지로 바이브 라떼 추천",0,37.566125,126.994711,"1030825495","카페"],["커피한약방","cafe","한약방 개조 레트로",0,37.566564,126.988602,"1440347564","커피전문점"]],
+  hannam: [["고다이","meal","생양갈비(200g) 추천",1,37.534606,127.008791,"1543749471","육류,고기"],["이태리국시 한남","meal","숯불대창돌솥파스타 추천",0,37.535702,126.999594,"1563450232","양식"],["아따","meal","케이크 반입 가능",1,37.537705,127.003081,"292115046","이탈리안"],["맥심플랜트","cafe","카페",0,37.53699,127.000997,"711864705","카페"],["레종데트르 한남","cafe","디저트카페",1,37.537194,127.00146,"1623804721","디저트카페"],["르솔레이","dessert","제과·베이커리",1,37.537127,127.001831,"1161755224","제과,베이커리"],["파티세리 뮤흐","dessert","제과·베이커리",1,37.534669,127.00525,"468658415","제과,베이커리"],["야키토리고우","bar","꼬치 3천원대 야키토리",0,37.534886,126.992782,"19723946","일본식주점"],["경리단길","walk","언덕 골목 빈티지 산책",0,37.539758,126.991722,"22730592","테마거리"]],
+  hyehwa: [["핏제리아오","meal","감베리 로제 크레마 추천",0,37.582098,127.004376,"21555096","피자"],["봉쥬떡볶이","meal","버터갈릭감자튀김 세트 추천",1,37.58381,127.001177,"27510351","떡볶이"],["청년밥상문간 슬로우점","meal","김치찌개 추천",0,37.582593,127.004512,"398943713","찌개,전골"],["정돈 대학로점","meal","바삭촉촉 정통 일식 돈까스",0,37.581789,127.001095,"27306859","돈까스,우동"],["서래향 대학로점","meal","유린기 추천",0,37.581198,127.003621,"297814026","중국요리"],["학림다방","cafe","대학로 최고참 다방",1,37.58195,127.001657,"8143287","카페"],["밀곳간 본점","dessert","빵 좋아하면 대안",0,37.594113,126.999338,"65305259","제과,베이커리"],["히어로보드 게임카페 대학로점","play","혜화역 앞 보드게임",0,37.581615,127.002808,"1525847477","보드카페"],["이화동 벽화마을","walk","벽화 골목 오르는 길",0,37.577976,127.007102,"25039734","관광,명소"],["마로니에공원","walk","버스킹·거리공연 광장",0,37.580289,127.002826,"10353868","도시근린공원"],["낙산공원","view","성곽길 낙조·야경",0,37.58057,127.007522,"8253524","도시근린공원"]],
+  ikseon: [["오죽이네","meal","닭매운탕(대) 추천",0,37.573758,126.990804,"16734831","닭요리"],["지오쿠치나 익선점","meal","고르게리따 추천",1,37.573687,126.990033,"1354467190","양식"],["엘까르니따스 익선점","meal","파히타플래터 추천",1,37.573223,126.989416,"242454137","멕시칸,브라질"],["플리퍼스 익선점","cafe","디저트카페",0,37.57308,126.99012,"1959516004","디저트카페"],["레인리포트 레인보우","cafe","한옥 속 무지개 비 내리는 카페",1,37.57343,126.990106,"1620441418","카페"],["스탠다드브레드 익선","cafe","디저트카페",0,37.57379,126.989948,"527221713","디저트카페"],["청수당 베이커리","dessert","수플레 카스텔라 핸드드립",0,37.573881,126.989785,"78911659","디저트카페"],["미완성식탁","dessert","제과·베이커리",0,37.57779,126.983936,"27373298","제과,베이커리"],["익선동한옥거리","walk","한옥 골목 산책 코스",0,37.573437,126.989776,"467710256","테마거리"]],
+  jamsil: [["진작 잠실점","meal","돈토로동 추천",1,37.512291,127.098301,"803844455","일식"],["청국장과보리밥 잠실점","meal","구수한 청국장과 건강한 보리밥",0,37.504469,127.086116,"22513020","한식"],["토마루해물칼국수","meal","손수 빚은 얇은 만두와 칼국수",0,37.505897,127.084819,"13582223","칼국수"],["진지아","meal","마라 중국가정식",1,37.50758,127.108247,"219797863","중국요리"],["뷰클런즈","cafe","우드톤 조용한 카페",1,37.508354,127.109585,"244820280","커피전문점"],["효모","dessert","제과·베이커리",1,37.509013,127.084184,"1919299021","제과,베이커리"],["머더파커 WOW잠실점","play","방탈출카페",0,37.5135,127.108337,"1796437751","방탈출카페"],["석촌호수 서호","walk","호수 한 바퀴 산책",0,37.507681,127.099113,"7947003","호수"]],
+  kondae: [["기름칠","meal","삼겹살",1,37.542316,127.070368,"1173821572","삼겹살"],["탄토탄토","meal","하우스스테이크 추천",0,37.54251,127.070741,"192485759","양식"],["우마이도 건대점","meal","혼밥도 편안한 진한 돈코츠 라멘",0,37.543041,127.071689,"8029124","일본식라면"],["송림식당","meal","추억 담긴 진한 선지해장국과 불백",1,37.536688,127.076405,"7963415","기사식당"],["릴리베이커리","dessert","놀라운 토요일 소개",0,37.542963,127.070717,"39192828","제과,베이커리"],["히어로보드게임카페 건대본점","play","300종 보드게임",0,37.543443,127.069998,"1232273833","히어로보드게임카페"],["황금열쇠 건대점","play","방탈출카페",0,37.541432,127.068453,"1271584354","방탈출카페"],["뚝섬한강공원","walk","강변 산책·돗자리",0,37.529297,127.068921,"8136085","도시근린공원"]],
+  mangwon: [["헤키","meal","히레카츠 추천",0,37.555241,126.90979,"1226420399","일식"],["산볼","meal","와규 로스트비프동 추천",1,37.553869,126.906388,"351203677","일식"],["육장","meal","육개장 추천",1,37.553913,126.905502,"64633006","국밥"],["소금집델리 망원","meal","겹겹이 쌓인 수제햄 샌드위치",0,37.556824,126.908236,"256064588","샌드위치"],["레이키친","meal","감바스 파스타 추천",0,37.552955,126.906237,"54314344","양식"],["평형","cafe","히비스커스 추천",1,37.55562,126.904603,"2131106327","카페"],["포트레이트 커피바","cafe","카페",1,37.556534,126.906508,"1291730987","카페"],["피피커피","cafe","고즈넉한 골목의 융드립 커피",0,37.552251,126.905049,"20620718","커피전문점"],["밀로밀","dessert","바게트 소금빵 3천원",1,37.552878,126.904499,"1917968704","제과,베이커리"],["블랑제리코팡","dessert","생활의 달인 소개",1,37.554914,126.90049,"1251590315","제과,베이커리"],["라바즈","dessert","프렌치 에끌레어 테이크아웃",1,37.554994,126.909425,"783754308","제과,베이커리"],["망원시장","walk","먹거리 1만원 투어",0,37.555886,126.906266,"18526234","시장"],["망원한강공원","walk","시장 음식 들고 피크닉",0,37.551725,126.900028,"8126939","도시근린공원"]],
+  mullae: [["아나텔로판","meal","마르게리타 추천",1,37.513346,126.892369,"1501752665","피자"],["이치니이치","meal","12시간 우려낸 깊은 닭육수 라멘",1,37.514453,126.894199,"10556324","일본식라면"],["양키스그릴 문래점","meal","트러플화이트라구파스타 추천",1,37.514742,126.89497,"2137063082","스테이크,립"],["바이닐인사이드","cafe","바이시그니처라떼 추천",1,37.514372,126.891997,"418405990","디저트카페"],["아도 티하우스","cafe","전통찻집",0,37.513045,126.894765,"1637094739","전통찻집"],["입허전","dessert","제과·베이커리",1,37.513934,126.892635,"949771323","제과,베이커리"]],
+  namsan: [["데칼코마니","meal","꿀마늘 대구·파스타",1,37.545272,126.9849,"1915089772","양식"],["팟카파우","meal","태국 셰프 바질 덮밥",1,37.545192,126.984859,"2141862994","태국음식"],["타코스탠드","meal","테라스 있는 멕시칸 타코",0,37.541425,126.987248,"1312716777","멕시칸,브라질"],["르몽블랑","cafe","디저트카페",1,37.544879,126.984855,"1316697633","디저트카페"],["개방 해방촌점","cafe","버터떡 (3pcs) 추천",1,37.545242,126.984648,"1240741859","카페"],["언뎁트","cafe","적산가옥 카페+소품샵",1,37.546214,126.976698,"941538435","커피전문점"],["신흥시장","walk","야장 깔린 레트로 시장",1,37.545315,126.984991,"25043156","시장"],["108하늘계단","walk","서울미래유산 계단 산책",0,37.546446,126.98189,"20992450","관광,명소"],["N서울타워","view","야경 + 자물쇠 데이트",0,37.551305,126.988231,"1629378951","전망대"]],
+  samseong: [["동어 동락 삼성2호점","meal","깐 생새우회 추천",1,37.508377,127.05853,"1883427320","해물,생선"],["이치규 본점","meal","직접 구워 즐기는 일본식 규카츠",1,37.505701,127.058622,"1406873213","일식"],["허머스키친 삼성점","meal","후무스·샥슈카",0,37.509344,127.061432,"2022806150","아시아음식"],["동어동락 삼성본점","meal","가을 전어회 추천",1,37.508812,127.056408,"1751054299","회"],["포스톤즈 삼성점","cafe","아메리카노 추천",1,37.509793,127.064085,"2124768638","카페"],["별마당도서관 스타필드코엑스몰","walk","13m 책장 무료 구경",0,37.510193,127.060159,"2104663194","도서관"],["대한불교조계종 봉은사","walk","도심 속 사찰 산책",0,37.515518,127.05771,"8373155","절,사찰"]],
+  seochon: [["뼈탄집","meal","숙성육의 깊은 풍미와 전문 그릴링",0,37.576418,126.971665,"1993931194","육류,고기"],["김진목삼 2호점","meal","통목살 추천",1,37.576906,126.97203,"1442254819","육류,고기"],["라파리나","cafe","소금 베이글 추천",1,37.579966,126.971555,"320328582","카페"],["미드메","cafe","프랑스식 빵·테라스",1,37.579267,126.971736,"864262498","제과,베이커리"],["금상고로케 서촌마을점","dessert","바삭함과 치즈가 어우러진 고로케",1,37.579542,126.969648,"26839488","제과,베이커리"],["애소아소금빵","dessert","초코소금빵4 추천",0,37.576725,126.972231,"155896679","제과,베이커리"],["서울은마꽈배기","dessert","설탕 듬뿍 쫄깃한 찹쌀 꽈배기",1,37.576849,126.972613,"1077729968","제과,베이커리"],["경복궁","walk","고궁 산책 데이트",0,37.577613,126.976898,"18619553","고궁,궁"]],
+  seongsu: [["이태리국시 성수","meal","숯불불고기쌈피자 추천",0,37.546058,127.046723,"780776735","양식"],["누메로도스","meal","아마트리치아나 추천",1,37.546357,127.047361,"142054376","이탈리안"],["어반누크","cafe","아메리카노 추천",0,37.546743,127.043325,"1883661279","카페"],["뺑드에코","dessert","천연효모로 빚은 건강한 사워도우",0,37.542267,127.049042,"304432238","제과,베이커리"],["밀도 성수본점","dessert","담백식빵 추천",1,37.546239,127.044879,"27300932","제과,베이커리"],["성수베이킹스튜디오","dessert","유 퀴즈 온 더 블럭 소개",1,37.546185,127.043759,"799001769","제과,베이커리"],["서울숲","walk","잔디밭 산책·자전거",0,37.544322,127.037618,"11331488","도시근린공원"]],
+  sinsa: [["인딕슬로우","meal","프라운 아보카도 사그 추천",1,37.521859,127.020348,"1104467407","인도음식"],["이태리국시 도산","meal","동서양이 어우러진 퓨전 양식",0,37.525594,127.034959,"1136678146","양식"],["소각","meal","런치마라샹궈 추천",0,37.519581,127.020118,"1947749247","중국요리"],["까폼 본점","meal","태국음식",0,37.524857,127.037993,"558503389","태국음식"],["동인동","meal","갈비",0,37.518078,127.020393,"7847225","갈비"],["마일스톤커피","cafe","플랫화이트 추천",0,37.521851,127.02433,"22549791","커피전문점"],["따우전드 신사점","cafe","바나나크림파이 추천",1,37.520594,127.021366,"1363607100","카페"],["올드페리도넛 가로수길점","dessert","가로수길 도넛",1,37.520723,127.021293,"700133104","도넛"],["에뚜왈 가로수길점","dessert","마들렌 레몬 추천",1,37.521315,127.022222,"431521088","제과,베이커리"],["압구정로데오거리","shop","편집숍·플리마켓",0,37.526756,127.039152,"7990409","테마거리"],["하이스트리트이탈리아","shop","디자인·리빙 구경",0,37.522554,127.02238,"1082459907","문화시설"]],
+  yeonnam: [["서양면옥 연남","meal","재훈이자냐 추천",0,37.560941,126.925726,"2036858666","양식"],["소이연남","meal","소고기 쌀국수 추천",0,37.563514,126.925388,"25479306","태국음식"],["동차밥","meal","생연어 덮밥 추천",0,37.561379,126.926358,"26089191","일식"],["연교","meal","우육탕 추천",0,37.561605,126.926671,"934767425","중국요리"],["566라멘","meal","진한 기름진 맛의 지로라멘",0,37.560563,126.920881,"1235914986","일본식라면"],["일기","cafe","후추 프렌치 토스트 추천",0,37.565178,126.923228,"1889411038","카페"],["조앤도슨","cafe","카페",1,37.563646,126.923197,"43859487","카페"],["치플레","dessert","제과·베이커리",1,37.562819,126.92564,"852129186","제과,베이커리"],["리틀빅토리","dessert","제과·베이커리",0,37.560784,126.925739,"1963942486","제과,베이커리"],["피오니 연남점","dessert","딸기생크림 1호 추천",0,37.564433,126.919945,"22446604","제과,베이커리"],["히어로보드게임카페 홍대2호점","play","시간제 보드게임",0,37.555349,126.922703,"205320302","히어로보드게임카페"]],
+  yeouido: [["폴앤폴리나 여의도점","dessert","담백함이 빛나는 건강한 식사빵",1,37.521062,126.924028,"17079438","제과,베이커리"],["브레드피트","dessert","우유 크림빵 추천",1,37.520206,126.9318,"27545464","제과,베이커리"],["클라르테 반지공방 여의도점","play","미술·공예",0,37.52623,126.931053,"1904269646","미술,공예"],["더현대 서울","shop","팝업 순회 코스",0,37.525872,126.928446,"1662602781","현대백화점"],["여의도한강공원","walk","잔디밭 피크닉",0,37.526389,126.935129,"10952963","도시근린공원"]],
+  yongsan: [["능동미나리 신용산점","meal","능동 미나리 곰탕 추천",0,37.530092,126.97082,"596181447","곰탕"],["버뮤다삼각지","meal","폭립플래터 추천",1,37.531972,126.972349,"26925620","멕시칸,브라질"],["심퍼티쿠시 용산점","meal","차돌 고사리 오일 파스타 추천",1,37.532189,126.972075,"1740706159","양식"],["헤비사이드","cafe","바닐라 프렌치 토스트 추천",1,37.533414,126.972324,"40101863","카페"],["티에이알티","cafe","디저트카페",1,37.531671,126.973018,"757834218","디저트카페"],["아이파크몰 용산점","play","닌텐도·덕질 체험 몰",1,37.528817,126.964533,"7990380","복합쇼핑몰"],["용리단길","walk","신용산~삼각지 골목",0,37.531451,126.972204,"1351263673","테마거리"]]
+};
+const PICK_AS = { brunch: ["dessert"], sight: ["shop"] };
+
 /* 종류: 이름, 머무는 분, 카카오 검색어(없으면 동네 명소만) */
 const TYPES = {
-  meal: ["식사", 70, ["맛집"]], brunch: ["브런치", 60, ["브런치"]], cafe: ["카페", 60, ["카페", "디저트카페"]],
-  dessert: ["디저트", 40, ["디저트", "베이커리"]], walk: ["산책", 50], sight: ["구경", 40], show: ["전시", 80, ["전시"]],
-  play: ["체험", 90, ["공방", "원데이클래스"]], shop: ["소품샵", 50, ["소품샵", "편집샵"]], view: ["야경", 40],
-  bar: ["한잔", 80, ["와인바", "이자카야", "술집"]], pick: ["가고 싶은 곳", 40]
+  meal: ["식사", 60, ["맛집"]], brunch: ["브런치", 50, ["브런치", "베이글"]], cafe: ["카페", 50, ["카페", "디저트카페"]],
+  dessert: ["디저트", 30, ["디저트", "베이커리", "소금빵"]], walk: ["산책", 40], sight: ["구경", 30], show: ["전시·팝업", 50, ["팝업스토어", "전시"]],
+  play: ["놀거리", 60, ["방탈출", "보드게임카페", "오락실", "코인노래방", "공방", "만화카페"]], photo: ["사진", 20, ["인생네컷", "포토이즘", "포토그레이", "셀프사진관"]],
+  shop: ["소품샵", 40, ["소품샵", "편집샵"]], view: ["야경", 30], bar: ["한잔", 70, ["포차", "요리주점", "이자카야"]], pick: ["가고 싶은 곳", 40]
 };
-const ICON = { meal: "🍽️", brunch: "🥞", cafe: "☕", dessert: "🍰", walk: "🌳", sight: "👀", show: "🖼️", play: "🎨", shop: "🛍️", view: "🌃", bar: "🍷", pick: "💗" };
-const PREFS = [["meal", "맛집"], ["cafe", "카페"], ["walk", "산책"], ["show", "전시"], ["play", "체험"], ["shop", "구경"], ["view", "야경"], ["bar", "한잔"]];
-const KINDS = [[150, "가벼운 데이트"], [300, "반나절 데이트"], [510, "긴 데이트"], [9999, "하루 종일 데이트"]];
-const kindOf = (len, from) => len > 150 && from >= H(17) && len <= 420 ? "저녁 데이트" : KINDS.find(([m]) => len <= m)[1];
+const ICON = { meal: "🍽️", brunch: "🥯", cafe: "☕", dessert: "🍰", walk: "🌳", sight: "👀", show: "✨", play: "🎲", photo: "📸", shop: "🛍️", view: "🌃", bar: "🍻", pick: "💗" };
+const PREFS = [["meal", "맛집"], ["cafe", "카페·디저트"], ["play", "놀거리"], ["photo", "인생네컷"], ["walk", "산책"], ["shop", "소품샵"], ["show", "팝업·전시"], ["view", "야경"], ["bar", "한잔"]];
 const CHAIN = /스타벅스|투썸|이디야|메가MGC|메가커피|컴포즈|빽다방|할리스|파스쿠찌|커피빈|폴바셋|엔제리너스|맥도날드|버거킹|롯데리아|KFC|맘스터치|서브웨이|김밥천국|본죽|파리바게뜨|뚜레쥬르|배스킨|던킨|CU |GS25|세븐일레븐|이마트24|다이소|올리브영|교촌|BBQ|bhc|굽네|노랑통닭|백다방|더벤티|공차|설빙/;
 
 /* ---------- 상태 ---------- */
@@ -163,6 +185,33 @@ async function kSearch(query, at, radius = 2000) {
   searchCache.set(key, out);
   return out;
 }
+async function kStation(at) {
+  const k = await kakaoReady();
+  const ps = new k.maps.services.Places();
+  const r = await new Promise(ok => ps.categorySearch("SW8", (d, st) => ok(st === k.maps.services.Status.OK ? d : []),
+    { location: new k.maps.LatLng(at.lat, at.lng), radius: 1500, sort: k.maps.services.SortBy.DISTANCE }));
+  return r[0] ? { name: r[0].place_name.split(" ")[0], lat: +r[0].y, lng: +r[0].x } : null;
+}
+const meetKey = s => `${s.lat.toFixed(5)},${s.lng.toFixed(5)}`;
+async function meetOf(first) {
+  const st = await kStation(first).catch(() => null);
+  return st ? { ...st, min: Math.max(1, Math.round(dist(st, first) * 1.3 / 70)), for: meetKey(first) } : null;
+}
+/* 첫 장소가 바뀌면 만나는 역도 다시 */
+const meetBusy = new Set();
+async function ensureMeet(c) {
+  const f = c.stops[0]; if (!f) return;
+  const key = meetKey(f);
+  if (c.meet?.for === key || meetBusy.has(key)) return;
+  meetBusy.add(key);
+  const m = await meetOf(f);
+  meetBusy.delete(key);
+  if (!m || c.stops[0] !== f) return;
+  c.meet = m;
+  if (S.view !== "draft" && c.id) updateDoc(ref("courses", c.id), { meet: m }).catch(() => {});
+  if (viewCourse() === c) renderCourse();
+}
+
 /* 동네 명소 좌표(한 번 찾으면 기기에 저장) */
 const ANCHOR_KEY = "urigil-anchors";
 const anchors = store.get(ANCHOR_KEY) || {};
@@ -261,25 +310,42 @@ function chooseArea(date, from, to, prefs, wet) {
 }
 
 const opensAt = (o, t, stay, wd) => (o.off === undefined || o.off !== wd) && (o.o ?? 0) <= t && t + Math.min(stay, 40) <= (o.c ?? H(26));
-const HOURS = { meal: [H(11), H(21)], brunch: [H(9), H(15)], cafe: [H(10), H(22)], dessert: [H(11), H(22)], show: [H(10), H(19)],
-                play: [H(11), H(20)], shop: [H(11), H(21)], bar: [H(17), H(26)] };
+const HOURS = { meal: [H(11), H(21)], brunch: [H(9), H(15)], cafe: [H(10), H(22)], dessert: [H(11), H(22)], show: [H(11), H(20)],
+                play: [H(11), H(23)], photo: [H(9), H(26)], shop: [H(11), H(21)], bar: [H(17), H(26)] };
 
+async function fromPicks(type, ctx, t) {
+  const hrs = HOURS[type];
+  if (hrs && (t < hrs[0] || t + 20 > hrs[1])) return null;
+  const want = [type, ...(PICK_AS[type] || [])];
+  const center = ctx.pos || await areaPos(ctx.area);
+  const found = (PICKS[ctx.area] || []).filter(x => want.includes(x[1]) && !ctx.used.has(x[0]) && !ctx.used.has(x[6])
+    && (!center || dist(center, { lat: x[4], lng: x[5] }) <= (ctx.pos ? 1500 : 3000)));
+  if (!found.length) return null;
+  const wt = x => (x[3] ? 1.3 : 1) / (1 + (ctx.pos ? dist(ctx.pos, { lat: x[4], lng: x[5] }) / 700 : 0));
+  let r = Math.random() * found.reduce((s2, x) => s2 + wt(x), 0), x = found[0];
+  for (const f of found) if ((r -= wt(f)) <= 0) { x = f; break; }
+  ctx.used.add(x[0]); ctx.used.add(x[6]); ctx.used.add(x[0].replace(/\s/g, ""));
+  return { id: x[6], name: x[0], lat: x[4], lng: x[5], url: `https://place.map.kakao.com/${x[6]}`, addr: "", cat: x[7], g: "",
+           stay: TYPES[type][1], why: x[2], hot: !!x[3] };
+}
 async function findPlace(type, ctx, t) {
+  const picked = await fromPicks(type, ctx, t);
+  if (picked) return picked;
   const area = AREAS[ctx.area], wd = parse(ctx.date).getDay(), dark = t >= ctx.sun;
   const pool = type === "view" ? [area, ...area.near.map(n => AREAS[n])].flatMap(a => a.spots) : area.spots;
   let spots = pool.filter(s => (s[1] === type || (type === "view" && s[1] === "walk" && s[3].n))
     && !ctx.used.has(s[0]) && !ctx.used.has(s[3].label) && opensAt(s[3], t, s[2], wd) && (!dark || s[3].n || s[3].i));
   if (spots.length) {
     const far = type === "view" ? 3000 : 1600;
-    const found = (await Promise.all(spots.map(s => anchor(s).then(p => p && { p, s })))).filter(x => x && (!ctx.pos || dist(ctx.pos, x.p) <= far));
+    const found = (await Promise.all(spots.map(s => anchor(s).then(p => p && { p, s })))).filter(x => x && !ctx.used.has(x.p.id) && !ctx.used.has(x.p.name.replace(/\s/g, "")) && (!ctx.pos || dist(ctx.pos, x.p) <= far));
     if (found.length) {
       const near = ctx.pos ? found.sort((x, y) => dist(ctx.pos, x.p) - dist(ctx.pos, y.p)) : found.sort(() => Math.random() - .5);
       const { p, s } = near[0];
-      ctx.used.add(s[0]); ctx.used.add(p.name);
+      ctx.used.add(s[0]); ctx.used.add(p.name); ctx.used.add(p.name.replace(/\s/g, "")); if (p.id) ctx.used.add(p.id);
       return { ...p, stay: s[2], name: p.name };
     }
   }
-  const words = TYPES[type][2];
+  const words = type === "play" && area.play ? [...TYPES[type][2], ...area.play] : TYPES[type][2];
   if (!words) return null;
   const hrs = HOURS[type];
   if (hrs && (t < hrs[0] || t + 30 > hrs[1])) return null;
@@ -297,14 +363,15 @@ async function findPlace(type, ctx, t) {
 function fits(type, p) {
   const c = p.cat;
   switch (type) {
-    case "meal": return p.g === "FD6" && !/술집|카페|간식|제과/.test(c);
+    case "meal": return p.g === "FD6" && !/술집|카페|간식|제과|뷔페|코스요리|오마카세/.test(c);
     case "brunch": return (p.g === "FD6" || p.g === "CE7") && !/술집|주점/.test(c);
-    case "cafe": return p.g === "CE7";
-    case "dessert": return p.g === "CE7" || /간식|제과|디저트|베이커리/.test(c);
-    case "bar": return /술집|와인|이자카야|바$|칵테일|요리주점|호프/.test(c) || /와인|바 /.test(p.name);
-    case "show": return p.g === "CT1" || /전시|미술관|갤러리|문화/.test(c);
-    case "play": return p.g !== "FD6" && p.g !== "CE7" && /공방|체험|클래스|만들기|원데이|캐리커|향수|반지/.test(c + p.name) && !/화랑|갤러리|미술관|전시/.test(c);
-    case "shop": return p.g !== "FD6" && p.g !== "CE7" && (/소품|생활용품|잡화|문구|선물|인테리어|편집/.test(c) || /소품|편집|문구/.test(p.name)) && !/신발|의류|안경/.test(c);
+    case "cafe": return p.g === "CE7" && !/여가시설|만화|보드/.test(c);
+    case "dessert": return (p.g === "CE7" || /간식|제과|디저트|베이커리|도넛|아이스크림/.test(c)) && !/여가시설/.test(c);
+    case "bar": return /포장마차|요리주점|호프|이자카야|일본식주점|술집/.test(c) && !/와인|칵테일|바$/.test(c);
+    case "show": return /팝업스토어|전시|미술관|박물관|문화시설/.test(c) && !/갤러리|화랑/.test(c + p.name);
+    case "play": return /여가시설|방탈출|보드카페|오락실|노래방|만화카페|공방|미술,공예|볼링|체험|연극극장/.test(c) && !/화랑|갤러리|화방/.test(c);
+    case "photo": return /즉석사진|셀프사진|셀프스튜디오/.test(c);
+    case "shop": return p.g !== "FD6" && p.g !== "CE7" && (/소품|생활용품|잡화|문구|선물|인테리어|편집|팝업/.test(c) || /소품|편집|문구/.test(p.name)) && !/신발|의류|안경/.test(c);
     default: return true;
   }
 }
@@ -314,6 +381,7 @@ async function areaPos(id) {
 }
 
 function pickType(ctx, t, rem, last) {
+  const no = k => ctx.no.has(k) && t - ctx.no.get(k) < 90;
   const P = ctx.prefs, has = p => P.includes(p), sinceRest = t - ctx.restAt;
   if (!ctx.lunch && t >= H(11) + 30 && t < H(14) && rem >= 55) return "meal";
   if (!ctx.dinner && t >= H(17) + 30 && t < H(20) + 30 && rem >= 55) return "meal";
@@ -322,24 +390,27 @@ function pickType(ctx, t, rem, last) {
   if (has("view") && !ctx.view && rem >= 30 && t >= ctx.sun + 15 && t < H(23) && (!barOk || rem >= 110)) return "view";
   if (barOk) return "bar";
   if (t >= H(23) + 30) return null;
-  if (t < H(21) + 30 && ctx.cafes < 2 && !ctx.no.has("cafe") && !(last === "cafe" || last === "dessert")
+  if (t < H(21) + 30 && ctx.cafes < 2 && !ctx.bar && !no("cafe") && !(last === "cafe" || last === "dessert")
       && (last === "meal" ? ctx.cafes === 0 || sinceRest >= 150 : (ctx.cafes === 0 && rem <= 100 && last !== "brunch") || sinceRest >= 170))
     return ctx.cafes && !ctx.dessert ? "dessert" : "cafe";
+  if (has("photo") && !ctx.count.photo && t - ctx.from >= 80 && rem >= 45 && last !== "photo" && !no("photo") && Math.random() < .5) return "photo";
   const untilMeal = !ctx.lunch && t < H(11) + 30 && ctx.to >= H(13) ? H(11) + 50 - t : !ctx.dinner && t < H(17) + 30 && ctx.to >= H(19) ? H(17) + 50 - t : 999;
-  const w = { walk: 1, sight: .9, show: .55, play: .45, shop: .55 };
+  const w = { walk: .9, sight: .6, show: .35, play: 1, shop: .6 };
   for (const k in w) {
     if (has(k === "sight" ? "shop" : k)) w[k] *= 3;
     if (ctx.wet) w[k] *= k === "walk" || k === "sight" ? .15 : 2;
-    if ((ctx.count[k] || 0) >= (k === "walk" && ctx.len > 420 ? 2 : 1) || k === last || ctx.no.has(k)) w[k] = 0;
-    if ((k === "show" || k === "play") && (rem < 70 || untilMeal < 75)) w[k] = 0;
+    if ((ctx.count[k] || 0) >= (k === "walk" && ctx.len > 420 ? 2 : 1) || k === last || no(k)) w[k] = 0;
+    if (k === "play" && (ctx.count.play || 0) < (ctx.len > 420 ? 2 : 1) && k !== last && !no(k)) w[k] = has("play") ? 3 : 1;
+    if ((k === "show" || k === "play") && (rem < 60 || untilMeal < 65)) w[k] = 0;
   }
   const sum = Object.values(w).reduce((s, v) => s + v, 0);
   if (sum > 0) {
     let r = Math.random() * sum;
     for (const [k, v] of Object.entries(w)) if ((r -= v) <= 0) return k;
   }
-  if (t < H(21) + 30 && ctx.cafes < 2 && last !== "cafe" && !ctx.no.has("cafe")) return "cafe";
-  if (!ctx.dessert && t < H(21) && last !== "dessert" && !ctx.no.has("dessert")) return "dessert";
+  if (t < H(21) + 30 && ctx.cafes < 2 && !ctx.bar && last !== "cafe" && !no("cafe")) return "cafe";
+  if (!ctx.dessert && t < H(21) && last !== "dessert" && !no("dessert")) return "dessert";
+  if (has("photo") && !ctx.count.photo && !no("photo") && last !== "photo") return "photo";
   return null;
 }
 
@@ -347,8 +418,8 @@ async function plan({ date, from, to, prefs, area: chosen, replaces }) {
   const len = to - from, w = await weather(date, from, to);
   const area = chosen || chooseArea(date, from, to, prefs, w?.wet);
   const a2 = len >= 420 && !chosen ? pick(AREAS[area].near) : null;
-  const ctx = { date, area, prefs, wet: !!w?.wet, sun: sunset(date), used: new Set(), count: {}, no: new Set(),
-                lunch: from >= H(14), dinner: from >= H(20) + 30, cafes: 0, restAt: from, pos: null, len, to };
+  const ctx = { date, area, prefs, wet: !!w?.wet, sun: sunset(date), used: new Set(), count: {}, no: new Map(),
+                lunch: from >= H(14), dinner: from >= H(20) + 30, cafes: 0, restAt: from, pos: null, len, to, from };
   const stops = [], legs = [];
   let t = from, last = null, switched = !a2, guard = 0;
   while (guard++ < 24) {
@@ -360,7 +431,7 @@ async function plan({ date, from, to, prefs, area: chosen, replaces }) {
     const type = pickType(ctx, t, rem, last);
     if (!type) break;
     const p = await findPlace(type, ctx, t);
-    if (!p) { ctx.no.add(type); if (type === "meal") ctx[t < H(15) ? "lunch" : "dinner"] = true; if (type === "brunch") ctx.lunch = true;
+    if (!p) { ctx.no.set(type, t); if (type === "meal") ctx[t < H(15) ? "lunch" : "dinner"] = true; if (type === "brunch") ctx.lunch = true;
               if (type === "view") ctx.view = true; if (type === "bar") ctx.bar = true; continue; }
     const leg = ctx.pos ? legOf(ctx.pos, p) : null;
     const at = leg ? r5(t + leg.min) : t;
@@ -371,7 +442,7 @@ async function plan({ date, from, to, prefs, area: chosen, replaces }) {
     }
     if (stay < Math.min(25, p.stay)) break;
     stay = Math.round(stay / 5) * 5;
-    stops.push({ id: p.id || "", name: p.name, type, lat: p.lat, lng: p.lng, url: p.url || "", addr: p.addr || "", cat: (p.cat || "").split(">").pop().trim(), t: at, stay, likes: {} });
+    stops.push({ id: p.id || "", name: p.name, type, lat: p.lat, lng: p.lng, url: p.url || "", addr: p.addr || "", cat: (p.cat || "").split(">").pop().trim(), why: p.why || "", hot: !!p.hot, t: at, stay, likes: {} });
     legs.push(leg);
     ctx.count[type] = (ctx.count[type] || 0) + 1;
     if (type === "meal") { ctx[at < H(15) ? "lunch" : "dinner"] = true; ctx.restAt = at + stay; ctx.lastCat = stops.at(-1).cat; }
@@ -382,7 +453,8 @@ async function plan({ date, from, to, prefs, area: chosen, replaces }) {
     if (type === "walk" && at >= ctx.sun) ctx.view = true;
     ctx.pos = p; last = type; t = at + stay;
   }
-  return { date, from, to, kind: kindOf(len, from), area, area2: a2 && switched ? a2 : null,
+  const meet = stops[0] ? await meetOf(stops[0]) : null;
+  return { date, from, to, meet, area, area2: a2 && switched ? a2 : null,
            prefs, picked: chosen || null, weather: w?.label || "", stops, legs, replaces: replaces || null };
 }
 
@@ -404,7 +476,7 @@ async function swapStop(c, i) {
   let p = await findPlace(type, ctx, s.t);
   if (!p && type === "view") p = await findPlace("walk", ctx, s.t);
   if (!p) return false;
-  c.stops[i] = { ...s, id: p.id || "", name: p.name, lat: p.lat, lng: p.lng, url: p.url || "", addr: p.addr || "", cat: (p.cat || "").split(">").pop().trim(), likes: {} };
+  c.stops[i] = { ...s, id: p.id || "", name: p.name, lat: p.lat, lng: p.lng, url: p.url || "", addr: p.addr || "", cat: (p.cat || "").split(">").pop().trim(), why: p.why || "", hot: !!p.hot, likes: {} };
   retime(c);
   return true;
 }
@@ -422,7 +494,7 @@ function renderHead() {
   if (n) {
     const left = diff(today(), n.date);
     $("hD").textContent = left ? `D-${left}` : "D-DAY";
-    $("hNext").textContent = left ? `${mdw(n.date)} · ${AREAS[n.area]?.name} ${n.kind}` : `${hm(n.from)}부터 ${AREAS[n.area]?.name} ${n.kind}`;
+    $("hNext").textContent = left ? `${mdw(n.date)} · ${AREAS[n.area]?.name}` : `오늘 ${hm(n.from)} · ${AREAS[n.area]?.name}`;
   } else {
     const st = S.info.start, d = st ? diff(st, today()) + 1 : 0;
     $("hD").textContent = d > 0 ? `D+${d}` : "우리길";
@@ -447,7 +519,7 @@ function renderCal() {
 }
 function courseCard(c) {
   return `<button type="button" class="ccard${c.done ? " done" : ""}" data-c="${c.id}">
-    <span class="cc-top"><b>${esc(areaName(c))}</b><span class="kpill">${c.kind}</span></span>
+    <b class="cc-top">${esc(areaName(c))}</b>
     <small>${mdw(c.date)} · ${hm(c.from)}–${hm(c.to)} · ${c.stops.length}곳${c.done ? " · 다녀옴" : ""}</small>
     <span class="cc-icons">${c.stops.map(s => ICON[s.type]).join("")}</span></button>`;
 }
@@ -493,7 +565,8 @@ function renderCourse() {
   const walkM = c.legs.reduce((s, l) => s + (l?.mode === "walk" ? l.m : 0), 0);
   head.innerHTML = `<div class="chead"><small>${mdw(c.date)}요일 · ${hm(c.from)}–${hm(c.to)}</small>
     <h2>${esc(areaName(c))}</h2>
-    <div class="chips"><span class="kpill">${c.kind}</span>${c.weather ? `<span class="chip">${esc(c.weather)}</span>` : ""}<span class="chip">걷기 ${(walkM / 1000).toFixed(1)}km</span>${draft ? `<span class="chip new">미리보기</span>` : ""}</div></div>`;
+    ${c.meet ? `<a class="meet" href="https://map.kakao.com/link/to/${encodeURIComponent(clean(c.meet.name))},${c.meet.lat},${c.meet.lng}" target="_blank" rel="noopener"><span class="flag">출발</span><span><b>${esc(c.meet.name)}에서 만나요</b><small>${hm(c.from)} · ${esc(c.stops[0].name)}까지 ${c.meet.min > 15 ? `버스·택시 ${Math.round(6 + c.meet.min / 3)}분` : `걸어서 ${c.meet.min}분`}</small></span><em>길찾기</em></a>` : ""}
+    <div class="chips">${c.weather ? `<span class="chip">${esc(c.weather)}</span>` : ""}<span class="chip">걷기 ${(walkM / 1000).toFixed(1)}km</span>${draft ? `<span class="chip new">미리보기</span>` : ""}</div></div>`;
   $("mapWrap").hidden = false;
   body.innerHTML = `<ol class="stops">${c.stops.map((s, i) => {
       const l = c.legs[i], live = nowM >= s.t && nowM < s.t + s.stay;
@@ -502,7 +575,7 @@ function renderCourse() {
           + `<a href="${routeUrl(c.stops[i - 1], s, l.mode)}" target="_blank" rel="noopener">길찾기</a></li>` : "")
         + `<li class="stop${live ? " now" : ""}${s.likes?.a && s.likes?.b ? " both" : ""}" data-i="${i}">
           <span class="time"><span class="num">${i + 1}</span>${hm(s.t)}<small>${s.stay}분</small></span>
-          <div class="sbody"><b>${esc(s.name)}</b><small>${ICON[s.type]} ${TYPES[s.type][0]}${s.cat && s.cat !== TYPES[s.type][0] ? ` · ${esc(s.cat)}` : ""}${live ? ` · <em>지금</em>` : ""}</small>
+          <div class="sbody"><b>${esc(s.name)}</b>${s.why ? `<span class="why">${s.hot ? `<i class="hot">요즘</i>` : ""}${esc(s.why)}</span>` : ""}<small>${ICON[s.type]} ${TYPES[s.type][0]}${s.cat && s.cat !== TYPES[s.type][0] ? ` · ${esc(s.cat)}` : ""}${live ? ` · <em>지금</em>` : ""}</small>
             <div class="sacts">${likes}${s.url ? `<a href="${esc(s.url)}" target="_blank" rel="noopener">정보</a>` : ""}<button type="button" data-swap="${i}">바꾸기</button><button type="button" data-drop="${i}">빼기</button></div></div></li>`;
     }).join("")}</ol>
     <button type="button" class="addbtn" data-addplace>+ 가고 싶은 곳 넣기</button>
@@ -511,6 +584,7 @@ function renderCourse() {
       ? `<button type="button" class="big ghost" data-again>다시 짜기</button><button type="button" class="big" data-keep>이걸로 정하기</button>`
       : `<button type="button" class="del" data-cdel>지우기</button><button type="button" class="big ghost" data-again>다시 짜기</button><button type="button" class="big" data-done>${c.done ? "한 줄 고치기" : "다녀왔어요"}</button>`}</div>`;
   drawMap(c);
+  ensureMeet(c);
 }
 const clean = s => String(s).replace(/[,/]/g, " ");
 const routeUrl = (a, b, mode) => `https://map.kakao.com/link/by/${mode === "walk" ? "walk" : "traffic"}/${encodeURIComponent(clean(a.name))},${a.lat},${a.lng}/${encodeURIComponent(clean(b.name))},${b.lat},${b.lng}`;
@@ -518,7 +592,7 @@ const routeUrl = (a, b, mode) => `https://map.kakao.com/link/by/${mode === "walk
 let map = null, drawn = [], drawId = 0, drawnSig = "";
 async function drawMap(c) {
   const css = getComputedStyle(document.documentElement), acc = css.getPropertyValue("--acc-ink").trim(), soft = css.getPropertyValue("--soft").trim();
-  const sig = c.stops.map(s => `${s.lat},${s.lng}`).join("|") + acc;
+  const sig = c.stops.map(s => `${s.lat},${s.lng}`).join("|") + acc + (c.meet ? c.meet.name : "");
   if (map && sig === drawnSig) return map.relayout();
   const my = ++drawId;
   let k;
@@ -535,6 +609,13 @@ async function drawMap(c) {
     drawn.push(new k.maps.CustomOverlay({ position: L(s), content: el, yAnchor: 1.1, zIndex: 3, map }));
     bounds.extend(L(s));
   });
+  if (c.meet && c.stops[0]) {
+    const el = document.createElement("div"); el.className = "startpin"; el.textContent = `출발 · ${c.meet.name}`;
+    drawn.push(new k.maps.CustomOverlay({ position: L(c.meet), content: el, yAnchor: 1.4, zIndex: 4, map }));
+    const first = c.stops[0], line = new k.maps.Polyline({ map, path: [L(c.meet), L(first)], strokeWeight: 4, strokeColor: soft, strokeOpacity: .9, strokeStyle: "shortdot" });
+    drawn.push(line); bounds.extend(L(c.meet));
+    walkPath(c.meet, first).then(p => { if (p && my === drawId) line.setPath([L(c.meet), ...p.map(([lat, lng]) => new k.maps.LatLng(lat, lng)), L(first)]); });
+  }
   const fit = () => { map.relayout(); if (c.stops.length) map.setBounds(bounds, 40, 30, 40, 30); };
   fit(); requestAnimationFrame(fit); setTimeout(fit, 350);
   for (let i = 1; i < c.stops.length; i++) {
@@ -575,13 +656,12 @@ const TIMES = Array.from({ length: 41 }, (_, i) => H(6) + i * 30);
 const tLabel = m => m >= H(24) ? `새벽 ${hm(m)}` : hm(m);
 function openPlanSheet(date, base) {
   const last = store.get("urigil-last") || {};
-  const prefs = base?.prefs || store.get("urigil-prefs") || ["meal", "cafe", "walk", "view"];
+  const prefs = base?.prefs || store.get("urigil-prefs") || ["meal", "cafe", "play", "photo", "walk"];
   const from = base?.from ?? last.from ?? H(13), to = base?.to ?? last.to ?? H(20);
   openSheet(`<h3>데이트 짜기</h3>
     <label>날짜 <input type="date" id="pD" required></label>
     <div class="two"><label>몇 시부터 <select id="pF">${TIMES.slice(0, -2).map(m => `<option value="${m}">${tLabel(m)}</option>`).join("")}</select></label>
       <label>몇 시까지 <select id="pT">${TIMES.slice(2).map(m => `<option value="${m}">${tLabel(m)}</option>`).join("")}</select></label></div>
-    <p class="kindline" id="pK"></p>
     <span class="flabel">하고 싶은 것</span>
     <div class="chipset" id="pP">${PREFS.map(([k, l]) => `<button type="button" data-p="${k}" class="${prefs.includes(k) ? "on" : ""}">${ICON[k]} ${l}</button>`).join("")}</div>
     <span class="flabel">동네</span>
@@ -595,8 +675,6 @@ function openPlanSheet(date, base) {
     makeCourse({ date: $("pD").value, from: f, to: t, prefs: ps, area: $("pA").querySelector(".on").dataset.a || null, replaces: base?.id || null });
   }, () => {
     $("pD").value = date; $("pF").value = from; $("pT").value = to;
-    const kl = () => { const len = $("pT").value - $("pF").value; $("pK").textContent = len >= 60 ? `${Math.floor(len / 60)}시간${len % 60 ? " 반" : ""} → ${kindOf(len, +$("pF").value)}` : "끝나는 시간을 늦춰 주세요"; };
-    $("pF").onchange = $("pT").onchange = kl; kl();
     $("pP").addEventListener("click", e => { const b = e.target.closest("button"); if (b) b.classList.toggle("on"); });
     $("pA").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; $("pA").querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b)); });
     if (base?.area) $("pA").querySelector(`[data-a="${base.area}"]`)?.click();
@@ -620,7 +698,7 @@ function eventFor(c) {
 }
 async function keepDraft() {
   const c = S.draft; if (!c) return;
-  const data = { date: c.date, from: c.from, to: c.to, kind: c.kind, area: c.area, area2: c.area2 || null, prefs: c.prefs, picked: c.picked || null,
+  const data = { date: c.date, from: c.from, to: c.to, meet: c.meet || null, area: c.area, area2: c.area2 || null, prefs: c.prefs, picked: c.picked || null,
                  weather: c.weather, stops: c.stops, legs: c.legs, done: false, by: S.me, at: Date.now() };
   try {
     if (c.replaces && S.courses.some(x => x.id === c.replaces)) {

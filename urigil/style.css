@@ -130,12 +130,10 @@ main { max-width: 640px; margin: 0 auto; padding: 14px max(14px, env(safe-area-i
 
 .ccard { display: flex; flex-direction: column; gap: 2px; width: 100%; padding: 14px 16px; border: 0; border-radius: 24px; text-align: left;
   background: var(--panel); box-shadow: var(--shadow); }
-.cc-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.cc-top b { font: 19px var(--round); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cc-top { font: 19px var(--round); font-weight: 400; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ccard small { color: var(--soft); font-weight: 600; font-size: 13px; }
 .cc-icons { font-size: 15px; letter-spacing: 2px; }
 .ccard.done { background: color-mix(in srgb, var(--both) 22%, var(--panel)); }
-.kpill { flex: none; padding: 3px 11px; border-radius: 999px; background: var(--both); color: var(--both-ink); font-size: 12px; font-weight: 800; white-space: nowrap; }
 
 /* 코스 */
 .chead { display: flex; flex-direction: column; gap: 4px; padding: 2px 4px; }
@@ -144,6 +142,15 @@ main { max-width: 640px; margin: 0 auto; padding: 14px max(14px, env(safe-area-i
 .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
 .chip { padding: 3px 11px; border-radius: 999px; background: var(--panel); box-shadow: var(--shadow); font-size: 12px; font-weight: 800; color: var(--ink); white-space: nowrap; }
 .chip.new { background: var(--acc); color: #fff; }
+.meet { display: flex; align-items: center; gap: 10px; margin-top: 8px; padding: 10px 14px 10px 10px; border-radius: 22px; background: var(--panel); box-shadow: var(--shadow); text-decoration: none; }
+.meet .flag { flex: none; display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: var(--acc); color: #fff; font: 13px var(--round); }
+.meet span { min-width: 0; display: flex; flex-direction: column; }
+.meet b { font: 18px var(--round); font-weight: 400; color: var(--acc-ink); line-height: 1.25; overflow-wrap: anywhere; }
+.meet small { color: var(--soft); font-weight: 700; font-size: 13px; }
+.meet em { margin-left: auto; flex: none; padding: 4px 10px; border-radius: 999px; background: var(--hero); color: var(--acc-ink); font: 700 12px var(--font); font-style: normal; }
+.startpin { padding: 5px 11px; border: 3px solid #fff; border-radius: 999px; background: var(--ink); color: var(--bg); font: 14px var(--round); white-space: nowrap; box-shadow: 0 4px 10px rgb(0 0 0 / .25); }
+.why { display: block; margin-top: 2px; font-size: 13px; font-weight: 700; color: var(--acc-ink); }
+.hot { display: inline-block; margin-right: 4px; padding: 0 7px; border-radius: 999px; background: var(--acc); color: #fff; font-size: 11px; font-weight: 800; vertical-align: 1px; }
 .mapwrap { height: clamp(240px, 46vh, 380px); border-radius: 28px; overflow: hidden; background: var(--hero); box-shadow: var(--shadow); isolation: isolate; }
 #map { width: 100%; height: 100%; }
 .maperr { display: grid; place-items: center; height: 100%; margin: 0; color: var(--soft); font-weight: 700; }
@@ -243,7 +250,6 @@ dialog[open]::backdrop { animation: fade .3s ease; }
 #sheetForm .danger { display: block; margin: 4px auto 2px; }
 .two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
 .two label, .two input, .two select { min-width: 0; }
-.kindline { margin: -2px 0 0; padding: 10px 14px; border-radius: 18px; background: var(--hero); color: var(--acc-ink); font: 17px var(--round); text-align: center; }
 .chipset { display: flex; flex-wrap: wrap; gap: 6px; margin-top: -4px; }
 .chipset button { padding: 8px 13px; border: 0; border-radius: 999px; background: var(--bg); font-weight: 700; font-size: 14px; color: var(--soft); }
 .chipset button.on { background: var(--acc); color: #fff; }
