@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>마디 움직임 비교</title>
-<meta name="description" content="마디 캐릭터 조정값 15개를 사람 모캡 측정·논문·ARPG·3인칭 액션 게임과 나란히 놓은 비교 — 사람 숫자, 게임 타이밍, 빠진 동작, 검사 방법">
+<meta name="description" content="마디 캐릭터 조정값 15개를 사람 모캡 측정·논문·ARPG·3인칭 액션 게임과 나란히 놓은 비교 — 사람 숫자, 게임 타이밍, 빠진 동작, 2차 전환 동작(출발·멈춤·되돌기·꺾기·착지·발끝), 검사 방법">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -180,6 +180,41 @@ section.s { padding-block: clamp(56px, 8vw, 112px); scroll-margin-top: 8px }
 .miss .how { font-weight: 600; font-size: 15px; line-height: 1.6; font-variant-numeric: tabular-nums; color: var(--on-vp) }
 .miss .how small { display: block; margin-top: 6px; font: 400 13px var(--sans); color: var(--on-vp-soft) }
 .later { margin-top: 18px; font-size: 14px; color: var(--on-vp-soft) }
+.miss .go { display: inline-block; margin-top: 8px; font: 500 12.5px var(--mono); color: var(--joint); text-decoration: none }
+.miss .go:hover { text-decoration: underline }
+
+/* ── 2차 · 전환 동작 ── */
+.r2 { background: var(--tone) }
+.r2-head { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: clamp(28px, 4vw, 64px); align-items: end }
+.r2 .htabs { margin-top: 48px }
+.tt { width: 100%; border-collapse: collapse; font-size: 14.5px; line-height: 1.55; border-top: 3px solid var(--ink); font-variant-numeric: tabular-nums }
+.tt th, .tt td { text-align: left; vertical-align: top; padding: 11px 16px 11px 0; border-bottom: 1px solid var(--rule) }
+.tt thead th { font: 500 11.5px/1.4 var(--mono); color: var(--muted); letter-spacing: .04em; vertical-align: bottom }
+.tt thead th small { display: block; font-weight: 400; opacity: .85 }
+.tt td:first-child { font-weight: 600; width: 15% }
+.tt td.hu { width: 33% }
+.tt td small { display: block; margin-top: 3px; font-size: 12.5px; line-height: 1.45; color: var(--muted) }
+.tt td.na { color: var(--muted) }
+.tt tr.bad td b, .tt tr.bad td:first-child { color: var(--joint-ink) }
+.tt.num td:not(:first-child) { font-family: var(--mono); font-size: 14px; white-space: nowrap }
+.fit { margin: 10px 0 28px; font: 500 12.5px var(--mono); color: var(--muted) }
+.mk { margin-top: 16px; display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 4px 12px; padding: 16px 20px 18px; background: var(--vp); color: var(--on-vp); font-size: 14.5px; clip-path: polygon(0 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%) }
+.mk > b { font: 500 12px/2 var(--mono); color: var(--joint); letter-spacing: .06em }
+.mk ul { display: grid; gap: 6px }
+.mk li { padding-left: 14px; position: relative }
+.mk li::before { content: ""; position: absolute; left: 0; top: .78em; width: 6px; height: 2px; background: var(--joint) }
+.r2-order { margin-top: clamp(56px, 7vw, 96px) }
+.r2-order h3 { font-size: clamp(26px, 3vw, 38px); font-weight: 500 }
+.rules { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px clamp(20px, 3vw, 40px); margin-top: 24px; font-size: 14px; color: var(--muted) }
+.rules b { display: block; font: 700 16px/1.35 var(--display); color: var(--ink); margin-bottom: 4px }
+.steps { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 28px 14px; margin-top: 36px; counter-reset: s }
+.steps li { counter-increment: s; border-top: 3px solid var(--ink); padding-top: 10px }
+.steps li::before { content: counter(s); display: block; font: 300 44px/1 var(--display); color: var(--muted) }
+.steps li:nth-child(-n+3) { border-color: var(--joint) }
+.steps li:nth-child(-n+3)::before { color: var(--joint-ink) }
+.steps b { display: block; margin-top: 8px; font: 700 16px/1.3 var(--display) }
+.steps span { display: block; margin-top: 6px; font-size: 13.5px; line-height: 1.55; color: var(--muted) }
+@media (max-width: 1100px) { .steps { grid-template-columns: repeat(4, minmax(0, 1fr)) } }
 
 /* ── 릴스 ── */
 .reels { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); margin-top: 48px }
@@ -237,6 +272,7 @@ footer { padding-block: 32px 48px; font-size: 13px; color: var(--muted) }
   .miss .how { grid-column: 2 }
   .hside aside { transform: none }
   .swipe { display: block }
+  .r2-head, .rules { grid-template-columns: minmax(0, 1fr) }
 }
 @media (max-width: 600px) {
   body { font-size: 16px }
@@ -261,6 +297,21 @@ footer { padding-block: 32px 48px; font-size: 13px; color: var(--muted) }
   .film figcaption { padding-inline: var(--m); position: sticky; left: 0; width: 100vw }
   .shot figcaption { padding-right: var(--m) }
   .counts { gap: 12px 24px }
+  /* 전환 표: 항목 위, 사람 한 줄, 게임 둘 나란히 */
+  .tt thead { display: none }
+  .tt tr { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px 14px; padding-block: 12px; border-bottom: 1px solid var(--rule) }
+  .tt.num tr { grid-template-columns: repeat(3, minmax(0, 1fr)) }
+  .tt td { display: block; padding: 0; border: 0; width: auto !important }
+  .tt td:first-child, .tt td.hu, .tt td[colspan] { grid-column: 1 / -1 }
+  .tt td[data-l]::before { content: attr(data-l); display: block; font: 500 10.5px var(--mono); color: var(--muted); letter-spacing: .04em }
+  .tt.num td:not(:first-child) { white-space: normal }
+  .tt td.na.hu, .tt td.na[colspan] { display: none }
+  .mk { grid-template-columns: minmax(0, 1fr); padding: 14px 16px 18px }
+  .steps { grid-template-columns: minmax(0, 1fr); gap: 0 }
+  .steps li { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 0 10px; padding-block: 12px 14px; border-top-width: 1px }
+  .steps li:first-child { border-top-width: 3px }
+  .steps li::before { grid-row: span 2; font-size: 34px }
+  .steps b { margin-top: 2px }
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto } }
 </style>
@@ -269,15 +320,16 @@ footer { padding-block: 32px 48px; font-size: 13px; color: var(--muted) }
 
 <header class="hero">
   <div class="wrap">
-    <div class="top mono"><a href="../">← 마디 기획서</a><span>움직임 조사 · 2026-11-02</span></div>
+    <div class="top mono"><a href="../">← 마디 기획서</a><span>움직임 조사 2차 · 2026-11-02</span></div>
     <div class="hero-grid">
       <div>
         <h1>사람처럼<br>움직일 <b>값</b></h1>
-        <p class="lede">마디 캐릭터의 조정값 15개를 사람 모캡·논문·쿼터뷰 ARPG·3인칭 액션 게임과 나란히 놓았어요.</p>
+        <p class="lede">마디 캐릭터의 조정값 15개를 사람 모캡·논문·쿼터뷰 ARPG·3인칭 액션 게임과 나란히 놓았어요. 2차로 출발·멈춤·돌기·착지 같은 전환 동작을 더 쟀어요.</p>
         <div class="counts">
           <div><b>15</b><span>조정값</span></div>
-          <div><b>154</b><span>모캡 파일 직접 측정</span></div>
+          <div><b>208</b><span>모캡 파일 직접 측정</span></div>
           <div><b>10</b><span>게임 조사</span></div>
+          <div><b>7</b><span>전환 동작</span></div>
         </div>
       </div>
       <figure class="shot">
@@ -291,6 +343,7 @@ footer { padding-block: 32px 48px; font-size: 13px; color: var(--muted) }
       <a href="#human"><span class="ic" data-icon="route" data-size="16"></span>사람 숫자</a>
       <a href="#games"><span class="ic" data-icon="gamepad" data-size="16"></span>게임 타이밍</a>
       <a href="#missing"><span class="ic" data-icon="list-checks" data-size="16"></span>빠진 동작</a>
+      <a href="#trans"><span class="ic" data-icon="layers" data-size="16"></span>전환 동작</a>
       <a href="#reels"><span class="ic" data-icon="clapperboard" data-size="16"></span>릴스</a>
       <a href="#test"><span class="ic" data-icon="circle-check" data-size="16"></span>검사</a>
       <a href="#sources"><span class="ic" data-icon="book-open" data-size="16"></span>출처</a>
@@ -495,7 +548,7 @@ footer { padding-block: 32px 48px; font-size: 13px; color: var(--muted) }
       <div class="answer">
         <h3>둘 다 맞아요</h3>
         <p>사람은 발 마찰 때문에 <b>가는 방향</b>을 초당 76~120°보다 빨리 못 꺾어요. 게임은 <b>몸만</b> 450~1200°/s로 돌리고, 모자란 물리는 피벗 동작(낮게 짚기 → 다시 박차기, 합계 0.85~1.3초)으로 보여 줘요.</p>
-        <p>그래서 마디는 몸 회전은 빠르게, 120°가 넘는 반전은 피벗 상태로 넘기는 게 맞아요. 220°/s로 호를 그리며 도는 게임은 하나도 없었어요.</p>
+        <p>그래서 마디는 몸 회전은 빠르게, 135°가 넘는 반전은 피벗 상태로 넘기는 게 맞아요. 220°/s로 호를 그리며 도는 게임은 하나도 없었어요.</p>
       </div>
     </div>
   </div>
@@ -632,15 +685,15 @@ footer { padding-block: 32px 48px; font-size: 13px; color: var(--muted) }
     <ol class="miss">
       <li>
         <div><h3>피벗 · 제자리 돌기</h3><p class="fix">"방향 전환이 어색함"</p></div>
-        <p class="how">120° 넘으면: 빠른 회전 0.15–0.3 s → 낮게 짚기 0.2–0.3 s → 박차기<small>몸 회전은 남은 각도에 비례(반감기 0.15–0.27 s). 서서 돌 땐 90°·180° 두 종, 머리가 먼저.</small></p>
+        <p class="how">135° 넘으면: 빠른 회전 0.15–0.3 s → 낮게 짚기 0.2–0.3 s → 박차기<small>몸 회전은 남은 각도에 비례(반감기 0.15–0.27 s). 서서 돌 땐 90°·180° 두 종, 머리가 먼저.</small><a class="go" href="#r2-pivot">2차 숫자 →</a></p>
       </li>
       <li>
         <div><h3>출발 · 멈춤</h3><p class="fix">"달리는 것 같지 않음", 출발·멈춤의 무게</p></div>
-        <p class="how">출발 0.15–0.25 s 밀기 + 엉덩이 5–10 cm 낮춤 · 멈춤 0.3–0.67 s<small>멈춤은 남은 제동 거리로 재생 위치를 맞추고, 왼발·오른발 두 벌.</small></p>
+        <p class="how">출발 0.15–0.25 s 밀기 + 엉덩이 5–10 cm 낮춤 · 멈춤 0.3–0.67 s<small>멈춤은 남은 제동 거리로 재생 위치를 맞추고, 왼발·오른발 두 벌.</small><a class="go" href="#r2-start">2차 숫자 →</a></p>
       </li>
       <li>
         <div><h3>높이별 착지</h3><p class="fix">"중력·무게가 없음"</p></div>
-        <p class="how">보통 0.4 s · 높은 곳 0.9–1.1 s 손 짚기 · 점프 전 웅크림 0.1 s<small>낙하 속도가 기준을 넘으면 무거운 착지로. 이륙 때 발을 몇 프레임 땅에 남김.</small></p>
+        <p class="how">보통 0.4 s · 높은 곳 0.9–1.1 s 손 짚기 · 점프 전 웅크림 0.1 s<small>낙하 속도가 기준을 넘으면 무거운 착지로. 이륙 때 발을 몇 프레임 땅에 남김.</small><a class="go" href="#r2-land">2차 숫자 →</a></p>
       </li>
       <li>
         <div><h3>회피</h3><p class="fix">전투 이동의 무게와 반응</p></div>
@@ -656,6 +709,143 @@ footer { padding-block: 32px 48px; font-size: 13px; color: var(--muted) }
       </li>
     </ol>
     <p class="later">그다음: 머리카락·천 스프링(0.2–0.3 s 늦게), 카메라 가로 지연 0.15–0.25 s, 달리기로 돌아갈 때 발 위상 맞추기.</p>
+  </div>
+</section>
+
+<!-- 5-2. 2차 · 전환 동작 -->
+<section class="s r2" id="trans">
+  <div class="wrap">
+    <div class="r2-head">
+      <div>
+        <p class="eyebrow">2차 조사 · 전환 동작</p>
+        <h2>달리기와 서기 사이</h2>
+        <p class="sub">출발·멈춤·되돌기·꺾기·제자리 돌기·착지·발끝 벌림을 걸음 단위로 다시 쟀어요. 모캡 파일 54개를 더 받았고, 게임은 엔진 문서·개발 발표에서 만드는 법까지 봤어요.</p>
+      </div>
+      <div class="answer">
+        <h3>달리기 클립은 안 벌어졌어요</h3>
+        <p>마디 Mixamo 달리기의 발끝 벌림은 <b>+1.3°</b>, 발 사이 7.6 cm. 사람(4–11°)보다 오히려 덜 벌어져요.</p>
+        <p>다른 건 <b>Heroine 뼈대의 쉬는 자세</b>예요. 두 발목 사이 40.6 cm (원본 뼈대 18.2 cm), 골반선이 10.4° 돌아 있어요.</p>
+        <p>벌어져 보이는 건 이 자세가 달리기에 그대로 얹히기 때문으로 보여요 <i class="e">추정</i></p>
+      </div>
+    </div>
+
+    <div class="htabs" role="tablist" aria-label="전환 동작">
+      <button role="tab" id="t2-start" aria-controls="r2-start" aria-selected="true">출발</button>
+      <button role="tab" id="t2-stop" aria-controls="r2-stop" aria-selected="false" tabindex="-1">멈춤</button>
+      <button role="tab" id="t2-pivot" aria-controls="r2-pivot" aria-selected="false" tabindex="-1">180° 되돌기</button>
+      <button role="tab" id="t2-cut" aria-controls="r2-cut" aria-selected="false" tabindex="-1">90° 꺾기</button>
+      <button role="tab" id="t2-tip" aria-controls="r2-tip" aria-selected="false" tabindex="-1">제자리 돌기</button>
+      <button role="tab" id="t2-land" aria-controls="r2-land" aria-selected="false" tabindex="-1">높이별 착지</button>
+      <button role="tab" id="t2-feet" aria-controls="r2-feet" aria-selected="false" tabindex="-1">발끝 벌림</button>
+    </div>
+    <div class="hpanels">
+      <div class="hpanel" role="tabpanel" id="r2-start" aria-labelledby="t2-start" tabindex="0">
+        <table class="tt"><thead><tr><th>항목</th><th>사람<small>모캡</small></th><th>ARPG<small>디아 IV · 로아 · PoE2</small></th><th>3인칭<small>소울 · 몬헌 · P의 거짓 · 스텔라</small></th></tr></thead><tbody>
+          <tr><td>길이</td><td class="hu" data-l="사람"><b>1.14 s · 3걸음</b> 달리기 90%까지<small>걷기 2걸음 1.05 s · 전력 5걸음 1.72 s</small></td><td data-l="ARPG"><b>0.17 s</b> 첫 보폭 (디아 IV)</td><td data-l="3인칭"><b>0.17–0.83 s</b><small>P 0.17 · 엘든 0.25–0.33 · 몬헌 0.6–0.8 · 스텔라 0.83</small></td></tr>
+          <tr><td>먼저 움직이는 것</td><td class="hu" data-l="사람">몸통 숙임이 첫 발 떼기 <b>0.27 s 전</b>, 무게중심은 0.46 s 전</td><td colspan="2" data-l="게임">누른 그 프레임에 움직여요 (Fortnite 출발 동작 묶음)</td></tr>
+          <tr><td>숙임</td><td class="hu" data-l="사람">몸통 최대 <b>+34°</b> (달리기)<small>23–46°, 전력 +47°, 첫 발 뗀 뒤 0.4–0.6 s. 1차 18°와는 재는 기준이 달라요 (진행 방향·선 자세 대비)</small></td><td data-l="ARPG">깊게 숙인 첫 걸음 하나</td><td data-l="3인칭">엘든 약 20° · 몬헌 25–30° · 스텔라 약 40° <i class="e">추정</i><small>첫 1–2걸음이 "밀기"</small></td></tr>
+          <tr><td>첫 걸음</td><td class="hu" data-l="사람">발 <b>0.6 m</b> 옮김, 공중 0.26 s<small>보폭 0.60 → 1.64 → 2.10 → 2.38 m</small></td><td colspan="2" data-l="게임">왼발 출발·오른발 출발 2개가 기본 (Epic)</td></tr>
+          <tr><td>첫 발 좌우</td><td class="hu" data-l="사람">앞으로는 규칙 없음. 옆으로 달려 나가면 <b>가는 쪽 발 74%</b></td><td colspan="2" data-l="게임">입력과 몸 방향 각도로 앞 / 90° / 180° 출발을 골라요</td></tr>
+          <tr><td>방향 바꿔 출발</td><td class="hu na" data-l="사람">—</td><td data-l="ARPG">서서 90°를 <b>0.17 s</b><small>550–700°/s</small></td><td data-l="3인칭">몸 돌리기 <b>0.1–0.13 s</b> 후 박차기<small>700–900°/s</small></td></tr>
+          <tr><td>캔슬</td><td class="hu na" data-l="사람">—</td><td colspan="2" data-l="게임">언제든. 손 떼면 정지, 반대로 누르면 피벗</td></tr>
+        </tbody></table>
+        <div class="mk"><b>마디</b><ul><li>속도 말고 <b>입력</b>으로 출발을 판정해요. 속도 값은 0.08 s 늦게 따라와요.</li><li>숙임은 입력 순간 시작, 첫 발은 0.1–0.2 s 안에 <i class="e">추정</i></li><li>앞뒤 기울기 한도는 35–45°까지 열어 둬요 <i class="e">추정</i></li><li>accel 7이면 0 → 5.55 m/s에 0.79 s <i class="e">계산</i></li></ul></div>
+      </div>
+
+      <div class="hpanel" role="tabpanel" id="r2-stop" aria-labelledby="t2-stop" tabindex="0" hidden>
+        <table class="tt"><thead><tr><th>항목</th><th>사람<small>모캡</small></th><th>ARPG<small>디아 IV · 로아 · PoE2</small></th><th>3인칭<small>소울 · 몬헌 · P의 거짓 · 스텔라</small></th></tr></thead><tbody>
+          <tr><td>시간 · 거리</td><td class="hu" data-l="사람"><b>1.57 s · 2.12 m</b> 3.5 m/s 달리기에서<small>걷기 1.13 s · 0.61 m</small></td><td data-l="ARPG">위치는 <b>≤ 0.07 s</b>, 자세만 0.3–0.45 s 버팀 (디아 IV)</td><td data-l="3인칭"><b>0.45–0.67 s</b><small>엘든 0.45–0.5 · P 0.47 · 스텔라 0.63 · 몬헌 0.67, 질주 정지 0.55–0.6</small></td></tr>
+          <tr><td>걸음</td><td class="hu" data-l="사람">달리기 <b>4걸음</b>, 끝으로 갈수록 1.21 → 1.13 → 0.76 → 0.28 → 0.01 m<small>마지막은 발을 나란히 모으는 걸음</small></td><td class="na" data-l="ARPG">—</td><td data-l="3인칭">제동 걸음 + 앞발 꽂기<small>엘든은 왼발·오른발 정지가 따로</small></td></tr>
+          <tr><td>브레이크 발</td><td class="hu" data-l="사람">끝에서 셋째 걸음, 무게중심보다 <b>0.44 m 앞</b><small>그다음 0.23 m, 마지막 0.11 m</small></td><td class="na" data-l="ARPG">—</td><td data-l="3인칭">Paragon: 멈출 지점 약 1.05 m 앞에서 정지 동작 시작, 남은 거리로 프레임을 정함</td></tr>
+          <tr><td>젖힘</td><td class="hu" data-l="사람">전신 <b>−27°</b> (달리기), 걷기 −13°<small>정지 0.9 s 전에 가장 많이</small></td><td class="na" data-l="ARPG">—</td><td data-l="3인칭">몸을 뒤로 젖혀 제동</td></tr>
+          <tr><td>넘침</td><td class="hu" data-l="사람">무게중심이 <b>1–2 cm</b>만 더 갔다 돌아와요</td><td colspan="2" class="na" data-l="게임">—</td></tr>
+          <tr><td>캔슬</td><td class="hu na" data-l="사람">—</td><td colspan="2" data-l="게임">출발·피벗·회피·공격 모두 즉시. 가라앉는 뒷부분은 언제 끊어도 돼요</td></tr>
+        </tbody></table>
+        <div class="mk"><b>마디</b><ul><li>지금 grip 0.9면 5.55 m/s에서 <b>0.63 s · 1.74 m</b>에 서요 <i class="e">계산</i></li><li>2.5 m/s가 넘을 때만 정지 동작. 재생 위치는 남은 제동 거리로 (Motion Time), 좌우는 Mirror로.</li><li>"줄어드는 두 걸음 + 모으기" 3박, 휘청이는 스프링 없이 넘침 2 cm 안 <i class="e">추정</i></li></ul></div>
+      </div>
+
+      <div class="hpanel" role="tabpanel" id="r2-pivot" aria-labelledby="t2-pivot" tabindex="0" hidden>
+        <table class="tt"><thead><tr><th>항목</th><th>사람<small>모캡 · 달리다 반대로</small></th><th>ARPG<small>디아 IV · 로아 · PoE2</small></th><th>3인칭<small>소울 · 몬헌 · P의 거짓 · 스텔라</small></th></tr></thead><tbody>
+          <tr><td>전체</td><td class="hu" data-l="사람"><b>1.43 s</b> 옛 90% → 새 90% (2.9 m/s)<small>1.10–2.95 s, 전력 1.90 s</small></td><td data-l="ARPG">즉시로 보임 <i class="e">추정</i></td><td data-l="3인칭">엘든 <b>0.23 s</b>, 짚기 없음 / 짚고 다시 <b>0.85–1.3 s</b><small>P·스텔라 0.85 · 몬헌 1.15–1.3</small></td></tr>
+          <tr><td>순서</td><td class="hu" data-l="사람">제동 <b>0.53</b> → 디딤 <b>0.68</b> → 재가속 <b>0.87 s</b></td><td class="na" data-l="ARPG">—</td><td data-l="3인칭">빠른 회전 → 짚기 → 박차기<small>회전 몬헌 0.4 · 스텔라 0.15–0.2 s</small></td></tr>
+          <tr><td>제동</td><td class="hu" data-l="사람">디딤 포함 <b>2걸음</b>, 1.0 m 더 가서 0.16 m/s까지<small>거의 멈춰요. 전력은 4걸음 · 2.2 m</small></td><td class="na" data-l="ARPG">—</td><td data-l="3인칭">Paragon: 반전 약 60 cm 앞에서 멈추는 동작, 뒤로 약 3 m 밀기</td></tr>
+          <tr><td>디딤 동안 회전</td><td class="hu" data-l="사람"><b>71°</b> (전체의 38%)를 102°/s로<small>순간 최대 200°/s (전력 246). 나머지는 앞뒤 걸음에서</small></td><td class="na" data-l="ARPG">—</td><td data-l="3인칭">일부 구간만 애니메이션이 회전을 정함 (Control)</td></tr>
+          <tr><td>디딤발</td><td class="hu" data-l="사람">좌우 규칙 없음 (도는 쪽 발 48%). 그때 땅에 있던 발로 돌아요</td><td colspan="2" class="na" data-l="게임">—</td></tr>
+          <tr><td>무게중심</td><td class="hu" data-l="사람">디딤발 <b>13 cm 앞</b>에서 되돌아서요<small>디딤발을 넘는 건 10번에 1번</small></td><td colspan="2" class="na" data-l="게임">—</td></tr>
+          <tr><td>트리거</td><td class="hu na" data-l="사람">—</td><td data-l="ARPG">반대 클릭</td><td data-l="3인칭">속도 &gt; 2 m/s · 각도 &gt; <b>145°</b> (유니티 3D Game Kit)<small>UE 샘플은 스트레이프 45°</small></td></tr>
+          <tr><td>캔슬</td><td class="hu na" data-l="사람">—</td><td colspan="2" data-l="게임">회피는 언제든, 공격은 짚은 뒤 <i class="e">추정</i></td></tr>
+        </tbody></table>
+        <div class="mk"><b>마디</b><ul><li>속도 2 m/s, 각도 135°를 넘으면 피벗: 회전 잠금 → grip 제동 → 0.15–0.25 s에 180° → 박차기 <i class="e">추정</i></li><li>grip 1.0 · accel 9면 합계 <b>약 1.2 s</b>, 몬헌형이에요. 소울형 0.23 s는 마디 마찰 물리로는 안 나와요 <i class="e">계산</i></li><li>회전은 코드 하나만. 동작 회전과 겹치면 270°까지 돌아요.</li></ul></div>
+      </div>
+
+      <div class="hpanel" role="tabpanel" id="r2-cut" aria-labelledby="t2-cut" tabindex="0" hidden>
+        <table class="tt"><thead><tr><th>항목</th><th>사람<small>모캡 · 2.75 m/s 달리기</small></th><th>ARPG<small>디아 IV · 로아 · PoE2</small></th><th>3인칭<small>소울 · 몬헌 · P의 거짓 · 스텔라</small></th></tr></thead><tbody>
+          <tr><td>디딤발</td><td class="hu" data-l="사람"><b>바깥 발 65%</b> (옆걸음 꺾기)<small>안쪽 발 + 다음 발 교차 26%</small></td><td colspan="2" class="na" data-l="게임">—</td></tr>
+          <tr><td>디딤</td><td class="hu" data-l="사람"><b>0.35 s</b>, 이 발이 42° (48%)만 꺾어요<small>15° 넘게 꺾는 걸음 2개 (1–4)</small></td><td colspan="2" class="na" data-l="게임">—</td></tr>
+          <tr><td>몸 회전</td><td class="hu" data-l="사람">10–90% <b>1.47 s</b><small>빠른 절반 0.82 s</small></td><td data-l="ARPG">90° <b>0.25–0.3 s</b> <i class="e">추정</i></td><td data-l="3인칭">몸만 450–1200°/s, 피벗 없음<small>원신 90° 0.4 s, 호를 그림</small></td></tr>
+        </tbody></table>
+        <div class="mk"><b>마디</b><ul><li>90°를 한 디딤에 다 꺾지 말고 <b>약 25° / 45° / 20°</b>로 세 걸음에 나눠요 <i class="e">추정</i></li><li>90–135°는 피벗 없이 빠른 회전 (turnRun 450–600).</li></ul></div>
+      </div>
+
+      <div class="hpanel" role="tabpanel" id="r2-tip" aria-labelledby="t2-tip" tabindex="0" hidden>
+        <table class="tt"><thead><tr><th>항목</th><th>사람<small>모캡 · 발로 걸어 돎</small></th><th>ARPG<small>디아 IV · 로아 · PoE2</small></th><th>3인칭<small>소울 · 몬헌 · P의 거짓 · 스텔라</small></th></tr></thead><tbody>
+          <tr><td>걸음</td><td class="hu" data-l="사람">발 한 번에 <b>약 85°</b><small>90° 2걸음 · 180° 4걸음 · 360° 9걸음</small></td><td data-l="ARPG">없음, 몸이 바로 돎</td><td data-l="3인칭">엘든 서서 180°, 한 발 디딤</td></tr>
+          <tr><td>시간</td><td class="hu" data-l="사람">90° <b>1.1 s</b> · 180° <b>2.3 s</b><small>최대 105–121°/s. 1차 1.13 s는 빠른 절반만 잰 값</small></td><td data-l="ARPG">550–700°/s (디아 IV)</td><td data-l="3인칭">엘든 180° <b>0.27–0.3 s</b></td></tr>
+          <tr><td>순서</td><td class="hu" data-l="사람">도는 쪽 발이 먼저 벌려 딛고 다른 발이 모아요<small>90° 4/4, 180° 5/6</small></td><td class="na" data-l="ARPG">—</td><td data-l="3인칭">Paragon: 90°는 일부러 느리게, 180°는 빨리, 머리가 먼저</td></tr>
+          <tr><td>빨리 돌기</td><td class="hu" data-l="사람">뛰어서 180°: 공중 0.17 s, 최대 250°/s</td><td colspan="2" class="na" data-l="게임">—</td></tr>
+          <tr><td>트리거</td><td class="hu na" data-l="사람">—</td><td data-l="ARPG">커서·키 방향으로 즉시</td><td data-l="3인칭">조준·락온 중 몸과 시선이 50° 넘게 벌어질 때 (UE 샘플), 멈춘 직후 스틱 톡</td></tr>
+        </tbody></table>
+        <div class="mk"><b>마디</b><ul><li>입력이 곧 이동이라, 순수 제자리 돌기는 키를 짧게 톡 눌렀을 때와 나중의 락온뿐이에요.</li><li>서서 다른 방향으로 걷는 건 출발이 맡아요.</li><li>회전은 코드가 600–720°/s, 동작은 돈 각도에 맞춰 재생.</li></ul></div>
+      </div>
+
+      <div class="hpanel" role="tabpanel" id="r2-land" aria-labelledby="t2-land" tabindex="0" hidden>
+        <table class="tt num"><thead><tr><th>사람 · 모캡</th><th>닿는 속도</th><th>골반 내려감</th><th>무릎 최대</th><th>90% 회복</th><th>다음 발</th></tr></thead><tbody>
+          <tr><td>서서 0.12 m</td><td data-l="닿는 속도">1.5 m/s</td><td data-l="골반">10 cm</td><td data-l="무릎">66°</td><td data-l="회복">0.27 s</td><td data-l="다음 발">0.30 s</td></tr>
+          <tr><td>서서 0.19 m</td><td data-l="닿는 속도">1.9 m/s</td><td data-l="골반">12 cm</td><td data-l="무릎">64°</td><td data-l="회복">0.30 s</td><td data-l="다음 발">0.33 s</td></tr>
+          <tr><td>서서 0.33 m</td><td data-l="닿는 속도">2.55 m/s</td><td data-l="골반">20 cm</td><td data-l="무릎">88°</td><td data-l="회복">0.73 s</td><td data-l="다음 발">1.02 s</td></tr>
+          <tr><td>내려뛰기 0.63 m</td><td data-l="닿는 속도">3.5 m/s</td><td data-l="골반">25 cm</td><td data-l="무릎">86°</td><td data-l="회복">0.77 s</td><td data-l="다음 발">0.52 s</td></tr>
+          <tr><td>내려뛰기 0.91 m</td><td data-l="닿는 속도">4.2 m/s</td><td data-l="골반">41 cm</td><td data-l="무릎">103°</td><td data-l="회복">0.62 s</td><td data-l="다음 발">0.37 s</td></tr>
+          <tr><td>달리며 착지</td><td data-l="닿는 속도">1.6–3.2 m/s</td><td data-l="골반">12–22 cm</td><td data-l="무릎">79–94°</td><td data-l="회복">0.27–0.67 s</td><td data-l="다음 발">0.15–0.27 s</td></tr>
+        </tbody></table>
+        <p class="fit">골반 ≈ 7–8 cm × 닿는 속도 (느슨함, R² 0.28) · 바닥까지 0.075 s × 속도 · 회복 0.21 s × 속도</p>
+        <table class="tt"><thead><tr><th>게임</th><th>ARPG<small>디아 IV · 로아 · PoE2</small></th><th>3인칭<small>소울 · 몬헌 · P의 거짓 · 스텔라</small></th></tr></thead><tbody>
+          <tr><td>단계</td><td class="na" data-l="ARPG">자유 낙하 없음</td><td data-l="3인칭">엘든 보통 <b>0.4–0.45 s</b> · 높은 곳 손 짚기 <b>1.1–1.2 s</b><small>몬헌 1.07 s · 스텔라 짧은 점프도 0.95 s · P는 착지하자마자 구르기 0.75 s</small></td></tr>
+          <tr><td>판정</td><td class="na" data-l="ARPG">—</td><td data-l="3인칭">착지 속도로 2–3단계<small>UE 샘플 가벼움·무거움, 3D Game Kit는 수직 −10 m/s · 앞 5 m/s면 구르기. 엘든 낙하 피해는 높이 차만 봄</small></td></tr>
+        </tbody></table>
+        <div class="mk"><b>마디</b><ul><li>지금 점프 (0.55 m, 낙하 중력 16 m/s²)는 <b>4.2 m/s</b>로 닿아요. 사람이 0.9 m에서 뛰어내린 속도예요 <i class="e">계산</i></li><li>6 m/s 아래 눌림만 · 6–9 m/s 착지 동작 0.4–0.5 s · 9 m/s 넘으면 손 짚기 0.9–1.1 s <i class="e">추정</i></li><li>눌리는 시간 0.075·v, 회복 0.2·v. 공중에서 가장 빠른 낙하 속도를 기억해 골라요 <i class="e">추정</i></li></ul></div>
+      </div>
+
+      <div class="hpanel" role="tabpanel" id="r2-feet" aria-labelledby="t2-feet" tabindex="0" hidden>
+        <table class="tt"><thead><tr><th>항목</th><th>사람<small>모캡 · 두 발 평균, + = 발끝 바깥</small></th><th>마디<small>Blender로 FBX만 읽음</small></th></tr></thead><tbody>
+          <tr><td>걷기 발끝 벌림</td><td data-l="사람"><b>−2…+12°</b><small>CMU −2.4 · LAFAN1 5.2 · Bandai 12.4</small></td><td data-l="마디">Mixamo Walk <b>+0.6°</b></td></tr>
+          <tr><td>걷기 발 사이 폭</td><td data-l="사람"><b>8–16 cm</b></td><td data-l="마디">15.2 cm</td></tr>
+          <tr><td>달리기 발끝 벌림</td><td data-l="사람"><b>4…11°</b><small>CMU 4.2 · LAFAN1 8.7 · Bandai 10.8, 전력 8.5</small></td><td data-l="마디">Mixamo Run <b>+1.3°</b><small>왼발 +6.2 · 오른발 −3.6</small></td></tr>
+          <tr><td>달리기 발 사이 폭</td><td data-l="사람"><b>1–7.5 cm</b></td><td data-l="마디">7.6 cm</td></tr>
+          <tr class="bad"><td>쉬는 자세 발목 사이</td><td class="na" data-l="사람">—</td><td data-l="마디">Heroine <b>40.6 cm</b><small>Mixamo 원본 뼈대 18.2 cm</small></td></tr>
+          <tr class="bad"><td>골반선</td><td class="na" data-l="사람">—</td><td data-l="마디">Heroine <b>10.4° 돌아 있음</b><small>엉덩이 관절 왼쪽 12.5 · 오른쪽 9.7 cm, 오른쪽이 4 cm 앞. 발 자체는 정면</small></td></tr>
+        </tbody></table>
+        <div class="mk"><b>마디</b><ul><li>Humanoid 리타깃은 쉬는 자세를 T자세로 보고 움직임을 얹어요. 벌어진 다리가 달리기에 그대로 더해지는 것으로 보여요 <i class="e">추정</i></li><li>확인 ①: Heroine Avatar에서 Enforce T-Pose, 또는 Blender에서 다리 곧게 · 엉덩이 좌우 대칭으로.</li><li>확인 ②: 게임 안에서 디딘 발을 다시 재서 달리기 발끝 5–10°, 발 사이 8 cm 아래인지. 화면 속 Heroine 발 각도는 아직 못 쟀어요.</li></ul></div>
+      </div>
+    </div>
+
+    <div class="r2-order">
+      <h3>마디에 만드는 순서</h3>
+      <p class="sub">걷기·달리기가 선 다음에 붙여요.</p>
+      <ul class="rules">
+        <li><b>루프는 코드, 사이 동작은 애니메이션</b>위치는 코드가 정하고, 동작 재생 위치를 남은 거리·각도에 맞춰요.</li>
+        <li><b>13개면 기초</b>대기 · 달리기 · 출발 좌우 · 정지 좌우 · 곡선 달리기 · 방향 바꿔 출발 (Epic).</li>
+        <li><b>반응은 첫 프레임</b>무게는 그림으로. 입력 지연으로 낸 스텔라 0.5 s는 불만을 샀어요.</li>
+      </ul>
+      <ol class="steps">
+        <li><b>정지</b><span>모든 이동이 이걸로 끝나요. 제동 거리를 이미 알아서 재생 위치 한 줄로 맞춰요.</span></li>
+        <li><b>출발</b><span>정지와 짝. 90°·180° 방향 바꿔 출발을 넣으면 제자리 돌기가 따로 필요 없어요.</span></li>
+        <li><b>피벗 180°</b><span>turnRun을 450–600으로 올릴 때 같이 넣어야 팽이처럼 안 돌아요.</span></li>
+        <li><b>착지 단계</b><span>Land는 이미 있어요. 높은 곳이 생기면 중간·무거움을 더해요.</span></li>
+        <li><b>회피</b><span>전투를 시작할 때. 코드 속도 곡선이라 손맛을 숫자로 맞춰요.</span></li>
+        <li><b>캔슬 창 3단</b><span>회피가 생긴 뒤. Attack에 프레임 값 2개.</span></li>
+        <li><b>제자리 돌기</b><span>락온·조준을 넣을 때만.</span></li>
+      </ol>
+    </div>
   </div>
 </section>
 
@@ -749,9 +939,23 @@ footer { padding-block: 32px 48px; font-size: 13px; color: var(--muted) }
           </ul>
           <h3>모캡 데이터</h3>
           <ul>
-            <li><a href="http://mocap.cs.cmu.edu/">CMU Motion Capture</a> <small>연구·상업 모두 무료 · 102개. The data used in this project was obtained from mocap.cs.cmu.edu. The database was created with funding from NSF EIA-0196217.</small></li>
-            <li><a href="https://github.com/ubisoft/ubisoft-laforge-animation-dataset">LAFAN1</a> <small>CC BY-NC-ND 4.0 · 20개 · 숫자만 뽑음</small></li>
-            <li><a href="https://github.com/BandaiNamcoResearchInc/Bandai-Namco-Research-Motiondataset">Bandai Namco Motiondataset-2</a> <small>CC BY-NC 4.0 · 32개 · 숫자만 뽑음</small></li>
+            <li><a href="http://mocap.cs.cmu.edu/">CMU Motion Capture</a> <small>연구·상업 모두 무료 · 102개 + 2차 31개. The data used in this project was obtained from mocap.cs.cmu.edu. The database was created with funding from NSF EIA-0196217.</small></li>
+            <li><a href="https://github.com/ubisoft/ubisoft-laforge-animation-dataset">LAFAN1</a> <small>CC BY-NC-ND 4.0 (비상업) · 20개 + 2차 23개 · 통계만 쓰고 파일은 다시 배포 안 함</small></li>
+            <li><a href="https://github.com/BandaiNamcoResearchInc/Bandai-Namco-Research-Motiondataset">Bandai Namco Motiondataset-2</a> <small>CC BY-NC 4.0 (비상업) · 32개 · 통계만 씀</small></li>
+            <li>마디 Mixamo Run · Walk · Idle, Heroine.fbx <small>2차 발끝 비교 · Blender로 뼈 위치만 읽음</small></li>
+          </ul>
+          <h3>2차 · 엔진 문서 · 개발 발표</h3>
+          <ul>
+            <li><a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/game-animation-sample-project-in-unreal-engine">UE Game Animation Sample 문서</a> <small>5.4–5.5</small></li>
+            <li><a href="https://www.youtube.com/watch?v=tNw9lD2PW3U">Motion Matching and the Game Animation Sample</a> <small>Unreal Fest 2024</small></li>
+            <li><a href="https://www.youtube.com/watch?v=-03Xm2oZK_Y">Choosing How Your Game Animation Feels</a> <small>Unreal Fest 2024</small></li>
+            <li><a href="https://www.youtube.com/watch?v=FLDXtAV7qsw">Embracing Motion Matching</a> <small>Unreal Fest Bali 2025</small></li>
+            <li><a href="https://dev.epicgames.com/documentation/unreal-engine/BlueprintAPI/AnimationCharacterMovement/PredictGroundMovementPivotLocati-">UE PredictGroundMovementPivotLocation</a></li>
+            <li><a href="https://forums.unrealengine.com/t/ue5-6-locomotion-state-machine-pivot-direction-change-occasionally-fails-to-trigger/2732550">UE 포럼 · 피벗 상태 기계</a></li>
+            <li><a href="https://docs.unity.com/en-us/engine/current/manual/animation-section/animation-mecanim/animation-animator-controller/animation-state-machines/class-state">유니티 매뉴얼 State · Transition</a> <small>Unity 6</small></li>
+            <li><a href="https://kybernetik.com.au/animancer/docs/samples/animator-controllers/3d-game-kit/landing">Animancer 3D Game Kit</a> <small>착지 · 이동 · 대기</small></li>
+            <li><a href="https://discussions.unity.com/t/animation-to-turn-character-at-180-degrees-dont-go-full-180-degrees/1693600">Unity Discussions · 180° 동작</a></li>
+            <li><a href="https://github.com/SindreOpsahl/UnityMixamoLibrary">UnityMixamoLibrary</a> <small>Mixamo 동작 길이</small></li>
           </ul>
         </div>
         <div>
@@ -773,8 +977,15 @@ footer { padding-block: 32px 48px; font-size: 13px; color: var(--muted) }
             <li><a href="https://youtu.be/PVVQSZ6Lk44">엘든 링 이동 동작 모음</a> · <a href="https://eldenring.wiki.gg/wiki/I-Frame">무적 프레임</a></li>
             <li><a href="https://www.destructoid.com/after-beta-feedback-hitstop-is-returning-to-monster-hunter-wilds/">몬헌 와일즈 히트스톱</a></li>
             <li><a href="https://www.youtube.com/watch?v=6aLZWuFHuZc">P의 거짓 이동 동작</a> · <a href="https://www.youtube.com/watch?v=YCkCn4ML4Uk">스텔라 블레이드 동작</a></li>
-            <li><a href="https://www.gfinityesports.com/article/stellar-blade-director-input-lag-intentional">스텔라 0.5 s 지연 발언</a></li>
+            <li><a href="https://www.gfinityesports.com/article/stellar-blade-director-input-lag-intentional">스텔라 0.5 s 지연 발언</a> · <a href="https://automaton-media.com/en/news/stellar-blade-director-explains-games-0-5-second-lag-when-doing-perfect-parries-or-dodging/">Automaton</a></li>
             <li><a href="https://library.keqingmains.com/combat-mechanics/frames">원신 프레임 자료</a></li>
+          </ul>
+          <h3>2차 · 패치 · 분석 글</h3>
+          <ul>
+            <li><a href="https://www.bandainamcoent.com/news/elden-ring-patch-notes-v1-04">엘든 링 1.04 패치노트</a> · <a href="https://www.youtube.com/watch?v=Fm-QA4rZPYk">낙하 피해 분석</a> <small>Illusory Wall</small></li>
+            <li><a href="https://jmargaris.substack.com/">Margaris · 회피·조작 분석 3편</a> <small>Callisto · P의 거짓 · 스텔라</small></li>
+            <li><a href="https://maxroll.gg/poe2/news/patch-0-2-0h-removes-animation-cancels-for-rake-and-whirling-slash">PoE2 0.2.0h 캔슬 수정</a> · <a href="https://mobalytics.gg/poe-2/guides/dodge-roll-mechanic">구르기 규칙</a></li>
+            <li><a href="https://80.lv/articles/the-lies-of-p-s-dodge-ability-will-be-fixed-before-its-launch">P의 거짓 회피 재검토</a> <small>80.lv</small></li>
           </ul>
           <h3>릴스</h3>
           <ul>
@@ -788,22 +999,27 @@ footer { padding-block: 32px 48px; font-size: 13px; color: var(--muted) }
 </section>
 </main>
 
-<footer><div class="wrap mono">마디 · 움직임 조사 · 2026-11-02</div></footer>
+<footer><div class="wrap mono">마디 · 움직임 조사 2차 · 2026-11-02</div></footer>
 
 <script>
-// 사람 숫자 탭: 화살표 키로도 이동
-const tabs = [...document.querySelectorAll('.htabs [role="tab"]')];
-function pick(t) {
-  tabs.forEach(x => { const on = x === t; x.setAttribute('aria-selected', on); x.tabIndex = on ? 0 : -1; document.getElementById(x.getAttribute('aria-controls')).hidden = !on });
-}
-tabs.forEach((t, i) => {
-  t.addEventListener('click', () => pick(t));
-  t.addEventListener('keydown', e => {
-    const d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
-    if (!d) return;
-    const n = tabs[(i + d + tabs.length) % tabs.length]; pick(n); n.focus();
+// 탭: 화살표 키로도 이동, #패널 주소로 바로 열기
+document.querySelectorAll('[role="tablist"]').forEach(list => {
+  const tabs = [...list.querySelectorAll('[role="tab"]')];
+  const pick = t => tabs.forEach(x => { const on = x === t; x.setAttribute('aria-selected', on); x.tabIndex = on ? 0 : -1; document.getElementById(x.getAttribute('aria-controls')).hidden = !on });
+  tabs.forEach((t, i) => {
+    t.addEventListener('click', () => pick(t));
+    t.addEventListener('keydown', e => {
+      const d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      if (!d) return;
+      const n = tabs[(i + d + tabs.length) % tabs.length]; pick(n); n.focus();
+    });
   });
 });
+function openHash() {
+  const t = location.hash && document.querySelector(`[role="tab"][aria-controls="${CSS.escape(location.hash.slice(1))}"]`);
+  if (t) { t.click(); t.parentElement.scrollIntoView({ block: 'start' }) }
+}
+addEventListener('hashchange', openHash); addEventListener('load', openHash);
 </script>
 </body>
 </html>
