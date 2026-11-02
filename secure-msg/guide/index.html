@@ -1096,7 +1096,7 @@ details.more .tbl { background: var(--paper) }
       <h2>열쇠는 두 종류입니다</h2>
       <p class="lead">한 번 만들어 계속 쓰는 신원 키와, 접속할 때마다 새로 만드는 세션 키. 신원 키가 세션 키에 도장을 찍어서 서버가 바꿔치기하지 못하게 합니다.</p>
     </div>
-<pre class="code"><span class="y">~/.deolmi/id</span>  처음 실행할 때 한 번 만들고 저장 (Ed25519)
+<pre class="code"><span class="y">~/.deolmi/이름/id</span>  처음 실행할 때 한 번 만들고 저장 (Ed25519). 이름별 폴더라 노트북 한 대에서 A·B·C를 같이 켤 수 있음
  ├─ 지문   = 신원 공개키의 해시 → 한글 단어 8개 <span class="c">(실행할 때마다 같음)</span>
  ├─ 서명   = 세션 키 · 금고 묶음 · 열람 요청 · 승인 · 열쇠 전달 증명
  └─ 금고 키 = 신원 키를 X25519로 변환 → 금고 조각 봉인 <span class="c">(다음 접속에도 열 수 있게)</span>
@@ -1131,7 +1131,7 @@ seq가 건너뛰면  <span class="r">[!] A→B #6이 오지 않음: 대화가 �
       <tr><th>#</th><th>누가 · 무엇을</th><th>서버가 보는 것</th></tr>
       <tr><td>1 A</td><td>잠금 키 L 만들기 → 내용 암호화 → L = S1 ⊕ S2로 나누기 → (S1 + 제목 32바이트)를 B의 금고 키로, (S2 + 제목)을 C의 금고 키로 봉인 → 묶음 전체에 서명 → B, C에게 한 통씩 보내고 L, S1, S2 지움</td><td>암호문, 봉인 조각 2개, 서명</td></tr>
       <tr><td>2 서버</td><td>to를 보고 B, C에게 넘겨줌. 보관하지 않음. 보유자가 접속해 있지 않으면 A에게 SYS 오류</td><td>지나가는 것만</td></tr>
-      <tr><td>3 B, C</td><td>A의 서명 확인 → 자기 조각만 열어 제목 확인 → 묶음을 <code>~/.deolmi/vault/</code>에 저장</td><td>-</td></tr>
+      <tr><td>3 B, C</td><td>A의 서명 확인 → 자기 조각만 열어 제목 확인 → 묶음을 <code>~/.deolmi/이름/vault/</code>에 저장</td><td>-</td></tr>
       <tr><td>4 B</td><td><code>/open</code> → 금고 해시에 서명한 열람 요청을 C에게</td><td>서명된 요청</td></tr>
       <tr><td>5 C</td><td>B의 서명 확인 → <code>/approve</code> → 자기 조각 S2를 B의 금고 키로 다시 봉인 + 열쇠 전달 증명에 서명 → 자기 사본 지움, 승인한 해시 기억</td><td>B만 여는 조각, 증명</td></tr>
       <tr><td>6 B</td><td>S1 ⊕ S2 = L → 복호화 → 보여 준 뒤 화면·스크롤 지움 → 묶음 지움 → 증명을 모두에게</td><td>증명</td></tr>
@@ -1150,7 +1150,7 @@ seq가 건너뛰면  <span class="r">[!] A→B #6이 오지 않음: 대화가 �
     <div class="tbl"><table>
       <tr><th>무엇</th><th>어떻게</th></tr>
       <tr><td>열쇠</td><td>K = Argon2id(비밀번호, 무작위 소금 16바이트) (<code>crypto_pwhash</code>). K는 메모리에만 두고 끌 때 지움</td></tr>
-      <tr><td>파일</td><td><code>~/.deolmi/log/</code> 아래 대화마다 하나(<code>all.log</code>, <code>dm-B.log</code>)와 <code>salt</code>. 한 줄 = [길이 4][nonce 24][암호문 + 태그 16]</td></tr>
+      <tr><td>파일</td><td><code>~/.deolmi/이름/log/</code> 아래 대화마다 하나(<code>all.log</code>, <code>dm-B.log</code>)와 <code>salt</code>. 한 줄 = [길이 4][nonce 24][암호문 + 태그 16]</td></tr>
       <tr><td>암호</td><td>XChaCha20-Poly1305. AD에 <b>대화 이름 + 줄 번호</b>를 넣어 줄을 바꾸거나 지우거나 옮기면 열 때 걸림</td></tr>
       <tr><td>저장하는 것</td><td>복호화에 성공한 일반·1:1 메시지, 경고 줄, 열쇠 전달 증명</td></tr>
       <tr><td>저장하지 않는 것</td><td>금고 내용, 모든 키</td></tr>
@@ -1172,7 +1172,8 @@ seq가 건너뛰면  <span class="r">[!] A→B #6이 오지 않음: 대화가 �
     </div>
     <div class="tbl wide"><table>
       <tr><th>심각도</th><th>구멍</th><th>막는 법</th></tr>
-      <tr><td><span class="sev hi">치명</span></td><td>봉인(sealed box)은 보낸 사람이 익명이라 서버가 "A의 금고"를 위조할 수 있음</td><td>A가 신원 키로 묶음 전체(보유자 2명, 봉인 조각 2개, 암호문, nonce, 제목 해시)에 서명. 금고 번호도 묶음 해시</td></tr>
+      <tr><td><span class="sev hi">치명</span></td><td>봉인(sealed box)은 보낸 사람이 익명이라 서버가 "A의 금고"를 위조할 수 있음</td><td>A가 신원 키로 묶음 전체(보유자 2명, 봉인 조각 2개, 암호문, nonce)에 서명. 금고 번호도 묶음 해시</td></tr>
+      <tr><td><span class="sev mid">중간</span></td><td>제목 해시를 평문으로 보내면 서버가 "통장 비번" 같은 흔한 제목을 넣어 보고 맞힘</td><td>제목 해시를 빼고 제목은 봉인 조각 안에만. 제목이 든 열쇠 전달 증명도 래칫으로 잠가 보냄</td></tr>
       <tr><td><span class="sev hi">치명</span></td><td>지문이 kx 키만 덮으면 서버가 봉인용 공개키를 바꿔치기해 두 조각을 다 엶</td><td>신원 키 하나만 지문으로 비교하고, 금고 키는 신원 키에서 변환. 세션 키는 신원 키로 서명</td></tr>
       <tr><td><span class="sev mid">높음</span></td><td>숫자 12자리(40비트)는 생일 공격으로 수 분이면 깨짐</td><td>사람별 단어 8개(64비트). 특정인의 지문에 맞는 키를 찾아야 해서 2^64 수준</td></tr>
       <tr><td><span class="sev mid">높음</span></td><td>세션 개인키가 메모리에 남아 "지금 키가 털려도 지난 대화는 안전"이 과장</td><td>말을 고침: "체인 키가 새도 지난 메시지는 안전. 프로그램 메모리 전체가 털리면 그 세션은 위험"</td></tr>
@@ -1223,10 +1224,10 @@ seq가 건너뛰면  <span class="r">[!] A→B #6이 오지 않음: 대화가 �
       <tr><td>1 HELLO</td><td>클라 → 서버</td><td>신원 공개키 32 + 세션 kx 공개키 32 + 서명 64 (신원 키로 이름 + kx 공개키에 서명)</td><td>접속 후 첫 패킷이어야 함. 저장하고 다른 사람들에게 그대로 전달. 서명은 검사하지 않음</td></tr>
       <tr><td>1 HELLO</td><td>서버 → 클라</td><td>같음, from = 키 주인</td><td>새 사람에게 기존 전원의 HELLO, 기존 전원에게 새 HELLO</td></tr>
       <tr><td>2 MSG</td><td>클라 → 클라</td><td>암호문 + 태그 16. 전체/1:1 표시는 암호문 안 첫 바이트</td><td>to에게 그대로. 전체 대화는 보내는 쪽이 사람마다 따로 보냄</td></tr>
-      <tr><td>3 VAULT</td><td>A → B, A → C</td><td>금고 묶음: 보유자 이름 2 + 봉인 조각 2 (각 112 = 32 + 제목 32 + 48) + 제목 해시 32 + 암호문 + A 서명 64. nonce는 헤더 칸</td><td>to에게 그대로, 저장 안 함</td></tr>
+      <tr><td>3 VAULT</td><td>A → B, A → C</td><td>금고 묶음: 보유자 이름 2 + 봉인 조각 2 (각 112 = 32 + 제목 32 + 48) + 암호문 + A 서명 64. nonce는 헤더 칸</td><td>to에게 그대로, 저장 안 함</td></tr>
       <tr><td>4 OPEN_REQ</td><td>B → C</td><td>금고 해시 32 + B 서명 64</td><td>to에게 그대로</td></tr>
-      <tr><td>5 SHARE</td><td>C → B</td><td>B의 금고 키로 다시 봉인한 조각 112 + 증명 서명 64</td><td>to에게 그대로</td></tr>
-      <tr><td>6 PROOF</td><td>B → 접속자 한 명씩</td><td>열쇠 전달 증명: 금고 해시, 제목, 시각, A·B·C 서명</td><td>to에게 그대로</td></tr>
+      <tr><td>5 SHARE</td><td>C → B</td><td>금고 번호 32 + B의 금고 키로 다시 봉인한 조각 112 + 시각 8 + C의 증명 서명 64</td><td>to에게 그대로</td></tr>
+      <tr><td>6 PROOF</td><td>B → 접속자 한 명씩</td><td>열쇠 전달 증명: 금고 번호, 제목, 시각, 맡긴·요청·승인한 사람, B·C 서명. 제목이 있어서 MSG처럼 래칫으로 잠금 (AD의 type만 다름)</td><td>to에게 그대로</td></tr>
       <tr><td>7 SYS</td><td>서버 → 클라</td><td>UTF-8 문장</td><td>입장·퇴장·오류 알림</td></tr>
     </table></div>
     <p class="fine">서버가 내용을 보는 건 HELLO와 SYS뿐입니다. 나머지는 type과 상관없이 to에게 넘기므로 금고를 만들어도 서버 코드는 거의 그대로입니다.</p>
