@@ -1202,7 +1202,7 @@ seq가 건너뛰면  <span class="r">[!] A→B #6이 오지 않음: 대화가 �
                └─ 그 밖 → to에게 그대로 (중계 직전 공격 적용 · 서버의 눈 출력)</pre>
     <div class="tbl"><table>
       <tr><th>서버가 들고 있는 것</th><th>칸</th></tr>
-      <tr><td>클라이언트 표 (최대 16명)</td><td>소켓 fd, 받는 중인 버퍼와 길이, 이름 16, HELLO body 128, 등록 여부</td></tr>
+      <tr><td>클라이언트 표 (최대 16명 + 거절용 1칸)</td><td>소켓 fd, 받는 중인 버퍼와 길이, 이름 16, HELLO body 128, 등록 여부</td></tr>
       <tr><td>공격 상태</td><td>사람별로 걸어 둔 공격(다음 한 통), 사람별 마지막으로 보낸 패킷(replay용), 서버 자신의 키(swap·forge용)</td></tr>
     </table></div>
     <p class="fine">금고 표는 없습니다. 고정 크기 배열이면 충분하고, 이름으로 찾을 때도 16칸을 처음부터 훑으면 됩니다.</p>
@@ -1240,6 +1240,7 @@ seq가 건너뛰면  <span class="r">[!] A→B #6이 오지 않음: 대화가 �
       <tr><td>from이 등록한 이름과 다름</td><td>버리고 SYS 오류 (남의 이름으로 보내기 차단)</td></tr>
       <tr><td>to가 없는 사람</td><td>보낸 사람에게 SYS "B는 접속해 있지 않습니다"</td></tr>
       <tr><td>length가 65보다 작거나 65 + 64KB보다 큼</td><td>연결 끊기 (버퍼를 늘리지 않음)</td></tr>
+      <tr><td>HELLO, 이미 16명 등록됨</td><td>SYS "서버가 꽉 찼습니다" 보내고 연결 끊기</td></tr>
       <tr><td>연결 끊김 (recv 0 또는 오류)</td><td>표에서 지우고 전원에게 SYS "B 퇴장"</td></tr>
       <tr><td>모르는 type</td><td>버리고 SYS 오류</td></tr>
     </table></div>
@@ -1376,14 +1377,14 @@ seq가 건너뛰면  <span class="r">[!] A→B #6이 오지 않음: 대화가 �
     <span class="k">int</span>     registered;
 };
 
-<span class="k">static struct</span> client clients[MAX_CLIENTS];
+<span class="k">static struct</span> client clients[MAX_CLIENTS + 1];   <span class="c">/* 한 칸은 17번째 거절용 */</span>
 <span class="k">static int</span> nclients;
 <span class="k">static struct</span> packet pkt;
 
 <span class="k">int</span> main(<span class="k">void</span>)
 {
     <span class="k">int</span> lfd = net_listen(9000);
-    <span class="k">struct</span> pollfd fds[2 + MAX_CLIENTS];
+    <span class="k">struct</span> pollfd fds[2 + MAX_CLIENTS + 1];
 
     signal(SIGPIPE, SIG_IGN);
     printf(<span class="g">"[서버] 9000번에서 기다리는 중\n"</span>);
@@ -1406,7 +1407,7 @@ seq가 건너뛰면  <span class="r">[!] A→B #6이 오지 않음: 대화가 �
         <span class="k">if</span> (fds[1].revents &amp; POLLIN)
             read_command();                  <span class="c">/* tamper B, drop B ... */</span>
         <span class="k">if</span> (fds[0].revents &amp; POLLIN)
-            add_client(accept(lfd, NULL, NULL));   <span class="c">/* 꽉 찼으면 SYS 보내고 close */</span>
+            add_client(accept(lfd, NULL, NULL));   <span class="c">/* 표는 17칸: 17번째는 HELLO를 읽은 뒤 거절 */</span>
     }
 }
 
@@ -1452,6 +1453,7 @@ seq가 건너뛰면  <span class="r">[!] A→B #6이 오지 않음: 대화가 �
       <tr><td>껐다 켜면 <code>bind: Address already in use</code></td><td>방금 닫은 포트가 잠깐 TIME_WAIT</td><td>bind 전에 <code>setsockopt(SO_REUSEADDR)</code></td></tr>
       <tr><td>가끔 메시지가 깨지거나 두 통이 붙어서 옴</td><td>recv 한 번이 패킷 하나라고 가정함</td><td>항상 버퍼에 붙이고 <code>conn_take</code>로 꺼냄</td></tr>
       <tr><td>다른 노트북에서 seq가 이상한 큰 수</td><td>바이트 순서 변환 없이 보냄</td><td>length는 <code>htonl</code>, seq는 시프트</td></tr>
+      <tr><td>거절당한 쪽에 SYS 대신 Connection reset만 옴</td><td>상대가 보낸 데이터를 안 읽은 채 close하면 RST가 나가고, 받는 쪽은 먼저 온 SYS도 못 읽음</td><td>받은 걸 다 읽은 뒤에 거절. 17번째 접속도 accept 직후 끊지 말고 HELLO를 읽은 다음</td></tr>
       <tr><td>packet 변수 선언하자마자 Segmentation fault</td><td>64KB 넘는 구조체를 지역 변수로 둠</td><td><code>static</code> 또는 전역</td></tr>
       <tr><td>서버 창에 친 공격 명령이 안 먹음</td><td>서버를 <code>&amp;</code>로 백그라운드 실행해서 키보드가 없음</td><td>서버는 자기 터미널 창에서 그냥 실행</td></tr>
       <tr><td>다른 노트북에서 접속이 안 됨</td><td>WSL 기본 네트워크, 방화벽, 학교 Wi-Fi</td><td>서버 노트북에 mirrored 설정 + 방화벽 9000 허용. 안 되면 휴대폰 핫스팟</td></tr>
