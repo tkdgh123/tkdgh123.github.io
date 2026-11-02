@@ -202,6 +202,15 @@ networkingMode=mirrored</div>
 
 <div class="pick"><b>추천</b> — 지금은 <b>역할을 나눠 두는 편이 낫다.</b> ⑴ 구조가 단순해 디버깅과 발표 설명이 쉽고, ⑵ 나중에 암호화를 얹을 때 "서버는 내용을 못 보고 전해 주기만 한다"를 보여 주려면 서버가 뚜렷이 구분돼 있는 게 유리하다. 배포를 하나로 하고 싶으면 <b>방법 1</b>이 깔끔하고, 호스트도 대화에 끼고 싶으면 <b>방법 2</b>가 편의 업그레이드다.</div>
 
+<h3 style="margin-top:30px">실제로 만들어 봤어요 — <code>deolmi</code> (방법 2)</h3>
+<p>방법 2를 그대로 구현했다. 한 프로그램이 <b>방장이면 중계와 대화를 함께</b> 하고, 참가자는 방장 주소만 알면 된다. 별도 서버 프로세스가 없다 — <b>방장이 곧 서버</b>다. 이름·전체 대화·<code>/dm</code>·<code>/who</code>·입퇴장까지 된다. (P2P 1:1 실험에서 막혔던 "셋째가 조용히 무시됨·메시지 쪼개짐"은 연결을 배열로 들고 <code>net.c</code>의 길이 구분을 써서 해결했다.)</p>
+<div class="term"><span class="c"># 방장 — 방을 연다 (중계하면서 자기도 대화)</span>
+<span class="p">./deolmi 방장 --host</span>
+
+<span class="c"># 참가자 — 방장 주소만 알면 된다 (같은 컴퓨터면 주소 생략)</span>
+<span class="p">./deolmi 민지 192.168.0.5</span></div>
+<p>코드는 <a href="../code/#f2">deolmi.c</a> 에서 볼 수 있다.</p>
+
 <p class="foot">코드는 <a href="../code/">전체 코드</a>에서, 원리와 계획은 <a href="../guide/">덜미 설명서</a>에서.</p>
 
 </main>
