@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>덜미 실행</title>
+<meta name="description" content="덜미를 빌드하고 서버·클라이언트를 띄우는 법. 그리고 서버와 클라이언트를 한 프로그램에서 함께 할 수 있는지.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
+<style>
+:root{
+  --paper:#ECEFF2; --sheet:#FAFBFC; --ink:#15202C; --ink-2:#556273; --rule:#CBD3DC;
+  --steel:#2A4F86; --void:#CF3B1C; --seal:#17806A;
+  --term-bg:#0F1823; --term-ink:#D6E1EC; --t-dim:#7D8B9B; --t-red:#FF8B70; --t-green:#7ED6B3; --t-yel:#F1C56C; --t-blue:#8DB4F0;
+  --f-display:"Black Han Sans","IBM Plex Sans KR","Malgun Gothic",sans-serif;
+  --f-body:"IBM Plex Sans KR","Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"Cascadia Code",Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0C131B; --sheet:#131D28; --ink:#E2E9F1; --ink-2:#93A1B2; --rule:#263342;
+  --steel:#82A9E3; --void:#FF7A58; --seal:#4FC4A6; --term-bg:#070C12; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --paper:#0C131B; --sheet:#131D28; --ink:#E2E9F1; --ink-2:#93A1B2; --rule:#263342;
+  --steel:#82A9E3; --void:#FF7A58; --seal:#4FC4A6; --term-bg:#070C12; color-scheme:dark }
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font:16.5px/1.75 var(--f-body);word-break:keep-all;overflow-wrap:anywhere}
+a{color:var(--steel)}
+:focus-visible{outline:2px solid var(--steel);outline-offset:2px}
+.wrap{max-width:860px;margin:0 auto;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px))}
+.top{display:flex;justify-content:space-between;gap:12px;padding-block:18px 0;font-size:14px}
+.top a{color:var(--ink-2);text-decoration:none}
+.top a:hover{color:var(--ink)}
+.top .r a{margin-left:14px}
+.eyebrow{font:600 13px/1 var(--f-mono);letter-spacing:.14em;color:var(--steel);text-transform:uppercase;margin:0 0 12px}
+h1{font-family:var(--f-display);font-weight:400;font-size:clamp(52px,13vw,116px);line-height:.92;margin:6px 0 16px;letter-spacing:-.01em}
+h1 span{color:var(--void)}
+.lede{color:var(--ink-2);max-width:40rem;margin:0 0 8px;font-size:18px}
+.hero{padding-block:30px 26px;border-bottom:2px solid var(--ink)}
+h2{font-family:var(--f-display);font-weight:400;font-size:clamp(26px,4.4vw,34px);line-height:1.15;margin:52px 0 6px}
+h2 .n{color:var(--steel);font-family:var(--f-mono);font-size:.62em;margin-right:12px;vertical-align:.08em}
+h3{font-size:17px;margin:26px 0 8px}
+p{margin:0 0 14px}
+ul{margin:0 0 14px;padding-left:1.2em}
+li{margin:5px 0}
+code{font-family:var(--f-mono);font-size:.86em;background:color-mix(in srgb,var(--ink) 9%,transparent);padding:1px 5px;border-radius:5px}
+b{font-weight:700}
+.sub{color:var(--ink-2);font-size:15px;margin:-2px 0 14px}
+
+/* 터미널 명령 블록 */
+.term{background:var(--term-bg);color:var(--term-ink);font:14px/1.7 var(--f-mono);border-radius:12px;padding:16px 18px;margin:0 0 16px;overflow:auto;white-space:pre-wrap;border:1px solid color-mix(in srgb,var(--term-ink) 14%,transparent)}
+.term .c{color:var(--t-dim)}       /* 주석 */
+.term .p{color:var(--t-green)}     /* 입력 */
+.term .o{color:var(--term-ink)}    /* 출력 */
+.term .k{color:var(--t-yel)}
+.term b{color:#fff}
+
+/* 단계 */
+.step{border-left:2px solid var(--rule);padding:2px 0 2px 20px;margin:0 0 6px}
+.tip{background:var(--sheet);border:1px solid var(--rule);border-radius:12px;padding:12px 16px;font-size:15px;color:var(--ink-2);margin:0 0 16px}
+.tip b{color:var(--ink)}
+
+/* 방법 카드 */
+.opts{display:grid;gap:14px;margin:14px 0 18px}
+.opt{background:var(--sheet);border:1px solid var(--rule);border-radius:14px;padding:16px 18px;position:relative}
+.opt .h{display:flex;align-items:baseline;gap:10px;margin:0 0 6px}
+.opt .tag{font:600 12px/1 var(--f-mono);color:#fff;background:var(--steel);border-radius:999px;padding:5px 9px;white-space:nowrap}
+.opt.two .tag{background:var(--seal)} .opt.three .tag{background:var(--void)}
+.opt .t{font-weight:700;font-size:16.5px}
+.opt .lv{margin-left:auto;font:500 12.5px/1 var(--f-mono);color:var(--ink-2)}
+.opt p{margin:0;font-size:15px;color:var(--ink-2)}
+.pick{background:color-mix(in srgb,var(--seal) 12%,transparent);border:1px solid color-mix(in srgb,var(--seal) 40%,transparent);border-radius:14px;padding:16px 18px;margin:8px 0 10px}
+.pick b{color:var(--seal)}
+
+/* 토폴로지 그림 */
+.diag{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:10px 0 18px}
+@media (max-width:560px){.diag{grid-template-columns:1fr}}
+.diag figure{margin:0;background:var(--sheet);border:1px solid var(--rule);border-radius:14px;padding:14px}
+.diag figcaption{font:600 13px/1.4 var(--f-mono);color:var(--ink-2);margin-top:6px;text-align:center}
+.diag svg{width:100%;height:auto;display:block}
+.foot{color:var(--ink-2);font-size:14.5px;margin:40px 0 50px;border-top:1px solid var(--rule);padding-top:16px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="top"><a href="../guide/">← 덜미 설명서</a><span class="r"><a href="../code/">코드</a><a href="/">작업실</a></span></nav>
+</div>
+
+<header class="hero"><div class="wrap">
+  <p class="eyebrow">덜미 · 실행과 구조</p>
+  <h1>실행<span>하기</span></h1>
+  <p class="lede">빌드해서 서버와 클라이언트를 띄우는 법. 그리고 "서버와 클라이언트를 한 프로그램에서 함께 할 수 있나?"에 대한 답.</p>
+</div></header>
+
+<main class="wrap">
+
+<h2><span class="n">01</span>처음 한 번 — 우분투 준비</h2>
+<p class="sub">윈도우라면 WSL2 위에서 돌린다. 평문 버전이라 libsodium도 필요 없다.</p>
+<div class="term"><span class="c"># 윈도우 PowerShell (관리자)에서 — 한 번만</span>
+<span class="p">wsl --install -d Ubuntu-24.04</span>
+<span class="c"># 재부팅하고 우분투를 처음 켜면 사용자 이름·비밀번호를 정한다. 그다음:</span>
+<span class="p">sudo apt update && sudo apt install -y build-essential</span></div>
+
+<h2><span class="n">02</span>빌드</h2>
+<p>코드가 있는 폴더로 가서 <code>make</code>. 서버와 클라이언트 두 개가 만들어진다.</p>
+<div class="term"><span class="p">cd /mnt/c/Users/user/Desktop/deolmi</span>   <span class="c"># 코드 둔 곳</span>
+<span class="p">make</span>
+<span class="o">gcc ... -o server ...</span>
+<span class="o">gcc ... -o client ...</span>
+<span class="p">make test</span>   <span class="c"># 네트워크·서버 테스트가 다 통과하면 OK</span></div>
+<div class="tip"><b>참고</b> — <code>wsl --cd &lt;경로&gt;</code> 가 에러나는 환경이 있다. 그럴 땐 <code>wsl -d Ubuntu-24.04 -- bash -lc "cd /mnt/c/.../deolmi &amp;&amp; make"</code> 처럼 bash 안에서 <code>cd</code> 한다.</div>
+
+<h2><span class="n">03</span>한 대에서 여러 명 (제일 쉬움)</h2>
+<p>터미널을 여러 개 연다. 하나는 서버, 사람마다 하나씩 클라이언트. 같은 컴퓨터면 서버 주소는 생략(127.0.0.1).</p>
+<div class="term"><span class="c"># 1번 터미널 — 서버</span>
+<span class="p">./server</span>
+<span class="o">[서버] 9000번에서 기다리는 중 …</span>
+
+<span class="c"># 2번 터미널 — 민지</span>
+<span class="p">./client 민지</span>
+
+<span class="c"># 3번 터미널 — 현우</span>
+<span class="p">./client 현우</span></div>
+<ul>
+<li>그냥 치면 전체 대화, <code>/dm 이름</code> 은 1:1, <code>/who</code> 는 접속자, <code>/quit</code> 로 나간다.</li>
+<li><b>Windows Terminal</b>이면 창 하나를 <code>Alt+Shift+D</code> 로 나눠 네 칸을 만들면 서버·세 명을 한 화면에서 본다.</li>
+<li>서버를 끄려면 그 터미널에서 <code>Ctrl+C</code>.</li>
+</ul>
+
+<h2><span class="n">04</span>여러 노트북에서 (발표용)</h2>
+<p>같은 와이파이의 노트북들이 붙으려면, <b>서버를 켤 노트북</b>에서 두 가지가 돼 있어야 한다.</p>
+<h3>① 미러링</h3>
+<p><code>C:\Users\&lt;이름&gt;\.wslconfig</code> 에 아래를 넣고, 바꿨으면 <code>wsl --shutdown</code> 후 다시 켠다. 이러면 WSL이 윈도우와 같은 LAN IP를 쓴다.</p>
+<div class="term"><span class="k">[wsl2]</span>
+networkingMode=mirrored</div>
+<h3>② 방화벽 인바운드 9000 허용</h3>
+<p>WSL은 Hyper-V 방화벽 인바운드 기본값이 Block이라, 규칙을 안 넣으면 다른 노트북이 못 붙는다. <b>관리자 권한 PowerShell</b>에서 한 번만:</p>
+<div class="term"><span class="p">New-NetFirewallHyperVRule</span> -DisplayName <span class="k">"덜미 9000"</span> -Direction Inbound `
+  -VMCreatorId <span class="k">"{40E0AC32-46A5-438A-A0B2-2B479E8F2E90}"</span> `
+  -Protocol TCP -LocalPorts <span class="k">9000</span> -Action Allow</div>
+<p>확인은 <code>Test-NetConnection &lt;서버 IP&gt; -Port 9000</code> 의 <code>TcpTestSucceeded</code> 가 <code>True</code> 면 열린 것. 서버 노트북의 IP는 <code>ipconfig</code> 의 Wi-Fi IPv4 주소. 다른 노트북은:</p>
+<div class="term"><span class="p">./client 수빈 192.168.0.5</span>   <span class="c"># 뒤에 서버 노트북 IP</span></div>
+
+<h2><span class="n">05</span>막히면</h2>
+<ul>
+<li><code>bind: Address already in use</code> → 서버가 이미 떠 있다. 이전 서버를 끄거나(<code>pkill -x server</code>) 잠깐 뒤 다시.</li>
+<li>다른 노트북이 안 붙음 → 위 방화벽 규칙 + 같은 와이파이 + IP 확인(<code>Test-NetConnection</code>).</li>
+<li>클라이언트가 바로 꺼짐 → 서버가 안 떠 있거나 주소가 틀림. 서버 먼저 켠다.</li>
+<li>이름이 거절됨 → 이름은 15바이트까지(한글 5글자), 띄어쓰기와 <code>/</code> 없이.</li>
+</ul>
+
+<h2><span class="n">06</span>서버와 클라이언트를 한 프로그램에서?</h2>
+<p><b>짧은 답: 된다.</b> 지금 둘로 나눠 둔 건 어쩔 수 없어서가 아니라, 구조를 단순하게 두려고 일부러 그렇게 한 것이다.</p>
+<p>지금은 가운데 <b>서버 1개</b>가 모두를 이어 주는 <b>별 모양</b>이다. 서버는 받은 메시지를 <code>to</code>에 적힌 사람에게 전해 주기만 한다. 합치는 길은 세 가지다.</p>
+
+<div class="diag">
+  <figure>
+    <svg viewBox="0 0 200 150" role="img" aria-label="별 모양 구조: 가운데 서버, 둘레에 세 사람">
+      <g fill="none" stroke="currentColor" stroke-width="1.4" opacity=".55">
+        <line x1="100" y1="75" x2="38" y2="34"/><line x1="100" y1="75" x2="162" y2="34"/><line x1="100" y1="75" x2="100" y2="128"/>
+      </g>
+      <g font-family="IBM Plex Mono, monospace" font-size="11" text-anchor="middle">
+        <rect x="68" y="62" width="64" height="26" rx="7" fill="#CF3B1C"/><text x="100" y="79" fill="#fff" font-weight="600">서버</text>
+        <circle cx="38" cy="34" r="15" fill="#2A4F86"/><text x="38" y="38" fill="#fff">민지</text>
+        <circle cx="162" cy="34" r="15" fill="#2A4F86"/><text x="162" y="38" fill="#fff">현우</text>
+        <circle cx="100" cy="128" r="15" fill="#2A4F86"/><text x="100" y="132" fill="#fff">수빈</text>
+      </g>
+    </svg>
+    <figcaption>지금 — 별 모양</figcaption>
+  </figure>
+  <figure>
+    <svg viewBox="0 0 200 150" role="img" aria-label="방법 2: 수빈이 서버이면서 참여자, 민지와 현우가 붙음">
+      <g fill="none" stroke="currentColor" stroke-width="1.4" opacity=".55">
+        <line x1="100" y1="88" x2="40" y2="40"/><line x1="100" y1="88" x2="160" y2="40"/>
+      </g>
+      <g font-family="IBM Plex Mono, monospace" font-size="11" text-anchor="middle">
+        <rect x="58" y="74" width="84" height="30" rx="8" fill="#17806A"/><text x="100" y="86" fill="#fff" font-weight="600" font-size="10.5">수빈</text><text x="100" y="98" fill="#fff" font-size="8.5">서버+참여</text>
+        <circle cx="40" cy="40" r="15" fill="#2A4F86"/><text x="40" y="44" fill="#fff">민지</text>
+        <circle cx="160" cy="40" r="15" fill="#2A4F86"/><text x="160" y="44" fill="#fff">현우</text>
+      </g>
+    </svg>
+    <figcaption>방법 2 — 호스트가 둘 다</figcaption>
+  </figure>
+</div>
+
+<div class="opts">
+  <div class="opt one">
+    <div class="h"><span class="tag">방법 1</span><span class="t">한 파일, 켤 때 역할 선택</span><span class="lv">쉬움</span></div>
+    <p><code>./deolmi --host</code> 면 서버, <code>./deolmi 민지</code> 면 클라이언트. <code>net.c</code> 같은 공통 코드를 함께 쓰고 <code>main</code>만 둘로 나눈다. 배포 파일이 하나가 된다. (동시에 두 역할은 아니고, 켤 때 고른다.)</p>
+  </div>
+  <div class="opt two">
+    <div class="h"><span class="tag">방법 2</span><span class="t">호스트가 서버이면서 참여자</span><span class="lv">중간</span></div>
+    <p>한 프로세스가 포트를 열어 <b>중계도 하고, 자기도 방의 참가자로 대화</b>한다. 서버 터미널을 따로 안 띄워도 된다. <code>poll</code> 하나로 (듣는 소켓 + 손님들 + 내 키보드)를 같이 보고, 내가 친 메시지는 네트워크를 거치지 않고 바로 중계 경로에 넣으면 된다.</p>
+  </div>
+  <div class="opt three">
+    <div class="h"><span class="tag">방법 3</span><span class="t">서버 없이 완전 P2P</span><span class="lv">큼</span></div>
+    <p>모두가 서로 직접 연결하는 그물망. 중앙 서버가 사라지지만, 누가 누구에게 잇고 그룹 대화를 누가 중계할지가 복잡해진다. 과제에는 과하다.</p>
+  </div>
+</div>
+
+<div class="pick"><b>추천</b> — 지금은 <b>역할을 나눠 두는 편이 낫다.</b> ⑴ 구조가 단순해 디버깅과 발표 설명이 쉽고, ⑵ 나중에 암호화를 얹을 때 "서버는 내용을 못 보고 전해 주기만 한다"를 보여 주려면 서버가 뚜렷이 구분돼 있는 게 유리하다. 배포를 하나로 하고 싶으면 <b>방법 1</b>이 깔끔하고, 호스트도 대화에 끼고 싶으면 <b>방법 2</b>가 편의 업그레이드다.</div>
+
+<p class="foot">코드는 <a href="../code/">전체 코드</a>에서, 원리와 계획은 <a href="../guide/">덜미 설명서</a>에서.</p>
+
+</main>
+</body>
+</html>
