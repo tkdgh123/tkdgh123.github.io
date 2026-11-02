@@ -1263,14 +1263,15 @@ seq가 건너뛰면  <span class="r">[!] A→B #6이 오지 않음: 대화가 �
     </div>
     <div class="tbl wide"><table>
       <tr><th>명령</th><th>서버가 하는 짓</th><th>덜미</th></tr>
-      <tr><td><code>tamper B</code></td><td>B에게 가는 다음 MSG 암호문 마지막 바이트를 <code>^= 0x01</code></td><td>B: [!] 변조 감지</td></tr>
-      <tr><td><code>replay B</code></td><td>B에게 마지막으로 보낸 패킷을 한 번 더 보냄</td><td>B: [!] 순서번호 불일치</td></tr>
+      <tr><td><code>tamper B</code></td><td>B에게 가는 다음 MSG 암호문 마지막 바이트를 <code>^= 0x01</code></td><td>B: [!] 변조 감지. 그 문장을 몰라서 그다음 메시지부터 A→B가 끊김 (B→A는 그대로)</td></tr>
+      <tr><td><code>replay B</code></td><td>B에게 마지막으로 보낸 패킷을 한 번 더 보냄</td><td>B: [!] 순서번호 불일치. 대화는 안 끊김</td></tr>
       <tr><td><code>drop B</code></td><td>B에게 가는 다음 MSG를 몰래 버림</td><td>그다음 메시지가 오면 B: [!] #6이 오지 않음: 대화 끊김</td></tr>
       <tr><td><code>swap B</code></td><td>서버 키로 만든 가짜 B의 HELLO를 전원에게 뿌림</td><td>전원: [!] B의 열쇠가 바뀜 + 단어 비교</td></tr>
       <tr><td><code>peek</code></td><td>마지막으로 지나간 금고 조각을 서버 키로 열어 봄</td><td>서버 창: 열기 실패 (조각이 B, C에게 봉인됨)</td></tr>
       <tr><td><code>forge B C</code></td><td>남의 이름으로 서버 키가 서명한 가짜 금고를 B, C에게</td><td>B, C: [!] 서명 불일치</td></tr>
       <tr><td><code>mitm A B</code> <span class="tier opt">선택</span></td><td>처음부터 양쪽과 따로 키를 맞춰 평문을 엿보고 다시 암호화</td><td>서버 창에 평문이 보임 → 단어를 비교하는 순간 들킴</td></tr>
     </table></div>
+    <p class="fine">시연은 <code>replay</code>를 먼저 합니다. <code>tamper</code>와 <code>drop</code>은 A→B를 끊으므로, 그 뒤에는 B가 다시 접속하면 새 열쇠로 이어집니다.</p>
     <p class="fine"><code>swap</code>·<code>peek</code>·<code>forge</code>·<code>mitm</code> 때문에 서버도 libsodium을 링크합니다(키 만들기와 서명만). 단어를 맞추기 전에는 서버가 자기 키로 서명해서 <code>forge</code>가 통하고, 맞춘 뒤에는 실패합니다. 발표에서 이 두 장면을 차례로 보여 줍니다.</p>
   </div>
 </section>
