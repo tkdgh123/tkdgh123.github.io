@@ -146,6 +146,13 @@ export async function launch({ scrollbars = false } = {}) {
 
   return {
     newPage,
-    async close() { b.close(); proc.kill(); await sleep(300); try { rmSync(prof, { recursive: true, force: true }); } catch {} }
+    // 크롬이 완전히 꺼진 뒤에 지운다. 300ms만 기다리면 파일이 잠겨 있어 프로필이 남았다
+    async close() {
+      b.close();
+      const exited = new Promise((r) => proc.exitCode !== null ? r() : proc.once("exit", r));
+      proc.kill();
+      await Promise.race([exited, sleep(5000)]);
+      rmSync(prof, { recursive: true, force: true, maxRetries: 10, retryDelay: 200 });
+    }
   };
 }
