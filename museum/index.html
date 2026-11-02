@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>잠긴 페이지</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@250;600&display=swap">
+<style>
+:root { --paper: #f2f1ec; --ink: #151514; --muted: #5a5954; --rule: #c9c6bc; --blue: #2b44a6 }
+* { box-sizing: border-box }
+body { margin: 0; min-height: 100svh; display: grid; grid-template-rows: auto 1fr; background: var(--paper); color: var(--ink); font: 400 17px/1.6 "Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif }
+header { padding: 26px clamp(16px, 3.2vw, 52px) }
+header a { font: 600 22px/1 Hahmlet, serif; text-decoration: none; color: inherit }
+form { align-self: center; justify-self: center; width: min(100% - 32px, 420px); display: grid; gap: 14px; padding-bottom: 12vh }
+body:not(.ask) form { visibility: hidden }
+h1 { margin: 0 0 18px; font: 250 clamp(44px, 9vw, 72px)/1.05 Hahmlet, serif; letter-spacing: -.02em }
+h1 b { font-weight: 600 }
+input { font: inherit; padding: 14px 16px; border: 0; border-bottom: 2px solid var(--ink); background: transparent; outline: none }
+input:focus-visible { border-color: var(--blue) }
+button { font: 700 16px/1 inherit; min-height: 54px; border: 0; background: var(--blue); color: #fff; cursor: pointer }
+button:disabled { opacity: .6 }
+button:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px }
+#msg { min-height: 1.6em; margin: 0; color: #a3261d; font-size: 15px }
+</style>
+</head>
+<body>
+<header><a href="/">작업실</a></header>
+<form id="f">
+  <h1>잠긴 <b>페이지</b></h1>
+  <input id="pw" type="password" autocomplete="current-password" aria-label="비밀번호" placeholder="비밀번호" required autofocus>
+  <button id="go">열기</button>
+  <p id="msg" role="alert"></p>
+</form>
+<script src="/lock/gate.js"></script>
+</body>
+</html>
