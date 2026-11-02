@@ -1,0 +1,809 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>마디 움직임 비교</title>
+<meta name="description" content="마디 캐릭터 조정값 15개를 사람 모캡 측정·논문·ARPG·3인칭 액션 게임과 나란히 놓은 비교 — 사람 숫자, 게임 타이밍, 빠진 동작, 검사 방법">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@300;500;700&display=swap">
+<script src="../../icons.js" defer></script>
+<style>
+/* 마디 기획서·공부와 같은 작업대 결: 회색 종이, 어두운 뷰포트, 관절 주황 하나. 여기선 실험실 측정판처럼 */
+:root {
+  --paper: #eceef0; --tone: #dfe2e6; --card: #f6f7f8; --ink: #15171a; --muted: #5b6068; --rule: #c4c8ce;
+  --vp: #1c1e22; --vp-2: #26292e; --vp-3: #31353b; --on-vp: #e8eaed; --on-vp-soft: #9aa0a8;
+  --joint: #f06a1d; --joint-ink: #b7470a; --joint-soft: #fbe3d4; --ok: #2f7d4f; --ok-soft: #dcefe3;
+  --m: clamp(16px, 4vw, 64px);
+  --display: "IBM Plex Sans KR", "Pretendard Variable", Pretendard, system-ui, sans-serif;
+  --sans: "Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif;
+  --mono: "IBM Plex Mono", "Pretendard Variable", ui-monospace, monospace;
+  --cut: clamp(28px, 5vw, 72px);
+  color-scheme: light;
+}
+* { box-sizing: border-box }
+html { scroll-behavior: smooth }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 16.5px/1.7 var(--sans); word-break: keep-all; overflow-wrap: anywhere; -webkit-font-smoothing: antialiased; overflow-x: clip }
+a { color: inherit; text-decoration-color: var(--joint); text-underline-offset: 3px }
+h1, h2, h3 { margin: 0; font-family: var(--display); letter-spacing: -.02em; line-height: 1.15; text-wrap: balance }
+p { margin: 0 }
+ul, ol { margin: 0; padding: 0; list-style: none }
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums }
+.wrap { max-width: 1280px; margin: 0 auto; padding-left: max(var(--m), env(safe-area-inset-left, 0px)); padding-right: max(var(--m), env(safe-area-inset-right, 0px)) }
+:focus-visible { outline: 2px solid var(--joint); outline-offset: 3px }
+.ic { display: inline-flex; width: 16px; height: 16px; flex: none }
+.e { display: inline-block; font: 500 10.5px/1.5 var(--mono); font-style: normal; padding: 0 5px; border-radius: 3px; background: #f3e6c4; color: #7a5200; vertical-align: 2px; margin-left: 4px; white-space: nowrap }
+
+/* ── 첫 화면 ── */
+.hero { background: var(--vp); color: var(--on-vp); position: relative; overflow: hidden; padding-top: 24px }
+.top { display: flex; justify-content: space-between; gap: 16px; font-size: 13px; color: var(--on-vp-soft) }
+.top a { text-decoration: none } .top a:hover { color: var(--on-vp) }
+.hero-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(24px, 4vw, 56px); align-items: center; margin-top: clamp(28px, 5vw, 56px) }
+.hero h1 { font-size: clamp(54px, 7.2vw, 104px); font-weight: 300; letter-spacing: -.045em; line-height: .92 }
+.hero h1 b { font-weight: 700; color: var(--joint) }
+.lede { margin-top: 24px; font-size: clamp(17px, 1.5vw, 20px); line-height: 1.6; max-width: 32ch }
+.counts { display: flex; flex-wrap: wrap; gap: 12px 32px; margin-top: 32px }
+.counts div { display: grid }
+.counts b { font: 300 clamp(36px, 4vw, 52px)/1 var(--display); color: var(--on-vp) }
+.counts span { font: 500 12px var(--mono); color: var(--on-vp-soft); margin-top: 6px }
+.shot { position: relative; margin: 0; min-width: 0 }
+.shot::before { content: ""; position: absolute; inset: 8% -40% -6% 18%; background: var(--joint); transform: skewX(-14deg); z-index: 0 }
+.shot img { position: relative; z-index: 1; display: block; width: 100%; height: auto; aspect-ratio: 16 / 10; clip-path: polygon(9% 0, 100% 0, 100% 100%, 0 100%) }
+.shot figcaption { position: relative; z-index: 2; margin-top: 10px; text-align: right; font: 500 11.5px var(--mono); color: #1a0f07 }
+nav.jump { display: flex; gap: 2px; margin-top: clamp(32px, 5vw, 56px); overflow-x: auto; scrollbar-width: none; position: relative; z-index: 2 }
+nav.jump::-webkit-scrollbar { display: none }
+nav.jump a { flex: none; display: flex; align-items: center; gap: 8px; padding: 14px 16px 16px; text-decoration: none; color: var(--on-vp-soft); font-weight: 600; font-size: 14.5px; border-radius: 6px 6px 0 0 }
+nav.jump a:hover { color: var(--on-vp); background: var(--vp-2) }
+nav.jump a:first-child { background: var(--paper); color: var(--ink) }
+nav.jump a:first-child .ic { color: var(--joint-ink) }
+
+/* ── 공통 ── */
+section.s { padding-block: clamp(56px, 8vw, 112px); scroll-margin-top: 8px }
+.eyebrow { font: 500 12.5px var(--mono); letter-spacing: .08em; color: var(--joint-ink); text-transform: uppercase }
+.s h2 { font-size: clamp(30px, 4vw, 52px); font-weight: 500; margin-top: 12px; max-width: 20ch }
+.s .sub { margin-top: 14px; color: var(--muted); max-width: 58ch }
+.dark { background: var(--vp); color: var(--on-vp) }
+.dark .eyebrow { color: var(--joint) }
+.dark .sub { color: var(--on-vp-soft) }
+.slant { clip-path: polygon(0 var(--cut), 100% 0, 100% 100%, 0 100%); margin-top: calc(-1 * var(--cut)); padding-top: calc(clamp(56px, 8vw, 112px) + var(--cut)) }
+
+/* ── 비교표 ── */
+.key { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 28px; font-size: 14px; color: var(--muted) }
+.key span { display: inline-flex; align-items: center; gap: 8px }
+.chip { display: inline-block; font: 600 11.5px/1 var(--mono); padding: 5px 8px 4px; border-radius: 3px; white-space: nowrap }
+.c-split { background: var(--joint); color: #1a0f07 }
+.c-up { background: var(--ink); color: var(--paper) }
+.c-ok { background: var(--ok-soft); color: var(--ok) }
+.scroll { margin-top: 24px; overflow-x: auto; border-top: 3px solid var(--ink); overscroll-behavior-x: contain }
+.cmp { width: 100%; min-width: 1100px; table-layout: fixed; border-collapse: separate; border-spacing: 0; font-size: 14px }
+.cmp th, .cmp td { text-align: left; vertical-align: top; padding: 14px 12px; border-bottom: 1px solid var(--rule) }
+.cmp thead th { font: 500 11.5px/1.4 var(--mono); color: var(--muted); letter-spacing: .03em; padding-block: 12px; vertical-align: bottom; background: var(--paper) }
+.cmp thead th small { display: block; font-weight: 400; color: var(--muted); opacity: .85 }
+.cmp th[scope="row"] { position: sticky; left: 0; z-index: 1; background: var(--paper); padding-left: 14px; font: 600 15px/1.35 var(--sans); box-shadow: inset 4px 0 0 transparent }
+.cmp thead th:first-child { position: sticky; left: 0; z-index: 2; padding-left: 14px }
+.cmp tr.split th[scope="row"] { box-shadow: inset 4px 0 0 var(--joint) }
+.cmp tr.split td.now { background: #f8d6c0 }
+.cmp td b { display: block; white-space: nowrap; font: 600 18px/1.15 var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -.02em }
+.cmp td small { display: block; margin-top: 4px; font-size: 12.5px; line-height: 1.45; color: var(--muted) }
+.cmp td.now { background: var(--joint-soft) }
+.cmp td.now b { color: var(--joint-ink) }
+.cmp thead th.now { background: var(--joint); color: #1a0f07 }
+.cmp thead th.now small { color: #1a0f07 }
+.cmp .c1 { width: 178px } .cmp .c2 { width: 86px } .cmp .c3 { width: 150px } .cmp .c4 { width: 170px } .cmp .c5 { width: 132px } .cmp .c6 { width: 142px }
+.cmp td.note { font-size: 13.5px; line-height: 1.5 }
+.cmp td.note .chip { margin-bottom: 6px }
+.cmp tr.grp th { position: sticky; left: 0; background: var(--paper); font: 500 12px var(--mono); color: var(--joint-ink); letter-spacing: .08em; padding: 22px 14px 8px; border-bottom: 1px solid var(--ink) }
+.cmp tr:hover th[scope="row"], .cmp tr:hover td:not(.now) { background: var(--card) }
+.swipe { display: none; margin-top: 10px; font: 500 12px var(--mono); color: var(--muted) }
+
+/* ── 회전 갈림 ── */
+.turn-grid { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 4fr); gap: clamp(32px, 5vw, 72px); margin-top: 48px; align-items: start }
+.rng { display: grid; gap: 4px }
+.rng .row { display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 4px 16px; align-items: center; padding-block: 8px }
+.rng .lab { font-size: 14px; line-height: 1.35 }
+.rng .lab small { display: block; font: 500 11px var(--mono); color: var(--on-vp-soft) }
+.track { position: relative; height: 28px; background: repeating-linear-gradient(to right, rgb(255 255 255 / .09) 0 1px, transparent 1px 25%); box-shadow: inset -1px 0 0 rgb(255 255 255 / .09) }
+.bar { position: absolute; top: 9px; height: 10px; border-radius: 4px; left: calc(var(--a) * 1%); width: calc((var(--b) - var(--a)) * 1%); min-width: 6px }
+.bar.h { background: var(--on-vp) }
+.bar.g { background: var(--joint) }
+.bar.pt { width: 14px; height: 14px; top: 7px; margin-left: -7px; border-radius: 50%; background: var(--vp); border: 3px solid var(--joint); min-width: 0 }
+.bar.pt.hp { border-color: var(--on-vp) }
+.val { position: absolute; top: 4px; font: 500 12px/20px var(--mono); color: var(--on-vp-soft); white-space: nowrap; left: calc(var(--b) * 1% + 10px) }
+.val.l { left: auto; right: calc((100 - var(--a)) * 1% + 10px) }
+.axis { display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 16px; margin-top: 6px }
+.axis div { position: relative; height: 22px; border-top: 1px solid rgb(255 255 255 / .25); font: 500 11px var(--mono); color: var(--on-vp-soft) }
+.axis div span { position: absolute; top: 4px; transform: translateX(-50%); white-space: nowrap } .axis div span:first-child { transform: none } .axis div span:last-child { transform: translateX(-100%) }
+.rng-key { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-bottom: 14px; font-size: 13px; color: var(--on-vp-soft) }
+.rng-key i { display: inline-block; width: 18px; height: 8px; border-radius: 3px; margin-right: 6px; vertical-align: 1px }
+.answer { background: var(--joint); color: #1a0f07; padding: clamp(22px, 3vw, 32px); clip-path: polygon(0 0, 100% 0, 100% 100%, 22px 100%, 0 calc(100% - 22px)) }
+.answer h3 { font-size: 22px; font-weight: 700 }
+.answer p { margin-top: 10px; font-size: 15.5px }
+.answer p b { font-weight: 700 }
+.big2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 20px }
+.big2 div { border-top: 1px solid rgb(255 255 255 / .2); padding-top: 12px }
+.big2 b { display: block; font: 300 clamp(30px, 3vw, 40px)/1 var(--display) }
+.big2 span { display: block; margin-top: 6px; font-size: 13px; color: var(--on-vp-soft) }
+
+/* ── 사람 숫자 ── */
+.human { background: var(--tone) }
+.htabs { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 36px }
+.htabs button { font: 600 14.5px var(--sans); border: 0; border-radius: 4px; padding: 9px 14px; background: transparent; color: var(--muted); cursor: pointer; box-shadow: inset 0 0 0 1px var(--rule) }
+.htabs button[aria-selected="true"] { background: var(--ink); color: var(--paper); box-shadow: none }
+.hpanels { margin-top: 18px }
+.hpanel[hidden] { display: none }
+.ht { width: 100%; border-collapse: collapse; font-size: 15px; border-top: 3px solid var(--ink) }
+.ht th, .ht td { text-align: left; vertical-align: top; padding: 11px 16px 11px 0; border-bottom: 1px solid var(--rule) }
+.ht thead th { font: 500 11.5px var(--mono); color: var(--muted); letter-spacing: .04em }
+.ht td:first-child { font-weight: 600; width: 22% }
+.ht td.mc { font-weight: 500; font-variant-numeric: tabular-nums; width: 38% }
+.ht td.lit { font-size: 14.5px }
+.hside { display: grid; grid-template-columns: minmax(0, 8fr) minmax(0, 3fr); gap: clamp(24px, 4vw, 56px); align-items: start }
+.hside aside { background: var(--vp); color: var(--on-vp); padding: 22px; font-size: 14.5px; transform: rotate(-1.2deg); margin-top: 24px }
+.hside aside b { display: block; font: 300 44px/1 var(--display); color: var(--joint) }
+.hside aside p { margin-top: 10px }
+.hside aside small { display: block; margin-top: 10px; font: 500 11.5px var(--mono); color: var(--on-vp-soft) }
+
+/* ── 게임 ── */
+.gt { width: 100%; min-width: 1080px; border-collapse: collapse; font-size: 14px }
+.gt th, .gt td { text-align: left; vertical-align: top; padding: 13px 12px; border-bottom: 1px solid var(--rule) }
+.gt thead th { font: 500 11.5px var(--mono); color: var(--muted); letter-spacing: .04em }
+.gt th[scope="row"] { position: sticky; left: 0; z-index: 1; background: var(--paper); min-width: 132px; font: 700 15px/1.3 var(--display) }
+.gt th[scope="row"] small { display: block; font: 500 11px var(--mono); color: var(--muted); margin-top: 3px }
+.gt td b { font: 600 15px var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap }
+.gt td small { display: block; color: var(--muted); font-size: 12.5px; line-height: 1.45; margin-top: 2px }
+.gt tr.arpg > * { background: var(--tone) }
+.gt tr.arpg th[scope="row"] { background: var(--tone); box-shadow: inset 4px 0 0 var(--ink) }
+.gt .na { color: var(--muted) }
+.pat-wrap { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: clamp(28px, 4vw, 64px); margin-top: 64px; align-items: start }
+.slab { background: var(--joint); color: #1a0f07; padding: clamp(24px, 3vw, 36px) clamp(24px, 3vw, 36px) 64px; clip-path: polygon(0 0, 100% 0, 100% calc(100% - 48px), 0 100%); position: sticky; top: 24px }
+.slab b { display: block; font: 300 clamp(80px, 9vw, 128px)/.85 var(--display); letter-spacing: -.04em }
+.slab h3 { font-size: clamp(22px, 2.2vw, 28px); font-weight: 700; margin-top: 14px }
+.pats { counter-reset: p }
+.pats li { counter-increment: p; padding: 14px 0 16px; border-bottom: 1px solid var(--rule); display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 0 10px }
+.pats li:first-child { border-top: 3px solid var(--ink) }
+.pats li::before { content: counter(p, decimal-leading-zero); font: 500 13px/1.6 var(--mono); color: var(--joint-ink) }
+.pats b { display: block; font-family: var(--display); font-size: 17px; line-height: 1.35 }
+.pats span { display: block; margin-top: 4px; font-size: 14.5px; color: var(--muted) }
+
+/* ── 빠진 동작 ── */
+.has { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 28px; font-size: 14px; color: var(--on-vp-soft) }
+.has .st { font: 500 12.5px var(--mono); padding: 5px 10px; border-radius: 3px; background: var(--vp-3); color: var(--on-vp) }
+.miss { margin-top: 36px; display: grid; counter-reset: r }
+.miss li { counter-increment: r; display: grid; grid-template-columns: 88px minmax(0, 1.1fr) minmax(0, 1fr); gap: 6px 32px; padding-block: 24px; border-top: 1px solid rgb(255 255 255 / .12) }
+.miss li::before { content: counter(r); font: 300 clamp(48px, 5vw, 64px)/.9 var(--display); color: var(--on-vp-soft) }
+.miss li:nth-child(-n+2)::before { color: var(--joint) }
+.miss h3 { font-size: 21px; font-weight: 700 }
+.miss .fix { margin-top: 4px; font-size: 14px; color: var(--on-vp-soft) }
+.miss .how { font-weight: 600; font-size: 15px; line-height: 1.6; font-variant-numeric: tabular-nums; color: var(--on-vp) }
+.miss .how small { display: block; margin-top: 6px; font: 400 13px var(--sans); color: var(--on-vp-soft) }
+.later { margin-top: 18px; font-size: 14px; color: var(--on-vp-soft) }
+
+/* ── 릴스 ── */
+.reels { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); margin-top: 48px }
+.reel { padding: clamp(24px, 3.5vw, 44px) }
+.reel.a { background: var(--ink); color: var(--on-vp); clip-path: polygon(0 0, 100% 0, calc(100% - 36px) 100%, 0 100%); padding-right: calc(clamp(24px, 3.5vw, 44px) + 36px) }
+.reel.b { background: var(--joint); color: #1a0f07; margin-left: -36px; clip-path: polygon(36px 0, 100% 0, 100% 100%, 0 100%); padding-left: calc(clamp(24px, 3.5vw, 44px) + 36px) }
+.reel .who { font: 500 12.5px var(--mono); opacity: .75 }
+.reel h3 { font-size: clamp(24px, 2.4vw, 32px); font-weight: 700; margin-top: 6px }
+.reel ul { margin-top: 18px; display: grid; gap: 12px }
+.reel li { font-size: 15px; padding-left: 16px; position: relative }
+.reel li::before { content: ""; position: absolute; left: 0; top: .72em; width: 7px; height: 2px; background: currentColor }
+.reel li code { font: 500 12.5px var(--mono); background: rgb(255 255 255 / .1); padding: 1px 5px; border-radius: 3px }
+.reel.b li code { background: rgb(0 0 0 / .1) }
+.reel .lim { margin-top: 18px; font: 500 12px var(--mono); opacity: .75 }
+
+/* ── 검사 ── */
+.test { background: var(--vp); color: var(--on-vp) }
+.film { margin: 40px 0 0; position: relative }
+.film img { display: block; width: 100%; height: auto; aspect-ratio: 1800 / 420 }
+.film figcaption, .feet figcaption { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 8px; font: 500 12px var(--mono); color: var(--on-vp-soft) }
+.test-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: clamp(28px, 4vw, 56px); margin-top: 36px; align-items: start }
+.feet { margin: 0 }
+.feet img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9 }
+.order { margin-top: 22px; font-size: 14.5px; color: var(--on-vp-soft) }
+.order b { color: var(--on-vp); font-weight: 600 }
+.nt { width: 100%; border-collapse: collapse; font-size: 14px }
+.nt th, .nt td { text-align: left; padding: 9px 12px 9px 0; border-bottom: 1px solid rgb(255 255 255 / .1); vertical-align: top }
+.nt thead th { font: 500 11.5px var(--mono); color: var(--on-vp-soft) }
+.nt td.n { font-family: var(--mono); white-space: nowrap }
+.nt td.n.bad { color: var(--joint) }
+
+/* ── 출처 ── */
+#sources { padding-block: 48px 24px }
+details.src { border-top: 3px solid var(--ink) }
+details.src summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 10px; padding: 18px 0; font: 700 20px var(--display) }
+details.src summary::-webkit-details-marker { display: none }
+details.src summary::after { content: "+"; margin-left: auto; font: 300 28px/1 var(--display); color: var(--joint-ink) }
+details.src[open] summary::after { content: "−" }
+.srcs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px clamp(24px, 4vw, 56px); padding-bottom: 24px }
+.srcs h3 { font: 500 12px var(--mono); color: var(--joint-ink); letter-spacing: .06em; margin: 18px 0 6px }
+.srcs li { font-size: 14px; padding-block: 4px; border-bottom: 1px solid var(--rule) }
+.srcs li small { color: var(--muted) }
+footer { padding-block: 32px 48px; font-size: 13px; color: var(--muted) }
+
+@media (max-width: 960px) {
+  .hero-grid, .turn-grid, .test-grid, .hside { grid-template-columns: minmax(0, 1fr) }
+  .shot { margin-right: calc(-1 * var(--m)) }
+  .pat-wrap { grid-template-columns: minmax(0, 1fr) }
+  .slab { position: static; clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); padding-bottom: clamp(24px, 3vw, 36px); display: flex; align-items: flex-end; gap: 20px }
+  .slab h3 { margin: 0 0 6px }
+  .reels { grid-template-columns: minmax(0, 1fr) }
+  .reel.a { clip-path: polygon(0 0, 100% 0, 100% calc(100% - 28px), 0 100%); padding-right: clamp(24px, 3.5vw, 44px); padding-bottom: calc(clamp(24px, 3.5vw, 44px) + 28px) }
+  .reel.b { margin: -28px 0 0; clip-path: polygon(0 28px, 100% 0, 100% 100%, 0 100%); padding-left: clamp(24px, 3.5vw, 44px); padding-top: calc(clamp(24px, 3.5vw, 44px) + 28px) }
+  .miss li { grid-template-columns: 56px minmax(0, 1fr) }
+  .miss .how { grid-column: 2 }
+  .hside aside { transform: none }
+  .swipe { display: block }
+}
+@media (max-width: 600px) {
+  body { font-size: 16px }
+  .rng .row, .axis { grid-template-columns: minmax(0, 1fr) }
+  .axis > i { display: none }
+  .rng .row { gap: 2px }
+  .srcs { grid-template-columns: minmax(0, 1fr) }
+  .cmp { min-width: 1040px } .cmp .c1 { width: 120px }
+  .cmp th[scope="row"] { font-size: 13.5px }
+  /* 좁은 화면: 표 행을 "항목 위, 두 값 나란히"로 */
+  .ht thead, .nt thead { display: none }
+  .ht tr, .nt tr { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 2px 14px; padding-block: 11px; border-bottom: 1px solid var(--rule) }
+  .nt tr { border-color: rgb(255 255 255 / .1) }
+  .ht td, .nt td { display: block; padding: 0; border: 0; width: auto !important }
+  .ht td:first-child, .nt td:first-child { grid-column: 1 / -1; margin-bottom: 2px }
+  .ht td.mc::before, .ht td.lit::before, .nt td.n::before { display: block; font: 500 10.5px var(--mono); color: var(--muted); letter-spacing: .04em }
+  .ht td.mc::before { content: "모캡" } .ht td.lit::before { content: "논문" }
+  .nt td.n::before { color: var(--on-vp-soft) } .nt td:nth-child(2)::before { content: "지금 게임" } .nt td:nth-child(3)::before { content: "사람" }
+  .nt td.n { white-space: normal }
+  .film { margin-inline: calc(-1 * var(--m)); overflow-x: auto }
+  .film img { width: 880px; max-width: none }
+  .film figcaption { padding-inline: var(--m); position: sticky; left: 0; width: 100vw }
+  .shot figcaption { padding-right: var(--m) }
+  .counts { gap: 12px 24px }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto } }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="top mono"><a href="../">← 마디 기획서</a><span>움직임 조사 · 2026-11-02</span></div>
+    <div class="hero-grid">
+      <div>
+        <h1>사람처럼<br>움직일 <b>값</b></h1>
+        <p class="lede">마디 캐릭터의 조정값 15개를 사람 모캡·논문·쿼터뷰 ARPG·3인칭 액션 게임과 나란히 놓았어요.</p>
+        <div class="counts">
+          <div><b>15</b><span>조정값</span></div>
+          <div><b>154</b><span>모캡 파일 직접 측정</span></div>
+          <div><b>10</b><span>게임 조사</span></div>
+        </div>
+      </div>
+      <figure class="shot">
+        <img src="img/jump.webp" alt="마디 게임 카메라 화면: 긴 머리 캐릭터가 회색 격자 바닥 위에서 달리다 뛰어오른 순간" width="1280" height="800">
+        <figcaption>게임 카메라 · 코스 테스트 f_0358 · 달리며 점프</figcaption>
+      </figure>
+    </div>
+    <nav class="jump" aria-label="이 페이지 안">
+      <a href="#values"><span class="ic" data-icon="gauge" data-size="16"></span>값 비교</a>
+      <a href="#turn"><span class="ic" data-icon="rotate-ccw" data-size="16"></span>회전</a>
+      <a href="#human"><span class="ic" data-icon="route" data-size="16"></span>사람 숫자</a>
+      <a href="#games"><span class="ic" data-icon="gamepad" data-size="16"></span>게임 타이밍</a>
+      <a href="#missing"><span class="ic" data-icon="list-checks" data-size="16"></span>빠진 동작</a>
+      <a href="#reels"><span class="ic" data-icon="clapperboard" data-size="16"></span>릴스</a>
+      <a href="#test"><span class="ic" data-icon="circle-check" data-size="16"></span>검사</a>
+      <a href="#sources"><span class="ic" data-icon="book-open" data-size="16"></span>출처</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<!-- 1. 값 비교 -->
+<section class="s" id="values">
+  <div class="wrap">
+    <p class="eyebrow">조정값 15개</p>
+    <h2>지금 값과 네 가지 근거</h2>
+    <div class="key">
+      <span><i class="chip c-split">갈림</i>사람과 게임이 다른 쪽을 가리킴</span>
+      <span><i class="chip c-up">올리기</i>근거가 모두 지금보다 큼</span>
+      <span><i class="chip c-ok">맞음</i>지금 값이 범위 안</span>
+      <span><i class="e" style="margin:0">추정</i>계산하거나 원문 미확인</span>
+    </div>
+    <p class="swipe">← 표를 옆으로 밀어 보세요 →</p>
+    <div class="scroll" tabindex="0" role="region" aria-label="조정값 비교표">
+      <table class="cmp">
+        <colgroup><col class="c1"><col class="c2"><col class="c3"><col class="c4"><col class="c5"><col class="c6"><col></colgroup>
+        <thead>
+          <tr>
+            <th scope="col">조정값</th>
+            <th scope="col" class="now">지금<small>사용자 값</small></th>
+            <th scope="col">사람<small>모캡 측정</small></th>
+            <th scope="col">사람<small>논문</small></th>
+            <th scope="col">ARPG<small>디아·로아 추천 <i class="e">추정</i></small></th>
+            <th scope="col">3인칭 액션<small>소울·몬헌 등 추천 <i class="e">추정</i></small></th>
+            <th scope="col">메모</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="grp"><th colspan="7">이동</th></tr>
+          <tr>
+            <th scope="row">발 마찰 (그립)</th>
+            <td class="now"><b>0.9</b></td>
+            <td><b>0.9</b><small>꺾을 때 최대 0.75–1.05 g</small></td>
+            <td><b>0.74</b><small>최대 컷 평균 (0.41–1.07), 멈춤 ≥ 0.8</small></td>
+            <td><b>1.1–1.2</b><small>멈춤 0.47–0.51 s</small></td>
+            <td><b>1.0</b><small>0.9–1.1, 멈춤 0.57 s</small></td>
+            <td class="note"><i class="chip c-ok">맞음</i><br>값은 맞아요. 멈춤도 이 한도를 써서 사람보다 4배 빨리 서는 게 문제예요.</td>
+          </tr>
+          <tr class="split">
+            <th scope="row">출발 가속 (m/s²)</th>
+            <td class="now"><b>7</b></td>
+            <td><b>2.7</b><small>평균, 순간 최대 4.7–6.6</small></td>
+            <td><b>6–10</b><small>처음만 세고 속도 붙으면 줄어듦</small></td>
+            <td><b>10</b><small>D4 첫 보폭 0.17 s</small></td>
+            <td><b>9</b><small>8–10, 출발 0.25–0.8 s</small></td>
+            <td class="note"><i class="chip c-split">갈림</i><br>사람은 첫 걸음만 세요. 속도가 붙을수록 줄이는 곡선이 둘을 이어 줘요.</td>
+          </tr>
+          <tr>
+            <th scope="row">공중 조작 (m/s²)</th>
+            <td class="now"><b>2</b></td>
+            <td><b>—</b><small>공중에선 못 바꿈</small></td>
+            <td><b>0</b><small>물리</small></td>
+            <td><b>2</b><small>자유 점프가 없어 근거 없음</small></td>
+            <td><b>1.5</b><small>1–2, 소울류는 거의 없음</small></td>
+            <td class="note"><i class="chip c-ok">맞음</i><br>무게감을 더 원하면 조금 낮게.</td>
+          </tr>
+          <tr class="split">
+            <th scope="row">서서 도는 빠르기 (°/s)</th>
+            <td class="now"><b>600</b></td>
+            <td><b>120</b><small>회전 시간 맞춤, 순간 최대 234</small></td>
+            <td><b>155</b><small>180° 디딤 돌기 최대</small></td>
+            <td><b>600–650</b><small>D4 출발 선회 550–700</small></td>
+            <td><b>720</b><small>600–800, 엘든 링 서서 180° 600–670</small></td>
+            <td class="note"><i class="chip c-split">갈림</i><br>사람의 4배. <a href="#turn">회전</a>에서 풀어요.</td>
+          </tr>
+          <tr class="split">
+            <th scope="row">달리며 도는 빠르기 (°/s)</th>
+            <td class="now"><b>220</b></td>
+            <td><b>100</b><small>회전 시간 맞춤, 순간 최대 172–217</small></td>
+            <td><b>76–123</b><small>5.5 m/s에서 가는 방향 <i class="e">추정</i></small></td>
+            <td><b>300–360</b><small>90° 꺾기 0.25–0.3 s</small></td>
+            <td><b>500</b><small>450–600 + 큰 각도는 피벗</small></td>
+            <td class="note"><i class="chip c-split">갈림</i><br>가장 크게 갈리는 값. 220은 양쪽 어디에도 안 맞아요.</td>
+          </tr>
+          <tr>
+            <th scope="row">크게 돌 때 감속 (0~1)</th>
+            <td class="now"><b>0.73</b></td>
+            <td><b>0.8</b><small>90°만 0.33, 180°만 0.77–0.95</small></td>
+            <td><b>3–6걸음</b><small>45° 거의 안 줄임, 90° 3–5걸음, 180° 3–6걸음 제동</small></td>
+            <td><b>0.85–0.9</b><small>반대면 멈췄다 피벗</small></td>
+            <td><b>0.75</b><small>유지, 짚는 자세가 없는 게 문제</small></td>
+            <td class="note"><i class="chip c-ok">맞음</i><br>감속 규칙을 (1 + cos) / 2로 바꾸면 0.9 하나로 90°·180°가 다 맞아요 <i class="e">추정</i></td>
+          </tr>
+          <tr class="split">
+            <th scope="row">점프 높이 (m)</th>
+            <td class="now"><b>0.55</b></td>
+            <td><b>0.3</b><small>제자리 보통 0.21, 달리며 최대 0.44</small></td>
+            <td><b>0.35–0.37</b><small>반동 점프</small></td>
+            <td><b>—</b><small>자유 점프 없음</small></td>
+            <td><b>0.6</b><small>엘든 링 공중 0.70 s <i class="e">추정</i></small></td>
+            <td class="note"><i class="chip c-split">갈림</i><br>지금은 사람의 1.5배, 게임 쪽에 가까워요.</td>
+          </tr>
+          <tr class="split">
+            <th scope="row">떨어질 때 중력 배수</th>
+            <td class="now"><b>1.63</b></td>
+            <td><b>1.0</b><small>공중 g 9.0–9.8, 내릴 때도 같음</small></td>
+            <td><b>1</b><small>물리</small></td>
+            <td><b>—</b><small>근거 없음</small></td>
+            <td><b>1.8</b><small>1.6–2.0</small></td>
+            <td class="note"><i class="chip c-split">갈림</i><br>사람에겐 없는 게임 장치. 무게감을 위해 남겨도 돼요.</td>
+          </tr>
+          <tr class="grp"><th colspan="7">몸 반응</th></tr>
+          <tr>
+            <th scope="row">돌 때 안쪽으로 기울기 배수</th>
+            <td class="now"><b>0.25</b></td>
+            <td><b>0.5</b><small>몸통 0.25–0.69, 전신 0.82</small></td>
+            <td><b>1</b><small>곡선 단거리 계산 13.4°, 측정 10–15°</small></td>
+            <td><b>0.3</b></td>
+            <td><b>0.35</b><small>0.3–0.4</small></td>
+            <td class="note"><i class="chip c-up">올리기</i><br>0.25가 맞아 보인 건 게임 옆 가속이 커서예요 (42° 대 사람 27°).</td>
+          </tr>
+          <tr>
+            <th scope="row">출발·멈춤 앞뒤 기울기 배수</th>
+            <td class="now"><b>0.30</b></td>
+            <td><b>0.85</b><small>0.39–1.46</small></td>
+            <td><b>0.6–1</b><small>첫 걸음 힘 방향 26–30° <i class="e">추정</i></small></td>
+            <td><b>0.35–0.4</b></td>
+            <td><b>0.55</b><small>출발 약 23°</small></td>
+            <td class="note"><i class="chip c-up">올리기</i><br>몸을 판자처럼 통째로 기울이면 어색해요. 엉덩이 낮추기와 같이 올려요.</td>
+          </tr>
+          <tr>
+            <th scope="row">최대 기울기 (°)</th>
+            <td class="now"><b>14.5</b></td>
+            <td><b>20</b><small>몸통 옆 8–22, 전력 180° 19–36</small></td>
+            <td><b>25–35</b><small>최대 컷 μ 0.74 → 36° <i class="e">추정</i></small></td>
+            <td><b>18</b></td>
+            <td><b>26</b><small>24–28, 몬헌 출발 25–30°</small></td>
+            <td class="note"><i class="chip c-up">올리기</i><br>지금 한도로는 출발 기울기가 중간에 잘려요.</td>
+          </tr>
+          <tr>
+            <th scope="row">기울기 따라가는 시간 (초)</th>
+            <td class="now"><b>0.069</b></td>
+            <td><b>0.03</b><small>늦음 0–0.033 s</small></td>
+            <td><b>0.05–0.12</b><small>반력 50 ms 안에 최대</small></td>
+            <td><b>0.07–0.08</b></td>
+            <td><b>0.09</b><small>0.08–0.1</small></td>
+            <td class="note"><i class="chip c-ok">맞음</i><br>사람은 거의 동시, 게임은 살짝 늦게 해서 무게를 보여요.</td>
+          </tr>
+          <tr>
+            <th scope="row">착지 눌림 (cm / 낙하 m/s)</th>
+            <td class="now"><b>1.5</b></td>
+            <td><b>7</b><small>착지 246번, 4.5–8</small></td>
+            <td><b>6–7</b><small>착지 무릎 각도에서 계산 <i class="e">추정</i></small></td>
+            <td><b>—</b><small>근거 없음</small></td>
+            <td><b>4</b><small>3–5</small></td>
+            <td class="note"><i class="chip c-up">올리기</i><br>근거가 모두 3배 이상. "중력이 안 느껴짐"의 유력 원인이에요. 내려가는 데 0.1–0.27 s를 주면 툭 꺼지지 않아요.</td>
+          </tr>
+          <tr>
+            <th scope="row">최대 착지 눌림 (cm)</th>
+            <td class="now"><b>38</b></td>
+            <td><b>37</b><small>0.78 m 턱에서 뛰어내림</small></td>
+            <td><b>35–43</b><small>부드러운 착지 무릎 117° <i class="e">추정</i></small></td>
+            <td><b>25–30</b></td>
+            <td><b>38</b><small>유지</small></td>
+            <td class="note"><i class="chip c-ok">맞음</i></td>
+          </tr>
+          <tr>
+            <th scope="row">눌림 회복 시간 (초)</th>
+            <td class="now"><b>0.3</b></td>
+            <td><b>0.45</b><small>깡충 0.24 – 내려뛰기 0.78</small></td>
+            <td><b>0.3–0.5</b><small>높을수록 길게 <i class="e">추정</i></small></td>
+            <td><b>0.3–0.35</b><small>D4 정지 버팀 0.3–0.45 s</small></td>
+            <td><b>0.4</b><small>엘든 링 보통 착지 0.4–0.45 s</small></td>
+            <td class="note"><i class="chip c-up">올리기</i><br>조금만. 높이에 비례해 늘리면 더 좋아요.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- 2. 회전 -->
+<section class="s dark slant" id="turn">
+  <div class="wrap">
+    <p class="eyebrow">가장 크게 갈리는 곳</p>
+    <h2>방향 바꾸기, 초당 몇 도?</h2>
+    <div class="turn-grid">
+      <div>
+        <div class="rng-key"><span><i style="background:var(--on-vp)"></i>사람</span><span><i style="background:var(--joint)"></i>게임</span><span><i style="background:var(--vp);box-shadow:inset 0 0 0 2px var(--joint)"></i>마디 지금</span></div>
+        <div class="rng" role="list">
+          <div class="row" role="listitem"><p class="lab">가는 방향 꺾기<small>사람 · 5.5 m/s · 계산</small></p><div class="track"><i class="bar h" style="--a:6.33;--b:10.25"></i><span class="val" style="--b:10.25">76–123</span></div></div>
+          <div class="row" role="listitem"><p class="lab">가는 방향 꺾기<small>사람 · 3 m/s · 계산</small></p><div class="track"><i class="bar h" style="--a:11.58;--b:18.75"></i><span class="val" style="--b:18.75">139–225</span></div></div>
+          <div class="row" role="listitem"><p class="lab">몸 돌기 순간 최대<small>사람 · 모캡</small></p><div class="track"><i class="bar h" style="--a:10.42;--b:19.5"></i><span class="val" style="--b:19.5">125–234</span></div></div>
+          <div class="row" role="listitem"><p class="lab">달리며 도는 빠르기<small>마디 지금</small></p><div class="track"><i class="bar pt" style="--a:18.33;--b:18.33"></i><span class="val" style="--b:18.33">220</span></div></div>
+          <div class="row" role="listitem"><p class="lab">서서 도는 빠르기<small>마디 지금</small></p><div class="track"><i class="bar pt" style="--a:50;--b:50"></i><span class="val" style="--b:50">600</span></div></div>
+          <div class="row" role="listitem"><p class="lab">출발 선회<small>ARPG · 디아블로 IV</small></p><div class="track"><i class="bar g" style="--a:45.83;--b:58.33"></i><span class="val" style="--b:58.33">550–700</span></div></div>
+          <div class="row" role="listitem"><p class="lab">몸 돌리기<small>3인칭 · 소울·몬헌·P·스텔라</small></p><div class="track"><i class="bar g" style="--a:37.5;--b:100"></i><span class="val l" style="--a:37.5">450–1200</span></div></div>
+        </div>
+        <div class="axis" aria-hidden="true"><i></i><div><span style="left:0">0</span><span style="left:25%">300</span><span style="left:50%">600</span><span style="left:75%">900</span><span style="left:100%">1200 °/s</span></div></div>
+        <div class="big2">
+          <div><b class="mono">1.0–1.3 s</b><span>사람이 90°·180°를 도는 시간 (모캡, 10–90%)</span></div>
+          <div><b class="mono">0.12–0.38 s</b><span>지금 마디 값으로 흉내 낸 같은 회전</span></div>
+        </div>
+      </div>
+      <div class="answer">
+        <h3>둘 다 맞아요</h3>
+        <p>사람은 발 마찰 때문에 <b>가는 방향</b>을 초당 76~120°보다 빨리 못 꺾어요. 게임은 <b>몸만</b> 450~1200°/s로 돌리고, 모자란 물리는 피벗 동작(낮게 짚기 → 다시 박차기, 합계 0.85~1.3초)으로 보여 줘요.</p>
+        <p>그래서 마디는 몸 회전은 빠르게, 120°가 넘는 반전은 피벗 상태로 넘기는 게 맞아요. 220°/s로 호를 그리며 도는 게임은 하나도 없었어요.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3. 사람 숫자 -->
+<section class="s human" id="human">
+  <div class="wrap">
+    <p class="eyebrow">사람 숫자</p>
+    <h2>모캡으로 잰 값과 논문 값</h2>
+    <div class="hside">
+      <div>
+        <div class="htabs" role="tablist" aria-label="동작">
+          <button role="tab" id="t-run" aria-controls="p-run" aria-selected="true">달리기</button>
+          <button role="tab" id="t-walk" aria-controls="p-walk" aria-selected="false" tabindex="-1">걷기</button>
+          <button role="tab" id="t-ss" aria-controls="p-ss" aria-selected="false" tabindex="-1">출발·멈춤</button>
+          <button role="tab" id="t-turn" aria-controls="p-turn" aria-selected="false" tabindex="-1">방향 전환</button>
+          <button role="tab" id="t-jump" aria-controls="p-jump" aria-selected="false" tabindex="-1">점프·착지</button>
+        </div>
+        <div class="hpanels">
+          <div class="hpanel" role="tabpanel" id="p-run" aria-labelledby="t-run" tabindex="0">
+            <table class="ht"><thead><tr><th>항목</th><th>모캡 측정</th><th>논문</th></tr></thead><tbody>
+              <tr><td>속도</td><td class="mc">조깅 3.17 · 전력 5.34 m/s</td><td class="lit">조깅 2.5–3.5, 빠른 달리기 4.5–5.5 m/s</td></tr>
+              <tr><td>걸음</td><td class="mc">2.73 /s · 전력 3.53 /s</td><td class="lit">2.9 m/s에서 분당 173, 엘리트 5.4 m/s에서 196</td></tr>
+              <tr><td>디딤 / 공중</td><td class="mc">0.27 / 0.08 s · 전력 0.17 / 0.12 s</td><td class="lit">5.4 m/s 0.17–0.18 / 약 0.13 s</td></tr>
+              <tr><td>골반 위아래</td><td class="mc">8–13 cm</td><td class="lit">무게중심 8.7 cm (2.9 m/s)</td></tr>
+              <tr><td>몸통 앞 기울기</td><td class="mc">절대 15° · 전력 26°</td><td class="lit">일정 속도 평균 약 7° <i class="e">추정</i></td></tr>
+              <tr><td>발목 한 보 범위</td><td class="mc">44–58°</td><td class="lit">디딤 중 최대 발등굽힘 26°, 박차기 발바닥굽힘 17–23°</td></tr>
+              <tr><td>디딘 발 미끄러짐</td><td class="mc">6–20 cm/s (잡음 포함)</td><td class="lit">0 (구르는 동안 축만 바뀜)</td></tr>
+              <tr><td>착지 방식</td><td class="mc">—</td><td class="lit">뒤꿈치 68–89%</td></tr>
+            </tbody></table>
+          </div>
+          <div class="hpanel" role="tabpanel" id="p-walk" aria-labelledby="t-walk" tabindex="0" hidden>
+            <table class="ht"><thead><tr><th>항목</th><th>모캡 측정</th><th>논문</th></tr></thead><tbody>
+              <tr><td>속도</td><td class="mc">1.46 m/s</td><td class="lit">스스로 고른 속도 1.30–1.46 m/s</td></tr>
+              <tr><td>걸음</td><td class="mc">2.0 /s</td><td class="lit">분당 109–122 <i class="e">추정</i></td></tr>
+              <tr><td>디딤</td><td class="mc">0.61 s · 두 발 0.12 s</td><td class="lit">입각 0.62–0.70 s, 두 발 지지 21–24%</td></tr>
+              <tr><td>골반 위아래</td><td class="mc">3–6 cm</td><td class="lit">무게중심 4.8 cm (1.6 m/s)</td></tr>
+              <tr><td>머리 끄덕임</td><td class="mc">4–9°</td><td class="lit">—</td></tr>
+              <tr><td>발목 한 보 범위</td><td class="mc">34–44°</td><td class="lit">발등굽힘 10–15° ~ 발바닥굽힘 20°</td></tr>
+              <tr><td>발가락 젖힘</td><td class="mc">밀어낼 때 +27–35°</td><td class="lit">엄지발가락 48 ±12° (Perry 65°)</td></tr>
+              <tr><td>달리기로 바뀜</td><td class="mc">—</td><td class="lit">약 2.0 m/s <i class="e">추정</i></td></tr>
+            </tbody></table>
+          </div>
+          <div class="hpanel" role="tabpanel" id="p-ss" aria-labelledby="t-ss" tabindex="0" hidden>
+            <table class="ht"><thead><tr><th>항목</th><th>모캡 측정</th><th>논문</th></tr></thead><tbody>
+              <tr><td>달리기 출발</td><td class="mc">90%까지 1.14 s · 1.76 m · 평균 2.5 m/s²</td><td class="lit">처음 6–10 m/s², 속도가 붙을수록 지수적으로 줄어듦</td></tr>
+              <tr><td>전력 출발</td><td class="mc">1.83 s · 4.25 m · 평균 2.65</td><td class="lit">단거리 선수 90%까지 약 12걸음 <i class="e">추정</i></td></tr>
+              <tr><td>걷기 출발</td><td class="mc">1.17 s</td><td class="lit">2걸음이면 정상 속도</td></tr>
+              <tr><td>출발 몸 기울기</td><td class="mc">세게 출발할 때 최대 약 18°</td><td class="lit">첫 걸음 힘 방향 26–30° <i class="e">추정</i></td></tr>
+              <tr><td>달리기 멈춤</td><td class="mc">3.5 m/s에서 1.62 s · 2.16 m · 최대 −3.8 m/s²</td><td class="lit">7.35 m/s 최대 노력 1.50 s · 6.86 m · 최대 −8.48</td></tr>
+              <tr><td>멈출 때 몸</td><td class="mc">—</td><td class="lit">발을 무게중심 0.39–0.44 m 앞에 꽂음 → 뒤로 약 25° <i class="e">추정</i></td></tr>
+            </tbody></table>
+          </div>
+          <div class="hpanel" role="tabpanel" id="p-turn" aria-labelledby="t-turn" tabindex="0" hidden>
+            <table class="ht"><thead><tr><th>항목</th><th>모캡 측정</th><th>논문</th></tr></thead><tbody>
+              <tr><td>달리며 90°</td><td class="mc">1.10 s · 남은 속도 0.73 · 최대 172°/s</td><td class="lit">디딤발 접지 0.18 s, 제동 2.7–5.4걸음</td></tr>
+              <tr><td>달리며 180°</td><td class="mc">1.27 s · 남은 속도 0.12 · 최대 204°/s</td><td class="lit">직전 걸음이 가장 센 브레이크 (0.38 s, 1.8 체중)</td></tr>
+              <tr><td>제자리 180°</td><td class="mc">1.13 s · 최대 234°/s</td><td class="lit">최대 155°/s, 반감기 0.6 s</td></tr>
+              <tr><td>45° 컷</td><td class="mc">—</td><td class="lit">세 걸음에 나눠 돎, 디딤 걸음에서 15°만</td></tr>
+              <tr><td>몸통 안쪽 기울기</td><td class="mc">90° 달리기 4–18° · 전력 180° 19–36°</td><td class="lit">곡선 단거리 10–15°</td></tr>
+              <tr><td>머리</td><td class="mc">—</td><td class="lit">몸보다 27–127 ms 먼저 돎</td></tr>
+            </tbody></table>
+          </div>
+          <div class="hpanel" role="tabpanel" id="p-jump" aria-labelledby="t-jump" tabindex="0" hidden>
+            <table class="ht"><thead><tr><th>항목</th><th>모캡 측정</th><th>논문</th></tr></thead><tbody>
+              <tr><td>제자리 점프</td><td class="mc">보통 0.21 m · 최대 0.31 m</td><td class="lit">반동 점프 0.35–0.37 m</td></tr>
+              <tr><td>달리며 점프</td><td class="mc">최대 0.44 m</td><td class="lit">—</td></tr>
+              <tr><td>예비 동작</td><td class="mc">—</td><td class="lit">0.36 m 내려가며 0.70 s, 미는 데 0.30 s</td></tr>
+              <tr><td>공중 중력</td><td class="mc">9.0–9.8 m/s², 내릴 때도 같음</td><td class="lit">9.81</td></tr>
+              <tr><td>착지 눌림</td><td class="mc">닿는 속도 1 m/s당 7–8 cm</td><td class="lit">6–7 cm <i class="e">추정</i></td></tr>
+              <tr><td>0.6 m 턱 착지</td><td class="mc">골반 21 cm · 바닥까지 0.27 s</td><td class="lit">무릎 80°, 반력 6.6 체중</td></tr>
+              <tr><td>회복</td><td class="mc">깡충 0.24 · 제자리 0.42 · 달리며 0.55 · 내려뛰기 0.78 s</td><td class="lit">무릎 최대까지 0.14–0.16 s <i class="e">추정</i></td></tr>
+            </tbody></table>
+          </div>
+        </div>
+      </div>
+      <aside>
+        <b class="mono">×4</b>
+        <p>지금 마디는 사람보다 4배 빨리 멈춰요. 3.5 m/s에서 0.40 s, 사람은 1.62 s.</p>
+        <small>멈춤만 따로 2.5–4 m/s² 한도 <i class="e">추정</i></small>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- 4. 게임 -->
+<section class="s" id="games">
+  <div class="wrap">
+    <p class="eyebrow">게임 타이밍</p>
+    <h2>영상 프레임을 세어 잰 값</h2>
+    <p class="swipe">← 표를 옆으로 밀어 보세요 →</p>
+    <div class="scroll" tabindex="0" role="region" aria-label="게임별 동작 타이밍">
+      <table class="gt">
+        <thead><tr><th scope="col">게임</th><th scope="col">출발</th><th scope="col">멈춤</th><th scope="col">회전·피벗</th><th scope="col">회피</th><th scope="col">공격 준비 / 타격 / 전체</th><th scope="col">착지 회복</th></tr></thead>
+        <tbody>
+          <tr class="arpg"><th scope="row">디아블로 IV<small>ARPG</small></th><td><b>0.17 s</b><small>깊게 숙인 첫 걸음</small></td><td><b>≤ 0.07 s</b><small>+ 제자리 버팀 0.3–0.45 s</small></td><td><b>550–700°/s</b><small>서서 출발하며 90°</small></td><td><b>쿨 5 s</b><small>공격 동작을 끊음</small></td><td><small>포즈 3개로 블로킹, 이동 클릭으로 후딜 끊기</small></td><td class="na">점프 없음</td></tr>
+          <tr class="arpg"><th scope="row">로스트아크<small>ARPG</small></th><td class="na">—</td><td class="na">—</td><td><small>시선이 먼저, 몸이 나중</small></td><td><b>0.27 + 0.27 s</b><small>대시 이동 + 미끄러지는 회복</small></td><td><small>넘어지면 기상 행동을 직접 고름</small></td><td class="na">점프 없음</td></tr>
+          <tr class="arpg"><th scope="row">패스 오브 엑자일 2<small>ARPG</small></th><td class="na">—</td><td class="na">—</td><td><small>조준과 이동 분리</small></td><td><b>0.6–0.75 s</b> <i class="e">추정</i><small>3.7 m, 앞 절반만 회피, 쿨 없음</small></td><td><small>구르기로 거의 다 취소, 공격속도별 꼬리만 자른 버전 약 4개</small></td><td class="na">점프 없음</td></tr>
+          <tr><th scope="row">엘든 링<small>3인칭</small></th><td><b>0.25–0.33 s</b><small>약 20° 숙임</small></td><td><b>0.45–0.5 s</b><small>왼발·오른발 따로</small></td><td><b>0.23 s · 180°</b><small>≈780°/s, 짚기 없음</small></td><td><b>≈ 0.9 s</b><small>무적 0.47 s</small></td><td><b>0.37–0.4 / 0.07 / 1.37 s</b></td><td><b>0.4–0.45 s</b><small>높은 곳 1.1–1.2 s, 손 짚음</small></td></tr>
+          <tr><th scope="row">몬스터 헌터 와일즈<small>3인칭</small></th><td><b>0.6–0.8 s</b><small>25–30° 숙임</small></td><td><b>≈ 0.67 s</b><small>뒤로 젖혀 제동</small></td><td><b>1.15–1.3 s · 180°</b><small>회전 0.4 s → 짚기 → 재가속</small></td><td><b>0.5 + ≥ 0.4 s</b><small>시작 2프레임</small></td><td><small>대검 0.13 s 내려침, 0.27 s 박힘. 히트스톱 줄였다 되돌림</small></td><td><b>1.07 s</b><small>약 1 s 낙하 뒤</small></td></tr>
+          <tr><th scope="row">P의 거짓<small>3인칭</small></th><td><b>≈ 0.17 s</b><small>출발 동작 없음</small></td><td><b>≈ 0.47 s</b><small>제동 한 걸음</small></td><td><b>0.85 s · 180°</b><small>회전 0.3 s → 웅크려 박차기</small></td><td><b>≈ 1.13 s</b><small>이동 0.63 s</small></td><td><b>0.3 / 0.1 / 1.57 s</b></td><td><b>≈ 0.75 s</b><small>착지하자마자 구르기</small></td></tr>
+          <tr><th scope="row">스텔라 블레이드<small>3인칭</small></th><td><b>≈ 0.83 s</b><small>약 40° 숙임</small></td><td><b>≈ 0.63 s</b><small>옆으로 미끄러져 전투 자세</small></td><td><b>0.85 s · 180°</b><small>회전 0.15–0.2 s → 짚고 버팀</small></td><td><b>≈ 1.15 s</b><small>돌진 0.33 s</small></td><td><b>0.07 / 0.13 / 1.23 s</b><small>마무리 자세 0.5 s 유지</small></td><td><b>0.95 s</b><small>0.65 s 깊게 웅크림</small></td></tr>
+          <tr><th scope="row">원신<small>3인칭 · 애니풍</small></th><td><b>1프레임</b><small>대시</small></td><td><b>≈ 0.43 s</b></td><td><b>0.4 s · 90°</b><small>호를 그림, 짚기 없음</small></td><td><b>0.33 s</b><small>바로 질주로</small></td><td><small>판정 0.17 s, 히트스톱 0.03–0.15 s</small></td><td class="na">—</td></tr>
+          <tr><th scope="row">명조<small>3인칭 · 애니풍</small></th><td class="na">—</td><td class="na">—</td><td><small>회피 때 1–2프레임에 몸 방향 전환</small></td><td><b>≈ 0.75 s</b><small>0.05 → 0.22 → 0.2 → 0.22</small></td><td class="na">—</td><td class="na">—</td></tr>
+          <tr><th scope="row">검은사막<small>3인칭</small></th><td colspan="6"><small>기본 이동은 못 잼. 스킬마다 슈퍼아머·전방 가드·무적이 붙고, 무게는 이펙트·카메라 쪽.</small></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pat-wrap">
+    <div class="slab"><b>9</b><h3>게임들이 같이 하는 것</h3></div>
+    <ol class="pats">
+      <li><div><b>판정은 즉시, 무게는 그림으로</b><span>D4는 0.17 s에 달리지만 첫 걸음을 깊게 숙여요. 스텔라의 0.5 s 의도적 지연은 불만을 샀어요.</span></div></li>
+      <li><div><b>출발은 첫 1~2걸음의 "밀기"</b><span>20~40° 숙임, 정상 달리기까지 0.25~0.8 s.</span></div></li>
+      <li><div><b>멈춤은 제동 걸음 + 뒤로 젖힘</b><span>0.43~0.67 s. 엘든 링은 왼발·오른발 멈춤이 따로 있어요.</span></div></li>
+      <li><div><b>몸은 빠르게, 큰 반전은 피벗</b><span>450~1200°/s. 빠른 회전 → 짚기 → 박차기, 합계 0.85~1.3 s.</span></div></li>
+      <li><div><b>회피 무적은 앞쪽 25~50%</b><span>전체 0.75~1.15 s, 나머지는 회복.</span></div></li>
+      <li><div><b>타격은 짧고 무게는 앞뒤에서</b><span>타격 0.07~0.13 s. 준비·회수·히트스톱(0.03~0.15 s)이 무게를 정해요.</span></div></li>
+      <li><div><b>착지 회복은 높이에 따라 단계로</b><span>보통 0.4 s, 높은 곳 1.1 s에 손 짚기.</span></div></li>
+      <li><div><b>회복 꼬리는 끊을 수 있게</b><span>타격 프레임까지만 고정, 뒤는 회피·이동으로 취소.</span></div></li>
+      <li><div><b>관성은 카메라와 머리카락이</b><span>카메라 0.2~0.5 s, 머리카락·천 약 0.3 s 늦게 따라와요.</span></div></li>
+    </ol>
+    </div>
+  </div>
+</section>
+
+<!-- 5. 빠진 동작 -->
+<section class="s dark slant" id="missing">
+  <div class="wrap">
+    <p class="eyebrow">마디에 아직 없는 것</p>
+    <h2>느낌에 미치는 순서대로</h2>
+    <div class="has"><span>지금 있는 상태</span><span class="st">Idle</span><span class="st">Move</span><span class="st">Air</span><span class="st">Land</span></div>
+    <ol class="miss">
+      <li>
+        <div><h3>피벗 · 제자리 돌기</h3><p class="fix">"방향 전환이 어색함"</p></div>
+        <p class="how">120° 넘으면: 빠른 회전 0.15–0.3 s → 낮게 짚기 0.2–0.3 s → 박차기<small>몸 회전은 남은 각도에 비례(반감기 0.15–0.27 s). 서서 돌 땐 90°·180° 두 종, 머리가 먼저.</small></p>
+      </li>
+      <li>
+        <div><h3>출발 · 멈춤</h3><p class="fix">"달리는 것 같지 않음", 출발·멈춤의 무게</p></div>
+        <p class="how">출발 0.15–0.25 s 밀기 + 엉덩이 5–10 cm 낮춤 · 멈춤 0.3–0.67 s<small>멈춤은 남은 제동 거리로 재생 위치를 맞추고, 왼발·오른발 두 벌.</small></p>
+      </li>
+      <li>
+        <div><h3>높이별 착지</h3><p class="fix">"중력·무게가 없음"</p></div>
+        <p class="how">보통 0.4 s · 높은 곳 0.9–1.1 s 손 짚기 · 점프 전 웅크림 0.1 s<small>낙하 속도가 기준을 넘으면 무거운 착지로. 이륙 때 발을 몇 프레임 땅에 남김.</small></p>
+      </li>
+      <li>
+        <div><h3>회피</h3><p class="fix">전투 이동의 무게와 반응</p></div>
+        <p class="how">박차기 0.05 → 이동 0.2–0.3 → 감속 0.2 → 회복 0.2–0.4 s<small>무적은 앞쪽에만. 거리 3–4 m, 평균 속도는 달리기 정도.</small></p>
+      </li>
+      <li>
+        <div><h3>캔슬 창</h3><p class="fix">공격이 조작을 막는 느낌</p></div>
+        <p class="how">타격 프레임 뒤: 회피는 즉시, 이동은 조금 뒤<small>빨라지면 꼬리만 짧은 버전으로 바꿔요. 빨리 감기처럼 안 보이게.</small></p>
+      </li>
+      <li>
+        <div><h3>피격 반응</h3><p class="fix">맞아도 밋밋함</p></div>
+        <p class="how">가벼운 피격 = 상체 덧셈 레이어 · 강한 피격 = 넘어짐 → 기상<small>D2는 0.36–0.6 s 잠금, D4는 거의 안 막음, 로아는 기상 행동을 고르게 해요.</small></p>
+      </li>
+    </ol>
+    <p class="later">그다음: 머리카락·천 스프링(0.2–0.3 s 늦게), 카메라 가로 지연 0.15–0.25 s, 달리기로 돌아갈 때 발 위상 맞추기.</p>
+  </div>
+</section>
+
+<!-- 6. 릴스 -->
+<section class="s" id="reels">
+  <div class="wrap">
+    <p class="eyebrow">릴스 두 채널</p>
+    <h2>가져올 것만</h2>
+    <div class="reels">
+      <div class="reel a">
+        <p class="who">@gamedevinspire · Unity · 릴스 14 + 튜토리얼 3</p>
+        <h3>벽에 손 짚기</h3>
+        <ul>
+          <li>어깨에서 좌우로 레이를 쏴서 맞으면 그 점이 손 목표. 팔마다 Two Bone IK.</li>
+          <li>켜고 끌 땐 <code>rig.weight = Mathf.MoveTowards(…)</code>로 서서히. 목표도 스무딩해서 떨림을 막아요.</li>
+          <li>몸 전체 반응: 척추 3개에 나눈 Aim, 머리 따라보기 0.47 s, 엉덩이 내리기 최대 0.19.</li>
+          <li>걷기·달리기는 Speed 하나로 섞는 블렌드 트리(0 / 0.5 / 1).</li>
+        </ul>
+        <p class="lim">벽 손 거리·속도 숫자는 영상에 없음</p>
+      </div>
+      <div class="reel b">
+        <p class="who">@mvoidey · 아케인 참여 애니메이터 · 72편 중 동작 12편</p>
+        <h3>대비와 홀드</h3>
+        <ul>
+          <li>작은 동작 → 0.6 s 멈춤 → 6~9프레임 예비동작 → 발사.</li>
+          <li>임팩트는 1~3프레임 정지 + 화면 플래시. 그 순간 몸은 멈추고 이펙트가 움직여요.</li>
+          <li>런 사이클 12프레임(24 fps, 한 주기 0.5 s)에 몸통 25~35° 숙임, 디딜 때 가장 낮음.</li>
+          <li>서 있을 땐 체중을 한쪽 다리에. 무거운 몸은 상체가 한 박자 늦게.</li>
+        </ul>
+        <p class="lim">눈대중 값, ±20% 이상 틀릴 수 있음</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 7. 검사 -->
+<section class="s test slant" id="test">
+  <div class="wrap">
+    <p class="eyebrow">지금 검사하는 법</p>
+    <h2>게임 카메라로 한 바퀴, 발은 확대, 숫자는 표로</h2>
+    <figure class="film">
+      <img src="img/course.webp" alt="게임 카메라로 찍은 코스 장면 여섯 장: 달리기, 도약, 공중, 착지" width="1800" height="420" loading="lazy">
+      <figcaption><span>코스 테스트 · 960×540 · 60 fps 고정, 2프레임마다</span><span>달리기 → 점프 → 착지</span></figcaption>
+    </figure>
+    <div class="test-grid">
+      <div>
+        <figure class="feet">
+          <img src="img/feet.webp" alt="발 확대 화면 네 장: 흔드는 발, 디딤, 박차기, 착지" width="1280" height="720" loading="lazy">
+          <figcaption><span>발 확대 · 640×360</span></figcaption>
+        </figure>
+        <p class="order"><b>코스</b> 서기 → 걷기 → 달리기 → 90° 꺾기 → 180° 돌기 → 멈춤 → 제자리 점프 → 달리며 점프 → 경사 → 단에서 떨어지기. 같은 걷기·달리기를 원래 몸(Y Bot)으로도 재서 비교해요.</p>
+      </div>
+      <div>
+        <table class="nt">
+          <thead><tr><th>구간별로 재는 값</th><th>지금 게임</th><th>사람</th></tr></thead>
+          <tbody>
+            <tr><td>착지 눌림 · 제자리 점프</td><td class="n bad">5.8 cm</td><td class="n">8–26 cm</td></tr>
+            <tr><td>착지 눌림 · 단에서 떨어짐</td><td class="n bad">10.0 cm</td><td class="n">21 cm</td></tr>
+            <tr><td>몸 옆 기울기 · 달리며 90°</td><td class="n">0–10°</td><td class="n">4–18°</td></tr>
+            <tr><td>몸 앞뒤 기울기 · 멈춤</td><td class="n">−13–5°</td><td class="n">최대 약 18°</td></tr>
+            <tr><td>디딘 발 미끄럼 한도</td><td class="n bad">걷기 8 · 달리기 28 cm/s</td><td class="n">2–9 · 6–20 cm/s</td></tr>
+          </tbody>
+        </table>
+        <p class="order">정강이–발 각, 발바닥 옆 기울기, 발가락 꺾임, 속도도 같이 재요. 미끄럼 한도를 넘으면 테스트가 실패해요.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 8. 출처 -->
+<section class="s" id="sources">
+  <div class="wrap">
+    <details class="src">
+      <summary>출처</summary>
+      <div class="srcs">
+        <div>
+          <h3>사람 · 논문</h3>
+          <ul>
+            <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC5426356/">Fukuchi 2017</a> <small>달리기 관절·박자</small></li>
+            <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3022995/">Heiderscheit 2011</a> <small>달리기 무릎·무게중심</small></li>
+            <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3761913/">Kong & de Heer 2008</a> <small>엘리트 접지·공중</small></li>
+            <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8217618/">성인 보행 일반값</a> <small>걷기 박자</small></li>
+            <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9474351/">Harper 2022</a> <small>감속·멈춤 리뷰</small></li>
+            <li><a href="https://frontiersin.org/articles/10.3389/fspor.2020.594567/full">Falch 2020</a> <small>각도별 방향 전환</small></li>
+            <li><a href="https://media.isbweb.org/images/conf/2003/longAbstracts/SHORTEN_372-405_NB_LONG.pdf">Shorten 2003</a> <small>필요 마찰</small></li>
+            <li><a href="https://www.frontiersin.org/journals/sports-and-active-living/articles/10.3389/fspor.2020.00022/full">Baker 2020</a> <small>머리가 먼저 돎</small></li>
+            <li><a href="https://ojs.ub.uni-konstanz.de/cpa/article/view/4874/4513">곡선 단거리 기울기</a> <small>ISBS</small></li>
+            <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6655540/">초기 가속 666명</a> <small>PMC6655540</small></li>
+            <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11208864/">반동 점프 깊이</a> <small>PMC11208864</small></li>
+            <li><a href="https://ojs.ub.uni-konstanz.de/cpa/article/view/1679/1581">높이별 착지</a> · <a href="https://pubmed.ncbi.nlm.nih.gov/1548984/">DeVita 1992</a></li>
+          </ul>
+          <h3>모캡 데이터</h3>
+          <ul>
+            <li><a href="http://mocap.cs.cmu.edu/">CMU Motion Capture</a> <small>연구·상업 모두 무료 · 102개. The data used in this project was obtained from mocap.cs.cmu.edu. The database was created with funding from NSF EIA-0196217.</small></li>
+            <li><a href="https://github.com/ubisoft/ubisoft-laforge-animation-dataset">LAFAN1</a> <small>CC BY-NC-ND 4.0 · 20개 · 숫자만 뽑음</small></li>
+            <li><a href="https://github.com/BandaiNamcoResearchInc/Bandai-Namco-Research-Motiondataset">Bandai Namco Motiondataset-2</a> <small>CC BY-NC 4.0 · 32개 · 숫자만 뽑음</small></li>
+          </ul>
+        </div>
+        <div>
+          <h3>게임 개발 자료</h3>
+          <ul>
+            <li><a href="https://theorangeduck.com/page/fitting-code-driven-displacement">Holden · 모캡에 맞춘 이동 값</a></li>
+            <li><a href="https://theorangeduck.com/page/code-vs-data-driven-displacement">Holden · 시뮬레이션 몸과 애니 몸</a></li>
+            <li><a href="https://www.youtube.com/watch?v=1UOY-FMm-xo">Paragon 애니메이션 기법</a> <small>Epic</small></li>
+            <li><a href="https://media.gdcvault.com/gdc2016/Presentations/Clavet_Simon_MotionMatching.pdf">For Honor 모션 매칭</a> <small>GDC 2016</small></li>
+            <li><a href="https://dev.epicgames.com/documentation/ko-kr/unreal-engine/pose-warping-in-unreal-engine">Unreal Pose Warping</a> · <a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/animation-in-lyra-sample-game-in-unreal-engine">Lyra</a></li>
+            <li><a href="https://www.youtube.com/watch?v=1ih5BxnJu2I">Ghost of Tsushima 근접 전투</a> <small>GDC</small></li>
+            <li><a href="https://raw.githubusercontent.com/NoelFB/Celeste/master/Source/Player/Player.cs">Celeste Player.cs</a></li>
+          </ul>
+          <h3>게임 측정 영상</h3>
+          <ul>
+            <li><a href="https://www.youtube.com/watch?v=AkzOiG-Adws">디아블로 IV 애니메이터 패널</a> · <a href="https://www.youtube.com/watch?v=BTDSvMEJmQw">측정 클립</a></li>
+            <li><a href="https://www.youtube.com/watch?v=vRKIWqNwMEg">로스트아크 측정 클립</a> · <a href="https://www.youtube.com/watch?v=cjhA9OTn6Dc">애니메이터 리뷰</a></li>
+            <li><a href="https://www.youtube.com/watch?v=4-HW8YMitaw">PoE2 애니메이션 팀 인터뷰</a> · <a href="https://www.youtube.com/watch?v=3PpmEYJ-AC4">구르기 해설</a></li>
+            <li><a href="https://youtu.be/PVVQSZ6Lk44">엘든 링 이동 동작 모음</a> · <a href="https://eldenring.wiki.gg/wiki/I-Frame">무적 프레임</a></li>
+            <li><a href="https://www.destructoid.com/after-beta-feedback-hitstop-is-returning-to-monster-hunter-wilds/">몬헌 와일즈 히트스톱</a></li>
+            <li><a href="https://www.youtube.com/watch?v=6aLZWuFHuZc">P의 거짓 이동 동작</a> · <a href="https://www.youtube.com/watch?v=YCkCn4ML4Uk">스텔라 블레이드 동작</a></li>
+            <li><a href="https://www.gfinityesports.com/article/stellar-blade-director-input-lag-intentional">스텔라 0.5 s 지연 발언</a></li>
+            <li><a href="https://library.keqingmains.com/combat-mechanics/frames">원신 프레임 자료</a></li>
+          </ul>
+          <h3>릴스</h3>
+          <ul>
+            <li><a href="https://www.instagram.com/reel/DfKR-ylir6t/">gamedevinspire · 벽 손</a></li>
+            <li><a href="https://www.instagram.com/reel/DcPUeh2KYHs/">mvoidey · 에너지볼</a></li>
+          </ul>
+        </div>
+      </div>
+    </details>
+  </div>
+</section>
+</main>
+
+<footer><div class="wrap mono">마디 · 움직임 조사 · 2026-11-02</div></footer>
+
+<script>
+// 사람 숫자 탭: 화살표 키로도 이동
+const tabs = [...document.querySelectorAll('.htabs [role="tab"]')];
+function pick(t) {
+  tabs.forEach(x => { const on = x === t; x.setAttribute('aria-selected', on); x.tabIndex = on ? 0 : -1; document.getElementById(x.getAttribute('aria-controls')).hidden = !on });
+}
+tabs.forEach((t, i) => {
+  t.addEventListener('click', () => pick(t));
+  t.addEventListener('keydown', e => {
+    const d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+    if (!d) return;
+    const n = tabs[(i + d + tabs.length) % tabs.length]; pick(n); n.focus();
+  });
+});
+</script>
+</body>
+</html>
