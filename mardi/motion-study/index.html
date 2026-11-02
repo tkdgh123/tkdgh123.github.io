@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>마디 움직임 비교</title>
-<meta name="description" content="마디 캐릭터 조정값 15개를 사람 모캡 측정·논문·ARPG·3인칭 액션 게임과 나란히 놓은 비교 — 사람 숫자, 게임 타이밍, 빠진 동작, 2차 전환 동작(출발·멈춤·되돌기·꺾기·착지·발끝), 검사 방법">
+<meta name="description" content="마디 캐릭터 조정값 15개를 사람 모캡 측정·논문·ARPG·3인칭 액션 게임과 나란히 놓은 비교 — 사람 숫자, 게임 타이밍, 빠진 동작, 2차 전환 동작(출발·멈춤·되돌기·꺾기·착지·발끝), 3차 릴스 3편(MuJoCo 접촉·UE5 되돌기·손가락 리그), 검사 방법">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -230,6 +230,18 @@ section.s { padding-block: clamp(56px, 8vw, 112px); scroll-margin-top: 8px }
 .reel.b li code { background: rgb(0 0 0 / .1) }
 .reel .lim { margin-top: 18px; font: 500 12px var(--mono); opacity: .75 }
 
+/* ── 3차 · 릴스 3편 ── */
+.r3-who { font: 500 12.5px var(--mono); color: var(--muted) }
+.r3-what { margin-top: 4px; font: 700 18px/1.4 var(--display) }
+.sheet { margin: 18px 0 22px }
+.sheet img { display: block; width: 100%; height: auto }
+.sheet figcaption { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 8px; font: 500 12px var(--mono); color: var(--muted) }
+.r3 .pat-wrap { margin-top: clamp(56px, 7vw, 96px) }
+.r3 .pats code { font: 500 12.5px var(--mono); background: rgb(0 0 0 / .06); padding: 1px 5px; border-radius: 3px }
+.r3 .tt td.hu { width: auto }
+.r3 .tt td[data-l="시간"] { width: 15% }
+.r3-note { margin-top: 20px; font-size: 14.5px; color: var(--muted); max-width: 64ch }
+
 /* ── 검사 ── */
 .test { background: var(--vp); color: var(--on-vp) }
 .film { margin: 40px 0 0; position: relative }
@@ -312,6 +324,9 @@ footer { padding-block: 32px 48px; font-size: 13px; color: var(--muted) }
   .steps li:first-child { border-top-width: 3px }
   .steps li::before { grid-row: span 2; font-size: 34px }
   .steps b { margin-top: 2px }
+  .sheet { margin-inline: calc(-1 * var(--m)); overflow-x: auto }
+  .sheet img { width: 960px; max-width: none }
+  .sheet figcaption { padding-inline: var(--m); position: sticky; left: 0; width: 100vw }
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto } }
 </style>
@@ -320,11 +335,11 @@ footer { padding-block: 32px 48px; font-size: 13px; color: var(--muted) }
 
 <header class="hero">
   <div class="wrap">
-    <div class="top mono"><a href="../">← 마디 기획서</a><span>움직임 조사 2차 · 2026-11-02</span></div>
+    <div class="top mono"><a href="../">← 마디 기획서</a><span>움직임 조사 3차 · 2026-11-02</span></div>
     <div class="hero-grid">
       <div>
         <h1>사람처럼<br>움직일 <b>값</b></h1>
-        <p class="lede">마디 캐릭터의 조정값 15개를 사람 모캡·논문·쿼터뷰 ARPG·3인칭 액션 게임과 나란히 놓았어요. 2차로 출발·멈춤·돌기·착지 같은 전환 동작을 더 쟀어요.</p>
+        <p class="lede">마디 캐릭터의 조정값 15개를 사람 모캡·논문·쿼터뷰 ARPG·3인칭 액션 게임과 나란히 놓았어요. 2차로 출발·멈춤·돌기·착지 같은 전환 동작을 더 쟀고, 3차로 릴스 3편을 프레임 단위로 봤어요.</p>
         <div class="counts">
           <div><b>15</b><span>조정값</span></div>
           <div><b>208</b><span>모캡 파일 직접 측정</span></div>
@@ -345,6 +360,7 @@ footer { padding-block: 32px 48px; font-size: 13px; color: var(--muted) }
       <a href="#missing"><span class="ic" data-icon="list-checks" data-size="16"></span>빠진 동작</a>
       <a href="#trans"><span class="ic" data-icon="layers" data-size="16"></span>전환 동작</a>
       <a href="#reels"><span class="ic" data-icon="clapperboard" data-size="16"></span>릴스</a>
+      <a href="#reels3"><span class="ic" data-icon="target" data-size="16"></span>릴스 3편</a>
       <a href="#test"><span class="ic" data-icon="circle-check" data-size="16"></span>검사</a>
       <a href="#sources"><span class="ic" data-icon="book-open" data-size="16"></span>출처</a>
     </nav>
@@ -881,6 +897,105 @@ footer { padding-block: 32px 48px; font-size: 13px; color: var(--muted) }
   </div>
 </section>
 
+<!-- 6-2. 3차 · 릴스 3편 -->
+<section class="s r2 r3" id="reels3">
+  <div class="wrap">
+    <div class="r2-head">
+      <div>
+        <p class="eyebrow">3차 조사 · 릴스 3편</p>
+        <h2>닿고, 되돌고, 쥐는 법</h2>
+        <p class="sub">물리 엔진 MuJoCo 설명, UE5 모션 매칭 되돌기, Blender 손가락 리그. 프레임을 세고, 화면 속 숫자는 원본 코드·문서로 확인했어요.</p>
+      </div>
+      <div class="answer">
+        <h3>착지 눌림에 시간이 없어요</h3>
+        <p>MuJoCo 접촉은 겹친 만큼을 시간을 두고 밀어내요. 마디 착지 눌림은 닿는 프레임에 바로 목표 깊이라 <b>내려가는 구간이 0 s</b>예요.</p>
+        <p>깊이는 그대로 두고 바닥까지 <b>0.075 s × 닿는 속도</b>만 넣으면 돼요. "중력이 안 느껴짐"의 원인 중 하나로 보여요 <i class="e">추정</i></p>
+      </div>
+    </div>
+
+    <div class="htabs" role="tablist" aria-label="릴스 3편">
+      <button role="tab" id="t3-phys" aria-controls="r3-phys" aria-selected="true">MuJoCo 접촉</button>
+      <button role="tab" id="t3-pivot" aria-controls="r3-pivot" aria-selected="false" tabindex="-1">UE5 되돌기</button>
+      <button role="tab" id="t3-hand" aria-controls="r3-hand" aria-selected="false" tabindex="-1">손가락 리그</button>
+    </div>
+    <div class="hpanels">
+      <div class="hpanel" role="tabpanel" id="r3-phys" aria-labelledby="t3-phys" tabindex="0">
+        <p class="r3-who"><a href="https://www.instagram.com/reel/DeQ7CMLDvbk/">index.opensource</a> · 큐레이션 @hyun2xyz · 2026-10-09 · 72 s · MuJoCo 3.14</p>
+        <p class="r3-what">관절 나무 · 접촉 · 마찰 · 휴머노이드 100개</p>
+        <figure class="sheet">
+          <img src="img/reel1_mujoco_contact_friction.webp" alt="릴스 1 장면 네 개: 관절로 이어진 노란 휴머노이드, 시간상수가 다른 상자 세 개와 파묻힘 그래프, 20° 경사에서 마찰 0.2 상자는 미끄러지고 0.6 상자는 버팀" width="1600" height="748" loading="lazy">
+          <figcaption><span>릴스에서 뽑은 장면 · 원본 index.opensource</span><span>관절 나무 → 접촉 시간상수 → 경사 마찰</span></figcaption>
+        </figure>
+        <table class="tt"><thead><tr><th>항목</th><th>릴스<small>원본 코드·문서로 확인</small></th><th>마디 지금</th></tr></thead><tbody>
+          <tr><td>몸 구조</td><td data-l="릴스">몸체 <b>16</b> · 경첩 <b>21</b> · 자세 숫자 28개<small>humanoid.xml을 받아 셈. 자유도 27 × 100명 = 2,700</small></td><td data-l="마디">랙돌은 Rigidbody + ConfigurableJoint<small>Unity ArticulationBody가 MuJoCo 같은 관절 나무 방식</small></td></tr>
+          <tr class="bad"><td>접촉 시간상수</td><td data-l="릴스"><b>0.004 · 0.02 · 0.3 s</b> (0.02가 기본)<small>임계 감쇠라 안 튀어요. 0.3 s 상자는 약 17–18 cm 파묻혔다 천천히 올라와요 (그래프 눈금, ±1 cm)</small></td><td data-l="마디">닿는 프레임에 바로 목표 깊이<small>내려가는 시간 0 s. 사람은 바닥까지 0.075 s × 닿는 속도</small></td></tr>
+          <tr><td>20° 경사</td><td data-l="릴스">버티려면 마찰 <b>tan 20° = 0.36</b><small>0.2 상자는 2.69 m 미끄러지고 0.6 상자는 0 m</small></td><td data-l="마디">땅이면 경사 중력을 무조건 다 상쇄 (40° 안)<small>grip을 0.4로 낮춰도 40°에 서 있어요. 사람이면 22°부터 미끄러져요 <i class="e">계산</i></small></td></tr>
+          <tr><td>관절 힘</td><td data-l="릴스">엉덩이 <b>120</b> : 무릎 <b>80</b> : 몸통·팔꿈치 40 : 발목·어깨 20</td><td data-l="마디">모든 마디 같은 힘<small>spring 3600 × 관성</small></td></tr>
+        </tbody></table>
+        <p class="fit">휴머노이드는 중력을 끄고 모터로 흔든 것 · 사람처럼 걷는 건 그 위 제어기 몫 · 배울 건 땅과 만나는 규칙</p>
+        <div class="mk"><b>마디</b><ul><li>착지 눌림: 내려가는 시간 <b>0.075·v s</b> (최소 0.06), 회복 smoothTime <b>0.07·v</b>. 깊이(squash 1.5)는 그대로 <i class="e">계산</i></li><li>경사 버팀을 <b>grip × g × cos θ</b>로 잘라요. 버티는 경사가 grip에서 저절로 나와요.</li><li>랙돌 마디별 힘(다리 &gt; 몸통 &gt; 팔), ArticulationBody는 떨림이 보일 때만 <i class="e">추정</i></li></ul></div>
+      </div>
+
+      <div class="hpanel" role="tabpanel" id="r3-pivot" aria-labelledby="t3-pivot" tabindex="0" hidden>
+        <p class="r3-who"><a href="https://www.instagram.com/reel/DezoVT5B1Cm/">Chema Luque (@chemaluque_dev)</a> · 2026-10-22 · 36 s · UE5 Game Animation Sample</p>
+        <p class="r3-what">모션 매칭 설명 + 전력질주 되돌기</p>
+        <figure class="sheet">
+          <img src="img/reel2_gasp_sprint_pivot.webp" alt="전력질주 되돌기 32프레임: 제동, 내려앉아 디딤, 쪼그려 낮게 돌기, 박차기, 낮게 가속" width="1600" height="713" loading="lazy">
+          <figcaption><span>f38–f69 · 30 fps · 원본 Chema Luque</span><span>제동 → 디딤 → 낮게 돌기 → 박차기</span></figcaption>
+        </figure>
+        <table class="tt"><thead><tr><th>단계</th><th>시간<small>프레임</small></th><th>보이는 것</th></tr></thead><tbody>
+          <tr><td>곧게 선 제동</td><td data-l="시간"><b>0.13 s</b><small>f42–45</small></td><td class="hu" data-l="보이는 것">상체가 서고 보폭이 짧아져요</td></tr>
+          <tr><td>내려앉으며 디딤</td><td data-l="시간"><b>0.10 s</b><small>f46–48</small></td><td class="hu" data-l="보이는 것">무릎·엉덩이가 확 굽어요</td></tr>
+          <tr class="bad"><td>낮게 돌기</td><td data-l="시간"><b>0.50 s</b><small>f48–62</small></td><td class="hu" data-l="보이는 것">쪼그린 채 새 방향으로. <b>고개가 먼저</b> 돌고 엉덩이는 아직 옛 방향, 팔을 뻗어 균형, 손이 바닥 가까이</td></tr>
+          <tr><td>박차기</td><td data-l="시간"><b>0.13 s</b><small>f63–66</small></td><td class="hu" data-l="보이는 것">크게 숙인 채 밀어내요</td></tr>
+          <tr><td>낮게 가속</td><td class="na" data-l="시간">—</td><td class="hu" data-l="보이는 것">깊게 숙인 출발, 약 40° <i class="e">추정</i></td></tr>
+        </tbody></table>
+        <p class="fit">제동 → 박차기 끝 0.80 s · 사람 전력 되돌기 1.90 s · 스텔라·P의 거짓 0.85 s · 몬헌 1.15–1.3 s · 머리 25–30% 낮아짐 <i class="e">추정</i></p>
+        <table class="tt"><thead><tr><th>그 밖에</th><th>본 것</th></tr></thead><tbody>
+          <tr><td>걷다 180°</td><td class="hu" data-l="본 것">약 <b>0.5 s</b>. 코트가 몸보다 늦게 돌고, 몸이 멈춘 뒤 <b>0.4 s</b> 더 펄럭여요. 앞 궤적이 몸보다 먼저 휘어요</td></tr>
+          <tr><td>고르는 기준</td><td class="hu" data-l="본 것">궤적 <b>3</b> : 두 발 위치·속도 <b>1</b> (Epic 문서 예시). 디딘 발과 맞는 프레임에서 들어가요</td></tr>
+          <tr><td>얹는 층</td><td class="hu" data-l="본 것">가속 기울기, 하체 비틀기, 발 IK, 관성 블렌딩</td></tr>
+          <tr><td>릴스 주장</td><td class="hu" data-l="본 것">Fortnite 챕터 5부터 모션 매칭 → Epic 발표문을 옮긴 기사로 확인<small>"초당 2000 자세"는 편집 그래픽, 검색 간격 기본값은 문서에 없어요</small></td></tr>
+        </tbody></table>
+        <div class="mk"><b>마디</b><ul><li>모션 매칭 자체는 안 해요. 동작이 몇 개뿐이라 싼 것만 가져와요.</li><li>지금 되돌기는 Stop 1.8배 → Start라 <b>몸이 곧게 선 채</b> 멈췄다 출발해요. 낮게 디디고 도는 Pivot 상태로.</li><li>Posture(고개 먼저)가 Heroine 장면엔 안 붙어 있어요. 입력 방향을 보게, 되돌기 땐 최대 90° <i class="e">추정</i></li></ul></div>
+      </div>
+
+      <div class="hpanel" role="tabpanel" id="r3-hand" aria-labelledby="t3-hand" tabindex="0" hidden>
+        <p class="r3-who"><a href="https://www.instagram.com/reel/DebSlIgA7t3/">3dbimops1</a> · 원작자 표시 @leedoppo · 2026-10-13 · 11 s · Blender</p>
+        <p class="r3-what">컨트롤 하나로 손가락 여럿을 굽히는 보조 리그</p>
+        <figure class="sheet">
+          <img src="img/reel3_finger_close_open.webp" alt="장갑 낀 손 프레임: 위는 주먹 쥐기 f58–f73, 아래는 주먹 펴기 f228–f251" width="1600" height="646" loading="lazy">
+          <figcaption><span>30 fps · 올린 곳 3dbimops1</span><span>쥐기 f59–66 · 펴기 f230–243</span></figcaption>
+        </figure>
+        <table class="tt"><thead><tr><th>동작</th><th>시간<small>프레임</small></th><th>보이는 것</th></tr></thead><tbody>
+          <tr><td>주먹 쥐기</td><td data-l="시간"><b>0.23 s</b><small>f59–66</small></td><td class="hu" data-l="보이는 것">네 손가락이 <b>거의 한꺼번에</b>, 손목도 조금. 뿌리 마디부터 굽고 끝마디가 따라와요</td></tr>
+          <tr class="bad"><td>주먹 펴기</td><td data-l="시간"><b>0.45 s</b><small>f230–243</small></td><td class="hu" data-l="보이는 것"><b>검지가 먼저</b>, 약지·새끼가 2–4프레임 늦게. 다 펴진 뒤 살짝 흩어졌다 모여요</td></tr>
+          <tr><td>물결</td><td data-l="시간"><b>3–4프레임</b><small>손가락 사이</small></td><td class="hu" data-l="보이는 것">한 손가락씩 차례로 굽어요. 엄지는 따로</td></tr>
+        </tbody></table>
+        <p class="fit">끝마디 ≈ ⅔ × 가운데 마디 (Handrix 2003, 옮긴 인용) · 펴기가 쥐기의 2배 느린 건 이 릴스 하나의 연기 <i class="e">추정</i></p>
+        <div class="mk"><b>마디</b><ul><li>Heroine 손가락 뼈 <b>0개</b>, 메시도 네 손가락이 붙은 장갑 모양이라 손이 납작한 판으로 고정돼요.</li><li>장갑 리그: 붙은 네 손가락을 한 덩어리 3마디 + 엄지 3마디, Humanoid 가운데 손가락 칸에만 연결 <i class="e">추정</i></li><li>뼈가 생기면 손 레이어 하나, 값 <b>Grip 0~1</b>. 달리기 0.3–0.5 · 공격 직전 1.0 (0.2 s) · 힘 빼기 0 (0.45 s). 펼 때만 검지 0 · 중지 1 · 약지 2 · 새끼 3프레임 늦게</li></ul></div>
+      </div>
+    </div>
+
+    <div class="pat-wrap">
+      <div class="slab"><b>8</b><h3>마디가 가져갈 것</h3></div>
+      <div>
+        <ol class="pats">
+          <li><div><b>착지 눌림에 내려가는 시간</b><span>바닥까지 0.075·v s, 회복 0.07·v. 깊이는 사용자 값 그대로 · <code>BodyReact</code> 몇 줄 · MuJoCo</span></div></li>
+          <li><div><b>되돌기 전용 Pivot 상태</b><span>짧은 제동 → 엉덩이 내리고 디딤 → 디딤 중에만 회전 → 박차기, 합 0.8 s 안팎 · <code>Mover.Transitions</code> + CMU 되돌기나 Mixamo run_turn180 하나 · UE5</span></div></li>
+          <li><div><b>고개 먼저</b><span>Posture를 Heroine에 붙이고 입력 방향을 보게, 되돌기 땐 최대 90° · <code>Basics.cs</code> + <code>Posture</code> · UE5</span></div></li>
+          <li><div><b>진입 프레임을 발까지 맞춰 고르기</b><span>속도 차 3 : 앞에 나온 발 차 1, 반대 발이면 Mirror. 지금은 속도로만 골라요 · <code>Mover.Transitions</code> · UE5</span></div></li>
+          <li><div><b>머리카락 2차 움직임</b><span>뼈 몇 줄 + 몸보다 늦게 따라오는 스프링. 지금 머리카락 뼈 0개 · 리깅 + <code>Rope.cs</code> · UE5 코트</span></div></li>
+          <li><div><b>경사 버팀을 마찰 한도 안으로</b><span>F1로 grip을 낮출 때만 틀려요 · <code>Mover.FixedUpdate</code> 한 줄 · MuJoCo</span></div></li>
+          <li><div><b>손가락</b><span>장갑 리그 → 손 레이어 Grip 하나 · Blender + Animator · 손가락 리그</span></div></li>
+          <li><div><b>랙돌 마디별 힘</b><span>다리 &gt; 몸통 &gt; 팔, 떨리면 ArticulationBody · <code>Ragdoll</code> · <code>Limp</code> · MuJoCo</span></div></li>
+        </ol>
+        <p class="r3-note">1·3·6은 몇 줄이라 걷기·달리기에서 바로 느껴져요. 2·4는 "방향 전환 어색함"의 짝, 5·7은 리깅이 먼저, 8은 증상이 있을 때만. F1로 정한 값은 안 건드리고 상태별 배수·시간 모양으로 더해요.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- 7. 검사 -->
 <section class="s test slant" id="test">
   <div class="wrap">
@@ -991,6 +1106,19 @@ footer { padding-block: 32px 48px; font-size: 13px; color: var(--muted) }
           <ul>
             <li><a href="https://www.instagram.com/reel/DfKR-ylir6t/">gamedevinspire · 벽 손</a></li>
             <li><a href="https://www.instagram.com/reel/DcPUeh2KYHs/">mvoidey · 에너지볼</a></li>
+            <li><a href="https://www.instagram.com/reel/DeQ7CMLDvbk/">index.opensource · MuJoCo 설명</a> <small>3차</small></li>
+            <li><a href="https://www.instagram.com/reel/DezoVT5B1Cm/">Chema Luque · UE5 모션 매칭</a> <small>3차</small></li>
+            <li><a href="https://www.instagram.com/reel/DebSlIgA7t3/">3dbimops1 · 손가락 보조 리그</a> <small>3차 · 원작자 표시 @leedoppo</small></li>
+          </ul>
+          <h3>3차 · 릴스 숫자 확인</h3>
+          <ul>
+            <li><a href="https://github.com/google-deepmind/mujoco/blob/main/model/humanoid/humanoid.xml">MuJoCo humanoid.xml</a> <small>몸체·관절·모터 세기</small></li>
+            <li><a href="https://mujoco.readthedocs.io/en/stable/modeling.html">MuJoCo 문서 Modeling</a> <small>접촉 시간상수 solref</small></li>
+            <li><a href="https://github.com/google-deepmind/dm_control/blob/main/dm_control/locomotion/walkers/cmu_humanoid.py">dm_control CMU 휴머노이드</a></li>
+            <li><a href="https://docs.unity.com/en-us/engine/6000.6/manual/physics-section/physics-overview/articulations-section/physics-articulations">유니티 매뉴얼 Physics articulations</a> <small>ArticulationBody</small></li>
+            <li><a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/motion-matching-in-unreal-engine">UE Motion Matching 문서</a> <small>궤적 3 : 자세 1</small></li>
+            <li><a href="https://gamefromscratch.com/epic-games-release-500-free-aaa-quality-game-animations/">GASP 공개 · Fortnite 문구</a> <small>Epic 발표문 인용</small></li>
+            <li>ElKoura & Singh 2003 "Handrix" <small>끝마디 ⅔ 규칙, 옮긴 인용</small></li>
           </ul>
         </div>
       </div>
@@ -999,7 +1127,7 @@ footer { padding-block: 32px 48px; font-size: 13px; color: var(--muted) }
 </section>
 </main>
 
-<footer><div class="wrap mono">마디 · 움직임 조사 2차 · 2026-11-02</div></footer>
+<footer><div class="wrap mono">마디 · 움직임 조사 3차 · 2026-11-02</div></footer>
 
 <script>
 // 탭: 화살표 키로도 이동, #패널 주소로 바로 열기
