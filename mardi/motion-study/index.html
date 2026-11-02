@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>마디 움직임 비교</title>
-<meta name="description" content="마디 캐릭터 조정값 15개를 사람 모캡 측정·논문·ARPG·3인칭 액션 게임과 나란히 놓은 비교 — 사람 숫자, 게임 타이밍, 빠진 동작, 2차 전환 동작(출발·멈춤·되돌기·꺾기·착지·발끝), 3차 릴스 3편(MuJoCo 접촉·UE5 되돌기·손가락 리그), 검사 방법">
+<meta name="description" content="마디 캐릭터 조정값 15개를 사람 모캡 측정·논문·ARPG·3인칭 액션 게임과 나란히 놓은 비교 — 사람 숫자, 게임 타이밍, 빠진 동작, 2차 전환 동작(출발·멈춤·되돌기·꺾기·착지·발끝), 3차 릴스 3편(MuJoCo 접촉·UE5 되돌기·손가락 리그), 4차 애니메이터 영상(HY-Motion 리뷰·출발 압축), 검사 방법">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -242,6 +242,29 @@ section.s { padding-block: clamp(56px, 8vw, 112px); scroll-margin-top: 8px }
 .r3 .tt td[data-l="시간"] { width: 15% }
 .r3-note { margin-top: 20px; font-size: 14.5px; color: var(--muted); max-width: 64ch }
 
+/* ── 4차 · 영상 ── */
+.v-who { margin-top: 16px; font: 500 12.5px var(--mono); color: var(--muted) }
+.crit { margin-top: 48px }
+.crit > li { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 16px clamp(24px, 4vw, 56px); padding-block: 28px; border-top: 1px solid var(--rule) }
+.crit > li:first-child { border-top: 3px solid var(--ink) }
+.crit h3 { font-size: 22px; font-weight: 700; margin-top: 8px }
+.crit p.d { margin-top: 10px; font-size: 15px; color: var(--muted) }
+.crit p.d b { color: var(--ink) }
+.crit p.t { margin-top: 12px; font-size: 15px; font-weight: 600; padding-left: 16px; position: relative }
+.crit p.t::before { content: ""; position: absolute; left: 0; top: .78em; width: 8px; height: 2px; background: var(--joint) }
+.crit figure { margin: 0 }
+.crit figure img { display: block; width: 100%; height: auto }
+.crit figcaption { margin-top: 8px; font: 500 12px var(--mono); color: var(--muted) }
+.v-clip { margin-top: clamp(56px, 7vw, 96px) }
+.v-clip h3, .v-left h3 { font-size: clamp(26px, 3vw, 38px); font-weight: 500 }
+.v-clip .tt { margin-top: 20px }
+.done { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px clamp(28px, 4vw, 56px); margin-top: 28px; padding: clamp(22px, 3vw, 36px); background: var(--vp); color: var(--on-vp); clip-path: polygon(0 0, 100% 0, 100% calc(100% - 22px), calc(100% - 22px) 100%, 0 100%) }
+.done .eyebrow { color: var(--joint) }
+.done h4 { margin: 8px 0 0; font: 700 20px/1.3 var(--display) }
+.done p { margin-top: 8px; font-size: 14.5px; color: var(--on-vp-soft) }
+.done .big2 b { font-size: clamp(22px, 2.2vw, 28px) }
+.v-left { margin-top: clamp(48px, 6vw, 72px) }
+
 /* ── 검사 ── */
 .test { background: var(--vp); color: var(--on-vp) }
 .film { margin: 40px 0 0; position: relative }
@@ -285,6 +308,7 @@ footer { padding-block: 32px 48px; font-size: 13px; color: var(--muted) }
   .hside aside { transform: none }
   .swipe { display: block }
   .r2-head, .rules { grid-template-columns: minmax(0, 1fr) }
+  .crit > li, .done { grid-template-columns: minmax(0, 1fr) }
 }
 @media (max-width: 600px) {
   body { font-size: 16px }
@@ -327,6 +351,9 @@ footer { padding-block: 32px 48px; font-size: 13px; color: var(--muted) }
   .sheet { margin-inline: calc(-1 * var(--m)); overflow-x: auto }
   .sheet img { width: 960px; max-width: none }
   .sheet figcaption { padding-inline: var(--m); position: sticky; left: 0; width: 100vw }
+  .crit .sheet { margin: 0 calc(-1 * var(--m)) }
+  .crit .sheet img { width: 960px }
+  .done .big2 { grid-template-columns: minmax(0, 1fr) }
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto } }
 </style>
@@ -335,11 +362,11 @@ footer { padding-block: 32px 48px; font-size: 13px; color: var(--muted) }
 
 <header class="hero">
   <div class="wrap">
-    <div class="top mono"><a href="../">← 마디 기획서</a><span>움직임 조사 3차 · 2026-11-02</span></div>
+    <div class="top mono"><a href="../">← 마디 기획서</a><span>움직임 조사 4차 · 2026-11-02</span></div>
     <div class="hero-grid">
       <div>
         <h1>사람처럼<br>움직일 <b>값</b></h1>
-        <p class="lede">마디 캐릭터의 조정값 15개를 사람 모캡·논문·쿼터뷰 ARPG·3인칭 액션 게임과 나란히 놓았어요. 2차로 출발·멈춤·돌기·착지 같은 전환 동작을 더 쟀고, 3차로 릴스 3편을 프레임 단위로 봤어요.</p>
+        <p class="lede">마디 캐릭터의 조정값 15개를 사람 모캡·논문·쿼터뷰 ARPG·3인칭 액션 게임과 나란히 놓았어요. 2차로 출발·멈춤·돌기·착지 같은 전환 동작을 더 쟀고, 3·4차로 릴스 3편과 애니메이터 영상 하나를 프레임 단위로 봤어요.</p>
         <div class="counts">
           <div><b>15</b><span>조정값</span></div>
           <div><b>208</b><span>모캡 파일 직접 측정</span></div>
@@ -361,6 +388,7 @@ footer { padding-block: 32px 48px; font-size: 13px; color: var(--muted) }
       <a href="#trans"><span class="ic" data-icon="layers" data-size="16"></span>전환 동작</a>
       <a href="#reels"><span class="ic" data-icon="clapperboard" data-size="16"></span>릴스</a>
       <a href="#reels3"><span class="ic" data-icon="target" data-size="16"></span>릴스 3편</a>
+      <a href="#video"><span class="ic" data-icon="presentation" data-size="16"></span>영상</a>
       <a href="#test"><span class="ic" data-icon="circle-check" data-size="16"></span>검사</a>
       <a href="#sources"><span class="ic" data-icon="book-open" data-size="16"></span>출처</a>
     </nav>
@@ -996,6 +1024,104 @@ footer { padding-block: 32px 48px; font-size: 13px; color: var(--muted) }
   </div>
 </section>
 
+<!-- 6-3. 4차 · 영상 -->
+<section class="s" id="video">
+  <div class="wrap">
+    <div class="r2-head">
+      <div>
+        <p class="eyebrow">4차 조사 · 영상</p>
+        <h2>모캡을 고르지 않게 줄이기</h2>
+        <p class="sub">게임 애니메이터 껨미가 텐센트 텍스트→모션 AI HY-Motion 1.0을 직접 깔아 SayMotion·QuickMagic과 비교한 사용기예요. 애니메이터가 "쓸 만하다"를 가르는 기준을 마디에 쓸 기법으로 바꿨어요.</p>
+        <p class="v-who"><a href="https://www.youtube.com/watch?v=S9zckuUgukc">껨미 (@GGEMMii)</a> · 2026-02-11 · 9분 06초 · 유튜브</p>
+      </div>
+      <div class="answer">
+        <h3>HY-Motion은 마디에 못 써요</h3>
+        <p>라이선스 원문이 <b>한국·EU·영국</b>을 적용 지역에서 빼요. 생성한 동작 파일까지요 (원문 문구 기준, 법률 자문 아님).</p>
+        <p>최소 그래픽 메모리 <b>26 GB</b> (Lite 24 GB)인데 이 노트북엔 NVIDIA가 없어요. 사이 동작은 지금처럼 CMU 모캡으로.</p>
+      </div>
+    </div>
+
+    <ol class="crit">
+      <li>
+        <div>
+          <p class="eyebrow">기준 1 · 3:30</p>
+          <h3>줄이면 모캡이 손맛이 돼요</h3>
+          <p class="d">같은 구르기를 5·2·1초로 만들면 길수록 모캡 느낌, 짧을수록 핸드키 느낌. 구르기 자체는 덜 줄고 <b>예비 동작·머무름이 먼저 사라져요</b> <i class="e">추정</i></p>
+          <p class="t">모캡을 통째로 빨리 틀지 말고, 예비 동작은 많이 · 핵심은 조금 줄여요.</p>
+        </div>
+        <figure>
+          <img src="img/frame_roll_5s_2s_1s.webp" alt="같은 구르기를 5초·2초·1초로 만든 마네킹 세 개: 5초는 바닥에 앉아 머물고, 2초는 이미 서 있고, 1초는 일어서는 중" width="854" height="480" loading="lazy">
+          <figcaption>같은 프롬프트 5 s · 2 s · 1 s · 원본 껨미</figcaption>
+        </figure>
+      </li>
+      <li>
+        <div>
+          <p class="eyebrow">기준 2 · 4:03</p>
+          <h3>끝은 다음 자세로 가라앉아야 해요</h3>
+          <p class="d">SayMotion 구르기는 누운 자세에서 딱 끊기고, HY-Motion은 일어서 대기 자세까지 돌아와요. 애니메이터는 이 <b>복귀</b>를 가장 높이 쳤어요.</p>
+          <p class="t">동작 끝의 자리 잡기는 줄이지 않고 남겨요. 사람 멈춤도 마지막은 1 cm 모으는 걸음이에요.</p>
+        </div>
+        <figure class="sheet">
+          <img src="img/frame_roll_end_saymotion_vs_hymotion.webp" alt="구르기 끝 비교: 왼쪽 SayMotion은 바닥에 누운 채 끝나고, 오른쪽 HY-Motion은 서서 대기 자세로 끝남" width="1280" height="360" loading="lazy">
+          <figcaption><span>구르기 끝 · 왼쪽 SayMotion, 오른쪽 HY-Motion · 원본 껨미</span></figcaption>
+        </figure>
+      </li>
+      <li>
+        <div>
+          <p class="eyebrow">기준 3 · 5:15</p>
+          <h3>포즈가 맞아도 타이밍이 틀리면 실패</h3>
+          <p class="d">HY-Motion 발레 점프는 다리 찢기를 <b>바닥 높이에서 약 1.0 s</b> 보여 주고, 다시 뜰 때 박차기가 없어요. 디딤 0.1 → 뜬 포즈 0.4 → 내려옴 0.3 → 찢기 1.0 → 다시 오름 0.9 s <i class="e">추정</i></p>
+          <p class="d">진짜 그랑 제테는 찢는 순간이 공중 꼭대기, 0.5–0.7 m 떠도 공중 시간은 <b>0.64–0.76 s</b> <i class="e">계산</i>. 영상 기반 QuickMagic이 모캡에 가장 가까웠어요.</p>
+          <p class="t">사람다움은 포즈보다 공중 시간 · 박차기 · 착지 흡수에서 나와요.</p>
+        </div>
+        <figure class="sheet">
+          <img src="img/frame_ballet_hymotion_sequence.webp" alt="HY-Motion 발레 점프 여섯 장면: 디딤, 수직으로 뜬 포즈, 웅크려 내려옴, 바닥 높이에서 다리 찢기, 다시 오르는 자세, 팔 벌리고 선 자세" width="1600" height="356" loading="lazy">
+          <figcaption><span>HY-Motion 발레 점프 · 480p · 10 fps로 셈 (±0.1 s) · 원본 껨미</span></figcaption>
+        </figure>
+      </li>
+    </ol>
+
+    <div class="v-clip">
+      <h3>마디 출발·멈춤 클립 안에서 잰 값</h3>
+      <table class="tt"><thead><tr><th>클립</th><th>경계</th><th>뜻</th></tr></thead><tbody>
+        <tr class="bad"><td>RunStop<small>CMU 104_56 · 2.55 s</small></td><td data-l="경계">속도 10% 밑 <b>1.51 s (59%)</b><small>50% 밑 0.86 s · 사실상 0 1.75 s</small></td><td class="hu" data-l="뜻">앞 59%가 제동, 뒤 약 1.0 s는 거의 안 움직이는 <b>자리 잡기</b></td></tr>
+        <tr class="bad"><td>RunStart<small>CMU 104_54 · 1.9 s</small></td><td data-l="경계">최고 속도 10% 넘음 <b>0.67 s (36%)</b><small>50% 1.07 s · 90% 1.72 s</small></td><td class="hu" data-l="뜻">앞 36%는 숙이며 체중 옮기기. 통째로 1.3배면 누르고 반 박자 늦어요</td></tr>
+      </tbody></table>
+      <p class="fit">골반 수평 속도 (4 Hz 거름) · 유니티 몸 중심 속도와 조금 다를 수 있음</p>
+
+      <div class="done">
+        <div>
+          <p class="eyebrow">마디에 반영 · 오늘 넣음</p>
+          <h4>출발 첫 숙임만 2배로</h4>
+          <p>출발 클립 처음 36%만 2배 빠르기. F1 "달려 나가기 첫 숙임 줄이기", 기본 2.</p>
+          <div class="big2">
+            <div><b class="mono">0.35 → 0.15 s</b><span>0.5 m/s까지</span></div>
+            <div><b class="mono">1.15 → 0.8 s</b><span>5 m/s까지</span></div>
+          </div>
+          <p>숙임은 약 0.26 s 남아요. 사람은 첫 발보다 0.27–0.46 s 먼저 숙여요.</p>
+        </div>
+        <div>
+          <p class="eyebrow">오늘 넣음 · 되돌기</p>
+          <h4>제동 걸음 동안 몸 돌리기</h4>
+          <p>멈추는 동안 잠가 두던 회전을 풀어 360°/s로 돌아요. F1 "되돌기 중 몸 돌리기".</p>
+          <div class="big2">
+            <div><b class="mono">138 → 97</b><span>되돌기 구간 발 미끄럼 cm/s</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="v-left">
+      <h3>남은 것</h3>
+      <ul class="rules">
+        <li><b>멈춤 두 단계 빠르기</b>앞 59% 제동은 stopRate, 뒤 자리 잡기는 따로 0.9–1.3. 빨리 서도 착 붙지 않게.</li>
+        <li><b>공중 자세를 공중 시간에</b>올라갈 때 펴고, 꼭대기에서 접고, 내려올 때 다리를 미리 뻗어요. 예전 Player.cs의 AirPhase 방식.</li>
+        <li><b>멈춘 뒤 둘러보기</b>대기 1.5–3 s 뒤 고개를 ±30–45° 한 번씩. 입력이 오면 바로 0으로.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
 <!-- 7. 검사 -->
 <section class="s test slant" id="test">
   <div class="wrap">
@@ -1120,6 +1246,14 @@ footer { padding-block: 32px 48px; font-size: 13px; color: var(--muted) }
             <li><a href="https://gamefromscratch.com/epic-games-release-500-free-aaa-quality-game-animations/">GASP 공개 · Fortnite 문구</a> <small>Epic 발표문 인용</small></li>
             <li>ElKoura & Singh 2003 "Handrix" <small>끝마디 ⅔ 규칙, 옮긴 인용</small></li>
           </ul>
+          <h3>4차 · 영상</h3>
+          <ul>
+            <li><a href="https://www.youtube.com/watch?v=S9zckuUgukc">껨미 · HY-Motion 1.0 직접 써 보기</a> <small>2026-02-11</small></li>
+            <li><a href="https://github.com/Tencent-Hunyuan/HY-Motion-1.0">HY-Motion 1.0 저장소</a> · <a href="https://github.com/Tencent-Hunyuan/HY-Motion-1.0/blob/master/License.txt">License.txt</a> <small>적용 지역에서 한국·EU·영국 제외</small></li>
+            <li><a href="https://huggingface.co/tencent/HY-Motion-1.0">HY-Motion 모델 카드</a> <small>VRAM 26 / 24 GB, 미지원 목록</small></li>
+            <li><a href="https://arxiv.org/abs/2512.23464">HY-Motion 1.0 논문</a> <small>arXiv 2512.23464</small></li>
+            <li>CMU 104_54 · 104_56 <small>마디 출발·멈춤 클립, 골반 속도로 잼</small></li>
+          </ul>
         </div>
       </div>
     </details>
@@ -1127,7 +1261,7 @@ footer { padding-block: 32px 48px; font-size: 13px; color: var(--muted) }
 </section>
 </main>
 
-<footer><div class="wrap mono">마디 · 움직임 조사 3차 · 2026-11-02</div></footer>
+<footer><div class="wrap mono">마디 · 움직임 조사 4차 · 2026-11-02</div></footer>
 
 <script>
 // 탭: 화살표 키로도 이동, #패널 주소로 바로 열기
