@@ -82,7 +82,7 @@ input:focus, textarea:focus { outline: none; border-color: var(--acc); }
 .err { margin: 0; color: var(--sun); font-weight: 700; text-align: center; }
 .code { display: block; padding: 16px 12px; border-radius: 20px; background: var(--hero); text-align: center;
   font: 800 18px/1.3 ui-monospace, "SFMono-Regular", Consolas, monospace; letter-spacing: .04em; word-break: break-all; user-select: all; color: var(--acc-ink); }
-.code.small { padding: 6px 10px; font-size: 13px; border-radius: 12px; flex: 1; min-width: 0; }
+.code.small { padding: 6px 10px; font-size: 13px; border-radius: 12px; flex: 1 1 100%; min-width: 0; }
 .pick { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .pick button { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 22px 8px; border: 0; border-radius: 26px; font: 24px var(--round); }
 .pick button small { font: 700 13px var(--font); opacity: .8; }
@@ -99,7 +99,7 @@ input:focus, textarea:focus { outline: none; border-color: var(--acc); }
 .beat { color: var(--acc); font-size: 18px; animation: beat 1.6s ease-in-out infinite; }
 @keyframes beat { 0%, 60%, 100% { transform: scale(1); } 15% { transform: scale(1.3); } 30% { transform: scale(1.05); } 45% { transform: scale(1.22); } }
 .dnum { font-size: 46px; line-height: 1.1; color: var(--acc-ink); font-variant-numeric: tabular-nums; }
-.next { font-size: 13px; font-weight: 700; color: var(--soft); }
+.next { font-size: 13px; font-weight: 700; color: var(--soft); text-align: center; }
 main { max-width: 640px; margin: 0 auto; padding: 14px max(14px, env(safe-area-inset-right, 0px)) 0 max(14px, env(safe-area-inset-left, 0px)); }
 .tab { display: flex; flex-direction: column; gap: 12px; }
 
@@ -112,17 +112,20 @@ main { max-width: 640px; margin: 0 auto; padding: 14px max(14px, env(safe-area-i
 .week, .grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
 .week span { text-align: center; font-size: 12px; font-weight: 700; color: var(--soft); }
 .week .sun { color: var(--sun); } .week .sat { color: var(--a-ink); }
-.grid { background: var(--panel); border-radius: 28px; padding: 8px; gap: 2px; box-shadow: var(--shadow); }
-.day { position: relative; min-height: 68px; padding: 4px 2px 4px; border: 0; border-radius: 16px; background: none; text-align: left; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.grid { background: var(--panel); border-radius: 28px; padding: 8px 6px; gap: 2px; box-shadow: var(--shadow); }
+.day { position: relative; min-height: 68px; padding: 4px 1px; border: 0; border-radius: 16px; background: none; text-align: left; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .day:active { transform: scale(.93); }
 .day.out { opacity: .3; }
 .day.sel { background: color-mix(in srgb, var(--acc) 13%, transparent); }
 .day .n { display: inline-grid; place-items: center; width: 26px; height: 26px; margin-left: 1px; border-radius: 50%; font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }
 .day.sun .n { color: var(--sun); }
 .day.today .n { background: var(--acc); color: #fff; }
-.day .moods { position: absolute; top: 6px; right: 2px; font-size: 9px; line-height: 1; letter-spacing: -2px; }
-.day .heart { position: absolute; top: 22px; right: 4px; color: var(--acc); font-size: 10px; }
-.bar { display: block; padding: 1px 6px; border-radius: 999px; font-size: 10.5px; font-weight: 700; line-height: 1.5; white-space: nowrap; overflow: hidden; text-overflow: clip; }
+.day .moods { position: absolute; top: 3px; right: 1px; width: 1em; font-size: 9px; line-height: 1.1; text-align: center; word-break: break-all; }
+.day .heart { position: absolute; top: 1px; left: 1px; color: var(--acc); font-size: 9px; line-height: 1; }
+/* 칸이 좁아도 글자가 반쯤 잘리지 않게: 글자 단위로 줄 바꿈, 줄 단위로만 자름(위아래 여백은 border라 넘친 줄이 비치지 않음) */
+.bar { display: block; max-height: calc(2.6em + 4px); overflow: hidden; padding: 0 3px; border: solid transparent; border-width: 2px 0; border-radius: 7px;
+  font-size: 10.5px; font-weight: 700; line-height: 1.3; word-break: break-all; overflow-wrap: anywhere; }
+.bar.solo { max-height: calc(3.9em + 4px); }
 .bar.a { background: var(--a); color: var(--a-ink); } .bar.b { background: var(--b); color: var(--b-ink); } .bar.both { background: var(--both); color: var(--both-ink); }
 .more { font-size: 10px; color: var(--soft); font-weight: 700; padding-left: 4px; }
 
@@ -163,6 +166,8 @@ main { max-width: 640px; margin: 0 auto; padding: 14px max(14px, env(safe-area-i
 .wish small { display: block; color: var(--soft); font-weight: 600; font-size: 12px; }
 .wish.done b { text-decoration: line-through; color: var(--soft); }
 .wbtns { display: flex; gap: 4px; }
+/* 좁은 폰: 버튼을 제목 아래로 내려 제목이 몇 글자씩 쪼개지지 않게 */
+@media (max-width: 420px) { .wish { grid-template-columns: auto minmax(0, 1fr); } .wbtns { grid-column: 2; } }
 .wbtns button { padding: 8px 12px; border: 0; border-radius: 999px; background: var(--bg); font-weight: 700; font-size: 13px; }
 .wbtns button.go { background: var(--acc); color: #fff; }
 .wbtns button.arm { background: var(--sun); color: #fff; }
@@ -183,7 +188,7 @@ main { max-width: 640px; margin: 0 auto; padding: 14px max(14px, env(safe-area-i
 .settings { display: flex; flex-direction: column; gap: 10px; padding: 18px 16px; margin-bottom: 20px; border-radius: 26px; background: var(--panel); box-shadow: var(--shadow); }
 .settings label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; font-weight: 700; color: var(--soft); }
 .settings .pill { margin: 0; align-self: flex-start; background: var(--hero); box-shadow: none; }
-.coderow { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--soft); }
+.coderow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--soft); }
 .hint { margin: 0; font-size: 13px; color: var(--soft); }
 
 /* 떠 있는 탭 */
@@ -216,8 +221,8 @@ dialog[open]::backdrop { animation: fade .3s ease; }
 .seg.two-way { grid-template-columns: 1fr 1fr; }
 .seg button { padding: 11px 6px; border: 0; border-radius: 999px; background: var(--bg); font-weight: 800; color: var(--soft); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .seg button.on.a { background: var(--a); color: var(--a-ink); } .seg button.on.both { background: var(--both); color: var(--both-ink); } .seg button.on.b { background: var(--b); color: var(--b-ink); }
-.faces { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; }
-.faces button { padding: 6px 0; border: 0; border-radius: 50%; aspect-ratio: 1; background: var(--bg); font-size: 22px; }
+.faces { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 4px; }
+.faces button { padding: 0; border: 0; border-radius: 50%; aspect-ratio: 1; background: var(--bg); font-size: min(22px, 5.6vw); }
 .faces button.on { background: var(--b); transform: scale(1.12); }
 .acts { display: flex; gap: 8px; }
 .acts .big { flex: 1; padding: 14px; }
@@ -290,7 +295,7 @@ dialog[open]::backdrop { animation: fade .3s ease; }
 .props i { position: absolute; background: center / contain no-repeat; }
 .props .bowbig { top: -24px; right: -10px; width: 52px; height: 36px; background-image: var(--bow); }
 [data-skin="kitty"] .week { margin-bottom: 10px; }
-.props .wh { top: 44%; width: 22px; height: 24px; background-image: var(--whisk); }
+.props .wh { top: 44%; width: 20px; height: 22px; background-image: var(--whisk); }
 .props .wh.l { left: -14px; }
 .props .wh.r { right: -14px; transform: scaleX(-1); }
 .props .apple { bottom: -30px; left: 4px; width: 40px; height: 42px; background-image: var(--apple); }

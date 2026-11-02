@@ -146,7 +146,7 @@ function renderCal() {
     html += `<button type="button" class="${cls}" data-d="${d}" aria-label="${md(d)}"><span class="n">${dt.getDate()}</span>`
       + (moods ? `<span class="moods">${esc(moods)}</span>` : "")
       + (marksOn(d).length ? `<span class="heart">♥</span>` : "")
-      + evs.slice(0, 2).map(e => `<span class="bar ${e.who}">${esc(e.title)}</span>`).join("")
+      + evs.slice(0, 2).map(e => `<span class="bar ${e.who}${evs.length === 1 ? " solo" : ""}">${esc(e.title)}</span>`).join("")
       + (evs.length > 2 ? `<span class="more">+${evs.length - 2}</span>` : "")
       + `</button>`;
   }
