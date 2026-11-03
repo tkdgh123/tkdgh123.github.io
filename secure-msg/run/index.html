@@ -66,6 +66,8 @@ b{font-weight:700}
 table{width:100%;border-collapse:collapse;margin:6px 0 18px;font-size:15px}
 th,td{text-align:left;vertical-align:top;padding:8px 10px;border-bottom:1px solid var(--rule)}
 th{font-size:13px;color:var(--ink-2);font-weight:600}
+td > code:only-child{white-space:nowrap}
+th{white-space:nowrap}
 a.dl{display:inline-block;background:var(--ink);color:var(--paper);text-decoration:none;font-weight:700;border-radius:10px;padding:11px 18px}
 a.dl:hover{background:var(--steel)}
 .pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -83,6 +85,10 @@ a.dl:hover{background:var(--steel)}
 .diag figure{margin:0;background:var(--sheet);border:1px solid var(--rule);border-radius:14px;padding:14px}
 .diag figcaption{font:600 13px/1.4 var(--f-mono);color:var(--ink-2);margin-top:6px;text-align:center}
 .diag svg{width:100%;height:auto;display:block}
+.pkt{display:flex;flex-wrap:wrap;gap:3px;margin:8px 0 6px;font:500 12.5px/1.3 var(--f-mono)}
+.pkt span{flex:var(--w) 1 0;min-width:58px;background:var(--sheet);border:1px solid var(--rule);border-top:3px solid var(--steel);border-radius:6px;padding:6px 8px;color:var(--ink-2)}
+.pkt span b{display:block;color:var(--ink);font-family:var(--f-body);font-size:13px}
+.pkt span.dim{opacity:.55;border-top-color:var(--rule)}
 .map td:first-child{white-space:nowrap;font-weight:700}
 .map code{font-size:.8em}
 .foot{color:var(--ink-2);font-size:14.5px;margin:40px 0 50px;border-top:1px solid var(--rule);padding-top:16px}
@@ -218,7 +224,7 @@ networkingMode=mirrored</div>
 <li>이름이 거절됨 → 이름은 한글 5글자(15바이트)까지, 띄어쓰기와 <code>/</code> 없이. 이미 들어와 있는 이름도 안 된다.</li>
 </ul>
 
-<p class="foot">만든 사람: <b>김창식</b>(기획·결정·실행 확인) · <b>Claude</b>(Anthropic의 AI — 코드와 이 사이트 작성). 누가 무엇을 했는지는 <a href="../log/#who">작업 기록</a>에 있다.<br>파일별 코드는 <a href="../code/">전체 코드</a>, 무엇을 왜 바꿨는지는 <a href="../log/">작업 기록</a>, 원리와 계획은 <a href="../guide/">덜미 설명서</a>.</p>
+<p class="foot">만든 사람: <b>김창식</b>(기획·결정·실행 확인) · <b>Claude</b>(Anthropic의 AI — 코드와 이 사이트 작성). 누가 무엇을 했는지는 <a href="../log/#who">작업 기록</a>에 있다.<br>파일별 코드는 <a href="../code/">전체 코드</a>, 무엇을 왜 바꿨는지는 <a href="../log/">작업 기록</a>, 프로그램 구조는 <a href="../guide/">덜미 설명서</a>.</p>
 </main>
 </body>
 </html>

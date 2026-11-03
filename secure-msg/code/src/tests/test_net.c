@@ -1,4 +1,4 @@
-/* 패킷 송수신 확인 (설명서 '단계와 확인'의 S3). 서버(./deolmi --server)가 켜져 있어야 한다 — make test 가 알아서 켠다
+/* 패킷 송수신 확인 (설명서 '만든 순서와 확인'의 S3). 서버(./deolmi --server)가 켜져 있어야 한다 — make test 가 알아서 켠다
    ① 1바이트씩 쪼개 보내기  ② 두 통을 한 번에  ③ 길이 0xFFFFFFFF */
 #include <stdio.h>
 #include <string.h>

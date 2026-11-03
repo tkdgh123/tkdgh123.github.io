@@ -1,4 +1,4 @@
-/* 서버 중계 확인 (설명서 '단계와 확인'의 S4). 서버(./deolmi --server)가 켜져 있어야 한다 — make test 가 알아서 켠다
+/* 서버 중계 확인 (설명서 '만든 순서와 확인'의 S4). 서버(./deolmi --server)가 켜져 있어야 한다 — make test 가 알아서 켠다
    HELLO 등록·전달, to로 중계, 입장·퇴장 SYS, 처리 규칙 */
 #include <stdio.h>
 #include <string.h>
