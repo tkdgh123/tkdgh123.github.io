@@ -123,7 +123,7 @@ a.copy{text-decoration:none;line-height:1}
 <main class="wrap">
   <div class="app">
     <nav class="rail" data-v="n" role="tablist" aria-label="지금 버전 · 평문 파일" hidden>
-<button class="tab" data-f="n0" role="tab"><span class="nm">deolmi.c</span><span class="meta">905줄 · 프로그램 전부 — 통신 · 화면 · 중계 · 대화</span></button>
+<button class="tab" data-f="n0" role="tab"><span class="nm">deolmi.c</span><span class="meta">941줄 · 프로그램 전부 — 통신 · 화면 · 중계 · 대화</span></button>
 <div class="grp"><span class="grp-t">확인용 · 테스트를 돌릴 때만</span></div>
 <button class="tab" data-f="n1" role="tab"><span class="nm">tests/test_net.c</span><span class="meta">115줄 · 네트워크 테스트</span></button>
 <button class="tab" data-f="n2" role="tab"><span class="nm">tests/test_server.c</span><span class="meta">223줄 · 서버 중계 테스트</span></button>
@@ -150,7 +150,7 @@ a.copy{text-decoration:none;line-height:1}
     <div class="view">
       <section class="panel" id="n0" hidden>
   <div class="bar"><span class="path">deolmi.c</span><span class="role">프로그램 전부 — 통신 · 화면 · 중계 · 대화</span>
-    <span class="ll">905줄</span>
+    <span class="ll">941줄</span>
     <button class="copy" data-f="n0">복사</button><a class="copy dl" href="src/deolmi.c" download>받기</a></div>
   <pre class="codebox"><code class="language-c">/* 덜미 — 프밍기2 메신저. 이 파일 하나가 프로그램 전부다 (평문 단계).
 
@@ -178,6 +178,8 @@ a.copy{text-decoration:none;line-height:1}
 #include &lt;termios.h&gt;
 #include &lt;netdb.h&gt;
 #include &lt;arpa/inet.h&gt;
+#include &lt;ifaddrs.h&gt;
+#include &lt;net/if.h&gt;
 #include &lt;sys/ioctl.h&gt;
 #include &lt;sys/socket.h&gt;
 
@@ -986,6 +988,38 @@ static void raw_tty(void)
     atexit(restore_tty);
 }
 
+/* 방을 연 쪽(서버·방장): 다른 컴퓨터가 들어올 때 칠 내 주소를 보여 준다.
+   루프백(127.0.0.1 같은 자기 자신용)과 169.254.x(주소를 못 받았을 때 임시)는 뺀다 */
+static void show_my_address(void)
+{
+    struct ifaddrs *list;
+    char ip[INET_ADDRSTRLEN], others[160] = &quot;&quot;;
+    int n = 0;
+
+    if (getifaddrs(&amp;list) == 0) {
+        for (struct ifaddrs *a = list; a; a = a-&gt;ifa_next) {
+            if (!a-&gt;ifa_addr || a-&gt;ifa_addr-&gt;sa_family != AF_INET
+                || (a-&gt;ifa_flags &amp; IFF_LOOPBACK) || !(a-&gt;ifa_flags &amp; IFF_UP))
+                continue;
+            inet_ntop(AF_INET, &amp;((struct sockaddr_in *)a-&gt;ifa_addr)-&gt;sin_addr, ip, sizeof(ip));
+            if (strncmp(ip, &quot;169.254.&quot;, 8) == 0)
+                continue;
+            if (n++ == 0)
+                show(&quot;[주소] %s — 다른 컴퓨터는  ./deolmi 이름 %s  으로 들어와요&quot;, ip, ip);
+            else
+                snprintf(others + strlen(others), sizeof(others) - strlen(others), &quot; %s&quot;, ip);
+            int b = atoi(ip + 4);   /* 172.16~31 은 WSL 안쪽 주소일 수 있다 */
+            if (strncmp(ip, &quot;172.&quot;, 4) == 0 &amp;&amp; b &gt;= 16 &amp;&amp; b &lt;= 31)
+                show(&quot;[주소] 172.로 시작하면 WSL 안쪽 주소일 수 있어요 — 미러링을 켜야 밖에서 들어와요 (시작하기 05)&quot;);
+        }
+        freeifaddrs(list);
+    }
+    if (others[0])
+        show(&quot;[주소] 안 되면 이 주소로:%s&quot;, others);
+    if (n == 0)
+        show(&quot;[주소] 네트워크 주소를 못 찾았어요 — 같은 컴퓨터에서는  ./deolmi 이름  으로 들어와요&quot;);
+}
+
 /* ================= ⑤ 실행 ================= */
 
 int main(int argc, char **argv)
@@ -1000,7 +1034,8 @@ int main(int argc, char **argv)
         lfd = net_listen(PORT);
         if (lfd &lt; 0)
             return 1;
-        show(&quot;[서버] %d번에서 기다리는 중&quot;, PORT);
+        show(&quot;[서버] 기다리는 중 — 중계만 해요&quot;);
+        show_my_address();
     } else if (argc &gt;= 2 &amp;&amp; argv[1][0] != &#x27;-&#x27; &amp;&amp; valid_name(argv[1])) {
         strncpy(my_name, argv[1], NAME_LEN - 1);
         mode = (argc &gt;= 3 &amp;&amp; strcmp(argv[2], &quot;--host&quot;) == 0) ? M_HOST : M_JOIN;
@@ -1009,7 +1044,8 @@ int main(int argc, char **argv)
             if (lfd &lt; 0)
                 return 1;
             raw_tty();
-            show(&quot;%s덜미%s · %s · 방장 (포트 %d) — 서버 없이 내가 중계해요&quot;, C_ACCENT, C_RESET, my_name, PORT);
+            show(&quot;%s덜미%s · %s · 방장 — 서버 없이 내가 중계해요&quot;, C_ACCENT, C_RESET, my_name);
+            show_my_address();
         } else {
             const char *host = argc &gt;= 3 ? argv[2] : &quot;127.0.0.1&quot;;
             srv.fd = net_connect(host, PORT);

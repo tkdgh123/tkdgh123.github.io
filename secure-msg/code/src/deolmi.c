@@ -24,6 +24,8 @@
 #include <termios.h>
 #include <netdb.h>
 #include <arpa/inet.h>
+#include <ifaddrs.h>
+#include <net/if.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
 
@@ -832,6 +834,38 @@ static void raw_tty(void)
     atexit(restore_tty);
 }
 
+/* 방을 연 쪽(서버·방장): 다른 컴퓨터가 들어올 때 칠 내 주소를 보여 준다.
+   루프백(127.0.0.1 같은 자기 자신용)과 169.254.x(주소를 못 받았을 때 임시)는 뺀다 */
+static void show_my_address(void)
+{
+    struct ifaddrs *list;
+    char ip[INET_ADDRSTRLEN], others[160] = "";
+    int n = 0;
+
+    if (getifaddrs(&list) == 0) {
+        for (struct ifaddrs *a = list; a; a = a->ifa_next) {
+            if (!a->ifa_addr || a->ifa_addr->sa_family != AF_INET
+                || (a->ifa_flags & IFF_LOOPBACK) || !(a->ifa_flags & IFF_UP))
+                continue;
+            inet_ntop(AF_INET, &((struct sockaddr_in *)a->ifa_addr)->sin_addr, ip, sizeof(ip));
+            if (strncmp(ip, "169.254.", 8) == 0)
+                continue;
+            if (n++ == 0)
+                show("[주소] %s — 다른 컴퓨터는  ./deolmi 이름 %s  으로 들어와요", ip, ip);
+            else
+                snprintf(others + strlen(others), sizeof(others) - strlen(others), " %s", ip);
+            int b = atoi(ip + 4);   /* 172.16~31 은 WSL 안쪽 주소일 수 있다 */
+            if (strncmp(ip, "172.", 4) == 0 && b >= 16 && b <= 31)
+                show("[주소] 172.로 시작하면 WSL 안쪽 주소일 수 있어요 — 미러링을 켜야 밖에서 들어와요 (시작하기 05)");
+        }
+        freeifaddrs(list);
+    }
+    if (others[0])
+        show("[주소] 안 되면 이 주소로:%s", others);
+    if (n == 0)
+        show("[주소] 네트워크 주소를 못 찾았어요 — 같은 컴퓨터에서는  ./deolmi 이름  으로 들어와요");
+}
+
 /* ================= ⑤ 실행 ================= */
 
 int main(int argc, char **argv)
@@ -846,7 +880,8 @@ int main(int argc, char **argv)
         lfd = net_listen(PORT);
         if (lfd < 0)
             return 1;
-        show("[서버] %d번에서 기다리는 중", PORT);
+        show("[서버] 기다리는 중 — 중계만 해요");
+        show_my_address();
     } else if (argc >= 2 && argv[1][0] != '-' && valid_name(argv[1])) {
         strncpy(my_name, argv[1], NAME_LEN - 1);
         mode = (argc >= 3 && strcmp(argv[2], "--host") == 0) ? M_HOST : M_JOIN;
@@ -855,7 +890,8 @@ int main(int argc, char **argv)
             if (lfd < 0)
                 return 1;
             raw_tty();
-            show("%s덜미%s · %s · 방장 (포트 %d) — 서버 없이 내가 중계해요", C_ACCENT, C_RESET, my_name, PORT);
+            show("%s덜미%s · %s · 방장 — 서버 없이 내가 중계해요", C_ACCENT, C_RESET, my_name);
+            show_my_address();
         } else {
             const char *host = argc >= 3 ? argv[2] : "127.0.0.1";
             srv.fd = net_connect(host, PORT);
