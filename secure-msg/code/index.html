@@ -123,7 +123,7 @@ a.copy{text-decoration:none;line-height:1}
 <main class="wrap">
   <div class="app">
     <nav class="rail" data-v="n" role="tablist" aria-label="지금 버전 · 평문 파일" hidden>
-<button class="tab" data-f="n0" role="tab"><span class="nm">deolmi.c</span><span class="meta">876줄 · 프로그램 전부 — 통신 · 화면 · 중계 · 대화</span></button>
+<button class="tab" data-f="n0" role="tab"><span class="nm">deolmi.c</span><span class="meta">905줄 · 프로그램 전부 — 통신 · 화면 · 중계 · 대화</span></button>
 <button class="tab" data-f="n1" role="tab"><span class="nm">tests/test_net.c</span><span class="meta">115줄 · 네트워크 테스트</span></button>
 <button class="tab" data-f="n2" role="tab"><span class="nm">tests/test_server.c</span><span class="meta">223줄 · 서버 중계 테스트</span></button>
 <button class="tab" data-f="n3" role="tab"><span class="nm">Makefile</span><span class="meta">24줄 · 빌드</span></button>
@@ -148,7 +148,7 @@ a.copy{text-decoration:none;line-height:1}
     <div class="view">
       <section class="panel" id="n0" hidden>
   <div class="bar"><span class="path">deolmi.c</span><span class="role">프로그램 전부 — 통신 · 화면 · 중계 · 대화</span>
-    <span class="ll">876줄</span>
+    <span class="ll">905줄</span>
     <button class="copy" data-f="n0">복사</button><a class="copy dl" href="src/deolmi.c" download>받기</a></div>
   <pre class="codebox"><code class="language-c">/* 덜미 — 프밍기2 메신저. 이 파일 하나가 프로그램 전부다 (평문 단계).
 
@@ -856,6 +856,8 @@ static void on_line(const char *line)
         show(&quot;[전체 대화] 접속한 사람 모두에게 갑니다&quot;);
     } else if (strncmp(line, &quot;/dm &quot;, 4) == 0) {
         const char *name = line + 4;
+        while (*name == &#x27; &#x27;)   /* &quot;/dm  친구&quot; 처럼 띄어쓰기를 두 번 해도 */
+            name++;
         if (strcmp(name, my_name) == 0 || !name[0])
             show(&quot;[1:1 대화] 쓰는 법: /dm 이름&quot;);
         else if (find_peer(name) &lt; 0)
@@ -873,6 +875,30 @@ static void on_line(const char *line)
     } else {
         send_text(line);
     }
+}
+
+/* 앞뒤 공백을 지운다. 복사해 붙이면 끝에 공백이나 NBSP(눈에 안 보이는 공백, C2 A0)가 딸려 오기 쉽다 */
+static char *trim(char *s)
+{
+    for (;;) {
+        if (*s == &#x27; &#x27; || *s == &#x27;\t&#x27;)
+            s++;
+        else if ((unsigned char)s[0] == 0xC2 &amp;&amp; (unsigned char)s[1] == 0xA0)
+            s += 2;
+        else
+            break;
+    }
+    size_t n = strlen(s);
+    for (;;) {
+        if (n &gt; 0 &amp;&amp; (s[n - 1] == &#x27; &#x27; || s[n - 1] == &#x27;\t&#x27;))
+            n--;
+        else if (n &gt; 1 &amp;&amp; (unsigned char)s[n - 2] == 0xC2 &amp;&amp; (unsigned char)s[n - 1] == 0xA0)
+            n -= 2;
+        else
+            break;
+    }
+    s[n] = &#x27;\0&#x27;;
+    return s;
 }
 
 /* 키 하나. 엔터면 한 줄 처리, 지우기·Ctrl+U·Ctrl+C·Ctrl+D, 화살표 같은 ESC 줄은 무시 */
@@ -897,8 +923,11 @@ static void on_key(unsigned char ch)
         strcpy(line, input);
         input_len = 0;
         input[0] = &#x27;\0&#x27;;
-        echo_line(line);
-        on_line(line);
+        char *text = trim(line);   /* &quot;/who &quot; 처럼 끝에 공백이 붙어도 명령으로 알아듣게 */
+        if (text[0] == &#x27;\0&#x27;)
+            return;
+        echo_line(text);
+        on_line(text);
     } else if (ch == 0x7f || ch == 0x08) {
         while (input_len &gt; 0 &amp;&amp; (input[input_len - 1] &amp; 0xC0) == 0x80)
             input_len--;   /* 한글은 여러 바이트: 글자 하나를 통째로 지운다 */

@@ -704,6 +704,8 @@ static void on_line(const char *line)
         show("[전체 대화] 접속한 사람 모두에게 갑니다");
     } else if (strncmp(line, "/dm ", 4) == 0) {
         const char *name = line + 4;
+        while (*name == ' ')   /* "/dm  친구" 처럼 띄어쓰기를 두 번 해도 */
+            name++;
         if (strcmp(name, my_name) == 0 || !name[0])
             show("[1:1 대화] 쓰는 법: /dm 이름");
         else if (find_peer(name) < 0)
@@ -721,6 +723,30 @@ static void on_line(const char *line)
     } else {
         send_text(line);
     }
+}
+
+/* 앞뒤 공백을 지운다. 복사해 붙이면 끝에 공백이나 NBSP(눈에 안 보이는 공백, C2 A0)가 딸려 오기 쉽다 */
+static char *trim(char *s)
+{
+    for (;;) {
+        if (*s == ' ' || *s == '\t')
+            s++;
+        else if ((unsigned char)s[0] == 0xC2 && (unsigned char)s[1] == 0xA0)
+            s += 2;
+        else
+            break;
+    }
+    size_t n = strlen(s);
+    for (;;) {
+        if (n > 0 && (s[n - 1] == ' ' || s[n - 1] == '\t'))
+            n--;
+        else if (n > 1 && (unsigned char)s[n - 2] == 0xC2 && (unsigned char)s[n - 1] == 0xA0)
+            n -= 2;
+        else
+            break;
+    }
+    s[n] = '\0';
+    return s;
 }
 
 /* 키 하나. 엔터면 한 줄 처리, 지우기·Ctrl+U·Ctrl+C·Ctrl+D, 화살표 같은 ESC 줄은 무시 */
@@ -745,8 +771,11 @@ static void on_key(unsigned char ch)
         strcpy(line, input);
         input_len = 0;
         input[0] = '\0';
-        echo_line(line);
-        on_line(line);
+        char *text = trim(line);   /* "/who " 처럼 끝에 공백이 붙어도 명령으로 알아듣게 */
+        if (text[0] == '\0')
+            return;
+        echo_line(text);
+        on_line(text);
     } else if (ch == 0x7f || ch == 0x08) {
         while (input_len > 0 && (input[input_len - 1] & 0xC0) == 0x80)
             input_len--;   /* 한글은 여러 바이트: 글자 하나를 통째로 지운다 */
