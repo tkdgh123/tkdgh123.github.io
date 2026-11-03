@@ -7,6 +7,12 @@
    ./deolmi 이름 [주소]        참가자 — 서버나 방장에게 접속 (주소 생략 시 127.0.0.1)
 
    차례: ① 통신(패킷 주고받기)  ② 화면  ③ 중계(서버·방장 공통)  ④ 대화  ⑤ main
+
+   누가 무엇을 했나
+     김창식 — 기획, 방향 결정(암호화는 나중에·한 파일·주소 표시 등), 실제로 돌려 보고 문제 찾기
+     Claude (Anthropic의 AI) — 이 코드 작성, 테스트 작성·실행, 작업실 사이트(설명서·코드·시작하기·작업 기록) 작성
+     자세한 내역: https://tkdgh123.github.io/secure-msg/log/
+
    ※ 암호화는 뺀 단계다. 메시지는 평문으로 오간다. 암호화까지 넣었던 예전 버전과
      무엇을 왜 바꿨는지는 https://tkdgh123.github.io/secure-msg/ (코드 · 작업 기록) 에 있다. */
 #define _GNU_SOURCE   /* wcwidth: 한글이 화면에서 두 칸인 걸 재려고 */
@@ -22,6 +28,8 @@
 #include <poll.h>
 #include <unistd.h>
 #include <termios.h>
+#include <errno.h>
+#include <fcntl.h>
 #include <netdb.h>
 #include <arpa/inet.h>
 #include <ifaddrs.h>
@@ -112,13 +120,35 @@ int net_connect(const char *host, int port)
     }
 
     int fd = socket(AF_INET, SOCK_STREAM, 0);
-    if (fd < 0 || connect(fd, res->ai_addr, res->ai_addrlen) < 0) {
-        perror("connect");
-        if (fd >= 0)
-            close(fd);
-        fd = -1;
+    if (fd < 0) {
+        perror("socket");
+        freeaddrinfo(res);
+        return -1;
     }
+
+    /* 5초 안에 안 붙으면 포기한다. 중간에서 막힌 네트워크면 그냥 두면 2분 넘게 아무 말 없이 멈춘다.
+       그래서 잠깐 기다리지 않는 모드로 접속을 걸어 두고, poll로 5초만 기다린다 */
+    int flags = fcntl(fd, F_GETFL, 0);
+    fcntl(fd, F_SETFL, flags | O_NONBLOCK);
+    int r = connect(fd, res->ai_addr, res->ai_addrlen);
+    if (r < 0 && errno == EINPROGRESS) {
+        struct pollfd p = { .fd = fd, .events = POLLOUT };
+        int err = ETIMEDOUT;
+        socklen_t len = sizeof(err);
+        if (poll(&p, 1, 5000) == 1)
+            getsockopt(fd, SOL_SOCKET, SO_ERROR, &err, &len);
+        errno = err;
+        r = err ? -1 : 0;
+    }
+    fcntl(fd, F_SETFL, flags);
     freeaddrinfo(res);
+    if (r < 0) {
+        int e = errno;   /* 왜 실패했는지는 부른 쪽에서 errno로 본다 */
+        perror("connect");
+        close(fd);
+        errno = e;
+        return -1;
+    }
     return fd;
 }
 
@@ -520,6 +550,7 @@ static void relay(int to, struct packet *p)
 }
 
 static void display_msg(const struct packet *p);   /* ④에 있음 */
+static void show_guide(void);                      /* ⑤ 바로 위에 있음 */
 
 /* 패킷 하나 처리. 이 사람을 끊었으면 -1 */
 static int handle_packet(int i, struct packet *p)
@@ -719,7 +750,7 @@ static void on_line(const char *line)
     } else if (strcmp(line, "/who") == 0) {
         cmd_who();
     } else if (strcmp(line, "/help") == 0) {
-        show("[알림] 그냥 치면 전체 대화 · /dm 이름 · /all · /who · /quit");
+        show_guide();
     } else if (line[0] == '/') {
         show("[알림] 모르는 명령입니다 · /help");
     } else {
@@ -866,6 +897,38 @@ static void show_my_address(void)
         show("[주소] 네트워크 주소를 못 찾았어요 — 같은 컴퓨터에서는  ./deolmi 이름  으로 들어와요");
 }
 
+/* 시작할 때와 /help 때 보여 주는 설명. 처음 쓰는 사람도 이것만 보고 쓸 수 있게 */
+static void show_guide(void)
+{
+    const char *rule = "────────────────────────────────────────────";
+    show("%s", rule);
+    if (mode == M_SERVER) {
+        show("덜미 서버 — 중계만 하는 창이에요. 여기서는 대화하지 않아요.");
+        show("오가는 메시지가 [relay] 로 한 줄씩 찍혀요 (암호화 전이라 내용 바이트가 그대로 보여요).");
+        show_my_address();
+        show("끄려면 Ctrl+C. 서버를 끄면 들어와 있던 사람이 모두 끊겨요.");
+    } else {
+        if (mode == M_HOST) {
+            show("이 창이 방이에요. 서버 없이 내가 중계하면서 같이 대화해요.");
+            show_my_address();
+            show("같은 와이파이여야 들어와요. 학교 와이파이에서 안 되면 둘 다 휴대폰 핫스팟에 연결하세요.");
+        } else {
+            show("방에 들어왔어요. 방장이 나가면 방이 닫혀요.");
+        }
+        show("사용법");
+        show("  그냥 치고 엔터   방에 있는 모두에게 보내기");
+        show("  /dm 이름         그 사람하고만 1:1  (/all 로 다시 모두에게)");
+        show("  /who             지금 들어와 있는 사람");
+        show("  /help            이 설명 다시 보기");
+        show("  /quit            나가기%s", mode == M_HOST ? " (방장이 나가면 방이 닫혀요)" : "");
+        show("받은 글은 [이름] 내용, 나에게만 온 1:1은 [이름 → 나] 내용 으로 떠요.");
+    }
+    show("지금은 암호화 전 단계라 메시지가 평문(그대로)으로 오가요.");
+    show("만든 사람: 김창식(기획·결정·실행 확인) · Claude(AI — 코드와 사이트 작성)");
+    show("누가 무엇을 했는지: https://tkdgh123.github.io/secure-msg/log/");
+    show("%s", rule);
+}
+
 /* ================= ⑤ 실행 ================= */
 
 int main(int argc, char **argv)
@@ -880,8 +943,8 @@ int main(int argc, char **argv)
         lfd = net_listen(PORT);
         if (lfd < 0)
             return 1;
-        show("[서버] 기다리는 중 — 중계만 해요");
-        show_my_address();
+        show("[서버] 기다리는 중");
+        show_guide();
     } else if (argc >= 2 && argv[1][0] != '-' && valid_name(argv[1])) {
         strncpy(my_name, argv[1], NAME_LEN - 1);
         mode = (argc >= 3 && strcmp(argv[2], "--host") == 0) ? M_HOST : M_JOIN;
@@ -890,24 +953,34 @@ int main(int argc, char **argv)
             if (lfd < 0)
                 return 1;
             raw_tty();
-            show("%s덜미%s · %s · 방장 — 서버 없이 내가 중계해요", C_ACCENT, C_RESET, my_name);
-            show_my_address();
+            show("%s덜미%s · %s · 방장", C_ACCENT, C_RESET, my_name);
         } else {
             const char *host = argc >= 3 ? argv[2] : "127.0.0.1";
+            printf("%s 에 접속하는 중… (5초)\n", host);
             srv.fd = net_connect(host, PORT);
-            if (srv.fd < 0)
+            if (srv.fd < 0) {
+                if (errno == ECONNREFUSED)
+                    fprintf(stderr, "→ 그 주소에 열린 방이 없어요. 방장이 먼저 --host 로 방을 열었는지, 주소가 맞는지 보세요\n");
+                else if (errno == ETIMEDOUT || errno == EHOSTUNREACH || errno == ENETUNREACH)
+                    fprintf(stderr, "→ 연결이 중간에서 막혔어요. 방장 노트북 방화벽, 같은 네트워크인지 보세요.\n"
+                                    "  학교 와이파이는 기기끼리 연결을 막는 경우가 많아요 — 둘 다 휴대폰 핫스팟에 연결해 보세요\n");
                 return 1;
+            }
             pkt_init(&out, T_HELLO, my_name, NULL);
             out.body_len = HELLO_LEN;
             send_packet(srv.fd, &out);
             raw_tty();
             show("%s덜미%s · %s · %s 에 접속", C_ACCENT, C_RESET, my_name, host);
         }
-        show("대화는 그냥 입력 · /dm 이름 · /all · /who · /help · /quit");
+        show_guide();
     } else {
-        fprintf(stderr, "사용법: %s --server              (서버: 중계만)\n", argv[0]);
-        fprintf(stderr, "        %s 이름 --host           (방장: 서버 없이 방을 연다)\n", argv[0]);
-        fprintf(stderr, "        %s 이름 [주소]           (참가자: 서버나 방장에게 접속)\n", argv[0]);
+        fprintf(stderr, "덜미 — 터미널 채팅 (프밍기2 팀 프로젝트)\n\n");
+        fprintf(stderr, "  %s 이름 --host       방을 연다 (방장: 서버 없이 내가 중계하면서 대화)\n", argv[0]);
+        fprintf(stderr, "  %s 이름 [주소]       방에 들어간다 (주소는 방장 화면의 [주소] 줄, 같은 컴퓨터면 생략)\n", argv[0]);
+        fprintf(stderr, "  %s --server          중계만 하는 서버를 켠다 (대화는 안 함)\n\n", argv[0]);
+        fprintf(stderr, "이름은 한글 5글자(15바이트)까지, 띄어쓰기와 / 없이.\n");
+        fprintf(stderr, "만든 사람: 김창식(기획·결정·실행 확인) · Claude(AI — 코드와 사이트 작성)\n");
+        fprintf(stderr, "자세한 안내: https://tkdgh123.github.io/secure-msg/run/\n");
         return 1;
     }
 

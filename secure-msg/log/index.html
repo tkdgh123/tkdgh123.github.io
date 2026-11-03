@@ -86,6 +86,14 @@ a.dl:hover{background:var(--steel)}
 .map td:first-child{white-space:nowrap;font-weight:700}
 .map code{font-size:.8em}
 .foot{color:var(--ink-2);font-size:14.5px;margin:40px 0 50px;border-top:1px solid var(--rule);padding-top:16px}
+.who{font-size:13.5px;color:var(--ink-2);margin:-2px 0 10px}
+.u,.c{display:inline-block;font-weight:700;border-radius:6px;padding:0 7px;font-size:.92em}
+.u{background:color-mix(in srgb,var(--seal) 16%,transparent);color:var(--seal)}
+.c{background:color-mix(in srgb,var(--steel) 16%,transparent);color:var(--steel)}
+.whot td:first-child{white-space:nowrap}
+.whot small{color:var(--ink-2)}
+.chg td:last-child{white-space:nowrap;font-size:13.5px;color:var(--ink-2);line-height:2}
+@media (max-width:600px){.chg td:last-child{white-space:normal}}
 </style>
 </head>
 <body>
@@ -96,7 +104,7 @@ a.dl:hover{background:var(--steel)}
 <header class="hero"><div class="wrap">
   <p class="eyebrow">덜미 · 작업 기록</p>
   <h1>작업 <span>기록</span></h1>
-  <p class="lede">코드가 어떤 순서로 바뀌었고, 왜 그렇게 정했고, 어떻게 확인했는지. 처음 보는 팀원이 여기만 읽어도 지금 코드를 이어서 고칠 수 있게 적는다.</p>
+  <p class="lede">코드가 어떤 순서로 바뀌었고, 누가 무엇을 했고, 왜 그렇게 정했고, 어떻게 확인했는지. 처음 보는 팀원이 여기만 읽어도 지금 코드를 이어서 고칠 수 있게 적는다.</p>
 </div></header>
 
 <main class="wrap">
@@ -104,18 +112,27 @@ a.dl:hover{background:var(--steel)}
 <div class="now">
   <b>지금 상태 · 11월 3일</b>
   <ul>
-    <li>코드는 <code>deolmi.c</code> <b>한 파일</b> (941줄). <code>gcc -o deolmi deolmi.c</code> 한 줄로 빌드된다.</li>
+    <li>코드는 <code>deolmi.c</code> <b>한 파일</b> (1014줄). <code>gcc -o deolmi deolmi.c</code> 한 줄로 빌드된다.</li>
     <li>실행할 때 셋 중 하나를 고른다: <code>--server</code>(중계만) · <code>이름 --host</code>(방장: 중계하면서 대화) · <code>이름 [주소]</code>(참가자).</li>
     <li><b>암호화는 뺀 평문 단계.</b> 먼저 "사람끼리 통신이 되는 것"을 확실히 하는 중이다.</li>
     <li>자동 테스트 25개 통과. 둘이 채팅하는 것도 직접 돌려 확인했다 (아래 <a href="#check">확인</a>).</li>
   </ul>
 </div>
 
+<h2 id="who"><span class="n">00</span>누가 무엇을 했나</h2>
+<table class="whot">
+<tr><th>누구</th><th>한 일</th></tr>
+<tr><td><span class="u">김창식</span></td><td>기획과 방향 결정 (암호화는 나중에, 한 파일로, 공격 명령은 빼기, 주소 표시 등), 직접 실행해 보고 문제 찾기 (<code>/who</code>가 안 됨, 다른 컴퓨터에서 안 붙음, 사이트가 처음 보는 사람에게 불친절함)</td></tr>
+<tr><td><span class="c">Claude</span><br><small>Anthropic의 AI</small></td><td><b>코드 전부 작성</b> (S1~S8, 한 파일로 합치기, 버그 수정), 자동 테스트 작성·실행, 둘이 채팅 시뮬레이션, <b>이 사이트의 모든 페이지 작성</b> (설명서·코드·시작하기·작업 기록), 이 노트북 방화벽 규칙 넣기</td></tr>
+</table>
+<p class="sub">git 커밋 기록에는 작성자가 모두 김창식으로 남아 있지만, 위 표처럼 실제 코드는 Claude가 썼다. 아래 각 항목에도 누가 요청하고 누가 만들었는지 적었다.</p>
+
 <h2><span class="n">01</span>바뀐 순서</h2>
 
 <div class="tl">
 <div class="ev"><span class="d">11-02 오전</span>
 <h3>통신 기초 — S1~S5</h3>
+<p class="who">구현 <span class="c">Claude</span></p>
 <p>설명서의 <a href="../guide/#steps">단계와 확인</a> 순서대로 한 단계씩 쌓았다. 단계마다 확인을 통과해야 다음으로 넘어갔다.</p>
 <ul>
 <li><b>S1</b> 받은 글을 그대로 돌려주는 에코 서버</li>
@@ -127,15 +144,18 @@ a.dl:hover{background:var(--steel)}
 
 <div class="ev"><span class="d">11-02 낮</span>
 <h3>암호화 — S6~S8</h3>
+<p class="who">구현 <span class="c">Claude</span></p>
 <p>세션 열쇠와 문장마다 바뀌는 열쇠(래칫), 신원 키와 단어 지문, 두 열쇠 금고, 잠긴 대화 기록, 서버 창의 공격 명령(tamper·replay·drop). 원리는 <a href="../guide/">설명서</a>에 있다.</p></div>
 
 <div class="ev"><span class="d">11-02 21시</span>
 <h3>결정: 암호화를 빼고 통신부터</h3>
+<p class="who">결정 <span class="u">김창식</span> · 분리 작업 <span class="c">Claude</span></p>
 <p><b>암호화를 빼고 평문으로 통신부터 탄탄하게</b> 하기로 했다. 사람끼리 메시지가 확실히 오가는 것을 먼저 보고, 그 위에 암호화를 한 단계씩 다시 얹는다.</p>
 <p>암호화 코드는 지우지 않았다. 코드 페이지의 <a href="../code/#e0">암호화 버전</a>에 그대로 있다. 패킷 모양을 암호화 버전과 똑같이 남겨 둬서, 나중에 다시 얹을 때 서버 쪽은 거의 안 바꿔도 된다.</p></div>
 
 <div class="ev"><span class="d">11-02 23시</span>
 <h3>서버를 따로 안 띄우는 방장 모드</h3>
+<p class="who">질문 <span class="u">김창식</span> · 세 방법 비교와 구현 <span class="c">Claude</span></p>
 <p>"서버와 클라이언트를 한 프로그램에서 할 수 있나?"를 따져 봤다. 길은 세 가지였다.</p>
 <div class="diag">
   <figure>
@@ -176,6 +196,7 @@ a.dl:hover{background:var(--steel)}
 
 <div class="ev"><span class="d">11-03</span>
 <h3>한 파일로 합침</h3>
+<p class="who">요청 <span class="u">김창식</span> — "net.h 랑 net.c 합쳐줘", "실행이 한 파일에서 되게끔" · 구현 <span class="c">Claude</span></p>
 <p><b>왜:</b> 파일이 다섯 개로 나뉘어 있으니 받을 것도, 빌드 명령도, "어느 파일에 뭐가 있지?"도 많았다. 팀원이 받아서 바로 돌리려면 <b>파일 하나, 명령 하나</b>가 제일 쉽다.</p>
 <p><b>어떻게:</b></p>
 <ul>
@@ -184,10 +205,22 @@ a.dl:hover{background:var(--steel)}
 <li><code>client.c</code>의 대화 화면은 <code>deolmi.c</code>의 참가자 모드가 이어받았다. 참가자는 서버에도, 방장에게도 똑같이 붙는다.</li>
 <li>테스트 두 개는 <code>deolmi.c</code>의 통신 부분만 가져다 쓴다. 파일 맨 앞에 <code>#define NET_ONLY</code> 를 두면 ① 통신 부분까지만 읽히고 나머지는 건너뛴다.</li>
 </ul>
-<p><b>결정: 공격 명령은 뺐다.</b> 지금은 통신 구현만 한다. tamper·replay·drop은 <a href="../code/#e1">암호화 버전 server.c</a>에 그대로 있다.</p>
-<p><b>고친 버그:</b> <code>/who</code> 뒤에 공백이 붙으면 "모르는 명령입니다"가 떴다. 화면의 글을 복사해 붙이면 끝에 눈에 안 보이는 공백이 딸려 오기 쉽다. 입력한 줄의 앞뒤 공백을 지우고 처리하게 고쳐서, <code>/dm  이름 </code> 처럼 공백이 섞여도 된다.</p>
-<p><b>주소 표시:</b> 방장·서버를 켜면 포트 번호 대신 <b>친구가 칠 명령이 주소까지 붙어서</b> 뜬다 (<code>[주소] 10.x.x.x — 다른 컴퓨터는 ./deolmi 이름 10.x.x.x 으로 들어와요</code>). 전에는 방장이 따로 <code>ipconfig</code>로 주소를 찾아야 했다. 컴퓨터의 네트워크 주소 중 자기 자신용(127.x)과 임시 주소(169.254.x)는 빼고 보여 준다.</p>
-<p><b>사이트도 같이 고쳤다.</b> 코드 페이지에서 두 버전 파일이 한 목록에 섞여 있던 것을 버전별로 나눴다. 프로그램에 필요 없는 테스트 파일과 Makefile은 아래 "확인용" 칸으로 따로 뺐다. 복사 버튼이 코드를 <b>한 줄로 붙여</b> 복사하던 문제도 고쳤다. 줄 번호를 붙이는 부품이 줄바꿈을 지운 뒤의 글자를 복사하고 있었다. 지금은 화면에 보이는 줄 그대로 복사된다. <a href="../run/">시작하기</a> 페이지도 한 파일 기준으로 새로 썼다.</p></div>
+</div>
+
+<div class="ev"><span class="d">11-03</span>
+<h3>그 뒤로 바꾼 것</h3>
+<table class="chg">
+<tr><th>바꾼 것</th><th>누가</th></tr>
+<tr><td><b>공격 명령(tamper·replay·drop)을 뺐다.</b> 지금은 통신 구현만 한다. 공격 명령은 <a href="../code/#e1">암호화 버전 server.c</a>에 그대로 있다.</td><td>결정 <span class="u">김창식</span><br>반영 <span class="c">Claude</span></td></tr>
+<tr><td><b>코드 페이지를 버전별로 나눴다.</b> 지금 버전과 암호화 버전 파일이 한 목록에 섞여 있었다. 프로그램에 필요 없는 테스트 파일과 Makefile은 아래 "확인용" 칸으로 따로 뺐다.</td><td>지적·요청 <span class="u">김창식</span><br>수정 <span class="c">Claude</span></td></tr>
+<tr><td><b>복사 버튼이 코드를 한 줄로 붙여 복사하던 문제.</b> 줄 번호를 붙이는 부품이 줄바꿈을 지운 뒤의 글자를 복사하고 있었다. 지금은 화면에 보이는 줄 그대로 복사된다.</td><td>질문 <span class="u">김창식</span><br>확인·수정 <span class="c">Claude</span></td></tr>
+<tr><td><b>시작하기·작업 기록 페이지.</b> 받기부터 친구와 채팅까지 순서대로 따라 하는 안내와, 이 기록을 새로 썼다. 코드 주석의 내부 용어도 풀어 썼다.</td><td>지적 <span class="u">김창식</span> — "너만 아는 내용들이 너무 많아"<br>작성 <span class="c">Claude</span></td></tr>
+<tr><td><b><code>/who</code> 뒤에 공백이 붙으면 "모르는 명령"이 뜨던 버그.</b> 복사해 붙이면 끝에 눈에 안 보이는 공백이 딸려 오기 쉽다. 입력한 줄의 앞뒤 공백을 지우고 처리하게 고쳤다.</td><td>발견 <span class="u">김창식</span> (직접 실행)<br>원인 찾기·수정 <span class="c">Claude</span></td></tr>
+<tr><td><b>방을 열면 주소가 뜬다.</b> 포트 번호 대신 <code>[주소] 10.x.x.x — 다른 컴퓨터는 ./deolmi 이름 10.x.x.x 으로 들어와요</code>. 전에는 <code>ipconfig</code>로 따로 찾아야 했다.</td><td>요청 <span class="u">김창식</span><br>구현 <span class="c">Claude</span></td></tr>
+<tr><td><b>접속이 막히면 5초 뒤 이유를 알려 준다.</b> 전에는 2분 넘게 아무 말 없이 멈췄다. 방이 없으면 "열린 방이 없어요", 중간에서 막히면 방화벽·와이파이를 확인하라고 뜬다.</td><td>발견 <span class="u">김창식</span> — "다른 데스크탑에서 아무것도 안 떠"<br>수정 <span class="c">Claude</span></td></tr>
+<tr><td><b>시작 화면에 자세한 설명.</b> 방장·참가자·서버마다 무엇을 하는 창인지, 친구가 칠 명령, 명령 목록, 만든 사람이 뜬다. <code>/help</code> 로 다시 볼 수 있다.</td><td>요청 <span class="u">김창식</span><br>구현 <span class="c">Claude</span></td></tr>
+</table>
+</div>
 </div>
 
 <h2 id="check"><span class="n">02</span>어떻게 확인했나</h2>
@@ -203,7 +236,8 @@ a.dl:hover{background:var(--steel)}
 <li><b>방장 모드</b> — 민지(<code>--host</code>)와 현우</li>
 <li><b>서버 모드</b> — <code>--server</code> + 민지 + 현우. 서버 창에 중계 줄이 찍히는 것까지 확인</li>
 </ul>
-<div class="tip"><b>아직 확인 못 한 것</b> — 노트북 두 대로 실제 와이파이를 거친 접속(이번엔 한 컴퓨터 안에서만), 맥에서 빌드.</div>
+<p>위 자동 테스트와 시뮬레이션은 <span class="c">Claude</span>가 돌렸고, 실제 노트북에서 띄워 대화해 본 것은 <span class="u">김창식</span>이다.</p>
+<div class="tip"><b>아직 확인 못 한 것</b> — 다른 컴퓨터에서 접속: 11-03 다른 데스크탑에서 시도했지만 연결이 이 노트북까지 오지 않았다. 학교 와이파이(SSU_INFO_WI-FI)가 기기끼리 연결을 막는 것으로 보고, 휴대폰 핫스팟으로 다시 해 볼 예정. 맥에서 빌드도 아직.</div>
 
 <h2><span class="n">03</span>deolmi.c 지도</h2>
 <p>위에서부터 이 순서로 놓여 있다. 고치고 싶은 게 있으면 해당 칸부터 보면 된다.</p>
