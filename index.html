@@ -25,11 +25,14 @@ document.documentElement.classList.add("js");
   --sans: "Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif;
   --mono: "IBM Plex Mono", "Pretendard Variable", Pretendard, ui-monospace, monospace;
   --ease: cubic-bezier(.7, 0, .2, 1);
+  /* 종이 결: 밝은 바탕엔 먹 알갱이, 어두운 바탕엔 흰 알갱이 */
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --grain-on-dark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .045 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   color-scheme: light;
 }
 * { box-sizing: border-box }
 html { scroll-behavior: smooth }
-body { margin: 0; background: var(--paper); color: var(--ink); font: 400 17px/1.7 var(--sans); word-break: keep-all; overflow-wrap: anywhere; -webkit-font-smoothing: antialiased; overflow-x: clip }
+body { margin: 0; background: var(--grain), var(--paper); color: var(--ink); font: 400 17px/1.7 var(--sans); word-break: keep-all; overflow-wrap: anywhere; -webkit-font-smoothing: antialiased; overflow-x: clip }
 a { color: inherit }
 img { display: block; max-width: 100%; height: auto }
 h1, h2, h3 { margin: 0; font-family: var(--serif); font-weight: 400; letter-spacing: -.012em; line-height: 1.1 }
@@ -50,12 +53,11 @@ figcaption { margin-top: 10px; color: var(--muted) }
 .bar nav i { font: normal 11px var(--mono); color: var(--muted) }
 .bar nav a:hover span { text-decoration: underline 1px; text-underline-offset: 5px }
 
-/* 첫 화면: 큰 그림 하나, 작은 그림 둘. 제목 둘째 줄이 큰 그림 귀퉁이를 물고 들어간다 */
+/* 첫 화면: 큰 제목 아래 큰 그림 하나, 왼쪽에 작은 그림 하나 */
 .hero { --h1: clamp(46px, 7.4vw, 124px); padding: 128px var(--m) 120px; align-items: start }
 .hero .kick { grid-column: 1 / 10; color: var(--muted); margin-bottom: 22px }
 .hero h1 { grid-column: 1 / 13; grid-row: 2; position: relative; z-index: 2; font-size: var(--h1); font-weight: 250; line-height: 1.1; letter-spacing: -.02em }
 .hero h1 b { font-weight: 700 }
-.hero h1 .bite { background: linear-gradient(transparent 24%, var(--paper) 24%); padding: 0 .28em .06em 0; box-decoration-break: clone; -webkit-box-decoration-break: clone }
 .cover { grid-column: 6 / 13; grid-row: 3; margin-top: 40px }
 .cover a { display: block; overflow: hidden }
 .cover img { width: 100%; transform: scale(1.08); will-change: transform }
@@ -75,7 +77,7 @@ figcaption { margin-top: 10px; color: var(--muted) }
 .num { font: 200 clamp(84px, 13vw, 220px)/.78 var(--serif); letter-spacing: -.03em }
 .sec { padding-inline: var(--m) }
 .intro { font-size: 17px; max-width: 26em }
-.dark { background: var(--dark); color: var(--on-dark) }
+.dark { background: var(--grain-on-dark), radial-gradient(70% 50% at 18% 0, rgb(255 255 255 / .05), transparent 70%), var(--dark); color: var(--on-dark) }
 .dark .intro, .dark .meta { color: var(--on-dark-soft) }
 .more { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; text-underline-offset: 6px; text-decoration-thickness: 1px }
 
@@ -108,7 +110,7 @@ figcaption { margin-top: 10px; color: var(--muted) }
 .show .more { margin-top: 22px }
 
 /* 02 공부: 왼쪽 목차는 붙어 있고, 오른쪽 판이 바뀐다 */
-.study { background: var(--tone); padding-top: 120px; padding-bottom: 120px; align-items: start }
+.study { background: var(--grain), var(--tone); padding-top: 120px; padding-bottom: 120px; align-items: start }
 .study .aside { grid-column: 1 / 5; position: sticky; top: 40px }
 .study .num { font-size: clamp(64px, 7vw, 116px) }
 .study h2 { margin-top: 20px; font-size: clamp(36px, 3.6vw, 60px); font-weight: 500 }
@@ -138,7 +140,7 @@ figcaption { margin-top: 10px; color: var(--muted) }
 
 
 /* 04 기타: 큰 그림 하나 + 작은 목록 */
-.etc { background: var(--tone); padding-top: 120px; padding-bottom: 140px; align-items: end }
+.etc { background: var(--grain), var(--tone); padding-top: 120px; padding-bottom: 140px; align-items: end }
 .etc h2 { grid-column: 1 / 6; font-size: clamp(48px, 6vw, 100px); font-weight: 500; display: flex; align-items: flex-start; gap: .25em }
 .etc h2 .mono { font-size: 14px; padding-top: .8em; color: var(--muted) }
 .etc .intro { grid-column: 8 / 12; color: var(--muted) }
@@ -240,7 +242,7 @@ figcaption { margin-top: 10px; color: var(--muted) }
 <main>
 <section class="hero grid">
   <p class="kick mono rise">숭실대 AI소프트웨어학부 1학년 — 게임 2 · 공부 5 · 프로젝트 5 · 기타 6</p>
-  <h1 class="rise" style="--i:1">만들면서 <b>배우는</b><br><span class="bite">1학년의 작업실</span></h1>
+  <h1 class="rise" style="--i:1">만들면서 <b>배우는</b><br>1학년의 작업실</h1>
   <figure class="cover">
     <a class="mask" href="neokgut/" data-par><img src="neokgut/img/bg_siwang.webp" alt="넋굿의 구름 위 시왕 관문" width="1200" height="675"></a>
     <figcaption class="mono"><span>넋굿 — 시왕 관문</span><span>01 게임</span></figcaption>
