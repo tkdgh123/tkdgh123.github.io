@@ -60,8 +60,8 @@ figcaption { margin-top: 10px; color: var(--muted) }
 .cover a { display: block; overflow: hidden }
 .cover img { width: 100%; transform: scale(1.08); will-change: transform }
 .cover figcaption { display: flex; justify-content: space-between; gap: 16px }
-.hero .side { grid-column: 1 / 5; grid-row: 3; align-self: stretch; display: flex; flex-direction: column; justify-content: space-between; gap: 40px; padding-top: 40px }
-.lede { font-size: clamp(17px, 1rem + .3vw, 21px); line-height: 1.6; max-width: 22em }
+.hero .side { grid-column: 1 / 6; grid-row: 3; align-self: stretch; display: flex; flex-direction: column; justify-content: space-between; gap: 40px; padding-top: 40px }
+.lede { font-size: clamp(17px, 1rem + .3vw, 21px); line-height: 1.6; max-width: 25em }
 .act { margin-top: 30px; display: grid; gap: 14px; justify-items: start }
 .btn { display: inline-flex; align-items: center; gap: 12px; min-height: 54px; padding: 0 22px; background: var(--blue); color: #fff; font-weight: 700; font-size: 16px; text-decoration: none; transition: background-color .2s, transform .15s }
 .btn:hover { background: #1f3486 } .btn:active { transform: scale(.98) }
@@ -87,23 +87,23 @@ figcaption { margin-top: 10px; color: var(--muted) }
 .show .intro { grid-column: 9 / 13; color: var(--on-dark-soft) }
 .g1 { margin-top: 96px; align-items: end }
 .g1 .art { grid-column: 1 / 8; grid-row: 1 }
-.g1 .txt { grid-column: 8 / 12; grid-row: 1; position: relative; z-index: 2 }
-.g1 h3 { font-size: clamp(64px, 9.4vw, 160px); font-weight: 300; line-height: .95; margin: 0 0 38px }
-.g2 { margin-top: 140px; align-items: start }
+.g1 .txt { grid-column: 8 / 13; grid-row: 1; position: relative; z-index: 2 }
+.g1 h3 { font-size: clamp(56px, 7.6vw, 128px); font-weight: 300; line-height: .95; margin: 0 0 38px }
+.g2 { margin-top: 140px; align-items: center }
 .g2 .art { grid-column: 6 / 12; grid-row: 1 }
-.g2 .txt { grid-column: 1 / 5; grid-row: 1; padding-top: 18%; padding-right: var(--g) }
-.g2 h3 { font-size: clamp(40px, 4.4vw, 76px); font-weight: 600 }
+.g2 .txt { grid-column: 2 / 6; grid-row: 1 }
+.g2 h3 { font-size: clamp(36px, 3.8vw, 64px); font-weight: 600 }
 .g2.flip .art { grid-column: 2 / 8 }
-.g2.flip .txt { grid-column: 9 / 13; padding-right: 0 }
+.g2.flip .txt { grid-column: 8 / 12 }
 /* 밝은 스크린샷 위에선 흰 제목이 묻히니 겹치지 않는다 */
-.make .g1 h3 { font-size: clamp(56px, 6.4vw, 108px); margin-left: 0; text-shadow: none }
+.make .g1 h3 { font-size: clamp(48px, 5.6vw, 96px); margin-left: 0; text-shadow: none }
 .make .g2 h3 { font-size: clamp(36px, 3.6vw, 60px) }
 .show .txt p a { color: var(--on-dark); font-weight: 600; text-underline-offset: 4px }
 .show .art { display: block; overflow: hidden }
 .show .art img { width: 100%; transition: transform .9s cubic-bezier(.2, .7, .2, 1) }
 .show .art:hover img { transform: scale(1.03) }
 .g1 .art[data-par] img, .g1 .art[data-par]:hover img { transform: scale(1.1); transition: none }
-.show .txt p { margin-top: 16px; max-width: 26em }
+.show .txt p { margin-top: 16px; max-width: 30em }
 .show .meta { margin-top: 18px }
 .show .more { margin-top: 22px }
 
@@ -149,7 +149,7 @@ figcaption { margin-top: 10px; color: var(--muted) }
 .feat .label { margin-top: 18px; display: grid; gap: 4px }
 .feat b { font: 500 clamp(24px, 2.2vw, 34px)/1.25 var(--serif) }
 .feat:hover b { text-decoration: underline 1px; text-underline-offset: 6px }
-.rest { grid-column: 9 / 13; margin-top: 64px; align-self: start }
+.rest { grid-column: 8 / 13; margin-top: 64px; align-self: start }
 .rest a { display: grid; grid-template-columns: 42% 1fr; gap: 16px; align-items: center; padding: 18px 0; border-top: 1px solid var(--rule); text-decoration: none }
 .rest li:last-child a { border-bottom: 1px solid var(--rule) }
 .rest img { width: 100%; transition: opacity .2s }
