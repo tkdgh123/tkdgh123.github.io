@@ -109,25 +109,26 @@ a.dl:hover{background:var(--steel)}
 
 <main class="wrap">
 
-<h2><span class="n">01</span>코드 받기</h2>
-<p><code>deolmi.c</code> 파일 하나가 프로그램 전부다. 서버도, 대화 화면도 이 안에 있다.</p>
-<p><a class="dl" href="../code/src/deolmi.c" download>deolmi.c 받기</a></p>
-<p class="sub">받은 파일은 보통 윈도우 <b>다운로드</b> 폴더에 들어간다. <a href="../code/">코드 페이지</a>에서 읽어 보거나 복사해도 된다.</p>
-
-<h2><span class="n">02</span>준비 — 처음 한 번만</h2>
-<p>C 컴파일러가 있는 리눅스 환경이 필요하다. 윈도우는 WSL(윈도우 안의 우분투)을 쓴다.</p>
-<div class="term"><span class="c"># ① 윈도우 PowerShell을 "관리자로 실행"해서</span>
+<h2><span class="n">01</span>우분투 준비 — 처음 한 번만</h2>
+<p>덜미는 <b>우분투(리눅스) 창</b>에서 돌린다. 윈도우에서는 WSL로 윈도우 안에 우분투를 깐다.</p>
+<div class="term"><span class="c"># ① 시작 버튼 오른쪽 클릭 → "터미널(관리자)" 를 열고</span>
 <span class="p">wsl --install -d Ubuntu-24.04</span>
-<span class="c"># ② 재부팅 → 시작 메뉴에서 Ubuntu를 켜고 사용자 이름·비밀번호를 정한다</span>
-<span class="c"># ③ 우분투 창에서 컴파일러 설치</span>
+<span class="c"># ② 재부팅 → 시작 메뉴에서 "Ubuntu" 를 켠다. 처음이면 사용자 이름(영어 소문자)·비밀번호를 정한다</span>
+<span class="c"># ③ 그 우분투 창에서 컴파일러 설치 (비밀번호를 물으면 ②에서 정한 것)</span>
 <span class="p">sudo apt update && sudo apt install -y build-essential</span></div>
-<p class="sub">맥은 터미널에서 <code>xcode-select --install</code> 하면 된다. (맥에서는 아직 직접 돌려 보지 못했다.)</p>
+<p class="sub">이미 우분투가 깔려 있으면 시작 메뉴에서 <b>Ubuntu</b> 를 켜고 ③만 하면 된다. 맥은 터미널에서 <code>xcode-select --install</code> (맥에서는 아직 직접 돌려 보지 못했다).</p>
+
+<h2><span class="n">02</span>코드 받기 — 우분투 창에서</h2>
+<p><code>deolmi.c</code> 파일 하나가 프로그램 전부다. 우분투 창에 아래를 그대로 친다. 홈 폴더(<code>~</code>)로 받는다.</p>
+<div class="term"><span class="p">cd ~</span>
+<span class="p">curl -O https://tkdgh123.github.io/secure-msg/code/src/deolmi.c</span>
+<span class="c"># 진행 표시가 100 까지 차면 끝. 코드가 바뀌면 이 줄을 다시 치면 새것으로 덮어쓴다</span></div>
+<p class="sub">브라우저로 받고 싶으면 <a class="dl" href="../code/src/deolmi.c" download style="padding:4px 10px;font-size:14px">deolmi.c 받기</a> — 윈도우 <b>다운로드</b> 폴더에 들어가고, 우분투에서는 <code>cd /mnt/c/Users/윈도우이름/Downloads</code> 로 간다.</p>
 
 <h2><span class="n">03</span>빌드</h2>
-<p>우분투 창에서 파일이 있는 폴더로 가서 컴파일한다. 윈도우의 <code>C:\Users\이름\Downloads</code> 는 우분투에서 <code>/mnt/c/Users/이름/Downloads</code> 다.</p>
-<div class="term"><span class="p">cd /mnt/c/Users/이름/Downloads</span>   <span class="c"># 이름 = 윈도우 사용자 이름</span>
-<span class="p">gcc -Wall -Wextra -o deolmi deolmi.c</span>
-<span class="c"># 아무 말 없이 끝나면 성공. deolmi 라는 실행 파일이 생긴다</span></div>
+<div class="term"><span class="p">gcc -o deolmi deolmi.c</span>
+<span class="c"># 아무 말 없이 끝나면 성공. deolmi 라는 실행 파일이 생긴다. 이제 ./deolmi 로 켠다</span></div>
+<p class="sub">다음에 다시 켤 때는 우분투를 열고 <code>cd ~</code> 한 뒤 바로 <code>./deolmi …</code> 하면 된다.</p>
 
 <h2><span class="n">04</span>혼자 먼저 해 보기 — 노트북 한 대</h2>
 <p>우분투 창을 두 개 연다. 하나는 방을 여는 <b>방장</b>, 하나는 들어오는 <b>참가자</b>. 같은 컴퓨터면 주소를 안 써도 된다.</p>
