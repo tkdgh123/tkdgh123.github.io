@@ -96,15 +96,56 @@ a.dl:hover{background:var(--steel)}
 .u,.c{display:inline-block;font-weight:700;border-radius:6px;padding:0 7px;font-size:.92em}
 .u{background:color-mix(in srgb,var(--seal) 16%,transparent);color:var(--seal)}
 .c{background:color-mix(in srgb,var(--steel) 16%,transparent);color:var(--steel)}
+.term .c{display:inline;background:none;padding:0;border-radius:0;font-weight:400;font-size:inherit;color:var(--t-dim)}
 .whot td:first-child{white-space:nowrap}
 .whot small{color:var(--ink-2)}
 .chg td:last-child{white-space:nowrap;font-size:13.5px;color:var(--ink-2);line-height:2}
 @media (max-width:600px){.chg td:last-child{white-space:normal}}
+.toc{display:flex;flex-wrap:wrap;gap:6px;margin:24px 0 0}
+.toc a{font-size:13.5px;text-decoration:none;color:var(--ink-2);background:var(--sheet);border:1px solid var(--rule);border-radius:999px;padding:2px 11px}
+.toc a:hover{color:var(--ink);border-color:var(--steel)}
+.seq{margin:12px 0 18px;background:var(--sheet);border:1px solid var(--rule);border-radius:14px;padding:14px;overflow-x:auto}
+.seq svg{width:100%;min-width:540px;height:auto;display:block;font-family:var(--f-body);font-size:13px}
+.seq figcaption{font:600 13px/1.4 var(--f-mono);color:var(--ink-2);margin-top:6px;text-align:center}
+.seq .hd text{font-weight:700;fill:var(--ink);font-size:15px}
+.seq .dim{fill:var(--ink-2);font-weight:400;font-size:12px}
+.seq .lane line{stroke:var(--rule);stroke-width:2;stroke-dasharray:4 5}
+.seq .ar line{stroke:var(--steel);stroke-width:1.8;marker-end:url(#ah)}
+.seq .ar.good line{stroke:var(--seal);marker-end:url(#ahg)}
+.seq .ar text{fill:var(--ink);font:500 13px var(--f-body);text-anchor:middle}
+.seq .box rect{fill:var(--paper);stroke:var(--ink-2);stroke-width:1.2}
+.seq .box text{fill:var(--ink);font-size:13px}
+.seq .box.key rect{stroke:var(--seal);stroke-width:1.8}
+.seq .box.warn rect{stroke:var(--void);stroke-width:1.8}
+.seq .note text{fill:var(--ink-2);font-size:12px}
+.seq .lbl text{fill:var(--ink-2);font-size:12.5px;font-weight:600}
+.ahp{fill:var(--steel)} .ahg{fill:var(--seal)}
+.term.hex{white-space:pre}
+ol.steps{padding-left:1.3em;margin:0 0 14px}
+ol.path{list-style:none;counter-reset:p;padding:0;margin:8px 0 18px}
+ol.path li{counter-increment:p;position:relative;padding:0 0 14px 46px;margin:0}
+ol.path li::before{content:counter(p);position:absolute;left:0;top:1px;width:30px;height:30px;border-radius:50%;background:var(--steel);color:var(--paper);font:600 14px/30px var(--f-mono);text-align:center}
+ol.path li:not(:last-child)::after{content:"";position:absolute;left:14px;top:34px;bottom:2px;width:2px;background:var(--rule)}
+.who-tag{display:inline-block;font:600 12px/1.6 var(--f-mono);border-radius:6px;padding:0 7px;margin-right:8px;background:color-mix(in srgb,var(--steel) 16%,transparent);color:var(--steel)}
+.who-tag.relay{background:color-mix(in srgb,var(--void) 16%,transparent);color:var(--void)}
+td.bad{color:var(--void);font-weight:700} td.good{color:var(--seal);font-weight:700} td.mid{color:var(--ink-2);font-weight:700}
+.vs td:first-child{width:40%}
+.tools td > code:only-child{white-space:normal;overflow-wrap:anywhere}
+@media (max-width:600px){.tools{font-size:13.5px}.tools th,.tools td{padding:7px 5px}.tools th{white-space:normal}.tools td{overflow-wrap:anywhere}}
+.demo{background:var(--sheet);border:1px solid var(--rule);border-radius:14px;padding:16px 18px;margin:6px 0 16px}
+.demo label{font-weight:700;margin-right:8px}
+.demo input{font:15px var(--f-mono);padding:7px 10px;border:1.5px solid var(--rule);border-radius:8px;background:var(--paper);color:var(--ink);width:min(260px,100%);margin-left:6px}
+.demo button{font:600 14px var(--f-body);padding:7px 14px;border-radius:8px;border:0;background:var(--ink);color:var(--paper);cursor:pointer;margin-top:6px}
+.demo button:hover{background:var(--steel)}
+.demo dl{display:grid;grid-template-columns:max-content 1fr;gap:6px 14px;margin:14px 0 0;font-size:14.5px}
+.demo dt{color:var(--ink-2)} .demo dd{margin:0;font-family:var(--f-mono);overflow-wrap:anywhere}
+.demo dd.ok{color:var(--seal);font-weight:600}
+@media (max-width:560px){.demo dl{grid-template-columns:1fr}.demo dd{margin-bottom:6px}}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <nav class="top"><a href="../guide/">← 덜미 설명서</a><span class="r"><a href="../code/">코드</a><a href="../log/">작업 기록</a><a href="/">작업실</a></span></nav>
+  <nav class="top"><a href="../guide/">← 덜미 설명서</a><span class="r"><a href="../plan/">암호화 계획</a><a href="../code/">코드</a><a href="../log/">작업 기록</a><a href="/">작업실</a></span></nav>
 </div>
 
 <header class="hero"><div class="wrap">

@@ -96,15 +96,56 @@ a.dl:hover{background:var(--steel)}
 .u,.c{display:inline-block;font-weight:700;border-radius:6px;padding:0 7px;font-size:.92em}
 .u{background:color-mix(in srgb,var(--seal) 16%,transparent);color:var(--seal)}
 .c{background:color-mix(in srgb,var(--steel) 16%,transparent);color:var(--steel)}
+.term .c{display:inline;background:none;padding:0;border-radius:0;font-weight:400;font-size:inherit;color:var(--t-dim)}
 .whot td:first-child{white-space:nowrap}
 .whot small{color:var(--ink-2)}
 .chg td:last-child{white-space:nowrap;font-size:13.5px;color:var(--ink-2);line-height:2}
 @media (max-width:600px){.chg td:last-child{white-space:normal}}
+.toc{display:flex;flex-wrap:wrap;gap:6px;margin:24px 0 0}
+.toc a{font-size:13.5px;text-decoration:none;color:var(--ink-2);background:var(--sheet);border:1px solid var(--rule);border-radius:999px;padding:2px 11px}
+.toc a:hover{color:var(--ink);border-color:var(--steel)}
+.seq{margin:12px 0 18px;background:var(--sheet);border:1px solid var(--rule);border-radius:14px;padding:14px;overflow-x:auto}
+.seq svg{width:100%;min-width:540px;height:auto;display:block;font-family:var(--f-body);font-size:13px}
+.seq figcaption{font:600 13px/1.4 var(--f-mono);color:var(--ink-2);margin-top:6px;text-align:center}
+.seq .hd text{font-weight:700;fill:var(--ink);font-size:15px}
+.seq .dim{fill:var(--ink-2);font-weight:400;font-size:12px}
+.seq .lane line{stroke:var(--rule);stroke-width:2;stroke-dasharray:4 5}
+.seq .ar line{stroke:var(--steel);stroke-width:1.8;marker-end:url(#ah)}
+.seq .ar.good line{stroke:var(--seal);marker-end:url(#ahg)}
+.seq .ar text{fill:var(--ink);font:500 13px var(--f-body);text-anchor:middle}
+.seq .box rect{fill:var(--paper);stroke:var(--ink-2);stroke-width:1.2}
+.seq .box text{fill:var(--ink);font-size:13px}
+.seq .box.key rect{stroke:var(--seal);stroke-width:1.8}
+.seq .box.warn rect{stroke:var(--void);stroke-width:1.8}
+.seq .note text{fill:var(--ink-2);font-size:12px}
+.seq .lbl text{fill:var(--ink-2);font-size:12.5px;font-weight:600}
+.ahp{fill:var(--steel)} .ahg{fill:var(--seal)}
+.term.hex{white-space:pre}
+ol.steps{padding-left:1.3em;margin:0 0 14px}
+ol.path{list-style:none;counter-reset:p;padding:0;margin:8px 0 18px}
+ol.path li{counter-increment:p;position:relative;padding:0 0 14px 46px;margin:0}
+ol.path li::before{content:counter(p);position:absolute;left:0;top:1px;width:30px;height:30px;border-radius:50%;background:var(--steel);color:var(--paper);font:600 14px/30px var(--f-mono);text-align:center}
+ol.path li:not(:last-child)::after{content:"";position:absolute;left:14px;top:34px;bottom:2px;width:2px;background:var(--rule)}
+.who-tag{display:inline-block;font:600 12px/1.6 var(--f-mono);border-radius:6px;padding:0 7px;margin-right:8px;background:color-mix(in srgb,var(--steel) 16%,transparent);color:var(--steel)}
+.who-tag.relay{background:color-mix(in srgb,var(--void) 16%,transparent);color:var(--void)}
+td.bad{color:var(--void);font-weight:700} td.good{color:var(--seal);font-weight:700} td.mid{color:var(--ink-2);font-weight:700}
+.vs td:first-child{width:40%}
+.tools td > code:only-child{white-space:normal;overflow-wrap:anywhere}
+@media (max-width:600px){.tools{font-size:13.5px}.tools th,.tools td{padding:7px 5px}.tools th{white-space:normal}.tools td{overflow-wrap:anywhere}}
+.demo{background:var(--sheet);border:1px solid var(--rule);border-radius:14px;padding:16px 18px;margin:6px 0 16px}
+.demo label{font-weight:700;margin-right:8px}
+.demo input{font:15px var(--f-mono);padding:7px 10px;border:1.5px solid var(--rule);border-radius:8px;background:var(--paper);color:var(--ink);width:min(260px,100%);margin-left:6px}
+.demo button{font:600 14px var(--f-body);padding:7px 14px;border-radius:8px;border:0;background:var(--ink);color:var(--paper);cursor:pointer;margin-top:6px}
+.demo button:hover{background:var(--steel)}
+.demo dl{display:grid;grid-template-columns:max-content 1fr;gap:6px 14px;margin:14px 0 0;font-size:14.5px}
+.demo dt{color:var(--ink-2)} .demo dd{margin:0;font-family:var(--f-mono);overflow-wrap:anywhere}
+.demo dd.ok{color:var(--seal);font-weight:600}
+@media (max-width:560px){.demo dl{grid-template-columns:1fr}.demo dd{margin-bottom:6px}}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <nav class="top"><a href="../guide/">← 덜미 설명서</a><span class="r"><a href="../run/">시작하기</a><a href="../code/">코드</a><a href="/">작업실</a></span></nav>
+  <nav class="top"><a href="../guide/">← 덜미 설명서</a><span class="r"><a href="../run/">시작하기</a><a href="../plan/">암호화 계획</a><a href="../code/">코드</a><a href="/">작업실</a></span></nav>
 </div>
 
 <header class="hero"><div class="wrap">
@@ -129,7 +170,7 @@ a.dl:hover{background:var(--steel)}
 <table class="whot">
 <tr><th>누구</th><th>한 일</th></tr>
 <tr><td><span class="u">김창식</span></td><td>기획과 방향 결정 (암호화는 나중에, 한 파일로, 공격 명령은 빼기, 주소 표시 등), 직접 실행해 보고 문제 찾기 (<code>/who</code>가 안 됨, 다른 컴퓨터에서 안 붙음, 사이트가 처음 보는 사람에게 불친절함)</td></tr>
-<tr><td><span class="c">Claude</span><br><small>Anthropic의 AI</small></td><td><b>코드 전부 작성</b> (S1~S8, 한 파일로 합치기, 버그 수정), 자동 테스트 작성·실행, 둘이 채팅 시뮬레이션, <b>이 사이트의 모든 페이지 작성</b> (설명서·코드·시작하기·작업 기록), 이 노트북 방화벽 규칙 넣기</td></tr>
+<tr><td><span class="c">Claude</span><br><small>Anthropic의 AI</small></td><td><b>코드 전부 작성</b> (S1~S8, 한 파일로 합치기, 버그 수정), 자동 테스트 작성·실행, 둘이 채팅 시뮬레이션, <b>이 사이트의 모든 페이지 작성</b> (설명서·암호화 계획·코드·시작하기·작업 기록), 암호화·2인 잠금 설계, 이 노트북 방화벽 규칙 넣기</td></tr>
 </table>
 <p class="sub">git 커밋 기록에는 작성자가 모두 김창식으로 남아 있지만, 위 표처럼 실제 코드는 Claude가 썼다. 아래 각 항목에도 누가 요청하고 누가 만들었는지 적었다.</p>
 
@@ -228,6 +269,14 @@ a.dl:hover{background:var(--steel)}
 <tr><td><b>시작 화면에 자세한 설명.</b> 방장·참가자·서버마다 무엇을 하는 창인지, 친구가 칠 명령, 명령 목록, 만든 사람이 뜬다. <code>/help</code> 로 다시 볼 수 있다.</td><td>요청 <span class="u">김창식</span><br>구현 <span class="c">Claude</span></td></tr>
 </table>
 </div>
+<div class="ev"><span class="d">11-04</span>
+<h3>설명서를 자세히, 암호화 계획 페이지를 새로</h3>
+<p class="who">요청 <span class="u">김창식</span> — "지금까지 한 내용이 어떻게 작동되는지 자세하게 … 암호화를 어떻게 할 것이고 2인 잠금 시스템은 어떻게 진행할 것인지" · 작성 <span class="c">Claude</span></p>
+<ul>
+<li><b><a href="../guide/">설명서</a></b>에 안에서 돌아가는 과정을 더했다 — 접속(소켓, 5초 제한, 실패 이유), 들어오는 순서(HELLO 그림), 실제 패킷 바이트, 한 통이 가는 길(거치는 함수 순서), 조각 모으기, <code>poll</code> 반복, 화면 그리기, 주소 표시. 팀 역할 표는 그대로 뒀다.</li>
+<li><b><a href="../plan/">암호화 계획</a></b>을 새로 만들었다 — 무엇을 지키나, 쓰는 도구(libsodium), 열쇠 두 종류, HELLO 도장, 단어 지문, 래칫, 받을 때 검사, 지금 코드에서 바뀌는 곳, 2인 잠금(두 열쇠 금고) 흐름과 바이트 모양, 막은 구멍, 못 막는 것, 만드는 순서 E1~V4. 11-02 암호화 버전 코드를 바탕으로 지금 한 파일·방장 방식에 맞게 다시 짰다. 공격 실험 명령은 계획에 넣지 않았다 (11-03 결정).</li>
+<li><b>코드는 바꾸지 않았다.</b> 확인: 평문 테스트 25개, 11-02 암호화 버전 테스트 80개를 다시 돌려 모두 통과. 페이지의 서버 창 출력과 패킷 바이트는 실제로 돌려서 얻은 것이다.</li>
+</ul></div>
 </div>
 
 <h2 id="check"><span class="n">02</span>어떻게 확인했나</h2>
@@ -260,10 +309,10 @@ a.dl:hover{background:var(--steel)}
 <h2><span class="n">04</span>다음에 할 일</h2>
 <ul>
 <li>노트북 두 대로 실제 접속 확인 (<a href="../run/">시작하기</a> 05 순서대로)</li>
-<li>통신이 탄탄해지면 암호화를 단계별로 다시 얹기 — <a href="../code/#e0">암호화 버전</a>의 <code>crypto.c</code> · <code>vault.c</code> · <code>history.c</code> 를 가져온다. 이 파일들은 옛 <code>net.h</code>를 불러 쓰도록 돼 있어서, 붙일 때 그 부분을 <code>deolmi.c</code>에 맞게 고쳐야 한다.</li>
+<li>통신이 탄탄해지면 암호화를 <a href="../plan/#order">암호화 계획</a>의 E1~V4 순서로 얹기 — <a href="../code/#e0">암호화 버전</a>의 <code>crypto.c</code> · <code>vault.c</code>를 <code>deolmi.c</code>의 새 칸으로 옮긴다. 이 파일들은 옛 <code>net.h</code>를 불러 쓰도록 돼 있어서, 옮길 때 그 부분을 지워야 한다.</li>
 </ul>
 
-<p class="foot">받아서 실행하는 법은 <a href="../run/">시작하기</a>, 파일별 코드는 <a href="../code/">전체 코드</a>, 지금 프로그램의 구조는 <a href="../guide/">덜미 설명서</a>.</p>
+<p class="foot">받아서 실행하는 법은 <a href="../run/">시작하기</a>, 파일별 코드는 <a href="../code/">전체 코드</a>, 지금 프로그램의 구조는 <a href="../guide/">덜미 설명서</a>, 다음 단계는 <a href="../plan/">암호화 계획</a>.</p>
 </main>
 </body>
 </html>
