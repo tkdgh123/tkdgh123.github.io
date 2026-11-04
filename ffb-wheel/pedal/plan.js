@@ -1,86 +1,47 @@
-// 부품 이름·자르기 계획. 치수는 geo.js에서만 가져온다.
-import * as G from "./geo.js";
+// 부품 이름·조각 크기·철물. 모두 geo.js build() 결과로 계산한다.
+import { NUT, WASH } from "./geo.js";
 
-export const BOARD = { w: 1200, h: 400 };   // 미송 집성목 15T 400×1200
-export const KERF = 3;
-
-const stripW = (G.PEDAL.width - G.SLOT) / 2;                         // 아랫장 한 쪽 폭 39
-const screwX = [40, 120, 175, 225];                                   // 아랫장→윗장 피스, O(15)·A(81.8) 구멍을 피함
-
-// 나무 조각: 번호 = 3D 이름표·배치도·도면에서 같은 번호
-export const PIECES = {
-  base:    { no: 1,  name: "받침판",       w: G.BASE.x1 - G.BASE.x0, h: 2 * G.BASE.half, q: 1, what: "모든 받이를 세우는 바닥판" },
-  top:     { no: 2,  name: "발판 윗장",    w: G.PEDAL.back + G.PEDAL.len, h: G.PEDAL.width, q: 1, what: "발이 닿는 판. 밑면 가운데에 A 홈" },
-  bot:     { no: 3,  name: "발판 아랫장",  w: G.PEDAL.back + G.PEDAL.len, h: stripW, q: 2, what: `윗장 밑에 붙는 두 쪽. 사이 ${G.SLOT}mm가 발판 홈`, screws: screwX },
-  body:    { no: 4,  name: "막대 몸통",    w: G.STRUT.stem / 2 + G.S, h: G.STRUT.head, q: 1, what: "T자. 둥근 끝이 A핀, 머리 앞면이 C" },
-  pad:     { no: 5,  name: "머리 덧판",    w: G.STRUT.head, h: G.T, q: 2, what: "막대 몸통 머리 양옆. 머리 두께를 45로" },
-  hinge:   { no: 6,  name: "힌지 받이",    w: G.HINGE.w, h: G.HINGE.h, q: 2, what: "회전축 O를 받치는 기둥, 베어링 자리" },
-  brk:     { no: 7,  name: "B 받이",       w: G.BRK.w, h: G.BRK.h, q: 2, what: "B 블록 양옆 기둥, B핀이 지나감" },
-  trunTop: { no: 8,  name: "B 블록 윗장",  w: 2 * G.TRUN.zHalf, h: G.TRUN.w, q: 1, what: "스프링 자리(Ø20)가 뚫린 쪽, C를 향함" },
-  trunBot: { no: 9,  name: "B 블록 아랫장", w: 2 * G.TRUN.zHalf, h: G.TRUN.w, q: 1, what: "안내봉 구멍(Ø8.5). 윗장과 붙인 면이 B" },
-  stop:    { no: 10, name: "멈춤 블록",    w: G.STOP.len, h: 20, q: 6, what: "3장씩 쌓아 발판을 15°에서 멈춤" },
-  sensor:  { no: 11, name: "센서 받이",    w: 40, h: 50, q: 1, what: "회전축 끝 AS5600을 붙이는 기둥" },
-};
-export const HARDWARE = [
-  ["회전축", "M8 전산볼트 170", "O. 힌지 받이–발판–힌지 받이, 발판과 같이 돎"],
-  ["A핀", "M8 전산볼트 115", "A. 발판–막대 몸통–발판"],
-  ["B핀", "M8 전산볼트 40 × 2", "B. B 받이 바깥에서 B 블록 옆으로"],
-  ["안내봉", "M8 전산볼트 145", "C 면 → 스프링 속 → B 블록 밖, 끝 너트 2개"],
-  ["스프링", "1.2×17.85×78.4 × 1", "C와 B 사이, 78 → 39mm"],
-  ["베어링", "608ZZ × 2", "힌지 받이 베어링 자리"],
-  ["자석 · AS5600", "모듈 1", "회전축 왼쪽 끝 · 센서 받이"],
-  ["너트 · 와셔 · 피스", "M8 · 17×1T · 6×25", "철물 표 참고"],
-];
-export const GROUPS = [
-  ["발판", "발판 윗장 + 발판 아랫장 2쪽 (두께 30)"],
-  ["스프링 막대", "막대 몸통 + 머리 덧판 + 안내봉 + 스프링"],
-  ["B 블록", "B 블록 윗장 + 아랫장 (두께 30)"],
-];
-export const FEATURES = [
-  ["발판 홈", `아랫장 두 쪽 사이 틈, 폭 ${G.SLOT} · 깊이 15 · 발판 길이 전체`],
-  ["A 홈", `윗장 밑면 A 둘레, 길이 ${G.POCKET.x1 - G.POCKET.x0} · 폭 ${G.SLOT} · 깊이 ${G.POCKET.depth}`],
-  ["베어링 자리", "힌지 받이 발판 쪽 면, Ø22 깊이 7"],
-  ["스프링 자리", "B 블록 윗장 Ø20 구멍, 스프링 끝이 B까지 들어감"],
-];
-export const POINTS = [
-  ["O", "회전축 중심"], ["A", "A핀 중심 (OA = 발판 두께 한가운데)"], ["B", "B핀 중심 (O와 같은 높이)"],
-  ["C", "머리 앞면 가운데 = 스프링 시작"], ["D · E", "머리 뒷면 양 끝 (DE 40)"], ["P", "발판 밑면 (OA에서 15)"], ["Q", "머리 뒷면 줄 (C에서 15)"],
-];
-
-// 판 배치 (x = 판 길이 = 결 방향). w/h는 판 위 크기, rot = 도면과 90° 돌려 놓음
-const K = KERF, c2 = 2 * G.BASE.half + K;
-const items = [{ k: "base", x: 0, y: 0, w: 2 * G.BASE.half, h: G.BASE.x1 - G.BASE.x0, rot: true }];
-let y = 0;
-items.push({ k: "top", x: c2, y, w: PIECES.top.w, h: PIECES.top.h }); y += PIECES.top.h + K;
-for (let i = 0; i < 2; i++) { items.push({ k: "bot", x: c2, y, w: PIECES.bot.w, h: PIECES.bot.h }); y += PIECES.bot.h + K; }
-items.push({ k: "body", x: c2, y, w: PIECES.body.w, h: PIECES.body.h }); y += PIECES.body.h + K;
-const col = i => c2 + i * (40 + K);
-[["hinge", 0], ["hinge", 1], ["sensor", 2], ["brk", 3], ["brk", 4]].forEach(([k, i]) => items.push({ k, x: col(i), y, w: 40, h: PIECES[k].h }));
-y += 50 + K;
-items.push({ k: "trunTop", x: col(0), y, w: 40, h: 45, rot: true }, { k: "trunBot", x: col(1), y, w: 40, h: 45, rot: true });
-for (let i = 2; i < 5; i++) for (let j = 0; j < 2; j++) items.push({ k: "stop", x: col(i), y: y + j * (20 + K), w: 40, h: 20 });
-y += 45 + K;
-for (let i = 0; i < 2; i++) items.push({ k: "pad", x: col(i), y, w: 40, h: G.T });
-export const LAYOUT = { items, usedX: Math.max(...items.map(i => i.x + i.w)) };
-
-// M8 전산볼트 (1m에서 자름)
 const up5 = v => Math.ceil(v / 5) * 5;
-export const RODS = [
-  { name: "회전축", len: up5(2 * G.AXLE_HALF), q: 1 },
-  { name: "A핀", len: up5(2 * G.APIN_HALF), q: 1 },
-  { name: "B핀", len: up5(G.BRK.z0 + G.T + G.WASH + G.NUT + 2 - (G.TRUN.zHalf - G.BPIN_IN)), q: 2 },
-  { name: "안내봉", len: up5(G.ROD.embed + G.ROD.beyond), q: 1 },
-];
-
-// 받침판 위 고정 부품 자리 (위에서 본 좌표: x = 뒤 모서리부터, z = 한쪽 긴 모서리부터)
-export function mountPositions() {
-  const X = x => x - G.BASE.x0, Z = z => z + G.BASE.half;
-  const r = (k, x0, x1, z0, z1) => ({ k, x0: X(x0), x1: X(x1), z0: Z(Math.min(z0, z1)), z1: Z(Math.max(z0, z1)) });
-  const Hz = G.HINGE.z0, Bz = G.BRK.z0, T = G.T, S = G.STOP;
+// 조각: dims = [[이름, 값, 의존하는 입력키들]], holes = 구멍 설명
+export function pieces(G) {
+  const V = G.V;
   return [
-    r("hinge", -20, 20, Hz, Hz + T), r("hinge", -20, 20, -Hz, -Hz - T),
-    r("sensor", -20, 20, G.SENSOR_Z - T, G.SENSOR_Z),
-    r("stop", S.x, S.x + S.len, S.z0, S.z1), r("stop", S.x, S.x + S.len, -S.z0, -S.z1),
-    r("brk", G.OB - 20, G.OB + 20, Bz, Bz + T), r("brk", G.OB - 20, G.OB + 20, -Bz, -Bz - T),
+    { no: 1, name: "받침판", q: 1, what: "바닥판. 뒤쪽에 O 받이, 앞 끝에 B 판",
+      dims: [["길이", G.BASE.len, ["rear", "slotDepth"]], ["폭", V.baseW, ["baseW"]], ["두께", G.T, []]],
+      note: `스케치 ${207.2}과 비교 → 검사 참고` },
+    { no: 2, name: "발판", q: 1, what: "15T 한 장을 30 폭으로 켠 막대. 아래 끝에 O, 그 위 OA에 A",
+      dims: [["길이", V.pedalLen, []], ["폭", V.pedalDepth, []], ["두께", V.pedalT, []]],
+      holes: [["O 구멍 Ø8.5", `아래 끝에서 ${f(V.oFromEnd)}, 폭 가운데`, []], ["A 구멍 Ø8.5", `아래 끝에서 ${f(V.oFromEnd + G.OA)} (OA ${f(G.OA)})`, []]] },
+    { no: 3, name: "막대 몸통 옆벽", q: 2, what: "U의 양 팔. 발판 양옆에 틈을 두고 A핀으로 걸림",
+      dims: [["길이", G.BOX.back + G.S - G.T, ["boxBack"]], ["높이", V.boxH, []], ["두께", G.T, []]],
+      holes: [["A 구멍 Ø8.5", `뒤 끝에서 ${f(G.BOX.back)}, 높이 가운데`, ["boxBack"]]] },
+    { no: 4, name: "막대 몸통 앞벽", q: 1, what: "U의 바닥. 바깥 면 가운데가 C(스프링 자리), 안쪽 면이 DE",
+      dims: [["폭", G.BOX.inner + 2 * G.T, ["gap"]], ["높이", V.boxH, []], ["두께", G.T, []]] },
+    { no: 5, name: "B 판", q: 1, what: "받침판 앞 끝에 세운 판. 스프링 끝이 B 구멍에 들어감",
+      dims: [["폭", V.baseW, ["baseW"]], ["높이", V.bPlateH, []], ["두께", G.T, []]],
+      holes: [["B 구멍 (막힌 구멍)", `폭 ${f(V.slotW)} × 위아래 ${f(V.slotH)} × 깊이 ${f(V.slotDepth)}, 중심 높이 ${f(V.H)}`, ["slotW", "slotH", "slotDepth", "H"]]] },
+    { no: 6, name: "O 받이", q: 2, what: "스케치에 없지만 O핀을 받칠 기둥. 발판 양옆",
+      dims: [["앞뒤", V.oPostW, ["oPostW"]], ["높이", V.oPostH, ["oPostH"]], ["두께", G.T, []]],
+      holes: [["O 구멍 Ø8.5", `높이 ${f(V.H)}`, ["H"]]] },
   ];
 }
+export function hardware(G) {
+  return [
+    { name: "O핀", spec: `M8 전산볼트 ${up5(2 * G.OPIN_HALF)}mm`, q: 1, use: "O 받이–발판–O 받이", deps: ["gap"] },
+    { name: "A핀", spec: `M8 전산볼트 ${up5(2 * G.APIN_HALF)}mm`, q: 1, use: "막대 몸통 옆벽–발판–옆벽", deps: ["gap"] },
+    { name: "스프링", spec: "1.2×17.85×78.4", q: 1, use: `막대 몸통 앞벽 C ↔ B 구멍 바닥, ${f(G.V.springFree)} → ${f(G.V.springMin)}`, deps: [] },
+    { name: "너트 M8", spec: "", q: 4, use: "O핀 2 · A핀 2", deps: [] },
+    { name: "와셔 17×1T", spec: "", q: 4, use: "O핀 2 · A핀 2", deps: [] },
+    { name: "피스 6×25", spec: "", q: 11, use: "받침판→O 받이 4 · 받침판→B 판 3 · 앞벽→옆벽 4", deps: [] },
+  ];
+}
+export const FEATURES = [
+  ["B 구멍", "B 판 안쪽 면의 위아래로 긴 막힌 구멍. 바닥이 B"],
+  ["U 안쪽", "막대 몸통 옆벽 사이, 발판이 들어가는 틈"],
+];
+export const POINTS = [
+  ["O", "발판 아래 회전 중심"], ["A", "A핀 중심 (발판 위, OA)"], ["B", "B 구멍 바닥 가운데 = 스프링 끝 (O와 같은 높이)"],
+  ["C", "막대 몸통 앞벽 바깥 면 가운데 = 스프링 시작"], ["D · E", "앞벽 안쪽 면 위·아래 끝 (DE = 막대 높이)"], ["P", "발판의 B 쪽 면 (OA에서 15)"], ["Q", "앞벽 안쪽 면 줄 (C에서 15)"],
+];
+export const f = v => (Math.round(v * 10) / 10).toFixed(1).replace(/\.0$/, "");
+export { NUT, WASH };
