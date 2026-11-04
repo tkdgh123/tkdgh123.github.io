@@ -57,7 +57,7 @@
     const tb = enc.encode(text.value), body = [flag, ...tb], len = 65 + body.length;
     const lb = [len >>> 24, (len >>> 16) & 255, (len >>> 8) & 255, len & 255].map(hex).join(" ");
     const rows = [
-      line(`<span class="k">${lb}</span>`, 11, `길이 = 0x${len.toString(16)} = ${len} (머리 65 + 본문 ${body.length})`),
+      line(`<span class="k">${lb}</span>`, 11, `길이 ${len} (머리 65 + 본문 ${body.length})`),
       line(`<span class="k">02</span>`, 2, "종류 = MSG"),
       name(from.value, "보낸 사람"),
       name(to.value, "받을 사람"),
