@@ -1,0 +1,659 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>액셀 페달 3D</title>
+<meta name="description" content="회전 기구 문서 수치(AC 116mm)와 실제 부품 규격으로 만든 액셀 페달 3D 모델, 집성목 자르기 도면">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
+<style>
+:root {
+  --sky-top: #E9EDF0; --sky-bottom: #CBD3D9;
+  --ink: #1C2228; --ink-soft: #56616B; --rule: #C3CBD2; --paper: #FFFFFF; --page: #F4F5F6;
+  --accent: #C8102E; --wood: #B07A45; --wood-soft: #EBD3B3; --steel: #7E868D;
+  --ui: "IBM Plex Sans KR", "Malgun Gothic", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--page); color: var(--ink); font: 15px/1.6 var(--ui); -webkit-font-smoothing: antialiased; }
+a { color: inherit; }
+
+/* ---------- viewport ---------- */
+.view { position: relative; height: 100vh; min-height: 560px; background: linear-gradient(180deg, var(--sky-top), var(--sky-bottom)); overflow: hidden; }
+#stage, #stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+#labels { position: absolute; inset: 0; pointer-events: none; }
+.pt { position: absolute; transform: translate(8px, -22px); font: 600 15px/1 var(--mono); color: var(--accent); text-shadow: 0 0 3px #fff, 0 0 3px #fff, 0 0 6px #fff; }
+.top { position: absolute; top: 0; left: 0; right: 0; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 14px 18px; pointer-events: none; }
+.top .back { pointer-events: auto; text-decoration: none; font-size: 13px; color: var(--ink-soft); }
+.top h1 { margin: 0; font-size: 17px; font-weight: 700; letter-spacing: .01em; }
+.top h1 span { font: 400 12px var(--mono); color: var(--ink-soft); margin-left: 8px; }
+.tools { margin-left: auto; display: flex; gap: 4px; flex-wrap: wrap; pointer-events: auto; }
+.tools button { font: inherit; font-size: 13px; border: 1px solid var(--rule); background: rgba(255,255,255,.78); color: var(--ink-soft); padding: 6px 11px; border-radius: 3px; cursor: pointer; }
+.tools button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
+.tools .sep { width: 10px; }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.ctl { position: absolute; left: 18px; bottom: 18px; width: min(380px, calc(100% - 36px)); background: var(--paper); border: 1px solid var(--ink); box-shadow: 6px 6px 0 rgba(28,34,40,.12); }
+.ctl .row { display: flex; align-items: center; gap: 10px; padding: 12px 14px 8px; }
+.ctl .play { width: 38px; height: 34px; border: 1px solid var(--ink); background: var(--ink); color: #fff; cursor: pointer; font-size: 13px; flex: none; }
+.ctl input[type=range] { flex: 1; accent-color: var(--accent); }
+.ctl .deg { font: 500 20px var(--mono); min-width: 58px; text-align: right; }
+.ctl dl { margin: 0; display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--rule); }
+.ctl dl div { padding: 8px 10px 10px 14px; border-right: 1px solid var(--rule); }
+.ctl dl div:last-child { border-right: 0; }
+.ctl dt { font-size: 11.5px; color: var(--ink-soft); }
+.ctl dd { margin: 2px 0 0; font: 500 15px var(--mono); white-space: nowrap; }
+.ctl dd.ok { color: #0E7A3E; }
+#loading { position: absolute; inset: 0; display: grid; place-items: center; font: 13px var(--mono); color: var(--ink-soft); }
+.down { position: absolute; right: 18px; bottom: 18px; font-size: 13px; color: var(--ink-soft); text-decoration: none; background: rgba(255,255,255,.78); border: 1px solid var(--rule); padding: 6px 11px; border-radius: 3px; }
+
+/* ---------- document ---------- */
+main { max-width: 1180px; margin: 0 auto; padding: 72px 24px 120px; }
+section { margin-bottom: 96px; }
+.h { display: grid; grid-template-columns: 64px 1fr; align-items: baseline; margin-bottom: 26px; }
+.h .no { font: 500 15px var(--mono); color: var(--accent); }
+.h h2 { margin: 0; font-size: 30px; line-height: 1.2; font-weight: 700; }
+.h p { grid-column: 2; margin: 8px 0 0; color: var(--ink-soft); max-width: 62ch; }
+
+.nums { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 28px 36px; padding-left: 64px; }
+.nums div b { display: block; font: 500 34px/1.1 var(--mono); letter-spacing: -.01em; }
+.nums div b small { font-size: 15px; color: var(--ink-soft); margin-left: 3px; }
+.nums div span { font-size: 13.5px; color: var(--ink-soft); }
+.nums .hi b { color: var(--accent); }
+
+.sheet { padding-left: 64px; }
+.sheet .scroll { overflow-x: auto; }
+.sheet svg { width: 100%; min-width: 720px; height: auto; display: block; background: var(--paper); }
+.cuts { margin: 18px 0 0; padding: 0; list-style: none; counter-reset: c; columns: 2; column-gap: 40px; }
+.cuts li { break-inside: avoid; padding: 5px 0; font-size: 14.5px; }
+
+.pieces { padding-left: 64px; display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 44px 40px; }
+.pc h3 { margin: 0 0 2px; font-size: 17px; }
+.pc h3 .q { font: 500 14px var(--mono); color: var(--accent); margin-left: 6px; }
+.pc p { margin: 0 0 10px; font-size: 13.5px; color: var(--ink-soft); }
+.pc svg { max-width: 100%; height: auto; display: block; }
+.pc.wide { grid-column: 1 / -1; }
+
+table.hw { margin-left: 64px; width: calc(100% - 64px); border-collapse: collapse; font-size: 14.5px; }
+.hw th, .hw td { text-align: left; padding: 10px 12px 10px 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.hw th { font-size: 12.5px; color: var(--ink-soft); font-weight: 500; }
+.hw td.m { font-family: var(--mono); white-space: nowrap; }
+
+ol.steps { padding-left: 64px; margin: 0; list-style: none; counter-reset: s; max-width: 860px; }
+ol.steps li { counter-increment: s; display: grid; grid-template-columns: 40px 1fr; padding: 12px 0; border-bottom: 1px solid var(--rule); }
+ol.steps li::before { content: counter(s, decimal-leading-zero); font: 500 14px var(--mono); color: var(--accent); padding-top: 2px; }
+.warn { padding-left: 64px; margin-top: 22px; font-size: 14px; color: #8A5A00; max-width: 80ch; }
+.warn p { margin: 4px 0; }
+
+@media (max-width: 760px) {
+  .top h1 span { display: none; }
+  .tools { margin-left: 0; width: 100%; }
+  .tools button { padding: 5px 8px; font-size: 12px; }
+  .ctl dl { grid-template-columns: repeat(2, 1fr); }
+  .ctl dl div:nth-child(2) { border-right: 0; }
+  .ctl dl div:nth-child(-n+2) { border-bottom: 1px solid var(--rule); }
+  .down { display: none; }
+  main { padding: 56px 16px 96px; }
+  .h { grid-template-columns: 40px 1fr; }
+  .h h2 { font-size: 24px; }
+  .nums, .sheet, .pieces, ol.steps, .warn { padding-left: 0; }
+  .nums div b { font-size: 28px; }
+  table.hw { margin-left: 0; width: 100%; font-size: 13.5px; }
+  .hw th:nth-child(3), .hw td:nth-child(3) { display: none; }
+  .cuts { columns: 1; }
+  .pieces { grid-template-columns: 1fr; }
+}
+@media print { .view { display: none; } main { padding-top: 0; } }
+</style>
+</head>
+<body>
+
+<div class="view">
+  <div id="stage"></div>
+  <div id="labels" aria-hidden="true"></div>
+  <div id="loading">3D 모델 불러오는 중…</div>
+  <header class="top">
+    <a class="back" href="../../#make">← 작업실</a>
+    <h1>액셀 페달<span>AC 116 · 실제 부품 치수</span></h1>
+    <div class="tools" role="group" aria-label="보기">
+      <button type="button" data-cam="iso" aria-pressed="true">비스듬히</button>
+      <button type="button" data-cam="side" aria-pressed="false">옆</button>
+      <button type="button" data-cam="near" aria-pressed="false">막대 가까이</button>
+      <span class="sep"></span>
+      <button type="button" id="tLines" aria-pressed="true">문서 선</button>
+      <button type="button" id="tXray" aria-pressed="false">속 보기</button>
+    </div>
+  </header>
+  <div class="ctl">
+    <div class="row">
+      <button class="play" id="play" type="button" aria-label="밟기 재생">▶</button>
+      <input id="ang" type="range" min="15" max="60" step="0.1" value="60" aria-label="∠AOB">
+      <span class="deg" id="deg">60.0°</span>
+    </div>
+    <dl>
+      <div><dt>∠AOB</dt><dd id="vA">60.0°</dd></div>
+      <div><dt>AB</dt><dd id="vAB">—</dd></div>
+      <div><dt>스프링 CB</dt><dd id="vCB">—</dd></div>
+      <div><dt>DE–P 간격</dt><dd id="vGap" class="ok">—</dd></div>
+    </dl>
+  </div>
+  <a class="down" href="#cut">자르기 도면 ↓</a>
+</div>
+
+<main>
+  <section id="num">
+    <div class="h"><span class="no">01</span><h2>치수</h2>
+      <p>「회전 기구 기하 문제 풀이」 2단계 식에 AC = 116mm를 넣어 다시 푼 값이에요. 문서 최솟값 105.3mm에서는 DE가 P에 닿아서 3.2mm 여유를 뒀어요.</p></div>
+    <div class="nums" id="nums"></div>
+  </section>
+
+  <section id="cut">
+    <div class="h"><span class="no">02</span><h2>나무 자르기</h2>
+      <p>미송 집성목 15T 400×1200 한 장의 왼쪽 끝 <b id="usedX"></b>mm만 써요. 나머지는 브레이크 페달용으로 남겨요. 칸 사이는 톱날 두께 3mm.</p></div>
+    <div class="sheet"><div class="scroll"><svg id="board" role="img" aria-label="집성목 자르기 배치도"></svg></div>
+      <ol class="cuts" id="cuts"></ol></div>
+  </section>
+
+  <section id="pcs">
+    <div class="h"><span class="no">03</span><h2>조각별 치수와 구멍</h2>
+      <p>단위 mm. 빨간 원은 구멍, 숫자는 구멍 중심까지 거리예요.</p></div>
+    <div class="pieces" id="pieces"></div>
+  </section>
+
+  <section id="hw">
+    <div class="h"><span class="no">04</span><h2>철물</h2>
+      <p>신청서에서 산 부품만 써요. M8 전산볼트는 1m짜리에서 잘라요.</p></div>
+    <table class="hw" id="hwt"></table>
+  </section>
+
+  <section id="asm">
+    <div class="h"><span class="no">05</span><h2>조립 순서</h2></div>
+    <ol class="steps" id="steps"></ol>
+    <div class="warn" id="warn"></div>
+  </section>
+</main>
+
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+<script type="module">
+import * as G from "./geo.js";
+import { LAYOUT, PIECES, RODS, BOARD, KERF, mountPositions } from "./plan.js";
+
+/* =================== 문서 부분 =================== */
+const f1 = v => (Math.round(v * 10) / 10).toFixed(1).replace(/\.0$/, "");
+const rest = G.pose(G.DEG_REST), press = G.pose(G.DEG_PRESS);
+const NUMS = [
+  ["AC", G.S, "A–C 고정 길이 (T자 막대)", true],
+  ["OA", G.OA, "회전축 O → 핀 A"],
+  ["OB", G.OB, "회전축 O → 핀 B (받침 위)"],
+  ["AB", `${f1(rest.AB)}→${f1(press.AB)}`, "놓음 60° → 끝까지 15°"],
+  ["CB", `${G.CB_MAX}→${G.CB_MIN}`, "스프링 길이 (자유길이 78.4)"],
+  ["DE", 40, "스프링 받이 폭"],
+  ["P·Q", 15, "OA·C에서 떨어진 거리"],
+  ["간격", G.clearanceP(G.DEG_PRESS), "DE–P 최소 (15°에서)", true],
+];
+document.getElementById("nums").innerHTML = NUMS.map(([k, v, s, hi]) =>
+  `<div class="${hi ? "hi" : ""}"><b>${typeof v === "number" ? f1(v) : v}<small>mm</small></b><span>${k} · ${s}</span></div>`).join("");
+
+/* ---- SVG helpers ---- */
+const NS = "http://www.w3.org/2000/svg";
+const el = (tag, attrs = {}, text) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (text != null) e.textContent = text; return e; };
+const INK = "#1C2228", SOFT = "#56616B", RED = "#C8102E", WOOD = "#EBD3B3", WOODLINE = "#B07A45";
+function dimH(g, x0, x1, y, label, up = true) {   // 가로 치수선
+  const t = up ? -4 : 12;
+  g.append(el("line", { x1: x0, y1: y, x2: x1, y2: y, stroke: SOFT, "stroke-width": .6 }));
+  for (const x of [x0, x1]) g.append(el("line", { x1: x, y1: y - 3, x2: x, y2: y + 3, stroke: SOFT, "stroke-width": .6 }));
+  g.append(el("text", { x: (x0 + x1) / 2, y: y + t, "text-anchor": "middle", "font-size": 9, "font-family": "IBM Plex Mono", fill: INK }, label));
+}
+function dimV(g, x, y0, y1, label, left = true) {
+  g.append(el("line", { x1: x, y1: y0, x2: x, y2: y1, stroke: SOFT, "stroke-width": .6 }));
+  for (const y of [y0, y1]) g.append(el("line", { x1: x - 3, y1: y, x2: x + 3, y2: y, stroke: SOFT, "stroke-width": .6 }));
+  const tx = left ? x - 5 : x + 5;
+  g.append(el("text", { x: tx, y: (y0 + y1) / 2, "text-anchor": "middle", "font-size": 9, "font-family": "IBM Plex Mono", fill: INK, transform: `rotate(-90 ${tx} ${(y0 + y1) / 2})` }, label));
+}
+const hole = (g, x, y, d) => { g.append(el("circle", { cx: x, cy: y, r: d / 2, fill: "#fff", stroke: RED, "stroke-width": .8 })); g.append(el("line", { x1: x - d / 2 - 3, y1: y, x2: x + d / 2 + 3, y2: y, stroke: RED, "stroke-width": .3 })); g.append(el("line", { x1: x, y1: y - d / 2 - 3, x2: x, y2: y + d / 2 + 3, stroke: RED, "stroke-width": .3 })); };
+function grainRect(g, x, y, w, h, vertical = false) {
+  g.append(el("rect", { x, y, width: w, height: h, fill: WOOD, stroke: WOODLINE, "stroke-width": .8 }));
+  const n = Math.max(1, Math.floor((vertical ? w : h) / 9));
+  for (let i = 1; i < n; i++) { const t = i / n; if (vertical) g.append(el("line", { x1: x + w * t, y1: y + 1, x2: x + w * t, y2: y + h - 1, stroke: WOODLINE, "stroke-width": .25, opacity: .5 })); else g.append(el("line", { x1: x + 1, y1: y + h * t, x2: x + w - 1, y2: y + h * t, stroke: WOODLINE, "stroke-width": .25, opacity: .5 })); }
+}
+
+/* ---- 자르기 배치도 ---- */
+(function board() {
+  const svg = document.getElementById("board"), pad = 30, W = BOARD.w, Hh = BOARD.h;
+  svg.setAttribute("viewBox", `${-pad} ${-pad} ${W + pad * 2} ${Hh + pad * 2 + 6}`);
+  const g = el("g"); svg.append(g);
+  g.append(el("rect", { x: 0, y: 0, width: W, height: Hh, fill: "#F6EBDD", stroke: WOODLINE, "stroke-width": 1 }));
+  for (let y = 18; y < Hh; y += 18) g.append(el("line", { x1: 0, y1: y, x2: W, y2: y, stroke: WOODLINE, "stroke-width": .3, opacity: .35 }));
+  const used = LAYOUT.usedX; document.getElementById("usedX").textContent = used;
+  g.append(el("rect", { x: used + KERF, y: 0, width: W - used - KERF, height: Hh, fill: "#EDEFF1", opacity: .85 }));
+  g.append(el("text", { x: (used + W) / 2, y: Hh / 2, "text-anchor": "middle", "font-size": 16, fill: SOFT }, `남는 판 ${W - used - KERF}×${Hh} (브레이크 페달용)`));
+  g.append(el("line", { x1: used + KERF / 2, y1: -14, x2: used + KERF / 2, y2: Hh + 14, stroke: RED, "stroke-width": 1.2, "stroke-dasharray": "6 4" }));
+  g.append(el("text", { x: used + KERF / 2 + 6, y: -18, "font-size": 11, fill: RED, "font-family": "IBM Plex Mono" }, `① 먼저 ${used}에서 자르기`));
+  LAYOUT.items.forEach(it => {
+    const p = PIECES[it.k];
+    if (it.k === "T") {
+      const path = tPath(it.x, it.y);
+      g.append(el("rect", { x: it.x, y: it.y, width: it.w, height: it.h, fill: "none", stroke: WOODLINE, "stroke-width": .5, "stroke-dasharray": "3 2" }));
+      g.append(el("path", { d: path, fill: WOOD, stroke: WOODLINE, "stroke-width": .8 }));
+    } else grainRect(g, it.x, it.y, it.w, it.h);
+    const big = it.w > 100;
+    g.append(el("text", { x: it.x + it.w / 2, y: it.y + it.h / 2 + (big ? -2 : 3), "text-anchor": "middle", "font-size": big ? 13 : 8.5, "font-weight": 700, fill: INK }, big ? p.name : p.no));
+    if (big) g.append(el("text", { x: it.x + it.w / 2, y: it.y + it.h / 2 + 13, "text-anchor": "middle", "font-size": 10, "font-family": "IBM Plex Mono", fill: SOFT }, `${f1(p.w)}×${f1(p.h)}`));
+  });
+  dimH(g, 0, W, Hh + 16, `${W}`, false);
+  dimV(g, -12, 0, Hh, `${Hh}`);
+  dimH(g, 0, used, -8, `${used}`);
+  // 목록
+  const cuts = document.getElementById("cuts");
+  const order = ["base", "plate", "rail", "T", "hinge", "sensor", "brk", "trun", "stop"];
+  cuts.innerHTML = order.map(k => { const p = PIECES[k]; return `<li><span><b>${p.no} ${p.name}</b> &nbsp;<span style="font-family:var(--mono)">${f1(p.w)} × ${f1(p.h)}</span> × ${p.q}${p.cutNote ? ` — ${p.cutNote}` : ""}</span></li>`; }).join("");
+})();
+function tPath(x, y) {   // 배치도용 T자 (왼쪽이 둥근 끝)
+  const P = PIECES.T, r = G.STRUT.stem / 2, L = P.w, hh = G.STRUT.head, sw = G.STRUT.stem, cy = y + hh / 2;
+  return `M${x + r},${cy - sw / 2} L${x + L - G.T},${cy - sw / 2} L${x + L - G.T},${y} L${x + L},${y} L${x + L},${y + hh} L${x + L - G.T},${y + hh} L${x + L - G.T},${cy + sw / 2} L${x + r},${cy + sw / 2} A${r},${r} 0 0 1 ${x + r},${cy - sw / 2} Z`;
+}
+
+/* ---- 조각별 도면 ---- */
+(function pieces() {
+  const box = document.getElementById("pieces");
+  const card = (k, draw, wide) => {
+    const p = PIECES[k], d = document.createElement("div"); d.className = "pc" + (wide ? " wide" : "");
+    d.innerHTML = `<h3>${p.no} ${p.name}<span class="q">× ${p.q}</span></h3><p>${p.note}</p>`;
+    const svg = el("svg", { role: "img", "aria-label": p.name + " 도면" }); d.append(svg); box.append(d);
+    const g = el("g"); svg.append(g); draw(g, p);
+    const bb = g.getBBox(), pad = 6; svg.setAttribute("viewBox", [bb.x - pad, bb.y - pad, bb.width + 2 * pad, bb.height + 2 * pad].join(" "));
+    svg.style.width = (bb.width + 2 * pad) * 1.7 + "px";
+  };
+  // 받침: 위에서 본 배치
+  card("base", (g, p) => {
+    grainRect(g, 0, 0, p.w, p.h);
+    const M = mountPositions();
+    M.forEach(m => { g.append(el("rect", { x: m.x0, y: m.z0, width: m.x1 - m.x0, height: m.z1 - m.z0, fill: m.c || "#C9A27A", stroke: INK, "stroke-width": .6 })); });
+    // 기준선
+    const ox = -G.BASE.x0, bx = G.OB - G.BASE.x0, sx = G.STOP.x - G.BASE.x0;
+    for (const [x, t] of [[ox, "O"], [bx, "B"]]) { g.append(el("line", { x1: x, y1: -6, x2: x, y2: p.h + 6, stroke: RED, "stroke-width": .6, "stroke-dasharray": "4 3" })); g.append(el("text", { x: x + 3, y: -9, "font-size": 10, fill: RED, "font-family": "IBM Plex Mono", "font-weight": 600 }, t)); }
+    dimH(g, 0, ox, p.h + 14, f1(ox), false); dimH(g, ox, sx, p.h + 14, f1(sx - ox), false); dimH(g, sx, bx, p.h + 14, f1(bx - sx), false); dimH(g, bx, p.w, p.h + 14, f1(p.w - bx), false);
+    dimH(g, 0, p.w, p.h + 32, `${p.w}`, false); dimV(g, -10, 0, p.h, `${p.h}`);
+    const lab = [["힌지 받이", M[1], 1], ["센서 받이", M[2], -1], ["멈춤 블록", M[4], 1], ["B 받이", M[6], 1]];
+    lab.forEach(([t, m, s]) => g.append(el("text", { x: (m.x0 + m.x1) / 2, y: s > 0 ? m.z1 + 10 : m.z0 - 3, "text-anchor": "middle", "font-size": 8, fill: INK }, t)));
+    // 가까운 긴 모서리에서 떨어진 거리 (양쪽 대칭)
+    M.forEach((m, i) => { const top = m.z0 < p.h / 2, x = i === 2 ? m.x1 + 5 : m.x0 - 5; if (top) dimV(g, x, 0, m.z0, f1(m.z0), i === 2 ? false : true); else dimV(g, x, m.z1, p.h, f1(p.h - m.z1), true); });
+    g.append(el("text", { x: p.w - 4, y: p.h - 5, "text-anchor": "end", "font-size": 7.5, fill: SOFT }, "위에서 본 모습 · 받이 두께 15"));
+  }, true);
+  // 레일
+  card("rail", (g, p) => {
+    grainRect(g, 0, 0, p.w, p.h);
+    const xo = G.PEDAL.back, xa = xo + G.OA;
+    hole(g, xo, p.h / 2, 8.5); hole(g, xa, p.h / 2, 8.5);
+    g.append(el("text", { x: xo, y: -4, "text-anchor": "middle", "font-size": 9, fill: RED, "font-family": "IBM Plex Mono" }, "O"));
+    g.append(el("text", { x: xa, y: -4, "text-anchor": "middle", "font-size": 9, fill: RED, "font-family": "IBM Plex Mono" }, "A"));
+    dimH(g, 0, xo, p.h + 10, f1(xo), false); dimH(g, xo, xa, p.h + 10, f1(G.OA), false); dimH(g, 0, p.w, p.h + 26, `${p.w}`, false);
+    dimV(g, -8, 0, p.h, `${p.h}`); dimV(g, p.w + 8, 0, p.h / 2, "15", false);
+  });
+  // 발판
+  card("plate", (g, p) => {
+    grainRect(g, 0, 0, p.w, p.h);
+    const sc = PIECES.plate.screws;
+    sc.forEach(([x, y]) => g.append(el("circle", { cx: x, cy: y, r: 2.2, fill: "#fff", stroke: INK, "stroke-width": .6 })));
+    dimH(g, 0, p.w, p.h + 12, `${p.w}`, false); dimV(g, -8, 0, p.h, `${p.h}`);
+    dimV(g, p.w + 8, 0, sc[0][1], f1(sc[0][1]), false);
+    dimH(g, 0, sc[0][0], -6, f1(sc[0][0]));
+  });
+  // T자 막대
+  card("T", (g, p) => {
+    const y = 0; g.append(el("path", { d: tPath(0, y), fill: WOOD, stroke: WOODLINE, "stroke-width": .8 }));
+    const r = G.STRUT.stem / 2, cy = G.STRUT.head / 2;
+    hole(g, r, cy, 8.5);
+    g.append(el("text", { x: r, y: cy - 8, "text-anchor": "middle", "font-size": 9, fill: RED, "font-family": "IBM Plex Mono" }, "A"));
+    g.append(el("text", { x: p.w - G.T - 3, y: 7.5, "text-anchor": "end", "font-size": 7.5, fill: SOFT }, "DE 면 →"));
+    g.append(el("text", { x: p.w + 4, y: cy + 3, "font-size": 9, fill: RED, "font-family": "IBM Plex Mono" }, "C"));
+    dimH(g, r, p.w - G.T, G.STRUT.head + 12, f1(G.S - G.T), false); dimH(g, p.w - G.T, p.w, G.STRUT.head + 12, "15", false);
+    dimH(g, 0, p.w, G.STRUT.head + 28, f1(p.w), false); dimH(g, r, p.w, -10, `AC ${f1(G.S)}`);
+    dimV(g, p.w + 18, 0, G.STRUT.head, "40", false); dimV(g, -8, cy - G.STRUT.stem / 2, cy + G.STRUT.stem / 2, "20");
+  });
+  // 작은 받이들
+  const block = (k, holeY, holeD, extra) => card(k, (g, p) => {
+    grainRect(g, 0, 0, p.w, p.h);
+    if (holeD) hole(g, p.w / 2, p.h - holeY, holeD);
+    if (extra) extra(g, p);
+    dimH(g, 0, p.w, p.h + 10, `${p.w}`, false); dimV(g, -8, 0, p.h, `${p.h}`);
+    if (holeD) dimV(g, p.w + 8, p.h - holeY, p.h, f1(holeY), false);
+  });
+  block("hinge", G.H, 22, (g, p) => { g.append(el("circle", { cx: p.w / 2, cy: p.h - G.H, r: 5, fill: "none", stroke: RED, "stroke-width": .5, "stroke-dasharray": "2 1.5" })); });
+  block("brk", G.H, 8.5);
+  block("sensor", 0, 0, (g, p) => { g.append(el("rect", { x: p.w / 2 - 11.5, y: p.h - G.H - 11.5, width: 23, height: 23, fill: "#5B3AA8", opacity: .85 })); g.append(el("text", { x: p.w / 2, y: p.h - G.H + 3, "text-anchor": "middle", "font-size": 6, fill: "#fff" }, "AS5600")); dimV(g, p.w + 8, p.h - G.H, p.h, f1(G.H), false); });
+  // B 블록 두 겹
+  card("trun", (g, p) => {
+    const gap = 16;
+    [0, 1].forEach(i => {
+      const x = i * (p.w + gap + 10); grainRect(g, x, 0, p.w, p.h, true);
+      for (const z of [-G.SPRING.z, G.SPRING.z]) hole(g, x + p.w / 2 + z, p.h / 2, i === 0 ? 20 : 8.5);
+      g.append(el("text", { x: x + p.w / 2, y: -5, "text-anchor": "middle", "font-size": 8.5, fill: INK }, i === 0 ? "윗판 (C 쪽)" : "아랫판"));
+      dimH(g, x, x + p.w / 2 - G.SPRING.z, p.h + 10, f1(p.w / 2 - G.SPRING.z), false);
+      dimH(g, x + p.w / 2 - G.SPRING.z, x + p.w / 2 + G.SPRING.z, p.h + 10, f1(2 * G.SPRING.z), false);
+    });
+    dimV(g, -8, 0, p.h, `${p.h}`); dimH(g, 0, p.w, p.h + 26, `${p.w}`, false);
+  });
+  card("stop", (g, p) => {
+    [0, 1, 2].forEach(i => grainRect(g, 0, i * (p.h + 2), p.w, p.h));
+    dimH(g, 0, p.w, 3 * p.h + 14, `${p.w}`, false); dimV(g, -8, 0, p.h, `${p.h}`);
+  });
+})();
+
+/* ---- 철물 표 ---- */
+(function hw() {
+  const ROD_USE = { "회전축": "힌지 받이–레일–레일–힌지 받이, 왼쪽 끝에 자석", "A핀": "레일–T자–레일", "B핀": "B 받이 바깥에서 B 블록 옆구리로 16mm 돌려 넣기", "안내봉": "T자 C 면 → 스프링 속 → B 블록" };
+  const rows = [
+    ...RODS.map((r, i) => [`M8 전산볼트 · ${r.name}`, `${r.len}mm × ${r.q}`, ROD_USE[r.name], i === 0 ? `모두 ${RODS.reduce((a, r) => a + r.len * r.q, 0)}mm, 1m 한 개로 충분` : ""]),
+    ["M8 너트", "18개", "회전축 6 · A핀 4 · B핀 2 · 안내봉 6", "안내봉 끝은 너트 2개로 잠금"],
+    ["M8 와셔 17×1T", "20개", "회전축 8 · A핀 6 · B핀 4 · 안내봉 2", ""],
+    ["608ZZ 베어링", "2개", "힌지 받이 안쪽", "외경 22 · 내경 8 · 폭 7"],
+    ["압축 스프링 1.2×17.85×78.4", "2개", "T자 머리와 B 블록 사이, 나란히", "놓음 78mm(예압 0.4) → 끝 39mm"],
+    ["델타 피스 6×25", "22개", "받침 아래에서 받이·멈춤 14 · 발판→레일 8", "구멍 4mm 먼저 뚫기"],
+    ["AS5600 모듈", "1개", "센서 받이 안쪽, 축 끝 자석과 1.5mm", "자석은 축 끝에 순간접착"],
+    ["목공풀", "—", "T자 3겹 · B 블록 2겹 · 멈춤 3겹 · 받이 밑면", ""],
+  ];
+  document.getElementById("hwt").innerHTML = `<thead><tr><th>부품</th><th>수량</th><th>쓰는 곳</th><th>메모</th></tr></thead><tbody>` +
+    rows.map(r => `<tr><td>${r[0]}</td><td class="m">${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join("") + "</tbody>";
+})();
+
+/* ---- 조립 순서 ---- */
+document.getElementById("steps").innerHTML = [
+  "T자 3장을 목공풀로 겹쳐 붙이고(45mm), 굳으면 A 구멍 Ø8.5와 C 면의 안내봉 구멍 2개(가운데에서 좌우 12mm, Ø8.5 깊이 15 → Ø6.8 깊이 20)를 뚫어요.",
+  "B 블록 윗판(Ø20 구멍 2)과 아랫판(Ø8.5 구멍 2)을 구멍이 맞게 붙이고, 붙인 면 높이에서 양 끝에 Ø6.8 깊이 16 구멍을 뚫어 B핀 45mm를 돌려 넣어요.",
+  "레일 2개를 발판 아래 양쪽 끝에 피스로 고정하고, 회전축(170)과 A핀(115)을 끼워 레일 안팎을 너트로 조여요. 축이 페달과 같이 돌아야 AS5600이 각도를 읽어요.",
+  "받침에 힌지 받이·B 받이·멈춤 블록·센서 받이를 도면 위치에 풀+피스로 고정해요. 608ZZ는 힌지 받이 안쪽 Ø22 자리에 눌러 넣어요.",
+  `안내봉 2개를 T자 C 면에 돌려 넣고 너트로 잠근 뒤 스프링을 끼우고, B 블록 아랫판 구멍으로 빼서 와셔가 C 면에서 ${G.CB_MAX + G.T}mm 지점에 오게 끝 너트 2개를 잠가요. 이 너트가 60° 멈춤이에요.`,
+  "T자를 A핀 가운데에, B 블록을 B 받이 사이에 끼우고 페달을 끝까지 밟아 레일이 멈춤 블록에 닿는 각도(15°)를 확인해요.",
+].map(s => `<li><span>${s}</span></li>`).join("");
+document.getElementById("warn").innerHTML = [
+  "스프링 감은 수를 신청서로 알 수 없어서 밀착 길이는 확인 못 했어요. 받으면 39mm까지 눌러 코일끼리 붙지 않는지 먼저 봐 주세요.",
+  "놓았을 때 페달 무게로 스프링이 조금 눌려 60°보다 살짝 낮게 쉴 수 있어요. 놓음 0%는 펌웨어 보정으로 잡아요.",
+].map(s => `<p>${s}</p>`).join("");
+
+/* =================== 3D =================== */
+const THREE = await import("three");
+const { OrbitControls } = await import("three/addons/controls/OrbitControls.js");
+const { RoomEnvironment } = await import("three/addons/environments/RoomEnvironment.js");
+const SHOT = window.__SHOT === true;
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+const stage = document.getElementById("stage");
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true }); renderer.setClearColor(0x000000, 0);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = .92;
+stage.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), .04).texture;
+const camera = new THREE.PerspectiveCamera(30, 1, 5, 6000);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; controls.dampingFactor = .08; controls.minDistance = 120; controls.maxDistance = 2200;
+
+scene.add(new THREE.HemisphereLight(0xffffff, 0xb8c0c6, .9));
+const sun = new THREE.DirectionalLight(0xffffff, 2.2); sun.position.set(260, 520, 340); sun.castShadow = true;
+sun.shadow.mapSize.set(4096, 4096); Object.assign(sun.shadow.camera, { left: -400, right: 400, top: 400, bottom: -400, near: 50, far: 1500 });
+sun.shadow.bias = -.0002; sun.shadow.normalBias = .4; scene.add(sun);
+const fill = new THREE.DirectionalLight(0xe2eaf2, .7); fill.position.set(-300, 180, -200); scene.add(fill);
+
+/* ---- 집성목 텍스처: 폭이 다른 띠를 붙인 판, 핑거조인트, 결 ---- */
+let seed = 11; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+const TEX_MM = 400;   // 텍스처 한 장 = 400mm
+function woodCanvas(end) {
+  const c = document.createElement("canvas"); c.width = c.height = 1024; const g = c.getContext("2d"), px = 1024 / TEX_MM;
+  const tones = ["#DDB98F", "#E6C59D", "#D2A676", "#E9CCA6", "#D8AE80", "#E2BC90", "#CFA06F"];
+  let y = 0;
+  while (y < 1024) {
+    const hmm = 28 + rnd() * 30, h = hmm * px, tone = tones[Math.floor(rnd() * tones.length)];
+    g.fillStyle = tone; g.fillRect(0, y, 1024, h + 1);
+    if (!end) {
+      for (let i = 0; i < 14; i++) {   // 결
+        const yy = y + rnd() * h, a = .6 + rnd() * 2.5, f = .002 + rnd() * .006, ph = rnd() * 6;
+        g.strokeStyle = `rgba(${120 + rnd() * 30},${72 + rnd() * 20},${30 + rnd() * 15},${.10 + rnd() * .16})`; g.lineWidth = .6 + rnd() * 1.6;
+        g.beginPath(); for (let x = 0; x <= 1024; x += 8) g.lineTo(x, Math.min(y + h, Math.max(y, yy + Math.sin(x * f + ph) * a))); g.stroke();
+      }
+      if (rnd() < .45) {   // 핑거조인트
+        const x0 = rnd() * 1024, t = 10 * px, k = 4 * px; g.strokeStyle = "rgba(110,70,35,.35)"; g.lineWidth = 1.2; g.beginPath();
+        for (let yy = y, i = 0; yy <= y + h; yy += k, i++) g.lineTo(x0 + (i % 2 ? t : 0), yy); g.stroke();
+      }
+      if (rnd() < .12) { const kx = rnd() * 1024, ky = y + h * (.3 + rnd() * .4); g.fillStyle = "rgba(120,72,32,.55)"; g.beginPath(); g.ellipse(kx, ky, 7 + rnd() * 6, 3 + rnd() * 2, 0, 0, 7); g.fill(); }
+    } else {
+      for (let i = 0; i < 6; i++) { g.strokeStyle = "rgba(120,75,35,.25)"; g.lineWidth = 1; g.beginPath(); g.arc(rnd() * 1024, y + h * 2, 30 + rnd() * 90, 0, 7); g.stroke(); }
+    }
+    g.fillStyle = "rgba(90,55,25,.30)"; g.fillRect(0, y, 1024, 1.2);   // 접착선
+    y += h;
+  }
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 8; return t;
+}
+const woodTex = woodCanvas(false), endTex = woodCanvas(true);
+const woodMat = () => new THREE.MeshStandardMaterial({ map: woodTex, roughness: .82, metalness: 0, envMapIntensity: .6 });
+const steel = new THREE.MeshStandardMaterial({ color: 0xC7CCD0, metalness: .9, roughness: .32 });
+const zinc = new THREE.MeshStandardMaterial({ color: 0xBAC0C4, metalness: .85, roughness: .38, flatShading: true });
+const threadTex = (() => { const c = document.createElement("canvas"); c.width = 8; c.height = 64; const g = c.getContext("2d"); for (let y = 0; y < 64; y += 8) { g.fillStyle = "#e0e3e6"; g.fillRect(0, y, 8, 4); g.fillStyle = "#7d8489"; g.fillRect(0, y + 4, 8, 4); } const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; return t; })();
+const rodMat = len => { const t = threadTex.clone(); t.needsUpdate = true; t.repeat.set(1, len / 1.25 / 8); return new THREE.MeshStandardMaterial({ map: t, metalness: .85, roughness: .38 }); };
+
+// UV를 mm 기준으로: 면마다 결 방향 축을 u로
+function worldUV(geo, grain = "x", ox = rnd() * TEX_MM, oy = rnd() * TEX_MM) {
+  const pos = geo.attributes.position, nor = geo.attributes.normal, uv = geo.attributes.uv;
+  for (let i = 0; i < pos.count; i++) {
+    const p = [pos.getX(i), pos.getY(i), pos.getZ(i)], n = [Math.abs(nor.getX(i)), Math.abs(nor.getY(i)), Math.abs(nor.getZ(i))];
+    const ax = n[0] > n[1] && n[0] > n[2] ? 0 : n[1] > n[2] ? 1 : 2;   // 법선 축
+    const gi = { x: 0, y: 1, z: 2 }[grain];
+    let a = gi, b = [0, 1, 2].find(k => k !== ax && k !== gi);
+    if (ax === gi) { a = [0, 1, 2].find(k => k !== ax); b = 3 - ax - a; }
+    uv.setXY(i, (p[a] + ox) / TEX_MM, (p[b] + oy) / TEX_MM);
+  }
+  uv.needsUpdate = true; return geo;
+}
+function mesh(geo, mat, parent, pos, rot) { const m = new THREE.Mesh(geo, mat); if (pos) m.position.set(...pos); if (rot) m.rotation.set(...rot); m.castShadow = m.receiveShadow = true; parent.add(m); return m; }
+// 나무 상자: 중심 좌표 + 크기
+function woodBox(parent, [x0, x1], [y0, y1], [z0, z1], grain = "x") {
+  const g = new THREE.BoxGeometry(x1 - x0, y1 - y0, z1 - z0); worldUV(g, grain);
+  return mesh(g, woodMat(), parent, [(x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2]);
+}
+// 평면 모양(x,y) + 구멍 → z 방향 두께
+function woodShape(parent, shape, z0, depth, grain = "x") {
+  const g = new THREE.ExtrudeGeometry(shape, { depth, bevelEnabled: false, curveSegments: 28 }); g.computeVertexNormals(); worldUV(g, grain);
+  const m = mesh(g, woodMat(), parent); m.position.z = z0; return m;
+}
+const rectShape = (x0, x1, y0, y1) => { const s = new THREE.Shape(); s.moveTo(x0, y0); s.lineTo(x1, y0); s.lineTo(x1, y1); s.lineTo(x0, y1); s.closePath(); return s; };
+const circlePath = (x, y, r) => { const p = new THREE.Path(); p.absarc(x, y, r, 0, Math.PI * 2, true); return p; };
+function rodZ(parent, x, y, z0, z1, r = 4) { const len = z1 - z0; return mesh(new THREE.CylinderGeometry(r, r, len, 20), rodMat(len), parent, [x, y, (z0 + z1) / 2], [Math.PI / 2, 0, 0]); }
+function nutZ(parent, x, y, z0, z1) { const g = new THREE.Group(); g.position.set(x, y, (z0 + z1) / 2); parent.add(g); mesh(new THREE.CylinderGeometry(G.NUT_AC / 2, G.NUT_AC / 2, Math.abs(z1 - z0), 6), zinc, g, [0, 0, 0], [Math.PI / 2, 0, 0]); return g; }
+function washerZ(parent, x, y, z0, z1) { const s = new THREE.Shape(); s.absarc(0, 0, 8.5, 0, Math.PI * 2); s.holes.push(circlePath(0, 0, 4.3)); const g = new THREE.ExtrudeGeometry(s, { depth: Math.abs(z1 - z0), bevelEnabled: false, curveSegments: 24 }); const m = mesh(g, steel, parent, [x, y, Math.min(z0, z1)]); return m; }
+function stackZ(parent, x, y, z, dir, list) {   // list: ["w"|"n", ...] z부터 dir 방향으로 쌓기
+  let p = z; list.forEach(k => { const t = k === "w" ? G.WASH : G.NUT, q = p + dir * t; (k === "w" ? washerZ : nutZ)(parent, x, y, Math.min(p, q), Math.max(p, q)); p = q; }); return p;
+}
+function bearing(parent, x, y, z0) {
+  const g = new THREE.Group(); g.position.set(x, y, z0); parent.add(g);
+  const ring = (ro, ri, d, mat, zz) => { const s = new THREE.Shape(); s.absarc(0, 0, ro, 0, Math.PI * 2); s.holes.push(circlePath(0, 0, ri)); mesh(new THREE.ExtrudeGeometry(s, { depth: d, bevelEnabled: false, curveSegments: 40 }), mat, g, [0, 0, zz]); };
+  ring(11, 9.4, 7, steel, 0); ring(9.4, 6, 6.6, new THREE.MeshStandardMaterial({ color: 0xAEB4B9, metalness: .8, roughness: .45 }), .2); ring(6, 4, 7, steel, 0);
+  return g;
+}
+
+/* ---- 받침과 고정 부품 ---- */
+const fixed = new THREE.Group(); scene.add(fixed);
+const B = G.BASE, T = G.T, H = G.H;
+woodBox(fixed, [B.x0, B.x1], [-T, 0], [-B.half, B.half], "x");
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(4000, 4000), new THREE.ShadowMaterial({ opacity: .18 }));
+ground.rotation.x = -Math.PI / 2; ground.position.y = -T - .2; ground.receiveShadow = true; scene.add(ground);
+
+// 힌지 받이 (안쪽 7mm Ø22 베어링 자리, 바깥 8mm Ø10)
+for (const s of [1, -1]) {
+  const z0 = s * G.HINGE.z0, zIn = s > 0 ? z0 : z0 - 7, zOut = s > 0 ? z0 + 7 : z0 - T;
+  const sh1 = rectShape(-20, 20, 0, G.HINGE.h); sh1.holes.push(circlePath(0, H, 11)); woodShape(fixed, sh1, zIn, 7);
+  const sh2 = rectShape(-20, 20, 0, G.HINGE.h); sh2.holes.push(circlePath(0, H, 5)); woodShape(fixed, sh2, zOut, 8);
+  bearing(fixed, 0, H, zIn);
+}
+// B 받이
+for (const s of [1, -1]) { const sh = rectShape(G.OB - 20, G.OB + 20, 0, G.BRK.h); sh.holes.push(circlePath(G.OB, H, 4.25)); woodShape(fixed, sh, s > 0 ? G.BRK.z0 : -G.BRK.z0 - T, T); }
+// 멈춤 블록 3겹
+for (const s of [1, -1]) for (let i = 0; i < 3; i++) woodBox(fixed, [G.STOP.x, G.STOP.x + G.STOP.len], [i * T, (i + 1) * T], s > 0 ? [30, 50] : [-50, -30], "x");
+// 센서 받이 + AS5600
+const SENS_Z = G.SENSOR_Z;
+woodBox(fixed, [-20, 20], [0, 50], [SENS_Z - T, SENS_Z], "x");
+const asTex = (() => { const c = document.createElement("canvas"); c.width = c.height = 256; const g = c.getContext("2d"); g.fillStyle = "#5B3AA8"; g.fillRect(0, 0, 256, 256); g.strokeStyle = "rgba(255,255,255,.25)"; g.lineWidth = 3; for (let i = 0; i < 6; i++) { g.beginPath(); g.moveTo(20, 40 + i * 30); g.lineTo(150 + rnd() * 80, 40 + i * 30); g.stroke(); } g.fillStyle = "#fff"; g.font = "bold 34px monospace"; g.fillText("AS5600", 64, 230); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; })();
+mesh(new THREE.BoxGeometry(23, 23, 1.6), [0, 0, 0, 0, new THREE.MeshStandardMaterial({ map: asTex, roughness: .5 }), new THREE.MeshStandardMaterial({ color: 0x5B3AA8 })].map(m => m || new THREE.MeshStandardMaterial({ color: 0x4a2f8c })), fixed, [0, H, SENS_Z + .8]);
+mesh(new THREE.BoxGeometry(5, 5, 1), new THREE.MeshStandardMaterial({ color: 0x1d1f22, roughness: .6 }), fixed, [0, H, SENS_Z + 2.1]);
+
+/* ---- 페달(축과 같이 돎) ---- */
+const pedal = new THREE.Group(); pedal.position.set(0, H, 0); scene.add(pedal);
+const P = G.PEDAL, R = G.RAIL;
+const railMeshes = [];
+for (const s of [1, -1]) {
+  const sh = rectShape(-P.back, P.len, -R.h / 2, R.h / 2); sh.holes.push(circlePath(0, 0, 4.25)); sh.holes.push(circlePath(G.OA, 0, 4.25));
+  railMeshes.push(woodShape(pedal, sh, s > 0 ? R.zIn : -R.zOut, T));
+}
+const plate = woodBox(pedal, [-P.back, P.len], [R.h / 2, R.h / 2 + T], [-P.width / 2, P.width / 2], "x");
+// 발판 피스 머리 (델타 브라운)
+const screwMat = new THREE.MeshStandardMaterial({ color: 0x6B4A2E, metalness: .6, roughness: .45 });
+PIECES.plate.screws.forEach(([x, y]) => mesh(new THREE.CylinderGeometry(5.5, 5.5, .6, 20), screwMat, pedal, [x - P.back, R.h / 2 + T + .3, y - P.width / 2]));
+// 회전축 + 너트 (레일 안팎 조임), 자석
+const AXLE = G.AXLE_HALF;
+rodZ(pedal, 0, 0, -AXLE, AXLE);
+for (const s of [1, -1]) { stackZ(pedal, 0, 0, s * R.zOut, s, ["w", "n", "w"]); stackZ(pedal, 0, 0, s * R.zIn, -s, ["w", "n"]); stackZ(pedal, 0, 0, s * (G.HINGE.z0 + T), s, ["w", "n"]); }
+const mag = new THREE.Group(); mag.position.set(0, 0, -AXLE - 1.25); pedal.add(mag);
+mesh(new THREE.CylinderGeometry(3, 3, 2.5, 32, 1, false, 0, Math.PI), new THREE.MeshStandardMaterial({ color: 0xC8102E }), mag, [0, 0, 0], [Math.PI / 2, 0, 0]);
+mesh(new THREE.CylinderGeometry(3, 3, 2.5, 32, 1, false, Math.PI, Math.PI), new THREE.MeshStandardMaterial({ color: 0x2463B4 }), mag, [0, 0, 0], [Math.PI / 2, 0, 0]);
+// A 핀
+const APIN = R.zOut + G.WASH + G.NUT + 2;
+rodZ(pedal, G.OA, 0, -APIN, APIN);
+for (const s of [1, -1]) { stackZ(pedal, G.OA, 0, s * R.zOut, s, ["w", "n"]); stackZ(pedal, G.OA, 0, s * R.zIn, -s, ["w", "n", "w"]); }
+
+/* ---- 스프링 막대: T자 3겹 + 안내봉 2 + 스프링 2 ---- */
+const strut = new THREE.Group(); scene.add(strut);
+function tShape() {
+  const r = G.STRUT.stem / 2, hd = G.STRUT.head / 2, S = G.S;
+  const s = new THREE.Shape(); s.moveTo(0, -r); s.lineTo(S - T, -r); s.lineTo(S - T, -hd); s.lineTo(S, -hd); s.lineTo(S, hd); s.lineTo(S - T, hd); s.lineTo(S - T, r); s.lineTo(0, r);
+  s.absarc(0, 0, r, Math.PI / 2, Math.PI * 1.5, false); s.holes.push(circlePath(0, 0, 4.25)); return s;
+}
+const tLayers = [];
+for (let i = 0; i < 3; i++) tLayers.push(woodShape(strut, tShape(), -G.STRUT.zHalf + i * T, T));
+const RODLEN = G.ROD.embed + G.ROD.beyond;
+for (const z of [-G.SPRING.z, G.SPRING.z]) {
+  const m = mesh(new THREE.CylinderGeometry(4, 4, RODLEN, 20), rodMat(RODLEN), strut, [G.S - G.ROD.embed + RODLEN / 2, 0, z], [0, 0, Math.PI / 2]);
+  // C면 잠금 너트(스프링 안쪽), 끝 와셔 + 너트 2
+  const nx = (x0, x1, mat = zinc) => mesh(new THREE.CylinderGeometry(G.NUT_AC / 2, G.NUT_AC / 2, x1 - x0, 6), mat, strut, [(x0 + x1) / 2, 0, z], [0, 0, Math.PI / 2]);
+  nx(G.S, G.S + G.NUT);
+  const e0 = G.S + G.CB_MAX + T; mesh(new THREE.CylinderGeometry(8.5, 8.5, G.WASH, 24), steel, strut, [e0 + G.WASH / 2, 0, z], [0, 0, Math.PI / 2]);
+  nx(e0 + G.WASH, e0 + G.WASH + G.NUT); nx(e0 + G.WASH + G.NUT, e0 + G.WASH + 2 * G.NUT);
+}
+const springMeshes = [];
+const springMat = new THREE.MeshStandardMaterial({ color: 0xD3D8DC, metalness: .92, roughness: .25 });
+function springGeo(len) {
+  const turns = 11, rr = (G.SPRING.od - G.SPRING.wire) / 2, wr = G.SPRING.wire / 2;
+  const curve = new (class extends THREE.Curve { getPoint(t, v = new THREE.Vector3()) {
+    // 양 끝 1바퀴는 닫힌 감김
+    const a = t * turns * Math.PI * 2, endT = 1 / turns; let x;
+    const pitchClosed = G.SPRING.wire, open = len - 2 * pitchClosed - G.SPRING.wire;
+    if (t < endT) x = t / endT * pitchClosed; else if (t > 1 - endT) x = len - G.SPRING.wire - (1 - t) / endT * pitchClosed; else x = pitchClosed + (t - endT) / (1 - 2 * endT) * open;
+    return v.set(x + wr, Math.cos(a) * rr, Math.sin(a) * rr);
+  } })();
+  return new THREE.TubeGeometry(curve, turns * 40, wr, 8, false);
+}
+for (const z of [-G.SPRING.z, G.SPRING.z]) { const m = mesh(springGeo(G.CB_MAX), springMat, strut, [G.S, 0, z]); springMeshes.push(m); }
+
+/* ---- B 블록 (축 방향 2겹) + B핀 ---- */
+const trun = new THREE.Group(); scene.add(trun);
+function trunLayer(holeR, x0) {
+  const s = rectShape(-G.TRUN.zHalf, G.TRUN.zHalf, -G.TRUN.w / 2, G.TRUN.w / 2);
+  for (const z of [-G.SPRING.z, G.SPRING.z]) s.holes.push(circlePath(z, 0, holeR));
+  const g = new THREE.ExtrudeGeometry(s, { depth: T, bevelEnabled: false, curveSegments: 28 }); g.rotateY(Math.PI / 2); g.computeVertexNormals(); worldUV(g, "y");
+  const m = mesh(g, woodMat(), trun); m.position.x = x0; return m;
+}
+trunLayer(10, -T); trunLayer(4.25, 0);
+for (const s of [1, -1]) { rodZ(trun, 0, 0, s * 21, s * (G.BRK.z0 + T + G.WASH + G.NUT + 2)); stackZ(trun, 0, 0, s * (G.BRK.z0 + T), s, ["w", "n"]); stackZ(trun, 0, 0, s * G.TRUN.zHalf, s, ["w"]); }
+
+/* ---- 문서 선 ---- */
+const lines = new THREE.Group(); scene.add(lines);
+const LM = new THREE.LineBasicMaterial({ color: 0xC8102E, depthTest: false, transparent: true });
+const LD = new THREE.LineDashedMaterial({ color: 0xC8102E, dashSize: 5, gapSize: 4, depthTest: false, transparent: true, opacity: .8 });
+const LZ = 0;
+function lineObj(mat) { const g = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]); const l = new THREE.Line(g, mat); l.renderOrder = 10; l.frustumCulled = false; lines.add(l); return l; }
+const L = { OA: lineObj(LM), AB: lineObj(LM), P: lineObj(LD), Q: lineObj(LD), DE: lineObj(new THREE.LineBasicMaterial({ color: 0xC8102E, depthTest: false, linewidth: 2 })), OB: lineObj(LD) };
+const setL = (l, a, b) => { const p = l.geometry.attributes.position; p.setXYZ(0, a[0], a[1], LZ); p.setXYZ(1, b[0], b[1], LZ); p.needsUpdate = true; l.computeLineDistances && l.computeLineDistances(); };
+const dots = new THREE.Group(); lines.add(dots);
+const dotGeo = new THREE.SphereGeometry(2.2, 16, 12), dotMat = new THREE.MeshBasicMaterial({ color: 0xC8102E, depthTest: false });
+const DOT = {}; ["O", "A", "B", "C", "D", "E"].forEach(k => { DOT[k] = new THREE.Mesh(dotGeo, dotMat); DOT[k].renderOrder = 11; dots.add(DOT[k]); });
+const labelsEl = document.getElementById("labels");
+const LBL = {}; Object.keys(DOT).forEach(k => { const d = document.createElement("div"); d.className = "pt"; d.textContent = k; labelsEl.append(d); LBL[k] = d; });
+
+/* ---- 자세 ---- */
+const $ = id => document.getElementById(id);
+let curDeg = G.DEG_REST, lastCB = null;
+function setPose(deg) {
+  curDeg = deg; const q = G.parts(deg), p = q.p, phi = Math.atan2(p.w[1], p.w[0]);
+  pedal.rotation.z = deg * Math.PI / 180;
+  strut.position.set(p.A[0], p.A[1], 0); strut.rotation.z = phi;
+  trun.position.set(p.B[0], p.B[1], 0); trun.rotation.z = phi;
+  if (lastCB === null || Math.abs(p.CB - lastCB) > .05) { springMeshes.forEach(m => { m.geometry.dispose(); m.geometry = springGeo(p.CB); }); lastCB = p.CB; }
+  // 문서 선
+  const ext = (a, d, s0, s1) => [[a[0] + d[0] * s0, a[1] + d[1] * s0], [a[0] + d[0] * s1, a[1] + d[1] * s1]];
+  setL(L.OA, ...ext(p.O, p.u, -20, 260)); setL(L.AB, p.A, p.B); setL(L.OB, p.O, p.B);
+  const P0 = [p.O[0] - p.n[0] * 15, p.O[1] - p.n[1] * 15]; setL(L.P, ...ext(P0, p.u, -20, 260));
+  const Qc = [p.C[0] - p.w[0] * 15, p.C[1] - p.w[1] * 15]; setL(L.Q, ...ext(Qc, p.m, -45, 45)); setL(L.DE, q.D, q.E);
+  const pts = { O: p.O, A: p.A, B: p.B, C: p.C, D: q.D, E: q.E }; for (const k in pts) DOT[k].position.set(pts[k][0], pts[k][1], LZ);
+  $("deg").textContent = deg.toFixed(1) + "°"; $("vA").textContent = deg.toFixed(1) + "°";
+  $("vAB").textContent = p.AB.toFixed(1); $("vCB").textContent = p.CB.toFixed(1);
+  const gap = G.clearanceP(deg); $("vGap").textContent = gap.toFixed(1) + "mm"; $("vGap").className = gap > 0 ? "ok" : "";
+  $("ang").value = deg;
+}
+
+/* ---- 카메라 ---- */
+const CAMS = {
+  iso: { p: [560, 420, 760], t: [125, 40, -10] },
+  side: { p: [125, 75, 820], t: [125, 75, 0] },
+  near: { p: [330, 150, 330], t: [160, 45, 10] },
+};
+let tween = null;
+function go(k, instant) {
+  const c = CAMS[k], to = { p: new THREE.Vector3(...c.p), t: new THREE.Vector3(...c.t) };
+  if (innerWidth / innerHeight < .9) to.p.sub(to.t).multiplyScalar(1.7).add(to.t);
+  document.querySelectorAll("[data-cam]").forEach(b => b.setAttribute("aria-pressed", b.dataset.cam === k));
+  if (instant || reduce) { camera.position.copy(to.p); controls.target.copy(to.t); tween = null; }
+  else tween = { from: { p: camera.position.clone(), t: controls.target.clone() }, to, s: performance.now() };
+}
+document.querySelectorAll("[data-cam]").forEach(b => b.addEventListener("click", () => go(b.dataset.cam)));
+const toggle = (id, fn) => { const b = $(id); b.addEventListener("click", () => { const v = b.getAttribute("aria-pressed") !== "true"; b.setAttribute("aria-pressed", v); fn(v); }); };
+toggle("tLines", v => { lines.visible = v; labelsEl.style.display = v ? "" : "none"; });
+toggle("tXray", v => { [plate, railMeshes[0]].forEach(m => { m.material.transparent = v; m.material.opacity = v ? .16 : 1; m.material.depthWrite = !v; m.castShadow = !v; }); });
+
+/* ---- 밟기 ---- */
+let playing = false, playT = 0;
+$("ang").addEventListener("input", e => { playing = false; $("play").textContent = "▶"; setPose(+e.target.value); });
+$("play").addEventListener("click", () => { playing = !playing; $("play").textContent = playing ? "❚❚" : "▶"; playT = Math.acos(Math.max(-1, Math.min(1, (curDeg - 37.5) / 22.5))); });
+
+function resize() { const w = stage.clientWidth, h = stage.clientHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+addEventListener("resize", resize); resize();
+const params = new URLSearchParams(location.search);
+setPose(params.has("deg") ? +params.get("deg") : G.DEG_REST);
+go(params.get("cam") || "iso", true);
+if (params.has("cp")) { camera.position.set(...params.get("cp").split(",").map(Number)); controls.target.set(...params.get("ct").split(",").map(Number)); }
+if (params.get("xray") === "1") $("tXray").click();
+if (params.get("lines") === "0") $("tLines").click();
+$("loading").remove();
+
+const v = new THREE.Vector3(), clock = new THREE.Clock();
+const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+function frame() {
+  const dt = clock.getDelta();
+  if (tween) { const k = Math.min(1, (performance.now() - tween.s) / 1200), e = ease(k); camera.position.lerpVectors(tween.from.p, tween.to.p, e); controls.target.lerpVectors(tween.from.t, tween.to.t, e); if (k >= 1) tween = null; }
+  if (playing) { playT += dt * 1.6; setPose(37.5 + 22.5 * Math.cos(playT)); }
+  controls.update(); renderer.render(scene, camera);
+  if (lines.visible) { const w = stage.clientWidth, h = stage.clientHeight; for (const k in DOT) { v.copy(DOT[k].position).project(camera); LBL[k].style.left = (v.x * .5 + .5) * w + "px"; LBL[k].style.top = (-v.y * .5 + .5) * h + "px"; } }
+  requestAnimationFrame(frame);
+}
+frame();
+window.__ready = true;
+</script>
+</body>
+</html>
