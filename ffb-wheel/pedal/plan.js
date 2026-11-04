@@ -7,8 +7,8 @@ export function pieces(G) {
   const V = G.V;
   return [
     { no: 1, name: "받침판", q: 1, what: "바닥판. 뒤쪽에 O 받이, 앞 끝에 B 판",
-      dims: [["길이", G.BASE.len, ["rear", "slotDepth"]], ["폭", V.baseW, ["baseW"]], ["두께", G.T, []]],
-      note: `스케치 ${207.2}과 비교 → 검사 참고` },
+      dims: [["길이", G.BASE.len, []], ["폭", V.baseW, ["baseW"]], ["두께", G.T, []]],
+      holes: [["O 받이 자리", `뒤 끝에서 ${f(V.rear)} (O 중심)`, ["slotDepth"]]] },
     { no: 2, name: "발판", q: 1, what: "15T 한 장을 30 폭으로 켠 막대. 아래 끝에 O, 그 위 OA에 A",
       dims: [["길이", V.pedalLen, []], ["폭", V.pedalDepth, []], ["두께", V.pedalT, []]],
       holes: [["O 구멍 Ø8.5", `아래 끝에서 ${f(V.oFromEnd)}, 폭 가운데`, []], ["A 구멍 Ø8.5", `아래 끝에서 ${f(V.oFromEnd + G.OA)} (OA ${f(G.OA)})`, []]] },
@@ -19,7 +19,7 @@ export function pieces(G) {
       dims: [["폭", G.BOX.inner + 2 * G.T, ["gap"]], ["높이", V.boxH, []], ["두께", G.T, []]] },
     { no: 5, name: "B 판", q: 1, what: "받침판 앞 끝에 세운 판. 스프링 끝이 B 구멍에 들어감",
       dims: [["폭", V.baseW, ["baseW"]], ["높이", V.bPlateH, []], ["두께", G.T, []]],
-      holes: [["B 구멍 (막힌 구멍)", `폭 ${f(V.slotW)} × 위아래 ${f(V.slotH)} × 깊이 ${f(V.slotDepth)}, 중심 높이 ${f(V.H)}`, ["slotW", "slotH", "slotDepth", "H"]]] },
+      holes: [["B 구멍 (막힌 구멍)", `좌우 ${f(G.SLOT.w)}(스프링 지름) × 위아래 ${G.SLOT.h} × 깊이 ${f(V.slotDepth)}, 중심 높이 ${f(G.SLOT.cy)}`, ["slotDepth", "H"]]] },
     { no: 6, name: "O 받이", q: 2, what: "스케치에 없지만 O핀을 받칠 기둥. 발판 양옆",
       dims: [["앞뒤", V.oPostW, ["oPostW"]], ["높이", V.oPostH, ["oPostH"]], ["두께", G.T, []]],
       holes: [["O 구멍 Ø8.5", `높이 ${f(V.H)}`, ["H"]]] },

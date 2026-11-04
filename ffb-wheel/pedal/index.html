@@ -33,7 +33,14 @@ a { color: inherit; }
 .tag.on b { color: #FFB3BE; }
 .tag.hid { opacity: .3; }
 .dim { position: absolute; transform: translate(-50%, -50%); font: 500 11.5px var(--mono); color: var(--ink); background: rgba(233,237,240,.9); padding: 0 4px; white-space: nowrap; border-left: 2px solid var(--ink-soft); }
-.dim.q { color: var(--accent); border-left-color: var(--accent); font-weight: 700; background: rgba(255,240,242,.94); }
+.dim.q { color: var(--accent); font-weight: 700; background: #FFF0F2; pointer-events: auto; cursor: pointer; border: 1px dashed var(--accent); padding: 0 6px; }
+.dim.q.set { color: var(--ok); border-color: var(--ok); background: #F0FAF4; }
+.dim.q:hover { background: #FFE0E5; }
+.dim input { font: 700 12px var(--mono); width: 62px; padding: 1px 4px; border: 1px solid var(--accent); }
+.ask { position: absolute; right: 18px; bottom: 18px; background: rgba(255,255,255,.9); border: 1px solid var(--rule); padding: 8px 12px; font-size: 13px; color: var(--ink-soft); display: flex; gap: 10px; align-items: center; flex-wrap: wrap; max-width: calc(100% - 36px); }
+.ask b { color: var(--accent); }
+.ask button { font: inherit; font-size: 12.5px; padding: 4px 9px; border: 1px solid var(--ink); background: #fff; cursor: pointer; border-radius: 3px; }
+.ask #copied { font-size: 12px; word-break: break-all; }
 #tip { position: absolute; pointer-events: none; background: var(--ink); color: #fff; font-size: 13px; padding: 4px 9px; transform: translate(12px, 12px); display: none; white-space: nowrap; }
 #tip small { display: block; font: 11px var(--mono); color: #C9D0D6; }
 .top { position: absolute; top: 0; left: 0; right: 0; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 14px 18px; pointer-events: none; }
@@ -57,8 +64,6 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
 .ctl dd { margin: 2px 0 0; font: 500 15px var(--mono); white-space: nowrap; }
 .ok { color: var(--ok); } .bad { color: var(--accent); }
 #loading { position: absolute; inset: 0; display: grid; place-items: center; font: 13px var(--mono); color: var(--ink-soft); }
-.down { position: absolute; right: 18px; bottom: 18px; font-size: 13px; color: var(--ink-soft); text-decoration: none; background: rgba(255,255,255,.85); border: 1px solid var(--rule); padding: 6px 11px; border-radius: 3px; }
-.down b { color: var(--accent); }
 
 main { max-width: 1180px; margin: 0 auto; padding: 72px 24px 120px; }
 section { margin-bottom: 88px; }
@@ -122,7 +127,7 @@ ol.steps li::before { content: counter(s, decimal-leading-zero); font: 500 14px 
   .ctl dl { grid-template-columns: repeat(2, 1fr); }
   .ctl dl div:nth-child(2) { border-right: 0; }
   .ctl dl div:nth-child(-n+2) { border-bottom: 1px solid var(--rule); }
-  .down { display: none; }
+  .ask { left: 18px; right: auto; bottom: 158px; }
   main { padding: 56px 16px 96px; }
   .h { grid-template-columns: 40px 1fr; }
   .h h2 { font-size: 24px; }
@@ -167,38 +172,29 @@ ol.steps li::before { content: counter(s, decimal-leading-zero); font: 500 14px 
       <div><dt>DE–P 간격</dt><dd id="vGap">—</dd></div>
     </dl>
   </div>
-  <a class="down" href="#input">? 값 입력 <b id="qCount"></b> ↓</a>
+  <div class="ask"><span>빨간 점선 <b>?</b> <b id="qCount"></b> — 눌러서 숫자를 쓰면 바로 반영돼요</span><button type="button" id="copy">값 링크 복사</button><button type="button" id="reset">지우기</button><span id="copied"></span></div>
 </div>
 
 <main>
-  <section id="input">
-    <div class="h"><span class="no">01</span><h2>치수 입력</h2>
-      <p>빨간 칸이 아직 모르는 값이에요. 비워 두면 임시값으로 그리고 3D에 ?로 표시해요. 숫자를 넣으면 모델·검사·조각 크기가 바로 바뀌고, 이 브라우저에 저장돼요. 단위 mm.</p></div>
-    <div class="body">
-      <div class="form" id="form"></div>
-      <div class="fbtn"><button type="button" class="pri" id="copy">입력한 값 링크 복사</button><button type="button" id="reset">입력 지우기</button><span id="copied"></span></div>
-    </div>
-  </section>
-
   <section id="check">
-    <div class="h"><span class="no">02</span><h2>검사</h2>
+    <div class="h"><span class="no">01</span><h2>검사</h2>
       <p>지금 값으로 ∠AOB 전 구간을 0.5° 간격으로 계산해서, 부품 사이 가장 가까운 거리를 보여 줘요.</p></div>
     <div class="body"><ul class="chk" id="chk"></ul></div>
   </section>
 
   <section id="parts">
-    <div class="h"><span class="no">03</span><h2>부품 이름과 크기</h2>
-      <p>3D에서 부품에 마우스를 올려도 이 이름이 떠요. 고칠 때 이 이름으로 말하면 돼요. <span class="qm">?</span> = 빨간 칸 값에 따라 바뀌는 치수.</p></div>
+    <div class="h"><span class="no">02</span><h2>부품 이름과 크기</h2>
+      <p>3D에서 부품에 마우스를 올려도 이 이름이 떠요. 고칠 때 이 이름으로 말하면 돼요. <span class="qm">?</span> = 아직 모르는 값에 따라 바뀌는 치수.</p></div>
     <div class="body"><div class="pcs" id="pcs"></div><div class="lists" id="lists"></div></div>
   </section>
 
   <section id="hw">
-    <div class="h"><span class="no">04</span><h2>철물</h2></div>
+    <div class="h"><span class="no">03</span><h2>철물</h2></div>
     <div class="body"><table class="hw" id="hwt"></table></div>
   </section>
 
   <section id="asm">
-    <div class="h"><span class="no">05</span><h2>조립 순서</h2></div>
+    <div class="h"><span class="no">04</span><h2>조립 순서</h2></div>
     <div class="body"><ol class="steps" id="steps"></ol><div class="warn" id="warn"></div></div>
   </section>
 </main>
@@ -210,7 +206,7 @@ ol.steps li::before { content: counter(s, decimal-leading-zero); font: 500 14px 
 } }
 </script>
 <script type="module">
-import { SPEC, SKETCH_BASE_LEN, NUT, WASH, build } from "./geo.js";
+import { SPEC, NUT, WASH, build } from "./geo.js";
 import { pieces, hardware, FEATURES, POINTS, f } from "./plan.js";
 
 const $ = id => document.getElementById(id);
@@ -229,41 +225,27 @@ const isQ = key => spec(key).src === "?" && !Number.isFinite(vals[key]);
 const unknownIn = deps => deps.some(isQ);
 let G = build(vals);
 
-/* ---------- 01 입력 칸 ---------- */
-(function form() {
-  const row = s => `<label class="frow ${s.src === "?" ? "q" : ""}" data-k="${s.key}"><span>${s.label}</span><input type="number" step="0.1" inputmode="decimal" data-k="${s.key}" placeholder="? (임시 ${s.def})" value="${Number.isFinite(vals[s.key]) ? vals[s.key] : (s.src === "?" ? "" : s.def)}"><span class="src"></span></label>`;
-  $("form").innerHTML = `<div><h3 class="q">아직 모르는 값 (?)</h3>${SPEC.filter(s => s.src === "?").map(row).join("")}</div><div><h3>정해진 값</h3>${SPEC.filter(s => s.src !== "?").map(row).join("")}</div>`;
-  let t = null;
-  $("form").addEventListener("input", e => {
-    const k = e.target.dataset.k; if (!k) return;
-    const s = spec(k), v = e.target.value.trim();
-    if (v === "" || !isFinite(+v)) delete vals[k]; else if (s.src !== "?" && +v === s.def) delete vals[k]; else vals[k] = +v;
-    save(); markRows(); clearTimeout(t); t = setTimeout(update, 150);
-  });
-  $("reset").addEventListener("click", () => { vals = {}; save(); $("form").querySelectorAll("input").forEach(i => { const s = spec(i.dataset.k); i.value = s.src === "?" ? "" : s.def; }); update(); });
-  $("copy").addEventListener("click", async () => {
-    const d = Object.entries(vals).map(([k, v]) => `${k}:${v}`).join(",");
-    const url = location.href.split("#")[0] + (d ? `#d=${encodeURIComponent(d)}` : "");
-    try { await navigator.clipboard.writeText(url); $("copied").textContent = "복사했어요"; } catch (e) { $("copied").textContent = url; }
-  });
-})();
-function markRows() {
-  document.querySelectorAll(".frow").forEach(r => { const k = r.dataset.k, s = spec(k), set = Number.isFinite(vals[k]); r.classList.toggle("set", set); r.querySelector(".src").textContent = s.src === "?" ? (set ? "입력" : "?") : (set ? "바꿈" : s.src); });
-  const n = SPEC.filter(s => isQ(s.key)).length; $("qCount").textContent = n ? n + "개" : "없음";
-}
+/* ---------- 링크 복사 · 지우기 ---------- */
+$("reset").addEventListener("click", () => { vals = {}; save(); update(); });
+$("copy").addEventListener("click", async () => {
+  const d = Object.entries(vals).map(([k, v]) => `${k}:${v}`).join(",");
+  const url = location.href.split("#")[0].split("?")[0] + (d ? `#d=${encodeURIComponent(d)}` : "");
+  try { await navigator.clipboard.writeText(url); $("copied").textContent = "복사했어요"; } catch (e) { $("copied").textContent = url; }
+});
+function setVal(k, v) { if (v === "" || !isFinite(+v)) delete vals[k]; else vals[k] = +v; save(); update(); }
+function markRows() { const n = SPEC.filter(s => isQ(s.key)).length; $("qCount").textContent = n ? n + "개" : "없음"; }
 
 /* ---------- 02 검사 · 03 부품 · 04 철물 · 05 조립 ---------- */
 function renderDocs() {
   const C = G.check(), V = G.V, R = C.res;
   const item = (ok, name, v, sub) => `<li><i class="${ok ? "ok" : "bad"}">${ok ? "✓" : "!"}</i><span>${name}${sub ? `<small>${sub}</small>` : ""}</span><span class="v ${ok ? "" : "bad"}">${v}</span></li>`;
   const dd = k => { const r = R[k]; return item(r.d > 0, k, r.d < 0 ? "겹침" : f(r.d) + "mm", `가장 가까울 때 ${f(r.deg)}°`); };
-  const slotOk = V.slotH >= C.slot.h && V.slotW >= V.springOD;
-  const baseOk = Math.abs(G.BASE.len - SKETCH_BASE_LEN) < .5;
+  const postOk = V.rear - G.OPOST.w / 2 >= 0;
   $("chk").innerHTML = [
     item(R["DE–P (문서 조건)"].d > 0, "DE–P (문서 조건)", f(R["DE–P (문서 조건)"].d) + "mm", "막대 몸통 앞벽 안쪽 면 ↔ 발판의 B 쪽 면. 0보다 커야 해요"),
     item(true, "OA · OB (문서 식)", `${f(G.OA)} · ${f(G.OB)}`, `AC ${f(G.S)}, 스프링 ${f(V.springFree)}→${f(V.springMin)}, ${f(V.degRest)}°→${f(V.degPress)}°로 푼 값`),
-    item(baseOk, "받침판 길이", `필요 ${f(G.BASE.len)} · 스케치 ${f(SKETCH_BASE_LEN)}`, `뒤 끝→O ${f(V.rear)} + OB ${f(G.OB)} − B 구멍 깊이 ${f(V.slotDepth)} + B 판 ${f(G.T)}. 스케치 20.72는 문서에서 AC 10.53일 때의 OB예요`),
-    item(slotOk, "B 구멍 크기", `필요 위아래 ${f(C.slot.h)} · 폭 ${f(V.springOD)}`, `스프링이 기울며 B 높이 기준 ${f(C.slot.lo)} ~ +${f(C.slot.hi)}를 지나가요. 지금 ${f(V.slotW)} × ${f(V.slotH)}`),
+    item(postOk, "받침판 안에 O 받이", `뒤 끝→O ${f(V.rear)}`, `받침판 ${f(G.BASE.len)} − B 판 ${f(G.T)} − (OB ${f(G.OB)} − B 구멍 깊이 ${f(V.slotDepth)}). O 받이 반쪽 ${f(G.OPOST.w / 2)}보다 커야 해요`),
+    item(true, "B 구멍 크기", `좌우 ${f(G.SLOT.w)} × 위아래 ${G.SLOT.h}`, `좌우는 스프링 지름 그대로. 위아래는 스프링이 기울며 지나가는 ${f(G.SLOT.need)} + 여유 ${f(V.slotPlay)}`),
     dd("발판 ↔ 받침판"), dd("발판 ↔ B 판"), dd("막대 몸통 ↔ 받침판"), dd("막대 몸통 ↔ O 받이"), dd("막대 몸통 ↔ B 판"), dd("스프링 ↔ 받침판"),
   ].join("");
   const qv = (v, deps) => (unknownIn(deps) ? `<span class="qm">? </span>` : "") + v;
@@ -276,7 +258,7 @@ function renderDocs() {
   $("steps").innerHTML = [
     `발판에 O 구멍(아래 끝에서 ${f(V.oFromEnd)})과 A 구멍(아래 끝에서 ${f(V.oFromEnd + G.OA)})을 Ø8.5로 뚫어요.`,
     `막대 몸통 옆벽 2장에 A 구멍(뒤 끝에서 ${f(G.BOX.back)})을 뚫고, 앞벽을 옆벽 앞 끝에 피스로 붙여 U자로 만들어요. 옆벽 사이 안쪽 폭은 ${f(G.BOX.inner)}이에요.`,
-    `B 판 안쪽 면에 B 구멍(폭 ${f(V.slotW)} × 위아래 ${f(V.slotH)} × 깊이 ${f(V.slotDepth)}, 중심 높이 ${f(V.H)})을 파고, 받침판 앞 끝에 세워요.`,
+    `B 판 안쪽 면에 B 구멍(좌우 ${f(G.SLOT.w)} × 위아래 ${G.SLOT.h} × 깊이 ${f(V.slotDepth)}, 중심 높이 ${f(G.SLOT.cy)})을 파고, 받침판 앞 끝에 세워요.`,
     `O 받이 2개를 받침판 뒤 끝에서 ${f(V.rear)} 지점에 발판 두께만큼 띄워 세우고, O핀으로 발판을 걸어요.`,
     "막대 몸통 U 안에 발판을 넣고 A핀을 끼운 다음, 스프링을 앞벽 C와 B 구멍 사이에 넣어요.",
     `끝까지 밟아 스프링이 ${f(V.springMin)}mm까지 눌릴 때 ∠AOB가 ${f(V.degPress)}°인지 확인해요.`,
@@ -375,7 +357,25 @@ function buildModel() {
     return obj;
   };
   // 치수 표시: 모르는 값이면 ?
-  const dim = (frame, local, label, value, deps = []) => { const q = deps.some(isQ), d = document.createElement("div"); d.className = "dim" + (q ? " q" : ""); d.textContent = `${label} ${q ? "?" : value}`; labelsEl.append(d); DIMS.push({ el: d, frame, local: new THREE.Vector3(...local) }); };
+  // 치수선 (수학 문제처럼): 아는 값 = 회색 실선 + 숫자, 모르는 값 = 빨간 점선 + ? (눌러서 입력, 입력하면 초록)
+  const DL = new THREE.LineBasicMaterial({ color: 0x56616B, depthTest: false, transparent: true, opacity: .85 });
+  const DQ = new THREE.LineDashedMaterial({ color: 0xC8102E, dashSize: 2.5, gapSize: 2, depthTest: false, transparent: true });
+  const DS = new THREE.LineDashedMaterial({ color: 0x0E7A3E, dashSize: 2.5, gapSize: 2, depthTest: false, transparent: true });
+  const dim = (frame, a, b, off, label, value, key) => {
+    const ask = !!key && spec(key).src === "?", q = ask && isQ(key), mat = ask ? (q ? DQ : DS) : DL;
+    const A = new THREE.Vector3(...a), B = new THREE.Vector3(...b), o = new THREE.Vector3(...off), A2 = A.clone().add(o), B2 = B.clone().add(o);
+    const dir = B2.clone().sub(A2).normalize(), on = (o.lengthSq() ? o.clone() : new THREE.Vector3(0, 1, 0)).normalize(), tk = on.clone().multiplyScalar(2.5);
+    const ar = dir.clone().multiplyScalar(3);
+    const pts = [A, A2.clone().add(tk), B, B2.clone().add(tk), A2, B2, A2, A2.clone().add(ar).add(tk.clone().multiplyScalar(.5)), A2, A2.clone().add(ar).sub(tk.clone().multiplyScalar(.5)), B2, B2.clone().sub(ar).add(tk.clone().multiplyScalar(.5)), B2, B2.clone().sub(ar).sub(tk.clone().multiplyScalar(.5))];
+    const l = new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(pts), mat); l.computeLineDistances(); l.renderOrder = 9; l.frustumCulled = false; frame.add(l);
+    const d = document.createElement("div"); d.className = "dim" + (ask ? " q" : "") + (ask && !q ? " set" : "");
+    d.textContent = `${label} ${q ? "?" : value}`; labelsEl.append(d);
+    if (ask) { d.title = spec(key).label + " — 눌러서 숫자 입력 (mm)"; d.addEventListener("click", () => {
+      if (d.querySelector("input")) return; d.textContent = label + " "; const i = document.createElement("input"); i.type = "number"; i.step = "0.1"; i.value = Number.isFinite(vals[key]) ? vals[key] : ""; i.placeholder = "?"; d.append(i); i.focus();
+      let gone = false; const done = ok => { if (gone) return; gone = true; if (ok) setVal(key, i.value.trim()); else update(); };
+      i.addEventListener("keydown", e => { if (e.key === "Enter") done(true); if (e.key === "Escape") done(false); }); i.addEventListener("blur", () => done(true)); }); }
+    DIMS.push({ el: d, frame, local: A2.clone().add(B2).multiplyScalar(.5).add(on.clone().multiplyScalar(5)), line: l });
+  };
   const woodBox = (parent, [x0, x1], [y0, y1], [z0, z1], grain = "x") => { const g = new THREE.BoxGeometry(x1 - x0, y1 - y0, z1 - z0); worldUV(g, grain); return mesh(g, woodMat(), parent, [(x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2]); };
   const woodShape = (parent, shape, z0, depth, grain = "x") => { const g = new THREE.ExtrudeGeometry(shape, { depth, bevelEnabled: false, curveSegments: 28 }); g.computeVertexNormals(); worldUV(g, grain); const m = mesh(g, woodMat(), parent); m.position.z = z0; return m; };
   const rodZ = (parent, x, y, z0, z1) => mesh(new THREE.CylinderGeometry(4, 4, z1 - z0, 20), rodMat(z1 - z0), parent, [x, y, (z0 + z1) / 2], [Math.PI / 2, 0, 0]);
@@ -386,7 +386,7 @@ function buildModel() {
   const fixed = new THREE.Group(); root.add(fixed);
   part(woodBox(fixed, [BS.x0, BS.x1], [-T, 0], [-BS.half, BS.half]), "받침판", { no: 1, tag: [BS.x0 + 70, 0, BS.half - 12] });
   const bp = new THREE.Group(); fixed.add(bp);
-  { const sh = rectShape(-BS.half, BS.half, 0, BP.h), hw = V.slotW / 2, hh = V.slotH / 2, r = Math.min(hw, hh);
+  { const sh = rectShape(-BS.half, BS.half, 0, BP.h), hw = G.SLOT.w / 2, hh = G.SLOT.h / 2, r = Math.min(hw, hh), H = G.SLOT.cy;
     const hole = new THREE.Path(); hole.moveTo(-hw, H - hh + r); hole.absarc(-hw + r, H - hh + r, r, Math.PI, Math.PI * 1.5); hole.lineTo(hw - r, H - hh); hole.absarc(hw - r, H - hh + r, r, Math.PI * 1.5, Math.PI * 2); hole.lineTo(hw, H + hh - r); hole.absarc(hw - r, H + hh - r, r, 0, Math.PI / 2); hole.lineTo(-hw + r, H + hh); hole.absarc(-hw + r, H + hh - r, r, Math.PI / 2, Math.PI); hole.closePath(); sh.holes.push(hole);
     const g1 = new THREE.ExtrudeGeometry(sh, { depth: V.slotDepth, bevelEnabled: false, curveSegments: 20 }); g1.rotateY(Math.PI / 2); g1.computeVertexNormals(); worldUV(g1, "z");
     mesh(g1, woodMat(), bp, [BP.face, 0, 0]);
@@ -395,25 +395,29 @@ function buildModel() {
   for (const s of [1, -1]) { const sh = rectShape(-G.OPOST.w / 2, G.OPOST.w / 2, 0, G.OPOST.h); sh.holes.push(circlePath(0, H, 4.25)); part(woodShape(fixed, sh, s > 0 ? G.OPOST.z0 : -G.OPOST.z0 - T, T), "O 받이", { no: 6, tag: s > 0 ? [0, G.OPOST.h - 6, G.OPOST.z0 + T] : null }); }
   part(rodZ(fixed, 0, H, -G.OPIN_HALF, G.OPIN_HALF), "O핀", { kind: "hw", tag: [0, H, G.OPIN_HALF + 4] });
   for (const s of [1, -1]) stackZ(fixed, 0, H, s * (G.OPOST.z0 + T), s, ["w", "n"]);
-  dim(fixed, [(BS.x0 + BS.x1) / 2, -T - 5, BS.half], "받침판 길이", f(BS.len), ["rear", "slotDepth"]);
-  dim(fixed, [BS.x1 + 6, -T / 2, 0], "받침판 폭", f(V.baseW), ["baseW"]);
-  dim(fixed, [BS.x0 - 4, -T / 2, BS.half], "두께", f(T));
-  dim(fixed, [BS.x0 / 2, 4, BS.half], "뒤 끝→O", f(V.rear), ["rear"]);
-  dim(fixed, [BP.face + T + 4, BP.h / 2 + 10, BS.half], "B 판 높이", f(BP.h));
-  dim(fixed, [BP.face - 3, H + V.slotH / 2 + 7, 0], "B 구멍", `${f(V.slotW)}×${f(V.slotH)}`, ["slotW", "slotH"]);
-  dim(fixed, [BP.face - 3, H - V.slotH / 2 - 7, 0], "구멍 깊이", f(V.slotDepth), ["slotDepth"]);
-  dim(fixed, [-G.OPOST.w / 2 - 4, H / 2, -G.OPOST.z0 - T], "O·B 높이", f(H), ["H"]);
-  dim(fixed, [0, G.OPOST.h + 7, -G.OPOST.z0 - T], "O 받이", `${f(G.OPOST.w)}×${f(G.OPOST.h)}`, ["oPostW", "oPostH"]);
-  dim(fixed, [G.OB * .55, H - 7, 0], "OB", f(G.OB));
+  { const zp = -(G.OPOST.z0 + T), zb = BS.half, sw = G.SLOT.w / 2, sh = G.SLOT.h / 2, cy = G.SLOT.cy;
+    dim(fixed, [BS.x0, -T, zb], [BS.x1, -T, zb], [0, -10, 6], "받침판 길이", f(BS.len));
+    dim(fixed, [BS.x1, -T, -zb], [BS.x1, -T, zb], [12, -4, 0], "받침판 폭", f(V.baseW), "baseW");
+    dim(fixed, [BS.x0, -T, zb], [BS.x0, 0, zb], [-10, 0, 0], "두께", f(T));
+    dim(fixed, [BS.x0, 0, zb], [0, 0, zb], [0, 0, 10], "뒤 끝→O", f(V.rear));
+    dim(fixed, [G.OPOST.w / 2, 0, zp], [G.OPOST.w / 2, H, zp], [10, 0, 0], "O·B 높이", f(H), "H");
+    dim(fixed, [-G.OPOST.w / 2, G.OPOST.h, zp], [G.OPOST.w / 2, G.OPOST.h, zp], [0, 9, 0], "O 받이 앞뒤", f(G.OPOST.w), "oPostW");
+    dim(fixed, [-G.OPOST.w / 2, 0, zp], [-G.OPOST.w / 2, G.OPOST.h, zp], [-10, 0, 0], "O 받이 높이", f(G.OPOST.h), "oPostH");
+    dim(fixed, [BP.face + T, 0, zb], [BP.face + T, BP.h, zb], [10, 0, 0], "B 판 높이", f(BP.h));
+    dim(fixed, [BP.face - .5, cy + sh, -sw], [BP.face - .5, cy + sh, sw], [0, 7, 0], "구멍 좌우", f(G.SLOT.w));
+    dim(fixed, [BP.face - .5, cy - sh, sw], [BP.face - .5, cy + sh, sw], [0, 0, 8], "위아래", String(G.SLOT.h));
+    dim(fixed, [BP.face, cy - sh, -sw], [BP.face + V.slotDepth, cy - sh, -sw], [0, -7, 0], "구멍 깊이", f(V.slotDepth), "slotDepth");
+    dim(fixed, [0, H, -zb], [G.OB, H, -zb], [0, -H - T - 26, 0], "OB", f(G.OB)); }
 
   /* 발판 (O에서 돎) */
   const pedal = new THREE.Group(); pedal.position.set(0, H, 0); root.add(pedal);
   { const sh = rectShape(-P.back, P.len - P.back, -P.depth / 2, P.depth / 2); sh.holes.push(circlePath(0, 0, 4.25)); sh.holes.push(circlePath(G.OA, 0, 4.25)); part(woodShape(pedal, sh, -P.t / 2, P.t), "발판", { no: 2, tag: [P.len - P.back - 30, 0, P.t / 2] }); }
-  dim(pedal, [(P.len - P.back) * .62, P.depth / 2 + 7, P.t / 2], "발판 길이", f(P.len));
-  dim(pedal, [P.len - P.back + 6, 0, P.t / 2], "폭", f(P.depth));
-  dim(pedal, [P.len - P.back + 6, P.depth / 2 + 4, -P.t / 2], "두께", f(P.t));
-  dim(pedal, [-P.back / 2, -P.depth / 2 - 7, P.t / 2], "끝→O", f(P.back));
-  dim(pedal, [G.OA / 2, P.depth / 2 + 7, P.t / 2], "OA", f(G.OA));
+  { const L = P.len - P.back, d = P.depth / 2, t2 = P.t / 2;
+    dim(pedal, [-P.back, d, t2], [L, d, t2], [0, 12, 0], "발판 길이", f(P.len));
+    dim(pedal, [L, -d, t2], [L, d, t2], [12, 0, 0], "폭", f(P.depth));
+    dim(pedal, [L, d, -t2], [L, d, t2], [0, 10, 0], "두께", f(P.t));
+    dim(pedal, [-P.back, -d, t2], [0, -d, t2], [0, -10, 0], "끝→O", f(P.back));
+    dim(pedal, [0, -d, t2], [G.OA, -d, t2], [0, -10, 0], "OA", f(G.OA)); }
 
   /* 막대 몸통 (A에서 돎) + 스프링 */
   const strut = new THREE.Group(); root.add(strut);
@@ -423,10 +427,11 @@ function buildModel() {
   part(woodBox(strut, [G.S - T, G.S], [-BX.h / 2, BX.h / 2], [-BX.zOut, BX.zOut], "z"), "막대 몸통 앞벽", { no: 4, tag: [G.S, -BX.h / 2, BX.zOut] });
   part(rodZ(strut, 0, 0, -G.APIN_HALF, G.APIN_HALF), "A핀", { kind: "hw", tag: [0, 0, G.APIN_HALF + 4] });
   for (const s of [1, -1]) stackZ(strut, 0, 0, s * BX.zOut, s, ["w", "n"]);
-  dim(strut, [G.S / 2, -BX.h / 2 - 8, BX.zOut], "AC", f(G.S));
-  dim(strut, [G.S + 4, 4, BX.zOut], "높이", f(BX.h));
-  dim(strut, [-BX.back / 2, BX.h / 2 + 7, BX.zOut], "A 뒤", f(BX.back), ["boxBack"]);
-  dim(strut, [-BX.back - 6, -BX.h / 2, 0], "틈", f(BX.gap), ["gap"]);
+  { const hb = BX.h / 2, z = BX.zOut;
+    dim(strut, [0, -hb, z], [G.S, -hb, z], [0, -10, 0], "AC", f(G.S));
+    dim(strut, [G.S, -hb, z], [G.S, hb, z], [10, 0, 0], "높이", f(BX.h));
+    dim(strut, [-BX.back, hb, z], [0, hb, z], [0, 10, 0], "A 뒤", f(BX.back), "boxBack");
+    dim(strut, [-BX.back, -hb, P.t / 2], [-BX.back, -hb, BX.zIn], [0, -9, 0], "틈", f(BX.gap), "gap"); }
   const spring = mesh(springGeo(V.springFree), new THREE.MeshStandardMaterial({ color: 0xD3D8DC, metalness: .92, roughness: .25 }), strut, [G.S, 0, 0]);
   part(spring, "스프링", { kind: "hw", tag: [G.S + 26, V.springOD / 2 + 3, 0] });
 
@@ -440,7 +445,7 @@ function buildModel() {
   ["O", "A", "B", "C", "D", "E"].forEach(k => { DOT[k] = new THREE.Mesh(dotGeo, dotMat); DOT[k].renderOrder = 11; lines.add(DOT[k]); const d = document.createElement("div"); d.className = "pt"; d.textContent = k; d.style.display = lines.visible ? "" : "none"; labelsEl.append(d); PT[k] = d; });
 
   TAGS.forEach(t => t.el.style.display = pressed("tNames") ? "" : "none");
-  DIMS.forEach(t => t.el.style.display = pressed("tDims") ? "" : "none");
+  DIMS.forEach(t => { t.el.style.display = pressed("tDims") ? "" : "none"; t.line.visible = pressed("tDims"); });
   M = { root, pedal, strut, spring, PARTS, TAGS, DIMS, pickable: [...PARTS.values()].flatMap(p => p.meshes), lines, L, DOT, PT, lastCB: -1 };
 }
 
@@ -480,7 +485,7 @@ function go(k, instant) {
 document.querySelectorAll("[data-cam]").forEach(b => b.addEventListener("click", () => go(b.dataset.cam)));
 const toggle = (id, fn) => { const b = $(id); b.addEventListener("click", () => { const v = b.getAttribute("aria-pressed") !== "true"; b.setAttribute("aria-pressed", v); fn(v); }); };
 toggle("tNames", v => M.TAGS.forEach(t => t.el.style.display = v ? "" : "none"));
-toggle("tDims", v => M.DIMS.forEach(t => t.el.style.display = v ? "" : "none"));
+toggle("tDims", v => M.DIMS.forEach(t => { t.el.style.display = v ? "" : "none"; t.line.visible = v; }));
 toggle("tLines", v => { M.lines.visible = v; Object.values(M.PT).forEach(d => d.style.display = v ? "" : "none"); });
 
 /* ---- 마우스 올리면 이름 ---- */

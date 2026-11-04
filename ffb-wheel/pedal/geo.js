@@ -9,6 +9,8 @@ export const SPEC = [
   ["AC",         "A → C (막대 몸통 11.03)",   110.3, "스케치"],
   ["boxH",       "막대 몸통 높이 = DE",       40,    "스케치"],
   ["bPlateH",    "B 판 높이",                 60,    "스케치"],
+  ["baseLen",    "받침판 길이",               300,   "사용자"],
+  ["slotPlay",   "B 구멍 위아래 여유",        6,     "정함"],
   ["springFree", "스프링 놓음 길이 (CB 최대)", 78,   "사용자"],
   ["springMin",  "스프링 최대로 눌린 길이",   39,    "사용자"],
   ["degRest",    "놓았을 때 ∠AOB",            60,    "문서"],
@@ -19,14 +21,10 @@ export const SPEC = [
   ["gap",        "발판 옆 틈 (U 옆벽·O 받이, 한쪽)", 1, "?"],
   ["boxBack",    "U가 A 뒤로 나온 길이",      15,    "?"],
   ["H",          "O·B 높이 (받침판 윗면 위)", 25,    "?"],
-  ["rear",       "받침판 뒤 끝 → O",          25,    "?"],
-  ["slotW",      "B 구멍 폭",                 20,    "?"],
-  ["slotH",      "B 구멍 위아래 길이",        32,    "?"],
   ["slotDepth",  "B 구멍 깊이",               7,     "?"],
   ["oPostW",     "O 받이 앞뒤 길이 (스케치에 없음)", 30, "?"],
   ["oPostH",     "O 받이 높이 (스케치에 없음)",      45, "?"],
 ].map(([key, label, def, src]) => ({ key, label, def, src }));
-export const SKETCH_BASE_LEN = 207.2;   // 스케치 받침판 20.72cm
 export const NUT = 6.5, WASH = 1;
 
 const rad = d => d * Math.PI / 180;
@@ -52,7 +50,7 @@ export function build(vals = {}) {
   const PEDAL = { len: V.pedalLen, back: V.oFromEnd, depth: V.pedalDepth, t: V.pedalT };
   const BOX = { h: V.boxH, back: V.boxBack, gap: V.gap }; BOX.inner = PEDAL.t + 2 * BOX.gap; BOX.zIn = BOX.inner / 2; BOX.zOut = BOX.zIn + T;
   const BPLATE = { h: V.bPlateH, face: OB - V.slotDepth };
-  const BASE = { x0: -V.rear, x1: BPLATE.face + T, half: V.baseW / 2 }; BASE.len = BASE.x1 - BASE.x0;
+  const BASE = { x1: BPLATE.face + T, half: V.baseW / 2, len: V.baseLen }; BASE.x0 = BASE.x1 - BASE.len; V.rear = -BASE.x0;   // 받침판 뒤 끝 → O (계산)
   const OPOST = { w: V.oPostW, h: V.oPostH, z0: PEDAL.t / 2 + V.gap };   // 발판 옆 틈은 U와 같은 값
   const OPIN_HALF = OPOST.z0 + T + WASH + NUT + 2, APIN_HALF = BOX.zOut + WASH + NUT + 2;
 
@@ -81,10 +79,17 @@ export function build(vals = {}) {
     return Math.min(d(q.D), d(q.E)) - PEDAL.depth / 2;
   }
   // 검사: 전 구간 0.5° 간격
+  // B 구멍: 좌우 = 스프링 지름 그대로, 위아래 = 스프링이 기울며 지나가는 높이 + 여유
+  const SLOT = (() => {
+    let lo = 1e9, hi = -1e9; const r = V.springOD / 2;
+    for (let deg = V.degPress; deg <= V.degRest + 1e-9; deg += .5) { const p = pose(deg);
+      for (let s = 0; s <= V.slotDepth; s += .5) { const cy = p.B[1] - s * p.w[1] - H, ry = r * Math.abs(p.m[1]); lo = Math.min(lo, cy - ry); hi = Math.max(hi, cy + ry); } }
+    const need = hi - lo, h = Math.ceil(need + V.slotPlay);
+    return { w: V.springOD, h, need, lo, hi, cy: H + (lo + hi) / 2 };
+  })();
   function check() {
     const base = box(-1e4, 1e4, -1e3, 0), bplate = box(BPLATE.face, BPLATE.face + T, 0, BPLATE.h), post = box(-OPOST.w / 2, OPOST.w / 2, 0, OPOST.h);
     const res = {}, put = (k, d, deg) => { if (!res[k] || d < res[k].d) res[k] = { d, deg }; };
-    let slo = 1e9, shi = -1e9;
     for (let deg = V.degPress; deg <= V.degRest + 1e-9; deg += .5) {
       const q = parts(deg), p = q.p;
       put("DE–P (문서 조건)", clearanceP(deg), deg);
@@ -94,10 +99,8 @@ export function build(vals = {}) {
       put("막대 몸통 ↔ O 받이", dist(q.side, post), deg);
       put("막대 몸통 ↔ B 판", Math.min(dist(q.front, bplate), dist(q.side, bplate)), deg);
       put("스프링 ↔ 받침판", dist(q.spring, base), deg);
-      const r = V.springOD / 2;
-      for (let s = 0; s <= V.slotDepth; s += .5) { const cy = p.B[1] - s * p.w[1] - H, ry = r * Math.abs(p.m[1]); slo = Math.min(slo, cy - ry); shi = Math.max(shi, cy + ry); }
     }
-    return { res, slot: { lo: slo, hi: shi, h: shi - slo } };
+    return { res };
   }
-  return { V, T, S, H, OA, OB, PEDAL, BOX, BPLATE, BASE, OPOST, OPIN_HALF, APIN_HALF, pose, parts, clearanceP, check };
+  return { V, T, S, H, OA, OB, PEDAL, BOX, BPLATE, BASE, SLOT, OPOST, OPIN_HALF, APIN_HALF, pose, parts, clearanceP, check };
 }
