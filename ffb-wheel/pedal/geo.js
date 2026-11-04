@@ -1,6 +1,6 @@
 // 액셀 페달 치수 (mm) — 사용자 3D 시안 구조 + 「회전 기구 기하 문제 풀이」 식.
 // 옆에서 본 면 = x(앞뒤)·y(위), z = 폭. 받침판 윗면 y=0, 회전축 O = (0, H).
-// 안내봉(M8 전산볼트)이 스프링 속을 지나 U 앞벽 가운데(C)에 너트 2개로 고정되고, B 판을 뚫고 뒤로 빠져나감.
+// M8 전산볼트가 스프링 속을 지나 U 앞벽 가운데(C)에 너트 2개로 고정되고, B 판을 뚫고 뒤로 빠져나감.
 // src: 스케치 · 사용자 · 문서 · 부품(신청서) · 재료(15T) · 정함(Claude가 정한 값) · ?(아직 모름 → 임시값 def로 그림)
 export const SPEC = [
   ["pedalLen",   "발판 길이",                 250,   "스케치"],
@@ -57,7 +57,7 @@ export function build(vals = {}) {
   // O 받이: 위쪽 = O 중심 반원(R = 앞뒤/2)
   const OPOST = { w: V.oPostW, r: V.oPostW / 2, z0: PEDAL.t / 2 + V.gap }; OPOST.h = H + OPOST.r;
   const OPIN_HALF = OPOST.z0 + T + WASH + NUT + 2, APIN_HALF = BOX.zOut + WASH + NUT + 2;
-  // 안내봉: C 뒤(U 안쪽)로 앞벽 + 와셔 + 너트, C 앞으로 스프링 최대 길이 + B 판 + 와셔 + 너트
+  // 전산볼트: C 뒤(U 안쪽)로 앞벽 + 와셔 + 너트, C 앞으로 스프링 최대 길이 + B 판 + 와셔 + 너트
   const ROD = { inB: T + WASH + NUT + 2, out: V.springFree + T + WASH + NUT + 2 }; ROD.len = Math.ceil((ROD.inB + ROD.out) / 5) * 5; ROD.out = ROD.len - ROD.inB;
 
   function pose(deg) {
@@ -113,7 +113,7 @@ export function build(vals = {}) {
       put("막대 몸통 ↔ O 받이", distAll(q.side, post), deg);
       put("막대 몸통 ↔ B 판", Math.min(dist(q.front, bplate), distAll(q.side, [bplate])), deg);
       put("스프링 ↔ 받침판", dist(q.spring, base), deg);
-      put("안내봉·뒤 너트 ↔ 받침판", Math.min(dist(rodEnd, base), dist(backNut, base)), deg);
+      put("전산볼트·뒤 너트 ↔ 받침판", Math.min(dist(rodEnd, base), dist(backNut, base)), deg);
     }
     return { res };
   }
