@@ -107,11 +107,11 @@ a.copy{text-decoration:none;line-height:1}
 <button class="tab" data-f="e1" role="tab"><span class="nm">server.c</span><span class="meta">320줄 · 중계 · 입장/퇴장 · 공격 실험 명령</span></button>
 <button class="tab" data-f="e2" role="tab"><span class="nm">net.c</span><span class="meta">135줄 · 길이 붙인 패킷 송수신</span></button>
 <button class="tab" data-f="e3" role="tab"><span class="nm">net.h</span><span class="meta">38줄 · 패킷 모양과 상수</span></button>
-<button class="tab" data-f="e4" role="tab"><span class="nm">crypto.c</span><span class="meta">273줄 · 신원 키 · 세션 키 · 문장 섞기 래칫 · 단어 지문</span></button>
+<button class="tab" data-f="e4" role="tab"><span class="nm">crypto.c</span><span class="meta">273줄 · 신원 키 · 세션 키 · 평문 섞기 래칫 · 단어 지문</span></button>
 <button class="tab" data-f="e5" role="tab"><span class="nm">crypto.h</span><span class="meta">59줄</span></button>
-<button class="tab" data-f="e6" role="tab"><span class="nm">vault.c</span><span class="meta">304줄 · 두 열쇠 금고</span></button>
+<button class="tab" data-f="e6" role="tab"><span class="nm">vault.c</span><span class="meta">304줄 · 키 두 개짜리 금고</span></button>
 <button class="tab" data-f="e7" role="tab"><span class="nm">vault.h</span><span class="meta">69줄</span></button>
-<button class="tab" data-f="e8" role="tab"><span class="nm">history.c</span><span class="meta">236줄 · 잠긴 대화 기록</span></button>
+<button class="tab" data-f="e8" role="tab"><span class="nm">history.c</span><span class="meta">236줄 · 암호화된 대화 기록</span></button>
 <button class="tab" data-f="e9" role="tab"><span class="nm">history.h</span><span class="meta">12줄</span></button>
 <div class="grp"><span class="grp-t">확인용 · 테스트를 돌릴 때만</span></div>
 <button class="tab" data-f="e10" role="tab"><span class="nm">tests/test_net.c</span><span class="meta">114줄 · 네트워크 테스트</span></button>
@@ -3497,7 +3497,7 @@ int    conn_take(struct conn *c, struct packet *p);  /* 1 꺼냄, 0 덜 옴, -1 
 </code></pre>
 </section>
 <section class="panel" id="e4" hidden>
-  <div class="bar"><span class="path">crypto.c</span><span class="role">신원 키 · 세션 키 · 문장 섞기 래칫 · 단어 지문</span>
+  <div class="bar"><span class="path">crypto.c</span><span class="role">신원 키 · 세션 키 · 평문 섞기 래칫 · 단어 지문</span>
     <span class="ll">273줄</span>
     <button class="copy" data-f="e4">복사</button></div>
   <pre class="codebox"><code class="language-c">/* 열쇠 맞추기, 문장 섞기 래칫, 신원 키와 단어 지문, 봉인. 네트워크는 전혀 모른다 */
@@ -3841,7 +3841,7 @@ int unseal(const uint8_t id_pk[KEY_LEN], const uint8_t id_sk[ID_SK_LEN],
 </code></pre>
 </section>
 <section class="panel" id="e6" hidden>
-  <div class="bar"><span class="path">vault.c</span><span class="role">두 열쇠 금고</span>
+  <div class="bar"><span class="path">vault.c</span><span class="role">키 두 개짜리 금고</span>
     <span class="ll">304줄</span>
     <button class="copy" data-f="e6">복사</button></div>
   <pre class="codebox"><code class="language-c">/* 두 열쇠 금고: 묶음 만들기·확인, 조각 열기, 열람 요청, 승인 조각, 열쇠 전달 증명 */
@@ -4226,7 +4226,7 @@ int  share_open(const uint8_t *body, size_t len, const struct vault *v, const ch
 </code></pre>
 </section>
 <section class="panel" id="e8" hidden>
-  <div class="bar"><span class="path">history.c</span><span class="role">잠긴 대화 기록</span>
+  <div class="bar"><span class="path">history.c</span><span class="role">암호화된 대화 기록</span>
     <span class="ll">236줄</span>
     <button class="copy" data-f="e8">복사</button></div>
   <pre class="codebox"><code class="language-c">/* 선택 4: 잠긴 대화 기록.
