@@ -202,6 +202,15 @@ td.bad{color:var(--void);font-weight:700} td.good{color:var(--seal);font-weight:
 .js .h-ui.rise.in{clip-path:inset(0 0 0 0)}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.js .rise,.js .h-ui.rise{opacity:1;transform:none;clip-path:none;transition:none}}
 
+@media (max-width:1500px) and (min-width:1001px){
+  .hero{grid-template-columns:minmax(0,.84fr) minmax(0,1.16fr)}
+  .h-low{grid-template-columns:minmax(0,1fr)}
+  .h-next{flex-direction:row;align-items:center;padding:20px 30px}
+}
+@media (max-width:1250px) and (min-width:1001px){
+  .h-ui{padding:30px 24px}
+  .pk-out{font-size:11.5px}
+}
 @media (max-width:1000px){
   .hero{grid-template-columns:minmax(0,1fr);grid-template-rows:auto;min-height:0}
   .h-name h1{font-size:clamp(56px,13vw,124px)}
