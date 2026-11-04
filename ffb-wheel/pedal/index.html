@@ -244,9 +244,9 @@ function renderDocs() {
   $("chk").innerHTML = [
     item(R["DE–P (문서 조건)"].d > 0, "DE–P (문서 조건)", f(R["DE–P (문서 조건)"].d) + "mm", "막대 몸통 앞벽 안쪽 면 ↔ 발판의 B 쪽 면. 0보다 커야 해요"),
     item(true, "OA · OB (문서 식)", `${f(G.OA)} · ${f(G.OB)}`, `AC ${f(G.S)}, 스프링 ${f(V.springFree)}→${f(V.springMin)}, ${f(V.degRest)}°→${f(V.degPress)}°로 푼 값`),
-    item(postOk, "받침판 안에 O 받이", `뒤 끝→O ${f(V.rear)}`, `받침판 ${f(G.BASE.len)} − B 판 ${f(G.T)} − (OB ${f(G.OB)} − B 구멍 깊이 ${f(V.slotDepth)}). O 받이 반쪽 ${f(G.OPOST.w / 2)}보다 커야 해요`),
-    item(true, "B 구멍 크기", `좌우 ${f(G.SLOT.w)} × 위아래 ${G.SLOT.h}`, `좌우는 스프링 지름 그대로. 위아래는 스프링이 기울며 지나가는 ${f(G.SLOT.need)} + 여유 ${f(V.slotPlay)}`),
-    dd("발판 ↔ 받침판"), dd("발판 ↔ B 판"), dd("막대 몸통 ↔ 받침판"), dd("막대 몸통 ↔ O 받이"), dd("막대 몸통 ↔ B 판"), dd("스프링 ↔ 받침판"),
+    item(postOk, "받침판 안에 O 받이", `뒤 끝→O ${f(V.rear)}`, `받침판 ${f(G.BASE.len)} − B 판 ${f(G.T)} − OB ${f(G.OB)}. O 받이 반쪽 ${f(G.OPOST.w / 2)}보다 커야 해요`),
+    item(true, "B 구멍 크기 (관통)", `좌우 ${f(G.SLOT.w)} × 위아래 ${G.SLOT.h}`, `좌우 = 볼트 ${f(V.rodD)} + 여유 ${f(V.holeClr)}. 위아래 = 볼트가 ${f(V.degRest)}°→${f(V.degPress)}° 동안 기울며 판을 지나가는 ${f(G.SLOT.need)} + 여유 ${f(V.holePlay)}`),
+    dd("U 안쪽 너트 ↔ 발판"), dd("발판 ↔ 받침판"), dd("발판 ↔ B 판"), dd("막대 몸통 ↔ 받침판"), dd("막대 몸통 ↔ O 받이"), dd("막대 몸통 ↔ B 판"), dd("스프링 ↔ 받침판"), dd("안내봉·뒤 너트 ↔ 받침판"),
   ].join("");
   const qv = (v, deps) => (unknownIn(deps) ? `<span class="qm">? </span>` : "") + v;
   $("pcs").innerHTML = pieces(G).map(p => `<div class="pc"><h3><span class="n">${p.no}</span>${p.name}<span class="x">× ${p.q}</span></h3><p>${p.what}</p><table>` +
@@ -258,14 +258,15 @@ function renderDocs() {
   $("steps").innerHTML = [
     `발판에 O 구멍(아래 끝에서 ${f(V.oFromEnd)})과 A 구멍(아래 끝에서 ${f(V.oFromEnd + G.OA)})을 Ø8.5로 뚫어요.`,
     `막대 몸통 옆벽 2장에 A 구멍(뒤 끝에서 ${f(G.BOX.back)})을 뚫고, 앞벽을 옆벽 앞 끝에 피스로 붙여 U자로 만들어요. 옆벽 사이 안쪽 폭은 ${f(G.BOX.inner)}이에요.`,
-    `B 판 안쪽 면에 B 구멍(좌우 ${f(G.SLOT.w)} × 위아래 ${G.SLOT.h} × 깊이 ${f(V.slotDepth)}, 중심 높이 ${f(G.SLOT.cy)})을 파고, 받침판 앞 끝에 세워요.`,
+    `B 판에 B 구멍(좌우 ${f(G.SLOT.w)} × 위아래 ${G.SLOT.h}, 중심 높이 ${f(G.SLOT.cy)})을 관통으로 뚫고, 받침판 앞 끝에 세워요.`,
     `O 받이 2개를 받침판 뒤 끝에서 ${f(V.rear)} 지점에 발판 두께만큼 띄워 세우고, O핀으로 발판을 걸어요.`,
-    "막대 몸통 U 안에 발판을 넣고 A핀을 끼운 다음, 스프링을 앞벽 C와 B 구멍 사이에 넣어요.",
+    `안내봉(${G.ROD.len}mm)을 앞벽 가운데 구멍에 끼워 안쪽(와셔+너트)·바깥쪽(너트, 스프링 안으로 들어감)에서 조여요. C에서 앞으로 ${f(G.ROD.out)} 나와요.`,
+    `막대 몸통 U 안에 발판을 넣고 A핀을 끼운 뒤, 스프링을 안내봉에 끼우고 B 구멍으로 안내봉을 빼서 뒤 끝에 와셔+너트를 C에서 ${f(G.NUT_AT)}mm(놓았을 때 B 판 뒷면) 자리에 잠가요.`,
     `끝까지 밟아 스프링이 ${f(V.springMin)}mm까지 눌릴 때 ∠AOB가 ${f(V.degPress)}°인지 확인해요.`,
   ].map(s => `<li><span>${s}</span></li>`).join("");
   $("warn").innerHTML = [
-    "멈춤 블록이 없어서 15°는 스프링이 최대로 눌린 길이로 멈춰요. 놓았을 때(60°)는 스프링이 자유 길이라, 위로 더 올라가지 않게 잡아 주는 부품이 따로 없어요.",
-    "안내봉이 없어서 스프링은 앞벽 C와 B 구멍 사이에 끼워져만 있어요.",
+    `15°는 스프링이 최대로 눌린 ${f(V.springMin)}mm에서 멈추고, 60°는 안내봉 뒤 끝 너트가 B 판 뒷면에 걸려서 멈춰요.`,
+    `끝까지 밟으면 안내봉이 B 판 뒤로 ${f(G.ROD.out - G.V.springMin - G.T)}mm 나와요.`,
   ].map(s => `<p>${s}</p>`).join("");
 }
 
@@ -388,11 +389,10 @@ function buildModel() {
   const bp = new THREE.Group(); fixed.add(bp);
   { const sh = rectShape(-BS.half, BS.half, 0, BP.h), hw = G.SLOT.w / 2, hh = G.SLOT.h / 2, r = Math.min(hw, hh), H = G.SLOT.cy;
     const hole = new THREE.Path(); hole.moveTo(-hw, H - hh + r); hole.absarc(-hw + r, H - hh + r, r, Math.PI, Math.PI * 1.5); hole.lineTo(hw - r, H - hh); hole.absarc(hw - r, H - hh + r, r, Math.PI * 1.5, Math.PI * 2); hole.lineTo(hw, H + hh - r); hole.absarc(hw - r, H + hh - r, r, 0, Math.PI / 2); hole.lineTo(-hw + r, H + hh); hole.absarc(-hw + r, H + hh - r, r, Math.PI / 2, Math.PI); hole.closePath(); sh.holes.push(hole);
-    const g1 = new THREE.ExtrudeGeometry(sh, { depth: V.slotDepth, bevelEnabled: false, curveSegments: 20 }); g1.rotateY(Math.PI / 2); g1.computeVertexNormals(); worldUV(g1, "z");
-    mesh(g1, woodMat(), bp, [BP.face, 0, 0]);
-    const g2 = new THREE.BoxGeometry(T - V.slotDepth, BP.h, 2 * BS.half); worldUV(g2, "z"); mesh(g2, woodMat(), bp, [BP.face + V.slotDepth + (T - V.slotDepth) / 2, BP.h / 2, 0]); }
+    const g1 = new THREE.ExtrudeGeometry(sh, { depth: T, bevelEnabled: false, curveSegments: 20 }); g1.rotateY(Math.PI / 2); g1.computeVertexNormals(); worldUV(g1, "z");
+    mesh(g1, woodMat(), bp, [BP.face, 0, 0]); }
   part(bp, "B 판", { no: 5, tag: [BP.face + T, BP.h - 8, BS.half - 16] });
-  for (const s of [1, -1]) { const sh = rectShape(-G.OPOST.w / 2, G.OPOST.w / 2, 0, G.OPOST.h); sh.holes.push(circlePath(0, H, 4.25)); part(woodShape(fixed, sh, s > 0 ? G.OPOST.z0 : -G.OPOST.z0 - T, T), "O 받이", { no: 6, tag: s > 0 ? [0, G.OPOST.h - 6, G.OPOST.z0 + T] : null }); }
+  for (const s of [1, -1]) { const r = G.OPOST.r, sh = new THREE.Shape(); sh.moveTo(-r, 0); sh.lineTo(r, 0); sh.lineTo(r, H); sh.absarc(0, H, r, 0, Math.PI, false); sh.lineTo(-r, 0); sh.holes.push(circlePath(0, H, 4.25)); part(woodShape(fixed, sh, s > 0 ? G.OPOST.z0 : -G.OPOST.z0 - T, T), "O 받이", { no: 6, tag: s > 0 ? [0, G.OPOST.h - 6, G.OPOST.z0 + T] : null }); }
   part(rodZ(fixed, 0, H, -G.OPIN_HALF, G.OPIN_HALF), "O핀", { kind: "hw", tag: [0, H, G.OPIN_HALF + 4] });
   for (const s of [1, -1]) stackZ(fixed, 0, H, s * (G.OPOST.z0 + T), s, ["w", "n"]);
   { const zp = -(G.OPOST.z0 + T), zb = BS.half, sw = G.SLOT.w / 2, sh = G.SLOT.h / 2, cy = G.SLOT.cy;
@@ -401,12 +401,11 @@ function buildModel() {
     dim(fixed, [BS.x0, -T, zb], [BS.x0, 0, zb], [-10, 0, 0], "두께", f(T));
     dim(fixed, [BS.x0, 0, zb], [0, 0, zb], [0, 0, 10], "뒤 끝→O", f(V.rear));
     dim(fixed, [G.OPOST.w / 2, 0, zp], [G.OPOST.w / 2, H, zp], [10, 0, 0], "O·B 높이", f(H), "H");
-    dim(fixed, [-G.OPOST.w / 2, G.OPOST.h, zp], [G.OPOST.w / 2, G.OPOST.h, zp], [0, 9, 0], "O 받이 앞뒤", f(G.OPOST.w), "oPostW");
-    dim(fixed, [-G.OPOST.w / 2, 0, zp], [-G.OPOST.w / 2, G.OPOST.h, zp], [-10, 0, 0], "O 받이 높이", f(G.OPOST.h), "oPostH");
+    dim(fixed, [-G.OPOST.w / 2, G.OPOST.h, zp], [G.OPOST.w / 2, G.OPOST.h, zp], [0, 8, 0], "O 받이 앞뒤", f(G.OPOST.w), "oPostW");
+    dim(fixed, [-G.OPOST.w / 2, 0, zp], [-G.OPOST.w / 2, G.OPOST.h, zp], [-10, 0, 0], "O 받이 높이", f(G.OPOST.h));
     dim(fixed, [BP.face + T, 0, zb], [BP.face + T, BP.h, zb], [10, 0, 0], "B 판 높이", f(BP.h));
     dim(fixed, [BP.face - .5, cy + sh, -sw], [BP.face - .5, cy + sh, sw], [0, 7, 0], "구멍 좌우", f(G.SLOT.w));
     dim(fixed, [BP.face - .5, cy - sh, sw], [BP.face - .5, cy + sh, sw], [0, 0, 8], "위아래", String(G.SLOT.h));
-    dim(fixed, [BP.face, cy - sh, -sw], [BP.face + V.slotDepth, cy - sh, -sw], [0, -7, 0], "구멍 깊이", f(V.slotDepth), "slotDepth");
     dim(fixed, [0, H, -zb], [G.OB, H, -zb], [0, -H - T - 26, 0], "OB", f(G.OB)); }
 
   /* 발판 (O에서 돎) */
@@ -422,7 +421,7 @@ function buildModel() {
   /* 막대 몸통 (A에서 돎) + 스프링 */
   const strut = new THREE.Group(); root.add(strut);
   const sideG = new THREE.Group(); strut.add(sideG);
-  for (const s of [1, -1]) { const sh = rectShape(-BX.back, G.S - T, -BX.h / 2, BX.h / 2); sh.holes.push(circlePath(0, 0, 4.25)); woodShape(sideG, sh, s > 0 ? BX.zIn : -BX.zOut, T); }
+  for (const s of [1, -1]) { const r = BX.r, sh = new THREE.Shape(); sh.moveTo(0, -r); sh.lineTo(G.S - T, -r); sh.lineTo(G.S - T, r); sh.lineTo(0, r); sh.absarc(0, 0, r, Math.PI / 2, Math.PI * 1.5, false); sh.holes.push(circlePath(0, 0, 4.25)); woodShape(sideG, sh, s > 0 ? BX.zIn : -BX.zOut, T); }
   part(sideG, "막대 몸통 옆벽", { no: 3, tag: [G.S * .55, BX.h / 2, BX.zOut] });
   part(woodBox(strut, [G.S - T, G.S], [-BX.h / 2, BX.h / 2], [-BX.zOut, BX.zOut], "z"), "막대 몸통 앞벽", { no: 4, tag: [G.S, -BX.h / 2, BX.zOut] });
   part(rodZ(strut, 0, 0, -G.APIN_HALF, G.APIN_HALF), "A핀", { kind: "hw", tag: [0, 0, G.APIN_HALF + 4] });
@@ -430,8 +429,17 @@ function buildModel() {
   { const hb = BX.h / 2, z = BX.zOut;
     dim(strut, [0, -hb, z], [G.S, -hb, z], [0, -10, 0], "AC", f(G.S));
     dim(strut, [G.S, -hb, z], [G.S, hb, z], [10, 0, 0], "높이", f(BX.h));
-    dim(strut, [-BX.back, hb, z], [0, hb, z], [0, 10, 0], "A 뒤", f(BX.back), "boxBack");
+    dim(strut, [-BX.back, hb, z], [0, hb, z], [0, 10, 0], "둥근 끝 R", f(BX.r));
     dim(strut, [-BX.back, -hb, P.t / 2], [-BX.back, -hb, BX.zIn], [0, -9, 0], "틈", f(BX.gap), "gap"); }
+  { const rl = G.ROD.len, x0 = G.S - G.ROD.inB, rg = new THREE.Group(); strut.add(rg);
+    mesh(new THREE.CylinderGeometry(V.rodD / 2, V.rodD / 2, rl, 20), rodMat(rl), rg, [x0 + rl / 2, 0, 0], [0, 0, Math.PI / 2]);
+    part(rg, "안내봉", { kind: "hw", tag: [G.S + G.NUT_AT + 18, 0, 0] });
+    const nx = (a, b) => part(mesh(new THREE.CylinderGeometry(7.2, 7.2, b - a, 6), zincMat(), strut, [(a + b) / 2, 0, 0], [0, 0, Math.PI / 2]), "너트", { kind: "hw" });
+    const wx = (a, b) => part(mesh(new THREE.CylinderGeometry(8.5, 8.5, b - a, 24), steelMat(), strut, [(a + b) / 2, 0, 0], [0, 0, Math.PI / 2]), "와셔", { kind: "hw" });
+    const qi = G.S - T; wx(qi - WASH, qi); nx(qi - WASH - NUT, qi - WASH);    // 앞벽 안쪽
+    nx(G.S, G.S + NUT);                                                       // 앞벽 바깥 (스프링 속)
+    const e = G.S + G.NUT_AT; wx(e, e + WASH); nx(e + WASH, e + WASH + NUT); // 뒤 끝: 놓았을 때 B 판 뒷면
+    dim(strut, [G.S, -BX.h / 2, 0], [G.S + G.ROD.out, -BX.h / 2, 0], [0, -14, 0], "C→볼트 끝", f(G.ROD.out)); }
   const spring = mesh(springGeo(V.springFree), new THREE.MeshStandardMaterial({ color: 0xD3D8DC, metalness: .92, roughness: .25 }), strut, [G.S, 0, 0]);
   part(spring, "스프링", { kind: "hw", tag: [G.S + 26, V.springOD / 2 + 3, 0] });
 
