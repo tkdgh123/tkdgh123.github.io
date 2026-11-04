@@ -5,123 +5,96 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>덜미 코드</title>
 <meta name="description" content="덜미 전체 소스 코드. 지금 버전(평문, 한 파일)과 암호화 버전을 따로 본다.">
+<script>document.documentElement.classList.add("js")</script>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="../site.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/base16/tomorrow-night.min.css">
 <style>
-:root {
-  --paper:#ECEFF2; --sheet:#FAFBFC; --ink:#15202C; --ink-2:#556273; --rule:#CBD3DC;
-  --steel:#2A4F86; --void:#CF3B1C; --seal:#17806A;
-  --term-bg:#0F1823; --term-ink:#D6E1EC; --t-dim:#7D8B9B; --t-red:#FF8B70; --t-green:#7ED6B3; --t-yel:#F1C56C; --t-blue:#8DB4F0;
-  --f-display:"Black Han Sans","IBM Plex Sans KR","Malgun Gothic",sans-serif;
-  --f-body:"IBM Plex Sans KR","Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif;
-  --f-mono:"IBM Plex Mono",ui-monospace,"Cascadia Code",Consolas,monospace;
-  color-scheme:light;
-}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --paper:#0C131B; --sheet:#131D28; --ink:#E2E9F1; --ink-2:#93A1B2; --rule:#263342;
-  --steel:#82A9E3; --void:#FF7A58; --seal:#4FC4A6; --term-bg:#070C12; color-scheme:dark }}
-:root[data-theme="dark"]{
-  --paper:#0C131B; --sheet:#131D28; --ink:#E2E9F1; --ink-2:#93A1B2; --rule:#263342;
-  --steel:#82A9E3; --void:#FF7A58; --seal:#4FC4A6; --term-bg:#070C12; color-scheme:dark }
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.7 var(--f-body);word-break:keep-all;overflow-wrap:anywhere}
-a{color:var(--steel)}
-:focus-visible{outline:2px solid var(--steel);outline-offset:2px}
-.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-.top{display:flex;justify-content:space-between;gap:12px;padding-block:18px 0;font-size:14px}
-.top a{color:var(--ink-2);text-decoration:none}
-.top a:hover{color:var(--ink)}
-.eyebrow{font:600 13px/1 var(--f-mono);letter-spacing:.14em;color:var(--steel);text-transform:uppercase;margin:0 0 12px}
-h1{font-family:var(--f-display);font-weight:400;font-size:clamp(48px,11vw,104px);line-height:.95;margin:6px 0 16px;letter-spacing:-.01em}
-h1 span{color:var(--void)}
-.lede{color:var(--ink-2);max-width:40rem;margin:0 0 22px}
-.hero{padding-block:28px 24px;border-bottom:2px solid var(--ink);position:relative}
-.note{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:24px 0 8px}
-.note .c{background:var(--sheet);border:1px solid var(--rule);border-radius:14px;padding:14px 16px}
-.note .c b{display:block;font-size:14px;margin-bottom:4px}
-.note .c.p b{color:var(--seal)} .note .c.s b{color:var(--steel)} .note .c.b b{color:var(--void)}
-.note .c span{font-size:13.5px;color:var(--ink-2)}
-.note code{font-family:var(--f-mono);font-size:.85em;background:color-mix(in srgb,var(--ink) 9%,transparent);padding:1px 5px;border-radius:4px}
-
-.app{display:grid;grid-template-columns:260px minmax(0,1fr);gap:22px;margin:28px 0 60px;align-items:start}
-@media (max-width:860px){.app{grid-template-columns:minmax(0,1fr)}}
-.rail{position:sticky;top:12px;display:flex;flex-direction:column;gap:3px;max-height:calc(100vh - 24px);overflow:auto}
-@media (max-width:860px){.rail{position:static;max-height:none;flex-direction:row;flex-wrap:wrap;gap:6px}}
-.grp{margin:14px 0 4px}
-.grp:first-child{margin-top:0}
-.grp-t{font:600 12px/1.3 var(--f-mono);letter-spacing:.06em;color:var(--ink-2);text-transform:uppercase}
-@media (max-width:860px){.grp{flex-basis:100%;margin:8px 0 0}}
-.tab{display:flex;flex-direction:column;gap:1px;text-align:left;background:none;border:0;border-left:3px solid transparent;
-  padding:7px 10px;border-radius:0 8px 8px 0;cursor:pointer;color:var(--ink);font:inherit;width:100%}
-.tab:hover{background:color-mix(in srgb,var(--steel) 10%,transparent)}
-.tab[aria-selected=true]{background:color-mix(in srgb,var(--steel) 15%,transparent);border-left-color:var(--steel)}
+.app{display:grid;grid-template-columns:268px minmax(0,1fr);gap:var(--gap);align-items:start}
+.side{position:sticky;top:calc(var(--top) + var(--gap) * 2);display:grid;gap:var(--gap)}
+.vers{display:grid;gap:var(--gap)}
+.ver{display:flex;flex-direction:column;gap:4px;text-align:left;font:inherit;color:var(--ink);cursor:pointer;background:var(--tile);border:0;border-radius:var(--r);padding:14px 16px;transition:background-color .15s,color .15s}
+.ver b{font-size:16px}
+.ver span{font-size:14px;color:var(--ink-2);line-height:1.5}
+.ver code{font-size:.85em}
+.ver:hover{background:var(--paper)}
+.ver[aria-selected=true]{background:var(--ink);color:var(--tile)}
+.ver[aria-selected=true] span{color:inherit;opacity:.8}
+.ver[aria-selected=true] code{background:rgb(255 255 255 / .14);color:inherit}
+.rail{background:var(--tile);border-radius:var(--r);padding:10px;display:flex;flex-direction:column;gap:2px;max-height:calc(100svh - var(--top) - 260px);overflow:auto}
+.rail[hidden]{display:none}
+.grp{margin:12px 12px 4px}
+.grp:first-child{margin-top:4px}
+.grp-t{font-size:13.5px;font-weight:600;color:var(--ink-2)}
+.tab{display:flex;flex-direction:column;gap:1px;text-align:left;background:none;border:0;padding:8px 12px;border-radius:6px;cursor:pointer;color:var(--ink);font:inherit;width:100%;transition:background-color .15s}
+.tab:hover{background:var(--sheet)}
+.tab[aria-selected=true]{background:var(--ink);color:var(--tile)}
 .tab .nm{font-family:var(--f-mono);font-size:14px;font-weight:500}
-.tab .meta{font-size:11.5px;color:var(--ink-2)}
-@media (max-width:860px){.tab{width:auto;border-left:0;border-bottom:3px solid transparent;border-radius:8px;flex-direction:row;align-items:baseline;gap:7px}.tab .meta{display:none}.tab[aria-selected=true]{border-left:0;border-bottom-color:var(--steel)}}
-
-.panel .bar{display:flex;align-items:center;gap:10px;background:var(--sheet);border:1px solid var(--rule);border-bottom:0;
-  border-radius:12px 12px 0 0;padding:9px 14px;flex-wrap:wrap}
-.panel .path{font-family:var(--f-mono);font-weight:600;font-size:14.5px}
-.panel .role{font-size:13px;color:var(--ink-2)}
-.panel .ll{margin-left:auto;font:500 12px/1 var(--f-mono);color:var(--ink-2)}
-.copy{font:500 12.5px/1 var(--f-mono);background:var(--ink);color:var(--paper);border:0;border-radius:7px;padding:7px 12px;cursor:pointer}
-.copy:hover{background:var(--steel)}
+.tab .meta{font-size:13px;opacity:.8}
+.panel .bar{display:flex;align-items:center;gap:12px;background:var(--tile);border-radius:var(--r) var(--r) 0 0;padding:12px 16px;flex-wrap:wrap}
+.panel .path{font-family:var(--f-mono);font-weight:600;font-size:15px}
+.panel .role{font-size:14px;color:var(--ink-2)}
+.panel .ll{margin-left:auto;font-size:14px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.copy{font:600 14px/1 var(--f-body);background:var(--steel);color:var(--steel-ink);border:0;border-radius:6px;padding:9px 14px;cursor:pointer;transition:filter .15s}
+.copy:hover{filter:brightness(1.12)}
 .copy.ok{background:var(--seal)}
-.codebox{margin:0;border:1px solid var(--rule);border-radius:0 0 12px 12px;background:var(--term-bg);overflow:auto;max-height:76vh}
-.codebox code{font-family:var(--f-mono);font-size:13px;line-height:1.65;tab-size:4}
-/* highlight.js 색을 사이트 팔레트로 */
+a.copy{text-decoration:none;line-height:1}
+.codebox{margin:0;border-radius:0 0 var(--r) var(--r);background:var(--term-bg);overflow:auto;max-height:calc(100svh - var(--top) - 90px)}
+.codebox code{font-family:var(--f-mono);font-size:15px;line-height:1.7;tab-size:4}
 .hljs{background:var(--term-bg);color:var(--term-ink);padding:16px 0}
 .hljs-keyword,.hljs-type{color:var(--t-blue);font-weight:500}
 .hljs-string,.hljs-char,.hljs-char.escape_{color:var(--t-green)}
-.hljs-comment{color:var(--t-dim);font-style:italic}
+.hljs-comment{color:var(--t-dim);font-style:normal}
 .hljs-meta,.hljs-meta .hljs-keyword{color:var(--t-yel)}
 .hljs-meta .hljs-string{color:var(--t-green)}
 .hljs-number,.hljs-literal{color:var(--t-red)}
 .hljs-title,.hljs-title.function_{color:var(--term-ink);font-weight:600}
 .hljs-title.class_,.hljs-built_in{color:var(--t-yel)}
 .hljs-params{color:var(--term-ink)}
-/* 줄 번호 */
 .hljs-ln{border-collapse:collapse}
 .hljs-ln td{padding:0}
-.hljs-ln-numbers{user-select:none;text-align:right;color:var(--t-dim);padding-right:14px !important;padding-left:14px !important;
-  border-right:1px solid color-mix(in srgb,var(--term-ink) 14%,transparent);white-space:nowrap;vertical-align:top}
+.hljs-ln-numbers{user-select:none;text-align:right;color:var(--t-dim);padding-right:14px !important;padding-left:14px !important;white-space:nowrap;vertical-align:top;background:rgb(255 255 255 / .03)}
 .hljs-ln-code{padding-left:16px !important;padding-right:16px !important}
-.foot{color:var(--ink-2);font-size:14px;margin:0 0 40px}
-.rail[hidden]{display:none}
-a.copy{text-decoration:none;line-height:1}
-.vers{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin:24px 0 4px}
-.ver{display:flex;flex-direction:column;gap:4px;text-align:left;font:inherit;color:var(--ink);cursor:pointer;
-  background:var(--sheet);border:1px solid var(--rule);border-radius:14px;padding:14px 16px}
-.ver b{font-size:15px}
-.ver span{font-size:13.5px;color:var(--ink-2)}
-.ver code{font-family:var(--f-mono);font-size:.85em;background:color-mix(in srgb,var(--ink) 9%,transparent);padding:1px 5px;border-radius:4px}
-.ver.n b{color:var(--seal)} .ver.e b{color:var(--steel)}
-.ver:hover{border-color:var(--ink-2)}
-.ver[aria-selected=true]{border-color:currentColor;box-shadow:inset 0 0 0 1px currentColor}
-.ver.n[aria-selected=true]{color:var(--seal)} .ver.e[aria-selected=true]{color:var(--steel)}
-.ver[aria-selected=true] span{color:var(--ink)}
+@media (max-width:1000px){.app{grid-template-columns:minmax(0,1fr)}.side{position:static}.rail{max-height:none;flex-direction:row;flex-wrap:wrap}.grp{flex-basis:100%;margin:6px 8px 0}.tab{width:auto}.tab .meta{display:none}.vers{grid-template-columns:1fr 1fr}}
+@media (max-width:560px){.vers{grid-template-columns:1fr}}
+.map5{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.map5 button{width:100%;display:grid;grid-template-columns:7.5em 1fr auto;gap:12px;align-items:baseline;text-align:left;background:#1B2836;color:var(--term-ink);border:0;border-radius:6px;padding:14px 16px;font:500 17px/1.3 var(--f-body);cursor:pointer;transition:background-color .15s}
+.map5 button:hover,.map5 button:focus-visible{background:#26384B}
+.map5 b{font-weight:700}
+.map5 span{color:var(--t-dim);font-size:15px}
+.map5 i{font-style:normal;font-family:var(--f-mono);font-size:15px;color:var(--t-yel)}
+.codebox td,.codebox th{border:0}
+.ln-hit td{background:rgb(241 197 108 / .14)}
+@media (max-width:560px){.map5 button{grid-template-columns:1fr auto}.map5 span{display:none}}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <nav class="top"><a href="../guide/">← 덜미 설명서</a><span><a href="../run/">시작하기</a> · <a href="../plan/">암호화 계획</a> · <a href="../log/">작업 기록</a> · <a href="/">작업실</a></span></nav>
-</div>
-
-<header class="hero"><div class="wrap">
-  <p class="eyebrow">덜미 · 소스 코드</p>
-  <h1>전체 <span>코드</span></h1>
-  <p class="lede">프밍기2 메신저 덜미의 소스 전부. 버전을 고르고 파일을 고르면 된다.</p>
-  <div class="vers" role="tablist" aria-label="버전">
-    <button class="ver n" data-v="n" role="tab"><b>지금 버전 · 평문</b><span><code>deolmi.c</code> 한 파일. 실행할 때 서버 · 방장 · 참가자를 고른다.</span></button>
-    <button class="ver e" data-v="e" role="tab"><b>암호화 버전</b><span>암호화까지 넣었던 예전 전체 버전. 지금은 빌드에 안 쓰고 보관만 한다.</span></button>
+<div class="board">
+<header class="topbar">
+  <a class="logo" href="../guide/" aria-label="덜미 설명서">덜미<i>.</i></a>
+  <nav class="pages" aria-label="덜미 페이지"><a href="../guide/">설명서</a><a href="../run/">시작하기</a><a href="../code/" aria-current="page">전체 코드</a><a href="../plan/">암호화 계획</a><a href="../log/">작업 기록</a><a class="home" href="/">← 작업실</a></nav>
+  <a class="get" href="../code/src/deolmi.c" download>deolmi.c 받기 <span aria-hidden="true">↓</span></a>
+</header>
+<section class="hero" aria-label="전체 코드">
+  <div class="t h-name rise"><h1>전체 코드</h1></div>
+  <div class="h-low">
+    <div class="t h-say rise" style="--i:1"><p>프밍기2 메신저 덜미의 소스 전부. 버전을 고르고 파일을 고르면 된다.</p><div class="by">만든 사람 <b>김창식</b>(기획·결정·확인) · <b>Claude</b>(코드·사이트 작성)</div></div>
+    <a class="t h-next rise" style="--i:2" href="../plan/"><span>다음 페이지</span><b>암호화 계획 <span aria-hidden="true">→</span></b></a>
   </div>
-</div></header>
-
-<main class="wrap">
-  <div class="app">
+  <div class="h-ui rise" data-ui><p class="cap">deolmi.c 한 파일, 1014줄 — 칸을 누르면 그 줄로 간다</p>
+<ol class="map5"><li><button type="button" data-line="40"><b>① 통신</b><span>길이 붙인 패킷</span><i>40–241줄</i></button></li><li><button type="button" data-line="242"><b>② 화면</b><span></span><i>242–392줄</i></button></li><li><button type="button" data-line="393"><b>③ 중계</b><span>서버와 방장이 같이 쓴다</span><i>393–602줄</i></button></li><li><button type="button" data-line="603"><b>④ 대화</b><span>방장·참가자</span><i>603–931줄</i></button></li><li><button type="button" data-line="932"><b>⑤ 실행</b><span></span><i>932–1014줄</i></button></li></ol></div>
+</section>
+<main class="app">
+  <h2 class="sr">버전과 파일</h2>
+  <div class="side rise">
+    <div class="vers" role="tablist" aria-label="버전">
+      <button class="ver n rise" style="--i:1" data-v="n" role="tab"><b>지금 버전 · 평문</b><span><code>deolmi.c</code> 한 파일. 실행할 때 서버 · 방장 · 참가자를 고른다.</span></button>
+<button class="ver e rise" style="--i:2" data-v="e" role="tab"><b>암호화 버전</b><span>암호화까지 넣었던 예전 전체 버전. 지금은 빌드에 안 쓰고 보관만 한다.</span></button>
+    </div>
     <nav class="rail" data-v="n" role="tablist" aria-label="지금 버전 · 평문 파일" hidden>
 <button class="tab" data-f="n0" role="tab"><span class="nm">deolmi.c</span><span class="meta">1014줄 · 프로그램 전부 — 통신 · 화면 · 중계 · 대화</span></button>
 <div class="grp"><span class="grp-t">확인용 · 테스트를 돌릴 때만</span></div>
@@ -129,7 +102,7 @@ a.copy{text-decoration:none;line-height:1}
 <button class="tab" data-f="n2" role="tab"><span class="nm">tests/test_server.c</span><span class="meta">223줄 · 서버 중계 테스트</span></button>
 <button class="tab" data-f="n3" role="tab"><span class="nm">Makefile</span><span class="meta">24줄 · 빌드</span></button>
     </nav>
-    <nav class="rail" data-v="e" role="tablist" aria-label="암호화 버전 파일" hidden>
+<nav class="rail" data-v="e" role="tablist" aria-label="암호화 버전 파일" hidden>
 <button class="tab" data-f="e0" role="tab"><span class="nm">client.c</span><span class="meta">1281줄 · 화면 · 입력 · 명령 · 암호화 결합</span></button>
 <button class="tab" data-f="e1" role="tab"><span class="nm">server.c</span><span class="meta">320줄 · 중계 · 입장/퇴장 · 공격 실험 명령</span></button>
 <button class="tab" data-f="e2" role="tab"><span class="nm">net.c</span><span class="meta">135줄 · 길이 붙인 패킷 송수신</span></button>
@@ -147,8 +120,9 @@ a.copy{text-decoration:none;line-height:1}
 <button class="tab" data-f="e13" role="tab"><span class="nm">tests/test_vault.c</span><span class="meta">113줄 · 금고 테스트</span></button>
 <button class="tab" data-f="e14" role="tab"><span class="nm">Makefile</span><span class="meta">37줄 · 빌드</span></button>
     </nav>
-    <div class="view">
-      <section class="panel" id="n0" hidden>
+  </div>
+  <div class="view rise" style="--i:1">
+    <section class="panel" id="n0" hidden>
   <div class="bar"><span class="path">deolmi.c</span><span class="role">프로그램 전부 — 통신 · 화면 · 중계 · 대화</span>
     <span class="ll">1014줄</span>
     <button class="copy" data-f="n0">복사</button><a class="copy dl" href="src/deolmi.c" download>받기</a></div>
@@ -4996,10 +4970,16 @@ clean:
 .PHONY: all test clean
 </code></pre>
 </section>
-      <p class="foot">만든 사람: <b>김창식</b>(기획·결정·실행 확인) · <b>Claude</b>(Anthropic의 AI — 코드 작성). 자세한 내역은 <a href="../log/#who">작업 기록</a>.<br>받아서 실행하는 법은 <a href="../run/">시작하기</a>, 무엇을 왜 바꿨는지는 <a href="../log/">작업 기록</a>.</p>
-    </div>
   </div>
 </main>
+<footer class="end">
+  <div class="e-by"><p><b>김창식</b> — 기획 · 결정 · 실제로 돌려 보고 문제 찾기</p><p><b>Claude</b> (Anthropic의 AI) — 코드와 이 사이트 작성</p><p><a href="../log/#who">누가 무엇을 했나 자세히</a></p></div>
+  <nav class="e-nav" aria-label="덜미 페이지"><ul><li><a href="../guide/">설명서</a></li><li><a href="../run/">시작하기</a></li><li><a href="../code/" aria-current="page">전체 코드</a></li><li><a href="../plan/">암호화 계획</a></li><li><a href="../log/">작업 기록</a></li><li><a href="/">작업실로</a></li></ul></nav>
+  <a class="e-next" href="../plan/"><span>다음 페이지</span><b>암호화 계획 <span aria-hidden="true">→</span></b></a>
+  <p class="e-word" aria-hidden="true">덜미<i>.</i></p>
+</footer>
+</div>
+<script src="../site.js" defer></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js"></script>
@@ -5027,6 +5007,17 @@ vers.forEach(b => b.addEventListener('click', () => pick(b.dataset.v + '0')));
 document.querySelectorAll('.copy').forEach(b => b.addEventListener('click', async () => {
   try { await navigator.clipboard.writeText(raw.get(b.dataset.f)); b.textContent='복사됨'; b.classList.add('ok');
     setTimeout(()=>{b.textContent='복사';b.classList.remove('ok')},1400); } catch(e) { b.textContent='실패'; }
+}));
+// 첫 화면 칸 지도: 지금 버전 deolmi.c 를 열고 그 줄로 내린다
+document.querySelectorAll('.map5 button').forEach(b => b.addEventListener('click', () => {
+  pick('n0');
+  const p = document.getElementById('n0'), box = p.querySelector('.codebox');
+  const tr = p.querySelectorAll('.hljs-ln tr')[+b.dataset.line - 1];
+  if (!tr) return;
+  p.querySelectorAll('.ln-hit').forEach(r => r.classList.remove('ln-hit'));
+  tr.classList.add('ln-hit');
+  p.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+  box.scrollTop = tr.offsetTop - 8;
 }));
 const start = (location.hash && document.querySelector(location.hash + '.panel')) ? location.hash.slice(1) : 'n0';
 pick(start, true);

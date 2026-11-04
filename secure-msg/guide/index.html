@@ -5,163 +5,50 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>덜미 설명서</title>
 <meta name="description" content="덜미가 하는 일, 켜는 방식, 메시지 모양, 중계 규칙, 코드 구조, 아직 못 하는 것.">
+<script>document.documentElement.classList.add("js")</script>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
-<style>
-:root{
-  --paper:#ECEFF2; --sheet:#FAFBFC; --ink:#15202C; --ink-2:#556273; --rule:#CBD3DC;
-  --steel:#2A4F86; --void:#CF3B1C; --seal:#17806A;
-  --term-bg:#0F1823; --term-ink:#D6E1EC; --t-dim:#7D8B9B; --t-red:#FF8B70; --t-green:#7ED6B3; --t-yel:#F1C56C; --t-blue:#8DB4F0;
-  --f-display:"Black Han Sans","IBM Plex Sans KR","Malgun Gothic",sans-serif;
-  --f-body:"IBM Plex Sans KR","Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif;
-  --f-mono:"IBM Plex Mono",ui-monospace,"Cascadia Code",Consolas,monospace;
-  color-scheme:light;
-}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --paper:#0C131B; --sheet:#131D28; --ink:#E2E9F1; --ink-2:#93A1B2; --rule:#263342;
-  --steel:#82A9E3; --void:#FF7A58; --seal:#4FC4A6; --term-bg:#070C12; color-scheme:dark }}
-:root[data-theme="dark"]{
-  --paper:#0C131B; --sheet:#131D28; --ink:#E2E9F1; --ink-2:#93A1B2; --rule:#263342;
-  --steel:#82A9E3; --void:#FF7A58; --seal:#4FC4A6; --term-bg:#070C12; color-scheme:dark }
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:var(--paper);color:var(--ink);font:16.5px/1.75 var(--f-body);word-break:keep-all;overflow-wrap:anywhere}
-a{color:var(--steel)}
-:focus-visible{outline:2px solid var(--steel);outline-offset:2px}
-.wrap{max-width:860px;margin:0 auto;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px))}
-.top{display:flex;justify-content:space-between;gap:12px;padding-block:18px 0;font-size:14px}
-.top a{color:var(--ink-2);text-decoration:none}
-.top a:hover{color:var(--ink)}
-.top .r a{margin-left:14px}
-.eyebrow{font:600 13px/1 var(--f-mono);letter-spacing:.14em;color:var(--steel);text-transform:uppercase;margin:0 0 12px}
-h1{font-family:var(--f-display);font-weight:400;font-size:clamp(52px,13vw,116px);line-height:.92;margin:6px 0 16px;letter-spacing:-.01em}
-h1 span{color:var(--void)}
-.lede{color:var(--ink-2);max-width:40rem;margin:0 0 8px;font-size:18px}
-.hero{padding-block:30px 26px;border-bottom:2px solid var(--ink)}
-h2{font-family:var(--f-display);font-weight:400;font-size:clamp(26px,4.4vw,34px);line-height:1.15;margin:52px 0 6px}
-h2 .n{color:var(--steel);font-family:var(--f-mono);font-size:.62em;margin-right:12px;vertical-align:.08em}
-h3{font-size:17px;margin:26px 0 8px}
-p{margin:0 0 14px}
-ul{margin:0 0 14px;padding-left:1.2em}
-li{margin:5px 0}
-code{font-family:var(--f-mono);font-size:.86em;background:color-mix(in srgb,var(--ink) 9%,transparent);padding:1px 5px;border-radius:5px}
-b{font-weight:700}
-.sub{color:var(--ink-2);font-size:15px;margin:-2px 0 14px}
-
-/* 터미널 명령 블록 */
-.term{background:var(--term-bg);color:var(--term-ink);font:14px/1.7 var(--f-mono);border-radius:12px;padding:16px 18px;margin:0 0 16px;overflow:auto;white-space:pre-wrap;border:1px solid color-mix(in srgb,var(--term-ink) 14%,transparent)}
-.term .c{color:var(--t-dim)}       /* 주석 */
-.term .p{color:var(--t-green)}     /* 입력 */
-.term .o{color:var(--term-ink)}    /* 출력 */
-.term .k{color:var(--t-yel)}
-.term b{color:#fff}
-
-/* 단계 */
-.step{border-left:2px solid var(--rule);padding:2px 0 2px 20px;margin:0 0 6px}
-.tip{background:var(--sheet);border:1px solid var(--rule);border-radius:12px;padding:12px 16px;font-size:15px;color:var(--ink-2);margin:0 0 16px}
-.tip b{color:var(--ink)}
-
-
-table{width:100%;border-collapse:collapse;margin:6px 0 18px;font-size:15px}
-th,td{text-align:left;vertical-align:top;padding:8px 10px;border-bottom:1px solid var(--rule)}
-th{font-size:13px;color:var(--ink-2);font-weight:600}
-td > code:only-child{white-space:nowrap}
-th{white-space:nowrap}
-a.dl{display:inline-block;background:var(--ink);color:var(--paper);text-decoration:none;font-weight:700;border-radius:10px;padding:11px 18px}
-a.dl:hover{background:var(--steel)}
-.pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media (max-width:700px){.pair{grid-template-columns:1fr}}
-.pair .term{margin:0 0 16px}
-.now{background:var(--sheet);border:1px solid var(--rule);border-left:4px solid var(--seal);border-radius:12px;padding:14px 18px 6px;margin:34px 0 0}
-.now > b{color:var(--seal)}
-.tl{border-left:2px solid var(--rule);margin:18px 0 0 6px;padding-left:22px}
-.ev{position:relative;margin:0 0 30px}
-.ev::before{content:"";position:absolute;left:-29px;top:7px;width:12px;height:12px;border-radius:50%;background:var(--steel)}
-.ev .d{font:600 13px/1 var(--f-mono);color:var(--steel)}
-.ev h3{margin:6px 0 8px;font-size:18px}
-.diag{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:10px 0 18px}
-@media (max-width:560px){.diag{grid-template-columns:1fr}}
-.diag figure{margin:0;background:var(--sheet);border:1px solid var(--rule);border-radius:14px;padding:14px}
-.diag figcaption{font:600 13px/1.4 var(--f-mono);color:var(--ink-2);margin-top:6px;text-align:center}
-.diag svg{width:100%;height:auto;display:block}
-.pkt{display:flex;flex-wrap:wrap;gap:3px;margin:8px 0 6px;font:500 12.5px/1.3 var(--f-mono)}
-.pkt span{flex:var(--w) 1 0;min-width:58px;background:var(--sheet);border:1px solid var(--rule);border-top:3px solid var(--steel);border-radius:6px;padding:6px 8px;color:var(--ink-2)}
-.pkt span b{display:block;color:var(--ink);font-family:var(--f-body);font-size:13px}
-.pkt span.dim{opacity:.55;border-top-color:var(--rule)}
-.map td:first-child{white-space:nowrap;font-weight:700}
-.map code{font-size:.8em}
-.foot{color:var(--ink-2);font-size:14.5px;margin:40px 0 50px;border-top:1px solid var(--rule);padding-top:16px}
-.who{font-size:13.5px;color:var(--ink-2);margin:-2px 0 10px}
-.u,.c{display:inline-block;font-weight:700;border-radius:6px;padding:0 7px;font-size:.92em}
-.u{background:color-mix(in srgb,var(--seal) 16%,transparent);color:var(--seal)}
-.c{background:color-mix(in srgb,var(--steel) 16%,transparent);color:var(--steel)}
-.term .c{display:inline;background:none;padding:0;border-radius:0;font-weight:400;font-size:inherit;color:var(--t-dim)}
-.whot td:first-child{white-space:nowrap}
-.whot small{color:var(--ink-2)}
-.chg td:last-child{white-space:nowrap;font-size:13.5px;color:var(--ink-2);line-height:2}
-@media (max-width:600px){.chg td:last-child{white-space:normal}}
-.toc{display:flex;flex-wrap:wrap;gap:6px;margin:24px 0 0}
-.toc a{font-size:13.5px;text-decoration:none;color:var(--ink-2);background:var(--sheet);border:1px solid var(--rule);border-radius:999px;padding:2px 11px}
-.toc a:hover{color:var(--ink);border-color:var(--steel)}
-.seq{margin:12px 0 18px;background:var(--sheet);border:1px solid var(--rule);border-radius:14px;padding:14px;overflow-x:auto}
-.seq svg{width:100%;min-width:540px;height:auto;display:block;font-family:var(--f-body);font-size:13px}
-.seq figcaption{font:600 13px/1.4 var(--f-mono);color:var(--ink-2);margin-top:6px;text-align:center}
-.seq .hd text{font-weight:700;fill:var(--ink);font-size:15px}
-.seq .dim{fill:var(--ink-2);font-weight:400;font-size:12px}
-.seq .lane line{stroke:var(--rule);stroke-width:2;stroke-dasharray:4 5}
-.seq .ar line{stroke:var(--steel);stroke-width:1.8;marker-end:url(#ah)}
-.seq .ar.good line{stroke:var(--seal);marker-end:url(#ahg)}
-.seq .ar text{fill:var(--ink);font:500 13px var(--f-body);text-anchor:middle}
-.seq .box rect{fill:var(--paper);stroke:var(--ink-2);stroke-width:1.2}
-.seq .box text{fill:var(--ink);font-size:13px}
-.seq .box.key rect{stroke:var(--seal);stroke-width:1.8}
-.seq .box.warn rect{stroke:var(--void);stroke-width:1.8}
-.seq .note text{fill:var(--ink-2);font-size:12px}
-.seq .lbl text{fill:var(--ink-2);font-size:12.5px;font-weight:600}
-.ahp{fill:var(--steel)} .ahg{fill:var(--seal)}
-.term.hex{white-space:pre}
-ol.steps{padding-left:1.3em;margin:0 0 14px}
-ol.path{list-style:none;counter-reset:p;padding:0;margin:8px 0 18px}
-ol.path li{counter-increment:p;position:relative;padding:0 0 14px 46px;margin:0}
-ol.path li::before{content:counter(p);position:absolute;left:0;top:1px;width:30px;height:30px;border-radius:50%;background:var(--steel);color:var(--paper);font:600 14px/30px var(--f-mono);text-align:center}
-ol.path li:not(:last-child)::after{content:"";position:absolute;left:14px;top:34px;bottom:2px;width:2px;background:var(--rule)}
-.who-tag{display:inline-block;font:600 12px/1.6 var(--f-mono);border-radius:6px;padding:0 7px;margin-right:8px;background:color-mix(in srgb,var(--steel) 16%,transparent);color:var(--steel)}
-.who-tag.relay{background:color-mix(in srgb,var(--void) 16%,transparent);color:var(--void)}
-td.bad{color:var(--void);font-weight:700} td.good{color:var(--seal);font-weight:700} td.mid{color:var(--ink-2);font-weight:700}
-.vs td:first-child{width:40%}
-.tools td > code:only-child{white-space:normal;overflow-wrap:anywhere}
-@media (max-width:600px){.tools{font-size:13.5px}.tools th,.tools td{padding:7px 5px}.tools th{white-space:normal}.tools td{overflow-wrap:anywhere}}
-.demo{background:var(--sheet);border:1px solid var(--rule);border-radius:14px;padding:16px 18px;margin:6px 0 16px}
-.demo label{font-weight:700;margin-right:8px}
-.demo input{font:15px var(--f-mono);padding:7px 10px;border:1.5px solid var(--rule);border-radius:8px;background:var(--paper);color:var(--ink);width:min(260px,100%);margin-left:6px}
-.demo button{font:600 14px var(--f-body);padding:7px 14px;border-radius:8px;border:0;background:var(--ink);color:var(--paper);cursor:pointer;margin-top:6px}
-.demo button:hover{background:var(--steel)}
-.demo dl{display:grid;grid-template-columns:max-content 1fr;gap:6px 14px;margin:14px 0 0;font-size:14.5px}
-.demo dt{color:var(--ink-2)} .demo dd{margin:0;font-family:var(--f-mono);overflow-wrap:anywhere}
-.demo dd.ok{color:var(--seal);font-weight:600}
-@media (max-width:560px){.demo dl{grid-template-columns:1fr}.demo dd{margin-bottom:6px}}
-</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="../site.css">
 </head>
 <body>
-<div class="wrap">
-  <nav class="top"><a href="/">← 작업실</a><span class="r"><a href="../run/">시작하기</a><a href="../plan/">암호화 계획</a><a href="../code/">코드</a><a href="../log/">작업 기록</a></span></nav>
-</div>
-
-<header class="hero"><div class="wrap">
-  <p class="eyebrow">프로그래밍기초2 · 팀 프로젝트 설명서</p>
-  <h1>덜미<span>.</span></h1>
-  <p class="lede">같은 와이파이의 노트북끼리 터미널에서 대화하는 C 메신저. 지금 프로그램이 무엇을 하고, 안에서 어떻게 돌아가는지만 적었다.</p>
-  <p class="sub">만든 사람: <b>김창식</b>(기획·결정·실행 확인) · <b>Claude</b>(Anthropic의 AI — 코드와 이 사이트 작성). <a href="../log/#who">누가 무엇을 했나</a></p>
-</div></header>
-
-<main class="wrap">
+<div class="board">
+<header class="topbar">
+  <a class="logo" href="../guide/" aria-label="덜미 설명서">덜미<i>.</i></a>
+  <nav class="pages" aria-label="덜미 페이지"><a href="../guide/" aria-current="page">설명서</a><a href="../run/">시작하기</a><a href="../code/">전체 코드</a><a href="../plan/">암호화 계획</a><a href="../log/">작업 기록</a><a class="home" href="/">← 작업실</a></nav>
+  <a class="get" href="../code/src/deolmi.c" download>deolmi.c 받기 <span aria-hidden="true">↓</span></a>
+</header>
+<section class="hero" aria-label="설명서">
+  <div class="t h-name rise"><h1>덜미<i>.</i></h1></div>
+  <div class="h-low">
+    <div class="t h-say rise" style="--i:1"><p>같은 와이파이의 노트북끼리 터미널에서 대화하는 C 메신저. 지금 프로그램이 무엇을 하고, 안에서 어떻게 돌아가는지만 적었다.</p><div class="by">만든 사람: <b>김창식</b>(기획·결정·실행 확인) · <b>Claude</b>(Anthropic의 AI — 코드와 이 사이트 작성). <a href="../log/#who">누가 무엇을 했나</a></div></div>
+    <a class="t h-next rise" style="--i:2" href="../run/"><span>다음 페이지</span><b>시작하기 <span aria-hidden="true">→</span></b></a>
+  </div>
+  <div class="h-ui rise" data-ui><div class="pk" id="pk">
+  <p class="cap">글을 쳐 보면 덜미가 실제로 보내는 바이트가 나온다</p>
+  <div class="pk-in">
+    <label>보낸 사람<input id="pk-from" value="수빈" autocomplete="off" spellcheck="false"></label>
+    <label>받을 사람<input id="pk-to" value="민지" autocomplete="off" spellcheck="false"></label>
+    <label class="wide">글<input id="pk-text" value="안녕" autocomplete="off" spellcheck="false"></label>
+    <div class="pk-to" role="group" aria-label="보내는 방식"><button type="button" data-f="0" aria-pressed="true">모두에게</button><button type="button" data-f="1" aria-pressed="false">한 사람에게 (/dm)</button></div>
+  </div>
+<pre class="pk-out" id="pk-out" aria-live="polite"><span class="k">00 00 00 48</span>                                      <span class="c">길이 = 0x48 = 72 (머리 65 + 본문 7)</span>
+<span class="k">02</span>                                               <span class="c">종류 = MSG</span>
+<span class="o">ec 88 98 eb b9 88</span> <span class="z">00 00 00 00 00 00 00 00 00 00</span>  <span class="c">보낸 사람 "수빈" 6바이트 + 빈칸 10</span>
+<span class="o">eb af bc ec a7 80</span> <span class="z">00 00 00 00 00 00 00 00 00 00</span>  <span class="c">받을 사람 "민지" 6바이트 + 빈칸 10</span>
+<span class="z">00 00 00 00 00 00 00 00</span>                          <span class="c">seq (지금은 0)</span>
+<span class="z">00 × 24</span>                                          <span class="c">nonce (지금은 0)</span>
+<span class="k">00</span> <span class="o">ec 95 88 eb 85 95</span>                             <span class="c">본문: 00 = 모두에게, 뒤는 "안녕"</span></pre>
+  <p class="pk-sum" id="pk-sum">한 번에 <b>76바이트</b>가 나간다 — 길이 4 + 머리 65 + 본문 7</p>
+</div></div>
+</section>
+<div class="doc">
+<details class="t toc" open><summary>이 페이지 차례</summary><nav aria-label="차례"><ol><li><a href="#what"><i>01</i>덜미가 하는 일</a></li><li><a href="#modes"><i>02</i>켜는 방식 세 가지</a></li><li><a href="#connect"><i>03</i>접속</a></li><li><a href="#hello"><i>04</i>들어오는 순서</a></li><li><a href="#packet"><i>05</i>메시지 한 통의 모양</a></li><li><a href="#path"><i>06</i>한 통이 가는 길</a></li><li><a href="#bytes"><i>07</i>조각 모으기</a></li><li><a href="#rules"><i>08</i>중계 규칙</a></li><li><a href="#poll"><i>09</i>한 반복으로 동시에</a></li><li><a href="#screen"><i>10</i>화면</a></li><li><a href="#addr"><i>11</i>주소 표시</a></li><li><a href="#code"><i>12</i>코드는 이렇게 놓여 있다</a></li><li><a href="#steps"><i>13</i>만든 순서와 확인</a></li><li><a href="#limits"><i>14</i>아직 못 하는 것</a></li><li><a href="#next"><i>15</i>다음 단계</a></li><li><a href="#s16"><i>16</i>팀 역할</a></li></ol></nav></details>
+<main class="secs">
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" class="ahp"/></marker><marker id="ahg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" class="ahg"/></marker></defs></svg>
-
-<nav class="toc" aria-label="차례">
-  <a href="#what">하는 일</a><a href="#modes">켜는 방식</a><a href="#connect">접속</a><a href="#hello">들어오는 순서</a><a href="#packet">메시지 모양</a><a href="#path">한 통이 가는 길</a><a href="#bytes">조각 모으기</a><a href="#rules">중계 규칙</a><a href="#poll">poll 반복</a><a href="#screen">화면</a><a href="#addr">주소 표시</a><a href="#code">코드 배치</a><a href="#steps">만든 순서</a><a href="#limits">못 하는 것</a><a href="#next">다음 단계</a>
-</nav>
-
+<section class="t sec rise" id="what">
 <h2 id="what"><span class="n">01</span>덜미가 하는 일</h2>
 <ul>
 <li>여러 사람이 한 방에 들어와 <b>모두에게</b> 또는 <b>한 사람에게만</b>(<code>/dm 이름</code>) 글을 보낸다.</li>
@@ -169,15 +56,16 @@ td.bad{color:var(--void);font-weight:700} td.good{color:var(--seal);font-weight:
 <li>메시지는 <b>어디에도 저장하지 않는다.</b> 중계하는 쪽은 받자마자 전해 주고 잊는다. 꺼져 있던 사람에게는 가지 않는다.</li>
 <li><b>지금은 암호화 전 단계(평문)</b>라 중계하는 쪽은 내용을 볼 수 있다. 사람끼리 통신이 확실히 되는 것부터 만들고, 암호화는 그다음에 얹는다 — <a href="../plan/">암호화 계획</a>.</li>
 </ul>
-
+</section>
+<section class="t sec rise" id="modes">
 <h2 id="modes"><span class="n">02</span>켜는 방식 세 가지</h2>
 <p>한 프로그램이 켤 때 고른 방식에 따라 역할이 달라진다. 포트는 셋 다 <b>9000</b>번이다.</p>
-<table>
+<div class="tbl"><table>
 <tr><th>치는 것</th><th>역할</th></tr>
 <tr><td><code>./deolmi 이름 --host</code></td><td><b>방장</b> — 방을 연다. 서버 없이 내가 중계하면서 같이 대화한다. 화면에 친구가 칠 주소가 뜬다.</td></tr>
 <tr><td><code>./deolmi 이름 주소</code></td><td><b>참가자</b> — 방장(또는 서버)의 주소로 들어간다. 주소를 빼면 같은 컴퓨터(127.0.0.1)로 들어간다.</td></tr>
 <tr><td><code>./deolmi --server</code></td><td><b>서버</b> — 중계만 하고 대화는 안 한다. 오가는 메시지가 한 줄씩 찍힌다.</td></tr>
-</table>
+</table></div>
 <div class="diag">
   <figure>
     <svg viewBox="0 0 200 150" role="img" aria-label="방장 모드: 수빈이 중계하면서 대화, 민지와 현우가 붙음">
@@ -208,7 +96,8 @@ td.bad{color:var(--void);font-weight:700} td.good{color:var(--seal);font-weight:
   </figure>
 </div>
 <p class="sub">어느 방식이든 참가자끼리 직접 잇지 않는다. 모든 글은 방장(또는 서버)을 거쳐 받을 사람에게 간다. 방장과 서버는 <b>같은 중계 코드</b>(③ 칸)를 쓴다. 다른 점은 방장은 자기도 대화에 낀다는 것 하나다.</p>
-
+</section>
+<section class="t sec rise" id="connect">
 <h2 id="connect"><span class="n">03</span>접속 — 9000번 문을 열고 두드리기</h2>
 <p>컴퓨터끼리는 <b>소켓</b>으로 잇는다. 방을 연 쪽은 9000번 문을 열고 기다리고, 들어가는 쪽은 그 주소의 9000번을 두드린다. TCP를 써서 보낸 바이트가 빠지거나 순서가 바뀌지 않는다.</p>
 <div class="pair">
@@ -232,12 +121,13 @@ td.bad{color:var(--void);font-weight:700} td.good{color:var(--seal);font-weight:
 </ol>
 </div>
 </div>
-<table>
+<div class="tbl"><table>
 <tr><th>실패 이유</th><th>화면에 뜨는 말</th></tr>
 <tr><td><code>ECONNREFUSED</code> — 문을 두드렸는데 아무도 안 열어 둠</td><td>그 주소에 열린 방이 없어요. 방장이 먼저 --host 로 방을 열었는지, 주소가 맞는지 보세요</td></tr>
 <tr><td><code>ETIMEDOUT</code> · <code>EHOSTUNREACH</code> · <code>ENETUNREACH</code> — 가는 길에서 막힘</td><td>연결이 중간에서 막혔어요. 방장 노트북 방화벽, 같은 네트워크인지 보세요. 학교 와이파이는 기기끼리 연결을 막는 경우가 많아요 — 둘 다 휴대폰 핫스팟에 연결해 보세요</td></tr>
-</table>
-
+</table></div>
+</section>
+<section class="t sec rise" id="hello">
 <h2 id="hello"><span class="n">04</span>들어오는 순서 — HELLO 주고받기</h2>
 <p>접속하자마자 참가자는 <code>HELLO</code> 한 통으로 이름을 밝힌다. 중계하는 쪽은 이름을 검사하고 통과하면 등록한 뒤, <b>새 사람과 기존 사람이 서로를 알게</b> HELLO를 나눠 준다. 아래는 수빈이 방장이고 민지가 먼저 들어와 있을 때 현우가 들어오는 장면이다.</p>
 <figure class="seq">
@@ -268,16 +158,17 @@ td.bad{color:var(--void);font-weight:700} td.good{color:var(--seal);font-weight:
 </svg>
 <figcaption>서버 방식이면 ⑥이 없다 (서버는 대화에 끼지 않으니까)</figcaption>
 </figure>
-<table>
+<div class="tbl"><table>
 <tr><th>③ 검사</th><th>걸리면</th></tr>
 <tr><td>HELLO 본문이 128바이트가 아님</td><td>"HELLO 길이가 잘못됨" 후 끊는다</td></tr>
 <tr><td>이름이 비었거나 15바이트 넘음, 띄어쓰기·<code>/</code>·제어 문자, 이미 있는 이름, 방장과 같은 이름</td><td>"이름 사용 중이거나 쓸 수 없음" 후 끊는다</td></tr>
 <tr><td>이미 16명</td><td>"방이 꽉 찼습니다 (16명)" 후 끊는다</td></tr>
 <tr><td>같은 사람이 HELLO를 또 보냄</td><td>"이미 HELLO를 보냈습니다" — 끊지는 않는다</td></tr>
-</table>
+</table></div>
 <p>각자 화면에서 쓰는 <b>명단</b>(<code>peers</code>)은 받은 HELLO와 "○○ 입장 / ○○ 퇴장" 알림으로 고친다. <code>/who</code>, <code>/dm</code>, 전체 보내기가 모두 이 명단을 본다. 1:1로 얘기하던 상대가 나가면 저절로 전체 대화로 돌아온다.</p>
 <p class="sub">17번째 사람을 위해 칸을 하나 더 둔다. 그 사람의 HELLO까지 읽은 다음에 "꽉 찼습니다"를 보내야 알림이 도착한다. 안 읽은 데이터를 남긴 채 닫으면 운영체제가 연결을 강제로 끊어서(RST) 받는 쪽이 알림을 못 읽는다.</p>
-
+</section>
+<section class="t sec rise" id="packet">
 <h2 id="packet"><span class="n">05</span>메시지 한 통의 모양</h2>
 <p>TCP는 "어디까지가 한 메시지인지" 모른다. 그래서 보낼 때마다 맨 앞에 <b>길이 4바이트</b>를 붙이고, 그 뒤에 머리(헤더) 65바이트와 본문을 잇는다.</p>
 <div class="pkt">
@@ -285,7 +176,7 @@ td.bad{color:var(--void);font-weight:700} td.good{color:var(--seal);font-weight:
 </div>
 <p class="sub">숫자는 바이트. 흐린 칸(seq·nonce)은 암호화를 얹을 자리라 지금은 0으로 보낸다.</p>
 <h3>실제 바이트 — 수빈이 민지에게 "안녕" (모두에게)</h3>
-<pre class="term hex"><span class="c"># pack_packet 이 만든 76바이트를 그대로 찍은 것</span>
+<pre class="term hex" data-ui><span class="c"># pack_packet 이 만든 76바이트를 그대로 찍은 것</span>
 <span class="k">00 00 00 48</span>                                       <span class="c">길이 = 0x48 = 72 (머리 65 + 본문 7)</span>
 <span class="p">02</span>                                                <span class="c">종류 = MSG</span>
 <span class="o">ec 88 98 eb b9 88</span> 00 00 00 00 00 00 00 00 00 00   <span class="c">보낸 사람 "수빈" (UTF-8 6바이트 + 남는 칸 0)</span>
@@ -298,14 +189,15 @@ td.bad{color:var(--void);font-weight:700} td.good{color:var(--seal);font-weight:
 <li>C 구조체를 통째로 보내지 않고 <code>pack_packet</code>이 한 칸씩 복사한다. 구조체 사이사이에 컴파일러가 끼우는 빈 바이트(패딩)가 컴퓨터마다 다를 수 있어서다.</li>
 <li>이름 칸은 16바이트 고정이라 한글은 <b>5글자</b>(15바이트)까지 된다. 남는 칸은 0이다.</li>
 </ul>
-<table>
+<div class="tbl"><table>
 <tr><th>종류</th><th>언제</th><th>본문</th></tr>
 <tr><td><code>1 HELLO</code></td><td>들어오자마자 "내 이름은 ○○" 하고 밝힐 때 (위 04)</td><td>128바이트 (지금은 0 — 암호화 때 열쇠가 들어갈 자리)</td></tr>
 <tr><td><code>2 MSG</code></td><td>대화. 받을 사람 칸을 보고 그 사람에게만 전한다</td><td>첫 바이트 0 = 모두에게, 1 = 1:1. 나머지가 글 (최대 1000바이트)</td></tr>
 <tr><td><code>7 SYS</code></td><td>중계하는 쪽이 보내는 알림. "현우 입장", "Z는 접속해 있지 않습니다" 같은 것</td><td>알림 글</td></tr>
 <tr><td><code>3~6</code></td><td>금고용 자리(VAULT·OPEN_REQ·SHARE·PROOF). 지금 프로그램은 보내지 않는다</td><td>중계는 내용을 안 보고 받을 사람에게 그대로 넘긴다</td></tr>
-</table>
-
+</table></div>
+</section>
+<section class="t sec rise" id="path">
 <h2 id="path"><span class="n">06</span>한 통이 가는 길</h2>
 <p>수빈이 "안녕"을 치고 엔터를 누른 순간부터 민지 화면에 <code>[수빈] 안녕</code>이 뜰 때까지, 거치는 함수를 순서대로 적었다. 서버 방식 기준이다.</p>
 <ol class="path">
@@ -317,7 +209,7 @@ td.bad{color:var(--void);font-weight:700} td.good{color:var(--seal);font-weight:
 <li><span class="who-tag relay">서버</span><b>검사하고 넘기기</b> — <code>handle_packet</code>. HELLO를 했나, 아는 종류인가, 보낸 사람 칸이 진짜 수빈인가를 보고 받을 사람(<code>to</code>)을 찾아 <code>relay</code>로 넘긴다. 서버 창에는 한 줄이 찍힌다 ↓</li>
 <li><span class="who-tag">민지</span><b>받아서 띄우기</b> — <code>join_read</code> → <code>conn_take</code> → <code>display_msg</code>. 받은 글자에 섞인 제어 문자는 <code>?</code>로 바꾼 뒤(<code>clean</code>) 입력 줄 위에 찍는다.</li>
 </ol>
-<pre class="term"><span class="c"># 실제로 셋이 들어와서 수빈이 "안녕"을 쳤을 때 — 서버 창</span>
+<pre class="term" data-ui><span class="c"># 실제로 셋이 들어와서 수빈이 "안녕"을 쳤을 때 — 서버 창</span>
 <span class="o">[알림] 수빈 입장
 [알림] 민지 입장
 [알림] 현우 입장
@@ -327,21 +219,23 @@ td.bad{color:var(--void);font-weight:700} td.good{color:var(--seal);font-weight:
 <span class="o">[수빈] 안녕</span></pre>
 <p class="sub">"모두에게"가 사람 수만큼 따로 가는 게 보인다. 지금은 낭비 같지만 일부러 이렇게 했다. 암호화를 얹으면 사람마다 열쇠가 달라서 어차피 한 통씩 따로 잠가야 한다.</p>
 <p><b>방장 방식일 때 다른 점</b> — 방장은 4번에서 서버에 보내지 않고 자기 중계 칸으로 바로 <code>relay</code>한다. 참가자가 방장에게 보낸 글은 6번에서 넘기지 않고 방장 화면에 띄운다. 방장 창에는 <code>[relay]</code> 줄을 찍지 않는다 (대화 화면이 지저분해져서).</p>
-
+</section>
+<section class="t sec rise" id="bytes">
 <h2 id="bytes"><span class="n">07</span>조각 모으기 — 덜 온 바이트 기다리기</h2>
 <p>TCP는 보낸 덩어리 그대로 오지 않는다. 76바이트 한 통이 30 + 46으로 나뉘어 오기도 하고, 두 통이 붙어서 한 번에 152바이트로 오기도 한다. 그래서 사람마다 상자(<code>struct conn</code>의 <code>buf</code>)를 두고, 온 만큼 뒤에 붙인 다음 <code>conn_take</code>가 꺼낼 수 있는지 본다.</p>
-<table>
+<div class="tbl"><table>
 <tr><th>상자에 있는 것</th><th><code>conn_take</code></th></tr>
 <tr><td>4바이트도 안 됨</td><td><b>0</b> — 길이도 모르니 다음 recv를 기다린다</td></tr>
 <tr><td>길이는 72인데 모인 건 30</td><td><b>0</b> — 기다린다</td></tr>
 <tr><td>76바이트가 다 모임</td><td><b>1</b> — 한 통 꺼내고, 남은 바이트를 앞으로 당긴다(<code>memmove</code>). 두 통이 붙어 왔으면 한 번 더 꺼낸다</td></tr>
 <tr><td>길이가 65보다 작거나 65+65536보다 큼</td><td><b>−1</b> — 말이 안 되는 길이. 상자를 키우지 않고 그 사람만 끊는다</td></tr>
-</table>
+</table></div>
 <p class="sub">테스트 <code>test_net.c</code>가 이 네 경우를 확인한다 — 1바이트씩 쪼개 보내기, 두 통을 한 번에, <code>0xFFFFFFFF</code> 길이, 본문 0바이트.</p>
-
+</section>
+<section class="t sec rise" id="rules">
 <h2 id="rules"><span class="n">08</span>중계 규칙</h2>
 <p>방장과 서버는 같은 중계 코드를 쓴다. 아래 규칙은 모두 자동 테스트(<code>test_server.c</code>)로 확인한다.</p>
-<table>
+<div class="tbl"><table>
 <tr><th>상황</th><th>하는 일</th></tr>
 <tr><td>HELLO보다 다른 걸 먼저 보냄</td><td>"먼저 HELLO를 보내야 합니다" 후 끊는다</td></tr>
 <tr><td>이름이 비었거나 이미 있음, 띄어쓰기·<code>/</code>가 들어감</td><td>"이름 사용 중이거나 쓸 수 없음" 후 끊는다</td></tr>
@@ -351,26 +245,28 @@ td.bad{color:var(--void);font-weight:700} td.good{color:var(--seal);font-weight:
 <tr><td>길이가 말이 안 됨 (예: 0xFFFFFFFF)</td><td>그 사람만 끊고 나머지 대화는 계속된다</td></tr>
 <tr><td>17번째 사람</td><td>"방이 꽉 찼습니다 (16명)" 후 끊는다</td></tr>
 <tr><td>누가 나감 (끊김·<code>/quit</code>·Ctrl+C)</td><td>남은 모두에게 "○○ 퇴장". 같은 이름으로 다시 들어올 수 있다</td></tr>
-</table>
-
+</table></div>
+</section>
+<section class="t sec rise" id="poll">
 <h2 id="poll"><span class="n">09</span>한 반복으로 동시에 — <code>poll</code></h2>
 <p>채팅은 "키보드 입력 기다리기"와 "상대 글 받기"를 동시에 해야 한다. 스레드를 쓰지 않고 <code>poll</code> 하나에 지켜볼 것을 다 넘긴다. <code>poll</code>은 그중 하나라도 읽을 게 생기면 깨어나고, 프로그램은 깨운 것만 처리하고 다시 잔다.</p>
-<table>
+<div class="tbl"><table>
 <tr><th>칸</th><th>방장</th><th>참가자</th><th>서버</th></tr>
 <tr><td><code>fds[0]</code></td><td>키보드</td><td>키보드</td><td>안 봄 (−1)</td></tr>
 <tr><td><code>fds[1]</code></td><td>9000번 문 → 새 접속</td><td>방장·서버와 이은 소켓</td><td>9000번 문 → 새 접속</td></tr>
 <tr><td><code>fds[2…]</code></td><td>들어온 사람마다 하나</td><td>없음</td><td>들어온 사람마다 하나</td></tr>
-</table>
+</table></div>
 <p class="sub">들어온 사람들은 <b>뒤에서부터</b> 처리한다. 처리하다 누구를 끊으면 맨 끝 사람을 그 자리로 옮기는데(<code>drop_client</code>), 앞에서부터 돌면 옮겨 온 사람을 이번 바퀴에 건너뛰게 된다.</p>
-
+</section>
+<section class="t sec rise" id="screen">
 <h2 id="screen"><span class="n">10</span>화면 — 치는 중에도 받은 글이 뜬다</h2>
 <p>보통 터미널은 엔터를 칠 때까지 입력을 모아 두고, 친 글자를 알아서 화면에 찍는다. 그러면 받은 글이 치던 글자 사이에 끼어 엉망이 된다. 그래서 키보드를 <b>날 모드</b>로 바꿔(<code>raw_tty</code>: <code>ICANON</code>·<code>ECHO</code>·<code>ISIG</code> 끔) 프로그램이 화면을 직접 그린다.</p>
 <div class="pair">
-<pre class="term"><span class="c"># 받은 글이 올 때마다 (put_line)</span>
+<pre class="term" data-ui><span class="c"># 받은 글이 올 때마다 (put_line)</span>
 <span class="k">① clear_input</span>  <span class="c">입력 줄을 지운다</span>
 <span class="k">② printf</span>       <span class="c">받은 글 한 줄</span>
 <span class="k">③ draw_input</span>   <span class="c">입력 줄을 다시 그린다</span></pre>
-<pre class="term"><span class="o">[민지] 오늘 몇 시?
+<pre class="term" data-ui><span class="o">[민지] 오늘 몇 시?
 [현우] 7시
 [알림] 지현 입장</span>
 <span class="p">수빈&gt; 나도 7시 좋</span><span class="c">▌ ← 치던 줄은 맨 아래 그대로</span></pre>
@@ -383,40 +279,44 @@ td.bad{color:var(--void);font-weight:700} td.good{color:var(--seal);font-weight:
 <li><b>파이프로 돌릴 때</b> — 키보드가 아니면(<code>isatty</code>가 0) 날 모드·색·입력 줄을 모두 끄고 한 줄씩 읽는다. 자동 테스트와 시뮬레이션이 이 방식이다.</li>
 <li>맨 앞 <code>[태그]</code>는 청록색. 입력 줄에는 색을 넣지 않는다 (색 코드가 폭 계산을 흐트러뜨려서).</li>
 </ul>
-
+</section>
+<section class="t sec rise" id="addr">
 <h2 id="addr"><span class="n">11</span>주소 표시</h2>
 <p>방장·서버를 켜면 <code>show_my_address</code>가 이 컴퓨터의 주소를 찾아 첫 화면에 띄운다. <code>getifaddrs</code>로 네트워크 장치 목록을 받아 아래를 뺀다.</p>
-<table>
+<div class="tbl"><table>
 <tr><th>빼는 것</th><th>이유</th></tr>
 <tr><td><code>127.0.0.1</code> (루프백)</td><td>자기 자신만 들어오는 주소</td></tr>
 <tr><td>꺼진 장치</td><td>연결이 없다</td></tr>
 <tr><td><code>169.254.x.x</code></td><td>주소를 못 받았을 때 붙는 임시 주소</td></tr>
-</table>
+</table></div>
 <p>첫 번째 주소를 크게 보여 주고 나머지는 "안 되면 이 주소로"에 둔다. <code>172.16~31.x.x</code>는 WSL 안쪽 주소일 수 있어서 미러링을 켜라는 안내를 같이 띄운다 (<a href="../run/">시작하기</a> 05).</p>
-
+</section>
+<section class="t sec rise" id="code">
 <h2 id="code"><span class="n">12</span>코드는 이렇게 놓여 있다</h2>
 <p><code>deolmi.c</code> 안에 위에서부터 다섯 칸이 있다. 함수 이름까지는 <a href="../log/">작업 기록</a>의 지도에 있다.</p>
-<table>
+<div class="tbl"><table>
 <tr><th>칸</th><th>하는 일</th><th>이 페이지</th></tr>
 <tr><td>① 통신</td><td>패킷을 만들고, 보내고, 덜 온 바이트를 모았다가 한 통씩 꺼낸다</td><td>03 · 05 · 07</td></tr>
 <tr><td>② 화면</td><td>입력 줄은 맨 아래, 받은 글은 그 위. 한글 폭, 명단</td><td>10</td></tr>
 <tr><td>③ 중계</td><td>이름 등록, 검사, 받을 사람에게 넘기기. 방장·서버 공통</td><td>04 · 08</td></tr>
 <tr><td>④ 대화</td><td>받은 글 띄우기, 보내기, 명령, 키 입력, 주소, 시작 설명</td><td>06 · 11</td></tr>
 <tr><td>⑤ main</td><td>켜는 방식 고르기, 그다음 <code>poll</code> 반복</td><td>02 · 09</td></tr>
-</table>
+</table></div>
 <p class="sub">자동 테스트는 <code>#define NET_ONLY</code>를 켜고 <code>deolmi.c</code>를 불러와서 ① 통신 칸만 가져다 쓴다.</p>
-
+</section>
+<section class="t sec rise" id="steps">
 <h2 id="steps"><span class="n">13</span>만든 순서와 확인</h2>
 <p>한 단계씩 쌓고, 확인을 통과해야 다음으로 넘어갔다.</p>
-<table>
+<div class="tbl"><table>
 <tr><th>단계</th><th>만든 것</th><th>확인</th></tr>
 <tr><td>S1</td><td>에코 서버 — 한 명이 보낸 걸 그대로 돌려준다</td><td><code>nc 127.0.0.1 9000</code> 으로 친 글자가 돌아온다</td></tr>
 <tr><td>S2</td><td><code>poll</code>로 여러 명, 한 명이 보낸 줄을 나머지에게</td><td><code>nc</code> 3개로 채팅. 하나를 Ctrl+C로 꺼도 서버가 살아 있다</td></tr>
 <tr><td>S3</td><td>길이 붙인 패킷</td><td><code>test_net.c</code> — 1바이트씩 쪼개 보내기 · 두 통을 한 번에 · 말도 안 되는 길이</td></tr>
 <tr><td>S4</td><td>HELLO 등록, 받을 사람에게만 전하기, 입장·퇴장</td><td><code>test_server.c</code> — 위 08의 규칙 20개</td></tr>
 <tr><td>S5</td><td>채팅 화면 — 치는 중에도 받은 글이 뜬다, 전체·1:1</td><td>노트북 한 대에서 셋이 채팅</td></tr>
-</table>
-
+</table></div>
+</section>
+<section class="t sec rise" id="limits">
 <h2 id="limits"><span class="n">14</span>아직 못 하는 것</h2>
 <ul>
 <li><b>암호화가 없다.</b> 방장이나 서버는 오가는 글을 볼 수 있다. 중간에서 바꾸거나 남인 척해도 받는 쪽은 모른다.</li>
@@ -424,21 +324,31 @@ td.bad{color:var(--void);font-weight:700} td.good{color:var(--seal);font-weight:
 <li>방장이 나가면 방이 닫힌다. 접속해 있지 않은 사람에게는 보낼 수 없다.</li>
 <li>노트북 두 대로 실제 접속, 맥에서 빌드는 아직 확인하지 못했다.</li>
 </ul>
-
+</section>
+<section class="t sec rise" id="next">
 <h2 id="next"><span class="n">15</span>다음 단계 — 암호화와 2인 잠금</h2>
 <p>통신 위에 암호화를 한 단계씩 얹는다. 중계하는 쪽(서버·방장)이 <b>읽지도, 몰래 바꾸지도</b> 못하게 하고, 그다음 <b>두 사람이 함께여야 열리는 금고</b>를 만든다. 어떤 방식으로, 어떤 순서로 할지는 <a href="../plan/">암호화 계획</a>에 자세히 있다. 패킷 모양을 미리 맞춰 둬서 ③ 중계 칸은 거의 안 바뀐다.</p>
-
-<h2><span class="n">16</span>팀 역할</h2>
+</section>
+<section class="t sec rise" id="s16">
+<h2 id="s16"><span class="n">16</span>팀 역할</h2>
 <p class="sub">기획 때 정한 표를 그대로 옮겼다. 맡는 파일은 한 파일로 합치기 전 이름이다.</p>
-<table>
+<div class="tbl"><table>
 <tr><th>역할</th><th>맡는 파일</th><th>발표에서 설명할 것</th></tr>
 <tr><td>서버</td><td><code>server.c</code> <code>net.c</code></td><td>변조·재전송·빼먹기가 들키는 이유</td></tr>
 <tr><td>암복호화</td><td><code>crypto.c</code></td><td>끼어들기를 단어 지문이 잡는 이유</td></tr>
 <tr><td>UI</td><td><code>client.c</code> <code>history.c</code></td><td>서명이 없으면 위조가 통하는 장면</td></tr>
 <tr><td>총괄</td><td><code>vault.c</code> <code>tests/</code></td><td>두 열쇠 금고와 열쇠 전달 증명</td></tr>
-</table>
-
-<p class="foot">받아서 켜는 법은 <a href="../run/">시작하기</a>, 암호화를 얹는 계획은 <a href="../plan/">암호화 계획</a>, 파일별 코드는 <a href="../code/">전체 코드</a>, 무엇을 왜 바꿨고 누가 했는지는 <a href="../log/">작업 기록</a>.</p>
+</table></div>
+</section>
 </main>
+</div>
+<footer class="end">
+  <div class="e-by"><p><b>김창식</b> — 기획 · 결정 · 실제로 돌려 보고 문제 찾기</p><p><b>Claude</b> (Anthropic의 AI) — 코드와 이 사이트 작성</p><p><a href="../log/#who">누가 무엇을 했나 자세히</a></p></div>
+  <nav class="e-nav" aria-label="덜미 페이지"><ul><li><a href="../guide/" aria-current="page">설명서</a></li><li><a href="../run/">시작하기</a></li><li><a href="../code/">전체 코드</a></li><li><a href="../plan/">암호화 계획</a></li><li><a href="../log/">작업 기록</a></li><li><a href="/">작업실로</a></li></ul></nav>
+  <a class="e-next" href="../run/"><span>다음 페이지</span><b>시작하기 <span aria-hidden="true">→</span></b></a>
+  <p class="e-word" aria-hidden="true">덜미<i>.</i></p>
+</footer>
+</div>
+<script src="../site.js" defer></script>
 </body>
 </html>

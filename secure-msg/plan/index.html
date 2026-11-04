@@ -5,163 +5,43 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>덜미 암호화 계획</title>
 <meta name="description" content="덜미에 종단간 암호화와 2인 잠금(두 열쇠 금고)을 얹는 방식과 순서.">
+<script>document.documentElement.classList.add("js")</script>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
-<style>
-:root{
-  --paper:#ECEFF2; --sheet:#FAFBFC; --ink:#15202C; --ink-2:#556273; --rule:#CBD3DC;
-  --steel:#2A4F86; --void:#CF3B1C; --seal:#17806A;
-  --term-bg:#0F1823; --term-ink:#D6E1EC; --t-dim:#7D8B9B; --t-red:#FF8B70; --t-green:#7ED6B3; --t-yel:#F1C56C; --t-blue:#8DB4F0;
-  --f-display:"Black Han Sans","IBM Plex Sans KR","Malgun Gothic",sans-serif;
-  --f-body:"IBM Plex Sans KR","Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif;
-  --f-mono:"IBM Plex Mono",ui-monospace,"Cascadia Code",Consolas,monospace;
-  color-scheme:light;
-}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --paper:#0C131B; --sheet:#131D28; --ink:#E2E9F1; --ink-2:#93A1B2; --rule:#263342;
-  --steel:#82A9E3; --void:#FF7A58; --seal:#4FC4A6; --term-bg:#070C12; color-scheme:dark }}
-:root[data-theme="dark"]{
-  --paper:#0C131B; --sheet:#131D28; --ink:#E2E9F1; --ink-2:#93A1B2; --rule:#263342;
-  --steel:#82A9E3; --void:#FF7A58; --seal:#4FC4A6; --term-bg:#070C12; color-scheme:dark }
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:var(--paper);color:var(--ink);font:16.5px/1.75 var(--f-body);word-break:keep-all;overflow-wrap:anywhere}
-a{color:var(--steel)}
-:focus-visible{outline:2px solid var(--steel);outline-offset:2px}
-.wrap{max-width:860px;margin:0 auto;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px))}
-.top{display:flex;justify-content:space-between;gap:12px;padding-block:18px 0;font-size:14px}
-.top a{color:var(--ink-2);text-decoration:none}
-.top a:hover{color:var(--ink)}
-.top .r a{margin-left:14px}
-.eyebrow{font:600 13px/1 var(--f-mono);letter-spacing:.14em;color:var(--steel);text-transform:uppercase;margin:0 0 12px}
-h1{font-family:var(--f-display);font-weight:400;font-size:clamp(52px,13vw,116px);line-height:.92;margin:6px 0 16px;letter-spacing:-.01em}
-h1 span{color:var(--void)}
-.lede{color:var(--ink-2);max-width:40rem;margin:0 0 8px;font-size:18px}
-.hero{padding-block:30px 26px;border-bottom:2px solid var(--ink)}
-h2{font-family:var(--f-display);font-weight:400;font-size:clamp(26px,4.4vw,34px);line-height:1.15;margin:52px 0 6px}
-h2 .n{color:var(--steel);font-family:var(--f-mono);font-size:.62em;margin-right:12px;vertical-align:.08em}
-h3{font-size:17px;margin:26px 0 8px}
-p{margin:0 0 14px}
-ul{margin:0 0 14px;padding-left:1.2em}
-li{margin:5px 0}
-code{font-family:var(--f-mono);font-size:.86em;background:color-mix(in srgb,var(--ink) 9%,transparent);padding:1px 5px;border-radius:5px}
-b{font-weight:700}
-.sub{color:var(--ink-2);font-size:15px;margin:-2px 0 14px}
-
-/* 터미널 명령 블록 */
-.term{background:var(--term-bg);color:var(--term-ink);font:14px/1.7 var(--f-mono);border-radius:12px;padding:16px 18px;margin:0 0 16px;overflow:auto;white-space:pre-wrap;border:1px solid color-mix(in srgb,var(--term-ink) 14%,transparent)}
-.term .c{color:var(--t-dim)}       /* 주석 */
-.term .p{color:var(--t-green)}     /* 입력 */
-.term .o{color:var(--term-ink)}    /* 출력 */
-.term .k{color:var(--t-yel)}
-.term b{color:#fff}
-
-/* 단계 */
-.step{border-left:2px solid var(--rule);padding:2px 0 2px 20px;margin:0 0 6px}
-.tip{background:var(--sheet);border:1px solid var(--rule);border-radius:12px;padding:12px 16px;font-size:15px;color:var(--ink-2);margin:0 0 16px}
-.tip b{color:var(--ink)}
-
-
-table{width:100%;border-collapse:collapse;margin:6px 0 18px;font-size:15px}
-th,td{text-align:left;vertical-align:top;padding:8px 10px;border-bottom:1px solid var(--rule)}
-th{font-size:13px;color:var(--ink-2);font-weight:600}
-td > code:only-child{white-space:nowrap}
-th{white-space:nowrap}
-a.dl{display:inline-block;background:var(--ink);color:var(--paper);text-decoration:none;font-weight:700;border-radius:10px;padding:11px 18px}
-a.dl:hover{background:var(--steel)}
-.pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media (max-width:700px){.pair{grid-template-columns:1fr}}
-.pair .term{margin:0 0 16px}
-.now{background:var(--sheet);border:1px solid var(--rule);border-left:4px solid var(--seal);border-radius:12px;padding:14px 18px 6px;margin:34px 0 0}
-.now > b{color:var(--seal)}
-.tl{border-left:2px solid var(--rule);margin:18px 0 0 6px;padding-left:22px}
-.ev{position:relative;margin:0 0 30px}
-.ev::before{content:"";position:absolute;left:-29px;top:7px;width:12px;height:12px;border-radius:50%;background:var(--steel)}
-.ev .d{font:600 13px/1 var(--f-mono);color:var(--steel)}
-.ev h3{margin:6px 0 8px;font-size:18px}
-.diag{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:10px 0 18px}
-@media (max-width:560px){.diag{grid-template-columns:1fr}}
-.diag figure{margin:0;background:var(--sheet);border:1px solid var(--rule);border-radius:14px;padding:14px}
-.diag figcaption{font:600 13px/1.4 var(--f-mono);color:var(--ink-2);margin-top:6px;text-align:center}
-.diag svg{width:100%;height:auto;display:block}
-.pkt{display:flex;flex-wrap:wrap;gap:3px;margin:8px 0 6px;font:500 12.5px/1.3 var(--f-mono)}
-.pkt span{flex:var(--w) 1 0;min-width:58px;background:var(--sheet);border:1px solid var(--rule);border-top:3px solid var(--steel);border-radius:6px;padding:6px 8px;color:var(--ink-2)}
-.pkt span b{display:block;color:var(--ink);font-family:var(--f-body);font-size:13px}
-.pkt span.dim{opacity:.55;border-top-color:var(--rule)}
-.map td:first-child{white-space:nowrap;font-weight:700}
-.map code{font-size:.8em}
-.foot{color:var(--ink-2);font-size:14.5px;margin:40px 0 50px;border-top:1px solid var(--rule);padding-top:16px}
-.who{font-size:13.5px;color:var(--ink-2);margin:-2px 0 10px}
-.u,.c{display:inline-block;font-weight:700;border-radius:6px;padding:0 7px;font-size:.92em}
-.u{background:color-mix(in srgb,var(--seal) 16%,transparent);color:var(--seal)}
-.c{background:color-mix(in srgb,var(--steel) 16%,transparent);color:var(--steel)}
-.term .c{display:inline;background:none;padding:0;border-radius:0;font-weight:400;font-size:inherit;color:var(--t-dim)}
-.whot td:first-child{white-space:nowrap}
-.whot small{color:var(--ink-2)}
-.chg td:last-child{white-space:nowrap;font-size:13.5px;color:var(--ink-2);line-height:2}
-@media (max-width:600px){.chg td:last-child{white-space:normal}}
-.toc{display:flex;flex-wrap:wrap;gap:6px;margin:24px 0 0}
-.toc a{font-size:13.5px;text-decoration:none;color:var(--ink-2);background:var(--sheet);border:1px solid var(--rule);border-radius:999px;padding:2px 11px}
-.toc a:hover{color:var(--ink);border-color:var(--steel)}
-.seq{margin:12px 0 18px;background:var(--sheet);border:1px solid var(--rule);border-radius:14px;padding:14px;overflow-x:auto}
-.seq svg{width:100%;min-width:540px;height:auto;display:block;font-family:var(--f-body);font-size:13px}
-.seq figcaption{font:600 13px/1.4 var(--f-mono);color:var(--ink-2);margin-top:6px;text-align:center}
-.seq .hd text{font-weight:700;fill:var(--ink);font-size:15px}
-.seq .dim{fill:var(--ink-2);font-weight:400;font-size:12px}
-.seq .lane line{stroke:var(--rule);stroke-width:2;stroke-dasharray:4 5}
-.seq .ar line{stroke:var(--steel);stroke-width:1.8;marker-end:url(#ah)}
-.seq .ar.good line{stroke:var(--seal);marker-end:url(#ahg)}
-.seq .ar text{fill:var(--ink);font:500 13px var(--f-body);text-anchor:middle}
-.seq .box rect{fill:var(--paper);stroke:var(--ink-2);stroke-width:1.2}
-.seq .box text{fill:var(--ink);font-size:13px}
-.seq .box.key rect{stroke:var(--seal);stroke-width:1.8}
-.seq .box.warn rect{stroke:var(--void);stroke-width:1.8}
-.seq .note text{fill:var(--ink-2);font-size:12px}
-.seq .lbl text{fill:var(--ink-2);font-size:12.5px;font-weight:600}
-.ahp{fill:var(--steel)} .ahg{fill:var(--seal)}
-.term.hex{white-space:pre}
-ol.steps{padding-left:1.3em;margin:0 0 14px}
-ol.path{list-style:none;counter-reset:p;padding:0;margin:8px 0 18px}
-ol.path li{counter-increment:p;position:relative;padding:0 0 14px 46px;margin:0}
-ol.path li::before{content:counter(p);position:absolute;left:0;top:1px;width:30px;height:30px;border-radius:50%;background:var(--steel);color:var(--paper);font:600 14px/30px var(--f-mono);text-align:center}
-ol.path li:not(:last-child)::after{content:"";position:absolute;left:14px;top:34px;bottom:2px;width:2px;background:var(--rule)}
-.who-tag{display:inline-block;font:600 12px/1.6 var(--f-mono);border-radius:6px;padding:0 7px;margin-right:8px;background:color-mix(in srgb,var(--steel) 16%,transparent);color:var(--steel)}
-.who-tag.relay{background:color-mix(in srgb,var(--void) 16%,transparent);color:var(--void)}
-td.bad{color:var(--void);font-weight:700} td.good{color:var(--seal);font-weight:700} td.mid{color:var(--ink-2);font-weight:700}
-.vs td:first-child{width:40%}
-.tools td > code:only-child{white-space:normal;overflow-wrap:anywhere}
-@media (max-width:600px){.tools{font-size:13.5px}.tools th,.tools td{padding:7px 5px}.tools th{white-space:normal}.tools td{overflow-wrap:anywhere}}
-.demo{background:var(--sheet);border:1px solid var(--rule);border-radius:14px;padding:16px 18px;margin:6px 0 16px}
-.demo label{font-weight:700;margin-right:8px}
-.demo input{font:15px var(--f-mono);padding:7px 10px;border:1.5px solid var(--rule);border-radius:8px;background:var(--paper);color:var(--ink);width:min(260px,100%);margin-left:6px}
-.demo button{font:600 14px var(--f-body);padding:7px 14px;border-radius:8px;border:0;background:var(--ink);color:var(--paper);cursor:pointer;margin-top:6px}
-.demo button:hover{background:var(--steel)}
-.demo dl{display:grid;grid-template-columns:max-content 1fr;gap:6px 14px;margin:14px 0 0;font-size:14.5px}
-.demo dt{color:var(--ink-2)} .demo dd{margin:0;font-family:var(--f-mono);overflow-wrap:anywhere}
-.demo dd.ok{color:var(--seal);font-weight:600}
-@media (max-width:560px){.demo dl{grid-template-columns:1fr}.demo dd{margin-bottom:6px}}
-</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="../site.css">
 </head>
 <body>
-<div class="wrap">
-  <nav class="top"><a href="../guide/">← 덜미 설명서</a><span class="r"><a href="../run/">시작하기</a><a href="../code/">코드</a><a href="../log/">작업 기록</a><a href="/">작업실</a></span></nav>
-</div>
+<div class="board">
+<header class="topbar">
+  <a class="logo" href="../guide/" aria-label="덜미 설명서">덜미<i>.</i></a>
+  <nav class="pages" aria-label="덜미 페이지"><a href="../guide/">설명서</a><a href="../run/">시작하기</a><a href="../code/">전체 코드</a><a href="../plan/" aria-current="page">암호화 계획</a><a href="../log/">작업 기록</a><a class="home" href="/">← 작업실</a></nav>
+  <a class="get" href="../code/src/deolmi.c" download>deolmi.c 받기 <span aria-hidden="true">↓</span></a>
+</header>
+<section class="hero" aria-label="암호화 계획">
+  <div class="t h-name rise"><h1>암호화 계획</h1></div>
+  <div class="h-low">
+    <div class="t h-say rise" style="--i:1"><p>지금 평문 메신저 위에 암호화와 2인 잠금(두 열쇠 금고)을 어떤 방식으로, 어떤 순서로 얹을지. <b>아직 만들기 전</b> 계획이다.</p><div class="by">요청·결정 <span class="u">김창식</span> · 설계와 이 페이지 작성 <span class="c">Claude</span> · 바탕은 11-02에 만들어 둔 암호화 버전 코드 (<code>crypto.c</code> · <code>vault.c</code>, 테스트 55개 — 11-04에 다시 돌려 모두 통과)</div></div>
+    <a class="t h-next rise" style="--i:2" href="../log/"><span>다음 페이지</span><b>작업 기록 <span aria-hidden="true">→</span></b></a>
+  </div>
+  <div class="h-ui rise" data-ui><p class="cap">서버 창에 찍히는 같은 "안녕"</p>
+<pre class="term"><span class="c"># 지금 (실제 출력)</span>
+<span class="o">[relay] 수빈 → 민지  MSG  seq=0   7B</span>
+<span class="k">00 ec 95 88 eb 85 95</span>
+<span class="c">"안녕"이 바이트 그대로 보인다</span>
 
-<header class="hero"><div class="wrap">
-  <p class="eyebrow">덜미 · 다음 단계 계획</p>
-  <h1>암호화 <span>계획</span></h1>
-  <p class="lede">지금 평문 메신저 위에 암호화와 2인 잠금(두 열쇠 금고)을 어떤 방식으로, 어떤 순서로 얹을지. <b>아직 만들기 전</b> 계획이다.</p>
-  <p class="sub">요청·결정 <span class="u">김창식</span> · 설계와 이 페이지 작성 <span class="c">Claude</span> · 바탕은 11-02에 만들어 둔 암호화 버전 코드 (<code>crypto.c</code> · <code>vault.c</code>, 테스트 55개 — 11-04에 다시 돌려 모두 통과)</p>
-</div></header>
-
-<main class="wrap">
+<span class="c"># 암호화 뒤 (바이트는 예시)</span>
+<span class="o">[relay] 수빈 → 민지  MSG  seq=1  23B</span>
+<span class="k">8f 3a c1 07 5e d2 94 1b …</span>
+<span class="c">7바이트 + 검사 태그 16 = 23, 매번 다른 값</span></pre></div>
+</section>
+<div class="doc">
+<details class="t toc" open><summary>이 페이지 차례</summary><nav aria-label="차례"><ol><li><a href="#goal"><i>01</i>무엇을 지키나</a></li><li><a href="#e2e"><i>02</i>왜 종단간 암호화인가</a></li><li><a href="#tools"><i>03</i>쓰는 도구</a></li><li><a href="#keys"><i>04</i>열쇠는 두 종류</a></li><li><a href="#hello"><i>05</i>HELLO에 도장 찍기</a></li><li><a href="#words"><i>06</i>단어 지문</a></li><li><a href="#ratchet"><i>07</i>메시지 잠그기</a></li><li><a href="#check"><i>08</i>받을 때 검사 순서</a></li><li><a href="#change"><i>09</i>지금 코드에서 바뀌는 곳</a></li><li><a href="#vault"><i>10</i>2인 잠금</a></li><li><a href="#vflow"><i>11</i>금고 흐름</a></li><li><a href="#vbytes"><i>12</i>금고 묶음의 모양</a></li><li><a href="#vscreen"><i>13</i>금고 화면</a></li><li><a href="#holes"><i>14</i>미리 막은 구멍</a></li><li><a href="#cant"><i>15</i>못 막는 것</a></li><li><a href="#order"><i>16</i>만드는 순서</a></li><li><a href="#decide"><i>17</i>정할 것</a></li></ol></nav></details>
+<main class="secs">
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" class="ahp"/></marker><marker id="ahg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" class="ahg"/></marker></defs></svg>
-
-<nav class="toc" aria-label="차례">
-  <a href="#goal">무엇을 지키나</a><a href="#e2e">왜 종단간</a><a href="#tools">쓰는 도구</a><a href="#keys">열쇠 두 종류</a><a href="#hello">HELLO 도장</a><a href="#words">단어 지문</a><a href="#ratchet">메시지 잠그기</a><a href="#check">받을 때 검사</a><a href="#change">바뀌는 코드</a><a href="#vault">2인 잠금</a><a href="#vflow">금고 흐름</a><a href="#vbytes">금고 모양</a><a href="#vscreen">금고 화면</a><a href="#holes">막은 구멍</a><a href="#cant">못 막는 것</a><a href="#order">만드는 순서</a><a href="#decide">정할 것</a>
-</nav>
-
+<section class="t sec rise">
 <div class="now">
   <b>한 줄 요약</b>
   <ul>
@@ -171,10 +51,11 @@ td.bad{color:var(--void);font-weight:700} td.good{color:var(--seal);font-weight:
     <li>약속은 "<b>막는다</b>"보다 "<b>들킨다</b>"다. 중계가 바꾸거나 다시 보내거나 빼먹으면 받는 화면에 경고가 뜬다.</li>
   </ul>
 </div>
-
+</section>
+<section class="t sec rise" id="goal">
 <h2 id="goal"><span class="n">01</span>무엇을 지키나</h2>
 <p>덜미는 <b>중계하는 쪽(서버·방장)을 믿지 않는 것</b>에서 출발한다. 모든 글이 중계를 거치니까, 중계는 마음만 먹으면 아래 일을 다 할 수 있는 자리에 있다.</p>
-<table class="vs">
+<div class="tbl"><table class="vs">
 <tr><th>중계가 하려는 것</th><th>지금 (평문)</th><th>암호화 뒤</th></tr>
 <tr><td><b>엿보기</b> — 글을 읽음</td><td class="bad">그대로 보임</td><td class="good">암호문만 보임</td></tr>
 <tr><td><b>바꾸기</b> — 글자 하나를 고쳐 넘김</td><td class="bad">아무도 모름</td><td class="good">받는 쪽 경고 · 버림</td></tr>
@@ -183,17 +64,18 @@ td.bad{color:var(--void);font-weight:700} td.good{color:var(--seal);font-weight:
 <tr><td><b>남인 척</b> — 민지 이름으로 가짜 글</td><td class="bad">지금은 이름 칸 검사뿐 (중계 자신은 막지 못함)</td><td class="good">도장이 안 맞아 버림</td></tr>
 <tr><td><b>열쇠 바꿔치기</b> — 중간에 끼어들기</td><td class="mid">—</td><td class="good">단어 지문이 달라 들킴</td></tr>
 <tr><td><b>금고 열기</b></td><td class="mid">—</td><td class="good">열쇠 조각이 없어 못 엶</td></tr>
-</table>
+</table></div>
 <p class="sub">중계는 여전히 <b>누가 누구에게 언제 얼마나 긴</b> 글을 보내는지는 안다. 받을 사람 칸이 보여야 넘겨줄 수 있어서다 (아래 <a href="#cant">못 막는 것</a>).</p>
 <div class="pair">
-<pre class="term"><span class="c"># 지금 — 서버 창 (실제 출력)</span>
+<pre class="term" data-ui><span class="c"># 지금 — 서버 창 (실제 출력)</span>
 <span class="o">[relay] 수빈 → 민지  MSG      seq=0       7B  <span class="k">00 ec 95 88 eb 85 95</span></span>
 <span class="c">          "안녕"이 바이트 그대로</span></pre>
-<pre class="term"><span class="c"># 암호화 뒤 — 같은 "안녕" (바이트는 예시)</span>
+<pre class="term" data-ui><span class="c"># 암호화 뒤 — 같은 "안녕" (바이트는 예시)</span>
 <span class="o">[relay] 수빈 → 민지  MSG      seq=1      23B  <span class="k">8f 3a c1 07 5e d2 94 1b …</span></span>
 <span class="c">          7바이트 + 검사 태그 16 = 23, 매번 다른 값</span></pre>
 </div>
-
+</section>
+<section class="t sec rise" id="e2e">
 <h2 id="e2e"><span class="n">02</span>왜 종단간 암호화인가 — https 방식으로는 안 되는 이유</h2>
 <p>웹사이트의 https(TLS)는 <b>나와 서버 사이</b>만 잠근다. 서버에 도착하면 풀린다. 덜미에 그걸 쓰면 수빈→서버 구간, 서버→민지 구간은 잠기지만, 가운데 서버는 다 읽는다. 우리가 못 믿는 게 바로 그 서버라서 소용없다.</p>
 <figure class="seq">
@@ -208,10 +90,11 @@ td.bad{color:var(--void);font-weight:700} td.good{color:var(--seal);font-weight:
 </svg>
 </figure>
 <p>그래서 <b>보내는 사람이 잠그고, 받는 사람만 푼다</b>(종단간). 카카오톡 비밀채팅·Signal과 같은 생각이다. 중계 코드(③ 칸)는 내용을 몰라도 받을 사람 칸만 보고 넘기면 되니 거의 안 바뀐다.</p>
-
+</section>
+<section class="t sec rise" id="tools">
 <h2 id="tools"><span class="n">03</span>쓰는 도구 — libsodium</h2>
 <p>암호 알고리즘 자체를 직접 짜면 작은 실수 하나가 그대로 구멍이 된다. 그래서 알고리즘은 검증된 C 라이브러리 <b>libsodium</b>에 맡기고, 우리는 <b>조립과 규칙</b>(열쇠를 언제 만들고, 무엇에 도장을 찍고, 받을 때 무엇을 검사하는지)을 짠다.</p>
-<table class="tools">
+<div class="tbl"><table class="tools">
 <tr><th>하는 일</th><th>알고리즘</th><th>libsodium 함수</th><th>왜 이것</th></tr>
 <tr><td>두 사람이 같은 열쇠 맞추기</td><td>X25519</td><td><code>crypto_kx_*</code></td><td>공개키만 주고받고 각자 같은 열쇠를 계산한다. 열쇠 자체는 선을 타지 않는다</td></tr>
 <tr><td>메시지 잠그기</td><td>XChaCha20-Poly1305</td><td><code>crypto_aead_xchacha20poly1305_ietf_*</code></td><td>잠그면서 위조 검사 태그 16바이트를 붙인다. 1바이트만 바뀌어도 안 풀린다. nonce가 24바이트라 무작위로 뽑아도 겹칠 걱정이 없다 — 헤더의 nonce 칸이 24바이트인 이유</td></tr>
@@ -220,22 +103,24 @@ td.bad{color:var(--void);font-weight:700} td.good{color:var(--seal);font-weight:
 <tr><td>금고 조각 봉투</td><td>X25519 + XSalsa20-Poly1305</td><td><code>crypto_box_seal</code></td><td>받는 사람 공개키로 봉하면 그 사람만 연다. 신원 키를 변환해서 쓰니 다음 접속에도 열린다</td></tr>
 <tr><td>무작위 값</td><td>운영체제 난수</td><td><code>randombytes_buf</code></td><td>열쇠·nonce·금고 조각</td></tr>
 <tr><td>지울 때</td><td>—</td><td><code>sodium_memzero</code></td><td>컴파일러가 "안 쓰는 메모리니까" 하고 지우기를 빼먹지 않는다</td></tr>
-</table>
-<pre class="term"><span class="c"># 우분투에 한 번 설치</span>
+</table></div>
+<pre class="term" data-ui><span class="c"># 우분투에 한 번 설치</span>
 <span class="p">sudo apt install libsodium-dev</span>
 <span class="c"># 빌드에 -lsodium 하나가 붙는다</span>
 <span class="p">gcc -Wall -Wextra -o deolmi deolmi.c -lsodium</span></pre>
-
+</section>
+<section class="t sec rise" id="keys">
 <h2 id="keys"><span class="n">04</span>열쇠는 두 종류</h2>
-<table>
+<div class="tbl"><table>
 <tr><th></th><th>신원 키</th><th>세션 키</th></tr>
 <tr><td><b>언제 만드나</b></td><td>처음 실행할 때 한 번</td><td>접속할 때마다 새로</td></tr>
 <tr><td><b>어디 있나</b></td><td><code>~/.deolmi/이름/id</code> (나만 읽게 0600). 이름별 폴더라 한 노트북에서 여러 이름을 켜도 된다</td><td>메모리에만. 끄면 사라진다</td></tr>
 <tr><td><b>종류</b></td><td>Ed25519 (도장)</td><td>X25519 (열쇠 맞추기)</td></tr>
 <tr><td><b>하는 일</b></td><td>세션 키·금고·열람 요청·승인·증명에 도장 · 단어 지문 · 금고 조각 봉투</td><td>상대와 방향별 시작 열쇠 두 개(나→너, 너→나)를 만든다</td></tr>
-</table>
+</table></div>
 <p class="sub">세션 키까지 신원 키에서 만들면 접속할 때마다 같은 열쇠가 나온다. 그래서 세션 키는 매번 새로 뽑고, 신원 키로는 도장만 찍는다.</p>
-
+</section>
+<section class="t sec rise" id="hello">
 <h2 id="hello"><span class="n">05</span>HELLO에 도장 찍기</h2>
 <p>지금 HELLO 본문 128바이트는 0으로 비어 있다. 여기에 열쇠와 도장이 들어간다.</p>
 <div class="pkt">
@@ -247,10 +132,11 @@ td.bad{color:var(--void);font-weight:700} td.good{color:var(--seal);font-weight:
 <li>중계가 <b>이름만</b> 바꿔 남의 HELLO를 붙이면 → 이름도 도장 안에 있어서 안 맞는다</li>
 <li>중계가 <b>신원 키까지 통째로</b> 자기 걸로 바꾸면 → 도장은 맞는다. 이걸 잡는 게 다음의 단어 지문이다</li>
 </ul>
-
+</section>
+<section class="t sec rise" id="words">
 <h2 id="words"><span class="n">06</span>단어 지문 — 만나서 맞춰 보기</h2>
 <p>신원 공개키를 해시한 앞 8바이트를 단어 256개 표에 하나씩 대응시켜 <b>한글 단어 8개</b>로 바꾼다. 같은 키면 실행할 때마다 같은 단어다. 처음 만난 사람과는 옆에서(또는 전화로) 서로의 단어를 소리 내어 읽고 맞으면 확인 표시를 한다.</p>
-<pre class="term"><span class="c"># 현우 화면 — 처음 만남 (단어는 예시)</span>
+<pre class="term" data-ui><span class="c"># 현우 화면 — 처음 만남 (단어는 예시)</span>
 <span class="o">[열쇠] 민지 처음 만남 · 단어 고래-라면-등대-노을-탁구-혜성-냄비-참새 · 만나서 맞춰 보고 /verify 민지 ok</span>
 <span class="p">현우&gt; /verify 민지 ok</span>
 <span class="o">[열쇠] 민지 ✔ 확인한 열쇠로 기억합니다</span>
@@ -264,7 +150,8 @@ td.bad{color:var(--void);font-weight:700} td.good{color:var(--seal);font-weight:
 <li><b>왜 단어 8개인가</b> — 처음엔 숫자 12자리(40비트)였다. 40비트(약 1조 가지)는 끼어드는 쪽이 키를 계속 만들어 보며 같은 지문을 찾기에 짧다 — 그래픽카드면 몇 시간 거리다. 단어 8개는 64비트라 그보다 약 1,600만 배 어렵고, 숫자보다 읽어 주기 쉽다.</li>
 <li>Signal의 "안전 번호"와 같은 장치다.</li>
 </ul>
-
+</section>
+<section class="t sec rise" id="ratchet">
 <h2 id="ratchet"><span class="n">07</span>메시지 잠그기 — 한 통마다 바뀌는 열쇠</h2>
 <p>두 사람이 HELLO를 주고받으면 <code>kx_chains</code>가 방향별 <b>시작 열쇠 CK₁</b>을 만든다 (나→너, 너→나 따로). 보낼 때마다 이 열쇠를 한 칸씩 앞으로 돌린다(<b>래칫</b> — 한 방향으로만 돌아가는 톱니).</p>
 <figure class="seq">
@@ -282,20 +169,20 @@ td.bad{color:var(--void);font-weight:700} td.good{color:var(--seal);font-weight:
   <text x="58" y="196" text-anchor="middle" class="dim">쓰고 바로 지움</text><text x="310" y="196" text-anchor="middle" class="dim">쓰고 바로 지움</text></g>
 </svg>
 </figure>
-<pre class="term"><span class="c">── 보낼 때 (n번째) ──</span>
+<pre class="term" data-ui><span class="c">── 보낼 때 (n번째) ──</span>
 <span class="k">MK_n</span>   = BLAKE2b(키 = CK_n, 내용 = "msg")              <span class="c">이 한 통만 잠그는 열쇠</span>
 <span class="k">암호문</span> = XChaCha20-Poly1305(MK_n, 평문_n, nonce, AD)  <span class="c">AD = 헤더의 종류·보낸 사람·받을 사람·seq</span>
 <span class="k">CK_n+1</span> = BLAKE2b(키 = CK_n, 내용 = "next" ‖ 평문_n)    <span class="c">방금 보낸 문장을 섞어 다음 열쇠</span>
 CK_n, MK_n 지움                                        <span class="c">열쇠는 보내지 않는다</span>
 <span class="c">── 받을 때 ──</span>
 같은 식으로 MK_n 계산 → 풀어 봄 → <b>성공했을 때만</b> CK_n+1로 전진</pre>
-<table>
+<div class="tbl"><table>
 <tr><th>헤더 칸</th><th>지금</th><th>암호화 뒤</th></tr>
 <tr><td><code>seq</code></td><td>0</td><td>1, 2, 3 … 두 사람 사이 방향마다 따로 센다</td></tr>
 <tr><td><code>nonce</code></td><td>0</td><td>매번 새로 뽑은 무작위 24바이트</td></tr>
 <tr><td>본문</td><td>0/1 + 글</td><td>(0/1 + 글)을 잠근 암호문 + 태그 16바이트</td></tr>
 <tr><td>종류·보낸 사람·받을 사람</td><td>그대로</td><td>그대로 보이지만 <b>AD</b>로 묶여서, 중계가 바꾸면 풀리지 않는다</td></tr>
-</table>
+</table></div>
 <ul>
 <li><b>지난 대화는 안전</b> — 옛 CK는 덮어써서 지운다. 지금 체인 열쇠가 새어도 해시를 거꾸로 돌릴 수 없어서 지난 통은 못 연다. 다만 프로그램 메모리 전체가 털리면 그 접속(세션)은 위험하다 — 과장하지 않는다.</li>
 <li><b>다시 접속하면</b> 새 세션 키로 CK₁부터 새로 시작한다.</li>
@@ -303,7 +190,8 @@ CK_n, MK_n 지움                                        <span class="c">열쇠�
 <li><b>전체 대화</b>는 지금처럼 사람마다 한 통씩 — 이제는 사람마다 다른 열쇠로 잠근 한 통씩이다. 16명이면 16번 잠근다.</li>
 <li><b>방장 방식</b>에서도 같다. 방장은 다른 사람끼리의 글을 중계만 하고 열지 못한다. 방장 앞으로 온 글만 방장이 연다.</li>
 </ul>
-
+</section>
+<section class="t sec rise" id="check">
 <h2 id="check"><span class="n">08</span>받을 때 검사 순서</h2>
 <p>받은 통마다 이 순서로 본다. 하나라도 걸리면 화면에 경고를 띄우고 그 통은 버린다. 경고 문구는 11-02 버전 코드 그대로다.</p>
 <ol class="path">
@@ -314,10 +202,11 @@ CK_n, MK_n 지움                                        <span class="c">열쇠�
 <li><b>통과</b> → 열쇠를 한 칸 돌리고, 받은 번호를 적고, 화면에 띄운다.</li>
 </ol>
 <p class="sub">중계가 보내는 <code>SYS</code> 알림("○○ 입장" 같은 것)은 잠그지 않는다. 그래서 암호화 뒤에는 명단을 <b>도장이 맞는 HELLO로만</b> 늘린다. 퇴장 알림은 그대로 믿는다 — 중계가 거짓 퇴장을 보내도 그 사람과 대화가 끊기는 것뿐이고, 몰래 읽히지는 않는다.</p>
-
+</section>
+<section class="t sec rise" id="change">
 <h2 id="change"><span class="n">09</span>지금 코드에서 바뀌는 곳</h2>
 <p><code>deolmi.c</code> 한 파일을 유지한다 (11-03 결정). 11-02 버전의 <code>crypto.c</code>(1014줄)와 <code>vault.c</code>(1014줄)를 새 칸으로 옮겨 오고, 대화 칸의 몇 곳을 고친다. <b>③ 중계 칸은 거의 그대로다.</b></p>
-<table class="tools">
+<div class="tbl"><table class="tools">
 <tr><th>어디</th><th>지금</th><th>암호화 뒤</th></tr>
 <tr><td>새 칸 <b>⑥ 열쇠</b></td><td>—</td><td><code>crypto.c</code>를 옮김: 열쇠 맞추기, 래칫, 신원 키, 지문, 봉투</td></tr>
 <tr><td>새 칸 <b>⑦ 금고</b></td><td>—</td><td><code>vault.c</code>를 옮김: 묶음, 조각, 열람 요청, 승인, 증명</td></tr>
@@ -332,19 +221,20 @@ CK_n, MK_n 지움                                        <span class="c">열쇠�
 <tr><td><code>on_line</code></td><td><code>/dm</code> <code>/all</code> <code>/who</code> <code>/help</code> <code>/quit</code></td><td>+ <code>/verify</code> <code>/lock</code> <code>/vault</code> <code>/open</code> <code>/approve</code></td></tr>
 <tr><td><code>show_eye</code> (서버 창)</td><td>평문 바이트가 보임</td><td>코드는 그대로. 이제 암호문만 보인다</td></tr>
 <tr><td>Makefile</td><td><code>gcc … deolmi.c</code></td><td>끝에 <code>-lsodium</code></td></tr>
-</table>
+</table></div>
 <p class="sub">옮겨 올 파일들은 옛 <code>net.h</code>를 불러 쓰게 돼 있다. 한 파일에 넣으면서 그 부분은 지운다 (같은 정의가 이미 ① 통신 칸에 있다). 다 넣으면 <code>deolmi.c</code>는 대략 1,700줄이 된다.</p>
-
+</section>
+<section class="t sec rise" id="vault">
 <h2 id="vault"><span class="n">10</span>2인 잠금 — 두 열쇠 금고</h2>
 <p>민지가 비밀(예: 동아리 통장 비밀번호)을 금고에 넣고 <b>현우와 수아 두 사람</b>에게 맡긴다. 그 뒤로는 <b>현우와 수아가 둘 다 동의해야만</b> 열린다. 은행 금고의 열쇠 두 개, 핵 발사 열쇠 두 개와 같은 생각이다.</p>
-<table class="vs">
+<div class="tbl"><table class="vs">
 <tr><th>누가</th><th>혼자 열 수 있나</th><th>이유</th></tr>
 <tr><td>현우</td><td class="good">못 엶</td><td>자기 조각 S1만 있다</td></tr>
 <tr><td>수아</td><td class="good">못 엶</td><td>자기 조각 S2만 있다</td></tr>
 <tr><td>중계 (서버·방장)</td><td class="good">못 엶</td><td>조각이 현우·수아 신원 키로 봉해져 있다</td></tr>
 <tr><td>민지 노트북</td><td class="good">못 엶</td><td>맡기고 나면 열쇠와 조각을 지운다 (민지는 원래 내용을 안다)</td></tr>
 <tr><td>현우 + 수아</td><td class="mid">엶</td><td>이게 목적. 수아가 승인하면 현우 화면에 뜬다</td></tr>
-</table>
+</table></div>
 
 <h3>원리 — XOR로 반 나누기</h3>
 <p>XOR은 비트를 하나씩 비교해 같으면 0, 다르면 1. 비밀과 같은 길이의 완전한 무작위 값 S1을 뽑고, <code>S2 = 비밀 ⊕ S1</code>로 둔다. <code>S1 ⊕ S2</code>를 하면 비밀이 다시 나온다. S1은 그냥 무작위고 S2도 무작위처럼 보여서, <b>한 쪽만 봐서는 비밀에 대해 아무것도 알 수 없다.</b> 직접 해 보기:</p>
@@ -359,7 +249,8 @@ CK_n, MK_n 지움                                        <span class="c">열쇠�
   </dl>
 </div>
 <p class="sub">실제로는 비밀을 직접 나누지 않는다. 무작위 <b>잠금 열쇠 L</b>(32바이트)로 비밀을 잠그고, 그 L을 위처럼 S1·S2로 나눈다. 비밀 길이와 상관없이 조각은 늘 32바이트다.</p>
-
+</section>
+<section class="t sec rise" id="vflow">
 <h2 id="vflow"><span class="n">11</span>금고 흐름</h2>
 <p>모든 화살표는 중계를 거친다. 중계는 받을 사람 칸만 보고 넘긴다. 중계가 아무것도 보관하지 않으니 <b>맡길 때와 열 때 관련된 사람이 접속해 있어야</b> 한다.</p>
 <figure class="seq">
@@ -387,20 +278,21 @@ CK_n, MK_n 지움                                        <span class="c">열쇠�
   <g class="note"><text x="330" y="456" text-anchor="middle">현우·수아 도장 둘 다 찍힌 열쇠 전달 증명</text></g>
 </svg>
 </figure>
-<table>
+<div class="tbl"><table>
 <tr><th>#</th><th>누가 · 무엇을</th><th>중계가 보는 것</th></tr>
 <tr><td>1</td><td><b>민지</b> — 잠금 열쇠 L로 내용 잠그기 → L = S1 ⊕ S2 → (S1 + 제목)을 현우 신원 키로, (S2 + 제목)을 수아 신원 키로 봉투에 넣기 → 묶음 전체에 도장 → 둘에게 한 통씩 보내고 L·S1·S2 지움</td><td>암호문, 봉투 2개, 도장</td></tr>
 <tr><td>2</td><td><b>현우·수아</b> — 민지 도장 확인 → 자기 봉투만 열어 제목 확인 → 묶음을 <code>~/.deolmi/이름/vault/</code>에 저장</td><td>—</td></tr>
 <tr><td>3</td><td><b>현우</b> <code>/open 제목</code> — 금고 번호에 도장 찍은 열람 요청을 수아에게</td><td>금고 번호, 도장</td></tr>
 <tr><td>4</td><td><b>수아</b> — 현우 도장 확인 → 화면에 무엇을 누가 열려는지 뜸 → <code>/approve</code> → 자기 조각 S2를 <b>현우만 열게</b> 다시 봉하고, 열쇠 전달 증명에 도장 → 자기 사본 지움, 승인한 번호 기억</td><td>현우만 여는 봉투, 도장</td></tr>
 <tr><td>5</td><td><b>현우</b> — 수아 도장 확인 → S1 ⊕ S2 = L → 내용 열기 → 30초 뒤(또는 엔터) 화면·스크롤 지움 → 묶음 지움 → 증명을 모두에게 (래칫으로 잠가서)</td><td>잠긴 증명</td></tr>
-</table>
+</table></div>
 <ul>
 <li><b>금고 번호</b>는 중계가 붙이지 않는다. 도장까지 찍힌 묶음의 해시(BLAKE2b 32바이트)를 번호로 쓴다. 중계가 번호를 바꿔치기할 수 없다.</li>
 <li>봉투가 신원 키로 봉해져 있어서 <b>다음 접속에도</b> 열린다. 세션 키로 봉했다면 끄는 순간 못 열게 된다.</li>
 <li>한 번 열면 끝이다. 현우는 묶음을, 수아는 사본을 지운다.</li>
 </ul>
-
+</section>
+<section class="t sec rise" id="vbytes">
 <h2 id="vbytes"><span class="n">12</span>금고 묶음의 모양</h2>
 <div class="pkt">
   <span style="--w:3"><b>보유자 1</b>16</span><span style="--w:3"><b>보유자 2</b>16</span><span style="--w:5"><b>현우 봉투</b>112</span><span style="--w:5"><b>수아 봉투</b>112</span><span style="--w:6"><b>내용 암호문</b>내용 + 16</span><span style="--w:4"><b>민지 도장</b>64</span>
@@ -411,17 +303,18 @@ CK_n, MK_n 지움                                        <span class="c">열쇠�
 <li><b>저장</b> — <code>~/.deolmi/이름/vault/번호앞8바이트.vault</code> (0600). 불러올 때마다 도장을 다시 확인한다. 파일을 누가 고쳤으면 <code>[!] 금고 파일이 바뀌어 서명이 안 맞음</code>.</li>
 <li><b>열쇠 전달 증명</b> = 금고 번호 · 제목 · 시각 · 맡긴 사람 · 요청한 사람 · 승인한 사람 + 현우 도장 + 수아 도장. "누가 누구에게 언제 열쇠를 넘겼다"를 둘 다 부인할 수 없다.</li>
 </ul>
-<table>
+<div class="tbl"><table>
 <tr><th>종류</th><th>번호</th><th>보내는 쪽 → 받는 쪽</th><th>본문</th></tr>
 <tr><td><code>VAULT</code></td><td>3</td><td>민지 → 현우, 민지 → 수아</td><td>위 묶음</td></tr>
 <tr><td><code>OPEN_REQ</code></td><td>4</td><td>현우 → 수아</td><td>금고 번호 32 + 현우 도장 64</td></tr>
 <tr><td><code>SHARE</code></td><td>5</td><td>수아 → 현우</td><td>금고 번호 32 + 다시 봉한 조각 112 + 시각 8 + 수아 도장 64</td></tr>
 <tr><td><code>PROOF</code></td><td>6</td><td>현우 → 모두</td><td>증명 (래칫으로 잠금)</td></tr>
-</table>
+</table></div>
 <p class="sub">이 네 종류 번호는 지금 코드에도 자리가 잡혀 있고, 중계는 이미 내용을 안 보고 넘긴다. <code>test_server.c</code>의 "MSG가 아닌 type(VAULT)도 to에게 그대로"가 확인한다.</p>
-
+</section>
+<section class="t sec rise" id="vscreen">
 <h2 id="vscreen"><span class="n">13</span>금고 화면</h2>
-<pre class="term"><span class="c"># 민지</span>
+<pre class="term" data-ui><span class="c"># 민지</span>
 <span class="p">민지&gt; /lock 현우 수아 "통장 비번" 4512</span>
 <span class="o">[금고] '통장 비번' 금고를 현우, 수아에게 맡겼습니다. 둘이 함께여야 열리고, 이 노트북에는 남기지 않습니다</span>
 <span class="c"># 현우</span>
@@ -437,19 +330,20 @@ CK_n, MK_n 지움                                        <span class="c">열쇠�
 <span class="o">    Enter를 누르거나 30초가 지나면 화면에서 지웁니다</span>
 <span class="c"># 모두</span>
 <span class="o">[증명] 수아가 현우에게 '통장 비번' 열쇠를 넘김 · 민지의 금고 · 14:05 · 현우✔ 수아✔</span></pre>
-<table>
+<div class="tbl"><table>
 <tr><th>명령</th><th>하는 일</th></tr>
 <tr><td><code>/lock 이름1 이름2 "제목" 내용</code></td><td>나 말고 서로 다른 두 사람에게 맡긴다. 제목은 따옴표 안 31바이트(한글 10글자)까지, 둘 다 접속해 있어야 한다</td></tr>
 <tr><td><code>/vault</code></td><td>내가 가진 금고 목록 (제목 · 맡긴 사람 · 함께 가진 사람)</td></tr>
 <tr><td><code>/open 제목</code></td><td>함께 가진 사람에게 열람 요청. 그 사람이 접속해 있어야 한다</td></tr>
 <tr><td><code>/approve</code></td><td>받은 요청을 승인. 같은 금고를 두 번 요청하면 거절한다</td></tr>
 <tr><td><code>/verify [이름 [ok]]</code></td><td>내 단어 보기 / 상대 단어 보기 / 맞으면 확인 표시</td></tr>
-</table>
+</table></div>
 <p class="sub">단어를 확인하지 않은 사람에게 맡기거나 승인하면 <code>[*] ○○의 단어를 아직 확인하지 않았습니다</code>가 뜬다. 중계가 처음부터 신원 키를 바꿔치기했다면 그 조각은 중계가 열 수 있어서다.</p>
-
+</section>
+<section class="t sec rise" id="holes">
 <h2 id="holes"><span class="n">14</span>미리 막은 구멍</h2>
 <p>11-02 설계를 검토하면서 찾은 구멍과 막는 법이다. 코드를 옮길 때 이 줄을 빼먹으면 구멍이 다시 열린다.</p>
-<table>
+<div class="tbl"><table>
 <tr><th>심각도</th><th>구멍</th><th>막는 법</th></tr>
 <tr><td class="bad">치명</td><td>봉투는 보낸 사람이 익명이라, 중계가 "민지의 금고"를 위조할 수 있다</td><td>민지가 신원 키로 묶음 전체(보유자 둘, 봉투 둘, 암호문, nonce)에 도장. 금고 번호도 묶음 해시</td></tr>
 <tr><td class="bad">치명</td><td>지문이 세션 키만 덮으면, 중계가 봉투용 공개키를 바꿔치기해 두 조각을 다 연다</td><td>지문은 신원 키 하나만. 봉투 키는 신원 키에서 변환. 세션 키에는 신원 키 도장</td></tr>
@@ -459,8 +353,9 @@ CK_n, MK_n 지움                                        <span class="c">열쇠�
 <tr><td>참고</td><td>풀기에 실패해도 래칫이 돌면 가짜 한 통으로 대화가 깨진다</td><td>성공했을 때만 전진</td></tr>
 <tr><td>참고</td><td>중계가 예전 열람 요청을 다시 보낸다</td><td>승인한 금고 번호를 기억해 두 번째는 거절</td></tr>
 <tr><td>참고</td><td>세션 키까지 신원 키에서 만들면 접속마다 같은 키가 나온다</td><td>세션 키는 매번 새로, 신원 키로는 도장만</td></tr>
-</table>
-
+</table></div>
+</section>
+<section class="t sec rise" id="cant">
 <h2 id="cant"><span class="n">15</span>못 막는 것</h2>
 <ul>
 <li><b>누가 누구에게 언제, 얼마나 긴 글을</b> 보내는지는 중계가 안다. 넘겨주려면 받을 사람 칸을 봐야 해서다.</li>
@@ -471,10 +366,11 @@ CK_n, MK_n 지움                                        <span class="c">열쇠�
 <li>현우와 수아가 <b>짜고</b> 열면 열린다 — 그게 2인 잠금의 정의다. 맡긴 민지는 원래 내용을 안다.</li>
 <li>중계가 아무것도 보관하지 않으니, 맡길 때와 열 때 관련된 사람이 <b>동시에 접속</b>해 있어야 한다.</li>
 </ul>
-
+</section>
+<section class="t sec rise" id="order">
 <h2 id="order"><span class="n">16</span>만드는 순서</h2>
 <p>통신 때처럼 한 단계씩, 확인을 통과해야 다음으로 넘어간다. 평문 테스트 25개는 단계마다 계속 통과해야 한다 (중계가 안 바뀌었다는 확인).</p>
-<table class="stage">
+<div class="tbl"><table class="stage">
 <tr><th>단계</th><th>만들 것</th><th>확인</th></tr>
 <tr><td>E1</td><td>libsodium 붙이기 · <b>⑥ 열쇠</b> 칸 옮기기 · 신원 키 파일 · 첫 화면에 내 단어</td><td><code>test_crypto</code> 25개 · 두 번 켜도 같은 단어</td></tr>
 <tr><td>E2</td><td><b>도장 찍은 HELLO</b> (방장 포함) · <code>on_hello</code> · 명단은 HELLO로만</td><td>도장 틀린 HELLO는 무시하는 테스트 추가 · 셋이 들어와 서로 명단에 뜸</td></tr>
@@ -485,23 +381,23 @@ CK_n, MK_n 지움                                        <span class="c">열쇠�
 <tr><td>V2</td><td><code>/open</code> → OPEN_REQ · <code>/approve</code> → SHARE</td><td>셋이 시뮬레이션: 요청·승인 화면, 같은 요청 두 번은 거절</td></tr>
 <tr><td>V3</td><td>열기 · 30초 뒤 화면 지우기 · PROOF 보내고 확인</td><td>열린 내용이 맞음 · 지워짐 · 모두에게 증명 (도장 둘 확인)</td></tr>
 <tr><td>V4</td><td>노트북 두세 대에서 실제로</td><td>같은 핫스팟에서 E3~V3을 다시</td></tr>
-</table>
+</table></div>
 <ul>
 <li><b>넣지 않는 것</b> — 서버 창에서 메시지를 바꾸거나 다시 보내는 공격 실험 명령 (11-03 결정: "공격 실험 명령은 하지마, 일단 통신 구현만"). 들키는지는 E4의 자동 테스트로 확인한다.</li>
 <li><b>나중에 정할 것</b> — 잠긴 대화 기록(<code>history.c</code>: 비밀번호로 잠근 내 노트북 기록, Argon2id). 11-02 버전에 있지만 금고까지 끝난 뒤 넣을지 정한다.</li>
 </ul>
-
+</section>
+<section class="t sec rise" id="decide">
 <h2 id="decide"><span class="n">17</span>정할 것</h2>
-<table>
+<div class="tbl"><table>
 <tr><th>질문</th><th>추천</th><th>다른 길</th></tr>
 <tr><td>한 파일로 계속 갈까?</td><td><b>유지</b> — 11-03 결정. 칸 번호로 나뉘어 있어 1,700줄이어도 찾기 쉽다</td><td>⑥·⑦만 파일로 빼기. 맡은 사람별로 나누기는 쉽지만 빌드가 다시 여러 파일</td></tr>
 <tr><td>문장 섞기 래칫을 쓸까?</td><td><b>유지</b> — 이미 테스트 통과, 팀만의 특징. 발표에서는 "보안 이득은 크지 않다"고 솔직히</td><td>표준 대칭 래칫으로 바꾸기 (<code>next_chain</code> 몇 줄 수정)</td></tr>
 <tr><td>금고 보유자는 몇 명?</td><td><b>2명 고정</b> (둘 다 있어야 열림)</td><td>3명 중 2명 (Shamir 분할) — 더 복잡하고 이번 범위를 넘는다</td></tr>
 <tr><td>대화 기록은?</td><td><b>금고까지 끝난 뒤</b></td><td>E3 다음에 바로</td></tr>
-</table>
+</table></div>
 
-<p class="foot">지금 프로그램의 구조는 <a href="../guide/">덜미 설명서</a>, 11-02 암호화 버전 코드는 <a href="../code/#e0">코드 페이지의 암호화 버전</a>, 무엇을 왜 바꿨고 누가 했는지는 <a href="../log/">작업 기록</a>.</p>
-</main>
+
 <script>
 (() => {
   const $ = id => document.getElementById(id);
@@ -522,5 +418,16 @@ CK_n, MK_n 지움                                        <span class="c">열쇠�
   draw(true);
 })();
 </script>
+</section>
+</main>
+</div>
+<footer class="end">
+  <div class="e-by"><p><b>김창식</b> — 기획 · 결정 · 실제로 돌려 보고 문제 찾기</p><p><b>Claude</b> (Anthropic의 AI) — 코드와 이 사이트 작성</p><p><a href="../log/#who">누가 무엇을 했나 자세히</a></p></div>
+  <nav class="e-nav" aria-label="덜미 페이지"><ul><li><a href="../guide/">설명서</a></li><li><a href="../run/">시작하기</a></li><li><a href="../code/">전체 코드</a></li><li><a href="../plan/" aria-current="page">암호화 계획</a></li><li><a href="../log/">작업 기록</a></li><li><a href="/">작업실로</a></li></ul></nav>
+  <a class="e-next" href="../log/"><span>다음 페이지</span><b>작업 기록 <span aria-hidden="true">→</span></b></a>
+  <p class="e-word" aria-hidden="true">덜미<i>.</i></p>
+</footer>
+</div>
+<script src="../site.js" defer></script>
 </body>
 </html>

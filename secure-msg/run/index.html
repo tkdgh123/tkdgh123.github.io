@@ -5,204 +5,93 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>덜미 시작하기</title>
 <meta name="description" content="덜미 코드를 받아 빌드하고, 노트북 두 대로 친구와 채팅하는 법.">
+<script>document.documentElement.classList.add("js")</script>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
-<style>
-:root{
-  --paper:#ECEFF2; --sheet:#FAFBFC; --ink:#15202C; --ink-2:#556273; --rule:#CBD3DC;
-  --steel:#2A4F86; --void:#CF3B1C; --seal:#17806A;
-  --term-bg:#0F1823; --term-ink:#D6E1EC; --t-dim:#7D8B9B; --t-red:#FF8B70; --t-green:#7ED6B3; --t-yel:#F1C56C; --t-blue:#8DB4F0;
-  --f-display:"Black Han Sans","IBM Plex Sans KR","Malgun Gothic",sans-serif;
-  --f-body:"IBM Plex Sans KR","Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif;
-  --f-mono:"IBM Plex Mono",ui-monospace,"Cascadia Code",Consolas,monospace;
-  color-scheme:light;
-}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --paper:#0C131B; --sheet:#131D28; --ink:#E2E9F1; --ink-2:#93A1B2; --rule:#263342;
-  --steel:#82A9E3; --void:#FF7A58; --seal:#4FC4A6; --term-bg:#070C12; color-scheme:dark }}
-:root[data-theme="dark"]{
-  --paper:#0C131B; --sheet:#131D28; --ink:#E2E9F1; --ink-2:#93A1B2; --rule:#263342;
-  --steel:#82A9E3; --void:#FF7A58; --seal:#4FC4A6; --term-bg:#070C12; color-scheme:dark }
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:var(--paper);color:var(--ink);font:16.5px/1.75 var(--f-body);word-break:keep-all;overflow-wrap:anywhere}
-a{color:var(--steel)}
-:focus-visible{outline:2px solid var(--steel);outline-offset:2px}
-.wrap{max-width:860px;margin:0 auto;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px))}
-.top{display:flex;justify-content:space-between;gap:12px;padding-block:18px 0;font-size:14px}
-.top a{color:var(--ink-2);text-decoration:none}
-.top a:hover{color:var(--ink)}
-.top .r a{margin-left:14px}
-.eyebrow{font:600 13px/1 var(--f-mono);letter-spacing:.14em;color:var(--steel);text-transform:uppercase;margin:0 0 12px}
-h1{font-family:var(--f-display);font-weight:400;font-size:clamp(52px,13vw,116px);line-height:.92;margin:6px 0 16px;letter-spacing:-.01em}
-h1 span{color:var(--void)}
-.lede{color:var(--ink-2);max-width:40rem;margin:0 0 8px;font-size:18px}
-.hero{padding-block:30px 26px;border-bottom:2px solid var(--ink)}
-h2{font-family:var(--f-display);font-weight:400;font-size:clamp(26px,4.4vw,34px);line-height:1.15;margin:52px 0 6px}
-h2 .n{color:var(--steel);font-family:var(--f-mono);font-size:.62em;margin-right:12px;vertical-align:.08em}
-h3{font-size:17px;margin:26px 0 8px}
-p{margin:0 0 14px}
-ul{margin:0 0 14px;padding-left:1.2em}
-li{margin:5px 0}
-code{font-family:var(--f-mono);font-size:.86em;background:color-mix(in srgb,var(--ink) 9%,transparent);padding:1px 5px;border-radius:5px}
-b{font-weight:700}
-.sub{color:var(--ink-2);font-size:15px;margin:-2px 0 14px}
-
-/* 터미널 명령 블록 */
-.term{background:var(--term-bg);color:var(--term-ink);font:14px/1.7 var(--f-mono);border-radius:12px;padding:16px 18px;margin:0 0 16px;overflow:auto;white-space:pre-wrap;border:1px solid color-mix(in srgb,var(--term-ink) 14%,transparent)}
-.term .c{color:var(--t-dim)}       /* 주석 */
-.term .p{color:var(--t-green)}     /* 입력 */
-.term .o{color:var(--term-ink)}    /* 출력 */
-.term .k{color:var(--t-yel)}
-.term b{color:#fff}
-
-/* 단계 */
-.step{border-left:2px solid var(--rule);padding:2px 0 2px 20px;margin:0 0 6px}
-.tip{background:var(--sheet);border:1px solid var(--rule);border-radius:12px;padding:12px 16px;font-size:15px;color:var(--ink-2);margin:0 0 16px}
-.tip b{color:var(--ink)}
-
-
-table{width:100%;border-collapse:collapse;margin:6px 0 18px;font-size:15px}
-th,td{text-align:left;vertical-align:top;padding:8px 10px;border-bottom:1px solid var(--rule)}
-th{font-size:13px;color:var(--ink-2);font-weight:600}
-td > code:only-child{white-space:nowrap}
-th{white-space:nowrap}
-a.dl{display:inline-block;background:var(--ink);color:var(--paper);text-decoration:none;font-weight:700;border-radius:10px;padding:11px 18px}
-a.dl:hover{background:var(--steel)}
-.pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media (max-width:700px){.pair{grid-template-columns:1fr}}
-.pair .term{margin:0 0 16px}
-.now{background:var(--sheet);border:1px solid var(--rule);border-left:4px solid var(--seal);border-radius:12px;padding:14px 18px 6px;margin:34px 0 0}
-.now > b{color:var(--seal)}
-.tl{border-left:2px solid var(--rule);margin:18px 0 0 6px;padding-left:22px}
-.ev{position:relative;margin:0 0 30px}
-.ev::before{content:"";position:absolute;left:-29px;top:7px;width:12px;height:12px;border-radius:50%;background:var(--steel)}
-.ev .d{font:600 13px/1 var(--f-mono);color:var(--steel)}
-.ev h3{margin:6px 0 8px;font-size:18px}
-.diag{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:10px 0 18px}
-@media (max-width:560px){.diag{grid-template-columns:1fr}}
-.diag figure{margin:0;background:var(--sheet);border:1px solid var(--rule);border-radius:14px;padding:14px}
-.diag figcaption{font:600 13px/1.4 var(--f-mono);color:var(--ink-2);margin-top:6px;text-align:center}
-.diag svg{width:100%;height:auto;display:block}
-.pkt{display:flex;flex-wrap:wrap;gap:3px;margin:8px 0 6px;font:500 12.5px/1.3 var(--f-mono)}
-.pkt span{flex:var(--w) 1 0;min-width:58px;background:var(--sheet);border:1px solid var(--rule);border-top:3px solid var(--steel);border-radius:6px;padding:6px 8px;color:var(--ink-2)}
-.pkt span b{display:block;color:var(--ink);font-family:var(--f-body);font-size:13px}
-.pkt span.dim{opacity:.55;border-top-color:var(--rule)}
-.map td:first-child{white-space:nowrap;font-weight:700}
-.map code{font-size:.8em}
-.foot{color:var(--ink-2);font-size:14.5px;margin:40px 0 50px;border-top:1px solid var(--rule);padding-top:16px}
-.who{font-size:13.5px;color:var(--ink-2);margin:-2px 0 10px}
-.u,.c{display:inline-block;font-weight:700;border-radius:6px;padding:0 7px;font-size:.92em}
-.u{background:color-mix(in srgb,var(--seal) 16%,transparent);color:var(--seal)}
-.c{background:color-mix(in srgb,var(--steel) 16%,transparent);color:var(--steel)}
-.term .c{display:inline;background:none;padding:0;border-radius:0;font-weight:400;font-size:inherit;color:var(--t-dim)}
-.whot td:first-child{white-space:nowrap}
-.whot small{color:var(--ink-2)}
-.chg td:last-child{white-space:nowrap;font-size:13.5px;color:var(--ink-2);line-height:2}
-@media (max-width:600px){.chg td:last-child{white-space:normal}}
-.toc{display:flex;flex-wrap:wrap;gap:6px;margin:24px 0 0}
-.toc a{font-size:13.5px;text-decoration:none;color:var(--ink-2);background:var(--sheet);border:1px solid var(--rule);border-radius:999px;padding:2px 11px}
-.toc a:hover{color:var(--ink);border-color:var(--steel)}
-.seq{margin:12px 0 18px;background:var(--sheet);border:1px solid var(--rule);border-radius:14px;padding:14px;overflow-x:auto}
-.seq svg{width:100%;min-width:540px;height:auto;display:block;font-family:var(--f-body);font-size:13px}
-.seq figcaption{font:600 13px/1.4 var(--f-mono);color:var(--ink-2);margin-top:6px;text-align:center}
-.seq .hd text{font-weight:700;fill:var(--ink);font-size:15px}
-.seq .dim{fill:var(--ink-2);font-weight:400;font-size:12px}
-.seq .lane line{stroke:var(--rule);stroke-width:2;stroke-dasharray:4 5}
-.seq .ar line{stroke:var(--steel);stroke-width:1.8;marker-end:url(#ah)}
-.seq .ar.good line{stroke:var(--seal);marker-end:url(#ahg)}
-.seq .ar text{fill:var(--ink);font:500 13px var(--f-body);text-anchor:middle}
-.seq .box rect{fill:var(--paper);stroke:var(--ink-2);stroke-width:1.2}
-.seq .box text{fill:var(--ink);font-size:13px}
-.seq .box.key rect{stroke:var(--seal);stroke-width:1.8}
-.seq .box.warn rect{stroke:var(--void);stroke-width:1.8}
-.seq .note text{fill:var(--ink-2);font-size:12px}
-.seq .lbl text{fill:var(--ink-2);font-size:12.5px;font-weight:600}
-.ahp{fill:var(--steel)} .ahg{fill:var(--seal)}
-.term.hex{white-space:pre}
-ol.steps{padding-left:1.3em;margin:0 0 14px}
-ol.path{list-style:none;counter-reset:p;padding:0;margin:8px 0 18px}
-ol.path li{counter-increment:p;position:relative;padding:0 0 14px 46px;margin:0}
-ol.path li::before{content:counter(p);position:absolute;left:0;top:1px;width:30px;height:30px;border-radius:50%;background:var(--steel);color:var(--paper);font:600 14px/30px var(--f-mono);text-align:center}
-ol.path li:not(:last-child)::after{content:"";position:absolute;left:14px;top:34px;bottom:2px;width:2px;background:var(--rule)}
-.who-tag{display:inline-block;font:600 12px/1.6 var(--f-mono);border-radius:6px;padding:0 7px;margin-right:8px;background:color-mix(in srgb,var(--steel) 16%,transparent);color:var(--steel)}
-.who-tag.relay{background:color-mix(in srgb,var(--void) 16%,transparent);color:var(--void)}
-td.bad{color:var(--void);font-weight:700} td.good{color:var(--seal);font-weight:700} td.mid{color:var(--ink-2);font-weight:700}
-.vs td:first-child{width:40%}
-.tools td > code:only-child{white-space:normal;overflow-wrap:anywhere}
-@media (max-width:600px){.tools{font-size:13.5px}.tools th,.tools td{padding:7px 5px}.tools th{white-space:normal}.tools td{overflow-wrap:anywhere}}
-.demo{background:var(--sheet);border:1px solid var(--rule);border-radius:14px;padding:16px 18px;margin:6px 0 16px}
-.demo label{font-weight:700;margin-right:8px}
-.demo input{font:15px var(--f-mono);padding:7px 10px;border:1.5px solid var(--rule);border-radius:8px;background:var(--paper);color:var(--ink);width:min(260px,100%);margin-left:6px}
-.demo button{font:600 14px var(--f-body);padding:7px 14px;border-radius:8px;border:0;background:var(--ink);color:var(--paper);cursor:pointer;margin-top:6px}
-.demo button:hover{background:var(--steel)}
-.demo dl{display:grid;grid-template-columns:max-content 1fr;gap:6px 14px;margin:14px 0 0;font-size:14.5px}
-.demo dt{color:var(--ink-2)} .demo dd{margin:0;font-family:var(--f-mono);overflow-wrap:anywhere}
-.demo dd.ok{color:var(--seal);font-weight:600}
-@media (max-width:560px){.demo dl{grid-template-columns:1fr}.demo dd{margin-bottom:6px}}
-</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="../site.css">
 </head>
 <body>
-<div class="wrap">
-  <nav class="top"><a href="../guide/">← 덜미 설명서</a><span class="r"><a href="../plan/">암호화 계획</a><a href="../code/">코드</a><a href="../log/">작업 기록</a><a href="/">작업실</a></span></nav>
-</div>
+<div class="board">
+<header class="topbar">
+  <a class="logo" href="../guide/" aria-label="덜미 설명서">덜미<i>.</i></a>
+  <nav class="pages" aria-label="덜미 페이지"><a href="../guide/">설명서</a><a href="../run/" aria-current="page">시작하기</a><a href="../code/">전체 코드</a><a href="../plan/">암호화 계획</a><a href="../log/">작업 기록</a><a class="home" href="/">← 작업실</a></nav>
+  <a class="get" href="../code/src/deolmi.c" download>deolmi.c 받기 <span aria-hidden="true">↓</span></a>
+</header>
+<section class="hero" aria-label="시작하기">
+  <div class="t h-name rise"><h1>시작하기</h1></div>
+  <div class="h-low">
+    <div class="t h-say rise" style="--i:1"><p>코드를 받아서 친구와 채팅하기까지. 위에서부터 순서대로 하면 된다.</p><div class="by">만든 사람 <b>김창식</b>(기획·결정·확인) · <b>Claude</b>(코드·사이트 작성)</div></div>
+    <a class="t h-next rise" style="--i:2" href="../code/"><span>다음 페이지</span><b>전체 코드 <span aria-hidden="true">→</span></b></a>
+  </div>
+  <div class="h-ui rise" data-ui><p class="cap">우분투 창에서 — 받기, 빌드, 방 열기</p>
+<pre class="term"><span class="p">cd ~</span>
+<span class="p">curl -O https://tkdgh123.github.io/secure-msg/code/src/deolmi.c</span>
+<span class="p">gcc -o deolmi deolmi.c</span>
+<span class="p">./deolmi 민지 --host</span>
+<span class="o">[주소] 192.168.0.5 — 다른 컴퓨터는  <b>./deolmi 이름 192.168.0.5</b>  으로 들어와요</span>
 
-<header class="hero"><div class="wrap">
-  <p class="eyebrow">덜미 · 시작하기</p>
-  <h1>시작<span>하기</span></h1>
-  <p class="lede">코드를 받아서 친구와 채팅하기까지. 위에서부터 순서대로 하면 된다.</p>
-</div></header>
+<span class="c"># 친구 노트북에서 — "이름"만 자기 이름으로</span>
+<span class="p">./deolmi 현우 192.168.0.5</span></pre></div>
+</section>
+<div class="doc">
+<details class="t toc" open><summary>이 페이지 차례</summary><nav aria-label="차례"><ol><li><a href="#s01"><i>01</i>우분투 준비</a></li><li><a href="#s02"><i>02</i>코드 받기</a></li><li><a href="#s03"><i>03</i>빌드</a></li><li><a href="#s04"><i>04</i>혼자 먼저 해 보기</a></li><li><a href="#s05"><i>05</i>친구와 채팅</a></li><li><a href="#s06"><i>06</i>대화 명령</a></li><li><a href="#s07"><i>07</i>셋 이상이거나 서버를 따로 두고 싶을 때</a></li><li><a href="#s08"><i>08</i>막히면</a></li></ol></nav></details>
+<main class="secs">
 
-<main class="wrap">
-
-<h2><span class="n">01</span>우분투 준비 — 처음 한 번만</h2>
+<section class="t sec rise" id="s01">
+<h2 id="s01"><span class="n">01</span>우분투 준비 — 처음 한 번만</h2>
 <p>덜미는 <b>우분투(리눅스) 창</b>에서 돌린다. 윈도우에서는 WSL로 윈도우 안에 우분투를 깐다.</p>
-<div class="term"><span class="c"># ① 시작 버튼 오른쪽 클릭 → "터미널(관리자)" 를 열고</span>
+<div class="term" data-ui><span class="c"># ① 시작 버튼 오른쪽 클릭 → "터미널(관리자)" 를 열고</span>
 <span class="p">wsl --install -d Ubuntu-24.04</span>
 <span class="c"># ② 재부팅 → 시작 메뉴에서 "Ubuntu" 를 켠다. 처음이면 사용자 이름(영어 소문자)·비밀번호를 정한다</span>
 <span class="c"># ③ 그 우분투 창에서 컴파일러 설치 (비밀번호를 물으면 ②에서 정한 것)</span>
 <span class="p">sudo apt update && sudo apt install -y build-essential</span></div>
 <p class="sub">이미 우분투가 깔려 있으면 시작 메뉴에서 <b>Ubuntu</b> 를 켜고 ③만 하면 된다. 맥은 터미널에서 <code>xcode-select --install</code> (맥에서는 아직 직접 돌려 보지 못했다).</p>
-
-<h2><span class="n">02</span>코드 받기 — 우분투 창에서</h2>
+</section>
+<section class="t sec rise" id="s02">
+<h2 id="s02"><span class="n">02</span>코드 받기 — 우분투 창에서</h2>
 <p><code>deolmi.c</code> 파일 하나가 프로그램 전부다. 우분투 창에 아래를 그대로 친다. 홈 폴더(<code>~</code>)로 받는다.</p>
-<div class="term"><span class="p">cd ~</span>
+<div class="term" data-ui><span class="p">cd ~</span>
 <span class="p">curl -O https://tkdgh123.github.io/secure-msg/code/src/deolmi.c</span>
 <span class="c"># 진행 표시가 100 까지 차면 끝. 코드가 바뀌면 이 줄을 다시 치면 새것으로 덮어쓴다</span></div>
 <p class="sub">브라우저로 받고 싶으면 <a class="dl" href="../code/src/deolmi.c" download style="padding:4px 10px;font-size:14px">deolmi.c 받기</a> — 윈도우 <b>다운로드</b> 폴더에 들어가고, 우분투에서는 <code>cd /mnt/c/Users/윈도우이름/Downloads</code> 로 간다.</p>
-
-<h2><span class="n">03</span>빌드</h2>
-<div class="term"><span class="p">gcc -o deolmi deolmi.c</span>
+</section>
+<section class="t sec rise" id="s03">
+<h2 id="s03"><span class="n">03</span>빌드</h2>
+<div class="term" data-ui><span class="p">gcc -o deolmi deolmi.c</span>
 <span class="c"># 아무 말 없이 끝나면 성공. deolmi 라는 실행 파일이 생긴다. 이제 ./deolmi 로 켠다</span></div>
 <p class="sub">다음에 다시 켤 때는 우분투를 열고 <code>cd ~</code> 한 뒤 바로 <code>./deolmi …</code> 하면 된다.</p>
-
-<h2><span class="n">04</span>혼자 먼저 해 보기 — 노트북 한 대</h2>
+</section>
+<section class="t sec rise" id="s04">
+<h2 id="s04"><span class="n">04</span>혼자 먼저 해 보기 — 노트북 한 대</h2>
 <p>우분투 창을 두 개 연다. 하나는 방을 여는 <b>방장</b>, 하나는 들어오는 <b>참가자</b>. 같은 컴퓨터면 주소를 안 써도 된다.</p>
-<div class="term"><span class="c"># 창 1 — 방장 (방을 열고, 자기도 대화한다)</span>
+<div class="term" data-ui><span class="c"># 창 1 — 방장 (방을 열고, 자기도 대화한다)</span>
 <span class="p">./deolmi 민지 --host</span>
 
 <span class="c"># 창 2 — 참가자</span>
 <span class="p">./deolmi 현우</span></div>
 <p class="sub">Windows Terminal에서는 <code>Alt+Shift+D</code> 로 창을 나누면 한 화면에서 둘 다 보인다. 아무 글이나 치고 엔터를 누르면 상대 창에 뜬다.</p>
-
-<h2><span class="n">05</span>친구와 채팅 — 노트북 두 대</h2>
+</section>
+<section class="t sec rise" id="s05">
+<h2 id="s05"><span class="n">05</span>친구와 채팅 — 노트북 두 대</h2>
 <p>둘 다 <b>같은 와이파이</b>에 있어야 한다. 한 사람(방장)이 방을 열고, 친구가 그 노트북 주소로 들어온다.</p>
 
 <h3>방장 노트북 — 처음 한 번만 할 일</h3>
 <p>WSL은 기본 설정이면 바깥에서 들어오는 연결을 받지 못한다. 그래서 방장 노트북만 두 가지를 해 둔다. (참가자 노트북은 01~03만 하면 된다.)</p>
 <div class="step">
 <p><b>① 미러링</b> — 메모장으로 <code>C:\Users\이름\.wslconfig</code> 파일을 만들고 아래 두 줄을 넣는다. 저장한 다음 PowerShell에서 <code>wsl --shutdown</code> 하고 우분투를 다시 켠다. (윈도우 11 22H2 이상)</p>
-<div class="term"><span class="k">[wsl2]</span>
+<div class="term" data-ui><span class="k">[wsl2]</span>
 networkingMode=mirrored</div>
 <p><b>② 방화벽 열기</b> — <b>관리자 PowerShell</b>에서 한 번만 실행. 덜미가 쓰는 9000번 포트로 들어오는 연결을 허용한다.</p>
-<div class="term"><span class="p">New-NetFirewallHyperVRule</span> -DisplayName <span class="k">"덜미 9000"</span> -Direction Inbound `
+<div class="term" data-ui><span class="p">New-NetFirewallHyperVRule</span> -DisplayName <span class="k">"덜미 9000"</span> -Direction Inbound `
   -VMCreatorId <span class="k">"{40E0AC32-46A5-438A-A0B2-2B479E8F2E90}"</span> `
   -Protocol TCP -LocalPorts <span class="k">9000</span> -Action Allow</div>
 </div>
 
 <h3>채팅할 때마다</h3>
-<div class="term"><span class="c"># 1. 방장 — 방 열기 (우분투). 친구가 칠 명령이 주소까지 붙어서 뜬다</span>
+<div class="term" data-ui><span class="c"># 1. 방장 — 방 열기 (우분투). 친구가 칠 명령이 주소까지 붙어서 뜬다</span>
 <span class="p">./deolmi 민지 --host</span>
 <span class="o">[주소] 192.168.0.5 — 다른 컴퓨터는  <b>./deolmi 이름 192.168.0.5</b>  으로 들어와요</span>
 
@@ -212,7 +101,7 @@ networkingMode=mirrored</div>
 <h3 id="chat">실제로 돌려 본 화면</h3>
 <p class="sub">두 프로그램을 띄워 실제로 주고받은 화면이다 (주소만 예시로 바꿨고, <code>/who</code> 줄과 시작할 때 뜨는 사용법 설명은 줄였다). <code>민지&gt;</code> 로 시작하는 줄이 내가 친 것이다.</p>
 <div class="pair">
-<div class="term"><span class="c"># 민지 (방장)</span>
+<div class="term" data-ui><span class="c"># 민지 (방장)</span>
 <span class="o">덜미 · 민지 · 방장</span>
 <span class="o">이 창이 방이에요. 서버 없이 내가 중계하면서 같이 대화해요.</span>
 <span class="o">[주소] 192.168.0.5 — 다른 컴퓨터는  ./deolmi 이름 192.168.0.5  으로 들어와요</span>
@@ -225,7 +114,7 @@ networkingMode=mirrored</div>
 <span class="p">민지→현우&gt; 이건 너한테만 보내는 거야</span>
 <span class="o">[현우 → 나] 1:1도 잘 오네</span>
 <span class="o">[알림] 현우 퇴장</span></div>
-<div class="term"><span class="c"># 현우 (참가자)</span>
+<div class="term" data-ui><span class="c"># 현우 (참가자)</span>
 <span class="o">192.168.0.5 에 접속하는 중… (5초)</span>
 <span class="o">덜미 · 현우 · 192.168.0.5 에 접속</span>
 <span class="c">… 사용법 설명 · 만든 사람 …</span>
@@ -238,25 +127,28 @@ networkingMode=mirrored</div>
 <span class="p">현우→민지&gt; 1:1도 잘 오네</span>
 <span class="p">현우&gt; /quit</span></div>
 </div>
-
-<h2><span class="n">06</span>대화 명령</h2>
-<table>
+</section>
+<section class="t sec rise" id="s06">
+<h2 id="s06"><span class="n">06</span>대화 명령</h2>
+<div class="tbl"><table>
 <tr><th>치는 것</th><th>하는 일</th></tr>
 <tr><td>그냥 글</td><td>방에 있는 모두에게</td></tr>
 <tr><td><code>/dm 이름</code></td><td>그 사람하고만 1:1. 프롬프트가 <code>나→상대&gt;</code> 로 바뀐다</td></tr>
 <tr><td><code>/all</code></td><td>다시 모두에게</td></tr>
 <tr><td><code>/who</code></td><td>지금 들어와 있는 사람</td></tr>
 <tr><td><code>/help</code> · <code>/quit</code></td><td>명령 보기 · 나가기 (<code>Ctrl+C</code> 도 나가기)</td></tr>
-</table>
-
-<h2><span class="n">07</span>셋 이상이거나 서버를 따로 두고 싶을 때</h2>
+</table></div>
+</section>
+<section class="t sec rise" id="s07">
+<h2 id="s07"><span class="n">07</span>셋 이상이거나 서버를 따로 두고 싶을 때</h2>
 <p>방장 대신 <b>중계만 하는 서버</b>를 띄울 수도 있다. 서버 창에는 오가는 패킷이 한 줄씩 찍힌다 (지금은 암호화 전이라 내용이 그대로 보인다). 서버 노트북이 05의 "처음 한 번만 할 일"을 해 둔다.</p>
-<div class="term"><span class="p">./deolmi --server</span>              <span class="c"># 서버 노트북</span>
+<div class="term" data-ui><span class="p">./deolmi --server</span>              <span class="c"># 서버 노트북</span>
 <span class="p">./deolmi 민지 192.168.0.5</span>       <span class="c"># 나머지는 모두 참가자로, 서버 주소를 쓴다</span>
 <span class="p">./deolmi 현우 192.168.0.5</span></div>
 <p class="sub">한 방에 16명까지 들어온다.</p>
-
-<h2><span class="n">08</span>막히면</h2>
+</section>
+<section class="t sec rise" id="s08">
+<h2 id="s08"><span class="n">08</span>막히면</h2>
 <ul>
 <li><code>→ 그 주소에 열린 방이 없어요</code> → 방장(서버)이 아직 안 켰거나 주소가 틀렸다. 방장을 먼저 켠다.</li>
 <li><code>→ 연결이 중간에서 막혔어요</code> (5초 기다린 뒤 뜸) → 방장 노트북의 ①미러링 ②방화벽을 확인한다. 친구 윈도우 PowerShell에서 <code>Test-NetConnection 192.168.0.5 -Port 9000</code> 의 <code>TcpTestSucceeded</code> 가 <code>True</code> 여야 한다.</li>
@@ -264,8 +156,16 @@ networkingMode=mirrored</div>
 <li><code>bind: Address already in use</code> → 이미 켜 둔 덜미가 있다. 그 창을 닫거나 <code>pkill -x deolmi</code>.</li>
 <li>이름이 거절됨 → 이름은 한글 5글자(15바이트)까지, 띄어쓰기와 <code>/</code> 없이. 이미 들어와 있는 이름도 안 된다.</li>
 </ul>
-
-<p class="foot">만든 사람: <b>김창식</b>(기획·결정·실행 확인) · <b>Claude</b>(Anthropic의 AI — 코드와 이 사이트 작성). 누가 무엇을 했는지는 <a href="../log/#who">작업 기록</a>에 있다.<br>파일별 코드는 <a href="../code/">전체 코드</a>, 무엇을 왜 바꿨는지는 <a href="../log/">작업 기록</a>, 프로그램 구조는 <a href="../guide/">덜미 설명서</a>.</p>
+</section>
 </main>
+</div>
+<footer class="end">
+  <div class="e-by"><p><b>김창식</b> — 기획 · 결정 · 실제로 돌려 보고 문제 찾기</p><p><b>Claude</b> (Anthropic의 AI) — 코드와 이 사이트 작성</p><p><a href="../log/#who">누가 무엇을 했나 자세히</a></p></div>
+  <nav class="e-nav" aria-label="덜미 페이지"><ul><li><a href="../guide/">설명서</a></li><li><a href="../run/" aria-current="page">시작하기</a></li><li><a href="../code/">전체 코드</a></li><li><a href="../plan/">암호화 계획</a></li><li><a href="../log/">작업 기록</a></li><li><a href="/">작업실로</a></li></ul></nav>
+  <a class="e-next" href="../code/"><span>다음 페이지</span><b>전체 코드 <span aria-hidden="true">→</span></b></a>
+  <p class="e-word" aria-hidden="true">덜미<i>.</i></p>
+</footer>
+</div>
+<script src="../site.js" defer></script>
 </body>
 </html>
