@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>올려다봐 · 데모 7</title>
+<link rel="stylesheet" href="lab.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap">
+<style>
+/* 손그림 느낌 게임: 다들 폰만 보며 걷는다. 별똥별이 지나갈 때 사람을 눌러 고개를 들게 하기 */
+body { background: #f4f0e6; color: #24221f; overflow: hidden; touch-action: none; user-select: none; --hud: #24221f }
+canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; cursor: pointer }
+.over { position: fixed; inset: 0; z-index: 5; display: grid; place-items: center; text-align: center; font-family: "Gaegu", cursive; background: rgb(244 240 230 / .55) }
+.over[hidden] { display: none }
+.over h1 { margin: 0; font-size: clamp(64px, 12vw, 150px); line-height: .9; font-weight: 700 }
+.over p { margin: 12px 0 24px; font-size: clamp(20px, 2.2vw, 26px) }
+.over button { font: 700 28px "Gaegu", cursive; padding: 8px 36px; background: #fff; border: 3px solid #24221f; border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px; cursor: pointer; box-shadow: 4px 4px 0 #24221f }
+.over button:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 #24221f }
+</style>
+</head>
+<body>
+<nav class="hud mono"><a href="../#more">← 움직이는 웹사이트</a><span class="right"><a href="breaker.html">← 이전</a><span>데모 7 / 7 · 손그림 게임</span><a href="cup.html">처음 →</a></span></nav>
+<canvas id="cv" aria-label="걷는 사람들과 하늘이 있는 손그림 게임 화면"></canvas>
+<div class="over" id="over"><div><h1>올려다봐</h1><p id="msg">다들 폰만 보고 걸어요.<br>별똥별이 떨어질 때 사람을 눌러 고개를 들게 해 주세요.</p><button id="go" type="button">시작</button></div></div>
+
+<script>
+const cv = document.getElementById("cv"), g = cv.getContext("2d"), over = document.getElementById("over"), msg = document.getElementById("msg"), go = document.getElementById("go");
+let W, H, dpr, ground;
+function fit() { dpr = Math.min(devicePixelRatio, 2); W = innerWidth; H = innerHeight; cv.width = W * dpr; cv.height = H * dpr; g.setTransform(dpr, 0, 0, dpr, 0, 0); ground = H * .78; }
+addEventListener("resize", fit); fit();
+
+// 손으로 그은 듯한 선: 점을 조금씩 흔들고 두 번 긋기
+const wob = (a, k = 1.6) => a + (Math.random() - .5) * k;
+function line(x1, y1, x2, y2, w = 2.4) { g.lineWidth = w; for (let r = 0; r < 2; r++) { g.beginPath(); g.moveTo(wob(x1), wob(y1)); g.quadraticCurveTo(wob((x1 + x2) / 2, 3), wob((y1 + y2) / 2, 3), wob(x2), wob(y2)); g.stroke(); } }
+function circle(x, y, r, w = 2.4, fill) { g.lineWidth = w; if (fill) { g.fillStyle = fill; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill(); } for (let k = 0; k < 2; k++) { g.beginPath(); for (let a = 0; a <= 6.4; a += .4) { const rr = r + (Math.random() - .5) * 1.4; g[a ? "lineTo" : "moveTo"](x + Math.cos(a + k) * rr, y + Math.sin(a + k) * rr); } g.stroke(); } }
+
+let S, last = 0, frame = 0, jitter = 0;
+function reset() { S = { t: 45, score: 0, people: [], stars: [], hearts: [], spawn: 0, starIn: 3 }; for (let i = 0; i < 7; i++) addPerson(Math.random() * W); }
+function addPerson(x) {
+  const dir = Math.random() < .5 ? 1 : -1, sc = .8 + Math.random() * .5;
+  S.people.push({ x: x ?? (dir > 0 ? -40 : W + 40), dir, sc, speed: (20 + Math.random() * 25) * sc, phase: Math.random() * 6, up: 0, look: 0, y: ground + (Math.random() - .5) * 26 * sc });
+}
+
+function drawPerson(p) {
+  const s = p.sc * Math.min(1.25, H / 760), x = p.x, y = p.y, walk = Math.sin(p.phase) * (p.up ? .3 : 1);
+  g.strokeStyle = "#24221f";
+  line(x, y - 22 * s, x + walk * 9 * s, y);                    // 다리
+  line(x, y - 22 * s, x - walk * 9 * s, y);
+  line(x, y - 22 * s, x, y - 52 * s);                         // 몸
+  const lookUp = p.look;                                       // 0 = 폰 보기, 1 = 하늘 보기
+  const hx = x + p.dir * (6 - lookUp * 6) * s, hy = y - (62 + lookUp * 4) * s;
+  circle(hx, hy, 10 * s, 2.4, "#fff");
+  // 얼굴 방향: 아래(폰) ↔ 위(하늘)
+  g.fillStyle = "#24221f";
+  const ey = hy + (3 - lookUp * 7) * s; g.beginPath(); g.arc(hx + p.dir * 4 * s, ey, 1.6 * s, 0, 7); g.fill();
+  if (lookUp > .5) { g.beginPath(); g.arc(hx + p.dir * 3 * s, hy + 3 * s, 2.4 * s, 0, 3.14); g.stroke(); }
+  // 팔과 폰
+  if (lookUp < .5) { line(x, y - 46 * s, x + p.dir * 12 * s, y - 40 * s); g.fillStyle = "#24221f"; g.fillRect(x + p.dir * 11 * s - 3 * s, y - 46 * s, 6 * s, 9 * s); }
+  else { line(x, y - 46 * s, x + p.dir * 10 * s, y - 70 * s); line(x, y - 46 * s, x - p.dir * 8 * s, y - 34 * s); }
+  if (p.up > 0) { g.font = `700 ${22 * s}px Gaegu`; g.fillStyle = "#24221f"; g.fillText("!", hx - 3, hy - 16 * s); }
+}
+
+function drawStar(st) {
+  g.strokeStyle = "#24221f"; g.fillStyle = "#ffd84d";
+  const tail = 90; for (let i = 0; i < 3; i++) line(st.x - st.vx * .25 * tail / 20 + i * 3, st.y - st.vy * .25 * tail / 20 - i * 3, st.x, st.y, 1.6);
+  g.beginPath(); for (let i = 0; i < 10; i++) { const r = i % 2 ? 7 : 17, a = i / 10 * Math.PI * 2 + frame * .05; g[i ? "lineTo" : "moveTo"](st.x + Math.cos(a) * r, st.y + Math.sin(a) * r); } g.closePath(); g.fill(); g.lineWidth = 2.4; g.stroke();
+}
+
+function update(dt) {
+  S.t -= dt; if (S.t <= 0) return end();
+  S.spawn -= dt; if (S.spawn <= 0 && S.people.length < 14) { addPerson(); S.spawn = 1.4 + Math.random() * 1.4; }
+  S.starIn -= dt; if (S.starIn <= 0) { const fromL = Math.random() < .5; S.stars.push({ x: fromL ? -30 : W + 30, y: H * (.08 + Math.random() * .15), vx: (fromL ? 1 : -1) * (W / 3.2), vy: H * .05, life: 1 }); S.starIn = 4 + Math.random() * 3; }
+  const starOn = S.stars.length > 0;
+  for (const p of S.people) {
+    p.x += p.dir * p.speed * dt * (p.up ? .15 : 1); p.phase += dt * (p.up ? 2 : 8);
+    if (p.up > 0) { p.up -= dt; if (p.up <= 0) p.up = 0; }
+    p.look += ((p.up > 0 ? 1 : 0) - p.look) * Math.min(1, dt * 10);
+  }
+  S.people = S.people.filter(p => p.x > -60 && p.x < W + 60);
+  for (const st of S.stars) {
+    st.x += st.vx * dt; st.y += st.vy * dt;
+    // 별이 지나가는 동안 고개 든 사람마다 점수
+    for (const p of S.people) if (p.look > .8 && !p.got?.has(st)) { (p.got ??= new Set()).add(st); S.score++; S.hearts.push({ x: p.x, y: p.y - 110, life: 1 }); }
+  }
+  S.stars = S.stars.filter(st => st.x > -60 && st.x < W + 60);
+  S.hearts.forEach(h => { h.y -= 40 * dt; h.life -= dt * .8; }); S.hearts = S.hearts.filter(h => h.life > 0);
+}
+
+function render() {
+  g.clearRect(0, 0, W, H);
+  // 종이 바탕 + 지면 선 (손그림 흔들림은 1/8초마다만 새로 — 그래야 손그림처럼 보임)
+  g.strokeStyle = "#24221f"; line(0, ground + 14, W, ground + 10, 2);
+  g.globalAlpha = .25; for (let i = 0; i < 5; i++) line(W * (i / 5 + .05), ground + 30 + i % 2 * 12, W * (i / 5 + .12), ground + 30 + i % 2 * 12, 1.4); g.globalAlpha = 1;
+  // 집 몇 채
+  [[.08, 120], [.22, 90], [.7, 140], [.86, 100]].forEach(([fx, h]) => { const x = W * fx, w = 90; g.strokeStyle = "#24221f"; line(x, ground + 12, x, ground + 12 - h); line(x + w, ground + 12, x + w, ground + 12 - h); line(x - 8, ground + 12 - h, x + w / 2, ground - h - 40); line(x + w / 2, ground - h - 40, x + w + 8, ground + 12 - h); g.strokeRect(x + 20, ground - h + 40, 18, 18); });
+  S.people.sort((a, b) => a.y - b.y).forEach(drawPerson);
+  S.stars.forEach(drawStar);
+  S.hearts.forEach(h => { g.globalAlpha = h.life; g.font = "700 30px Gaegu"; g.fillStyle = "#e5484d"; g.fillText("+1 ✦", h.x - 20, h.y); }); g.globalAlpha = 1;
+  const fs = Math.min(38, W * .075); g.fillStyle = "#24221f"; g.font = `700 ${fs}px Gaegu`; g.fillText(`올려다본 사람 ${S.score}`, 20, 96);
+  g.textAlign = "right"; g.fillText(`${Math.ceil(S.t)}초`, W - 20, 96); g.textAlign = "left";
+  if (S.stars.length) { g.font = `700 ${Math.min(30, W * .06)}px Gaegu`; g.textAlign = "center"; g.fillText("지금! 눌러서 고개 들게 하기", W / 2, H * .5); g.textAlign = "left"; }
+}
+
+addEventListener("pointerdown", e => {
+  if (!over.hidden || !S) return;
+  let best = null, bd = 60;
+  for (const p of S.people) { const d = Math.hypot(e.clientX - p.x, e.clientY - (p.y - 40 * p.sc)); if (d < bd) { bd = d; best = p; } }
+  if (best) best.up = 2.6;
+});
+
+let running = false;
+function loop(now) {
+  if (!running) return;
+  const dt = Math.min(.05, (now - last) / 1000 || 0); last = now; frame++;
+  update(dt);
+  if (!running) return;
+  if (++jitter % 4 === 0 || frame < 3) render();     // 손그림 느낌: 그림을 매 프레임 다시 그리지 않고 끊어서
+  requestAnimationFrame(loop);
+}
+function end() { running = false; over.hidden = false; over.querySelector("h1").textContent = `${S.score}명`; msg.innerHTML = "별똥별을 보고 고개를 든 사람 수예요."; go.textContent = "다시"; }
+go.onclick = () => { over.hidden = true; reset(); running = true; last = performance.now(); requestAnimationFrame(loop); };
+reset(); render();
+</script>
+</body>
+</html>

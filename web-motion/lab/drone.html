@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>점검 드론 · 데모 2</title>
+<link rel="stylesheet" href="lab.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<style>
+/* 밝은 기술 제품 페이지: 3D 드론이 스크롤 따라 자리·자세를 바꾸고, 분해되고, 다리를 스캔 */
+body { background: #f3f4f1; color: #16191c; --hud: #16191c }
+section { height: 100vh; height: 100svh; display: flex; align-items: center; padding: 0 clamp(20px, 6vw, 100px); position: relative; z-index: 2; pointer-events: none }
+section.r { justify-content: flex-end }
+.t { max-width: 30ch }
+.t small { display: block; margin-bottom: 12px; color: #6b7177 }
+h1 { margin: 0; font-size: clamp(48px, 9vw, 140px); line-height: .92; letter-spacing: -.05em; font-weight: 500 }
+h2 { margin: 0 0 14px; font-size: clamp(30px, 4.4vw, 64px); line-height: 1.02; letter-spacing: -.04em; font-weight: 500 }
+p { margin: 0; color: #4c5257; font-size: clamp(15px, 1.3vw, 18px) }
+.stats { display: grid; grid-template-columns: repeat(3, auto); gap: 8px 36px; margin-top: 22px }
+.stats b { display: block; font-size: clamp(26px, 3vw, 42px); font-weight: 500; letter-spacing: -.03em; color: #16191c }
+.stats span { color: #6b7177 }
+.tag { position: fixed; z-index: 3; left: 0; top: 0; pointer-events: none; font: 500 12px "JetBrains Mono", monospace; color: #16191c; white-space: nowrap; opacity: 0; transition: opacity .3s }
+.tag::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #ff5a1f; margin-right: 8px; box-shadow: 0 0 0 4px rgb(255 90 31 / .18) }
+.bar { position: fixed; z-index: 3; left: clamp(20px, 6vw, 100px); right: clamp(20px, 6vw, 100px); bottom: 20px; height: 2px; background: rgb(22 25 28 / .1) }
+.bar i { display: block; height: 100%; width: 0; background: #16191c }
+@media (max-width: 700px) { section, section.r { align-items: flex-end; justify-content: flex-start; padding-bottom: 12vh } .stats { grid-template-columns: repeat(2, auto) } }
+</style>
+</head>
+<body>
+<nav class="hud mono"><a href="../#more">← 움직이는 웹사이트</a><span class="right"><a href="cup.html">← 이전</a><span>데모 2 / 7 · 3D 기계 분해</span><a href="terrain.html">다음 →</a></span></nav>
+<canvas class="bg" id="cv"></canvas>
+<div id="tags"></div>
+
+<section><div class="t"><small class="mono">MADI SCOUT · 가상의 제품</small><h1>다리를<br>읽는 드론</h1></div></section>
+<section class="r"><div class="t"><h2>아래를 보는 눈</h2><p>몸통 밑 짐벌 카메라가 흔들림 없이 땅을 향해요.</p></div></section>
+<section><div class="t"><h2>여섯 부품</h2><p>몸통, 팔 넷, 모터와 날개, 배터리, 카메라. 스크롤하면 떨어졌다 다시 붙어요.</p></div></section>
+<section class="r"><div class="t"><h2>점으로 스캔</h2><p>지나간 자리의 다리를 점 수만 개로 다시 그려요. 금이 간 곳은 주황.</p></div></section>
+<section><div class="t"><h2>숫자로는</h2><div class="stats"><div><b>±2cm</b><span class="mono">측정 오차</span></div><div><b>38분</b><span class="mono">한 번 비행</span></div><div><b>24만</b><span class="mono">초당 점</span></div></div></div></section>
+<div class="bar"><i id="bar"></i></div>
+
+<script type="module">
+import * as THREE from "three";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
+
+const cv = document.getElementById("cv");
+const renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+const scene = new THREE.Scene();
+scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), .04).texture;
+const camera = new THREE.PerspectiveCamera(32, 1, .1, 200);
+camera.position.set(0, 1.2, 9); camera.lookAt(0, 0, 0);
+scene.add(new THREE.DirectionalLight("#ffffff", 1.6).translateY(5).translateZ(3));
+
+// 드론을 부품별로 만든다 (각 부품: 기본 위치 + 분해 방향)
+const white = new THREE.MeshStandardMaterial({ color: "#eef0f2", roughness: .35, metalness: .1 });
+const grey = new THREE.MeshStandardMaterial({ color: "#5c6268", roughness: .5, metalness: .4 });
+const black = new THREE.MeshStandardMaterial({ color: "#16191c", roughness: .2, metalness: .6 });
+const orange = new THREE.MeshStandardMaterial({ color: "#ff5a1f", emissive: "#ff5a1f", emissiveIntensity: .6 });
+const drone = new THREE.Group(); scene.add(drone);
+const parts = [];
+function part(obj, explode, label) { obj.userData.home = obj.position.clone(); obj.userData.out = new THREE.Vector3(...explode); obj.userData.label = label; drone.add(obj); parts.push(obj); return obj; }
+
+const body = new THREE.Group();
+body.add(new THREE.Mesh(new RoundedBoxGeometry(1.5, .42, 1.0, 6, .16), white));
+const led = new THREE.Mesh(new THREE.BoxGeometry(.5, .03, .02), orange); led.position.set(0, .05, .51); body.add(led);
+part(body, [0, .5, 0], "몸통 · 비행 제어기");
+const battery = new THREE.Mesh(new RoundedBoxGeometry(.9, .2, .62, 4, .06), grey); battery.position.y = .3;
+part(battery, [0, 1.3, 0], "배터리 · 38분");
+const rotors = [];
+[[1, 1], [1, -1], [-1, 1], [-1, -1]].forEach(([sx, sz], i) => {
+  const arm = new THREE.Group();
+  const a = new THREE.Mesh(new RoundedBoxGeometry(1.25, .1, .14, 3, .04), white);
+  a.position.x = .62; arm.add(a);
+  const motor = new THREE.Mesh(new THREE.CylinderGeometry(.12, .12, .2, 24), black); motor.position.set(1.22, .08, 0); arm.add(motor);
+  const rotor = new THREE.Group(); rotor.position.set(1.22, .2, 0);
+  for (let b = 0; b < 2; b++) { const blade = new THREE.Mesh(new THREE.BoxGeometry(.9, .012, .07), grey); blade.rotation.y = b * Math.PI; blade.position.x = .0; rotor.add(blade); }
+  const disk = new THREE.Mesh(new THREE.CircleGeometry(.48, 40), new THREE.MeshBasicMaterial({ color: "#16191c", transparent: true, opacity: .05, side: THREE.DoubleSide }));
+  disk.rotation.x = -Math.PI / 2; rotor.add(disk);
+  arm.add(rotor); rotors.push(rotor);
+  arm.rotation.y = Math.atan2(-sz, sx);
+  part(arm, [sx * .9, .1, sz * .9], i === 0 ? "모터 · 날개" : "");
+});
+const gimbal = new THREE.Group(); gimbal.position.set(0, -.33, .2);
+gimbal.add(new THREE.Mesh(new THREE.SphereGeometry(.2, 32, 16), black));
+const lens = new THREE.Mesh(new THREE.CylinderGeometry(.09, .09, .1, 24), new THREE.MeshStandardMaterial({ color: "#1d4dff", metalness: 1, roughness: .05 }));
+lens.rotation.x = Math.PI / 2; lens.position.z = .16; gimbal.add(lens);
+part(gimbal, [0, -.9, .4], "짐벌 카메라");
+
+// 스캔할 다리: 아치와 상판을 점으로
+const N = innerWidth < 700 ? 22000 : 46000;
+const pos = new Float32Array(N * 3), col = new Float32Array(N * 3), seed = new Float32Array(N);
+const c1 = new THREE.Color("#16191c"), c2 = new THREE.Color("#ff5a1f");
+for (let i = 0; i < N; i++) {
+  const r = Math.random(); let x, y, z;
+  x = (Math.random() - .5) * 16; z = (Math.random() - .5) * 2.2;
+  if (r < .45) y = 0;                                           // 상판
+  else if (r < .8) { y = -2.6 * (x / 8) ** 2; z = (Math.random() < .5 ? -1 : 1) * 1.05; } // 아치 두 줄
+  else { const k = Math.round(x / 1.6) * 1.6; x = k + (Math.random() - .5) * .08; const top = -2.6 * (k / 8) ** 2; y = Math.random() * top; z = (Math.random() < .5 ? -1 : 1) * 1.05; } // 기둥
+  pos.set([x, y + (Math.random() - .5) * .03, z], i * 3);
+  const crack = Math.hypot(x - 2.4, y + .2) < .5 || Math.hypot(x + 4.1, y + 1.1) < .35;
+  (crack ? c2 : c1).toArray(col, i * 3);
+  seed[i] = (x + 8) / 16;
+}
+const bg = new THREE.BufferGeometry();
+bg.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+bg.setAttribute("color", new THREE.BufferAttribute(col, 3));
+bg.setAttribute("seed", new THREE.BufferAttribute(seed, 1));
+const bm = new THREE.ShaderMaterial({
+  transparent: true, depthWrite: false, vertexColors: true,
+  uniforms: { reveal: { value: 0 }, show: { value: 0 } },
+  vertexShader: `attribute float seed; uniform float reveal; varying vec3 vC; varying float vA;
+    void main(){ vC = color; float on = step(seed, reveal); vA = on; vec4 mv = modelViewMatrix * vec4(position,1.); gl_PointSize = (1.3 + 1.3*on) * (10. / -mv.z); gl_Position = projectionMatrix * mv; }`,
+  fragmentShader: `uniform float show; varying vec3 vC; varying float vA;
+    void main(){ if(length(gl_PointCoord-.5)>.5) discard; gl_FragColor = vec4(vC, (0.07 + vA*.38) * show); }`
+});
+const bridge = new THREE.Points(bg, bm); bridge.position.set(0, -1.5, -3); bridge.scale.setScalar(.7); scene.add(bridge);
+const scan = new THREE.Mesh(new THREE.PlaneGeometry(.05, 5), new THREE.MeshBasicMaterial({ color: "#ff5a1f", transparent: true, opacity: 0 }));
+scan.position.z = -1.9; scene.add(scan);
+
+// 장면: 드론 위치·자세, 분해 정도, 다리 보이기
+const K = [
+  { p: [2.2, .2, 0], r: [.15, -.7, -.12], ex: 0, br: 0 },
+  { p: [-1.5, .5, .2], r: [-1.15, .5, 0], ex: 0, br: 0 },
+  { p: [1.3, .2, -1.2], r: [.45, .8, 0], ex: 1, br: 0 },
+  { p: [-6, 1.6, -1], r: [.2, 0, .05], ex: 0, br: 1 },
+  { p: [2.6, 1.3, -.8], r: [.12, -2.6, .08], ex: 0, br: 1 }
+];
+const sm = t => t * t * (3 - 2 * t), L = (a, b, t) => a + (b - a) * t;
+let target = 0, prog = 0;
+addEventListener("scroll", () => target = scrollY / (document.documentElement.scrollHeight - innerHeight), { passive: true });
+let mx = 0, my = 0; addEventListener("pointermove", e => { mx = e.clientX / innerWidth - .5; my = e.clientY / innerHeight - .5; });
+
+function resize() { renderer.setSize(innerWidth, innerHeight, false); camera.aspect = innerWidth / innerHeight; camera.position.z = innerWidth < 700 ? 13 : 9;
+  innerWidth < 700 ? camera.setViewOffset(innerWidth, innerHeight, 0, innerHeight * .14, innerWidth, innerHeight) : camera.clearViewOffset();
+  camera.updateProjectionMatrix(); }
+addEventListener("resize", resize); resize();
+
+// 분해 때 붙는 이름표
+const tagsBox = document.getElementById("tags");
+const tags = parts.filter(o => o.userData.label).map(o => { const d = document.createElement("div"); d.className = "tag"; d.textContent = o.userData.label; tagsBox.append(d); return [o, d]; });
+const bar = document.getElementById("bar"), v = new THREE.Vector3(), clock = new THREE.Clock();
+
+renderer.setAnimationLoop(() => {
+  const t = clock.getElapsedTime();
+  prog += (target - prog) * .07;
+  const f = prog * (K.length - 1), i = Math.min(K.length - 2, Math.floor(f)), k = sm(f - i), A = K[i], B = K[i + 1];
+  // 셋째→넷째 사이에 드론이 다리 왼쪽 끝에서 오른쪽으로 날아감
+  const fly = Math.min(1, Math.max(0, f - 3));
+  const px = i >= 3 ? L(-5, 2.2, fly) : L(A.p[0], B.p[0], k);
+  drone.position.set(px * (innerWidth < 700 ? .45 : 1), L(A.p[1], B.p[1], k) + Math.sin(t * 1.6) * .06, L(A.p[2], B.p[2], k));   // 휴대폰은 좌우 폭이 좁아서
+  drone.rotation.set(L(A.r[0], B.r[0], k) + my * .2, L(A.r[1], B.r[1], k) + mx * .4, L(A.r[2], B.r[2], k) + Math.sin(t) * .03);
+  const ex = L(A.ex, B.ex, k);
+  parts.forEach(o => o.position.copy(o.userData.home).addScaledVector(o.userData.out, ex));
+  rotors.forEach((r, j) => r.rotation.y += (j % 2 ? .45 : -.45));
+  const br = L(A.br, B.br, k);
+  bm.uniforms.show.value = br;
+  const rv = i >= 3 ? fly * 1.04 : 0;
+  bm.uniforms.reveal.value = rv;
+  scan.position.x = (-8 + 16 * rv) * .7; scan.position.y = -2.4; scan.material.opacity = br * (fly > 0 && fly < 1 ? .8 : 0);
+  bridge.rotation.y = mx * .15;
+  tags.forEach(([o, d]) => {
+    o.getWorldPosition(v); v.project(camera);
+    d.style.transform = `translate(${(v.x * .5 + .5) * innerWidth + 14}px, ${(-v.y * .5 + .5) * innerHeight - 8}px)`;
+    d.style.opacity = ex > .6 ? 1 : 0;
+  });
+  bar.style.width = prog * 100 + "%";
+  renderer.render(scene, camera);
+});
+</script>
+</body>
+</html>
