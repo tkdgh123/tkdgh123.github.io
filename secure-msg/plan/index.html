@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>덜미 암호화 계획</title>
-<meta name="description" content="덜미에 종단간 암호화와 2인 잠금(두 열쇠 금고)을 얹는 방식과 순서.">
+<meta name="description" content="덜미에 종단간 암호화와 2인 잠금(키 두 개짜리 금고)을 얹는 방식과 순서.">
 <script>document.documentElement.classList.add("js")</script>
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -23,63 +23,66 @@
 <section class="hero" aria-label="암호화 계획">
   <div class="t h-name rise"><h1>암호화 계획</h1></div>
   <div class="h-low">
-    <div class="t h-say rise" style="--i:1"><p>지금 평문 메신저 위에 암호화와 2인 잠금(두 열쇠 금고)을 어떤 방식으로, 어떤 순서로 얹을지. <b>아직 만들기 전</b> 계획이다.</p><div class="by">요청·결정 <span class="u">김창식</span> · 설계와 이 페이지 작성 <span class="c">Claude</span> · 바탕은 11-02에 만들어 둔 암호화 버전 코드 (<code>crypto.c</code> · <code>vault.c</code>, 테스트 55개 — 11-04에 다시 돌려 모두 통과)</div></div>
+    <div class="t h-say rise" style="--i:1"><p>지금 평문 메신저 위에 암호화와 2인 잠금(키 두 개짜리 금고)을 어떤 방식으로, 어떤 순서로 얹을지. <b>아직 만들기 전</b> 계획이다.</p><div class="by">요청·결정 <span class="u">김창식</span> · 설계와 이 페이지 작성 <span class="c">Claude</span> · 바탕은 11-02에 만들어 둔 암호화 버전 코드 (<code>crypto.c</code> · <code>vault.c</code>, 테스트 55개 — 11-04에 다시 돌려 모두 통과)</div></div>
     <a class="t h-next rise" style="--i:2" href="../log/"><span>다음 페이지</span><b>작업 기록 <span aria-hidden="true">→</span></b></a>
   </div>
-  <div class="h-ui rise" data-ui><p class="cap">서버 창에 찍히는 같은 "안녕"</p>
+  <div class="h-ui rise" data-ui><p class="cap">방장 컴퓨터·와이파이에서 보이는 같은 "안녕"</p>
 <pre class="term"><span class="c"># 지금 (실제 출력)</span>
-<span class="o">[relay] 수빈 → 민지  MSG  seq=0   7B</span>
+<span class="o">수빈 → 민지  MSG  seq=0   7B</span>
 <span class="k">00 ec 95 88 eb 85 95</span>
 <span class="c">"안녕"이 바이트 그대로 보인다</span>
 
 <span class="c"># 암호화 뒤 (바이트는 예시)</span>
-<span class="o">[relay] 수빈 → 민지  MSG  seq=1  23B</span>
+<span class="o">수빈 → 민지  MSG  seq=1  23B</span>
 <span class="k">8f 3a c1 07 5e d2 94 1b …</span>
-<span class="c">7바이트 + 검사 태그 16 = 23, 매번 다른 값</span></pre></div>
+<span class="c">7바이트 + 인증 태그 16 = 23, 매번 다른 값</span></pre></div>
 </section>
 <div class="doc">
-<details class="t toc" open><summary>이 페이지 차례</summary><nav aria-label="차례"><ol><li><a href="#goal"><i>01</i>무엇을 지키나</a></li><li><a href="#e2e"><i>02</i>왜 종단간 암호화인가</a></li><li><a href="#tools"><i>03</i>쓰는 도구</a></li><li><a href="#keys"><i>04</i>열쇠는 두 종류</a></li><li><a href="#hello"><i>05</i>HELLO에 도장 찍기</a></li><li><a href="#words"><i>06</i>단어 지문</a></li><li><a href="#ratchet"><i>07</i>메시지 잠그기</a></li><li><a href="#check"><i>08</i>받을 때 검사 순서</a></li><li><a href="#change"><i>09</i>지금 코드에서 바뀌는 곳</a></li><li><a href="#vault"><i>10</i>2인 잠금</a></li><li><a href="#vflow"><i>11</i>금고 흐름</a></li><li><a href="#vbytes"><i>12</i>금고 묶음의 모양</a></li><li><a href="#vscreen"><i>13</i>금고 화면</a></li><li><a href="#holes"><i>14</i>미리 막은 구멍</a></li><li><a href="#cant"><i>15</i>못 막는 것</a></li><li><a href="#order"><i>16</i>만드는 순서</a></li><li><a href="#decide"><i>17</i>정할 것</a></li></ol></nav></details>
+<details class="t toc" open><summary>이 페이지 차례</summary><nav aria-label="차례"><ol><li><a href="#goal"><i>01</i>무엇을 지키나</a></li><li><a href="#e2e"><i>02</i>왜 종단간 암호화인가</a></li><li><a href="#tools"><i>03</i>쓰는 도구</a></li><li><a href="#keys"><i>04</i>키는 두 종류</a></li><li><a href="#hello"><i>05</i>HELLO에 서명하기</a></li><li><a href="#words"><i>06</i>단어 지문</a></li><li><a href="#ratchet"><i>07</i>메시지 암호화</a></li><li><a href="#check"><i>08</i>받을 때 검사 순서</a></li><li><a href="#change"><i>09</i>지금 코드에서 바뀌는 곳</a></li><li><a href="#vault"><i>10</i>2인 잠금</a></li><li><a href="#vflow"><i>11</i>금고 흐름</a></li><li><a href="#vbytes"><i>12</i>금고 묶음의 모양</a></li><li><a href="#vscreen"><i>13</i>금고 화면</a></li><li><a href="#holes"><i>14</i>미리 막은 구멍</a></li><li><a href="#cant"><i>15</i>못 막는 것</a></li><li><a href="#order"><i>16</i>만드는 순서</a></li><li><a href="#decide"><i>17</i>정할 것</a></li></ol></nav></details>
 <main class="secs">
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" class="ahp"/></marker><marker id="ahg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" class="ahg"/></marker></defs></svg>
 <section class="t sec rise">
 <div class="now">
   <b>한 줄 요약</b>
   <ul>
-    <li><b>메시지</b> — 두 사람마다 따로 맞춘 열쇠로, <b>한 통마다 열쇠를 바꿔 가며</b> 잠근다 (X25519 열쇠 맞추기 + XChaCha20-Poly1305 + BLAKE2b 래칫). 중계하는 쪽은 암호문만 넘긴다.</li>
-    <li><b>누구인지</b> — 사람마다 평생 쓰는 신원 키(Ed25519)로 도장을 찍고, 그 키를 <b>한글 단어 8개</b>로 바꿔 만나서 맞춰 본다.</li>
-    <li><b>2인 잠금</b> — 비밀을 잠근 열쇠를 XOR로 반 나눠 두 사람에게 한 쪽씩. <b>둘이 함께 동의해야만</b> 열린다. 중계도, 한 사람 혼자도 못 연다.</li>
+    <li><b>메시지</b> — 두 사람마다 따로 맞춘 키로, <b>한 통마다 키를 바꿔 가며</b> 암호화한다 (X25519 키 교환 + XChaCha20-Poly1305 + BLAKE2b 래칫). 중계하는 쪽은 암호문만 넘긴다.</li>
+    <li><b>누구인지</b> — 사람마다 평생 쓰는 신원 키(Ed25519)로 서명하고, 그 키를 <b>한글 단어 8개</b>로 바꿔 만나서 맞춰 본다.</li>
+    <li><b>2인 잠금</b> — 비밀을 암호화한 키를 XOR로 반 나눠 두 사람에게 한 쪽씩. <b>둘이 함께 동의해야만</b> 열린다. 중계도, 한 사람 혼자도 못 연다.</li>
     <li>약속은 "<b>막는다</b>"보다 "<b>들킨다</b>"다. 중계가 바꾸거나 다시 보내거나 빼먹으면 받는 화면에 경고가 뜬다.</li>
   </ul>
 </div>
 </section>
 <section class="t sec rise" id="goal">
 <h2 id="goal"><span class="n">01</span>무엇을 지키나</h2>
-<p>덜미는 <b>중계하는 쪽(서버·방장)을 믿지 않는 것</b>에서 출발한다. 모든 글이 중계를 거치니까, 중계는 마음만 먹으면 아래 일을 다 할 수 있는 자리에 있다.</p>
+<p>덜미는 <b>중계하는 방장</b>과 <b>네트워크 길목의 제3자</b>(같은 와이파이, 공유기)를 믿지 않는 것에서 출발한다. 참가자의 글은 모두 방장을 거치고, 오가는 바이트는 길목에서도 보인다. 둘 다 마음만 먹으면 아래 일을 다 할 수 있는 자리에 있다.</p>
 <div class="tbl"><table class="vs">
-<tr><th>중계가 하려는 것</th><th>지금 (평문)</th><th>암호화 뒤</th></tr>
+<tr><th>중계·길목이 하려는 것</th><th>지금 (평문)</th><th>암호화 뒤</th></tr>
 <tr><td><b>엿보기</b> — 글을 읽음</td><td class="bad">그대로 보임</td><td class="good">암호문만 보임</td></tr>
 <tr><td><b>바꾸기</b> — 글자 하나를 고쳐 넘김</td><td class="bad">아무도 모름</td><td class="good">받는 쪽 경고 · 버림</td></tr>
 <tr><td><b>다시 보내기</b> — 지난 글을 또 넘김</td><td class="bad">아무도 모름</td><td class="good">받는 쪽 경고 · 버림</td></tr>
 <tr><td><b>빼먹기</b> — 한 통을 안 넘김</td><td class="bad">아무도 모름</td><td class="good">다음 통에서 들킴</td></tr>
-<tr><td><b>남인 척</b> — 민지 이름으로 가짜 글</td><td class="bad">지금은 이름 칸 검사뿐 (중계 자신은 막지 못함)</td><td class="good">도장이 안 맞아 버림</td></tr>
-<tr><td><b>열쇠 바꿔치기</b> — 중간에 끼어들기</td><td class="mid">—</td><td class="good">단어 지문이 달라 들킴</td></tr>
-<tr><td><b>금고 열기</b></td><td class="mid">—</td><td class="good">열쇠 조각이 없어 못 엶</td></tr>
+<tr><td><b>남인 척</b> — 민지 이름으로 가짜 글</td><td class="bad">지금은 이름 필드 검사뿐 (중계 자신은 막지 못함)</td><td class="good">서명이 안 맞아 버림</td></tr>
+<tr><td><b>키 바꿔치기</b> — 중간에 끼어들기</td><td class="mid">—</td><td class="good">단어 지문이 달라 들킴</td></tr>
+<tr><td><b>금고 열기</b></td><td class="mid">—</td><td class="good">키 조각이 없어 못 엶</td></tr>
 </table></div>
-<p class="sub">중계는 여전히 <b>누가 누구에게 언제 얼마나 긴</b> 글을 보내는지는 안다. 받을 사람 칸이 보여야 넘겨줄 수 있어서다 (아래 <a href="#cant">못 막는 것</a>).</p>
+<p class="sub">중계는 여전히 <b>누가 누구에게 언제 얼마나 긴</b> 글을 보내는지는 안다. 받을 사람 필드가 보여야 넘겨줄 수 있어서다 (아래 <a href="#cant">못 막는 것</a>).</p>
 <div class="pair">
-<pre class="term" data-ui><span class="c"># 지금 — 서버 창 (실제 출력)</span>
-<span class="o">[relay] 수빈 → 민지  MSG      seq=0       7B  <span class="k">00 ec 95 88 eb 85 95</span></span>
+<pre class="term" data-ui><span class="c"># 지금 — 방장·길목에서 보이는 바이트 (실제)</span>
+<span class="o">수빈 → 민지  MSG  seq=0   7B  <span class="k">00 ec 95 88 eb 85 95</span></span>
 <span class="c">          "안녕"이 바이트 그대로</span></pre>
 <pre class="term" data-ui><span class="c"># 암호화 뒤 — 같은 "안녕" (바이트는 예시)</span>
-<span class="o">[relay] 수빈 → 민지  MSG      seq=1      23B  <span class="k">8f 3a c1 07 5e d2 94 1b …</span></span>
-<span class="c">          7바이트 + 검사 태그 16 = 23, 매번 다른 값</span></pre>
+<span class="o">수빈 → 민지  MSG  seq=1  23B  <span class="k">8f 3a c1 07 5e d2 94 1b …</span></span>
+<span class="c">          7바이트 + 인증 태그 16 = 23, 매번 다른 값</span></pre>
 </div>
+
+<h3>P2P면 암호화가 필요 없나?</h3>
+<p>팀에서 나온 질문이다. 둘이 직접 잇는 P2P라면 중간에 운영자가 없으니 "운영자가 엿보기"는 사라진다. 하지만 둘 사이 <b>네트워크 길목의 제3자</b>는 그대로라서, 그쪽을 막으려면 여전히 암호화가 필요하다. 게다가 덜미는 P2P가 아니다 — 방장이 서버가 되어 중계하므로, 셋 이상이면 방장도 남들끼리의 글이 지나가는 길목이다 (<a href="../guide/#modes">설명서 02</a>).</p>
 </section>
 <section class="t sec rise" id="e2e">
 <h2 id="e2e"><span class="n">02</span>왜 종단간 암호화인가 — https 방식으로는 안 되는 이유</h2>
-<p>웹사이트의 https(TLS)는 <b>나와 서버 사이</b>만 잠근다. 서버에 도착하면 풀린다. 덜미에 그걸 쓰면 수빈→서버 구간, 서버→민지 구간은 잠기지만, 가운데 서버는 다 읽는다. 우리가 못 믿는 게 바로 그 서버라서 소용없다.</p>
+<p>웹사이트의 https(TLS)는 <b>나와 서버 사이</b>만 암호화한다. 서버에 도착하면 복호화된다. 덜미에 그걸 쓰면 수빈→방장 구간, 방장→민지 구간은 암호화되지만, 가운데 방장은 다 읽는다. 셋 이상이면 방장이 남들끼리의 1:1까지 읽게 되니 소용없다.</p>
 <figure class="seq">
-<svg viewBox="0 0 640 180" role="img" aria-label="TLS는 서버에서 풀리고, 종단간 암호화는 받는 사람에게서만 풀린다">
+<svg viewBox="0 0 640 180" role="img" aria-label="TLS는 중계(방장)에서 복호화되고, 종단간 암호화는 받는 사람에게서만 복호화된다">
   <g class="hd" text-anchor="middle"><text x="80" y="22">수빈</text><text x="320" y="22">중계</text><text x="560" y="22">민지</text></g>
   <g class="lbl"><text x="0" y="62">https 방식</text><text x="0" y="132">덜미</text></g>
   <g class="ar"><line x1="96" y1="70" x2="300" y2="70"/><line x1="340" y1="70" x2="544" y2="70"/></g>
@@ -89,19 +92,19 @@
   <g class="note"><text x="560" y="98" text-anchor="middle">풂</text><text x="560" y="168" text-anchor="middle">여기서만 풂</text></g>
 </svg>
 </figure>
-<p>그래서 <b>보내는 사람이 잠그고, 받는 사람만 푼다</b>(종단간). 카카오톡 비밀채팅·Signal과 같은 생각이다. 중계 코드(③ 칸)는 내용을 몰라도 받을 사람 칸만 보고 넘기면 되니 거의 안 바뀐다.</p>
+<p>그래서 <b>보내는 사람이 암호화하고, 받는 사람만 복호화한다</b>(종단간). 카카오톡 비밀채팅·Signal과 같은 생각이다. 중계 코드(③ 칸)는 내용을 몰라도 받을 사람 필드만 보고 넘기면 되니 거의 안 바뀐다.</p>
 </section>
 <section class="t sec rise" id="tools">
 <h2 id="tools"><span class="n">03</span>쓰는 도구 — libsodium</h2>
-<p>암호 알고리즘 자체를 직접 짜면 작은 실수 하나가 그대로 구멍이 된다. 그래서 알고리즘은 검증된 C 라이브러리 <b>libsodium</b>에 맡기고, 우리는 <b>조립과 규칙</b>(열쇠를 언제 만들고, 무엇에 도장을 찍고, 받을 때 무엇을 검사하는지)을 짠다.</p>
+<p>암호 알고리즘 자체를 직접 짜면 작은 실수 하나가 그대로 구멍이 된다. 그래서 알고리즘은 검증된 C 라이브러리 <b>libsodium</b>에 맡기고, 우리는 <b>조립과 규칙</b>(키를 언제 만들고, 무엇에 서명하고, 받을 때 무엇을 검사하는지)을 짠다.</p>
 <div class="tbl"><table class="tools">
 <tr><th>하는 일</th><th>알고리즘</th><th>libsodium 함수</th><th>왜 이것</th></tr>
-<tr><td>두 사람이 같은 열쇠 맞추기</td><td>X25519</td><td><code>crypto_kx_*</code></td><td>공개키만 주고받고 각자 같은 열쇠를 계산한다. 열쇠 자체는 선을 타지 않는다</td></tr>
-<tr><td>메시지 잠그기</td><td>XChaCha20-Poly1305</td><td><code>crypto_aead_xchacha20poly1305_ietf_*</code></td><td>잠그면서 위조 검사 태그 16바이트를 붙인다. 1바이트만 바뀌어도 안 풀린다. nonce가 24바이트라 무작위로 뽑아도 겹칠 걱정이 없다 — 헤더의 nonce 칸이 24바이트인 이유</td></tr>
-<tr><td>다음 열쇠 만들기</td><td>BLAKE2b</td><td><code>crypto_generichash</code></td><td>열쇠를 넣어 쓰는 해시. 거꾸로 되돌릴 수 없다</td></tr>
-<tr><td>신원·도장</td><td>Ed25519</td><td><code>crypto_sign_*</code></td><td>신원 키로 찍은 도장은 공개키로 누구나 확인하지만 아무도 흉내 못 낸다</td></tr>
+<tr><td>키 교환 — 두 사람이 같은 키 만들기</td><td>X25519</td><td><code>crypto_kx_*</code></td><td>공개키만 주고받고 각자 같은 키를 계산한다. 키 자체는 선을 타지 않는다</td></tr>
+<tr><td>메시지 암호화</td><td>XChaCha20-Poly1305</td><td><code>crypto_aead_xchacha20poly1305_ietf_*</code></td><td>암호화하면서 위조를 막는 인증 태그 16바이트를 붙인다. 1바이트만 바뀌어도 복호화되지 않는다. nonce가 24바이트라 무작위로 뽑아도 겹칠 걱정이 없다 — 헤더의 nonce 필드가 24바이트인 이유</td></tr>
+<tr><td>다음 키 만들기</td><td>BLAKE2b</td><td><code>crypto_generichash</code></td><td>키를 넣어 쓰는 해시. 거꾸로 되돌릴 수 없다</td></tr>
+<tr><td>신원·서명</td><td>Ed25519</td><td><code>crypto_sign_*</code></td><td>신원 키로 한 서명은 공개키로 누구나 확인하지만 아무도 흉내 못 낸다</td></tr>
 <tr><td>금고 조각 봉투</td><td>X25519 + XSalsa20-Poly1305</td><td><code>crypto_box_seal</code></td><td>받는 사람 공개키로 봉하면 그 사람만 연다. 신원 키를 변환해서 쓰니 다음 접속에도 열린다</td></tr>
-<tr><td>무작위 값</td><td>운영체제 난수</td><td><code>randombytes_buf</code></td><td>열쇠·nonce·금고 조각</td></tr>
+<tr><td>무작위 값</td><td>운영체제 난수</td><td><code>randombytes_buf</code></td><td>키·nonce·금고 조각</td></tr>
 <tr><td>지울 때</td><td>—</td><td><code>sodium_memzero</code></td><td>컴파일러가 "안 쓰는 메모리니까" 하고 지우기를 빼먹지 않는다</td></tr>
 </table></div>
 <pre class="term" data-ui><span class="c"># 우분투에 한 번 설치</span>
@@ -110,40 +113,40 @@
 <span class="p">gcc -Wall -Wextra -o deolmi deolmi.c -lsodium</span></pre>
 </section>
 <section class="t sec rise" id="keys">
-<h2 id="keys"><span class="n">04</span>열쇠는 두 종류</h2>
+<h2 id="keys"><span class="n">04</span>키는 두 종류</h2>
 <div class="tbl"><table>
 <tr><th></th><th>신원 키</th><th>세션 키</th></tr>
 <tr><td><b>언제 만드나</b></td><td>처음 실행할 때 한 번</td><td>접속할 때마다 새로</td></tr>
 <tr><td><b>어디 있나</b></td><td><code>~/.deolmi/이름/id</code> (나만 읽게 0600). 이름별 폴더라 한 노트북에서 여러 이름을 켜도 된다</td><td>메모리에만. 끄면 사라진다</td></tr>
-<tr><td><b>종류</b></td><td>Ed25519 (도장)</td><td>X25519 (열쇠 맞추기)</td></tr>
-<tr><td><b>하는 일</b></td><td>세션 키·금고·열람 요청·승인·증명에 도장 · 단어 지문 · 금고 조각 봉투</td><td>상대와 방향별 시작 열쇠 두 개(나→너, 너→나)를 만든다</td></tr>
+<tr><td><b>종류</b></td><td>Ed25519 (서명)</td><td>X25519 (키 교환)</td></tr>
+<tr><td><b>하는 일</b></td><td>세션 키·금고·열람 요청·승인·증명에 서명 · 단어 지문 · 금고 조각 봉투</td><td>상대와 방향별 시작 키 두 개(나→너, 너→나)를 만든다</td></tr>
 </table></div>
-<p class="sub">세션 키까지 신원 키에서 만들면 접속할 때마다 같은 열쇠가 나온다. 그래서 세션 키는 매번 새로 뽑고, 신원 키로는 도장만 찍는다.</p>
+<p class="sub">세션 키까지 신원 키에서 만들면 접속할 때마다 같은 키가 나온다. 그래서 세션 키는 매번 새로 뽑고, 신원 키로는 서명만 한다.</p>
 </section>
 <section class="t sec rise" id="hello">
-<h2 id="hello"><span class="n">05</span>HELLO에 도장 찍기</h2>
-<p>지금 HELLO 본문 128바이트는 0으로 비어 있다. 여기에 열쇠와 도장이 들어간다.</p>
+<h2 id="hello"><span class="n">05</span>HELLO에 서명하기</h2>
+<p>지금 HELLO 본문 128바이트는 0으로 비어 있다. 여기에 키와 서명이 들어간다.</p>
 <div class="pkt">
-  <span style="--w:4"><b>신원 공개키</b>32</span><span style="--w:4"><b>세션 공개키</b>32</span><span style="--w:6"><b>도장 (서명)</b>64</span>
+  <span style="--w:4"><b>신원 공개키</b>32</span><span style="--w:4"><b>세션 공개키</b>32</span><span style="--w:6"><b>서명</b>64</span>
 </div>
-<p>도장 찍는 내용 = <code>"deolmi-hello"</code> ‖ 이름 16바이트 ‖ 세션 공개키. 받는 쪽은 <code>hello_check</code>로 확인한다.</p>
+<p>서명하는 내용 = <code>"deolmi-hello"</code> ‖ 이름 16바이트 ‖ 세션 공개키. 받는 쪽은 <code>hello_check</code>로 확인한다.</p>
 <ul>
-<li>중계가 <b>세션 공개키만</b> 자기 걸로 바꾸면 → 도장이 안 맞는다 → <code>[!] 민지의 HELLO 서명이 맞지 않아 무시합니다</code></li>
-<li>중계가 <b>이름만</b> 바꿔 남의 HELLO를 붙이면 → 이름도 도장 안에 있어서 안 맞는다</li>
-<li>중계가 <b>신원 키까지 통째로</b> 자기 걸로 바꾸면 → 도장은 맞는다. 이걸 잡는 게 다음의 단어 지문이다</li>
+<li>중계가 <b>세션 공개키만</b> 자기 걸로 바꾸면 → 서명이 안 맞는다 → <code>[!] 민지의 HELLO 서명이 맞지 않아 무시합니다</code></li>
+<li>중계가 <b>이름만</b> 바꿔 남의 HELLO를 붙이면 → 이름도 서명 안에 있어서 안 맞는다</li>
+<li>중계가 <b>신원 키까지 통째로</b> 자기 걸로 바꾸면 → 서명은 맞는다. 이걸 잡는 게 다음의 단어 지문이다</li>
 </ul>
 </section>
 <section class="t sec rise" id="words">
 <h2 id="words"><span class="n">06</span>단어 지문 — 만나서 맞춰 보기</h2>
 <p>신원 공개키를 해시한 앞 8바이트를 단어 256개 표에 하나씩 대응시켜 <b>한글 단어 8개</b>로 바꾼다. 같은 키면 실행할 때마다 같은 단어다. 처음 만난 사람과는 옆에서(또는 전화로) 서로의 단어를 소리 내어 읽고 맞으면 확인 표시를 한다.</p>
 <pre class="term" data-ui><span class="c"># 현우 화면 — 처음 만남 (단어는 예시)</span>
-<span class="o">[열쇠] 민지 처음 만남 · 단어 고래-라면-등대-노을-탁구-혜성-냄비-참새 · 만나서 맞춰 보고 /verify 민지 ok</span>
+<span class="o">[키] 민지 처음 만남 · 단어 고래-라면-등대-노을-탁구-혜성-냄비-참새 · 만나서 맞춰 보고 /verify 민지 ok</span>
 <span class="p">현우&gt; /verify 민지 ok</span>
-<span class="o">[열쇠] 민지 ✔ 확인한 열쇠로 기억합니다</span>
+<span class="o">[키] 민지 ✔ 확인한 키로 기억합니다</span>
 <span class="c"># 다음에 다시 접속했을 때 — 같은 키</span>
-<span class="o">[열쇠] 민지 ✔ 전에 단어를 확인한 열쇠</span>
+<span class="o">[키] 민지 ✔ 전에 단어를 확인한 키</span>
 <span class="c"># 누가 중간에 끼어들어 키가 바뀌었을 때</span>
-<span class="k">[!] 민지의 열쇠가 바뀜: 고래-라면-… → 사막-연필-…
+<span class="k">[!] 민지의 키가 바뀜: 고래-라면-… → 사막-연필-…
     민지에게 단어를 소리 내어 다시 읽어 달라고 하세요 (/verify 민지)</span></pre>
 <ul>
 <li>확인한 키는 <code>~/.deolmi/이름/known</code>에 "이름 · 신원 공개키 · 확인했나"로 적어 둔다. 처음 한 번만 맞춰 보면 된다.</li>
@@ -152,10 +155,10 @@
 </ul>
 </section>
 <section class="t sec rise" id="ratchet">
-<h2 id="ratchet"><span class="n">07</span>메시지 잠그기 — 한 통마다 바뀌는 열쇠</h2>
-<p>두 사람이 HELLO를 주고받으면 <code>kx_chains</code>가 방향별 <b>시작 열쇠 CK₁</b>을 만든다 (나→너, 너→나 따로). 보낼 때마다 이 열쇠를 한 칸씩 앞으로 돌린다(<b>래칫</b> — 한 방향으로만 돌아가는 톱니).</p>
+<h2 id="ratchet"><span class="n">07</span>메시지 암호화 — 한 통마다 바뀌는 키</h2>
+<p>두 사람이 HELLO를 주고받으면 <code>kx_chains</code>가 방향별 <b>시작 키 CK₁</b>을 만든다 (나→너, 너→나 따로). 보낼 때마다 이 키를 한 단계씩 앞으로 돌린다(<b>래칫</b> — 한 방향으로만 돌아가는 톱니).</p>
 <figure class="seq">
-<svg viewBox="0 0 640 210" role="img" aria-label="체인 열쇠 CK1에서 메시지 열쇠 MK1을 만들고, 다음 체인 열쇠 CK2로 넘어가는 래칫">
+<svg viewBox="0 0 640 210" role="img" aria-label="체인 키 CK1에서 메시지 키 MK1을 만들고, 다음 체인 키 CK2로 넘어가는 래칫">
   <g class="box"><rect x="10" y="30" width="96" height="40" rx="8"/><text x="58" y="55" text-anchor="middle">CK₁</text></g>
   <g class="box"><rect x="262" y="30" width="96" height="40" rx="8"/><text x="310" y="55" text-anchor="middle">CK₂</text></g>
   <g class="box"><rect x="514" y="30" width="96" height="40" rx="8"/><text x="562" y="55" text-anchor="middle">CK₃</text></g>
@@ -170,24 +173,24 @@
 </svg>
 </figure>
 <pre class="term" data-ui><span class="c">── 보낼 때 (n번째) ──</span>
-<span class="k">MK_n</span>   = BLAKE2b(키 = CK_n, 내용 = "msg")              <span class="c">이 한 통만 잠그는 열쇠</span>
+<span class="k">MK_n</span>   = BLAKE2b(키 = CK_n, 내용 = "msg")              <span class="c">이 한 통만 암호화하는 키</span>
 <span class="k">암호문</span> = XChaCha20-Poly1305(MK_n, 평문_n, nonce, AD)  <span class="c">AD = 헤더의 종류·보낸 사람·받을 사람·seq</span>
-<span class="k">CK_n+1</span> = BLAKE2b(키 = CK_n, 내용 = "next" ‖ 평문_n)    <span class="c">방금 보낸 문장을 섞어 다음 열쇠</span>
-CK_n, MK_n 지움                                        <span class="c">열쇠는 보내지 않는다</span>
+<span class="k">CK_n+1</span> = BLAKE2b(키 = CK_n, 내용 = "next" ‖ 평문_n)    <span class="c">방금 보낸 평문을 섞어 다음 키</span>
+CK_n, MK_n 지움                                        <span class="c">키는 보내지 않는다</span>
 <span class="c">── 받을 때 ──</span>
-같은 식으로 MK_n 계산 → 풀어 봄 → <b>성공했을 때만</b> CK_n+1로 전진</pre>
+같은 식으로 MK_n 계산 → 복호화해 봄 → <b>성공했을 때만</b> CK_n+1로 전진</pre>
 <div class="tbl"><table>
-<tr><th>헤더 칸</th><th>지금</th><th>암호화 뒤</th></tr>
+<tr><th>헤더 필드</th><th>지금</th><th>암호화 뒤</th></tr>
 <tr><td><code>seq</code></td><td>0</td><td>1, 2, 3 … 두 사람 사이 방향마다 따로 센다</td></tr>
 <tr><td><code>nonce</code></td><td>0</td><td>매번 새로 뽑은 무작위 24바이트</td></tr>
-<tr><td>본문</td><td>0/1 + 글</td><td>(0/1 + 글)을 잠근 암호문 + 태그 16바이트</td></tr>
-<tr><td>종류·보낸 사람·받을 사람</td><td>그대로</td><td>그대로 보이지만 <b>AD</b>로 묶여서, 중계가 바꾸면 풀리지 않는다</td></tr>
+<tr><td>본문</td><td>0/1 + 글</td><td>(0/1 + 글)을 암호화한 암호문 + 태그 16바이트</td></tr>
+<tr><td>종류·보낸 사람·받을 사람</td><td>그대로</td><td>그대로 보이지만 <b>AD</b>로 묶여서, 중계가 바꾸면 복호화되지 않는다</td></tr>
 </table></div>
 <ul>
-<li><b>지난 대화는 안전</b> — 옛 CK는 덮어써서 지운다. 지금 체인 열쇠가 새어도 해시를 거꾸로 돌릴 수 없어서 지난 통은 못 연다. 다만 프로그램 메모리 전체가 털리면 그 접속(세션)은 위험하다 — 과장하지 않는다.</li>
+<li><b>지난 대화는 안전</b> — 옛 CK는 덮어써서 지운다. 지금 체인 키가 새어도 해시를 거꾸로 돌릴 수 없어서 지난 통은 못 연다. 다만 프로그램 메모리 전체가 털리면 그 접속(세션)은 위험하다 — 과장하지 않는다.</li>
 <li><b>다시 접속하면</b> 새 세션 키로 CK₁부터 새로 시작한다.</li>
-<li><b>문장 섞기</b>(<code>"next" ‖ 평문</code>)는 우리 팀이 넣은 변형이다. 표준 래칫(Signal의 대칭 래칫)은 평문을 섞지 않는다. 솔직히 보안상 이득은 거의 없다. 대신 한 통이라도 빠지면 그다음 열쇠를 만들 수 없어서, TCP라 빠질 일이 없다는 전제 위에 서 있다. 11-02 버전에 이미 들어가 테스트까지 통과했으니 그대로 쓴다.</li>
-<li><b>전체 대화</b>는 지금처럼 사람마다 한 통씩 — 이제는 사람마다 다른 열쇠로 잠근 한 통씩이다. 16명이면 16번 잠근다.</li>
+<li><b>평문 섞기</b>(<code>"next" ‖ 평문</code>)는 우리 팀이 넣은 변형이다. 표준 래칫(Signal의 대칭 래칫)은 평문을 섞지 않는다. 솔직히 보안상 이득은 거의 없다. 대신 한 통이라도 빠지면 그다음 키를 만들 수 없어서, TCP라 빠질 일이 없다는 전제 위에 서 있다. 11-02 버전에 이미 들어가 테스트까지 통과했으니 그대로 쓴다.</li>
+<li><b>전체 대화</b>는 지금처럼 사람마다 한 통씩 — 이제는 사람마다 다른 키로 암호화한 한 통씩이다. 16명이면 16번 암호화한다.</li>
 <li><b>방장 방식</b>에서도 같다. 방장은 다른 사람끼리의 글을 중계만 하고 열지 못한다. 방장 앞으로 온 글만 방장이 연다.</li>
 </ul>
 </section>
@@ -195,44 +198,43 @@ CK_n, MK_n 지움                                        <span class="c">열쇠�
 <h2 id="check"><span class="n">08</span>받을 때 검사 순서</h2>
 <p>받은 통마다 이 순서로 본다. 하나라도 걸리면 화면에 경고를 띄우고 그 통은 버린다. 경고 문구는 11-02 버전 코드 그대로다.</p>
 <ol class="path">
-<li><b>이 사람과 열쇠가 있나?</b> 없으면 <code>[!] 열쇠를 모르는 ○○가 보낸 메시지 · 폐기</code></li>
+<li><b>이 사람과 키가 있나?</b> 없으면 <code>[!] 키를 모르는 ○○가 보낸 메시지 · 폐기</code></li>
 <li><b>seq가 이미 받은 번호 이하인가?</b> → 다시 보내기 <code>[!] 순서번호 불일치: ○○의 #5 메시지는 이미 받은 번호 (재전송 의심) · 폐기</code></li>
 <li><b>seq가 건너뛰었나?</b> (마지막+1이 아님) → 빼먹기 <code>[!] ○○→나 #6 메시지를 못 받아서 그 뒤로는 열 수 없습니다: 대화가 끊겼습니다. 다시 접속하세요</code></li>
-<li><b>풀리나?</b> 안 풀리면 → 바꾸기 <code>[!] 변조 감지: ○○의 #6 메시지가 잠근 그대로가 아님 (중간에 바뀜) · 폐기</code>. 열쇠는 앞으로 안 돌렸으니 진짜 6번이 오면 열린다 — 가짜 한 통으로 대화가 깨지지 않는다.</li>
-<li><b>통과</b> → 열쇠를 한 칸 돌리고, 받은 번호를 적고, 화면에 띄운다.</li>
+<li><b>복호화되나?</b> 안 되면 → 바꾸기 <code>[!] 변조 감지: ○○의 #6 메시지가 암호화한 그대로가 아님 (중간에 바뀜) · 폐기</code>. 키는 앞으로 안 돌렸으니 진짜 6번이 오면 열린다 — 가짜 한 통으로 대화가 깨지지 않는다.</li>
+<li><b>통과</b> → 키를 한 단계 돌리고, 받은 번호를 적고, 화면에 띄운다.</li>
 </ol>
-<p class="sub">중계가 보내는 <code>SYS</code> 알림("○○ 입장" 같은 것)은 잠그지 않는다. 그래서 암호화 뒤에는 명단을 <b>도장이 맞는 HELLO로만</b> 늘린다. 퇴장 알림은 그대로 믿는다 — 중계가 거짓 퇴장을 보내도 그 사람과 대화가 끊기는 것뿐이고, 몰래 읽히지는 않는다.</p>
+<p class="sub">중계가 보내는 <code>SYS</code> 알림("○○ 입장" 같은 것)은 암호화하지 않는다. 그래서 암호화 뒤에는 목록을 <b>서명이 맞는 HELLO로만</b> 늘린다. 퇴장 알림은 그대로 믿는다 — 중계가 거짓 퇴장을 보내도 그 사람과 대화가 끊기는 것뿐이고, 몰래 읽히지는 않는다.</p>
 </section>
 <section class="t sec rise" id="change">
 <h2 id="change"><span class="n">09</span>지금 코드에서 바뀌는 곳</h2>
-<p><code>deolmi.c</code> 한 파일을 유지한다 (11-03 결정). 11-02 버전의 <code>crypto.c</code>(1014줄)와 <code>vault.c</code>(1014줄)를 새 칸으로 옮겨 오고, 대화 칸의 몇 곳을 고친다. <b>③ 중계 칸은 거의 그대로다.</b></p>
+<p><code>deolmi.c</code> 한 파일을 유지한다 (11-03 결정). 11-02 버전의 <code>crypto.c</code>(273줄)와 <code>vault.c</code>(304줄)를 새 칸으로 옮겨 오고, 대화 칸의 몇 곳을 고친다. <b>③ 중계 칸은 거의 그대로다.</b></p>
 <div class="tbl"><table class="tools">
 <tr><th>어디</th><th>지금</th><th>암호화 뒤</th></tr>
-<tr><td>새 칸 <b>⑥ 열쇠</b></td><td>—</td><td><code>crypto.c</code>를 옮김: 열쇠 맞추기, 래칫, 신원 키, 지문, 봉투</td></tr>
+<tr><td>새 칸 <b>⑥ 키</b></td><td>—</td><td><code>crypto.c</code>를 옮김: 키 교환, 래칫, 신원 키, 지문, 봉투</td></tr>
 <tr><td>새 칸 <b>⑦ 금고</b></td><td>—</td><td><code>vault.c</code>를 옮김: 묶음, 조각, 열람 요청, 승인, 증명</td></tr>
 <tr><td><code>main</code></td><td>이름 확인 후 바로 접속</td><td>신원 키 읽기(없으면 만들기) · 세션 키 뽑기 · 첫 화면에 내 단어</td></tr>
-<tr><td>참가자 HELLO 보내기</td><td>본문 0 128바이트</td><td><code>hello_make</code> — 열쇠 둘 + 도장</td></tr>
-<tr><td><code>handle_hello</code> (방장 부분)</td><td>방장 HELLO를 0으로 보냄 · <code>add_peer</code></td><td>방장의 진짜 HELLO · 새 사람 HELLO를 <code>on_hello</code>로 확인하고 열쇠 계산</td></tr>
-<tr><td><code>join_read</code>의 HELLO</td><td><code>add_peer</code></td><td><code>on_hello</code> — 도장 확인 · 지문 비교 · 열쇠 계산</td></tr>
-<tr><td><code>sys_update</code></td><td>"입장" 알림으로 명단 추가</td><td>추가는 HELLO로만 (08 아래)</td></tr>
+<tr><td>참가자 HELLO 보내기</td><td>본문 0 128바이트</td><td><code>hello_make</code> — 키 둘 + 서명</td></tr>
+<tr><td><code>handle_hello</code> (방장 부분)</td><td>방장 HELLO를 0으로 보냄 · <code>add_peer</code></td><td>방장의 진짜 HELLO · 새 사람 HELLO를 <code>on_hello</code>로 확인하고 키 계산</td></tr>
+<tr><td><code>join_read</code>의 HELLO</td><td><code>add_peer</code></td><td><code>on_hello</code> — 서명 확인 · 지문 비교 · 키 계산</td></tr>
+<tr><td><code>sys_update</code></td><td>"입장" 알림으로 목록 추가</td><td>추가는 HELLO로만 (08 아래)</td></tr>
 <tr><td><code>send_one</code></td><td>평문 그대로</td><td><code>chain_seal</code>로 잠금 · seq 하나 올림 · nonce</td></tr>
 <tr><td><code>display_msg</code></td><td>받은 글 그대로</td><td>08의 검사를 통과한 것만</td></tr>
 <tr><td><code>handle_packet</code> (방장 앞으로 온 것)</td><td>MSG만 화면에</td><td>MSG · VAULT · OPEN_REQ · SHARE · PROOF 모두 방장의 대화 칸으로</td></tr>
 <tr><td><code>on_line</code></td><td><code>/dm</code> <code>/all</code> <code>/who</code> <code>/help</code> <code>/quit</code></td><td>+ <code>/verify</code> <code>/lock</code> <code>/vault</code> <code>/open</code> <code>/approve</code></td></tr>
-<tr><td><code>show_eye</code> (서버 창)</td><td>평문 바이트가 보임</td><td>코드는 그대로. 이제 암호문만 보인다</td></tr>
 <tr><td>Makefile</td><td><code>gcc … deolmi.c</code></td><td>끝에 <code>-lsodium</code></td></tr>
 </table></div>
 <p class="sub">옮겨 올 파일들은 옛 <code>net.h</code>를 불러 쓰게 돼 있다. 한 파일에 넣으면서 그 부분은 지운다 (같은 정의가 이미 ① 통신 칸에 있다). 다 넣으면 <code>deolmi.c</code>는 대략 1,700줄이 된다.</p>
 </section>
 <section class="t sec rise" id="vault">
-<h2 id="vault"><span class="n">10</span>2인 잠금 — 두 열쇠 금고</h2>
+<h2 id="vault"><span class="n">10</span>2인 잠금 — 키 두 개짜리 금고</h2>
 <p>민지가 비밀(예: 동아리 통장 비밀번호)을 금고에 넣고 <b>현우와 수아 두 사람</b>에게 맡긴다. 그 뒤로는 <b>현우와 수아가 둘 다 동의해야만</b> 열린다. 은행 금고의 열쇠 두 개, 핵 발사 열쇠 두 개와 같은 생각이다.</p>
 <div class="tbl"><table class="vs">
 <tr><th>누가</th><th>혼자 열 수 있나</th><th>이유</th></tr>
 <tr><td>현우</td><td class="good">못 엶</td><td>자기 조각 S1만 있다</td></tr>
 <tr><td>수아</td><td class="good">못 엶</td><td>자기 조각 S2만 있다</td></tr>
-<tr><td>중계 (서버·방장)</td><td class="good">못 엶</td><td>조각이 현우·수아 신원 키로 봉해져 있다</td></tr>
-<tr><td>민지 노트북</td><td class="good">못 엶</td><td>맡기고 나면 열쇠와 조각을 지운다 (민지는 원래 내용을 안다)</td></tr>
+<tr><td>중계 (방장)</td><td class="good">못 엶</td><td>조각이 현우·수아 신원 키로 봉해져 있다</td></tr>
+<tr><td>민지 노트북</td><td class="good">못 엶</td><td>맡기고 나면 키와 조각을 지운다 (민지는 원래 내용을 안다)</td></tr>
 <tr><td>현우 + 수아</td><td class="mid">엶</td><td>이게 목적. 수아가 승인하면 현우 화면에 뜬다</td></tr>
 </table></div>
 
@@ -248,11 +250,11 @@ CK_n, MK_n 지움                                        <span class="c">열쇠�
     <dt>S1 ⊕ S2</dt><dd id="xr" class="ok"></dd>
   </dl>
 </div>
-<p class="sub">실제로는 비밀을 직접 나누지 않는다. 무작위 <b>잠금 열쇠 L</b>(32바이트)로 비밀을 잠그고, 그 L을 위처럼 S1·S2로 나눈다. 비밀 길이와 상관없이 조각은 늘 32바이트다.</p>
+<p class="sub">실제로는 비밀을 직접 나누지 않는다. 무작위 <b>암호화 키 L</b>(32바이트)로 비밀을 암호화하고, 그 L을 위처럼 S1·S2로 나눈다. 비밀 길이와 상관없이 조각은 늘 32바이트다.</p>
 </section>
 <section class="t sec rise" id="vflow">
 <h2 id="vflow"><span class="n">11</span>금고 흐름</h2>
-<p>모든 화살표는 중계를 거친다. 중계는 받을 사람 칸만 보고 넘긴다. 중계가 아무것도 보관하지 않으니 <b>맡길 때와 열 때 관련된 사람이 접속해 있어야</b> 한다.</p>
+<p>모든 화살표는 중계를 거친다. 중계는 받을 사람 필드만 보고 넘긴다. 중계가 아무것도 보관하지 않으니 <b>맡길 때와 열 때 관련된 사람이 접속해 있어야</b> 한다.</p>
 <figure class="seq">
 <svg viewBox="0 0 640 470" role="img" aria-label="민지가 금고를 맡기고, 현우가 열람을 요청하고, 수아가 승인해서 현우가 여는 순서">
   <g class="hd" text-anchor="middle">
@@ -264,30 +266,30 @@ CK_n, MK_n 지움                                        <span class="c">열쇠�
   <g class="box"><rect x="14" y="44" width="152" height="40" rx="8"/><text x="90" y="62" text-anchor="middle">/lock 현우 수아</text><text x="90" y="77" text-anchor="middle" class="dim">L 만들고 반 나누기</text></g>
   <g class="ar"><line x1="94" y1="108" x2="322" y2="108"/><text x="208" y="101">① VAULT 묶음</text>
   <line x1="94" y1="132" x2="552" y2="132"/><text x="430" y="125">① 같은 묶음</text></g>
-  <g class="box"><rect x="254" y="150" width="152" height="40" rx="8"/><text x="330" y="168" text-anchor="middle">도장 확인 · 저장</text><text x="330" y="183" text-anchor="middle" class="dim">내 조각에서 제목만</text></g>
-  <g class="box"><rect x="484" y="150" width="152" height="40" rx="8"/><text x="560" y="168" text-anchor="middle">도장 확인 · 저장</text><text x="560" y="183" text-anchor="middle" class="dim">내 조각에서 제목만</text></g>
+  <g class="box"><rect x="254" y="150" width="152" height="40" rx="8"/><text x="330" y="168" text-anchor="middle">서명 확인 · 저장</text><text x="330" y="183" text-anchor="middle" class="dim">내 조각에서 제목만</text></g>
+  <g class="box"><rect x="484" y="150" width="152" height="40" rx="8"/><text x="560" y="168" text-anchor="middle">서명 확인 · 저장</text><text x="560" y="183" text-anchor="middle" class="dim">내 조각에서 제목만</text></g>
   <g class="note"><text x="90" y="174" text-anchor="middle">L·S1·S2 지움</text></g>
   <g class="lbl"><text x="330" y="222" text-anchor="middle">— 나중에, 다음 접속이어도 —</text></g>
-  <g class="ar"><line x1="334" y1="256" x2="552" y2="256"/><text x="443" y="249">② OPEN_REQ + 현우 도장</text></g>
+  <g class="ar"><line x1="334" y1="256" x2="552" y2="256"/><text x="443" y="249">② OPEN_REQ + 현우 서명</text></g>
   <g class="box"><rect x="484" y="272" width="152" height="40" rx="8"/><text x="560" y="290" text-anchor="middle">/approve</text><text x="560" y="305" text-anchor="middle" class="dim">"현우가 '제목'을 열려 함"</text></g>
   <g class="ar back good"><line x1="556" y1="340" x2="338" y2="340"/><text x="447" y="333">③ SHARE — S2를 현우만 열게</text></g>
   <g class="note"><text x="560" y="358" text-anchor="middle">내 사본 지움</text></g>
   <g class="box key"><rect x="254" y="356" width="152" height="40" rx="8"/><text x="330" y="374" text-anchor="middle">S1 ⊕ S2 = L → 열림</text><text x="330" y="389" text-anchor="middle" class="dim">30초 뒤 화면에서 지움</text></g>
   <g class="ar back"><line x1="326" y1="430" x2="98" y2="430"/><text x="212" y="423">④ PROOF</text></g>
   <g class="ar"><line x1="334" y1="430" x2="552" y2="430"/><text x="443" y="423">④ PROOF</text></g>
-  <g class="note"><text x="330" y="456" text-anchor="middle">현우·수아 도장 둘 다 찍힌 열쇠 전달 증명</text></g>
+  <g class="note"><text x="330" y="456" text-anchor="middle">현우·수아 서명이 둘 다 들어간 키 전달 증명</text></g>
 </svg>
 </figure>
 <div class="tbl"><table>
 <tr><th>#</th><th>누가 · 무엇을</th><th>중계가 보는 것</th></tr>
-<tr><td>1</td><td><b>민지</b> — 잠금 열쇠 L로 내용 잠그기 → L = S1 ⊕ S2 → (S1 + 제목)을 현우 신원 키로, (S2 + 제목)을 수아 신원 키로 봉투에 넣기 → 묶음 전체에 도장 → 둘에게 한 통씩 보내고 L·S1·S2 지움</td><td>암호문, 봉투 2개, 도장</td></tr>
-<tr><td>2</td><td><b>현우·수아</b> — 민지 도장 확인 → 자기 봉투만 열어 제목 확인 → 묶음을 <code>~/.deolmi/이름/vault/</code>에 저장</td><td>—</td></tr>
-<tr><td>3</td><td><b>현우</b> <code>/open 제목</code> — 금고 번호에 도장 찍은 열람 요청을 수아에게</td><td>금고 번호, 도장</td></tr>
-<tr><td>4</td><td><b>수아</b> — 현우 도장 확인 → 화면에 무엇을 누가 열려는지 뜸 → <code>/approve</code> → 자기 조각 S2를 <b>현우만 열게</b> 다시 봉하고, 열쇠 전달 증명에 도장 → 자기 사본 지움, 승인한 번호 기억</td><td>현우만 여는 봉투, 도장</td></tr>
-<tr><td>5</td><td><b>현우</b> — 수아 도장 확인 → S1 ⊕ S2 = L → 내용 열기 → 30초 뒤(또는 엔터) 화면·스크롤 지움 → 묶음 지움 → 증명을 모두에게 (래칫으로 잠가서)</td><td>잠긴 증명</td></tr>
+<tr><td>1</td><td><b>민지</b> — 암호화 키 L로 내용 암호화 → L = S1 ⊕ S2 → (S1 + 제목)을 현우 신원 키로, (S2 + 제목)을 수아 신원 키로 봉투에 넣기 → 묶음 전체에 서명 → 둘에게 한 통씩 보내고 L·S1·S2 지움</td><td>암호문, 봉투 2개, 서명</td></tr>
+<tr><td>2</td><td><b>현우·수아</b> — 민지 서명 확인 → 자기 봉투만 열어 제목 확인 → 묶음을 <code>~/.deolmi/이름/vault/</code>에 저장</td><td>—</td></tr>
+<tr><td>3</td><td><b>현우</b> <code>/open 제목</code> — 금고 번호에 서명한 열람 요청을 수아에게</td><td>금고 번호, 서명</td></tr>
+<tr><td>4</td><td><b>수아</b> — 현우 서명 확인 → 화면에 무엇을 누가 열려는지 뜸 → <code>/approve</code> → 자기 조각 S2를 <b>현우만 열게</b> 다시 봉하고, 키 전달 증명에 서명 → 자기 사본 지움, 승인한 번호 기억</td><td>현우만 여는 봉투, 서명</td></tr>
+<tr><td>5</td><td><b>현우</b> — 수아 서명 확인 → S1 ⊕ S2 = L → 내용 열기 → 30초 뒤(또는 엔터) 화면·스크롤 지움 → 묶음 지움 → 증명을 모두에게 (래칫으로 암호화해서)</td><td>암호화된 증명</td></tr>
 </table></div>
 <ul>
-<li><b>금고 번호</b>는 중계가 붙이지 않는다. 도장까지 찍힌 묶음의 해시(BLAKE2b 32바이트)를 번호로 쓴다. 중계가 번호를 바꿔치기할 수 없다.</li>
+<li><b>금고 번호</b>는 중계가 붙이지 않는다. 서명까지 된 묶음의 해시(BLAKE2b 32바이트)를 번호로 쓴다. 중계가 번호를 바꿔치기할 수 없다.</li>
 <li>봉투가 신원 키로 봉해져 있어서 <b>다음 접속에도</b> 열린다. 세션 키로 봉했다면 끄는 순간 못 열게 된다.</li>
 <li>한 번 열면 끝이다. 현우는 묶음을, 수아는 사본을 지운다.</li>
 </ul>
@@ -295,19 +297,19 @@ CK_n, MK_n 지움                                        <span class="c">열쇠�
 <section class="t sec rise" id="vbytes">
 <h2 id="vbytes"><span class="n">12</span>금고 묶음의 모양</h2>
 <div class="pkt">
-  <span style="--w:3"><b>보유자 1</b>16</span><span style="--w:3"><b>보유자 2</b>16</span><span style="--w:5"><b>현우 봉투</b>112</span><span style="--w:5"><b>수아 봉투</b>112</span><span style="--w:6"><b>내용 암호문</b>내용 + 16</span><span style="--w:4"><b>민지 도장</b>64</span>
+  <span style="--w:3"><b>보유자 1</b>16</span><span style="--w:3"><b>보유자 2</b>16</span><span style="--w:5"><b>현우 봉투</b>112</span><span style="--w:5"><b>수아 봉투</b>112</span><span style="--w:6"><b>내용 암호문</b>내용 + 16</span><span style="--w:4"><b>민지 서명</b>64</span>
 </div>
 <ul>
-<li><b>봉투 112바이트</b> = 열쇠 조각 32 + 제목 32 + 봉투가 붙이는 48. 제목을 32바이트로 고정해서 길이로 제목을 짐작하지 못한다. 제목은 봉투 안에만 있어서 중계는 모른다.</li>
-<li><b>내용</b>은 1000바이트까지. 패킷 종류는 <code>VAULT</code>(3), 지금 헤더의 nonce 칸에 내용을 잠근 nonce가 들어간다.</li>
-<li><b>저장</b> — <code>~/.deolmi/이름/vault/번호앞8바이트.vault</code> (0600). 불러올 때마다 도장을 다시 확인한다. 파일을 누가 고쳤으면 <code>[!] 금고 파일이 바뀌어 서명이 안 맞음</code>.</li>
-<li><b>열쇠 전달 증명</b> = 금고 번호 · 제목 · 시각 · 맡긴 사람 · 요청한 사람 · 승인한 사람 + 현우 도장 + 수아 도장. "누가 누구에게 언제 열쇠를 넘겼다"를 둘 다 부인할 수 없다.</li>
+<li><b>봉투 112바이트</b> = 키 조각 32 + 제목 32 + 봉투가 붙이는 48. 제목을 32바이트로 고정해서 길이로 제목을 짐작하지 못한다. 제목은 봉투 안에만 있어서 중계는 모른다.</li>
+<li><b>내용</b>은 1000바이트까지. 패킷 종류는 <code>VAULT</code>(3), 지금 헤더의 nonce 필드에 내용을 암호화한 nonce가 들어간다.</li>
+<li><b>저장</b> — <code>~/.deolmi/이름/vault/번호앞8바이트.vault</code> (0600). 불러올 때마다 서명을 다시 확인한다. 파일을 누가 고쳤으면 <code>[!] 금고 파일이 바뀌어 서명이 안 맞음</code>.</li>
+<li><b>키 전달 증명</b> = 금고 번호 · 제목 · 시각 · 맡긴 사람 · 요청한 사람 · 승인한 사람 + 현우 서명 + 수아 서명. "누가 누구에게 언제 키를 넘겼다"를 둘 다 부인할 수 없다.</li>
 </ul>
 <div class="tbl"><table>
 <tr><th>종류</th><th>번호</th><th>보내는 쪽 → 받는 쪽</th><th>본문</th></tr>
 <tr><td><code>VAULT</code></td><td>3</td><td>민지 → 현우, 민지 → 수아</td><td>위 묶음</td></tr>
-<tr><td><code>OPEN_REQ</code></td><td>4</td><td>현우 → 수아</td><td>금고 번호 32 + 현우 도장 64</td></tr>
-<tr><td><code>SHARE</code></td><td>5</td><td>수아 → 현우</td><td>금고 번호 32 + 다시 봉한 조각 112 + 시각 8 + 수아 도장 64</td></tr>
+<tr><td><code>OPEN_REQ</code></td><td>4</td><td>현우 → 수아</td><td>금고 번호 32 + 현우 서명 64</td></tr>
+<tr><td><code>SHARE</code></td><td>5</td><td>수아 → 현우</td><td>금고 번호 32 + 다시 봉한 조각 112 + 시각 8 + 수아 서명 64</td></tr>
 <tr><td><code>PROOF</code></td><td>6</td><td>현우 → 모두</td><td>증명 (래칫으로 잠금)</td></tr>
 </table></div>
 <p class="sub">이 네 종류 번호는 지금 코드에도 자리가 잡혀 있고, 중계는 이미 내용을 안 보고 넘긴다. <code>test_server.c</code>의 "MSG가 아닌 type(VAULT)도 to에게 그대로"가 확인한다.</p>
@@ -324,12 +326,12 @@ CK_n, MK_n 지움                                        <span class="c">열쇠�
 <span class="c"># 수아</span>
 <span class="o">[요청] 현우가 민지의 '통장 비번' 금고를 열려고 합니다 · 승인하려면 /approve</span>
 <span class="p">수아&gt; /approve</span>
-<span class="o">[금고] 현우에게 '통장 비번' 열쇠 조각을 넘겼습니다. 내 사본은 지웠습니다</span>
+<span class="o">[금고] 현우에게 '통장 비번' 키 조각을 넘겼습니다. 내 사본은 지웠습니다</span>
 <span class="c"># 현우</span>
 <span class="k">[금고 열림] '통장 비번': 4512</span>
 <span class="o">    Enter를 누르거나 30초가 지나면 화면에서 지웁니다</span>
 <span class="c"># 모두</span>
-<span class="o">[증명] 수아가 현우에게 '통장 비번' 열쇠를 넘김 · 민지의 금고 · 14:05 · 현우✔ 수아✔</span></pre>
+<span class="o">[증명] 수아가 현우에게 '통장 비번' 키를 넘김 · 민지의 금고 · 14:05 · 현우✔ 수아✔</span></pre>
 <div class="tbl"><table>
 <tr><th>명령</th><th>하는 일</th></tr>
 <tr><td><code>/lock 이름1 이름2 "제목" 내용</code></td><td>나 말고 서로 다른 두 사람에게 맡긴다. 제목은 따옴표 안 31바이트(한글 10글자)까지, 둘 다 접속해 있어야 한다</td></tr>
@@ -345,46 +347,46 @@ CK_n, MK_n 지움                                        <span class="c">열쇠�
 <p>11-02 설계를 검토하면서 찾은 구멍과 막는 법이다. 코드를 옮길 때 이 줄을 빼먹으면 구멍이 다시 열린다.</p>
 <div class="tbl"><table>
 <tr><th>심각도</th><th>구멍</th><th>막는 법</th></tr>
-<tr><td class="bad">치명</td><td>봉투는 보낸 사람이 익명이라, 중계가 "민지의 금고"를 위조할 수 있다</td><td>민지가 신원 키로 묶음 전체(보유자 둘, 봉투 둘, 암호문, nonce)에 도장. 금고 번호도 묶음 해시</td></tr>
-<tr><td class="bad">치명</td><td>지문이 세션 키만 덮으면, 중계가 봉투용 공개키를 바꿔치기해 두 조각을 다 연다</td><td>지문은 신원 키 하나만. 봉투 키는 신원 키에서 변환. 세션 키에는 신원 키 도장</td></tr>
+<tr><td class="bad">치명</td><td>봉투는 보낸 사람이 익명이라, 중계가 "민지의 금고"를 위조할 수 있다</td><td>민지가 신원 키로 묶음 전체(보유자 둘, 봉투 둘, 암호문, nonce)에 서명. 금고 번호도 묶음 해시</td></tr>
+<tr><td class="bad">치명</td><td>지문이 세션 키만 덮으면, 중계가 봉투용 공개키를 바꿔치기해 두 조각을 다 연다</td><td>지문은 신원 키 하나만. 봉투 키는 신원 키에서 변환. 세션 키에는 신원 키 서명</td></tr>
 <tr><td class="mid">높음</td><td>숫자 12자리(40비트) 지문은 같은 지문이 나오는 키를 몇 시간이면 찾는다</td><td>단어 8개(64비트)</td></tr>
-<tr><td class="mid">중간</td><td>제목 해시를 평문으로 보내면 중계가 "통장 비번" 같은 흔한 제목을 넣어 맞혀 본다</td><td>제목은 봉투 안에만. 제목이 든 증명도 래칫으로 잠가 보냄</td></tr>
-<tr><td class="mid">중간</td><td>승인하는 사람이 무엇을 승인하는지 모르고, 요청·승인에 도장이 없다</td><td>제목을 보유자 둘에게 봉해 보냄(길이 고정). 요청과 승인에 도장</td></tr>
+<tr><td class="mid">중간</td><td>제목 해시를 평문으로 보내면 중계가 "통장 비번" 같은 흔한 제목을 넣어 맞혀 본다</td><td>제목은 봉투 안에만. 제목이 든 증명도 래칫으로 암호화해 보냄</td></tr>
+<tr><td class="mid">중간</td><td>승인하는 사람이 무엇을 승인하는지 모르고, 요청·승인에 서명이 없다</td><td>제목을 보유자 둘에게 봉해 보냄(길이 고정). 요청과 승인에 서명</td></tr>
 <tr><td>참고</td><td>풀기에 실패해도 래칫이 돌면 가짜 한 통으로 대화가 깨진다</td><td>성공했을 때만 전진</td></tr>
 <tr><td>참고</td><td>중계가 예전 열람 요청을 다시 보낸다</td><td>승인한 금고 번호를 기억해 두 번째는 거절</td></tr>
-<tr><td>참고</td><td>세션 키까지 신원 키에서 만들면 접속마다 같은 키가 나온다</td><td>세션 키는 매번 새로, 신원 키로는 도장만</td></tr>
+<tr><td>참고</td><td>세션 키까지 신원 키에서 만들면 접속마다 같은 키가 나온다</td><td>세션 키는 매번 새로, 신원 키로는 서명만</td></tr>
 </table></div>
 </section>
 <section class="t sec rise" id="cant">
 <h2 id="cant"><span class="n">15</span>못 막는 것</h2>
 <ul>
-<li><b>누가 누구에게 언제, 얼마나 긴 글을</b> 보내는지는 중계가 안다. 넘겨주려면 받을 사람 칸을 봐야 해서다.</li>
+<li><b>누가 누구에게 언제, 얼마나 긴 글을</b> 보내는지는 중계가 안다. 넘겨주려면 받을 사람 필드를 봐야 해서다.</li>
 <li><b>빼먹기·끊기 자체</b>는 막지 못한다. 들킬 뿐이다. 중계가 다 버리면 대화가 안 된다.</li>
 <li><b>처음 만났을 때 단어를 안 맞춰 보면</b> 중계가 그때부터 끼어들 수 있다. 그래서 확인 전에는 경고를 띄운다.</li>
 <li><b>내 노트북이 해킹되면</b> 신원 키 파일과 화면이 다 털린다.</li>
-<li>금고에서 연 내용을 <b>베껴 적거나 화면을 찍는 것</b>. 증명할 수 있는 건 "수아가 현우에게 열쇠를 넘겼다"까지다.</li>
+<li>금고에서 연 내용을 <b>베껴 적거나 화면을 찍는 것</b>. 증명할 수 있는 건 "수아가 현우에게 키를 넘겼다"까지다.</li>
 <li>현우와 수아가 <b>짜고</b> 열면 열린다 — 그게 2인 잠금의 정의다. 맡긴 민지는 원래 내용을 안다.</li>
 <li>중계가 아무것도 보관하지 않으니, 맡길 때와 열 때 관련된 사람이 <b>동시에 접속</b>해 있어야 한다.</li>
 </ul>
 </section>
 <section class="t sec rise" id="order">
 <h2 id="order"><span class="n">16</span>만드는 순서</h2>
-<p>통신 때처럼 한 단계씩, 확인을 통과해야 다음으로 넘어간다. 평문 테스트 25개는 단계마다 계속 통과해야 한다 (중계가 안 바뀌었다는 확인).</p>
+<p>통신 때처럼 한 단계씩, 확인을 통과해야 다음으로 넘어간다. 평문 테스트 27개는 단계마다 계속 통과해야 한다 (중계가 안 바뀌었다는 확인).</p>
 <div class="tbl"><table class="stage">
 <tr><th>단계</th><th>만들 것</th><th>확인</th></tr>
-<tr><td>E1</td><td>libsodium 붙이기 · <b>⑥ 열쇠</b> 칸 옮기기 · 신원 키 파일 · 첫 화면에 내 단어</td><td><code>test_crypto</code> 25개 · 두 번 켜도 같은 단어</td></tr>
-<tr><td>E2</td><td><b>도장 찍은 HELLO</b> (방장 포함) · <code>on_hello</code> · 명단은 HELLO로만</td><td>도장 틀린 HELLO는 무시하는 테스트 추가 · 셋이 들어와 서로 명단에 뜸</td></tr>
-<tr><td>E3</td><td><b>메시지 잠그기</b> — 사람마다 열쇠, 래칫, AD</td><td>셋이 채팅 시뮬레이션: 대화는 그대로 뜨고 서버 창 <code>[relay]</code>에 평문이 없음</td></tr>
+<tr><td>E1</td><td>libsodium 붙이기 · <b>⑥ 키</b> 칸 옮기기 · 신원 키 파일 · 첫 화면에 내 단어</td><td><code>test_crypto</code> 25개 · 두 번 켜도 같은 단어</td></tr>
+<tr><td>E2</td><td><b>서명한 HELLO</b> (방장 포함) · <code>on_hello</code> · 목록은 HELLO로만</td><td>서명 틀린 HELLO는 무시하는 테스트 추가 · 셋이 들어와 서로 목록에 뜸</td></tr>
+<tr><td>E3</td><td><b>메시지 암호화</b> — 사람마다 키, 래칫, AD</td><td>셋이 채팅 시뮬레이션: 대화는 그대로 뜨고, 방장이 넘기는 바이트와 네트워크에서 잡은 바이트(<code>tcpdump</code>)에 평문이 없음</td></tr>
 <tr><td>E4</td><td><b>받을 때 검사</b> — seq, 경고 문구</td><td>테스트에서 1바이트 바꾼 통 · 같은 통 두 번 · 하나 뺀 다음 통 → 각각 경고</td></tr>
-<tr><td>E5</td><td><b>단어 지문</b> — <code>/verify</code>, <code>known</code> 파일, 열쇠 바뀜 경고</td><td>같은 이름이 다른 신원 키로 들어오면 경고</td></tr>
+<tr><td>E5</td><td><b>단어 지문</b> — <code>/verify</code>, <code>known</code> 파일, 키 바뀜 경고</td><td>같은 이름이 다른 신원 키로 들어오면 경고</td></tr>
 <tr><td>V1</td><td><b>⑦ 금고</b> 칸 옮기기 · <code>/lock</code> · VAULT 받아 확인·저장 · <code>/vault</code></td><td><code>test_vault</code> 30개 · 받은 둘의 <code>vault/</code>에 파일</td></tr>
 <tr><td>V2</td><td><code>/open</code> → OPEN_REQ · <code>/approve</code> → SHARE</td><td>셋이 시뮬레이션: 요청·승인 화면, 같은 요청 두 번은 거절</td></tr>
-<tr><td>V3</td><td>열기 · 30초 뒤 화면 지우기 · PROOF 보내고 확인</td><td>열린 내용이 맞음 · 지워짐 · 모두에게 증명 (도장 둘 확인)</td></tr>
+<tr><td>V3</td><td>열기 · 30초 뒤 화면 지우기 · PROOF 보내고 확인</td><td>열린 내용이 맞음 · 지워짐 · 모두에게 증명 (서명 둘 확인)</td></tr>
 <tr><td>V4</td><td>노트북 두세 대에서 실제로</td><td>같은 핫스팟에서 E3~V3을 다시</td></tr>
 </table></div>
 <ul>
-<li><b>넣지 않는 것</b> — 서버 창에서 메시지를 바꾸거나 다시 보내는 공격 실험 명령 (11-03 결정: "공격 실험 명령은 하지마, 일단 통신 구현만"). 들키는지는 E4의 자동 테스트로 확인한다.</li>
-<li><b>나중에 정할 것</b> — 잠긴 대화 기록(<code>history.c</code>: 비밀번호로 잠근 내 노트북 기록, Argon2id). 11-02 버전에 있지만 금고까지 끝난 뒤 넣을지 정한다.</li>
+<li><b>넣지 않는 것</b> — 중계하는 쪽에서 메시지를 바꾸거나 다시 보내는 공격 실험 명령 (11-03 결정: "공격 실험 명령은 하지마, 일단 통신 구현만"). 들키는지는 E4의 자동 테스트로 확인한다.</li>
+<li><b>나중에 정할 것</b> — 암호화된 대화 기록(<code>history.c</code>: 비밀번호로 암호화한 내 노트북 기록, Argon2id). 11-02 버전에 있지만 금고까지 끝난 뒤 넣을지 정한다.</li>
 </ul>
 </section>
 <section class="t sec rise" id="decide">
@@ -392,7 +394,7 @@ CK_n, MK_n 지움                                        <span class="c">열쇠�
 <div class="tbl"><table>
 <tr><th>질문</th><th>추천</th><th>다른 길</th></tr>
 <tr><td>한 파일로 계속 갈까?</td><td><b>유지</b> — 11-03 결정. 칸 번호로 나뉘어 있어 1,700줄이어도 찾기 쉽다</td><td>⑥·⑦만 파일로 빼기. 맡은 사람별로 나누기는 쉽지만 빌드가 다시 여러 파일</td></tr>
-<tr><td>문장 섞기 래칫을 쓸까?</td><td><b>유지</b> — 이미 테스트 통과, 팀만의 특징. 발표에서는 "보안 이득은 크지 않다"고 솔직히</td><td>표준 대칭 래칫으로 바꾸기 (<code>next_chain</code> 몇 줄 수정)</td></tr>
+<tr><td>평문 섞기 래칫을 쓸까?</td><td><b>유지</b> — 이미 테스트 통과, 팀만의 특징. 발표에서는 "보안 이득은 크지 않다"고 솔직히</td><td>표준 대칭 래칫으로 바꾸기 (<code>next_chain</code> 몇 줄 수정)</td></tr>
 <tr><td>금고 보유자는 몇 명?</td><td><b>2명 고정</b> (둘 다 있어야 열림)</td><td>3명 중 2명 (Shamir 분할) — 더 복잡하고 이번 범위를 넘는다</td></tr>
 <tr><td>대화 기록은?</td><td><b>금고까지 끝난 뒤</b></td><td>E3 다음에 바로</td></tr>
 </table></div>

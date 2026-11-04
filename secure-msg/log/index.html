@@ -27,13 +27,13 @@
     <a class="t h-next rise" style="--i:2" href="../guide/"><span>다음 페이지</span><b>설명서 <span aria-hidden="true">→</span></b></a>
   </div>
   <div class="h-ui rise" data-ui><p class="cap">deolmi 저장소의 최근 커밋 (git log)</p>
-<pre class="term"><span class="k">11-03 10:28</span>  테스트 주석: 새 설명서 제목(&#x27;만든 순서와 확인&#x27;)에 맞춤
+<pre class="term"><span class="k">11-04 15:36</span>  중계만 하는 서버(--server) 모드를 뺌: 방장이 서버를 …
+<span class="k">11-04 15:18</span>  윈도우에서도 빌드·실행: 같은 deolmi.c 를 Visual …
+<span class="k">11-03 10:28</span>  테스트 주석: 새 설명서 제목(&#x27;만든 순서와 확인&#x27;)에 맞춤
 <span class="k">11-03 10:18</span>  시작 화면에 자세한 사용 설명(/help 로 다시 보기)과 만든…
 <span class="k">11-03 09:56</span>  방장·서버 첫 화면에 들어올 주소 표시: [주소] x.x.x.x…
 <span class="k">11-03 09:38</span>  입력 줄 앞뒤 공백 무시: &#x27;/who &#x27; 처럼 끝에 공백이 붙으…
-<span class="k">11-03 09:25</span>  한 파일로 합침: server.c·client.c·net.c·n…
-<span class="k">11-02 23:02</span>  하이브리드 deolmi: 서버 없이 방장이 중계+대화를 한 프로…
-<span class="k">11-02 21:23</span>  암호화 분리: 평문 통신 버전으로 되돌림 (crypto/vaul…</pre></div>
+<span class="k">11-03 09:25</span>  한 파일로 합침: server.c·client.c·net.c·n…</pre></div>
 </section>
 <div class="doc">
 <details class="t toc" open><summary>이 페이지 차례</summary><nav aria-label="차례"><ol><li><a href="#who"><i>00</i>누가 무엇을 했나</a></li><li><a href="#s01"><i>01</i>바뀐 순서</a></li><li><a href="#check"><i>02</i>어떻게 확인했나</a></li><li><a href="#s03"><i>03</i>deolmi.c 지도</a></li><li><a href="#s04"><i>04</i>다음에 할 일</a></li></ol></nav></details>
@@ -41,12 +41,12 @@
 
 <section class="t sec rise">
 <div class="now">
-  <b>지금 상태 · 11월 3일</b>
+  <b>지금 상태 · 11월 4일</b>
   <ul>
-    <li>코드는 <code>deolmi.c</code> <b>한 파일</b> (1014줄). <code>gcc -o deolmi deolmi.c</code> 한 줄로 빌드된다.</li>
-    <li>실행할 때 셋 중 하나를 고른다: <code>--server</code>(중계만) · <code>이름 --host</code>(방장: 중계하면서 대화) · <code>이름 [주소]</code>(참가자).</li>
+    <li>코드는 <code>deolmi.c</code> <b>한 파일</b> (1174줄). 윈도우는 <code>cl /utf-8 deolmi.c</code>, 리눅스·맥은 <code>gcc -o deolmi deolmi.c</code> 한 줄로 빌드된다. 윈도우와 리눅스가 섞여서도 대화된다.</li>
+    <li>실행할 때 둘 중 하나를 고른다: <code>이름 --host</code>(방장 — 방장이 서버가 되어 중계하면서 대화) · <code>이름 [주소]</code>(참가자). 1:1이든 여럿이든 이 방식 하나다.</li>
     <li><b>암호화는 뺀 평문 단계.</b> 먼저 "사람끼리 통신이 되는 것"을 확실히 하는 중이다.</li>
-    <li>자동 테스트 25개 통과. 둘이 채팅하는 것도 직접 돌려 확인했다 (아래 <a href="#check">확인</a>).</li>
+    <li>자동 테스트 27개 통과. 둘이 채팅하는 것도 직접 돌려 확인했다 (아래 <a href="#check">확인</a>).</li>
   </ul>
 </div>
 </section>
@@ -55,7 +55,7 @@
 <div class="tbl"><table class="whot">
 <tr><th>누구</th><th>한 일</th></tr>
 <tr><td><span class="u">김창식</span></td><td>기획과 방향 결정 (암호화는 나중에, 한 파일로, 공격 명령은 빼기, 주소 표시 등), 직접 실행해 보고 문제 찾기 (<code>/who</code>가 안 됨, 다른 컴퓨터에서 안 붙음, 사이트가 처음 보는 사람에게 불친절함)</td></tr>
-<tr><td><span class="c">Claude</span><br><small>Anthropic의 AI</small></td><td><b>코드 전부 작성</b> (S1~S8, 한 파일로 합치기, 버그 수정), 자동 테스트 작성·실행, 둘이 채팅 시뮬레이션, <b>이 사이트의 모든 페이지 작성</b> (설명서·암호화 계획·코드·시작하기·작업 기록), 암호화·2인 잠금 설계, 이 노트북 방화벽 규칙 넣기</td></tr>
+<tr><td><span class="c">Claude</span><br><small>Anthropic의 AI</small></td><td><b>코드 전부 작성</b> (S1~S8, 한 파일로 합치기, 버그 수정), 자동 테스트 작성·실행, 둘이 채팅 시뮬레이션, <b>이 사이트의 모든 페이지 작성</b> (설명서·암호화 계획·코드·시작하기·작업 기록), 암호화·2인 잠금 설계, 이 노트북 방화벽 규칙 넣기, 윈도우판(같은 <code>deolmi.c</code>가 윈도우에서 돌게)과 그 시험</td></tr>
 </table></div>
 <p class="sub">git 커밋 기록에는 작성자가 모두 김창식으로 남아 있지만, 위 표처럼 실제 코드는 Claude가 썼다. 아래 각 항목에도 누가 요청하고 누가 만들었는지 적었다.</p>
 </section>
@@ -78,7 +78,7 @@
 <div class="ev"><span class="d">11-02 낮</span>
 <h3>암호화 — S6~S8</h3>
 <p class="who">구현 <span class="c">Claude</span></p>
-<p>세션 열쇠와 문장마다 바뀌는 열쇠(래칫), 신원 키와 단어 지문, 두 열쇠 금고, 잠긴 대화 기록, 서버 창의 공격 명령(tamper·replay·drop). 코드는 <a href="../code/#e0">암호화 버전</a>에 있다. 이 설계를 설명하던 옛 설명서 내용은 11-03에 지웠다 (지금 프로그램과 달라서).</p></div>
+<p>세션 키와 메시지마다 바뀌는 키(래칫), 신원 키와 단어 지문, 키 두 개짜리 금고, 암호화된 대화 기록, 서버 창의 공격 명령(tamper·replay·drop). 코드는 <a href="../code/#e0">암호화 버전</a>에 있다. 이 설계를 설명하던 옛 설명서 내용은 11-03에 지웠다 (지금 프로그램과 달라서).</p></div>
 
 <div class="ev"><span class="d">11-02 21시</span>
 <h3>결정: 암호화를 빼고 통신부터</h3>
@@ -159,37 +159,64 @@
 <h3>설명서를 자세히, 암호화 계획 페이지를 새로</h3>
 <p class="who">요청 <span class="u">김창식</span> — "지금까지 한 내용이 어떻게 작동되는지 자세하게 … 암호화를 어떻게 할 것이고 2인 잠금 시스템은 어떻게 진행할 것인지" · 작성 <span class="c">Claude</span></p>
 <ul>
-<li><b><a href="../guide/">설명서</a></b>에 안에서 돌아가는 과정을 더했다 — 접속(소켓, 5초 제한, 실패 이유), 들어오는 순서(HELLO 그림), 실제 패킷 바이트, 한 통이 가는 길(거치는 함수 순서), 조각 모으기, <code>poll</code> 반복, 화면 그리기, 주소 표시. 팀 역할 표는 그대로 뒀다.</li>
-<li><b><a href="../plan/">암호화 계획</a></b>을 새로 만들었다 — 무엇을 지키나, 쓰는 도구(libsodium), 열쇠 두 종류, HELLO 도장, 단어 지문, 래칫, 받을 때 검사, 지금 코드에서 바뀌는 곳, 2인 잠금(두 열쇠 금고) 흐름과 바이트 모양, 막은 구멍, 못 막는 것, 만드는 순서 E1~V4. 11-02 암호화 버전 코드를 바탕으로 지금 한 파일·방장 방식에 맞게 다시 짰다. 공격 실험 명령은 계획에 넣지 않았다 (11-03 결정).</li>
+<li><b><a href="../guide/">설명서</a></b>에 안에서 돌아가는 과정을 더했다 — 접속(소켓, 5초 제한, 실패 이유), 접속 절차(HELLO 그림), 실제 패킷 바이트, 한 통이 가는 길(거치는 함수 순서), 조각 모으기, <code>poll</code> 반복, 화면 그리기, 주소 표시. 팀 역할 표는 그대로 뒀다.</li>
+<li><b><a href="../plan/">암호화 계획</a></b>을 새로 만들었다 — 무엇을 지키나, 쓰는 도구(libsodium), 키 두 종류, HELLO 서명, 단어 지문, 래칫, 받을 때 검사, 지금 코드에서 바뀌는 곳, 2인 잠금(키 두 개짜리 금고) 흐름과 바이트 모양, 막은 구멍, 못 막는 것, 만드는 순서 E1~V4. 11-02 암호화 버전 코드를 바탕으로 지금 한 파일·방장 방식에 맞게 다시 짰다. 공격 실험 명령은 계획에 넣지 않았다 (11-03 결정).</li>
 <li><b>코드는 바꾸지 않았다.</b> 확인: 평문 테스트 25개, 11-02 암호화 버전 테스트 80개를 다시 돌려 모두 통과. 페이지의 서버 창 출력과 패킷 바이트는 실제로 돌려서 얻은 것이다.</li>
 </ul></div>
+
+<div class="ev"><span class="d">11-04 오후</span>
+<h3>윈도우에서도 돈다 — WSL 없이</h3>
+<p class="who">요청 <span class="u">김창식</span> — "저번에 줬던 test.c 파일처럼 윈도우에서도 되게끔" · 구현·시험 <span class="c">Claude</span></p>
+<p><b>왜:</b> 지금까지는 우분투(WSL) 창에서만 돌아서, 윈도우 노트북은 WSL 설치·미러링·Hyper-V 방화벽 규칙까지 해야 했다. 김창식이 준 <code>test.c</code>(winsock으로 만든 작은 채팅)처럼 윈도우에서 바로 빌드해 쓰게 했다.</p>
+<p><b>어떻게:</b> 파일을 나누지 않고 <code>deolmi.c</code> 맨 위에 <code>#ifdef _WIN32</code> 부분을 두어 윈도우와 다른 곳만 바꿨다. 리눅스 쪽 동작은 그대로다.</p>
+<ul>
+<li><b>소켓</b> — winsock(<code>WSAStartup</code>·<code>closesocket</code>·<code>ioctlsocket</code>·<code>WSAPoll</code>). 오류는 윈도우가 주는 한국어 설명으로 띄운다. 윈도우에서는 <code>SO_REUSEADDR</code>가 "같은 포트를 둘이 쓰기"라서 뺐다.</li>
+<li><b>키보드</b> — <code>test.c</code>는 입력용 스레드를 따로 두지만, 덜미는 치는 줄을 맨 아래에 다시 그리는 화면이라 스레드 없이 같은 구조를 지켰다. 소켓은 <code>WSAPoll</code>로 0.05초씩 기다리고 그 사이 키보드를 따로 본다. 키는 콘솔 함수로 하나씩 받아 UTF-8로 바꾼다.</li>
+<li><b>한글</b> — 화면을 UTF-8로 바꾸고, 명령줄의 이름도 UTF-8로 다시 받는다 (그대로 두면 윈도우에서 들어온 한글 이름이 리눅스 쪽에서 깨진다). 글자 폭은 윈도우에 <code>wcwidth</code>가 없어서 직접 잰다.</li>
+<li><b>주소 표시</b> — 윈도우는 가상 장치가 많아서, 인터넷 쪽으로 UDP <code>connect</code>만 해 보고 운영체제가 고른 주소 하나를 보여 준다. 방화벽 창에서 '액세스 허용'을 누르라는 안내도 뜬다.</li>
+</ul>
+<p><b>확인:</b> Visual Studio 2026으로 가장 엄격한 경고(<code>/W4</code>)에서도 경고 0 · 리눅스 테스트 그대로 통과 · 윈도우↔윈도우, 윈도우 방장↔리눅스 참가자, 리눅스 방장↔윈도우 참가자 대화(한글 이름, <code>/dm</code>) · Windows Terminal과 같은 방식(의사 콘솔)으로 실제 키를 쳐 넣어 한글·지우기·화살표·긴 줄·이모지·Ctrl+C 확인. 이모지가 사라지던 문제를 이 확인에서 찾아 고쳤다 (윈도우는 자판에 없는 글자를 "Alt 키를 뗐다"는 신호에 실어 보낸다).</p>
+<p class="sub">확인 못 한 것: MinGW(gcc)로 하는 윈도우 빌드, 노트북 두 대 사이 실제 접속.</p></div>
+
+<div class="ev"><span class="d">11-04 오후</span>
+<h3>방향: 방장이 서버 — 중계만 하는 서버 모드(<code>--server</code>)는 뺐다</h3>
+<p class="who">결정 <span class="u">김창식</span> — "1대1이든 다수의 참여자가 있는 채팅이든간에 방장이 서버를 열고 나머지가 참여하는 방식을 사용할것", "없애" · 반영 <span class="c">Claude</span></p>
+<p><b>정한 것:</b> 덜미는 P2P(모두가 서로 직접 연결)가 아니다. 방장만 서버가 되고 나머지는 참가자로 들어온다. 1:1이든 여럿이든 같은 방식이다. 그래서 따로 띄우던 중계 전용 서버 모드를 뺐다.</p>
+<p><b>암호화는 여전히 필요한가:</b> 팀에서 "P2P면 중계자가 없어 운영자가 훔쳐볼 수 없으니 암호화가 필요 없다"는 의견이 나왔다. 김창식의 판단은 "암호화가 막으려는 대상은 중계자만이 아니라 <b>둘 사이 네트워크 경로의 제3자</b>이기도 해서 완전히 필요 없는 건 아니다"였다. Claude가 한 가지를 더했다: 덜미에서는 셋 이상이면 <b>방장이 남들끼리의 글도 중계</b>하므로, 방장 컴퓨터도 참가자끼리 암호화해야 하는 길목이다. <a href="../plan/#goal">암호화 계획 01</a>에 반영했다.</p>
+<ul>
+<li><code>deolmi.c</code> — 서버 모드, 서버 창의 <code>[relay]</code> 줄, 서버 안내 화면을 지우고 ③ 중계 칸을 방장 전용으로 정리했다.</li>
+<li>테스트 — <code>make test</code>가 서버 대신 방장 <code>H</code>를 켜고 돈다. 방장의 HELLO를 받는지, 방장 이름으로 못 들어오는지, 방장에게 보낸 글이 남에게 안 가는지 2개를 더해 27개.</li>
+<li>사이트 — 설명서(켜는 방식 두 가지, 한 통이 가는 길을 방장 기준으로 다시, 윈도우 설명), 시작하기(윈도우를 먼저), 암호화 계획(P2P 질문, 서버 창 예시 바꿈)을 고쳤다. 암호화 계획 페이지에서 <code>crypto.c</code>·<code>vault.c</code> 줄 수가 <code>deolmi.c</code> 줄 수로 잘못 나오던 것도 고쳤다 (273줄·304줄).</li>
+</ul>
+<p><b>확인:</b> 리눅스 <code>make test</code> 27개 통과, 윈도우 경고 0, 윈도우 방장↔참가자 대화와 실제 키 입력 다시 확인. 설명서의 "한 통이 가는 길" 화면은 방장 민지·참가자 수빈·현우를 실제로 띄워 얻은 출력이다.</p></div>
 </div>
 </section>
 <section class="t sec rise" id="check">
 <h2 id="check"><span class="n">02</span>어떻게 확인했나</h2>
-<h3>자동 테스트 — <code>make test</code>, 25개 모두 통과</h3>
-<p>서버(<code>./deolmi --server</code>)를 켜 놓고 가짜 사용자들이 붙어서 확인한다.</p>
+<h3>자동 테스트 — <code>make test</code>, 27개 모두 통과</h3>
+<p>방장(<code>./deolmi H --host</code>)을 켜 놓고 가짜 참가자들이 붙어서 확인한다.</p>
 <ul>
 <li><b>패킷 5개</b> — 1바이트씩 쪼개 보내도 한 통으로 받는다 · 붙어서 온 두 통을 따로 꺼낸다 · 말도 안 되는 길이를 보내면 그 사람만 끊고 나머지는 계속된다 · 본문 0바이트</li>
-<li><b>중계 20개</b> — 입장하면 서로의 HELLO와 입장 알림을 받는다 · 같은 이름·빈 이름 거절 · <code>to</code>에게만 간다 · 남의 이름으로 보내기 차단 · 없는 사람·모르는 종류 처리 · 퇴장 알림 · 같은 이름으로 다시 입장 · 16명까지 받고 17번째는 "꽉 찼습니다"</li>
+<li><b>중계 22개</b> — 입장하면 서로의(방장 포함) HELLO와 입장 알림을 받는다 · 같은 이름·빈 이름·방장 이름 거절 · 방장에게 보낸 글은 남에게 안 감 · <code>to</code>에게만 간다 · 남의 이름으로 보내기 차단 · 없는 사람·모르는 종류 처리 · 퇴장 알림 · 같은 이름으로 다시 입장 · 16명까지 받고 17번째는 "꽉 찼습니다"</li>
 </ul>
 <h3>둘이서 채팅 — 직접 돌림</h3>
 <p>한 컴퓨터에서 프로그램 두 개를 띄우고, 정해 둔 순서대로 글을 넣어 양쪽 화면을 확인했다. 전체 대화, <code>/dm</code> 1:1, <code>/who</code>, 나가기까지 모두 맞게 떴다. 화면은 <a href="../run/#chat">시작하기</a>에 옮겨 두었다.</p>
 <ul>
 <li><b>방장 모드</b> — 민지(<code>--host</code>)와 현우</li>
-<li><b>서버 모드</b> — <code>--server</code> + 민지 + 현우. 서버 창에 중계 줄이 찍히는 것까지 확인</li>
+<li><b>셋이서</b> — 방장 민지 + 수빈 + 현우. 수빈이 모두에게 보낸 글이 방장 화면과 현우 화면에 뜨는 것까지 확인 (<a href="../guide/#path">설명서 06</a>)</li>
+<li><b>윈도우</b> — 윈도우끼리, 윈도우와 리눅스가 섞여서 (위 11-04 오후)</li>
 </ul>
 <p>위 자동 테스트와 시뮬레이션은 <span class="c">Claude</span>가 돌렸고, 실제 노트북에서 띄워 대화해 본 것은 <span class="u">김창식</span>이다.</p>
-<div class="tip"><b>아직 확인 못 한 것</b> — 다른 컴퓨터에서 접속: 11-03 다른 데스크탑에서 시도했지만 연결이 이 노트북까지 오지 않았다. 학교 와이파이(SSU_INFO_WI-FI)가 기기끼리 연결을 막는 것으로 보고, 휴대폰 핫스팟으로 다시 해 볼 예정. 맥에서 빌드도 아직.</div>
+<div class="tip"><b>아직 확인 못 한 것</b> — 다른 컴퓨터에서 접속: 11-03 다른 데스크탑에서 시도했지만 연결이 이 노트북까지 오지 않았다. 학교 와이파이(SSU_INFO_WI-FI)가 기기끼리 연결을 막는 것으로 보고, 휴대폰 핫스팟으로 다시 해 볼 예정. 맥에서 빌드, 윈도우 MinGW(gcc) 빌드도 아직.</div>
 </section>
 <section class="t sec rise" id="s03">
 <h2 id="s03"><span class="n">03</span>deolmi.c 지도</h2>
-<p>위에서부터 이 순서로 놓여 있다. 고치고 싶은 게 있으면 해당 칸부터 보면 된다.</p>
+<p>위에서부터 이 순서로 놓여 있다. 고치고 싶은 게 있으면 해당 칸부터 보면 된다. 맨 위 <code>#ifdef _WIN32</code> 부분은 윈도우와 리눅스·맥이 다른 곳(소켓·키보드·화면)만 모아 둔 것이다.</p>
 <div class="tbl"><table class="map">
 <tr><th>칸</th><th>하는 일</th><th>주요 함수</th></tr>
 <tr><td>① 통신</td><td>패킷 모양, 접속, 길이 붙여 보내기, 덜 온 바이트 모았다가 한 통씩 꺼내기</td><td><code>net_listen</code> <code>net_connect</code> <code>send_packet</code> <code>conn_read</code> <code>conn_take</code></td></tr>
-<tr><td>② 화면</td><td>입력 줄을 맨 아래에 두고, 받은 글은 그 위에 찍기. 한글 폭 계산, 색</td><td><code>show</code> <code>put_line</code> <code>draw_input</code> · 아는 사람 명단 <code>add_peer</code></td></tr>
-<tr><td>③ 중계</td><td>서버·방장 공통. 이름 등록, <code>to</code>에게 전하기, 입장·퇴장 알림, 규칙 검사</td><td><code>handle_hello</code> <code>handle_packet</code> <code>relay</code> <code>serve</code></td></tr>
+<tr><td>② 화면</td><td>입력 줄을 맨 아래에 두고, 받은 글은 그 위에 찍기. 한글 폭 계산, 색</td><td><code>show</code> <code>put_line</code> <code>draw_input</code> · 아는 사람 목록 <code>add_peer</code></td></tr>
+<tr><td>③ 중계</td><td>방장이 하는 일. 이름 등록, <code>to</code>에게 전하기, 입장·퇴장 알림, 규칙 검사</td><td><code>handle_hello</code> <code>handle_packet</code> <code>relay</code> <code>serve</code></td></tr>
 <tr><td>④ 대화</td><td>방장·참가자 공통. 받은 글 띄우기, 보내기, <code>/dm</code> 같은 명령, 키 입력</td><td><code>display_msg</code> <code>send_text</code> <code>on_line</code> <code>on_key</code></td></tr>
 <tr><td>⑤ main</td><td>실행 방식 고르기, 그다음 <code>poll</code> 하나로 키보드·접속·소켓을 같이 지켜보는 반복</td><td><code>main</code></td></tr>
 </table></div>

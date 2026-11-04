@@ -1,4 +1,4 @@
-/* 서버 중계 확인 (설명서 '만든 순서와 확인'의 S4). 서버(./deolmi --server)가 켜져 있어야 한다 — make test 가 알아서 켠다
+/* 방장 중계 확인 (설명서 '만든 순서와 확인'의 S4). 방장(./deolmi H --host)이 켜져 있어야 한다 — make test 가 알아서 켠다
    HELLO 등록·전달, to로 중계, 입장·퇴장 SYS, 처리 규칙 */
 #include <stdio.h>
 #include <string.h>
@@ -21,7 +21,7 @@ struct user {
     struct conn c;
     struct got  g[MAX_GOT];
     int         ng;
-    int         closed;  /* 서버가 연결을 끊었나 */
+    int         closed;  /* 방장이 연결을 끊었나 */
 };
 
 static struct user A, B, C, D, E, F;
@@ -127,7 +127,7 @@ int main(void)
 {
     join(&A, "A", 'a');
     if (A.c.fd < 0) {
-        printf("서버를 먼저 켜세요: ./deolmi --server\n");
+        printf("방장을 먼저 켜세요: ./deolmi H --host\n");
         return 1;
     }
     usleep(50000);
@@ -135,18 +135,29 @@ int main(void)
     usleep(50000);
     join(&C, "C", 'c');
     collect_all();
-    check(has_hello(&A, "B", 'b') && has_hello(&A, "C", 'c') && count(&A, T_HELLO, NULL) == 2,
-          "A가 B, C의 HELLO를 받음");
-    check(has_hello(&B, "A", 'a') && has_hello(&B, "C", 'c') && count(&B, T_HELLO, NULL) == 2,
-          "B가 A, C의 HELLO를 받음");
-    check(has_hello(&C, "A", 'a') && has_hello(&C, "B", 'b') && count(&C, T_HELLO, NULL) == 2,
-          "C가 A, B의 HELLO를 받음");
+    /* 방장 H도 방에 있는 한 사람이라 H의 HELLO(본문 0)도 온다 */
+    check(has_hello(&A, "B", 'b') && has_hello(&A, "C", 'c') && has_hello(&A, "H", 0) && count(&A, T_HELLO, NULL) == 3,
+          "A가 B, C와 방장 H의 HELLO를 받음");
+    check(has_hello(&B, "A", 'a') && has_hello(&B, "C", 'c') && has_hello(&B, "H", 0) && count(&B, T_HELLO, NULL) == 3,
+          "B가 A, C와 방장 H의 HELLO를 받음");
+    check(has_hello(&C, "A", 'a') && has_hello(&C, "B", 'b') && has_hello(&C, "H", 0) && count(&C, T_HELLO, NULL) == 3,
+          "C가 A, B와 방장 H의 HELLO를 받음");
     check(has_sys(&A, "C 입장") && has_sys(&B, "C 입장") && has_sys(&C, "C 입장"), "전원에게 SYS \"C 입장\"");
 
     join(&D, "B", 'd');
     collect_all();
     check(has_sys(&D, "이름 사용 중") && D.closed, "같은 이름 B는 거절하고 끊음");
     check(count(&A, T_HELLO, NULL) == 0 && count(&A, T_SYS, NULL) == 0, "거절된 사람은 남에게 알려지지 않음");
+
+    join(&D, "H", 'd');
+    collect_all();
+    check(has_sys(&D, "이름 사용 중") && D.closed, "방장 이름 H로도 못 들어옴");
+
+    make(T_MSG, "A", "H", "방장에게");
+    send_packet(A.c.fd, &pkt);
+    collect_all();
+    check(count(&A, T_SYS, NULL) == 0 && count(&B, T_MSG, NULL) == 0 && count(&C, T_MSG, NULL) == 0,
+          "방장에게 보낸 MSG는 방장이 받고 다른 사람에게 안 감");
 
     make(T_MSG, "A", "B", "B에게만");
     send_packet(A.c.fd, &pkt);
@@ -171,7 +182,7 @@ int main(void)
 
     make(9, "A", "B", "");
     send_packet(A.c.fd, &pkt);
-    make(T_SYS, "A", "B", "가짜 서버 알림");
+    make(T_SYS, "A", "B", "가짜 방장 알림");
     send_packet(A.c.fd, &pkt);
     collect_all();
     check(count(&A, T_SYS, NULL) == 2 && has_sys(&A, "모르는 type") && count(&B, T_SYS, NULL) == 0,

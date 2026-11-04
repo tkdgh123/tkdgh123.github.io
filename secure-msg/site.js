@@ -45,7 +45,7 @@
   const problem = (v, who) => {
     const n = enc.encode(v).length;
     if (!v) return `${who} 이름이 비어 있다`;
-    if (n > 15) return `${who} 이름이 ${n}바이트다. 16칸 중 끝 하나는 끝 표시라 15바이트(한글 5글자)까지만 된다`;
+    if (n > 15) return `${who} 이름이 ${n}바이트다. 16바이트 중 마지막 1바이트는 널 문자 자리라 15바이트(한글 5글자)까지만 된다`;
     if (/[\s/]/.test(v)) return `${who} 이름에 띄어쓰기나 / 는 못 쓴다`;
     return "";
   };
@@ -57,7 +57,7 @@
     const tb = enc.encode(text.value), body = [flag, ...tb], len = 65 + body.length;
     const lb = [len >>> 24, (len >>> 16) & 255, (len >>> 8) & 255, len & 255].map(hex).join(" ");
     const rows = [
-      line(`<span class="k">${lb}</span>`, 11, `길이 ${len} (머리 65 + 본문 ${body.length})`),
+      line(`<span class="k">${lb}</span>`, 11, `길이 ${len} (헤더 65 + 본문 ${body.length})`),
       line(`<span class="k">02</span>`, 2, "종류 = MSG"),
       name(from.value, "보낸 사람"),
       name(to.value, "받을 사람"),
@@ -73,7 +73,7 @@
     out.innerHTML = rows.join("\n");
     const long = tb.length > 1000 ? ` <span class="bad">· 덜미 입력 줄은 1000바이트에서 더 쳐지지 않는다</span>` : "";
     sum.innerHTML = bad ? `<span class="bad">${bad}</span>`
-      : `한 번에 <b>${4 + len}바이트</b>가 나간다 — 길이 4 + 머리 65 + 본문 ${body.length}${long}`;
+      : `한 번에 <b>${4 + len}바이트</b>가 나간다 — 길이 4 + 헤더 65 + 본문 ${body.length}${long}`;
   }
   modes.forEach(b => b.addEventListener("click", () => {
     flag = +b.dataset.f; modes.forEach(m => m.setAttribute("aria-pressed", m === b)); draw();

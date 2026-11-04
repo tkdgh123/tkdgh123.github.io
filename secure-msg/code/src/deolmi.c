@@ -1,12 +1,15 @@
 /* 덜미 — 프밍기2 메신저. 이 파일 하나가 프로그램 전부다 (평문 단계).
 
-   빌드:  gcc -Wall -Wextra -o deolmi deolmi.c      (또는 make)
+   빌드:  리눅스·맥·WSL     gcc -Wall -Wextra -o deolmi deolmi.c      (또는 make)
+          윈도우 MSYS2/MinGW  gcc -Wall -Wextra -o deolmi.exe deolmi.c -lws2_32
+          윈도우 Visual Studio 개발자 명령 창에서  cl /utf-8 deolmi.c   (→ deolmi.exe)
+          (Visual Studio 프로젝트로 빌드할 때는 C/C++ → 명령줄 → 추가 옵션에 /utf-8 — 한글이 깨지지 않게)
 
-   ./deolmi --server          서버 — 중계만 한다 (오가는 패킷이 서버 창에 한 줄씩 보인다)
-   ./deolmi 이름 --host       방장 — 서버 없이 내가 중계하면서 대화에도 낀다
-   ./deolmi 이름 [주소]        참가자 — 서버나 방장에게 접속 (주소 생략 시 127.0.0.1)
+   ./deolmi 이름 --host       방장 — 방을 연다. 방장이 서버가 되어 중계하면서 대화에도 낀다
+   ./deolmi 이름 [주소]        참가자 — 방장에게 접속 (주소 생략 시 127.0.0.1)
+   (윈도우에서는 ./deolmi 대신 .\deolmi)
 
-   차례: ① 통신(패킷 주고받기)  ② 화면  ③ 중계(서버·방장 공통)  ④ 대화  ⑤ main
+   차례: ① 통신(패킷 주고받기)  ② 화면  ③ 중계(방장)  ④ 대화  ⑤ main
 
    누가 무엇을 했나
      김창식 — 기획, 방향 결정(암호화는 나중에·한 파일·주소 표시 등), 실제로 돌려 보고 문제 찾기
@@ -15,20 +18,22 @@
 
    ※ 암호화는 뺀 단계다. 메시지는 평문으로 오간다. 암호화까지 넣었던 예전 버전과
      무엇을 왜 바꿨는지는 https://tkdgh123.github.io/secure-msg/ (코드 · 작업 기록) 에 있다. */
-#define _GNU_SOURCE   /* wcwidth: 한글이 화면에서 두 칸인 걸 재려고 */
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <stdint.h>
-#include <stddef.h>
-#include <string.h>
-#include <signal.h>
-#include <locale.h>
-#include <wchar.h>
+#ifdef _WIN32   /* 윈도우: 소켓은 winsock, 키보드·화면은 콘솔 API로 */
+#define _CRT_SECURE_NO_WARNINGS
+#undef  _WIN32_WINNT
+#define _WIN32_WINNT 0x0601   /* 윈도우 7 이후 기능까지 쓴다 (WSAPoll = 윈도우판 poll) */
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#include <windows.h>
+#include <shellapi.h>
+#ifdef _MSC_VER
+#pragma comment(lib, "ws2_32.lib")
+#pragma comment(lib, "shell32.lib")
+#endif
+#else
 #include <poll.h>
 #include <unistd.h>
 #include <termios.h>
-#include <errno.h>
 #include <fcntl.h>
 #include <netdb.h>
 #include <arpa/inet.h>
@@ -36,6 +41,36 @@
 #include <net/if.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
+#endif
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdarg.h>
+#include <stdint.h>
+#include <stddef.h>
+#include <string.h>
+#include <signal.h>
+#include <errno.h>
+
+#ifdef _WIN32
+#define close(s) closesocket(s)   /* 윈도우는 소켓을 close가 아니라 closesocket으로 닫는다 */
+#define poll     WSAPoll
+#ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
+#define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
+#endif
+
+/* 윈도우 소켓 오류는 errno가 아니라 WSAGetLastError()에 있다. perror 대신 이걸로 (윈도우 한국어 설명이 나온다) */
+static void sock_perror(const char *what)
+{
+    int e = WSAGetLastError();
+    wchar_t w[256];
+    char s[768] = "";
+    if (FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, e, 0, w, 256, NULL))
+        WideCharToMultiByte(CP_UTF8, 0, w, -1, s, sizeof(s), NULL, NULL);
+    s[strcspn(s, "\r\n")] = '\0';
+    fprintf(stderr, "%s: %s (오류 %d)\n", what, s, e);
+}
+#define perror(s) sock_perror(s)
+#endif
 
 /* ================= ① 통신: 길이 붙인 패킷 =================
    TCP는 "어디까지가 한 메시지"인지 모른다. 그래서 보낼 때 맨 앞에 길이 4바이트를 붙이고,
@@ -43,7 +78,7 @@
 
    패킷 모양은 암호화 버전(브랜치 with-crypto)과 똑같이 맞춰 두었다. 그래서 지금은 안 쓰는
    칸이 있다: seq·nonce 는 0, HELLO 본문 128바이트는 0으로 채워 보낸다.
-   나중에 암호화를 다시 얹을 때 서버 쪽 코드를 거의 안 바꿔도 되게 하려는 것이다. */
+   나중에 암호화를 다시 얹을 때 중계 코드를 거의 안 바꿔도 되게 하려는 것이다. */
 
 #ifndef MSG_NOSIGNAL        /* 맥에는 없다. 대신 main에서 SIGPIPE를 무시한다 */
 #define MSG_NOSIGNAL 0
@@ -56,8 +91,8 @@
 #define HELLO_LEN  (32 + 32 + 64)   /* 암호화 버전: 신원 공개키 + 세션 공개키 + 서명. 지금은 0 */
 #define PKT_MAX    (4 + HDR_LEN + MAX_BODY)
 
-/* 패킷 종류. 지금 쓰는 건 HELLO(접속하며 이름 밝히기) · MSG(대화) · SYS(서버 알림).
-   VAULT~PROOF 는 암호화 버전의 금고용 — 서버는 내용을 안 보고 to 에게 그대로 전한다 */
+/* 패킷 종류. 지금 쓰는 건 HELLO(접속하며 이름 밝히기) · MSG(대화) · SYS(방장 프로그램의 알림).
+   VAULT~PROOF 는 암호화 버전의 금고용 — 중계하는 쪽은 내용을 안 보고 to 에게 그대로 전한다 */
 enum { T_HELLO = 1, T_MSG, T_VAULT, T_OPEN_REQ, T_SHARE, T_PROOF, T_SYS };
 
 struct packet {
@@ -78,19 +113,22 @@ struct conn {                 /* 받는 중인 바이트를 모아 두는 곳 */
 /* port번에서 접속을 기다리는 소켓을 만든다. 실패하면 -1 */
 int net_listen(int port)
 {
-    int fd = socket(AF_INET, SOCK_STREAM, 0);
+    int fd = (int)socket(AF_INET, SOCK_STREAM, 0);
     if (fd < 0) {
         perror("socket");
         return -1;
     }
 
-    /* 껐다 바로 켜도 Address already in use가 안 나게 */
+#ifndef _WIN32
+    /* 껐다 바로 켜도 Address already in use가 안 나게.
+       윈도우에서는 이 옵션이 "같은 포트를 둘이 같이 쓰기"라서 방이 두 개 열려 버린다 → 안 쓴다 */
     int on = 1;
     setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
+#endif
 
     struct sockaddr_in addr = {0};
     addr.sin_family = AF_INET;
-    addr.sin_port = htons(port);
+    addr.sin_port = htons((uint16_t)port);
     addr.sin_addr.s_addr = htonl(INADDR_ANY);   /* 0.0.0.0: 다른 노트북에서도 접속 가능 */
 
     if (bind(fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
@@ -119,7 +157,7 @@ int net_connect(const char *host, int port)
         return -1;
     }
 
-    int fd = socket(AF_INET, SOCK_STREAM, 0);
+    int fd = (int)socket(AF_INET, SOCK_STREAM, 0);
     if (fd < 0) {
         perror("socket");
         freeaddrinfo(res);
@@ -128,6 +166,26 @@ int net_connect(const char *host, int port)
 
     /* 5초 안에 안 붙으면 포기한다. 중간에서 막힌 네트워크면 그냥 두면 2분 넘게 아무 말 없이 멈춘다.
        그래서 잠깐 기다리지 않는 모드로 접속을 걸어 두고, poll로 5초만 기다린다 */
+#ifdef _WIN32
+    u_long nb = 1;
+    ioctlsocket(fd, FIONBIO, &nb);
+    int r = connect(fd, res->ai_addr, (int)res->ai_addrlen);
+    int err = r < 0 ? WSAGetLastError() : 0;
+    if (err == WSAEWOULDBLOCK) {     /* 리눅스의 EINPROGRESS: 접속 거는 중 */
+        struct pollfd p = { .fd = fd, .events = POLLOUT };
+        int len = sizeof(err);
+        err = WSAETIMEDOUT;
+        if (poll(&p, 1, 5000) == 1)
+            getsockopt(fd, SOL_SOCKET, SO_ERROR, (char *)&err, &len);
+    }
+    nb = 0;
+    ioctlsocket(fd, FIONBIO, &nb);
+    WSASetLastError(err);            /* perror가 이 번호로 설명을 찾는다 */
+    /* main이 errno로 이유를 고르므로 리눅스와 같은 이름으로 바꿔 둔다 */
+    errno = err == WSAECONNREFUSED ? ECONNREFUSED : err == WSAETIMEDOUT ? ETIMEDOUT
+          : err == WSAEHOSTUNREACH ? EHOSTUNREACH : err == WSAENETUNREACH ? ENETUNREACH : err;
+    r = err ? -1 : 0;
+#else
     int flags = fcntl(fd, F_GETFL, 0);
     fcntl(fd, F_SETFL, flags | O_NONBLOCK);
     int r = connect(fd, res->ai_addr, res->ai_addrlen);
@@ -141,6 +199,7 @@ int net_connect(const char *host, int port)
         r = err ? -1 : 0;
     }
     fcntl(fd, F_SETFL, flags);
+#endif
     freeaddrinfo(res);
     if (r < 0) {
         int e = errno;   /* 왜 실패했는지는 부른 쪽에서 errno로 본다 */
@@ -177,7 +236,7 @@ int send_packet(int fd, const struct packet *p)
     size_t total = pack_packet(p, out), sent = 0;
 
     while (sent < total) {           /* send는 일부만 보낼 수 있다 */
-        ssize_t n = send(fd, out + sent, total - sent, MSG_NOSIGNAL);
+        int n = (int)send(fd, (const char *)out + sent, (int)(total - sent), MSG_NOSIGNAL);
         if (n <= 0)
             return -1;
         sent += (size_t)n;
@@ -188,11 +247,11 @@ int send_packet(int fd, const struct packet *p)
 /* 소켓에서 읽은 만큼 버퍼 뒤에 붙인다. >0 받음, 0 끊김, -1 오류 */
 int conn_read(struct conn *c)
 {
-    ssize_t n = recv(c->fd, c->buf + c->len, sizeof(c->buf) - c->len, 0);
+    int n = (int)recv(c->fd, (char *)c->buf + c->len, (int)(sizeof(c->buf) - c->len), 0);
     if (n < 0)
         return -1;
     c->len += n;
-    return (int)n;
+    return n;
 }
 
 /* 버퍼에 패킷이 통째로 모였으면 하나 꺼낸다. 1 꺼냄, 0 덜 옴, -1 잘못된 길이 */
@@ -231,18 +290,17 @@ int conn_take(struct conn *c, struct packet *p)
 #define MAX_CLIENTS 16
 #define INPUT_MAX   1000
 
-enum { M_SERVER, M_HOST, M_JOIN };  /* 실행 방식: 서버 / 방장 / 참가자 */
+enum { M_HOST, M_JOIN };  /* 실행 방식: 방장 / 참가자 */
 enum { TO_ALL = 0, TO_ONE = 1 };    /* MSG 본문 첫 바이트 */
 
 static int  mode;
-static char my_name[NAME_LEN];       /* 방장·참가자의 이름 (서버는 빈칸) */
+static char my_name[NAME_LEN];       /* 내 이름 */
 static char dm_to[NAME_LEN];         /* 비어 있으면 전체 대화 */
 static struct packet pkt, out;       /* 받는 패킷 / 보내는 패킷 (64KB가 넘어서 전역) */
 
 /* ================= ② 화면 ================= */
 
-static int tty;                      /* 키보드로 대화 중인가 (서버·파이프면 0) */
-static struct termios saved_tio;
+static int tty;                      /* 키보드로 대화 중인가 (입력을 파이프로 주면 0) */
 static char input[INPUT_MAX + 1];
 static size_t input_len;
 static int drawn_rows;               /* 입력 줄이 화면에서 몇 줄 넘어갔나 */
@@ -255,35 +313,53 @@ static void prompt(char *buf, size_t size)
         snprintf(buf, size, "%s> ", my_name);
 }
 
-/* 터미널 폭 cols에서 s를 찍으면 줄이 몇 번 넘어가나 (한글은 두 칸) */
+/* 글자 하나가 화면에서 몇 칸인가: 한글·한자·이모지 같은 넓은 글자는 2칸 (윈도우에는 wcwidth가 없어서 직접) */
+static int char_width(uint32_t c)
+{
+    return (c >= 0x1100 && c <= 0x115F) || (c >= 0x2E80 && c <= 0xA4CF) || (c >= 0xAC00 && c <= 0xD7A3)
+        || (c >= 0xF900 && c <= 0xFAFF) || (c >= 0xFE30 && c <= 0xFE4F) || (c >= 0xFF00 && c <= 0xFF60)
+        || (c >= 0xFFE0 && c <= 0xFFE6) || (c >= 0x1F300 && c <= 0x1FAFF) || (c >= 0x20000 && c <= 0x3FFFD)
+        ? 2 : 1;
+}
+
+/* 터미널 폭 cols에서 s를 찍으면 줄이 몇 번 넘어가나. s는 UTF-8: 첫 바이트가 글자 길이를 알려 준다 */
 static int rows_after(const char *s, int cols)
 {
-    mbstate_t st;
-    wchar_t wc;
-    size_t len = strlen(s), n;
     int x = 0, rows = 0;
-
-    memset(&st, 0, sizeof(st));
-    while (len > 0) {
-        n = mbrtowc(&wc, s, len, &st);
-        if (n == (size_t)-2)
-            break;
-        int cw = 1;
-        if (n == (size_t)-1) {
-            memset(&st, 0, sizeof(st));
-            n = 1;
-        } else if ((cw = wcwidth(wc)) < 0) {
-            cw = 0;
+    while (*s) {
+        unsigned char b = (unsigned char)*s;
+        int n = b >= 0xF0 ? 4 : b >= 0xE0 ? 3 : b >= 0xC0 ? 2 : 1;
+        uint32_t c = n == 1 ? b : (uint32_t)(b & (0x3F >> (n - 1)));
+        for (int k = 1; k < n; k++) {
+            if ((s[k] & 0xC0) != 0x80) {   /* 글자가 중간에 끊겼으면 거기까지만 */
+                n = k;
+                break;
+            }
+            c = (c << 6) | (s[k] & 0x3F);
         }
+        int cw = char_width(c);
         if (x + cw > cols) {
             rows++;
             x = 0;
         }
         x += cw;
         s += n;
-        len -= n;
     }
     return rows;
+}
+
+static int term_cols(void)   /* 터미널 폭 (모르면 80) */
+{
+#ifdef _WIN32
+    CONSOLE_SCREEN_BUFFER_INFO b;
+    if (GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &b) && b.dwSize.X > 0)
+        return b.dwSize.X;
+#else
+    struct winsize ws;
+    if (ioctl(1, TIOCGWINSZ, &ws) == 0 && ws.ws_col > 0)
+        return ws.ws_col;
+#endif
+    return 80;
 }
 
 #define C_ACCENT (tty ? "\033[36m" : "")
@@ -303,15 +379,11 @@ static void draw_input(void)
     if (!tty)
         return;
     char line[64 + INPUT_MAX];
-    struct winsize ws;
-    int cols = 80;
 
     prompt(line, sizeof(line));
     strcat(line, input);
     printf("%s", line);
-    if (ioctl(1, TIOCGWINSZ, &ws) == 0 && ws.ws_col > 0)
-        cols = ws.ws_col;
-    drawn_rows = rows_after(line, cols);
+    drawn_rows = rows_after(line, term_cols());
     fflush(stdout);
 }
 
@@ -390,7 +462,8 @@ static void remove_peer(const char *name)
     peers[i] = peers[--npeers];
 }
 
-/* ================= ③ 중계: 서버와 방장이 같이 쓴다 ================= */
+/* ================= ③ 중계: 방장 =================
+   방장이 서버다. 참가자들은 방장에게 접속하고, 방장은 패킷의 to 를 보고 그 사람에게만 전한다 */
 
 struct client {
     struct conn c;
@@ -403,12 +476,6 @@ struct client {
    (안 읽은 데이터가 남은 채 close하면 RST가 나가서 받는 쪽이 알림을 못 읽는다) */
 static struct client clients[MAX_CLIENTS + 1];
 static int nclients;
-
-static const char *type_name(int type)
-{
-    static const char *names[] = { "?", "HELLO", "MSG", "VAULT", "OPEN_REQ", "SHARE", "PROOF", "SYS" };
-    return (type >= T_HELLO && type <= T_SYS) ? names[type] : names[0];
-}
 
 static int find_client(const char *name)
 {
@@ -492,7 +559,7 @@ static int handle_hello(int i, const struct packet *p)
         return -1;
     }
     if (!valid_name(p->from) || find_client(p->from) >= 0
-        || (mode == M_HOST && strncmp(p->from, my_name, NAME_LEN) == 0)) {
+        || strncmp(p->from, my_name, NAME_LEN) == 0) {
         send_sys(i, "이름 사용 중이거나 쓸 수 없음: %s", p->from);
         drop_client(i);
         return -1;
@@ -518,34 +585,18 @@ static int handle_hello(int i, const struct packet *p)
         send_hello(i, clients[k].name, clients[k].hello);   /* 새 사람에게 기존 전원의 HELLO */
         send_hello(k, me->name, me->hello);                 /* 기존 전원에게 새 HELLO */
     }
-    if (mode == M_HOST) {   /* 방장도 방에 있는 한 사람이다 */
-        static const uint8_t no_key[HELLO_LEN];
-        send_hello(i, my_name, no_key);
-        add_peer(me->name);
-    }
+    static const uint8_t no_key[HELLO_LEN] = {0};   /* 방장도 방에 있는 한 사람이다 */
+    send_hello(i, my_name, no_key);
+    add_peer(me->name);
     for (int k = 0; k < nclients; k++)
         if (clients[k].registered)
             send_sys(k, "%s 입장", me->name);
     return 0;
 }
 
-/* 서버의 눈: 중계할 때마다 한 줄. 평문 단계라 내용이 그대로 보인다 (방장은 대화 화면이라 안 찍음) */
-static void show_eye(const struct packet *p)
-{
-    if (mode != M_SERVER)
-        return;
-    char line[200];
-    int off = snprintf(line, sizeof(line), "[relay] %s → %s  %-8s seq=%-4llu %4uB ", p->from, p->to,
-                       type_name(p->type), (unsigned long long)p->seq, p->body_len);
-    for (uint32_t k = 0; k < p->body_len && k < 8; k++)
-        off += snprintf(line + off, sizeof(line) - off, " %02x", p->body[k]);
-    show("%s%s", line, p->body_len > 8 ? " …" : "");
-}
-
 /* to에게 중계 */
 static void relay(int to, struct packet *p)
 {
-    show_eye(p);
     send_packet(clients[to].c.fd, p);   /* 실패해도 다음 poll에서 끊김으로 잡힌다 */
 }
 
@@ -570,7 +621,7 @@ static int handle_packet(int i, struct packet *p)
         send_sys(i, "보낸 사람 이름이 다릅니다: %s", p->from);   /* 남의 이름으로 보내기 차단 */
         return 0;
     }
-    if (mode == M_HOST && strncmp(p->to, my_name, NAME_LEN) == 0) {
+    if (strncmp(p->to, my_name, NAME_LEN) == 0) {
         if (p->type == T_MSG)
             display_msg(p);   /* 방장한테 온 것 */
         return 0;
@@ -602,7 +653,7 @@ static void serve(int i)
 
 /* ================= ④ 대화: 방장·참가자 ================= */
 
-static struct conn srv;   /* 참가자: 서버(또는 방장)와의 연결 */
+static struct conn srv;   /* 참가자: 방장과의 연결 */
 
 static void display_msg(const struct packet *p)
 {
@@ -643,7 +694,7 @@ static void sys_update(const char *text)
     }
 }
 
-/* 참가자: 서버(방장)에게서 받기 */
+/* 참가자: 방장에게서 받기 */
 static void join_read(void)
 {
     if (conn_read(&srv) <= 0) {
@@ -674,7 +725,7 @@ static void join_read(void)
     }
 }
 
-/* 한 사람에게 보낸다. 방장은 직접 중계하고, 참가자는 서버(방장)에게 맡긴다 */
+/* 한 사람에게 보낸다. 방장은 직접 중계하고, 참가자는 방장에게 맡긴다 */
 static void send_one(const char *to, uint8_t flag, const char *text)
 {
     size_t len = strlen(text);
@@ -830,19 +881,78 @@ static void on_key(unsigned char ch)
     }
 }
 
-static void read_keys(void)
+#ifdef _WIN32
+/* 윈도우: 키보드는 소켓이 아니라서 WSAPoll로 못 기다린다. main이 0.05초마다 이걸로 확인한다 */
+static int keys_waiting(void)
 {
-    unsigned char buf[256];
-    ssize_t n = read(0, buf, sizeof(buf));
-    if (n <= 0) {
-        clear_input();
-        exit(0);
-    }
-    for (ssize_t i = 0; i < n; i++)
-        on_key(buf[i]);
-    clear_input();
-    draw_input();
+    HANDLE h = GetStdHandle(STD_INPUT_HANDLE);
+    DWORD n = 0;
+    if (GetConsoleMode(h, &n))   /* 키보드 */
+        return GetNumberOfConsoleInputEvents(h, &n) && n > 0;
+    if (GetFileType(h) == FILE_TYPE_PIPE)   /* 파이프: 끊긴 것도 "읽을 것 있음" → 읽다가 끝난다 */
+        return !PeekNamedPipe(h, NULL, 0, NULL, &n, NULL) || n > 0;
+    return 1;                    /* 파일 */
 }
+
+/* 받은 입력을 UTF-8 바이트로 buf에. 끝(EOF)이면 -1 */
+static int read_stdin(unsigned char *buf, int size)
+{
+    HANDLE h = GetStdHandle(STD_INPUT_HANDLE);
+    DWORD got = 0, m;
+    if (!GetConsoleMode(h, &m))   /* 파이프·파일: 바이트 그대로 */
+        return ReadFile(h, buf, size, &got, NULL) && got > 0 ? (int)got : -1;
+
+    /* 키보드: 누른 키를 하나씩 받는다. 글자는 UTF-16이라 UTF-8로 바꾼다.
+       화살표처럼 글자가 없는 키, 키를 뗀 것, 마우스·창 이벤트는 건너뛴다.
+       단 이모지처럼 자판에 없는 글자는 "Alt 키를 뗀 것"에 실려 온다 (Alt+숫자판 입력과 같은 길) */
+    static wchar_t high;          /* 이모지처럼 UTF-16 두 개로 된 글자의 앞 반쪽 */
+    INPUT_RECORD rec[32];
+    int n = 0;
+    ReadConsoleInputW(h, rec, 32, &got);
+    for (DWORD i = 0; i < got; i++) {
+        const KEY_EVENT_RECORD *k = &rec[i].Event.KeyEvent;
+        wchar_t w[2] = { high, k->uChar.UnicodeChar };
+        if (rec[i].EventType != KEY_EVENT || !w[1] || !(k->bKeyDown || k->wVirtualKeyCode == VK_MENU))
+            continue;
+        if (w[1] >= 0xD800 && w[1] < 0xDC00) {
+            high = w[1];
+            continue;
+        }
+        n += WideCharToMultiByte(CP_UTF8, 0, high ? w : w + 1, high ? 2 : 1,
+                                 (char *)buf + n, size - n, NULL, NULL);
+        high = 0;
+    }
+    return n;
+}
+
+static DWORD saved_mode;
+
+static void restore_tty(void)
+{
+    if (tty)
+        SetConsoleMode(GetStdHandle(STD_INPUT_HANDLE), saved_mode);
+}
+
+/* 색·커서 이동(\033[…)을 켜고, Ctrl+C도 글자로 받아서 on_key가 정리하고 끝내게 한다 */
+static void raw_tty(void)
+{
+    HANDLE in = GetStdHandle(STD_INPUT_HANDLE), scr = GetStdHandle(STD_OUTPUT_HANDLE);
+    DWORD m;
+    tty = GetConsoleMode(in, &saved_mode) && GetConsoleMode(scr, &m)
+       && SetConsoleMode(scr, m | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+    if (!tty)
+        return;
+    SetConsoleMode(in, saved_mode & ~ENABLE_PROCESSED_INPUT);
+    atexit(restore_tty);
+}
+#else
+static int read_stdin(unsigned char *buf, int size)   /* 끝(EOF)이면 -1 */
+{
+    ssize_t n = read(0, buf, size);
+    return n > 0 ? (int)n : -1;
+}
+
+static struct termios saved_tio;
 
 static void restore_tty(void)
 {
@@ -864,9 +974,47 @@ static void raw_tty(void)
     tcsetattr(0, TCSANOW, &t);
     atexit(restore_tty);
 }
+#endif
 
-/* 방을 연 쪽(서버·방장): 다른 컴퓨터가 들어올 때 칠 내 주소를 보여 준다.
-   루프백(127.0.0.1 같은 자기 자신용)과 169.254.x(주소를 못 받았을 때 임시)는 뺀다 */
+static void read_keys(void)
+{
+    unsigned char buf[256];
+    int n = read_stdin(buf, sizeof(buf));
+    if (n < 0) {
+        clear_input();
+        exit(0);
+    }
+    for (int i = 0; i < n; i++)
+        on_key(buf[i]);
+    clear_input();
+    draw_input();
+}
+
+/* 방장: 다른 컴퓨터가 들어올 때 칠 내 주소를 보여 준다 */
+#ifdef _WIN32
+/* 윈도우: 인터넷으로 나갈 때 쓰는 주소 하나. UDP는 connect만 하면 패킷이 안 나가고 주소만 정해진다 */
+static void show_my_address(void)
+{
+    struct sockaddr_in to = {0}, me;
+    socklen_t len = sizeof(me);
+    char ip[INET_ADDRSTRLEN];
+    int fd = (int)socket(AF_INET, SOCK_DGRAM, 0);
+
+    to.sin_family = AF_INET;
+    to.sin_port = htons(53);
+    inet_pton(AF_INET, "8.8.8.8", &to.sin_addr);
+    if (fd >= 0 && connect(fd, (struct sockaddr *)&to, sizeof(to)) == 0
+        && getsockname(fd, (struct sockaddr *)&me, &len) == 0
+        && inet_ntop(AF_INET, &me.sin_addr, ip, sizeof(ip)))
+        show("[주소] %s — 다른 컴퓨터는  .\\deolmi 이름 %s  으로 들어와요", ip, ip);
+    else
+        show("[주소] 주소를 못 찾았어요 — 명령 창에 ipconfig 를 쳐서 IPv4 주소를 보세요 (같은 컴퓨터에서는  .\\deolmi 이름)");
+    if (fd >= 0)
+        close(fd);
+    show("[주소] 처음 켤 때 Windows 방화벽 창이 뜨면 '액세스 허용'을 눌러요 (공용 네트워크도 체크)");
+}
+#else
+/* 루프백(127.0.0.1 같은 자기 자신용)과 169.254.x(주소를 못 받았을 때 임시)는 뺀다 */
 static void show_my_address(void)
 {
     struct ifaddrs *list;
@@ -896,33 +1044,27 @@ static void show_my_address(void)
     if (n == 0)
         show("[주소] 네트워크 주소를 못 찾았어요 — 같은 컴퓨터에서는  ./deolmi 이름  으로 들어와요");
 }
+#endif
 
 /* 시작할 때와 /help 때 보여 주는 설명. 처음 쓰는 사람도 이것만 보고 쓸 수 있게 */
 static void show_guide(void)
 {
     const char *rule = "────────────────────────────────────────────";
     show("%s", rule);
-    if (mode == M_SERVER) {
-        show("덜미 서버 — 중계만 하는 창이에요. 여기서는 대화하지 않아요.");
-        show("오가는 메시지가 [relay] 로 한 줄씩 찍혀요 (암호화 전이라 내용 바이트가 그대로 보여요).");
+    if (mode == M_HOST) {
+        show("이 창이 방이에요. 내가 서버가 되어 중계하면서 같이 대화해요.");
         show_my_address();
-        show("끄려면 Ctrl+C. 서버를 끄면 들어와 있던 사람이 모두 끊겨요.");
+        show("같은 와이파이여야 들어와요. 학교 와이파이에서 안 되면 둘 다 휴대폰 핫스팟에 연결하세요.");
     } else {
-        if (mode == M_HOST) {
-            show("이 창이 방이에요. 서버 없이 내가 중계하면서 같이 대화해요.");
-            show_my_address();
-            show("같은 와이파이여야 들어와요. 학교 와이파이에서 안 되면 둘 다 휴대폰 핫스팟에 연결하세요.");
-        } else {
-            show("방에 들어왔어요. 방장이 나가면 방이 닫혀요.");
-        }
-        show("사용법");
-        show("  그냥 치고 엔터   방에 있는 모두에게 보내기");
-        show("  /dm 이름         그 사람하고만 1:1  (/all 로 다시 모두에게)");
-        show("  /who             지금 들어와 있는 사람");
-        show("  /help            이 설명 다시 보기");
-        show("  /quit            나가기%s", mode == M_HOST ? " (방장이 나가면 방이 닫혀요)" : "");
-        show("받은 글은 [이름] 내용, 나에게만 온 1:1은 [이름 → 나] 내용 으로 떠요.");
+        show("방에 들어왔어요. 방장이 나가면 방이 닫혀요.");
     }
+    show("사용법");
+    show("  그냥 치고 엔터   방에 있는 모두에게 보내기");
+    show("  /dm 이름         그 사람하고만 1:1  (/all 로 다시 모두에게)");
+    show("  /who             지금 들어와 있는 사람");
+    show("  /help            이 설명 다시 보기");
+    show("  /quit            나가기%s", mode == M_HOST ? " (방장이 나가면 방이 닫혀요)" : "");
+    show("받은 글은 [이름] 내용, 나에게만 온 1:1은 [이름 → 나] 내용 으로 떠요.");
     show("지금은 암호화 전 단계라 메시지가 평문(그대로)으로 오가요.");
     show("만든 사람: 김창식(기획·결정·실행 확인) · Claude(AI — 코드와 사이트 작성)");
     show("누가 무엇을 했는지: https://tkdgh123.github.io/secure-msg/log/");
@@ -933,19 +1075,32 @@ static void show_guide(void)
 
 int main(int argc, char **argv)
 {
-    setlocale(LC_ALL, "");
+#ifdef _WIN32
+    WSADATA wsa;
+    if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0) {
+        fprintf(stderr, "WSAStartup 실패\n");
+        return 1;
+    }
+    SetConsoleOutputCP(CP_UTF8);   /* 화면에 UTF-8 한글이 깨지지 않게 */
+
+    /* 윈도우의 argv는 UTF-8이 아니라 CP949라서, 한글 이름이 다른 사람(리눅스·맥)에게 깨져 보인다.
+       그래서 명령줄을 UTF-16으로 다시 받아 UTF-8로 바꾼다 */
+    static char arg_buf[8][256], *arg_ptr[8];
+    wchar_t **wargv = CommandLineToArgvW(GetCommandLineW(), &argc);
+    if (argc > 8)
+        argc = 8;
+    for (int i = 0; i < argc; i++) {
+        WideCharToMultiByte(CP_UTF8, 0, wargv[i], -1, arg_buf[i], sizeof(arg_buf[i]), NULL, NULL);
+        arg_ptr[i] = arg_buf[i];
+    }
+    argv = arg_ptr;
+#else
     signal(SIGPIPE, SIG_IGN);
     setvbuf(stdout, NULL, _IOLBF, 0);   /* 파일로 돌려도 줄마다 바로 나오게 */
+#endif
 
     int lfd = -1;
-    if (argc == 2 && strcmp(argv[1], "--server") == 0) {
-        mode = M_SERVER;
-        lfd = net_listen(PORT);
-        if (lfd < 0)
-            return 1;
-        show("[서버] 기다리는 중");
-        show_guide();
-    } else if (argc >= 2 && argv[1][0] != '-' && valid_name(argv[1])) {
+    if (argc >= 2 && argv[1][0] != '-' && valid_name(argv[1])) {
         strncpy(my_name, argv[1], NAME_LEN - 1);
         mode = (argc >= 3 && strcmp(argv[2], "--host") == 0) ? M_HOST : M_JOIN;
         if (mode == M_HOST) {
@@ -957,6 +1112,7 @@ int main(int argc, char **argv)
         } else {
             const char *host = argc >= 3 ? argv[2] : "127.0.0.1";
             printf("%s 에 접속하는 중… (5초)\n", host);
+            fflush(stdout);
             srv.fd = net_connect(host, PORT);
             if (srv.fd < 0) {
                 if (errno == ECONNREFUSED)
@@ -975,26 +1131,30 @@ int main(int argc, char **argv)
         show_guide();
     } else {
         fprintf(stderr, "덜미 — 터미널 채팅 (프밍기2 팀 프로젝트)\n\n");
-        fprintf(stderr, "  %s 이름 --host       방을 연다 (방장: 서버 없이 내가 중계하면서 대화)\n", argv[0]);
-        fprintf(stderr, "  %s 이름 [주소]       방에 들어간다 (주소는 방장 화면의 [주소] 줄, 같은 컴퓨터면 생략)\n", argv[0]);
-        fprintf(stderr, "  %s --server          중계만 하는 서버를 켠다 (대화는 안 함)\n\n", argv[0]);
+        fprintf(stderr, "  %s 이름 --host       방을 연다 (방장: 내가 서버가 되어 중계하면서 대화)\n", argv[0]);
+        fprintf(stderr, "  %s 이름 [주소]       방에 들어간다 (주소는 방장 화면의 [주소] 줄, 같은 컴퓨터면 생략)\n\n", argv[0]);
         fprintf(stderr, "이름은 한글 5글자(15바이트)까지, 띄어쓰기와 / 없이.\n");
         fprintf(stderr, "만든 사람: 김창식(기획·결정·실행 확인) · Claude(AI — 코드와 사이트 작성)\n");
         fprintf(stderr, "자세한 안내: https://tkdgh123.github.io/secure-msg/run/\n");
         return 1;
     }
 
-    int key_fd = mode == M_SERVER ? -1 : 0;   /* 키보드: 서버는 안 본다 (-1이면 poll이 건너뜀) */
     struct pollfd fds[2 + MAX_CLIENTS + 1];
     for (;;) {
         int n = nclients;   /* 이번 바퀴에 지켜볼 사람 수 (참가자는 0) */
-        fds[0] = (struct pollfd){ .fd = key_fd, .events = POLLIN };
+        fds[0] = (struct pollfd){ .fd = 0, .events = POLLIN };   /* 키보드 */
         fds[1] = (struct pollfd){ .fd = mode == M_JOIN ? srv.fd : lfd, .events = POLLIN };
         for (int i = 0; i < n; i++)
             fds[2 + i] = (struct pollfd){ .fd = clients[i].c.fd, .events = POLLIN };
 
+#ifdef _WIN32   /* WSAPoll은 소켓만 본다: 키보드(fds[0])는 빼고 0.05초마다 따로 확인 */
+        if (poll(fds + 1, 1 + n, 50) < 0)
+            continue;
+        fds[0].revents = keys_waiting() ? POLLIN : 0;
+#else
         if (poll(fds, 2 + n, -1) < 0)
             continue;
+#endif
 
         /* 뒤에서부터: 도중에 지워도 아직 안 본 칸이 밀려오지 않는다 */
         for (int i = n - 1; i >= 0; i--)
@@ -1004,7 +1164,7 @@ int main(int argc, char **argv)
             if (mode == M_JOIN)
                 join_read();
             else
-                add_client(accept(lfd, NULL, NULL));
+                add_client((int)accept(lfd, NULL, NULL));
         }
         if (fds[0].revents & (POLLIN | POLLHUP))
             read_keys();

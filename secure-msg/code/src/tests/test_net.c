@@ -1,4 +1,4 @@
-/* 패킷 송수신 확인 (설명서 '만든 순서와 확인'의 S3). 서버(./deolmi --server)가 켜져 있어야 한다 — make test 가 알아서 켠다
+/* 패킷 송수신 확인 (설명서 '만든 순서와 확인'의 S3). 방장(./deolmi H --host)이 켜져 있어야 한다 — make test 가 알아서 켠다
    ① 1바이트씩 쪼개 보내기  ② 두 통을 한 번에  ③ 길이 0xFFFFFFFF */
 #include <stdio.h>
 #include <string.h>
@@ -33,7 +33,7 @@ static void make(uint64_t seq, const char *text)
     memcpy(out.body, text, out.body_len);
 }
 
-/* 서버에 이름 등록 (body는 아무 128바이트) */
+/* 방장에게 이름 등록 (body는 아무 128바이트) */
 static void hello(int fd, const char *name)
 {
     struct packet *h = &in;
@@ -44,7 +44,7 @@ static void hello(int fd, const char *name)
     send_packet(fd, h);
 }
 
-/* B에서 MSG 하나를 받아 seq와 body가 맞는지. 서버가 보낸 HELLO, SYS는 건너뜀 */
+/* B에서 MSG 하나를 받아 seq와 body가 맞는지. 방장이 보낸 HELLO, SYS는 건너뜀 */
 static int got(uint64_t seq, const char *text)
 {
     int r;
@@ -63,7 +63,7 @@ int main(void)
     int a = net_connect("127.0.0.1", 9000);
     int b = net_connect("127.0.0.1", 9000);
     if (a < 0 || b < 0) {
-        printf("서버를 먼저 켜세요: ./deolmi --server\n");
+        printf("방장을 먼저 켜세요: ./deolmi H --host\n");
         return 1;
     }
     struct timeval tv = { 1, 0 };
@@ -71,7 +71,7 @@ int main(void)
     rb.fd = b;
     hello(a, "A");
     hello(b, "B");
-    usleep(100000);   /* 서버가 두 명을 다 받을 때까지 */
+    usleep(100000);   /* 방장이 두 명을 다 받을 때까지 */
 
     /* ① 1바이트씩 */
     make(1ULL << 40 | 7, "1바이트씩 쪼개서 보냄");
