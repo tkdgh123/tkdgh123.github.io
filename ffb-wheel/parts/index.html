@@ -49,7 +49,7 @@ h2 i { font: normal 400 13px var(--mono); color: var(--muted) }
 
 /* 01 흐름: 일곱 단계 눈금 위에 사람별 막대. main은 파랑, 함께는 옅은 파랑 */
 .scroll { overflow-x: auto; margin: 0 calc(-1 * var(--m)); padding: 0 var(--m) 8px }
-.lanes { min-width: 760px; display: grid; grid-template-columns: 128px repeat(7, minmax(0, 1fr)); row-gap: 10px; column-gap: 6px }
+.lanes { min-width: 620px; display: grid; grid-template-columns: 128px repeat(3, minmax(0, 1fr)); row-gap: 10px; column-gap: 6px }
 .lanes .st { padding-bottom: 12px; border-bottom: 1px solid var(--ink); font-size: 14.5px; font-weight: 650; line-height: 1.3 }
 .lanes .st i { display: block; font: normal 400 12px var(--mono); color: var(--muted); margin-bottom: 4px }
 .lanes .who { grid-column: 1; align-self: center; font-weight: 700; line-height: 1.25 }
@@ -90,15 +90,6 @@ h2 i { font: normal 400 13px var(--mono); color: var(--muted) }
 .band .it p { margin: 8px 0 0; color: var(--on-dark-soft); max-width: 30em }
 .band .it p strong { color: var(--on-dark); font-weight: 600 }
 
-/* 04 다음 주부터 */
-.next { margin: 0; padding: 0; list-style: none }
-.next li { display: grid; grid-template-columns: 7em minmax(0, 1fr); column-gap: var(--g); padding: 16px 0; border-top: 1px solid var(--rule) }
-.next li:last-child { border-bottom: 1px solid var(--rule) }
-.next .wk { font: 400 14px/1.7 var(--mono); color: var(--muted) }
-.next .wk b { display: block; font: 600 17px var(--sans); color: var(--ink) }
-.next p { margin: 0; color: var(--muted) }
-.next p b { color: var(--ink); font-weight: 650 }
-.note { margin: 16px 0 0; font-size: 14px; color: var(--muted) }
 
 footer { padding-top: clamp(56px, 6vw, 96px); padding-bottom: 48px; font: 400 12.5px/1.8 var(--mono); color: var(--muted) }
 
@@ -119,7 +110,6 @@ footer { padding-top: clamp(56px, 6vw, 96px); padding-bottom: 48px; font: 400 12
   .bar::before { content: attr(data-s); font: 400 11.5px var(--mono); margin-right: 8px; opacity: .75 }
 }
 @media (max-width: 520px) {
-  .next li { grid-template-columns: 1fr }
   .key { flex-wrap: wrap; gap: 8px 18px }
 }
 </style>
@@ -129,7 +119,7 @@ footer { padding-top: clamp(56px, 6vw, 96px); padding-bottom: 48px; font: 400 12
 <header class="wrap grid">
   <nav class="crumb" aria-label="위치"><a href="../../#make">← 작업실</a><a href="../">레이싱 휠</a></nav>
   <h1>10주차 <b>파트 분배</b></h1>
-  <p class="sub">11.3 – 11.9 · <b>액셀·브레이크 페달</b> 설계하고 나무로 만들기</p>
+  <p class="sub">11.3 – 11.9 · <b>액셀·브레이크 페달</b> 수치 정하고 나무 자르고 붙이기</p>
   <div class="due">
     <span class="d">11.9</span>
     <span class="t">월요일 23:59 마감</span>
@@ -143,30 +133,25 @@ footer { padding-top: clamp(56px, 6vw, 96px); padding-bottom: 48px; font: 400 12
   <div class="scroll">
     <div class="lanes">
       <span></span>
-      <span class="st"><i>1</i>설계</span>
-      <span class="st"><i>2</i>재단</span>
-      <span class="st"><i>3</i>조립</span>
-      <span class="st"><i>4</i>센서 장착</span>
-      <span class="st"><i>5</i>값 읽기·보정</span>
-      <span class="st"><i>6</i>시험</span>
-      <span class="st"><i>7</i>영상·기록</span>
+      <span class="st"><i>1</i>수치 정하기</span>
+      <span class="st"><i>2</i>자르기·붙이기</span>
+      <span class="st"><i>3</i>영상</span>
 
       <span class="who" style="grid-row:2">기구<span>김도영</span></span>
-      <span class="bar main" data-s="1–3" style="grid-row:2;grid-column:2/5">페달 설계 → 나무 재단 → 조립</span>
-      <span class="bar with" data-s="4" style="grid-row:2;grid-column:5/6">센서 자리</span>
+      <span class="bar main" data-s="1–2" style="grid-row:2;grid-column:2/4">페달 수치 → 자르기·붙이기</span>
 
       <span class="who" style="grid-row:3">HW<span>최민호</span></span>
-      <span class="bar with" data-s="1" style="grid-row:3;grid-column:2/3">센서 자리·선 길</span>
-      <span class="bar main" data-s="4" style="grid-row:3;grid-column:5/6">장착·A0·A1 배선</span>
-      <span class="bar with" data-s="6" style="grid-row:3;grid-column:7/8">배선 점검</span>
+      <span class="bar main" data-s="1" style="grid-row:3;grid-column:2/3">센서 자리 수치</span>
+      <span class="bar with" data-s="2" style="grid-row:3;grid-column:3/4">자르기·붙이기</span>
 
       <span class="who" style="grid-row:4">SW<span>황찬웅</span></span>
-      <span class="bar main" data-s="4–5" style="grid-row:4;grid-column:5/7">출력 범위 설정 → 값 읽기 → P 보정</span>
+      <span class="bar main" data-s="1" style="grid-row:4;grid-column:2/3">밟는 각도 수치</span>
+      <span class="bar with" data-s="2" style="grid-row:4;grid-column:3/4">자르기·붙이기</span>
 
       <span class="who" style="grid-row:5">기획/테스트<span>김창식</span></span>
-      <span class="bar with" data-s="2" style="grid-row:5;grid-column:3/4">재료·도구</span>
-      <span class="bar with" data-s="5" style="grid-row:5;grid-column:6/7">시험 표</span>
-      <span class="bar main" data-s="6–7" style="grid-row:5;grid-column:7/9">시험 → 영상·기록</span>
+      <span class="bar with" data-s="1" style="grid-row:5;grid-column:2/3">수치 표 정리</span>
+      <span class="bar with" data-s="2" style="grid-row:5;grid-column:3/4">조각 치수 확인</span>
+      <span class="bar main" data-s="3" style="grid-row:5;grid-column:4/5">진행 영상</span>
     </div>
   </div>
   <p class="key"><span>main으로 맡음</span><span>함께 함</span></p>
@@ -184,10 +169,8 @@ footer { padding-top: clamp(56px, 6vw, 96px); padding-bottom: 48px; font: 400 12
       <p class="crit"><b>평가 기준</b> 조립 난이도, 구조 문제 해결(내구성, 공간 제약)</p>
     </div>
     <ol class="tasks">
-      <li><div><b>페달 설계</b><span class="how">페달판 크기, 회전축 위치, 밟는 각도, 압축 스프링 자리. 액셀·브레이크는 같은 틀로. 밟는 각도는 SRS 2.5대로 18도 이상.</span></div><span class="out">치수 적은 설계도</span></li>
-      <li><div><b>나무 재단</b><span class="how">설계도에서 자를 조각 목록을 뽑아 자르기. 실톱은 학교에서 대여.</span></div><span class="out">재단 목록, 자르기 전·후 사진</span></li>
-      <li><div><b>조립</b><span class="how">축이 좌우로 흔들리지 않게, 세게 밟아도 받침이 밀리지 않게 바닥 고정.</span></div><span class="out">조립 사진, 고친 점</span></li>
-      <li><div><b>센서 자리</b><span class="how">회전축 끝 자석과 AS5600이 마주 보게. 최민호와 같이 정하기.</span></div><span class="out">센서 자리 사진</span></li>
+      <li><div><b>페달 수치 확정</b><span class="how">액셀·브레이크 페달판, 받침, 회전축 위치.</span></div><span class="out">수치 적은 설계도</span></li>
+      <li><div><b>나무 자르고 붙이기</b><span class="how">정한 수치대로 자르고 붙여 페달 틀 만들기.</span></div><span class="out">자르고 붙인 사진</span></li>
     </ol>
   </article>
 
@@ -200,10 +183,8 @@ footer { padding-top: clamp(56px, 6vw, 96px); padding-bottom: 48px; font: 400 12
       <p class="crit"><b>평가 기준</b> 부품 종류와 수, 부품 간 연동, 회로 복잡도</p>
     </div>
     <ol class="tasks">
-      <li><div><b>센서 자리·선 길 정하기</b><span class="how">설계 단계에서 김도영과. 페달 박스에서 아두이노까지 선이 지나갈 길.</span></div><span class="out">정한 내용</span></li>
-      <li><div><b>센서 장착·배선</b><span class="how">AS5600 OUT을 액셀 A0, 브레이크 A1에. 5V·GND 연결, 밟아도 선이 당겨지지 않게 고정.</span></div><span class="out">배선 사진</span></li>
-      <li><div><b>회로도에 페달 추가</b><span class="how">기존 회로도에 페달 센서 두 개 부분.</span></div><span class="out">회로도</span></li>
-      <li><div><b>배선 점검</b><span class="how">시험 때 김창식과. 선을 흔들어도 값이 튀지 않는지.</span></div><span class="out">점검 결과</span></li>
+      <li><div><b>센서 자리 수치</b><span class="how">자석과 AS5600이 들어갈 자리를 페달 수치에 넣기.</span></div><span class="out">설계도 속 센서 자리</span></li>
+      <li><div><b>자르기·붙이기 함께</b></div><span class="out">사진</span></li>
     </ol>
   </article>
 
@@ -216,9 +197,8 @@ footer { padding-top: clamp(56px, 6vw, 96px); padding-bottom: 48px; font: 400 12
       <p class="crit"><b>평가 기준</b> 제어 로직 복잡도, 부품 연동, 통신 프로토콜, 데이터 처리</p>
     </div>
     <ol class="tasks">
-      <li><div><b>센서 출력 범위 설정</b><span class="how">장착 전에 I2C로 각 AS5600을 페달 행정에 맞추기. 굽을지(BURN, 최대 3번) P 보정만 쓸지 정하기 — SRS 첨삭 5쪽 3번.</span></div><span class="out">정한 방식과 이유</span></li>
-      <li><div><b>페달 값 읽기</b><span class="how">A0·A1을 읽어 시리얼로 출력. V 명령으로 확인.</span></div><span class="out">코드, 시리얼 화면</span></li>
-      <li><div><b>P 보정</b><span class="how">끝까지 밟고 떼서 0~1023으로 맞추고, S로 EEPROM에 저장.</span></div><span class="out">보정 전·후 값</span></li>
+      <li><div><b>밟는 각도 수치</b><span class="how">놓았을 때부터 끝까지 밟았을 때까지. 센서가 읽을 범위라 나중에 보정 기준이 됨.</span></div><span class="out">정한 각도</span></li>
+      <li><div><b>자르기·붙이기 함께</b></div><span class="out">사진</span></li>
     </ol>
   </article>
 
@@ -231,10 +211,9 @@ footer { padding-top: clamp(56px, 6vw, 96px); padding-bottom: 48px; font: 400 12
       <p class="crit"><b>평가 기준</b> 다양한 상황 시험, 정상·예외 시험, 오류 재현과 원인 분석</p>
     </div>
     <ol class="tasks">
-      <li><div><b>재료·도구</b><span class="how">나무, 나사, 스프링이 재단 목록만큼 있는지 확인. 실톱·인두 대여. 재료비 추가 구매는 안 됨.</span></div><span class="out">재료 목록</span></li>
-      <li><div><b>페달 시험 표</b><span class="how">정상 — 끝까지 밟기·떼기, 천천히·빠르게. 예외 — 두 페달 동시에, 센서 선 뺐을 때, 여러 번 밟은 뒤 값이 밀리는지.</span></div><span class="out">시험 표</span></li>
-      <li><div><b>시험하고 기록</b><span class="how">결과, 생긴 문제, 원인. 문제는 다시 일으켜 보고 담당자에게.</span></div><span class="out">시험 결과</span></li>
-      <li><div><b>진행 동영상</b><span class="how">이번 주 만든 것을 3분 안으로 찍어 팀으로 제출.</span></div><span class="out">영상</span></li>
+      <li><div><b>수치 표 정리</b><span class="how">정한 액셀·브레이크 수치를 한 표로.</span></div><span class="out">수치 표</span></li>
+      <li><div><b>조각 치수 확인</b><span class="how">자른 조각이 수치대로인지 재 보기.</span></div><span class="out">확인 기록</span></li>
+      <li><div><b>진행 동영상</b><span class="how">이번 주 과정을 3분 안으로 찍어 팀으로 제출.</span></div><span class="out">영상</span></li>
     </ol>
   </article>
 </section>
@@ -245,7 +224,7 @@ footer { padding-top: clamp(56px, 6vw, 96px); padding-bottom: 48px; font: 400 12
     <div class="it">
       <span class="w">팀별 · 한 명</span>
       <b>프로젝트 진행 동영상</b>
-      <p>이번 주 진행한 결과물, 3분 이내.</p>
+      <p>이번 주 과정, 3분 이내.</p>
     </div>
     <div class="it">
       <span class="w">개별 · doc, hwp, pdf</span>
@@ -255,19 +234,9 @@ footer { padding-top: clamp(56px, 6vw, 96px); padding-bottom: 48px; font: 400 12
   </div>
 </section>
 
-<section class="wrap" aria-labelledby="h-next">
-  <h2 id="h-next"><i>04</i>다음 주부터</h2>
-  <ol class="next">
-    <li><span class="wk">11주차<b>휠 베이스</b></span><p><b>기구</b> 모터·벨트 받침 · <b>HW</b> BTS7960과 24V 배선, EN 풀다운 · <b>SW</b> 조향 센서 각도와 바퀴 수 세기 · <b>테스트</b> 페달 시험 결과 반영, 배선 점검</p></li>
-    <li><span class="wk">12주차<b>힘 출력</b></span><p><b>SW</b> 힘 명령 → PWM, 엔드스톱 · <b>HW</b> 패들 스위치 · <b>기구</b> 핸들·패들 장착 · <b>테스트</b> 통신 두절, 출력 상한 시험</p></li>
-    <li><span class="wk">13주차<b>합치기</b></span><p>게임 소프트웨어 연결, 전체 시험, 나온 문제 고치기</p></li>
-    <li><span class="wk">14주차<b>마무리</b></span><p>최종 작품 검토, <b>전시회 요약 템플릿</b>(12.7 팀장 제출), 결과보고서 나눠 쓰기</p></li>
-    <li><span class="wk">15주차<b>전시회</b></span><p><b>12.8 화 19:00</b> 강의실 준비 · <b>12.9 수</b> 정보과학관 1층 로비, 13:00 준비 완료, 15:00 시상(전원)</p></li>
-  </ol>
-  <p class="note">11~14주차는 순서 제안이에요. 팀 진행에 맞춰 바꾸면 돼요.</p>
-</section>
+
 </main>
 
-<footer class="wrap">정리 Claude · 요청 김창식 · 2026.11.04<br>근거 LMS 공지 「팀 구성, 역할분담 및 성적을 위한 평가」, 「10주차 자료 제출」, 「경진대회 일정」 · 팀 SRS</footer>
+<footer class="wrap">정리 Claude · 요청 김창식 · 2026.11.04<br>근거 LMS 공지 「팀 구성, 역할분담 및 성적을 위한 평가」, 「10주차 자료 제출」 · 팀 SRS</footer>
 </body>
 </html>
