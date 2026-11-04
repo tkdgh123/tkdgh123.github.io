@@ -145,6 +145,20 @@ b { font-weight: 700 }
 .tools td:first-child { font-weight: 700; white-space: nowrap }
 .tools td:last-child { color: var(--soft) }
 
+/* 더 찾아본 사이트 */
+.ch.g { --c: var(--ok) }
+.more-lead { color: var(--soft); max-width: 60ch; margin-bottom: 8px }
+.kind { margin-top: clamp(48px, 6vw, 80px); font: 700 13px var(--mono); color: var(--c); letter-spacing: .04em; padding-bottom: 12px; border-bottom: 1px solid var(--rule) }
+.site { padding: 28px 0; border-bottom: 1px solid var(--rule); align-items: start }
+.site > a { grid-column: 1 / span 6; display: block }
+.site img { width: 100%; height: auto; background: var(--bg-2); transition: opacity .2s }
+.site > a:hover img { opacity: .85 }
+.site .txt { grid-column: 7 / -1 }
+.site h3 { font-size: clamp(24px, 2.6vw, 36px); font-weight: 800 }
+.site h3 a { text-decoration: none } .site h3 a:hover { text-decoration: underline 2px; text-underline-offset: 5px }
+.site .who { margin: 8px 0 14px; color: var(--soft) }
+.site .can { margin-top: 14px }
+
 /* 끝 */
 .end { margin-top: clamp(100px, 12vw, 180px); padding: 56px var(--m) 64px; background: var(--bg-2) }
 .end h2 { font-size: clamp(26px, 3.4vw, 48px); font-weight: 800; grid-column: 1 / span 5 }
@@ -169,6 +183,8 @@ b { font-weight: 700 }
   .end .src { margin-top: 28px }
   .tools { font-size: 14px }
   .tools td:first-child { white-space: normal }
+  .site > a, .site .txt { grid-column: 1 / -1 }
+  .site .txt { margin-top: 16px }
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto } }
 </style>
@@ -179,7 +195,7 @@ b { font-weight: 700 }
 
 <header class="hero grid">
   <h1>스크롤하면<br>움직이는 <span>사이트</span></h1>
-  <p class="lead">보내 준 릴스 세 편 속 사이트를 실제로 열어 코드까지 확인했어요. 그리고 <b>제가 만들 수 있는지는 말보다 데모로</b> — 아래에 직접 만든 세 개가 들어 있어요.</p>
+  <p class="lead">보내 준 릴스 세 편 속 사이트를 실제로 열어 코드까지 확인했어요. 그리고 <b>제가 만들 수 있는지는 말보다 데모로</b> — 아래에 직접 만든 세 개가 들어 있어요. 비슷한 요즘 사이트는 <a href="#more">7곳 더</a> 모아 뒀어요.</p>
 </header>
 
 <ol class="verdict">
@@ -295,6 +311,65 @@ b { font-weight: 700 }
   </div>
 </section>
 
+<!-- 더 찾아본 사이트 -->
+<section class="ch g" id="more">
+  <div class="ch-head grid">
+    <span class="no" aria-hidden="true">+7</span>
+    <div class="ttl"><p class="src mono">더 찾아본 사이트</p><h2>요즘 수상작 일곱 곳</h2></div>
+  </div>
+  <p class="more-lead">2025~2026년 수상작과 3D 사이트 모음에서 14곳을 골라 직접 열어 보고, 움직임이 확실한 7곳만 남겼어요. 7곳 모두 브라우저 3D 그리기(캔버스)를 써요. 그림을 누르면 사이트가 열려요.</p>
+
+  <p class="kind">3D 물건을 스크롤로 돌려 보기</p>
+  <article class="site grid">
+    <a href="https://oryzo.ai/" target="_blank" rel="noopener"><img src="img/more/oryzo.webp" alt="Oryzo 첫 화면, 재단 매트 위 코르크 컵받침" width="960" height="600" loading="lazy"></a>
+    <div class="txt"><h3><a href="https://oryzo.ai/" target="_blank" rel="noopener">Oryzo</a></h3><p class="who mono">Lusion · Awwwards 이달의 사이트 2026.04</p>
+      <p>코르크 컵받침 하나가 스크롤에 따라 돌고, 다가오고, 손에 들리며 장면이 바뀌어요. 팔지 않는 가짜 제품으로 스튜디오 실력을 보여 주는 사이트예요.</p>
+      <p class="can t-ok"><i>가능</i>모양이 단순해서 Blender 모델 + Three.js 스크롤 카메라로 만들 수 있어요.</p></div>
+  </article>
+  <article class="site grid">
+    <a href="https://drone.riotters.com/" target="_blank" rel="noopener"><img src="img/more/lidar.webp" alt="Aevion 드론 사이트, 큰 Gear 글자 앞의 흰 드론 3D 모델" width="960" height="600" loading="lazy"></a>
+    <div class="txt"><h3><a href="https://drone.riotters.com/" target="_blank" rel="noopener">Aevion LiDAR 드론</a></h3><p class="who mono">Riotters · Awwwards 오늘의 사이트 2026.10.06</p>
+      <p>3D 드론이 스크롤 따라 기울고 돌며 화면 가운데로 오고, 옆 설명이 부품·성능 순서로 바뀌어요.</p>
+      <p class="can t-mid"><i>소재</i>이만큼 정밀한 드론 모델은 사거나 무료 모델을 받아야 해요. 움직임 연결은 제가 해요.</p></div>
+  </article>
+
+  <p class="kind">3D 풍경 속을 날아가기</p>
+  <article class="site grid">
+    <a href="https://explore.ownprimland.com/" target="_blank" rel="noopener"><img src="img/more/primland.webp" alt="Primland 사이트, 구름 사이로 보이는 산과 강" width="960" height="600" loading="lazy"></a>
+    <div class="txt"><h3><a href="https://explore.ownprimland.com/" target="_blank" rel="noopener">Primland</a></h3><p class="who mono">Awwwards 우수작 2025.12</p>
+      <p>미국 블루리지 산맥 리조트 사이트예요. 구름을 뚫고 내려가 산과 강 위를 날아다니고, 소리를 켜고 보는 구성이에요. 영상이 아니라 실시간 3D라 원하는 곳으로 움직여요.</p>
+      <p class="can t-mid"><i>소재</i>실제 지형 높이 데이터와 위성사진이 있으면 Three.js로 가능해요. 구름·나무를 얼마나 그럴듯하게 하느냐가 관건이에요.</p></div>
+  </article>
+
+  <p class="kind">글자·입자가 흩어졌다 모이기</p>
+  <article class="site grid">
+    <a href="https://www.shopify.com/editions/spring2026" target="_blank" rel="noopener"><img src="img/more/shopify.webp" alt="Shopify Editions 첫 화면, 숲 위로 휘어진 Everywhere 글자" width="960" height="600" loading="lazy"></a>
+    <div class="txt"><h3><a href="https://www.shopify.com/editions/spring2026" target="_blank" rel="noopener">Shopify Editions 봄 ’26</a></h3><p class="who mono">Shopify · 2026 봄 신기능 발표</p>
+      <p>숲 장면이 점 수만 개로 흩날리고, 글자가 공중에서 휘어 돌아요. 스크롤하면 장면이 입자로 부서지며 다음 소개로 넘어가요.</p>
+      <p class="can t-ok"><i>가능</i>점 수만 개를 그래픽카드에서 움직이는 Three.js 기본 기법이에요.</p></div>
+  </article>
+  <article class="site grid">
+    <a href="https://iventions.com/" target="_blank" rel="noopener"><img src="img/more/iventions.webp" alt="Iventions 첫 화면, 보라색 빛기둥 아래 기울어진 카드" width="960" height="600" loading="lazy"></a>
+    <div class="txt"><h3><a href="https://iventions.com/" target="_blank" rel="noopener">Iventions</a></h3><p class="who mono">행사 기획사 · CSSDA 이달의 사이트 2025.10</p>
+      <p>무대 조명 같은 빛기둥이 3D 카드를 비추고, 카드가 기울며 프로젝트가 하나씩 나와요. 아래로 가면 고객사 이름이 크게 흘러가요.</p>
+      <p class="can t-ok"><i>가능</i>카드 한 장 + 빛 + 스크롤 연결이라 데모 B 수준이에요.</p></div>
+  </article>
+
+  <p class="kind">사이트가 곧 게임</p>
+  <article class="site grid">
+    <a href="https://members-play.lacoste.com/ace-breaker-rg/gb/en/" target="_blank" rel="noopener"><img src="img/more/lacoste.webp" alt="Lacoste Ace Breaker 시작 화면" width="960" height="600" loading="lazy"></a>
+    <div class="txt"><h3><a href="https://members-play.lacoste.com/ace-breaker-rg/gb/en/" target="_blank" rel="noopener">Lacoste Ace Breaker</a></h3><p class="who mono">Lacoste · 롤랑가로스 회원 이벤트</p>
+      <p>테니스공으로 벽돌을 깨는 게임이에요. 점수판과 경품이 걸려 있어서 광고 대신 사람들이 계속 다시 하게 만들어요.</p>
+      <p class="can t-ok"><i>가능</i>마디·넋굿처럼 게임을 만들던 방식 그대로 웹으로 옮기면 돼요.</p></div>
+  </article>
+  <article class="site grid">
+    <a href="https://www.dontlookup.app/" target="_blank" rel="noopener"><img src="img/more/dontlookup.webp" alt="Don't Look Up 시작 화면, 거대한 다리 아래 작은 사람들" width="960" height="600" loading="lazy"></a>
+    <div class="txt"><h3><a href="https://www.dontlookup.app/" target="_blank" rel="noopener">Don’t Look Up</a></h3><p class="who mono">Marcelo Reis Melo · Awwwards 오늘의 사이트 2026.11.01</p>
+      <p>아주 크고 부자인 '나'가 사람들 위에 서서, 아무도 위를 올려다보지 못하게 하는 손그림 게임이에요. 개인 한 명이 만들어 수상했어요.</p>
+      <p class="can t-mid"><i>소재</i>게임 코드는 가능해요. 이 손그림 느낌은 그림 소재가 있어야 해요.</p></div>
+  </article>
+</section>
+
 <!-- 도구 -->
 <section class="ch" id="tools">
   <div class="ch-head grid">
@@ -321,6 +396,11 @@ b { font-weight: 700 }
     <li><a href="https://unseen.co/projects/quai-network/">Unseen Studio · Quai Network</a> — 제작사·2023년 1월·수상</li>
     <li><a href="https://gulfnews.com/business/property/saion-properties-offers-affordable-luxury-with-new-repos%C3%A9-residence-1.500311282">Gulf News · Reposé Residence</a> — 2027년 완공 예정</li>
     <li><a href="https://tympanus.net/codrops/2025/10/16/creating-smooth-scroll-synchronized-animation-for-optikka-from-html5-video-to-frame-sequences/">Codrops · 영상을 프레임으로 스크롤</a></li>
+    <li><a href="https://www.awwwards.com/websites/sites_of_the_day/">Awwwards 오늘의 사이트</a> — Aevion·Don’t Look Up 날짜</li>
+    <li><a href="https://www.awwwards.com/lusion/">Awwwards · Lusion</a> — Oryzo 이달의 사이트 2026.04</li>
+    <li><a href="https://www.awwwards.com/sites/primland-residences">Awwwards · Primland</a> — 우수작 2025.12</li>
+    <li><a href="https://www.utsubo.com/blog/best-threejs-websites-2026">Utsubo · 2026 Three.js 사이트 8곳</a> — Oryzo·Primland·Shopify·Lacoste 후보</li>
+    <li><a href="https://www.hontran.dev/blog/best-award-winning-websites-2026">Hon Tran · 2026 수상 사이트</a> — Iventions 수상</li>
   </ul>
   <p class="by mono">조사·데모 제작: Claude (Blender 렌더, 데모 코드 포함) · 릴스 화면은 설명용으로 잘라 씀</p>
 </footer>
