@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>작품 고리 · 작업실 적용 1</title>
+<link rel="stylesheet" href="apply.css">
+<style>
+/* 캔 고리(데모 B)를 작업실 작품 26개로: 끌어서 돌리고, 앞에 온 작품의 분류색으로 바탕이 바뀜 */
+body { height: 100svh; overflow: hidden; background: var(--bg, var(--paper)); color: var(--fg, var(--ink)); transition: background-color .7s var(--ease), color .7s var(--ease); --hud: var(--fg, var(--ink)) }
+body[data-c="게임"] { --bg: var(--dark); --fg: var(--on-dark); --soft: var(--on-dark-soft) }
+body[data-c="공부"] { --bg: var(--tone); --fg: var(--ink); --soft: var(--muted) }
+body[data-c="프로젝트"] { --bg: var(--blue); --fg: #fff; --soft: #c3cbef }
+body[data-c="기타"] { --bg: #34392f; --fg: #eeece6; --soft: #b4b8a8 }
+
+.tabs { position: fixed; z-index: 40; top: 64px; left: 0; right: 0; display: flex; justify-content: center; gap: 4px; padding: 0 var(--m); overflow-x: auto; scrollbar-width: none }
+.tabs button { flex: none; font: 600 15px var(--sans); color: inherit; background: none; border: 0; padding: 10px 14px; cursor: pointer; opacity: .55; transition: opacity .2s }
+.tabs button i { font: normal 11px var(--mono); margin-left: 5px; opacity: .8 }
+.tabs button:hover, .tabs button[aria-pressed="true"] { opacity: 1 }
+.tabs button[aria-pressed="true"] span { text-decoration: underline 1.5px; text-underline-offset: 7px }
+
+.stage { position: fixed; inset: 0; perspective: 1700px; perspective-origin: 50% 42%; touch-action: none; cursor: grab; user-select: none; -webkit-user-select: none }
+.stage.drag { cursor: grabbing }
+.card { position: absolute; left: 50%; top: 44%; width: var(--w); aspect-ratio: 16 / 10; margin: calc(var(--w) * -.3125) 0 0 calc(var(--w) / -2); display: block; background: #000; box-shadow: 0 30px 60px -30px rgb(0 0 0 / .55); will-change: transform, opacity; -webkit-user-drag: none }
+.card img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none }
+.card::after { content: ""; position: absolute; inset: 0; background: #000; opacity: var(--dim, 0); pointer-events: none }
+.stage { --w: clamp(250px, 34vw, 540px) }
+
+.cap { position: fixed; z-index: 40; left: var(--m); right: var(--m); bottom: clamp(24px, 6vh, 64px); display: flex; justify-content: space-between; align-items: end; gap: 24px; pointer-events: none }
+.cap > * { pointer-events: auto }
+.cap .meta { color: var(--soft, var(--muted)); margin-bottom: 12px; transition: color .7s }
+.cap h1 { font-size: clamp(34px, 5.2vw, 84px); max-width: 12em }
+.cap .txt { transition: opacity .25s, transform .25s }
+.cap .txt.out { opacity: 0; transform: translateY(8px) }
+.cap .go { margin-top: 22px }
+body[data-c="프로젝트"] .go { background: #fff; color: var(--blue) }
+body[data-c="프로젝트"] .go:hover { background: #e6e9f7 }
+.ctl { display: flex; align-items: center; gap: 14px; flex: none }
+.ctl .mono b { font-weight: 500; font-size: 15px }
+.ctl button { width: 48px; height: 48px; border-radius: 50%; border: 1.5px solid currentColor; background: none; color: inherit; font-size: 18px; cursor: pointer; opacity: .7; transition: opacity .2s }
+.ctl button:hover { opacity: 1 }
+@media (max-width: 700px) {
+  .stage { --w: 74vw; perspective: 900px }
+  .tabs { justify-content: flex-start; top: 56px }
+  .cap { flex-direction: column; align-items: stretch; gap: 18px }
+  .ctl { justify-content: space-between }
+}
+@media (prefers-reduced-motion: reduce) { body, .cap .txt { transition: none } }
+</style>
+</head>
+<body>
+<nav class="top mono"><a href="../#apply">← 움직이는 웹사이트</a><span class="right"><span>작업실 적용 1 / 3 · 작품 고리</span><a href="dots.html">다음 →</a></span></nav>
+<div class="tabs" id="tabs" role="toolbar" aria-label="분류"></div>
+<div class="stage" id="stage"></div>
+<div class="cap">
+  <div class="txt" id="txt"><p class="meta mono" id="meta"></p><h1 id="ttl"></h1><a class="go" id="open" href="#">열어 보기 →</a></div>
+  <div class="ctl"><button id="prev" type="button" aria-label="이전 작품">←</button><span class="mono" id="count"></span><button id="next" type="button" aria-label="다음 작품">→</button></div>
+</div>
+
+<script type="module">
+import { WORKS, ROOT } from "./works.js";
+const $ = id => document.getElementById(id);
+const stage = $("stage"), calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const CATS = ["전체", "게임", "공부", "프로젝트", "기타"];
+let list = [], cards = [], pos = 0, target = 0, cur = -1, step = 0, wrap = true;
+
+$("tabs").innerHTML = CATS.map(c => `<button type="button" data-c="${c}"><span>${c}</span><i>${c === "전체" ? WORKS.length : WORKS.filter(w => w.cat === c).length}</i></button>`).join("");
+$("tabs").onclick = e => { const b = e.target.closest("button"); if (b) build(b.dataset.c); };
+
+function build(cat) {
+  for (const b of $("tabs").children) b.setAttribute("aria-pressed", b.dataset.c === cat);
+  list = cat === "전체" ? WORKS : WORKS.filter(w => w.cat === cat);
+  // 9~12개는 한 바퀴 고리, 그보다 적거나 많으면 같은 휘어짐(32°)의 호로 두고 끝에서 멈춤
+  wrap = list.length >= 9 && list.length <= 12; step = wrap ? 360 / list.length : 32;
+  stage.innerHTML = list.map((w, i) => `<a class="card" href="${ROOT + w.href}" data-i="${i}" draggable="false"><img src="${ROOT + w.img}" alt="${w.t}" draggable="false" ${i > 5 && i < list.length - 5 ? 'loading="lazy"' : ""}></a>`).join("");
+  cards = [...stage.children];
+  pos = target = 0; cur = -1;
+  if (!calm) pos = -2.5;          // 바꿀 때 한 바퀴 살짝 돌며 들어옴
+}
+
+// 앞에서 몇 칸 떨어졌는지(고리면 짧은 쪽으로)
+const rel = i => { let r = i - pos; if (wrap) { const n = list.length; r = ((r % n) + n * 1.5) % n - n / 2; } return r; };
+const go = i => { target = wrap ? i : Math.max(0, Math.min(list.length - 1, i)); };
+
+function frame() {
+  pos += (target - pos) * (calm ? 1 : .12);
+  const w = cards[0]?.offsetWidth || 400;
+  const r = Math.max(w * 1.15, (w / 2 + 24) / Math.tan(Math.PI * step / 360));
+  for (let i = 0; i < cards.length; i++) {
+    const k = rel(i), a = k * step, abs = Math.abs(a);
+    const op = abs < 55 ? 1 : abs > 88 ? 0 : 1 - (abs - 55) / 33;
+    const c = cards[i];
+    c.style.transform = `translateZ(${-r}px) rotateY(${a}deg) translateZ(${r}px)`;
+    c.style.opacity = op;
+    c.style.zIndex = 100 - Math.round(abs);
+    c.style.setProperty("--dim", Math.min(Math.abs(k) * .16, .55).toFixed(3));
+    c.style.pointerEvents = op > .2 ? "" : "none";
+  }
+  const n = list.length, near = ((Math.round(pos) % n) + n) % n;
+  if (near !== cur) show(near);
+  requestAnimationFrame(frame);
+}
+
+let swap;
+function show(i) {
+  cur = i; const w = list[i];
+  document.body.dataset.c = w.cat;
+  $("count").innerHTML = `<b>${String(i + 1).padStart(2, "0")}</b> / ${String(list.length).padStart(2, "0")}`;
+  $("txt").classList.add("out"); clearTimeout(swap);
+  swap = setTimeout(() => {
+    $("meta").textContent = `${w.d} · ${w.cat}${w.lock ? " · 잠금" : ""}`;
+    $("ttl").textContent = w.t;
+    $("open").href = ROOT + w.href;
+    $("txt").classList.remove("out");
+  }, calm ? 0 : 160);
+}
+
+// 끌기·휠·키보드. 끌다가 놓으면 가까운 작품에 멈춤
+let drag = null, moved = false;
+stage.addEventListener("pointerdown", e => { drag = { x: e.clientX, p: target }; moved = false; });
+stage.addEventListener("pointermove", e => {
+  if (!drag) return;
+  const dx = e.clientX - drag.x;
+  // 실제로 끌 때만 포인터를 잡음 (처음부터 잡으면 카드 클릭이 무대로 가서 링크가 안 열림)
+  if (!moved && Math.abs(dx) > 6) { moved = true; stage.setPointerCapture(e.pointerId); stage.classList.add("drag"); }
+  if (!moved) return;
+  target = drag.p - dx / ((cards[0]?.offsetWidth || 400) * .7);
+  if (!wrap) target = Math.max(-.4, Math.min(list.length - .6, target));
+});
+const end = () => { if (!drag) return; drag = null; stage.classList.remove("drag"); go(Math.round(target)); };
+stage.addEventListener("pointerup", end); stage.addEventListener("pointercancel", end);
+stage.addEventListener("click", e => {
+  const c = e.target.closest(".card"); if (!c) return;
+  if (moved) { e.preventDefault(); return; }
+  const k = rel(+c.dataset.i);
+  if (Math.abs(k) > .5) { e.preventDefault(); go(Math.round(target + k)); }
+});
+let wheelT = 0;
+addEventListener("wheel", e => {
+  e.preventDefault();
+  const now = performance.now(); if (now - wheelT < 260) return; wheelT = now;
+  const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+  go(Math.round(target) + Math.sign(d));
+}, { passive: false });
+addEventListener("keydown", e => {
+  if (e.key === "ArrowRight") go(Math.round(target) + 1);
+  if (e.key === "ArrowLeft") go(Math.round(target) - 1);
+});
+$("prev").onclick = () => go(Math.round(target) - 1);
+$("next").onclick = () => go(Math.round(target) + 1);
+
+build("전체");
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

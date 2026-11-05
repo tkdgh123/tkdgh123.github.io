@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>점으로 그린 작품 · 작업실 적용 2</title>
+<link rel="stylesheet" href="apply.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js"}}</script>
+<style>
+/* 흩어지고 모이는 점(데모 4)을 작업실 대표 그림 다섯 장으로: 점 2만여 개가 그림 → 흩어짐 → 다음 그림 */
+body { background: var(--dark); color: var(--on-dark); height: 600svh; --hud: var(--on-dark) }
+canvas.bg { z-index: 0 }
+.side { position: fixed; z-index: 2; left: var(--m); top: 50%; transform: translateY(-50%); width: min(30vw, 400px) }
+.side .meta { color: var(--on-dark-soft); margin-bottom: 14px }
+.side h1 { font-size: clamp(40px, 5vw, 86px) }
+.side p.d { margin-top: 18px; color: var(--on-dark-soft); max-width: 19em }
+.side .go { margin-top: 26px }
+.side .fade { transition: opacity .3s, transform .3s }
+.side .fade.out { opacity: 0; transform: translateY(10px) }
+.bar { position: fixed; z-index: 2; right: var(--m); bottom: clamp(20px, 5vh, 48px); display: flex; gap: 8px }
+.bar i { width: 28px; height: 2px; background: currentColor; opacity: .25; transition: opacity .3s }
+.bar i.on { opacity: 1 }
+@media (max-width: 800px) {
+  .side { top: auto; bottom: 64px; transform: none; width: auto; right: var(--m) }
+  .side p.d { display: none }
+  .side .go { margin-top: 18px }
+  .bar { bottom: 28px }
+}
+</style>
+</head>
+<body>
+<nav class="top mono"><a href="../#apply">← 움직이는 웹사이트</a><span class="right"><a href="ring.html">← 이전</a><span>작업실 적용 2 / 3 · 점으로 그린 작품</span><a href="pile.html">다음 →</a></span></nav>
+<canvas class="bg" id="cv"></canvas>
+<div class="side"><div class="fade" id="info"></div></div>
+<div class="bar" id="bar"></div>
+
+<script type="module">
+import * as THREE from "three";
+import { WORKS, ROOT } from "./works.js";
+const PICK = ["넋굿", "마디", "우리달", "학과 진로 지도", "액셀 페달 3D"];
+const LINE = {
+  "넋굿": "구미호 아이가 오행 술법으로 원귀를 풀어 주는 쿼터뷰 로그라이트.",
+  "마디": "관절이 다 보이는 마네킹을 사람처럼 움직이게 만드는 3D 실험.",
+  "우리달": "여자친구랑 같이 쓰는 달력 앱.",
+  "학과 진로 지도": "101문항으로 흥미가 겹치는 직무를 찾아 주는 진로 검사.",
+  "액셀 페달 3D": "창공설 레이싱 휠의 액셀 페달 3D 시안.",
+};
+const SHOW = PICK.map(t => WORKS.find(w => w.t === t));
+const COLS = 200, ROWS = 112, N = COLS * ROWS, K = SHOW.length;
+const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+// 그림 → 칸마다 색(rgb)과 보임(a). 비율은 그대로 두고 남는 칸은 비움
+const load = src => new Promise((ok, no) => { const im = new Image(); im.onload = () => ok(im); im.onerror = no; im.src = src; });
+const cvs = Object.assign(document.createElement("canvas"), { width: COLS, height: ROWS });
+const g = cvs.getContext("2d", { willReadFrequently: true });
+function sample(im) {
+  g.clearRect(0, 0, COLS, ROWS);
+  const s = Math.min(COLS / im.width, ROWS / im.height), w = im.width * s, h = im.height * s;
+  g.drawImage(im, (COLS - w) / 2, (ROWS - h) / 2, w, h);
+  const px = g.getImageData(0, 0, COLS, ROWS).data, rgb = new Float32Array(N * 3), a = new Float32Array(N);
+  for (let i = 0; i < N; i++) { rgb[i * 3] = px[i * 4] / 255; rgb[i * 3 + 1] = px[i * 4 + 1] / 255; rgb[i * 3 + 2] = px[i * 4 + 2] / 255; a[i] = px[i * 4 + 3] > 128 ? 1 : 0; }
+  return { rgb, a };
+}
+const imgs = (await Promise.all(SHOW.map(w => load(ROOT + w.img)))).map(sample);
+
+// 그림마다 점 i가 맡는 칸을 섞어 둠 → 넘어갈 때 점이 화면을 가로질러 흩어졌다 모임
+const perm = imgs.map((_, k) => { const p = new Uint32Array(N); for (let i = 0; i < N; i++) p[i] = i; if (k) for (let i = N - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [p[i], p[j]] = [p[j], p[i]]; } return p; });
+const rnd = new Float32Array(N * 3); for (let i = 0; i < N * 3; i++) rnd[i] = Math.random() * 2 - 1;
+
+const cv = document.getElementById("cv");
+const renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: false });
+renderer.setClearColor(0x151618);
+const scene = new THREE.Scene(), cam = new THREE.OrthographicCamera(0, 1, 0, 1, -10, 10);
+const pos = new Float32Array(N * 3), col = new Float32Array(N * 3), alp = new Float32Array(N), push = new Float32Array(N * 2);
+const geo = new THREE.BufferGeometry();
+geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+geo.setAttribute("color", new THREE.BufferAttribute(col, 3));
+geo.setAttribute("alpha", new THREE.BufferAttribute(alp, 1));
+const mat = new THREE.ShaderMaterial({
+  uniforms: { size: { value: 4 }, round: { value: 1 } }, transparent: true, depthTest: false,
+  vertexShader: `attribute vec3 color; attribute float alpha; varying vec3 vC; varying float vA; uniform float size;
+    void main(){ vC = color; vA = alpha; gl_PointSize = size; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }`,
+  fragmentShader: `varying vec3 vC; varying float vA; uniform float round;
+    void main(){ if (vA < .01 || round > .5 && length(gl_PointCoord - .5) > .5) discard; gl_FragColor = vec4(vC, vA); }`,
+});
+scene.add(new THREE.Points(geo, mat));
+
+// 그림 칸 크기·자리: 넓은 화면은 오른쪽, 좁은 화면은 위
+let W, H, FW, FH, FX, FY, sp;
+function resize() {
+  W = innerWidth; H = innerHeight;
+  const dpr = Math.min(devicePixelRatio, 2); renderer.setPixelRatio(dpr); renderer.setSize(W, H, false);
+  cam.left = 0; cam.right = W; cam.top = 0; cam.bottom = H; cam.updateProjectionMatrix();
+  if (W > 800) { FW = Math.min(W * .58, (H - 140) * COLS / ROWS, 1100); FX = W - FW / 2 - Math.max(W * .04, 24); FY = H / 2; }
+  else { FW = W - 32; FX = W / 2; FY = H * .36; }
+  FH = FW * ROWS / COLS; sp = FW / COLS;
+  const round = sp * dpr >= 3.5;   // 점이 몇 픽셀뿐이면 동그랗게 깎지 않고 칸을 꽉 채움(틈 줄무늬 방지)
+  mat.uniforms.round.value = round ? 1 : 0;
+  mat.uniforms.size.value = round ? sp * .86 * dpr : Math.ceil(sp * dpr);
+}
+addEventListener("resize", resize); resize();
+const cell = (c, o) => { o[0] = FX + ((c % COLS) + .5) * sp - FW / 2; o[1] = FY + ((c / COLS | 0) + .5) * sp - FH / 2; return o; };
+
+// 스크롤 → 몇 번째 그림 사이인지
+const sm = x => x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x);
+let mx = -1e4, my = -1e4, intro = calm ? 1 : 0, cur = -1;
+addEventListener("pointermove", e => { mx = e.clientX; my = e.clientY; });
+addEventListener("pointerleave", () => { mx = my = -1e4; });
+document.getElementById("bar").innerHTML = SHOW.map(() => "<i></i>").join("");
+
+const a = [0, 0], b = [0, 0];
+function frame() {
+  const max = document.documentElement.scrollHeight - innerHeight;
+  const p = Math.min(K - 1, Math.max(0, scrollY / Math.max(1, max) * (K - 1) * 1.08));
+  const k = Math.min(K - 2, Math.floor(p)), f = p - k;
+  const t = k === K - 2 && p >= K - 1 ? 1 : sm((f - .3) / .6);   // 앞 30%는 그림 그대로, 뒤에서 넘어감
+  const swirl = Math.sin(Math.PI * t), R = Math.max(90, FW * .12);
+  intro += (1 - intro) * .035;
+  const A = imgs[k], B = imgs[k + 1], pa = perm[k], pb = perm[k + 1];
+  for (let i = 0; i < N; i++) {
+    const ca = pa[i], cb = pb[i];
+    cell(ca, a); cell(cb, b);
+    let x = a[0] + (b[0] - a[0]) * t, y = a[1] + (b[1] - a[1]) * t;
+    // 흩어짐: 가운데로 갈수록 크게, 시작할 땐 화면 밖에서 날아옴
+    const s = swirl * FW * .22 + (1 - intro) * W * .7;
+    x += rnd[i * 3] * s; y += rnd[i * 3 + 1] * s * .8;
+    // 마우스 근처 점은 제자리에서 살짝 흩어짐 (구멍·밝은 테 없이)
+    const d = Math.hypot(x - mx, y - my);
+    let px = 0, py = 0;
+    if (d < R) { const f2 = (1 - d / R) ** 2 * sp * 5; px = rnd[i * 3] * f2; py = rnd[i * 3 + 2] * f2; }
+    push[i * 2] += (px - push[i * 2]) * .12; push[i * 2 + 1] += (py - push[i * 2 + 1]) * .12;
+    pos[i * 3] = x + push[i * 2]; pos[i * 3 + 1] = y + push[i * 2 + 1];
+    for (let c = 0; c < 3; c++) col[i * 3 + c] = A.rgb[ca * 3 + c] + (B.rgb[cb * 3 + c] - A.rgb[ca * 3 + c]) * t;
+    alp[i] = (A.a[ca] + (B.a[cb] - A.a[ca]) * t) * (.35 + .65 * intro) * (1 - swirl * .25);
+  }
+  geo.attributes.position.needsUpdate = geo.attributes.color.needsUpdate = geo.attributes.alpha.needsUpdate = true;
+  renderer.render(scene, cam);
+  const near = Math.round(k + t);
+  if (near !== cur) info(near);
+  requestAnimationFrame(frame);
+}
+
+let tm;
+function info(i) {
+  const first = cur === -1; cur = i; const w = SHOW[i], el = document.getElementById("info");
+  [...document.getElementById("bar").children].forEach((e, j) => e.classList.toggle("on", j === i));
+  el.classList.add("out"); clearTimeout(tm);
+  tm = setTimeout(() => {
+    el.innerHTML = `<p class="meta mono">${String(i + 1).padStart(2, "0")} / ${String(K).padStart(2, "0")} · ${w.cat}</p><h1>${w.t}</h1><p class="d">${LINE[w.t]}</p><a class="go" href="${ROOT + w.href}">열어 보기 →</a>`;
+    el.classList.remove("out");
+  }, first || calm ? 0 : 180);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
