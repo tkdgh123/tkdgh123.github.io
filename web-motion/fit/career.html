@@ -1,0 +1,171 @@
+<!-- Claude가 만듦 (2026-11-06) — 나를 해로 두고 직무 예시를 궤도 위 행성으로 (궤도 위 행성 70 + 점 30) -->
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>나의 적성과 취업 방향 · 궤도</title>
+<link rel="icon" href="data:,">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js"}}</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root { --bg: #070810; --fg: #eceae4; --soft: #8f93a3; --sun: #ffcf8a }
+* { box-sizing: border-box }
+html, body { margin: 0 }
+body { height: 900vh; background: var(--bg); color: var(--fg); font: 400 17px/1.6 "Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif; word-break: keep-all; -webkit-font-smoothing: antialiased; overflow-x: clip }
+canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block }
+.mono { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 12px; letter-spacing: .04em }
+.hud { position: fixed; z-index: 30; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; padding: 14px clamp(16px, 3vw, 32px); pointer-events: none }
+.hud a { pointer-events: auto; color: var(--fg); text-decoration: none; opacity: .65 }
+.hud a:hover { opacity: 1 }
+.say { position: fixed; z-index: 5; left: clamp(20px, 6vw, 100px); top: 50%; width: min(34ch, 42vw); transform: translateY(-46%); opacity: 0; transition: opacity .7s, transform 1s cubic-bezier(.2, .7, .2, 1); pointer-events: none }
+.say.on { opacity: 1; transform: translateY(-50%) }
+.say small { display: block; margin-bottom: 16px; color: var(--soft) }
+.say h1 { margin: 0; font-size: clamp(46px, 7.4vw, 116px); line-height: .98; letter-spacing: -.055em; font-weight: 600 }
+.say h2 { margin: 0; font-size: clamp(32px, 4.6vw, 70px); line-height: 1.04; letter-spacing: -.045em; font-weight: 600 }
+.say p { margin: 16px 0 0; color: #b4b7c3; font-size: clamp(15px, 1.3vw, 19px) }
+.job { position: fixed; z-index: 5; left: clamp(20px, 6vw, 100px); bottom: clamp(60px, 14vh, 130px); width: min(420px, calc(100vw - 40px)); opacity: 0; transform: translateY(16px); transition: opacity .6s, transform .9s cubic-bezier(.2, .7, .2, 1); pointer-events: none }
+.job.on { opacity: 1; transform: none }
+.job small { color: var(--soft) }
+.job h2 { margin: 8px 0 0; font-size: clamp(38px, 5.4vw, 84px); line-height: 1; letter-spacing: -.05em; font-weight: 600; color: var(--c) }
+.job p { margin: 12px 0 0; color: #b4b7c3; font-size: clamp(15px, 1.3vw, 18px) }
+.lbl em { margin-left: 7px; font-style: normal; font-size: 10px; opacity: .5 }
+.lbl { position: fixed; z-index: 4; left: 0; top: 0; pointer-events: none; white-space: nowrap; font: 500 12px "JetBrains Mono", monospace; color: #d6d8e0; opacity: 0; transition: opacity .4s; text-shadow: 0 1px 8px #000 }
+.lbl.me { color: var(--sun); font: 600 18px "Pretendard Variable", sans-serif }
+.bar { position: fixed; z-index: 6; left: clamp(20px, 6vw, 100px); right: clamp(20px, 6vw, 100px); bottom: 20px; height: 1px; background: rgb(236 234 228 / .14) }
+.bar i { display: block; height: 100%; width: 0; background: var(--fg) }
+@media (max-width: 700px) {
+  .say { top: auto; bottom: 9vh; left: 20px; width: calc(100vw - 40px); transform: translateY(14px) } .say.on { transform: none }
+  .job { bottom: 9vh } .say h1 { font-size: clamp(44px, 13vw, 70px) }
+}
+</style>
+</head>
+<body>
+<nav class="hud mono"><a href="./index.html">← 카드별 어울림</a><a href="../../career/">작품 보기 →</a></nav>
+<canvas id="cv"></canvas>
+<div id="lbls"></div>
+
+<div class="say on" data-a="0" data-b=".09"><small class="mono">CAREER · ORBIT</small><h1>나의 적성과<br>취업 방향</h1></div>
+<div id="jobs"></div>
+<div class="say" data-a=".92" data-b="1.1"><h2>나를 해로,<br>직무를 행성으로.</h2></div>
+<div class="bar"><i id="bar"></i></div>
+
+<script type="module">
+import * as THREE from "three";
+const mob = innerWidth < 700, calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+// 직무는 널리 알려진 일반 직군의 예시, 순서는 임의 (실제 문서 내용·평가 아님)
+const JOBS = [
+  ["데이터 분석가", "데이터에서 답을 찾아요.", "#e6a76d"], ["서비스 기획자", "무엇을 만들지 정해요.", "#9298aa"], ["AI 엔지니어", "모델을 만들고 서비스에 올려요.", "#7aa9ee"],
+  ["연구원", "새로운 방법을 연구해요.", "#dcc67e"], ["게임 개발자", "움직임과 규칙을 코드로 만들어요.", "#82cba6"], ["백엔드 개발자", "서버와 데이터베이스를 맡아요.", "#b793d3"]
+];
+const NJ = JOBS.length, R0 = 13, RS = 8.6;
+const cv = document.getElementById("cv");
+const renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true });
+const PR = Math.min(devicePixelRatio, 2); renderer.setPixelRatio(PR);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+const scene = new THREE.Scene(); scene.background = new THREE.Color("#070810");
+const camera = new THREE.PerspectiveCamera(46, 1, .1, 1200);
+scene.add(new THREE.AmbientLight("#8d93b8", .35));
+const sunL = new THREE.PointLight("#ffe2b8", 52, 0, 1); scene.add(sunL);
+
+// 별 (점)
+const starGeo = new THREE.BufferGeometry(), SN = 2600, sp = new Float32Array(SN * 3), sr = new Float32Array(SN);
+for (let i = 0; i < SN; i++) { const u = Math.random() * 2 - 1, a = Math.random() * 6.283, r = 300 + Math.random() * 400, s = Math.sqrt(1 - u * u); sp.set([r * s * Math.cos(a), r * u, r * s * Math.sin(a)], i * 3); sr[i] = Math.random(); }
+starGeo.setAttribute("position", new THREE.BufferAttribute(sp, 3)); starGeo.setAttribute("r", new THREE.BufferAttribute(sr, 1));
+scene.add(new THREE.Points(starGeo, new THREE.ShaderMaterial({ transparent: true, depthWrite: false, uniforms: { px: { value: PR }, t: { value: 0 } },
+  vertexShader: `attribute float r; uniform float px, t; varying float a; void main(){ a = .25 + .6 * r * (.6 + .4 * sin(t * (.5 + r) + r * 40.)); gl_PointSize = (1. + r * 1.6) * px; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }`,
+  fragmentShader: `varying float a; void main(){ if (length(gl_PointCoord - .5) > .5) discard; gl_FragColor = vec4(.85, .88, 1., a); }` })));
+
+// 해 = "나": 점으로 된 공 + 안쪽 빛
+const sunCore = new THREE.Mesh(new THREE.SphereGeometry(2.6, 48, 32), new THREE.MeshBasicMaterial({ color: "#ffd9a3" })); scene.add(sunCore);
+const glow = (() => { const c = document.createElement("canvas"); c.width = c.height = 256; const g = c.getContext("2d"), r = g.createRadialGradient(128, 128, 0, 128, 128, 128);
+  r.addColorStop(0, "rgba(255,226,170,.9)"); r.addColorStop(.25, "rgba(255,190,110,.35)"); r.addColorStop(1, "rgba(255,160,80,0)"); g.fillStyle = r; g.fillRect(0, 0, 256, 256); return new THREE.CanvasTexture(c); })();
+const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: glow, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending })); halo.scale.setScalar(26); scene.add(halo);
+const SUN_N = mob ? 3000 : 6000, swp = new Float32Array(SUN_N * 3), swr = new Float32Array(SUN_N * 2);
+for (let i = 0; i < SUN_N; i++) { const u = Math.random() * 2 - 1, a = Math.random() * 6.283, r = 2.9 + Math.pow(Math.random(), 2) * 3.4, s = Math.sqrt(1 - u * u); swp.set([r * s * Math.cos(a), r * u * .8, r * s * Math.sin(a)], i * 3); swr.set([Math.random(), r], i * 2); }
+const sunG = new THREE.BufferGeometry(); sunG.setAttribute("position", new THREE.BufferAttribute(swp, 3)); sunG.setAttribute("r", new THREE.BufferAttribute(swr, 2));
+const sunP = new THREE.Points(sunG, new THREE.ShaderMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, uniforms: { px: { value: PR }, t: { value: 0 } },
+  vertexShader: `attribute vec2 r; uniform float px, t; varying float a; void main(){ float w = t * (.5 / (r.y * .6)); float c = cos(w), s = sin(w); vec3 p = vec3(position.x * c - position.z * s, position.y, position.x * s + position.z * c);
+    vec4 mv = modelViewMatrix * vec4(p, 1.); a = (.5 - (r.y - 2.9) * .09) * (.6 + .4 * sin(t * 2. + r.x * 30.)); gl_PointSize = (1.4 + r.x * 1.6) * px * (34. / -mv.z); gl_Position = projectionMatrix * mv; }`,
+  fragmentShader: `varying float a; void main(){ float d = length(gl_PointCoord - .5); if (d > .5) discard; gl_FragColor = vec4(1., .74, .42, a * smoothstep(.5, .1, d)); }` })); sunP.frustumCulled = false; scene.add(sunP);
+
+// 궤도 + 궤도 먼지 (점)
+const planets = [], orbitMat = new THREE.LineBasicMaterial({ color: "#8f93a3", transparent: true, opacity: .22 });
+const planetTex = (hex, k) => { const c = document.createElement("canvas"); c.width = 256; c.height = 128; const g = c.getContext("2d"), base = new THREE.Color(hex);
+  for (let y = 0; y < 128; y++) { const n = Math.sin(y * .22 + k * 3) * .5 + Math.sin(y * .07 + k) * .5, col = base.clone().offsetHSL(0, 0, n * .07 + (Math.random() - .5) * .015); g.fillStyle = "#" + col.getHexString(); g.fillRect(0, y, 256, 1); }
+  for (let i = 0; i < 260; i++) { g.fillStyle = `rgba(255,255,255,${Math.random() * .04})`; g.beginPath(); g.ellipse(Math.random() * 256, Math.random() * 128, 10 + Math.random() * 30, 1 + Math.random() * 3, 0, 0, 6.283); g.fill(); }
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; };
+const lbls = document.getElementById("lbls"), jobsBox = document.getElementById("jobs");
+const dustN = mob ? 500 : 900, dp = new Float32Array(NJ * dustN * 3), dr = new Float32Array(NJ * dustN * 3);
+JOBS.forEach(([name, desc, hex], i) => {
+  const R = R0 + RS * i + i * i * .35, size = 1.25 + (i % 3) * .28;
+  const ring = new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(Array.from({ length: 160 }, (_, k) => new THREE.Vector3(Math.cos(k / 160 * 6.2832) * R, 0, Math.sin(k / 160 * 6.2832) * R))), orbitMat); scene.add(ring);
+  const m = new THREE.Mesh(new THREE.SphereGeometry(size, 48, 32), new THREE.MeshStandardMaterial({ map: planetTex(hex, i), roughness: .85 })); scene.add(m);
+  if (i === 3) { const rg = new THREE.Mesh(new THREE.RingGeometry(size * 1.45, size * 2.0, 80), new THREE.MeshBasicMaterial({ color: "#d8c8e8", transparent: true, opacity: .28, side: THREE.DoubleSide })); rg.rotation.x = Math.PI / 2 - .35; m.add(rg); }
+  const P = { name, desc, hex, R, size, w: .12 / Math.pow(R / R0, 1.2), a0: i * 2.1 + .6, m, ang: 0 }; planets.push(P);
+  for (let k = 0; k < dustN; k++) { const a = Math.random() * 6.283, rr = R + (Math.random() - .5) * 2.4 + (Math.random() - .5) * 1.2; const o = (i * dustN + k) * 3; dp.set([Math.cos(a) * rr, (Math.random() - .5) * .5, Math.sin(a) * rr], o); dr.set([Math.random(), i, rr], o); }
+  const e = document.createElement("div"); e.className = "lbl"; e.innerHTML = name + "<em>예시</em>"; lbls.append(e); P.lbl = e;
+  const j = document.createElement("div"); j.className = "job"; j.style.setProperty("--c", hex);
+  j.innerHTML = `<small class="mono">예시</small><h2>${name}</h2><p>${desc}</p>`; jobsBox.append(j); P.job = j;
+});
+{ const me = document.createElement("div"); me.className = "lbl me"; me.textContent = "나"; lbls.append(me); planets.me = me; }
+const dg = new THREE.BufferGeometry(); dg.setAttribute("position", new THREE.BufferAttribute(dp, 3)); dg.setAttribute("r", new THREE.BufferAttribute(dr, 3));
+const dustM = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, uniforms: { px: { value: PR }, t: { value: 0 }, focus: { value: -1 } },
+  vertexShader: `attribute vec3 r; uniform float px, t, focus; varying float a; varying float f;
+    void main(){ float w = t * .09 / pow(r.z / 13., 1.2); float c = cos(w), s = sin(w); vec3 p = vec3(position.x * c - position.z * s, position.y, position.x * s + position.z * c);
+      f = 1. - smoothstep(0., .9, abs(r.y - focus)); vec4 mv = modelViewMatrix * vec4(p, 1.); a = .16 + .5 * f; gl_PointSize = (1. + r.x * 1.4 + f) * px * (40. / -mv.z); gl_Position = projectionMatrix * mv; }`,
+  fragmentShader: `varying float a; varying float f; void main(){ float d = length(gl_PointCoord - .5); if (d > .5) discard; gl_FragColor = vec4(mix(vec3(.62,.66,.8), vec3(1.,.85,.6), f), a * smoothstep(.5, .1, d)); }` });
+const dust = new THREE.Points(dg, dustM); dust.frustumCulled = false; scene.add(dust);
+
+// ── 카메라: 위에서 전체 → 가까운 행성부터 하나씩 따라가며 → 다시 전체
+const clamp01 = x => Math.min(1, Math.max(0, x)), sm = t => t * t * (3 - 2 * t), L = (a, b, t) => a + (b - a) * t;
+let target = 0, prog = 0, mx = 0, my = 0, mxs = 0, mys = 0;
+const prg = () => clamp01(scrollY / (document.documentElement.scrollHeight - innerHeight));
+addEventListener("scroll", () => target = prg(), { passive: true });
+addEventListener("pointermove", e => { mx = e.clientX / innerWidth - .5; my = e.clientY / innerHeight - .5; });
+function resize() { renderer.setSize(innerWidth, innerHeight, false); camera.aspect = innerWidth / innerHeight; camera.fov = innerWidth < 700 ? 62 : 46; camera.updateProjectionMatrix(); }
+addEventListener("resize", resize); resize(); target = prog = prg();
+
+const says = [...document.querySelectorAll(".say")], bar = document.getElementById("bar");
+const clock = new THREE.Clock(), v = new THREE.Vector3(), camP = new THREE.Vector3(), camL = new THREE.Vector3(), pa = new THREE.Vector3(), pb = new THREE.Vector3(), up = new THREE.Vector3();
+let T = 0, init = false;
+const P0 = .1, P1 = .9;
+renderer.setAnimationLoop(() => {
+  const rd = Math.min(.3, clock.getDelta()); T += Math.min(.05, rd) * (calm ? .15 : 1);
+  prog += (target - prog) * (1 - Math.exp(-rd * 3.4)); const p = prog;
+  mxs += (mx - mxs) * .05; mys += (my - mys) * .05;
+  planets.forEach(P => { P.ang = P.a0 + T * P.w; P.m.position.set(Math.cos(P.ang) * P.R, 0, Math.sin(P.ang) * P.R); P.m.rotation.y = T * .3; });
+  sunP.material.uniforms.t.value = dustM.uniforms.t.value = T; scene.children[2].material.uniforms.t.value = T;
+  sunCore.scale.setScalar(1 + Math.sin(T * 1.5) * .015);
+  const f = clamp01((p - P0) / (P1 - P0)) * NJ, i = Math.min(NJ - 1, Math.floor(f)), fr = f - i;
+  const focusOn = sm(clamp01((p - .07) / .05)) * (1 - sm(clamp01((p - .9) / .04)));
+  const fi = Math.min(NJ - 1, Math.floor(Math.min(f, NJ - .001)));
+  // 행성 i 와 i+1 사이: 앞 45% 는 i 에 머물고, 뒤 55% 에서 i+1 로 넘어감
+  const k = i < NJ - 1 ? sm(clamp01((fr - .5) / .5)) : 0, A = planets[i], B = planets[Math.min(NJ - 1, i + 1)];
+  const focusPos = pa.copy(A.m.position).lerp(B.m.position, k), sz = L(A.size, B.size, k), R = L(A.R, B.R, k);
+  // 카메라: 행성에서 해 바깥쪽으로 조금 떨어져, 행성과 뒤의 해를 함께 본다
+  const out = v.copy(focusPos).setY(0).normalize(), tang = new THREE.Vector3(-out.z, 0, out.x);
+  const dist = (mob ? 8 : 6) + sz * 2.8;
+  const near = focusPos.clone().addScaledVector(out, -dist * .55).addScaledVector(tang, dist * .95).add(up.set(0, dist * .3, 0));
+  const overview = new THREE.Vector3(mxs * 16, mob ? 140 : 76 - mys * 8, mob ? 92 : 58);
+  camP.copy(near).lerp(overview, 1 - focusOn);
+  const lk = focusPos.clone().lerp(new THREE.Vector3(0, 0, 0), 1 - focusOn);
+  if (!init) { camera.position.copy(camP); camL.copy(lk); init = true; }
+  camera.position.lerp(camP, 1 - Math.exp(-rd * 6)); camL.lerp(lk, 1 - Math.exp(-rd * 9)); camera.lookAt(camL);
+  if (!mob) camera.setViewOffset(innerWidth, innerHeight, innerWidth * .15 * focusOn, 0, innerWidth, innerHeight); else camera.clearViewOffset();
+  camera.updateProjectionMatrix();
+  halo.material.opacity = 1 - focusOn * .8;
+  dustM.uniforms.focus.value = focusOn > .5 ? (i + k > i + .5 ? i + 1 : i) : -1;
+  // 글
+  says.forEach(s => s.classList.toggle("on", p >= +s.dataset.a && p < +s.dataset.b));
+  planets.forEach((P, n) => { P.job.classList.toggle("on", focusOn > .6 && n === (k > .5 ? i + 1 : i) && p < .9); });
+  const labelVis = 1 - focusOn;
+  planets.forEach(P => { v.copy(P.m.position); v.y += P.size + 1; v.project(camera); P.lbl.style.transform = `translate(${(v.x * .5 + .5) * innerWidth}px, ${(-v.y * .5 + .5) * innerHeight}px) translate(-50%, -100%)`; P.lbl.style.opacity = v.z < 1 ? labelVis : 0; });
+  v.set(0, 0, 0).project(camera); planets.me.style.transform = `translate(${(v.x * .5 + .5) * innerWidth}px, ${(-v.y * .5 + .5) * innerHeight}px) translate(-50%, 18px)`; planets.me.style.opacity = labelVis > .1 ? 1 : 0;
+  bar.style.width = p * 100 + "%";
+  renderer.render(scene, camera);
+});
+</script>
+</body>
+</html>

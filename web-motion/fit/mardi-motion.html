@@ -1,0 +1,257 @@
+<!-- Claude가 만듦 (2026-11-06) — 사람과 마디를 막대 인형 둘로 나란히 움직이고(쫄라맨 70), 값을 바꾸면 스캔선이 지나가며 차이를 짚음(분해·스캔 30). 값은 mardi/motion-study 표 그대로 -->
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>마디 움직임 비교</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@300;500;700&display=swap">
+<style>
+/* 마디 기획서 색 그대로: 회색 종이, 어두운 뷰포트, 주황 관절 */
+:root { --paper: #eceef0; --tone: #e0e3e7; --ink: #15171a; --muted: #5b6068; --rule: #c9cdd3;
+  --vp: #1b1d21; --vp-2: #25282d; --on-vp: #e8eaed; --on-vp-soft: #9aa0a8; --joint: #f06a1d; --joint-ink: #b7470a;
+  --sans: "IBM Plex Sans KR", system-ui, "Malgun Gothic", sans-serif; --mono: "IBM Plex Mono", ui-monospace, monospace;
+  --m: clamp(16px, 3.2vw, 52px); color-scheme: light }
+* { box-sizing: border-box }
+html, body { margin: 0 }
+body { background: var(--paper); color: var(--ink); font: 400 16px/1.6 var(--sans); word-break: keep-all; -webkit-font-smoothing: antialiased; min-height: 100svh; display: grid; grid-template-rows: auto auto 1fr auto }
+a { color: inherit }
+.top { display: flex; justify-content: space-between; padding: 18px var(--m); font: 500 12.5px var(--mono); color: var(--muted) }
+.top a { text-decoration: none } .top a:hover { color: var(--ink) }
+header { display: flex; justify-content: space-between; align-items: end; gap: 24px; padding: 6px var(--m) 18px }
+h1 { margin: 0; font-size: clamp(32px, 4.6vw, 68px); font-weight: 300; letter-spacing: -.035em; line-height: 1 }
+h1 b { font-weight: 700 }
+.tabs { display: flex; gap: 2px; flex-wrap: wrap; justify-content: flex-end }
+.tabs button { font: 500 15px var(--sans); border: 0; background: none; color: var(--muted); padding: 10px 14px; cursor: pointer; border-bottom: 2px solid transparent; transition: color .2s, border-color .3s }
+.tabs button[aria-pressed="true"] { color: var(--ink); border-color: var(--joint) }
+.tabs button:hover { color: var(--ink) }
+.vp { position: relative; margin: 0 var(--m); background: var(--vp); min-height: 340px; overflow: hidden }
+#cv { position: absolute; inset: 0; width: 100%; height: 100%; display: block }
+.who { position: absolute; top: 16px; font: 500 12.5px var(--mono); color: var(--on-vp-soft); letter-spacing: .06em }
+.who.l { left: 18px } .who.r { left: calc(50% + 18px) }
+.who b { color: var(--on-vp); font-weight: 600 }
+.ctl { display: grid; grid-template-columns: auto 1fr auto; gap: 8px 28px; align-items: center; padding: 22px var(--m) 28px }
+.ctl .k { font: 500 13px var(--mono); color: var(--muted) }
+.ctl .v { font: 600 clamp(22px, 2.2vw, 30px)/1 var(--mono); letter-spacing: -.02em; text-align: right; min-width: 7ch }
+.ctl .v small { font-size: 13px; font-weight: 500; color: var(--muted); margin-left: 4px }
+.track { position: relative; height: 44px }
+.track .band { position: absolute; top: 15px; height: 14px; background: var(--rule) }
+.track .band.g { background: repeating-linear-gradient(90deg, #d4d7dc 0 4px, transparent 4px 7px) }
+.track .tick { position: absolute; top: 8px; width: 2px; height: 28px; background: var(--ink) }
+.track .lab { position: absolute; top: 38px; translate: -50% 0; font: 500 11.5px var(--mono); color: var(--muted); white-space: nowrap }
+.track input { position: absolute; inset: 0; width: 100%; margin: 0; appearance: none; background: none; cursor: pointer }
+.track input::-webkit-slider-runnable-track { height: 44px; background: linear-gradient(var(--ink), var(--ink)) 0 50% / 100% 1.5px no-repeat }
+.track input::-moz-range-track { height: 1.5px; background: var(--ink) }
+.track input::-webkit-slider-thumb { appearance: none; width: 22px; height: 22px; margin-top: 11px; border-radius: 50%; background: var(--joint); border: 3px solid var(--paper); box-shadow: 0 0 0 1.5px var(--joint) }
+.track input::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--joint); border: 3px solid var(--paper) }
+.track input:focus-visible { outline: 2px solid var(--joint); outline-offset: 4px }
+@media (max-width: 760px) {
+  header { flex-direction: column; align-items: start }
+  .tabs { justify-content: flex-start; margin-left: -14px }
+  .vp { min-height: 0; height: 52svh }
+  .ctl { grid-template-columns: 1fr auto; padding-bottom: 36px } .ctl .track { grid-column: 1 / -1; grid-row: 2 }
+}
+</style>
+</head>
+<body>
+<nav class="top"><a href="./index.html">← 카드별 어울림</a><a href="../../mardi/motion-study/">작품 보기 →</a></nav>
+<header>
+  <h1>사람처럼 <b>움직일 값</b></h1>
+  <div class="tabs" id="tabs" role="toolbar" aria-label="동작"></div>
+</header>
+<div class="vp"><canvas id="cv" aria-label="사람과 마디 막대 인형이 나란히 움직이는 화면"></canvas><p class="who l"><b>사람</b> · 모캡·논문</p><p class="who r"><b>마디</b> · 지금 값</p></div>
+<div class="ctl">
+  <span class="k" id="k"></span>
+  <div class="track" id="track"><input type="range" id="rng" aria-label="마디 값"></div>
+  <span class="v" id="v"></span>
+</div>
+
+<script>
+// 값은 mardi/motion-study 표에 있는 것만 씀
+const MODES = [
+  { id: "run", t: "달리기 속도", k: "달리기 · m/s", unit: "m/s", min: 2, max: 7, st: .05, hu: 3.17, ma: 5.55,
+    bands: [[2.5, 3.5, "조깅"], [4.5, 5.5, "빠른 달리기"]], ticks: [] },
+  { id: "land", t: "착지 눌림", k: "닿는 속도 1 m/s당 · cm", unit: "cm", min: 0, max: 10, st: .1, hu: 7, ma: 1.5,
+    bands: [], ticks: [[7, "사람 7"]] },
+  { id: "start", t: "출발", k: "5 m/s까지 · 초", unit: "s", min: .1, max: 2, st: .01, hu: 1.14, ma: .8,
+    bands: [[.17, .83, "게임 0.17–0.83", 1]], ticks: [[1.14, "사람 1.14"]] },
+  { id: "slip", t: "디딘 발 미끄럼", k: "달리기 · cm/s", unit: "cm/s", min: 0, max: 40, st: .1, hu: 13, ma: 29.7,
+    bands: [[6, 20, "사람 6–20"]], ticks: [[28, "한도 28"]] },
+];
+const $ = id => document.getElementById(id);
+const cv = $("cv"), g = cv.getContext("2d"), reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+let mode = MODES[0], ma = mode.ma, scanT = -1, t0 = performance.now();
+
+$("tabs").innerHTML = MODES.map((m, i) => `<button type="button" data-i="${i}">${m.t}</button>`).join("");
+$("tabs").onclick = e => { const b = e.target.closest("button"); if (b) setMode(MODES[+b.dataset.i]); };
+const rng = $("rng");
+function fmt(x) { return mode.st < .1 ? x.toFixed(2) : x.toFixed(1); }
+function setMode(m) {
+  mode = m; ma = m.ma; t0 = performance.now();
+  for (const b of $("tabs").children) b.setAttribute("aria-pressed", MODES[+b.dataset.i] === m);
+  $("k").textContent = m.k;
+  rng.min = m.min; rng.max = m.max; rng.step = m.st; rng.value = m.ma;
+  const pct = x => (x - m.min) / (m.max - m.min) * 100;
+  $("track").querySelectorAll(".band,.tick,.lab").forEach(e => e.remove());
+  for (const [a, b, l, game] of m.bands) $("track").insertAdjacentHTML("afterbegin", `<i class="band${game ? " g" : ""}" style="left:${pct(a)}%;width:${pct(b) - pct(a)}%"></i><span class="lab" style="left:${(pct(a) + pct(b)) / 2}%">${l}</span>`);
+  for (const [a, l] of m.ticks) $("track").insertAdjacentHTML("afterbegin", `<i class="tick" style="left:${pct(a)}%"></i><span class="lab" style="left:${pct(a)}%">${l}</span>`);
+  showV(); scanT = 0;
+}
+function showV() { $("v").innerHTML = `${fmt(ma)}<small>${mode.unit}</small>`; }
+rng.oninput = () => { ma = +rng.value; showV(); if (scanT < 0 || scanT > .7) scanT = 0; marks.length = 0; };
+
+// 막대 인형 (길이 m)
+const L = { th: .46, sh: .46, to: .56, ua: .3, fa: .28, hd: .11 };
+let W = 0, H = 0, dpr = 1, S = 100;
+function resize() {
+  dpr = Math.min(devicePixelRatio, 2); W = cv.clientWidth; H = cv.clientHeight;
+  cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+  S = Math.min(H * .3, W * (W < 700 ? .22 : .16));
+}
+new ResizeObserver(resize).observe(cv);
+
+// 두 뼈 IK: 엉덩이 h → 발 f, 무릎은 앞으로 굽음
+function ik(hx, hy, fx, fy, a, b, dir = 1) {
+  const dx = fx - hx, dy = fy - hy, d = Math.min(Math.hypot(dx, dy), a + b - 1e-4);
+  const ang = Math.atan2(dy, dx), c = Math.acos(Math.max(-1, Math.min(1, (a * a + d * d - b * b) / (2 * a * d))));
+  const k = ang - c * dir;
+  return [hx + Math.cos(k) * a, hy + Math.sin(k) * a];
+}
+// 달리기 한 주기 (p 0..1) — 다리 하나의 엉덩이·무릎 각 (앞 = +)
+function legRun(p, amp) {
+  const s = Math.sin(2 * Math.PI * p);
+  return [ .62 * amp * s, (.25 + 1.25 * Math.max(0, Math.sin(2 * Math.PI * p - .9))) * amp ];
+}
+// 몸 하나 그리기: 엉덩이(x,y 화면), 각들
+const P = { line: "#e8eaed", soft: "#6c727b" };
+function seg(x1, y1, x2, y2, w, c) { g.strokeStyle = c; g.lineWidth = w; g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke(); }
+function joint(x, y, r, hot) { g.fillStyle = hot ? "#f06a1d" : "#9aa0a8"; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill(); }
+function body(cx, gy, st, hot) {
+  // st: { hipY(m 위), lean(rad), legs:[[kneeX,kneeY,footX,footY]x2] (m, 엉덩이 기준), arms:[sh, el] x2 }
+  const k = S, hx = cx, hy = gy - st.hip * k, w = Math.max(3, k * .045);
+  const sx = hx + Math.sin(st.lean) * L.to * k, sy = hy - Math.cos(st.lean) * L.to * k;
+  g.lineCap = "round"; g.lineJoin = "round";
+  const draw = (back) => {
+    const i = back ? 1 : 0, lg = st.legs[i], ar = st.arms[i], col = back ? P.soft : P.line;
+    const kx = hx + lg[0] * k, ky = hy + lg[1] * k, fx = hx + lg[2] * k, fy = hy + lg[3] * k;
+    seg(hx, hy, kx, ky, w, col); seg(kx, ky, fx, fy, w, col); seg(fx, fy, fx + .1 * k, fy, w * .8, col);
+    const ex = sx + Math.sin(st.lean + ar[0]) * L.ua * k, ey = sy + Math.cos(st.lean + ar[0]) * L.ua * k;
+    const a2 = st.lean + ar[0] + ar[1];
+    seg(sx, sy, ex, ey, w * .9, col); seg(ex, ey, ex + Math.sin(a2) * L.fa * k, ey + Math.cos(a2) * L.fa * k, w * .9, col);
+    joint(kx, ky, w * .62, hot.includes("knee")); joint(ex, ey, w * .55, false);
+    if (!back) joint(fx, fy, w * .55, hot.includes("foot"));
+  };
+  draw(true);
+  seg(hx, hy, sx, sy, w * 1.1, P.line);
+  draw(false);
+  g.fillStyle = P.line; g.beginPath(); g.arc(sx + Math.sin(st.lean) * (L.hd + .05) * k, sy - Math.cos(st.lean) * (L.hd + .05) * k, L.hd * k, 0, 7); g.fill();
+  joint(hx, hy, w * .75, hot.includes("hip")); joint(sx, sy, w * .6, false);
+  return { hx, hy, sx, sy };
+}
+// 상태 만들기
+function runState(ph, speed, lean) {
+  const amp = Math.min(1.25, .55 + speed / 7);
+  const legs = [0, .5].map(o => {
+    const [h, kn] = legRun((ph + o) % 1, amp);
+    const kx = Math.sin(h) * L.th, ky = Math.cos(h) * L.th, sa = h - kn;
+    return [kx, ky, kx + Math.sin(sa) * L.sh, ky + Math.cos(sa) * L.sh];
+  });
+  const low = Math.max(legs[0][3], legs[1][3]);
+  const arms = [0, .5].map(o => [-.75 * amp * Math.sin(2 * Math.PI * (ph + o)), 1.5]);
+  return { hip: low, lean, legs, arms };
+}
+function standState(dip, lean, spread = .12) {
+  const hip = L.th + L.sh - .02 - dip;
+  const legs = [-spread / 2, spread / 2].map(f => { const [kx, ky] = ik(0, 0, f, hip, L.th, L.sh, -1); return [kx, ky, f, hip]; });
+  return { hip, lean, legs, arms: [[-.25 - dip * 2, .5 + dip * 3], [.35 + dip * 2, .6 + dip * 3]] };
+}
+
+// 미끄럼 자국 (땅에 남고 흘러감)
+const marks = [];
+let lastLow = [0, 0];
+function frame(now) {
+  if (W === 0) resize();
+  const t = (now - t0) / 1000, dt = 1 / 60;
+  g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+  const half = W / 2, gy = H * .8;
+  // 가운데 칸막이 + 땅
+  g.fillStyle = "#25282d"; g.fillRect(half - 1, 0, 2, H);
+  const hot = [];
+  const sides = [["hu", 0], ["ma", half]];
+  for (const [who, ox] of sides) {
+    const val = who === "hu" ? mode.hu : ma, cx = ox + half * .5;
+    let speed = 0, st, ground = 0, label = "";
+    if (mode.id === "run") {
+      speed = val; const cad = 1.37; st = runState((t * cad * (reduce ? .3 : 1)) % 1, speed, .26);
+      ground = t * speed;
+    } else if (mode.id === "slip") {
+      // 느린 화면(0.3배)으로 봐야 자국이 보임
+      const ts = t * .3; speed = 3.17; const ph = (ts * 1.37) % 1; st = runState(ph, speed, .26); ground = ts * speed;
+      // 디딜 때마다 미끄럼 자국 (디딤 0.27 s 동안 val cm/s)
+      const low = Math.max(st.legs[0][3], st.legs[1][3]);
+      [0, 1].forEach(i => {
+        const on = st.legs[i][3] >= low - .005;
+        if (on && !lastLow[who + i]) marks.push({ who, x: st.legs[i][2], g0: ground, len: val * .27 / 100 * 4, t: now });
+        lastLow[who + i] = on;
+      });
+    } else if (mode.id === "land") {
+      // 0.3 m 뛰었다 떨어짐: 닿는 속도 2.4 m/s × val cm (보이게 2배)
+      const T = 1.5, u = (t % T) / T, air = .42;
+      if (u < air) { const z = Math.sin(Math.PI * u / air) * .3; st = standState(0, .05); st.hip += z; st.legs.forEach(l => { l[3] -= z * .6; l[1] -= z * .3; }); }
+      else { const w = (u - air) / (1 - air), dip = val / 100 * 2.4 * 2 * Math.exp(-w * 7) * Math.sin(Math.min(1, w * 10) * Math.PI / 2); st = standState(dip, .05 + dip * .8); if (w < .3) hot.push(who + "knee"); }
+    } else {
+      // 출발: 0 → 5 m/s, val 초에 90%
+      const T = 3.2, u = t % T, tau = val / Math.log(10), sp = u < .4 ? 0 : 5 * (1 - Math.exp(-(u - .4) / tau));
+      speed = sp;
+      const ph = ((who === "hu" ? 1 : 1.3) * (u * 1.5 + sp * .25)) % 1;
+      st = u < .4 ? standState(0, .03) : runState(ph, sp, .1 + .5 * Math.exp(-(u - .4) / .5) * (who === "hu" ? 1 : .6));
+      ground = sp;
+      // 속도 곡선
+      g.strokeStyle = who === "hu" ? "#9aa0a8" : "#f06a1d"; g.lineWidth = 2; g.beginPath();
+      const gx = ox + 24, gw = half - 48, gh = H * .12, gyy = H * .97;
+      for (let k = 0; k <= 60; k++) { const uu = k / 60 * Math.min(u, T) , s = uu < .4 ? 0 : 5 * (1 - Math.exp(-(uu - .4) / tau)); const x = gx + uu / T * gw, y = gyy - s / 5 * gh; k ? g.lineTo(x, y) : g.moveTo(x, y); }
+      g.stroke();
+    }
+    // 땅 줄무늬 (속도만큼 흐름)
+    g.save(); g.beginPath(); g.rect(ox, 0, half, H); g.clip();
+    g.fillStyle = "#30343a"; g.fillRect(ox, gy, half, 2);
+    const off = mode.id === "start" ? (who === "hu" ? hu0 : ma0) : ground;
+    for (let k = -1; k < 14; k++) { const x = ox + ((k * .5 - off) % .5 + .5) % .5 * S + k * .5 * S - S * .5; g.fillRect(x, gy + 8, S * .2, 2); }
+    // 미끄럼 자국
+    if (mode.id === "slip") for (const m of marks) if (m.who === who) {
+      const x = cx + (m.x - (ground - m.g0)) * S, a = Math.max(0, 1 - (now - m.t) / 2600);
+      g.fillStyle = `rgba(240,106,29,${a})`; g.fillRect(x, gy - 3, m.len * S, 6);
+    }
+    const pts = body(cx, gy, st, hot.filter(h => h.startsWith(who)).map(h => h.slice(2)).concat(mode.id === "slip" ? ["foot"] : mode.id === "land" ? ["hip"] : []));
+    g.restore();
+    // 값 표시 (스캔선이 지나간 뒤)
+    const passed = scanT >= 0 && scanT * W > cx;
+    if (scanT < 0 || passed) {
+      g.font = `600 ${Math.max(14, S * .14)}px "IBM Plex Mono", monospace`; g.textAlign = "center";
+      g.fillStyle = who === "hu" ? "#e8eaed" : "#f06a1d";
+      const txt = mode.id === "slip" && who === "hu" ? "6–20" : fmt(val);
+      g.fillText(`${txt} ${mode.unit}`, cx, pts.sy - S * .55);
+    }
+  }
+  if (mode.id === "start") { hu0 += speedAt(mode.hu, t) * dt; ma0 += speedAt(ma, t) * dt; }
+  while (marks.length > 40) marks.shift();
+  // 스캔선
+  if (scanT >= 0) {
+    scanT += reduce ? 1 : dt / 1.1;
+    const x = scanT * W;
+    const gr = g.createLinearGradient(x - 90, 0, x, 0); gr.addColorStop(0, "rgba(240,106,29,0)"); gr.addColorStop(1, "rgba(240,106,29,.22)");
+    g.fillStyle = gr; g.fillRect(x - 90, 0, 90, H);
+    g.fillStyle = "#f06a1d"; g.fillRect(x - 1, 0, 2, H);
+    if (scanT > 1.1) scanT = -1;
+  }
+  requestAnimationFrame(frame);
+}
+let hu0 = 0, ma0 = 0;
+function speedAt(v, t) { const u = t % 3.2; return u < .4 ? 0 : 5 * (1 - Math.exp(-(u - .4) / (v / Math.log(10)))); }
+setMode(MODES[0]);
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

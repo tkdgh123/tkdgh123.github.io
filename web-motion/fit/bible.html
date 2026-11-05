@@ -1,0 +1,145 @@
+<!-- Claude가 만듦 (2026-11-06) — 답안은 차분해야 해요. 세 문항이 빛기둥 아래 하나씩, 빛 속 먼지만 살짝 -->
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:,">
+<title>인간과 성서 · 세 문항</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@200..800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<style>
+/* 어둡고 조용한 방. 빛기둥 셋이 나란히 서 있고, 스크롤하면 카메라가 옆으로 걸어가 문항 하나씩 빛 아래에 세움 */
+:root { --bg: #0d0f13; --ink: #f1ead9; --soft: #8f9099; --light: #f3e7cb;
+  --serif: "Hahmlet", "Noto Serif KR", serif; --sans: "Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif; --mono: "IBM Plex Mono", ui-monospace, monospace; color-scheme: dark }
+* { box-sizing: border-box }
+html, body { margin: 0 }
+body { background: var(--bg); color: var(--ink); font: 400 16px/1.6 var(--sans); word-break: keep-all; height: 400vh; -webkit-font-smoothing: antialiased; overflow-x: clip }
+canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block }
+.bar { position: fixed; z-index: 60; inset: 0 0 auto; display: flex; justify-content: space-between; padding: 16px clamp(16px, 3vw, 36px); font: 400 12px var(--mono); letter-spacing: .02em; pointer-events: none }
+.bar a { color: var(--ink); opacity: .7; text-decoration: none; pointer-events: auto; padding: 6px 0 }
+.bar a:hover { opacity: 1; text-decoration: underline; text-underline-offset: 4px }
+.txt { position: fixed; z-index: 3; left: clamp(20px, 5vw, 80px); bottom: clamp(32px, 9vh, 90px); pointer-events: none; transition: opacity .4s, transform .6s cubic-bezier(.2, .7, .2, 1) }
+.txt.out { opacity: 0; transform: translateY(10px) }
+.txt small { display: block; font: 400 12px var(--mono); letter-spacing: .1em; color: var(--soft); margin-bottom: 14px }
+.txt h1 { margin: 0; font: 300 clamp(40px, 6.4vw, 104px)/1.08 var(--serif); letter-spacing: -.04em }
+.nav { position: fixed; z-index: 4; right: clamp(16px, 3vw, 40px); top: 50%; transform: translateY(-50%); display: grid; gap: 6px }
+.nav button { all: unset; cursor: pointer; padding: 8px; display: grid; justify-items: end }
+.nav i { display: block; width: 6px; height: 6px; border-radius: 50%; background: var(--ink); opacity: .28; transition: opacity .3s, transform .3s }
+.nav button.on i { opacity: 1; transform: scale(1.7) }
+.nav button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; border-radius: 4px }
+.hint { position: fixed; z-index: 3; left: 50%; top: 50%; transform: translate(-50%, 190px); font: 400 12px var(--mono); letter-spacing: .1em; color: var(--soft); transition: opacity .6s; pointer-events: none }
+@media (max-width: 700px) { .nav { top: 76px; transform: none; display: flex; right: 8px } .hint { transform: translate(-50%, 150px) } }
+</style>
+</head>
+<body>
+<nav class="bar"><a href="./index.html">← 카드별 어울림</a><a href="../../human-bible/">작품 보기 →</a></nav>
+<canvas id="cv"></canvas>
+<div class="txt" id="txt"></div>
+<div class="nav" id="nav"><button aria-label="문항 1"><i></i></button><button aria-label="문항 2"><i></i></button><button aria-label="문항 3"><i></i></button></div>
+<p class="hint" id="hint">내려 보세요</p>
+
+<script type="module">
+import * as THREE from "three";
+import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+
+const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const Q = [
+  { n: "인간관", t: ["인간관"] },
+  { n: "기독교와 근대화", t: ["기독교와", "근대화"] },
+  { n: "혐오와 그 해결", t: ["혐오와", "그 해결"] },
+];
+await Promise.all([document.fonts.load("300 80px Hahmlet"), document.fonts.load("500 20px 'IBM Plex Mono'")]).catch(() => {});
+
+// 답안지 한 장: 번호와 제목, 아래는 글 없는 줄만
+function sheet(q, i) {
+  const W = 512, H = 720, k = document.createElement("canvas"); k.width = W; k.height = H; const g = k.getContext("2d");
+  g.fillStyle = "#ece5d3"; g.fillRect(0, 0, W, H);
+  g.fillStyle = "#1c1d21"; g.font = "300 120px Hahmlet, serif"; g.textBaseline = "alphabetic"; g.fillText("0" + (i + 1), 48, 170);
+  g.font = "500 22px 'IBM Plex Mono', monospace"; g.fillStyle = "#77746b"; g.fillText("문항 " + (i + 1) + " / 3", 52, 214);
+  g.fillStyle = "#1c1d21"; g.font = "500 48px Hahmlet, serif"; q.t.forEach((l, j) => g.fillText(l, 50, 300 + j * 62));
+  g.strokeStyle = "rgba(28,29,33,.22)"; g.lineWidth = 2;
+  for (let y = 440; y < 670; y += 42) { g.beginPath(); g.moveTo(50, y); g.lineTo(W - 50, y - (y > 600 ? 0 : 0)); g.stroke(); }
+  const t = new THREE.CanvasTexture(k); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;
+}
+
+const cv = document.getElementById("cv");
+const renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setClearColor("#0d0f13"); renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.shadowMap.enabled = true;
+const scene = new THREE.Scene(); scene.fog = new THREE.Fog("#0d0f13", 10, 34);
+scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), .04).texture; scene.environmentIntensity = .06;
+const camera = new THREE.PerspectiveCamera(35, 1, .1, 100);
+
+const GAP = 8, LIGHT = new THREE.Color("#f3e7cb");
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(120, 60), new THREE.MeshStandardMaterial({ color: "#16181d", roughness: .55, metalness: .1 }));
+floor.rotation.x = -Math.PI / 2; floor.position.y = -2.6; floor.receiveShadow = true; scene.add(floor);
+
+const beamVert = `varying vec3 vN; varying vec3 vV; varying float vY; void main(){ vY = uv.y; vec4 w = modelViewMatrix * vec4(position,1.); vN = normalize(normalMatrix*normal); vV = normalize(-w.xyz); gl_Position = projectionMatrix * w; }`;
+const beamFrag = `uniform vec3 col; uniform float lit; uniform float time; varying vec3 vN; varying vec3 vV; varying float vY;
+  void main(){ float rim = pow(abs(dot(vN, vV)), 2.0); float a = rim * pow(vY, 1.5) * .7 * lit * (0.94 + 0.06*sin(time*1.6 + vY*14.)); gl_FragColor = vec4(col, a); }`;
+const dustVert = `attribute vec4 r; uniform float time; uniform float lit; uniform float px; varying float vA;
+  void main(){ vec3 p = position; p.y -= mod(time * (.08 + r.x * .12) + r.y * 12., 12.); if (p.y < -2.6) p.y += 12.;
+    p.x += sin(time * .4 + r.z * 20.) * .25; p.z += cos(time * .35 + r.w * 20.) * .25;
+    vec4 mv = modelViewMatrix * vec4(p, 1.); gl_PointSize = (1.4 + r.x * 2.) * px * (11. / -mv.z); gl_Position = projectionMatrix * mv;
+    vA = (.25 + .6 * r.w) * (.2 + .8 * lit) * smoothstep(-2.6, -1., p.y) ; }`;
+const dustFrag = `varying float vA; uniform vec3 col; void main(){ float d = length(gl_PointCoord - .5); if (d > .5) discard; gl_FragColor = vec4(col, vA * smoothstep(.5, .05, d)); }`;
+
+const units = Q.map((q, i) => {
+  const x = (i - 1) * GAP, g = new THREE.Group(); g.position.x = x; scene.add(g);
+  const tex = sheet(q, i);
+  const card = new THREE.Group();
+  const slab = new THREE.Mesh(new RoundedBoxGeometry(2.3, 3.22, .05, 4, .03), new THREE.MeshStandardMaterial({ color: "#d8d0bb", roughness: .6 })); slab.castShadow = true; card.add(slab);
+  const face = new THREE.Mesh(new THREE.PlaneGeometry(2.3, 3.22), new THREE.MeshStandardMaterial({ map: tex, roughness: .7 })); face.position.z = .027; card.add(face);
+  const bk = new THREE.Mesh(new THREE.PlaneGeometry(2.3, 3.22), new THREE.MeshStandardMaterial({ color: "#cfc7b2", roughness: .8 })); bk.position.z = -.027; bk.rotation.y = Math.PI; card.add(bk);
+  card.position.y = .4; g.add(card);
+  const plinth = new THREE.Mesh(new THREE.CylinderGeometry(1.1, 1.25, .5, 48), new THREE.MeshStandardMaterial({ color: "#1d1f25", roughness: .5, metalness: .2 })); plinth.position.y = -2.35; plinth.castShadow = plinth.receiveShadow = true; g.add(plinth);
+  const spot = new THREE.SpotLight(LIGHT, 0, 30, .3, .65, 1.5); spot.position.set(0, 10, 1.5); spot.target = card; spot.castShadow = true; spot.shadow.mapSize.set(1024, 1024); g.add(spot);
+  const bm = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, vertexShader: beamVert, fragmentShader: beamFrag, uniforms: { col: { value: LIGHT }, lit: { value: 0 }, time: { value: 0 } } });
+  const beam = new THREE.Mesh(new THREE.CylinderGeometry(.16, 2.2, 12.8, 48, 1, true), bm); beam.position.y = 3.8; g.add(beam);
+  const N = 520, pos = new Float32Array(N * 3), rr = new Float32Array(N * 4);
+  for (let j = 0; j < N; j++) { const y = Math.random(), r = (.25 + y * 2) * Math.sqrt(Math.random()), a = Math.random() * 7; pos.set([Math.cos(a) * r, 10.2 - y * 12.8, Math.sin(a) * r], j * 3); rr.set([Math.random(), Math.random(), Math.random(), Math.random()], j * 4); }
+  const geo = new THREE.BufferGeometry(); geo.setAttribute("position", new THREE.BufferAttribute(pos, 3)); geo.setAttribute("r", new THREE.BufferAttribute(rr, 4));
+  const dm = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, vertexShader: dustVert, fragmentShader: dustFrag, uniforms: { time: { value: 0 }, lit: { value: 0 }, col: { value: new THREE.Color("#ffe9bd") }, px: { value: Math.min(devicePixelRatio, 2) } } });
+  const dust = new THREE.Points(geo, dm); dust.frustumCulled = false; g.add(dust);
+  return { g, card, spot, bm, dm, x };
+});
+
+const narrow = () => innerWidth < 700;
+function resize() { renderer.setSize(innerWidth, innerHeight, false); camera.aspect = innerWidth / innerHeight; camera.position.set(0, .9, narrow() ? 15 : 10.5); camera.updateProjectionMatrix(); }
+addEventListener("resize", resize); resize();
+
+const txt = document.getElementById("txt"), nav = [...document.querySelectorAll(".nav button")], hint = document.getElementById("hint");
+let target = 0, p = 0, shown = -1, mx = 0, my = 0;
+const maxS = () => document.documentElement.scrollHeight - innerHeight;
+const onS = () => { target = scrollY / maxS() * 2; if (scrollY > 8) hint.style.opacity = 0; };
+addEventListener("scroll", onS, { passive: true }); onS();
+nav.forEach((b, i) => b.addEventListener("click", () => scrollTo({ top: maxS() * i / 2, behavior: calm ? "auto" : "smooth" })));
+addEventListener("pointermove", e => { if (e.pointerType === "mouse") { mx = e.clientX / innerWidth - .5; my = e.clientY / innerHeight - .5; } });
+const clock = new THREE.Clock(), sm = x => x * x * (3 - 2 * x);
+
+renderer.setAnimationLoop(() => {
+  const t = clock.getElapsedTime(), rd = Math.min(.3, (performance.now() - (window._pl || performance.now())) / 1000); window._pl = performance.now();
+  p = calm ? target : p + (target - p) * (1 - Math.exp(-rd * 4));
+  const cx = (p - 1) * GAP;
+  camera.position.x = cx + mx * 1.2; camera.position.y = .9 - my * .5; camera.lookAt(cx, .2, 0);
+  units.forEach((u, i) => {
+    const d = Math.abs(p - i), lit = 1 - sm(Math.min(1, Math.max(0, (d - .15) / .75)));
+    u.bm.uniforms.lit.value = .12 + lit * .88; u.bm.uniforms.time.value = t; u.dm.uniforms.time.value = t + i * 7; u.dm.uniforms.lit.value = lit;
+    u.spot.intensity = 30 + 230 * lit;
+    u.card.position.y = .4 + Math.sin(t * .9 + i) * .07 + lit * .22;
+    u.card.rotation.y = (p - i) * -.35 + mx * .25 * lit; u.card.rotation.x = Math.sin(t * .6 + i) * .02 - my * .12 * lit;
+  });
+  const cur = Math.round(Math.min(2, Math.max(0, p)));
+  if (cur !== shown) {
+    shown = cur; txt.classList.add("out");
+    setTimeout(() => { txt.innerHTML = `<small>문항 ${cur + 1} / 3</small><h1>${Q[cur].t.join("<br>")}</h1>`; txt.classList.remove("out"); }, 260);
+    nav.forEach((b, j) => b.classList.toggle("on", j === cur));
+  }
+  renderer.render(scene, camera);
+});
+</script>
+</body>
+</html>

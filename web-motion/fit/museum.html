@@ -1,0 +1,227 @@
+<!-- Claude가 만듦 (2026-11-06) — 스크롤로 전시실 복도를 걸어 들어가고, 진열장마다 조명이 켜지며 감상이 나와요 -->
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:,">
+<title>한국기독교박물관 · 복도</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@200..800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js"}}</script>
+<style>
+/* 숭실대 한국기독교박물관의 실제 구성: 1층 경교·천주교·개신교 전시실, 2층 숭실역사실. 스크롤하면 복도를 걸어가고 가까워진 진열장에 조명이 켜짐 */
+:root { --bg: #0c0b0a; --ink: #efe9dc; --soft: #8d8880; --gold: #d8b36a;
+  --serif: "Hahmlet", "Noto Serif KR", serif; --sans: "Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif; --mono: "IBM Plex Mono", ui-monospace, monospace; color-scheme: dark }
+* { box-sizing: border-box }
+html, body { margin: 0 }
+body { background: var(--bg); color: var(--ink); font: 400 16px/1.6 var(--sans); word-break: keep-all; height: 900vh; -webkit-font-smoothing: antialiased; overflow-x: clip }
+canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block }
+.bar { position: fixed; z-index: 60; inset: 0 0 auto; display: flex; justify-content: space-between; padding: 16px clamp(16px, 3vw, 36px); font: 400 12px var(--mono); letter-spacing: .02em; pointer-events: none }
+.bar a { color: var(--ink); opacity: .72; text-decoration: none; pointer-events: auto; padding: 6px 0 }
+.bar a:hover { opacity: 1; text-decoration: underline; text-underline-offset: 4px }
+.cap { position: fixed; z-index: 3; left: clamp(20px, 4vw, 64px); bottom: clamp(28px, 7vh, 72px); pointer-events: none }
+.cap .f { font: 500 12px var(--mono); letter-spacing: .12em; color: var(--gold) }
+.cap h2 { margin: 8px 0 0; font: 300 clamp(38px, 5.4vw, 84px)/1.05 var(--serif); letter-spacing: -.035em; transition: opacity .4s, transform .5s cubic-bezier(.2, .7, .2, 1) }
+.cap .ex { margin-top: 12px; font: 400 14px var(--sans); color: var(--soft); min-height: 1.6em; transition: opacity .35s }
+.cap .out { opacity: 0; transform: translateY(8px) }
+.start { position: fixed; z-index: 3; left: 50%; top: 40%; transform: translate(-50%, -50%); text-align: center; pointer-events: none; transition: opacity .5s; width: max-content; max-width: calc(100vw - 32px) }
+.start small { display: block; font: 400 12px var(--mono); letter-spacing: .14em; color: var(--soft); margin-bottom: 16px }
+.start h1 { margin: 0; font: 300 clamp(40px, 7vw, 108px)/1.05 var(--serif); letter-spacing: -.04em }
+.hint { position: fixed; z-index: 3; left: 50%; bottom: 26px; transform: translateX(-50%); font: 400 12px var(--mono); letter-spacing: .1em; color: var(--soft); transition: opacity .5s; pointer-events: none }
+.bar2 { position: fixed; z-index: 3; right: clamp(16px, 3vw, 36px); top: 50%; width: 2px; height: 120px; transform: translateY(-50%); background: rgb(239 233 220 / .18) }
+.bar2 i { position: absolute; left: 0; top: 0; width: 100%; background: var(--gold); height: 0 }
+@media (max-width: 700px) { .start h1 { font-size: 44px } }
+</style>
+</head>
+<body>
+<nav class="bar"><a href="./index.html">← 카드별 어울림</a><a href="../../museum/">작품 보기 →</a></nav>
+<canvas id="cv"></canvas>
+<div class="start" id="start"><small>숭실대학교</small><h1>한국기독교<br>박물관</h1></div>
+<div class="cap" id="cap"><div class="f" id="f"></div><h2 id="h"></h2><div class="ex" id="ex"></div></div>
+<div class="bar2"><i id="prog"></i></div>
+<p class="hint" id="hint">내려 보세요</p>
+
+<script type="module">
+import * as THREE from "three";
+const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+await Promise.all([document.fonts.load("300 80px Hahmlet"), document.fonts.load("500 30px Hahmlet"), document.fonts.load("500 20px 'IBM Plex Mono'")]).catch(() => {});
+
+const cv = document.getElementById("cv");
+const renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setClearColor("#0c0b0a"); renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.1;
+const scene = new THREE.Scene(); scene.fog = new THREE.Fog("#0c0b0a", 9, 42);
+const camera = new THREE.PerspectiveCamera(58, 1, .1, 80);
+
+/* ───────── 재료·도우미 ───────── */
+const M = (c, r = .8, m = 0) => new THREE.MeshStandardMaterial({ color: c, roughness: r, metalness: m });
+const wallM = M("#4d463f", .9), floorM = M("#2e2925", .4, .1), darkM = M("#14120f", .6), frameM = M("#3a3530", .5, .3);
+const box = (w, h, d, mat, x, y, z, parent = scene) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat); m.position.set(x, y, z); parent.add(m); return m; };
+function canvasTex(w, h, draw) { const k = document.createElement("canvas"); k.width = w; k.height = h; const g = k.getContext("2d"); draw(g, w, h); const t = new THREE.CanvasTexture(k); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t; }
+function labelPlane(w, h, texW, texH, draw, y, x, z, ry = 0) {
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: canvasTex(texW, texH, draw), transparent: true, fog: true }));
+  m.position.set(x, y, z); m.rotation.y = ry; scene.add(m); return m;
+}
+
+/* ───────── 건물: 1층 복도(z +6 ~ -62) · 계단(-62 ~ -74) · 2층 홀(-74 ~ -110) ───────── */
+const FL2 = 4.2; // 2층 바닥 높이
+box(10, .2, 68, floorM, 0, -.1, -28);                                  // 1층 바닥
+box(10, .2, 38, floorM, 0, FL2 - .1, -92);                             // 2층 바닥
+box(.4, 14, 120, wallM, -5.2, 6, -50); box(.4, 14, 120, wallM, 5.2, 6, -50);   // 양쪽 벽
+box(10.8, 14, .4, M("#27231f", .9), 0, 6, -111);                                  // 끝 벽
+box(10.8, 14, .4, wallM, 0, 6, 6.4);                                   // 시작 벽
+const STEPS = 11, SH = FL2 / STEPS, SD = 12 / STEPS;
+for (let i = 0; i < STEPS; i++) box(5, SH * (i + 1), SD, floorM, 0, SH * (i + 1) / 2 - .05, -62 - SD * (i + .5));
+box(10, .1, 12, darkM, 0, 0, -68);
+for (let i = 0; i < 7; i++) { // 바닥 위 은은한 줄 불빛(길 안내)
+  box(.06, .02, 2.2, M("#d8b36a", .5), -1.6, .01, -2 - i * 9); box(.06, .02, 2.2, M("#d8b36a", .5), 1.6, .01, -2 - i * 9);
+}
+// 전시실 문틀 + 간판
+const ROOMS = [
+  { z: -6, n: "경교", f: "1층" }, { z: -24, n: "천주교", f: "1층" }, { z: -42, n: "개신교", f: "1층" },
+];
+function portal(z, sign) {
+  box(.5, 5.4, .5, frameM, -4.3, 2.7, z); box(.5, 5.4, .5, frameM, 4.3, 2.7, z); box(9.1, .5, .5, frameM, 0, 5.4, z);
+  if (sign) labelPlane(5, 1.1, 1000, 220, (g, w, h) => { g.fillStyle = "#d8b36a"; g.font = "500 34px 'IBM Plex Mono', monospace"; g.textAlign = "center"; g.fillText(sign.f, w / 2, 70); g.fillStyle = "#efe9dc"; g.font = "300 96px Hahmlet, serif"; g.fillText(sign.n, w / 2, 178); }, 4.45, 0, z + .3);
+}
+ROOMS.forEach(r => portal(r.z, r));
+portal(-60, null);
+labelPlane(5, 1.1, 1000, 220, (g, w, h) => { g.fillStyle = "#d8b36a"; g.font = "500 34px 'IBM Plex Mono', monospace"; g.textAlign = "center"; g.fillText("2층", w / 2, 70); g.fillStyle = "#efe9dc"; g.font = "300 96px Hahmlet, serif"; g.fillText("숭실역사실", w / 2, 178); }, FL2 + 3.2, 0, -75);
+box(.5, 5.4, .5, frameM, -4.3, FL2 + 2.7, -74); box(.5, 5.4, .5, frameM, 4.3, FL2 + 2.7, -74); box(9.1, .5, .5, frameM, 0, FL2 + 5.4, -74);
+
+/* ───────── 진열품 (실루엣만) ───────── */
+const stone = M("#8c867b", .95), brass = M("#b6924f", .35, .85), leather = M("#2a1c16", .6), paper = M("#d9d2bf", .9), ink = M("#1b1a19", .9);
+function stele() {
+  const g = new THREE.Group(), s = new THREE.Shape(); s.moveTo(-.34, 0); s.lineTo(.34, 0); s.lineTo(.34, .95); s.absarc(0, .95, .34, 0, Math.PI, false); s.lineTo(-.34, 0);
+  const m = new THREE.Mesh(new THREE.ExtrudeGeometry(s, { depth: .14, bevelEnabled: false }), stone); m.position.set(0, .05, -.07); g.add(m);
+  box(.045, .3, .02, M("#bdb6a6", .9), 0, 1.0, .075, g); box(.2, .045, .02, M("#bdb6a6", .9), 0, 1.07, .075, g);
+  for (let i = 0; i < 6; i++) box(.4, .015, .02, M("#6f6a60", .9), 0, .32 + i * .08, .075, g);
+  box(.9, .1, .35, stone, 0, 0, 0, g); return g;
+}
+function cross() { const g = new THREE.Group(); box(.1, 1.1, .08, brass, 0, .75, 0, g); box(.5, .1, .08, brass, 0, 1.05, 0, g); box(.5, .08, .3, ink, 0, .12, 0, g); box(.14, .5, .14, ink, 0, .4, 0, g); return g; }
+function book(open) {
+  const g = new THREE.Group();
+  if (open) { [-1, 1].forEach(s => { const p = box(.42, .05, .6, paper, s * .22, .28, 0, g); p.rotation.z = -s * .12; }); box(.9, .04, .66, leather, 0, .22, 0, g); }
+  else { box(.62, .1, .86, leather, 0, .3, 0, g); box(.56, .07, .8, paper, .02, .3, 0, g).scale.set(.97, .8, .97); box(.64, .11, .06, leather, -.31, .3, 0, g); }
+  box(.9, .2, .7, ink, 0, .05, 0, g); return g;
+}
+function stack() { const g = new THREE.Group(); [[.7, .1, .5, 0], [.62, .1, .46, .2], [.55, .09, .4, -.15]].forEach(([w, h, d, r], i) => { const b = box(w, h, d, i % 2 ? leather : M("#3a2f28", .7), 0, .3 + i * .1, 0, g); b.rotation.y = r; box(w - .06, h - .03, d - .03, paper, .02, .3 + i * .1, 0, g).rotation.y = r; b.scale.set(1, 1, 1); }); box(.9, .2, .7, ink, 0, .05, 0, g); return g; }
+function scroll() { const g = new THREE.Group(), c = new THREE.Mesh(new THREE.CylinderGeometry(.09, .09, .8, 24), paper); c.rotation.z = Math.PI / 2; c.position.y = .5; g.add(c); const sh = box(.8, .01, .5, paper, .0, .42, .02, g); sh.rotation.x = -.15; box(.9, .2, .7, ink, 0, .05, 0, g); return g; }
+
+/* ───────── 진열장 ───────── */
+const cases = []; // {g, ex, lit, pos}
+const glassM = new THREE.MeshStandardMaterial({ color: "#a8c4d6", transparent: true, opacity: .1, roughness: .05, metalness: .2, depthWrite: false });
+const beamVert = `varying vec3 vN; varying vec3 vV; varying float vY; void main(){ vY = uv.y; vec4 w = modelViewMatrix * vec4(position,1.); vN = normalize(normalMatrix*normal); vV = normalize(-w.xyz); gl_Position = projectionMatrix * w; }`;
+const beamFrag = `uniform vec3 col; uniform float lit; varying vec3 vN; varying vec3 vV; varying float vY; void main(){ float rim = pow(abs(dot(vN, vV)), 2.0); gl_FragColor = vec4(col, rim * pow(vY, 1.3) * .32 * lit); }`;
+function vitrine(x, y, z, obj, label, ex) {
+  const g = new THREE.Group(); g.position.set(x, y, z); scene.add(g);
+  box(1.5, 1.0, 1.5, M("#201d1a", .5, .3), 0, .5, 0, g);                  // 받침
+  const gl = box(1.4, 1.9, 1.4, glassM, 0, 1.95, 0, g); gl.renderOrder = 2; // 유리
+  const o = obj; o.position.y = 1.0; g.add(o); o.scale.setScalar(1.15);
+  const pl = new THREE.Mesh(new THREE.PlaneGeometry(.9, .26), new THREE.MeshBasicMaterial({ map: canvasTex(360, 104, (c, w, h) => { c.fillStyle = "#121110"; c.fillRect(0, 0, w, h); c.fillStyle = "#d8b36a"; c.font = "500 44px Hahmlet, serif"; c.textAlign = "center"; c.fillText(label, w / 2, 70); }), fog: true }));
+  pl.position.set(0, .55, .76); pl.rotation.x = -.3; g.add(pl);
+  const bm = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, vertexShader: beamVert, fragmentShader: beamFrag, uniforms: { col: { value: new THREE.Color("#ffe3b0") }, lit: { value: 0 } } });
+  const beam = new THREE.Mesh(new THREE.CylinderGeometry(.35, 1.25, 6.4, 32, 1, true), bm); beam.position.y = 4.2; g.add(beam);
+  const pool = new THREE.Mesh(new THREE.CircleGeometry(1.6, 40), new THREE.ShaderMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, uniforms: { lit: { value: 0 } }, vertexShader: `varying vec2 vU; void main(){ vU = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.); }`, fragmentShader: `uniform float lit; varying vec2 vU; void main(){ float d = length(vU - .5) * 2.; gl_FragColor = vec4(1., .86, .62, smoothstep(1., .0, d) * .3 * lit); }` }));
+  pool.rotation.x = -Math.PI / 2; pool.position.y = .02; g.add(pool);
+  const c = { g, o, bm, pool, label, ex, lit: 0, wp: new THREE.Vector3(x, y + 1.9, z), y };
+  cases.push(c); return c;
+}
+// 1층 전시실 셋, 방마다 진열장 둘 (왼쪽·오른쪽)
+const EX = [
+  [[stele(), "비석", "경교"], [scroll(), "두루마리", "경교"]],
+  [[cross(), "십자가", "천주교"], [book(false), "옛 기도서", "천주교"]],
+  [[book(true), "옛 성경", "개신교"], [stack(), "인쇄본", "개신교"]],
+];
+ROOMS.forEach((r, i) => {
+  vitrine(-3.1, 0, r.z - 7, EX[i][0][0], EX[i][0][1], r.n); vitrine(3.1, 0, r.z - 12, EX[i][1][0], EX[i][1][1], r.n);
+});
+
+// 2층 숭실역사실: 벽에 붙은 패널 네 개 + 가운데 인쇄본
+const PAN = [
+  { t: "최초 대학", z: -81, s: -1, glyph(g, w, h) { g.strokeStyle = "#efe9dc"; g.lineWidth = 8; g.strokeRect(w * .2, h * .46, w * .6, h * .3); g.beginPath(); g.moveTo(w * .14, h * .46); g.lineTo(w * .5, h * .24); g.lineTo(w * .86, h * .46); g.closePath(); g.stroke(); for (let i = 0; i < 4; i++) { g.beginPath(); g.moveTo(w * (.3 + i * .13), h * .5); g.lineTo(w * (.3 + i * .13), h * .72); g.stroke(); } } },
+  { t: "신문화운동", z: -87, s: 1, glyph(g, w, h) { g.strokeStyle = "#efe9dc"; g.lineWidth = 8; g.strokeRect(w * .25, h * .24, w * .5, h * .52); g.fillStyle = "#efe9dc"; g.fillRect(w * .3, h * .3, w * .4, h * .07); for (let i = 0; i < 5; i++) { g.fillRect(w * .3, h * (.43 + i * .06), w * .17, h * .03); g.fillRect(w * .53, h * (.43 + i * .06), w * .17, h * .03); } } },
+  { t: "민족운동과 폐교", z: -93, s: -1, glyph(g, w, h) { g.strokeStyle = "#efe9dc"; g.lineWidth = 8; g.strokeRect(w * .24, h * .24, w * .52, h * .52); g.beginPath(); g.moveTo(w * .5, h * .24); g.lineTo(w * .5, h * .76); g.moveTo(w * .24, h * .5); g.lineTo(w * .76, h * .5); g.stroke(); g.beginPath(); g.moveTo(w * .18, h * .34); g.lineTo(w * .82, h * .66); g.stroke(); g.fillStyle = "#d8b36a"; g.beginPath(); g.arc(w * .5, h * .5, w * .06, 0, 7); g.fill(); } },
+  { t: "재건", z: -99, s: 1, glyph(g, w, h) { g.strokeStyle = "#efe9dc"; g.lineWidth = 8; for (let r = 0; r < 4; r++) for (let c = 0; c < 4 - r * 0 && c < [4, 4, 3, 2][r]; c++) g.strokeRect(w * (.25 + c * .125) + (r % 2) * w * .06, h * (.7 - r * .1), w * .125, h * .1); g.beginPath(); g.moveTo(w * .7, h * .32); g.lineTo(w * .7, h * .5); g.moveTo(w * .6, h * .38); g.lineTo(w * .8, h * .38); g.stroke(); } },
+];
+PAN.forEach((p, i) => {
+  const x = [-3.75, -1.25, 1.25, 3.75][i], ry = 0, PZ = -110.75;
+  labelPlane(2.3, 2.45, 640, 680, (g, w, h) => { g.fillStyle = "#171513"; g.fillRect(0, 0, w, h); g.strokeStyle = "#3b3631"; g.lineWidth = 6; g.strokeRect(10, 10, w - 20, h - 20); p.glyph(g, w, h * .75); g.fillStyle = "#d8b36a"; g.font = "500 28px 'IBM Plex Mono', monospace"; g.textAlign = "left"; g.fillText("0" + (i + 1), 44, h - 128 + 6); g.fillStyle = "#efe9dc"; g.font = "400 56px Hahmlet, serif"; g.fillText(p.t, 44, h - 56); }, FL2 + 2.45, x, PZ, ry);
+  const c = { g: null, o: null, bm: { uniforms: { lit: { value: 0 } } }, pool: { material: { uniforms: { lit: { value: 0 } } } }, label: p.t, ex: "숭실역사실", lit: 0, wp: new THREE.Vector3(x, FL2 + 2.4, PZ), panel: true, endWall: true };
+  const spl = new THREE.Mesh(new THREE.PlaneGeometry(2.9, 3.1), new THREE.ShaderMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, uniforms: { lit: { value: 0 } }, vertexShader: `varying vec2 vU; void main(){ vU = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.); }`, fragmentShader: `uniform float lit; varying vec2 vU; void main(){ float d = length((vU - .5) * vec2(1., 1.05)) * 2.; gl_FragColor = vec4(1., .88, .66, smoothstep(1.1, .2, d) * .16 * lit); }` }));
+  spl.position.set(x, FL2 + 2.45, PZ + .05); spl.rotation.y = ry; scene.add(spl); c.spl = spl; cases.push(c);
+});
+vitrine(-3.3, FL2, -98.5, book(true), "인쇄본", "숭실역사실");
+
+// 조명: 가까운 진열장 셋에 실제 스포트라이트를 돌려 씀
+scene.add(new THREE.HemisphereLight("#a69a8c", "#2a2420", 1.5));
+const pool = [0, 1, 2].map(() => { const s = new THREE.SpotLight("#ffe3b0", 0, 14, .55, .6, 1.6); scene.add(s, s.target); return s; });
+const head = new THREE.PointLight("#ffd9a0", 40, 18, 1.4); scene.add(head); // 걷는 사람 앞의 은은한 빛
+
+/* ───────── 카메라 길 ───────── */
+const path = new THREE.CatmullRomCurve3([
+  [0, 1.65, 4], [0, 1.65, -8], [0, 1.65, -30], [0, 1.65, -56], [0, 1.65, -62], [0, 1.65 + FL2, -74], [0, 1.65 + FL2, -80], [0, 1.65 + FL2, -90], [0, 1.65 + FL2, -97]
+].map(a => new THREE.Vector3(...a)), false, "centripetal");
+const narrow = () => innerWidth < 700;
+function resize() { renderer.setSize(innerWidth, innerHeight, false); camera.aspect = innerWidth / innerHeight; camera.fov = narrow() ? 72 : 58; camera.updateProjectionMatrix(); }
+addEventListener("resize", resize); resize();
+
+/* ───────── 글자 · 스크롤 ───────── */
+const $ = id => document.getElementById(id);
+const fEl = $("f"), hEl = $("h"), exEl = $("ex"), startEl = $("start"), hint = $("hint"), prog = $("prog");
+let target = 0, p = 0, shown = "", mx = 0, my = 0;
+const onS = () => { target = scrollY / (document.documentElement.scrollHeight - innerHeight); if (scrollY > 8) hint.style.opacity = 0; };
+addEventListener("scroll", onS, { passive: true }); onS();
+addEventListener("pointermove", e => { if (e.pointerType === "mouse") { mx = e.clientX / innerWidth - .5; my = e.clientY / innerHeight - .5; } });
+const sm = x => x * x * (3 - 2 * x), tmp = new THREE.Vector3(), tang = new THREE.Vector3(), lerp = (a, b, t) => a + (b - a) * t, clock = new THREE.Clock();
+const roomOf = z => z > -6 ? ["", "입구"] : z > -24 ? ["1층", "경교"] : z > -42 ? ["1층", "천주교"] : z > -62 ? ["1층", "개신교"] : z > -74 ? ["", "계단"] : ["2층", "숭실역사실"];
+
+renderer.setAnimationLoop(() => {
+  const t = clock.getElapsedTime(), rd = Math.min(.3, (performance.now() - (window._pl || performance.now())) / 1000); window._pl = performance.now();
+  p = calm ? target : p + (target - p) * (1 - Math.exp(-rd * 3.5));
+  const SPLIT = .84, pr = Math.min(1, Math.max(0, p)), s = Math.min(1, pr / SPLIT), u = Math.max(0, (pr - SPLIT) / (1 - SPLIT));
+  path.getPointAt(s, tmp); path.getTangentAt(Math.min(.999, s), tang);
+  const Y = 1.65 + FL2, bob = calm || u > 0 ? 0 : Math.sin(s * 520) * .025;
+  let cx = tmp.x, cz = tmp.z, lx, ly, lz;
+  if (u <= 0) { lx = tmp.x + tang.x * 5; ly = tmp.y + tang.y * 5 - .15; lz = tmp.z + tang.z * 5; }
+  else {  // 끝: 안쪽 벽의 패널 넷이 한눈에 (폰은 가까이 다가가 좌우로 훑음)
+    const e1 = sm(Math.min(1, u * 3)), e2 = sm(Math.min(1, Math.max(0, (u - .25) / .75)));
+    if (narrow()) { cz = lerp(-97, -105.3, e1); cx = lerp(lerp(0, -3.75, e1), 3.75, e2); }
+    else { cz = lerp(-97, -103.6, e1); cx = 0; }
+    lx = cx * .6; ly = Y - .05; lz = -111;
+  }
+  camera.position.set(cx + mx * .5, (u > 0 ? Y : tmp.y) + bob, cz);
+  let best = null, bd = 99;
+  const wantEnd = pr > .8;
+  cases.forEach(c => { const d = c.endWall ? (wantEnd ? Math.abs(c.wp.x - cx) * .6 : 99) : Math.abs(c.wp.z - cz); const on = c.endWall ? wantEnd : d < 7; c.lit += ((on ? 1 : 0) - c.lit) * (1 - Math.exp(-rd * 5)); if (d < bd) { bd = d; best = c; } });
+  const lookX = best && !best.endWall && bd < 8 ? best.wp.x * .12 * (1 - bd / 8) : 0;
+  camera.lookAt(lx + lookX - mx * 1.2, ly - my * .6, lz);
+  head.position.set(0, (u > 0 ? Y : tmp.y) + 1.8, cz - 1.5); head.intensity = u > 0 ? 6 : 40;
+  // 실제 조명 배정
+  const ranked = [...cases].sort((a, b) => b.lit - a.lit);
+  pool.forEach((sl, i) => { const c = ranked[i]; if (!c || c.lit < .02) { sl.intensity = 0; return; } sl.position.set(c.wp.x * .4, c.wp.y + 5.5 + (c.panel ? 0 : -1), c.wp.z + 1); sl.target.position.copy(c.wp); sl.target.updateMatrixWorld(); sl.intensity = (c.panel ? 120 : 320) * c.lit; });
+  cases.forEach(c => {
+    c.bm.uniforms.lit.value = c.lit; if (c.pool.material) c.pool.material.uniforms.lit.value = c.lit;
+    if (c.spl) c.spl.material.uniforms.lit.value = c.lit;
+    if (c.o) c.o.rotation.y = t * .35 * c.lit + .4;
+  });
+
+  // 글자
+  const room = roomOf(cz), near = best && !best.endWall && bd < 5 && best.lit > .5 ? best : null;
+  const key = room[1] + "|" + (near ? near.label : "");
+  startEl.style.opacity = Math.max(0, 1 - s * 30);
+  prog.style.height = s * 100 + "%";
+  if (key !== shown) {
+    const roomChanged = shown.split("|")[0] !== room[1]; shown = key;
+    if (roomChanged) hEl.classList.add("out"); exEl.classList.add("out");
+    setTimeout(() => {
+      if (roomChanged) { fEl.textContent = room[0]; hEl.textContent = room[1] === "입구" ? "" : room[1]; hEl.classList.remove("out"); }
+      exEl.textContent = near ? near.label : ""; exEl.classList.remove("out");
+    }, 260);
+  }
+  renderer.render(scene, camera);
+});
+</script>
+</body>
+</html>

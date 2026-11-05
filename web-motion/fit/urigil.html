@@ -1,0 +1,202 @@
+<!-- Claude가 만듦 (2026-11-06) — 지도 위를 날며 데이트 코스 선을 따라가고, 장소마다 멈춰 한 장면씩 보여 준다 (지도 위 비행 60 + 운전해서 둘러보기 40) -->
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>우리길 · 코스 드라이브</title>
+<link rel="icon" href="data:,">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root { --bg: #f8f5ff; --hero: #ede6ff; --ink: #352f45; --soft: #9890ac; --acc: #9b7bea; --acc-ink: #7a55d6; --a: #a9cbff; --b: #ffb5cb; --both: #d5c2ff }
+* { box-sizing: border-box }
+html, body { margin: 0 }
+body { height: 800vh; background: var(--bg); color: var(--ink); font: 500 17px/1.55 "Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif; word-break: keep-all; -webkit-font-smoothing: antialiased; overflow-x: clip }
+canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block }
+.mono { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 12px; letter-spacing: .03em }
+.hud { position: fixed; z-index: 30; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; padding: 14px clamp(16px, 3vw, 32px); pointer-events: none }
+.hud a { pointer-events: auto; color: var(--ink); text-decoration: none; opacity: .6 }
+.hud a:hover { opacity: 1 }
+.say { position: fixed; z-index: 5; left: clamp(20px, 6vw, 100px); top: 50%; width: min(30ch, 40vw); transform: translateY(-46%); opacity: 0; transition: opacity .6s, transform .9s cubic-bezier(.2, .7, .2, 1); pointer-events: none }
+.say.on { opacity: 1; transform: translateY(-50%) }
+.say h1 { margin: 0; font-size: clamp(64px, 10vw, 158px); line-height: .9; letter-spacing: -.06em; font-weight: 800; color: var(--acc-ink) }
+.say h2 { margin: 0; font-size: clamp(32px, 4.4vw, 64px); line-height: 1.05; letter-spacing: -.05em; font-weight: 800 }
+.say p { margin: 14px 0 0; color: #6b6480; font-size: clamp(15px, 1.3vw, 18px) }
+.card { position: fixed; z-index: 6; right: clamp(20px, 6vw, 100px); top: 50%; width: min(300px, calc(100vw - 40px)); padding: 22px 24px; border-radius: 26px; background: #fff; box-shadow: 0 24px 60px -24px color-mix(in srgb, var(--acc) 55%, transparent); transform: translateY(-46%) scale(.96); opacity: 0; transition: opacity .5s, transform .7s cubic-bezier(.2, .8, .2, 1); pointer-events: none }
+.card.on { opacity: 1; transform: translateY(-50%) }
+.card .n { display: inline-grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--b); color: #fff; font-weight: 800; margin-bottom: 14px; box-shadow: 0 6px 14px -6px #f0698c }
+.card h3 { margin: 0; font-size: 30px; line-height: 1.1; letter-spacing: -.04em; font-weight: 800 }
+.card .row { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap }
+.card .row span { padding: 5px 12px; border-radius: 14px; background: var(--hero); color: var(--acc-ink); font-size: 14px; font-weight: 700 }
+.card .row span.t { background: var(--both); color: var(--ink) }
+.pin { position: fixed; z-index: 4; left: 0; top: 0; pointer-events: none; white-space: nowrap; padding: 4px 11px; border-radius: 14px; background: #fff; box-shadow: 0 8px 20px -10px color-mix(in srgb, var(--acc) 60%, transparent); font-size: 13px; font-weight: 700; opacity: 0; transition: opacity .35s }
+.bar { position: fixed; z-index: 6; left: clamp(20px, 6vw, 100px); right: clamp(20px, 6vw, 100px); bottom: 20px; height: 6px; border-radius: 3px; background: var(--hero) }
+.bar i { display: block; height: 100%; width: 0; border-radius: 3px; background: linear-gradient(90deg, var(--a), var(--b)) }
+@media (max-width: 700px) {
+  .say { top: auto; bottom: 9vh; left: 20px; width: calc(100vw - 40px); transform: translateY(14px) } .say.on { transform: none }
+  .say h1 { font-size: clamp(72px, 24vw, 110px) }
+  .card { top: auto; bottom: 8vh; right: 20px; left: 20px; width: auto; padding: 16px 20px; transform: translateY(20px) } .card.on { transform: none }
+  .card h3 { font-size: 24px } .card .n { margin-bottom: 8px }
+}
+</style>
+</head>
+<body>
+<nav class="hud mono"><a href="./index.html">← 카드별 어울림</a><a href="../../urigil/">작품 보기 →</a></nav>
+<canvas id="cv"></canvas>
+<div id="pins"></div>
+
+<div class="say on" data-a="0" data-b=".08"><h1>우리길</h1><p>날짜와 시간만 고르면 코스가 지도 위 길로.</p></div>
+<div class="card" id="c0" data-a=".24" data-b=".37"><div class="n">1</div><h3>서울숲</h3><div class="row"><span>산책</span><span class="t">14:00 · 60분</span></div></div>
+<div class="card" id="c1" data-a=".5" data-b=".63"><div class="n">2</div><h3>언더스탠드<br>에비뉴</h3><div class="row"><span>구경</span><span class="t">15:15 · 30분</span></div></div>
+<div class="card" id="c2" data-a=".78" data-b=".91"><div class="n">3</div><h3>뚝섬한강공원</h3><div class="row"><span>산책</span><span class="t">16:00 · 50분</span><span>밤에도 좋음</span></div></div>
+<div class="say" data-a=".94" data-b="1.1"><h2>오늘 코스<br>완성.</h2></div>
+<div class="bar"><i id="bar"></i></div>
+
+<script type="module">
+import * as THREE from "three";
+import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
+const mob = innerWidth < 700, calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const cv = document.getElementById("cv");
+const renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.08;
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+const scene = new THREE.Scene();
+scene.background = new THREE.Color("#f4eeff"); scene.fog = new THREE.Fog("#f4eeff", 90, 330);
+const camera = new THREE.PerspectiveCamera(50, 1, .5, 700);
+scene.add(new THREE.HemisphereLight("#ffffff", "#cdbbf5", 1.5));
+const sun = new THREE.DirectionalLight("#fff1e0", 2.2); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
+Object.assign(sun.shadow.camera, { left: -60, right: 60, top: 60, bottom: -60, near: 1, far: 200 }); sun.shadow.radius = 5; sun.shadow.bias = -.0004; scene.add(sun, sun.target);
+const rnd = (() => { let s = 7; return () => (s = (s * 16807) % 2147483647) / 2147483647; })();
+const PAL = ["#ffffff", "#f1e9ff", "#d5c2ff", "#ffd6e3", "#cfe2ff", "#fff0c9", "#d9f0e0"];
+
+// ── 코스: 출발 → 서울숲 → 언더스탠드에비뉴 → 뚝섬한강공원
+const STOPS = [[-62, -22], [2, 8], [58, 40]];
+const curve = new THREE.CatmullRomCurve3([[-100, -48], [-84, -34], STOPS[0], [-36, -26], [-14, -10], STOPS[1], [24, 24], [44, 30], STOPS[2], [76, 44]].map(a => new THREE.Vector3(a[0], .3, a[1])), false, "centripetal");
+const SM = 900, samples = Array.from({ length: SM + 1 }, (_, i) => curve.getPointAt(i / SM));
+const stopU = STOPS.map(s => { let b = 0, bd = 1e9; samples.forEach((p, i) => { const d = Math.hypot(p.x - s[0], p.z - s[1]); if (d < bd) { bd = d; b = i; } }); return b / SM; });
+const distPath = (x, z) => { let m = 1e9; for (let i = 0; i < SM; i += 6) m = Math.min(m, Math.hypot(samples[i].x - x, samples[i].z - z)); return m; };
+const river = x => 62 + Math.sin(x * .05) * 7;
+
+// ── 땅: 둥근 판 하나 (작은 도시 모형)
+const slab = new THREE.Mesh(new RoundedBoxGeometry(230, 8, 150, 4, 3.5), new THREE.MeshStandardMaterial({ color: "#f1eaff", roughness: .9 }));
+slab.position.set(0, -4.2, 0); slab.receiveShadow = true; scene.add(slab);
+{ const g = new THREE.PlaneGeometry(230, 22, 100, 1); g.rotateX(-Math.PI / 2); const P = g.attributes.position; for (let i = 0; i < P.count; i++) { const x = P.getX(i); P.setZ(i, river(x) + P.getZ(i) * 1); } g.computeVertexNormals();
+  const w = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ color: "#b4d3ff", roughness: .15, metalness: .1 })); w.position.y = .12; w.receiveShadow = true; scene.add(w); }
+// 길 (흰 바탕 + 코스 선)
+const road = new THREE.Mesh(new THREE.TubeGeometry(curve, 400, 2.6, 10, false), new THREE.MeshStandardMaterial({ color: "#ffffff", roughness: .8 }));
+road.scale.y = .14; road.position.y = .05; road.receiveShadow = true; scene.add(road);
+const lineMat = new THREE.ShaderMaterial({
+  uniforms: { u: { value: 0 } }, transparent: true,
+  vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }`,
+  fragmentShader: `uniform float u; varying vec2 vUv; void main(){ float on = step(vUv.x, u); float dash = step(.5, fract(vUv.x * 160.)); vec3 c = mix(vec3(.84,.76,1.), vec3(.61,.48,.92), on); gl_FragColor = vec4(c, mix(.8 * dash + .0, 1., on)); }`
+});
+const line = new THREE.Mesh(new THREE.TubeGeometry(curve, 600, .55, 8, false), lineMat); line.position.y = .55; scene.add(line);
+
+// ── 동네: 둥근 상자 건물, 잎이 동그란 나무
+const bGeo = new RoundedBoxGeometry(1, 1, 1, 3, .18), BN = 330, bI = new THREE.InstancedMesh(bGeo, new THREE.MeshStandardMaterial({ roughness: .75 }), BN);
+const m4 = new THREE.Matrix4(), qq = new THREE.Quaternion(), sc = new THREE.Vector3(), ps = new THREE.Vector3(), col = new THREE.Color();
+let bn = 0;
+for (let i = 0; i < 3000 && bn < BN; i++) {
+  const x = (rnd() - .5) * 215, z = (rnd() - .5) * 140, rv = river(x);
+  if (Math.abs(z - rv) < 14 || distPath(x, z) < 7 || STOPS.some(s => Math.hypot(x - s[0], z - s[1]) < 20) || Math.abs(z) > 70) continue;
+  const dp = distPath(x, z), w = 3 + rnd() * 3.4, h = dp < 18 ? 1.6 + rnd() * 2 : 2 + rnd() * rnd() * 11, d = 3 + rnd() * 3;
+  m4.compose(ps.set(x, h / 2, z), qq.setFromEuler(new THREE.Euler(0, Math.round(rnd() * 2) * Math.PI / 2 + (rnd() - .5) * .1)), sc.set(w, h, d)); bI.setMatrixAt(bn, m4);
+  bI.setColorAt(bn++, col.set(PAL[Math.floor(rnd() * PAL.length)]));
+}
+bI.count = bn; bI.castShadow = bI.receiveShadow = true; scene.add(bI);
+const TN = 420, tr = new THREE.InstancedMesh(new THREE.SphereGeometry(1, 14, 10), new THREE.MeshStandardMaterial({ roughness: .8 }), TN), tk = new THREE.InstancedMesh(new THREE.CylinderGeometry(.18, .26, 1, 6), new THREE.MeshStandardMaterial({ color: "#c9b79a" }), TN);
+let tn = 0; const tree = (x, z, s = 1) => { if (tn >= TN) return; const h = (1.1 + rnd() * .6) * s; tk.setMatrixAt(tn, m4.compose(ps.set(x, h * .5, z), qq.identity(), sc.set(s, h, s)));
+  tr.setMatrixAt(tn, m4.compose(ps.set(x, h + .9 * s, z), qq.identity(), sc.set(1.35 * s, 1.35 * s, 1.35 * s))); tr.setColorAt(tn++, col.set(["#bfe3c7", "#a8d9b4", "#cdebd0", "#b6e0c0"][Math.floor(rnd() * 4)])); };
+// 서울숲: 나무가 빽빽, 연못 하나
+for (let i = 0; i < 150; i++) { const a = rnd() * 6.283, r = 7 + rnd() * 17; { const x = STOPS[0][0] + Math.cos(a) * r * 1.2, z = STOPS[0][1] + Math.sin(a) * r * .9; if (distPath(x, z) > 7) tree(x, z, .9 + rnd() * .7); } }
+{ const g = new THREE.CircleGeometry(5.5, 32).rotateX(-Math.PI / 2), p = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ color: "#b4d3ff", roughness: .15 })); p.position.set(STOPS[0][0] + 9, .14, STOPS[0][1] - 9); p.scale.z = .6; scene.add(p); }
+// 한강 둑에도 나무
+for (let i = 0; i < 70; i++) { const x = -105 + rnd() * 210, z = river(x) - 13 - rnd() * 6; if (distPath(x, z) > 6) tree(x, z, .8 + rnd() * .5); }
+for (let i = tn; i < TN; i++) { const x = (rnd() - .5) * 215, z = (rnd() - .5) * 140; if (Math.abs(z - river(x)) < 14 || distPath(x, z) < 6) { tk.setMatrixAt(i, m4.compose(ps.set(0, -50, 0), qq.identity(), sc.set(0, 0, 0))); tr.setMatrixAt(i, m4); tr.setColorAt(i, col.set("#fff")); continue; } tree(x, z, .8 + rnd() * .5); }
+tr.count = tk.count = TN; tr.castShadow = tk.castShadow = true; scene.add(tr, tk);
+// 언더스탠드에비뉴: 알록달록 컨테이너 쌓기
+const cm = new THREE.MeshStandardMaterial({ roughness: .55 });
+[[-5, 0, 0], [0, 0, 0], [5, 0, 0], [-2.5, 1, 0], [2.5, 1, 0], [0, 2, 0], [-5, 0, -6], [0, 0, -6], [5, 0, 5]].forEach(([x, y, z], i) => {
+  const c = new THREE.Mesh(new RoundedBoxGeometry(4.6, 2.2, 3.4, 3, .25), cm.clone()); c.material.color.set(["#ffb5cb", "#a9cbff", "#ffe3a3", "#d5c2ff", "#c9ead2"][i % 5]);
+  c.position.set(STOPS[1][0] + x * 1.1, 1.1 + y * 2.25, STOPS[1][1] - 9 + z * 1.0); c.castShadow = c.receiveShadow = true; scene.add(c); });
+// 한강공원 잔디 띠
+{ const g = new THREE.PlaneGeometry(60, 12).rotateX(-Math.PI / 2), m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ color: "#d3efd8", roughness: 1 })); m.position.set(STOPS[2][0], .1, river(STOPS[2][0]) - 9); m.rotation.y = .1; m.receiveShadow = true; scene.add(m); }
+// 구름
+const clouds = []; for (let i = 0; i < 7; i++) { const g = new THREE.Group(); for (let k = 0; k < 3; k++) { const s = new THREE.Mesh(new THREE.SphereGeometry(2.2 + rnd() * 1.6, 14, 10), new THREE.MeshStandardMaterial({ color: "#fff", roughness: 1, transparent: true, opacity: .85 })); s.position.set(k * 3.6 - 3.6, rnd(), rnd() * 2); s.scale.y = .7; g.add(s); }
+  const side = i % 2 ? 1 : -1; g.position.set(side * (112 + rnd() * 20), 36 + rnd() * 10, (rnd() - .5) * 120); scene.add(g); clouds.push(g); }
+
+// ── 핀 (사과 모양) + 이름표
+const pins = [], pinBox = document.getElementById("pins");
+const pinMat = new THREE.MeshStandardMaterial({ color: "#ee4b67", roughness: .35 });
+STOPS.forEach((s, i) => {
+  const g = new THREE.Group(), b = new THREE.Mesh(new THREE.SphereGeometry(1.5, 24, 16), pinMat), t = new THREE.Mesh(new THREE.ConeGeometry(1.1, 2.4, 20).rotateX(Math.PI), pinMat);
+  b.position.y = 3.6; t.position.y = 1.4; const leaf = new THREE.Mesh(new THREE.SphereGeometry(.55, 10, 8), new THREE.MeshStandardMaterial({ color: "#7fc79a" })); leaf.position.set(.5, 5.2, 0); leaf.scale.set(1.5, .6, .8);
+  g.add(b, t, leaf); g.scale.setScalar(.7); g.position.set(s[0] + 5, 0, s[1] + 4); b.castShadow = true; scene.add(g);
+  const e = document.createElement("div"); e.className = "pin"; e.textContent = ["서울숲", "언더스탠드에비뉴", "뚝섬한강공원"][i]; pinBox.append(e); pins.push({ g, e });
+});
+
+// ── 자동차: 둥근 몸통, 하늘·분홍 두 사람
+const car = new THREE.Group(), wheels = [];
+const body = new THREE.Mesh(new RoundedBoxGeometry(2.4, 1.1, 4.2, 4, .45), new THREE.MeshStandardMaterial({ color: "#ffb5cb", roughness: .35 })); body.position.y = 1.1; body.castShadow = true;
+const top = new THREE.Mesh(new RoundedBoxGeometry(2.1, 1, 2.2, 4, .45), new THREE.MeshStandardMaterial({ color: "#f4eeff", roughness: .3 })); top.position.set(0, 1.9, -.2); top.castShadow = true;
+const h1 = new THREE.Mesh(new THREE.SphereGeometry(.42, 18, 14), new THREE.MeshStandardMaterial({ color: "#a9cbff" })), h2 = h1.clone(); h2.material = new THREE.MeshStandardMaterial({ color: "#ffd6e3" });
+h1.position.set(-.45, 2.4, -.2); h2.position.set(.45, 2.4, -.2);
+car.add(body, top, h1, h2);
+[[-1.25, .55, 1.3], [1.25, .55, 1.3], [-1.25, .55, -1.3], [1.25, .55, -1.3]].forEach(p => { const w = new THREE.Mesh(new THREE.CylinderGeometry(.62, .62, .5, 20).rotateZ(Math.PI / 2), new THREE.MeshStandardMaterial({ color: "#352f45", roughness: .7 })); w.position.set(...p); w.castShadow = true; car.add(w); wheels.push(w); });
+[-.8, .8].forEach(x => { const l = new THREE.Mesh(new THREE.SphereGeometry(.22, 10, 8), new THREE.MeshBasicMaterial({ color: "#fff3b0" })); l.position.set(x, 1.15, 2.1); car.add(l); });
+scene.add(car);
+
+// ── 스크롤 → 코스 위치. 서는 구간(dwell)마다 멈춰서 차 둘레를 돈다
+const clamp01 = x => Math.min(1, Math.max(0, x)), sm = t => t * t * (3 - 2 * t), L = (a, b, t) => a + (b - a) * t;
+const KP = [[0, 0], [.08, 0], [.24, stopU[0]], [.37, stopU[0]], [.5, stopU[1]], [.63, stopU[1]], [.78, stopU[2]], [.91, stopU[2]], [1, 1]];
+const uOf = p => { for (let i = 0; i < KP.length - 1; i++) if (p <= KP[i + 1][0]) return L(KP[i][1], KP[i + 1][1], sm(clamp01((p - KP[i][0]) / (KP[i + 1][0] - KP[i][0])))); return 1; };
+const dwellOf = p => { let d = 0; [[.24, .37], [.5, .63], [.78, .91]].forEach(([a, b]) => d = Math.max(d, sm(clamp01((p - a + .02) / .05)) * (1 - sm(clamp01((p - b + .02) / .05))))); return d; };
+let target = 0, prog = 0, mx = 0, my = 0, mxs = 0, mys = 0;
+const prg = () => clamp01(scrollY / (document.documentElement.scrollHeight - innerHeight));
+addEventListener("scroll", () => target = prg(), { passive: true });
+addEventListener("pointermove", e => { mx = e.clientX / innerWidth - .5; my = e.clientY / innerHeight - .5; });
+function resize() { renderer.setSize(innerWidth, innerHeight, false); camera.aspect = innerWidth / innerHeight; camera.fov = innerWidth < 700 ? 64 : 50; camera.updateProjectionMatrix(); }
+addEventListener("resize", resize); resize(); target = prog = prg();
+
+const says = [...document.querySelectorAll(".say")], cards = [...document.querySelectorAll(".card")], bar = document.getElementById("bar");
+const clock = new THREE.Clock(), v = new THREE.Vector3(), tan = new THREE.Vector3(), pos = new THREE.Vector3(), camP = new THREE.Vector3(), camL = new THREE.Vector3(), tmp = new THREE.Vector3();
+let T = 0, yaw = 0, uPrev = 0, lean = 0, bounce = 0, init = false, roll = 0;
+renderer.setAnimationLoop(() => {
+  const rd = Math.min(.3, clock.getDelta()), dt = Math.min(.05, rd); T += dt * (calm ? .2 : 1);
+  prog += (target - prog) * (1 - Math.exp(-rd * 3.2)); const p = prog;
+  mxs += (mx - mxs) * .05; mys += (my - mys) * .05;
+  const u = clamp01(uOf(p)); curve.getPointAt(u, pos); curve.getTangentAt(u, tan);
+  const hd = Math.atan2(tan.x, tan.z); let dy = hd - yaw; dy = Math.atan2(Math.sin(dy), Math.cos(dy)); yaw += dy * (1 - Math.exp(-rd * 7));
+  const sp = (u - uPrev) / Math.max(rd, .001); uPrev = u;
+  lean += (-dy * 2.2 * Math.min(1, Math.abs(sp) * 40) - lean) * .12; bounce = Math.sin(T * 9) * Math.min(1, Math.abs(sp) * 60) * .06;
+  car.position.set(pos.x, .1 + bounce, pos.z); car.rotation.set(0, yaw, lean * .5); roll += sp * 1500; wheels.forEach(w => w.rotation.x = roll);
+  lineMat.uniforms.u.value = u;
+  // 카메라: 처음·끝은 지도 전체, 가는 동안 차 뒤에서 따라가고, 서면 둘레를 돈다
+  const ov = 1 - sm(clamp01((p - .02) / .06)) + sm(clamp01((p - .92) / .06)), dw = dwellOf(p);
+  const back = (mob ? 19 : 16), up = (mob ? 13 : 10);
+  const orbitA = yaw + Math.PI + T * .25 * (calm ? 0 : 1) + 1.1;
+  const chase = tmp.set(pos.x - Math.sin(yaw) * back, up + 1, pos.z - Math.cos(yaw) * back);
+  const orb = new THREE.Vector3(pos.x + Math.sin(orbitA) * (mob ? 20 : 18), (mob ? 12 : 9.5), pos.z + Math.cos(orbitA) * (mob ? 20 : 18));
+  const want = chase.clone().lerp(orb, dw);
+  const over = new THREE.Vector3(mxs * 20, mob ? 190 : 118, mob ? 118 : 100 + mys * 10);
+  camP.copy(want).lerp(over, ov);
+  const lk = new THREE.Vector3(pos.x + Math.sin(yaw) * 9 * (1 - dw), 1.5, pos.z + Math.cos(yaw) * 9 * (1 - dw)).lerp(new THREE.Vector3(-5, 0, 0), ov);
+  if (!init) { camera.position.copy(camP); camL.copy(lk); init = true; }
+  camera.position.lerp(camP, 1 - Math.exp(-rd * 4)); camL.lerp(lk, 1 - Math.exp(-rd * 6)); camera.lookAt(camL);
+  if (!mob) camera.setViewOffset(innerWidth, innerHeight, ov > .5 ? -innerWidth * .08 * ov : 0, 0, innerWidth, innerHeight); else camera.clearViewOffset();
+  camera.updateProjectionMatrix();
+  sun.position.set(pos.x + 40, 60, pos.z + 30); sun.target.position.set(pos.x, 0, pos.z);
+  clouds.forEach((c, i) => c.position.z += Math.sin(T * .1 + i) * .02);
+  pins.forEach((P, i) => { P.g.position.y = Math.sin(T * 2 + i) * .4 + .1; P.g.rotation.y = T * .8;
+    v.copy(P.g.position).add(tmp.set(0, 7.5, 0)).project(camera); P.e.style.transform = `translate(${(v.x * .5 + .5) * innerWidth}px, ${(-v.y * .5 + .5) * innerHeight}px) translate(-50%, -100%)`; P.e.style.opacity = v.z < 1 && (ov > .5 || dw > .2 && Math.abs(P.g.position.x - pos.x) < 12) ? 1 : 0; });
+  says.forEach(s => s.classList.toggle("on", p >= +s.dataset.a && p < +s.dataset.b));
+  cards.forEach(s => s.classList.toggle("on", p >= +s.dataset.a && p < +s.dataset.b));
+  bar.style.width = p * 100 + "%";
+  renderer.render(scene, camera);
+});
+</script>
+</body>
+</html>

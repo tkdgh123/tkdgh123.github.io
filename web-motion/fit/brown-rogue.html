@@ -1,0 +1,319 @@
+<!-- Claude가 만듦 (2026-11-06) — 무대 빛 아래 영웅 다섯을 보여 주고, 카드를 끌어 진형 칸에 세우는 게 곧 게임 소개 -->
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:,">
+<title>브라운 로그 · 무대 위 진형</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<style>
+/* 브라운 로그 도록의 한지·주홍·금 색을 어두운 무대로 옮김. 스크롤로 영웅 다섯을 만나고, 마지막엔 카드를 끌어 3×4 진형에 세움 */
+:root { --night: #14121a; --night2: #221f27; --ink: #eee6d6; --soft: #ada59a; --verm: #ee7a60; --gold: #e0b85c; --acc: #e0b24a;
+  --serif: "Nanum Myeongjo", "Batang", serif; --sans: "Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif; --mono: "IBM Plex Mono", ui-monospace, monospace;
+  --c: min(150px, calc((100vw - 56px) / 4.6), calc((100svh - 360px) / 3.3)); color-scheme: dark }
+* { box-sizing: border-box }
+html, body { margin: 0 }
+body { background: var(--night); color: var(--ink); font: 400 16px/1.6 var(--sans); word-break: keep-all; height: 600vh; -webkit-font-smoothing: antialiased; overflow-x: clip }
+canvas#cv { position: fixed; inset: 0; width: 100%; height: 100%; display: block; z-index: 1 }
+.bar { position: fixed; z-index: 60; inset: 0 0 auto; display: flex; justify-content: space-between; padding: 16px clamp(16px, 3vw, 36px); font: 400 12px var(--mono); letter-spacing: .02em; pointer-events: none }
+.bar a { color: var(--ink); opacity: .72; text-decoration: none; pointer-events: auto; padding: 6px 0 }
+.bar a:hover { opacity: 1; text-decoration: underline; text-underline-offset: 4px }
+.big { position: fixed; z-index: 0; left: 50%; top: 50%; font: 800 clamp(300px, 56vw, 760px)/1 var(--serif); color: color-mix(in srgb, var(--acc) 9%, transparent); transform: translate(-50%, -52%); pointer-events: none; transition: color .6s, opacity .5s }
+.ttl { position: fixed; z-index: 3; left: clamp(16px, 4vw, 56px); top: clamp(56px, 9vh, 90px); pointer-events: none; transition: opacity .4s }
+.ttl h1 { margin: 0; font: 800 clamp(30px, 3.4vw, 46px)/1 var(--serif); letter-spacing: .02em }
+.ttl p { margin: 8px 0 0; font: 400 12px var(--mono); color: var(--soft); letter-spacing: .06em }
+.info { position: fixed; z-index: 3; left: clamp(16px, 4vw, 56px); top: 50%; transform: translateY(-40%); width: min(26ch, 40vw); pointer-events: none; transition: opacity .35s }
+.info small { display: block; margin-bottom: 14px; font: 500 12px var(--mono); letter-spacing: .08em; color: var(--acc); transition: color .6s }
+.info h2 { margin: 0; font: 800 clamp(48px, 6.4vw, 96px)/1 var(--serif); letter-spacing: .01em }
+.info p { margin: 18px 0 0; font-size: 17px; color: var(--ink); opacity: .86 }
+.info .u { margin-top: 22px; display: inline-flex; align-items: baseline; gap: 10px; font: 400 12px var(--mono); color: var(--soft); letter-spacing: .06em }
+.info .u b { font: 700 22px var(--serif); color: var(--acc); letter-spacing: .02em; transition: color .6s }
+.dots { position: fixed; z-index: 3; right: clamp(16px, 3vw, 40px); top: 50%; transform: translateY(-50%); display: grid; gap: 14px; transition: opacity .4s }
+.dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--ink); opacity: .25; transition: opacity .3s, transform .3s }
+.dots i.on { opacity: 1; transform: scale(1.5) }
+.hint { position: fixed; z-index: 3; left: 50%; bottom: 28px; transform: translateX(-50%); font: 400 12px var(--mono); letter-spacing: .08em; color: var(--soft); transition: opacity .5s; pointer-events: none }
+
+/* 진형판 */
+.board { position: fixed; z-index: 4; inset: 0; display: grid; place-content: center; justify-items: center; gap: clamp(14px, 3vh, 34px); opacity: 0; pointer-events: none; padding-top: 24px }
+.board.on { pointer-events: none }
+.board::before { content: ""; position: absolute; left: 50%; top: 42%; width: min(900px, 130vw); height: 80vh; transform: translate(-50%, -50%); background: radial-gradient(closest-side, rgb(238 230 214 / .13), rgb(238 230 214 / .05) 60%, transparent); pointer-events: none }
+.grid { position: relative; display: grid; grid-template-columns: repeat(4, var(--c)); grid-auto-rows: calc(var(--c) * 1.1); gap: 6px; padding: 14px; background: rgb(255 255 255 / .03); border-radius: 18px; box-shadow: inset 0 0 0 1px rgb(238 230 214 / .08), 0 30px 60px -20px #000 }
+.cell { position: relative; border-radius: 10px; background: rgb(238 230 214 / .05); transition: background .25s, box-shadow .25s }
+.cell::after { content: ""; position: absolute; left: 50%; bottom: 10%; width: 62%; height: 12%; transform: translateX(-50%); border-radius: 50%; background: rgb(0 0 0 / .45); filter: blur(4px) }
+.cell.over { background: rgb(238 230 214 / .16); box-shadow: inset 0 0 0 2px var(--ink) }
+.cell.lit { background: radial-gradient(closest-side at 50% 40%, color-mix(in srgb, var(--cc) 34%, transparent), rgb(238 230 214 / .05)) }
+.cell.warn { background: rgb(238 80 60 / .28); animation: warn .5s ease-in-out infinite alternate }
+.cell.warn::before { content: "예고"; position: absolute; inset: 6px auto auto 8px; font: 500 10px var(--mono); color: #ff9a86; letter-spacing: .08em }
+.cell.slam { background: rgb(255 90 70 / .75); transition: none }
+@keyframes warn { to { background: rgb(238 80 60 / .5) } }
+.hand { display: flex; gap: 6px; padding: 8px }
+.slot { width: calc(var(--c) * .72); height: calc(var(--c) * 1.1 * .72) }
+svg.ring { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 8; pointer-events: none; opacity: 0; transition: opacity .6s }
+svg.ring.on { opacity: .7 }
+svg.ring path { fill: none; stroke: var(--gold); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 0.1 10; animation: dash 2.4s linear infinite }
+@keyframes dash { to { stroke-dashoffset: -40 } }
+.done { position: fixed; z-index: 6; left: 50%; bottom: clamp(18px, 4vh, 44px); transform: translate(-50%, 10px); font: 500 13px var(--mono); letter-spacing: .06em; color: var(--gold); opacity: 0; transition: opacity .5s, transform .5s; pointer-events: none; white-space: nowrap }
+.done.on { opacity: 1; transform: translate(-50%, 0) }
+
+/* 영웅 카드 */
+.hc { position: fixed; z-index: 7; left: 0; top: 0; width: var(--c); height: calc(var(--c) * 1.1); border-radius: 9px; overflow: hidden; background: #efe7d6; touch-action: none; cursor: grab; user-select: none; -webkit-user-select: none; will-change: transform; box-shadow: 0 0 0 1.5px rgb(30 27 25 / .9) inset, 0 14px 28px -10px #000; opacity: 0; pointer-events: none }
+.hc.dragging { cursor: grabbing }
+.hc img { position: absolute; inset: 5px 5px 26% 5px; width: calc(100% - 10px); height: calc(74% - 5px); object-fit: cover; object-position: 50% 18%; border-radius: 5px; pointer-events: none }
+.hc b { position: absolute; left: 0; right: 0; bottom: 0; height: 26%; display: flex; align-items: center; justify-content: center; font: 800 calc(var(--c) * .15)/1 var(--serif); color: #1e1b19; letter-spacing: .04em }
+.hc i { position: absolute; right: 7px; top: 7px; width: calc(var(--c) * .2); height: calc(var(--c) * .2); display: grid; place-items: center; background: #c8452f; color: #efe7d6; font: 700 calc(var(--c) * .13)/1 var(--serif); border-radius: 2px; font-style: normal; box-shadow: 0 1px 3px rgb(0 0 0 / .4) }
+.hc u { position: absolute; left: 7px; top: 7px; min-width: calc(var(--c) * .19); height: calc(var(--c) * .19); padding: 0 4px; display: none; place-items: center; background: #1e1b19; color: #efe7d6; font: 500 calc(var(--c) * .11)/1 var(--mono); border-radius: 50%; text-decoration: none }
+.hc.placed u { display: grid }
+@media (max-width: 700px) {
+  .info { top: auto; bottom: 7vh; transform: none; width: min(30ch, calc(100vw - 32px)) }
+  .info h2 { font-size: 56px }
+  .info p { font-size: 15px; margin-top: 10px }
+  .info .u { margin-top: 12px }
+  .dots { top: 76px; transform: none; right: 18px; gap: 10px }
+  .ttl { top: 58px }
+}
+@media (prefers-reduced-motion: reduce) { svg.ring path { animation: none } .cell.warn { animation: none } }
+</style>
+</head>
+<body>
+<nav class="bar"><a href="./index.html">← 카드별 어울림</a><a href="../../brown-rogue/">작품 보기 →</a></nav>
+<div class="big" id="big">土</div>
+<canvas id="cv"></canvas>
+<header class="ttl" id="ttl"><h1>브라운 로그</h1><p>배치 턴제 RPG</p></header>
+<div class="info" id="info"></div>
+<div class="dots" id="dots"><i></i><i></i><i></i><i></i><i></i></div>
+<p class="hint" id="hint">내려 보세요</p>
+
+<section class="board" id="board">
+  <div class="grid" id="grid"></div>
+  <div class="hand" id="hand"></div>
+</section>
+<svg class="ring" id="ring"><path id="rp" d=""/></svg>
+<p class="done" id="done">오행 다섯이 모였어요 · 체력·공격 +3%</p>
+
+<script type="module">
+import * as THREE from "three";
+import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+
+const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const IMG = "../../brown-rogue/img/";
+// 시작 레어 다섯: 도록의 이름·직업·오행·한 줄 설명·궁극기 그대로 (오행 순서 = 상생 목→화→토→금→수에 쓸 번호 g)
+const H = [
+  { n: "이와오", job: "탱커", el: "토", hj: "土", col: "#e0b24a", t: "바위를 닮은 떠돌이 무사", u: "산사태", img: "il_tank_iwao.webp", g: 2 },
+  { n: "월영", job: "도적", el: "화", hj: "火", col: "#e8654f", t: "달그림자를 밟는 의적", u: "월하참", img: "il_rogue_wolyeong.webp", g: 1 },
+  { n: "백령", job: "궁수", el: "금", hj: "金", col: "#d9d4c8", t: "흰 깃 화살의 사냥꾼", u: "백발백중", img: "il_archer_baekryeong.webp", g: 3 },
+  { n: "츠쿠요", job: "마법사", el: "목", hj: "木", col: "#66bd72", t: "달밤의 술사", u: "백귀 봉인", img: "il_mage_tsukuyo.webp", g: 0 },
+  { n: "연화", job: "힐러", el: "수", hj: "水", col: "#5b8fe6", t: "연꽃 향이 나는 의녀", u: "만개", img: "il_healer_yeonhwa.webp", g: 4 },
+];
+const loadImg = s => new Promise(r => { const i = new Image(); i.onload = () => r(i); i.onerror = () => r(null); i.src = IMG + s; });
+const imgs = await Promise.all(H.map(h => loadImg(h.img)));
+await Promise.all([document.fonts.load("800 60px 'Nanum Myeongjo'"), document.fonts.load("400 12px 'IBM Plex Mono'")]).catch(() => {});
+
+/* ───────── 3D 무대 ───────── */
+function face(h, im) {
+  const W = 512, Hh = 853, k = document.createElement("canvas"); k.width = W; k.height = Hh; const g = k.getContext("2d");
+  g.fillStyle = "#efe7d6"; g.fillRect(0, 0, W, Hh);
+  g.strokeStyle = "#1e1b19"; g.lineWidth = 3; g.strokeRect(14, 14, W - 28, Hh - 28);
+  g.save(); g.beginPath(); g.roundRect(30, 30, W - 60, 650, 8); g.clip();
+  if (im) { const s = Math.max((W - 60) / im.width, 650 / im.height); g.drawImage(im, 30 + ((W - 60) - im.width * s) / 2, 30, im.width * s, im.height * s); }
+  g.restore();
+  g.fillStyle = "#c8452f"; g.fillRect(40, 716, 76, 76);
+  g.fillStyle = "#efe7d6"; g.font = "700 52px 'Nanum Myeongjo', serif"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(h.hj, 78, 756);
+  g.fillStyle = "#1e1b19"; g.textAlign = "left"; g.font = "800 66px 'Nanum Myeongjo', serif"; g.fillText(h.n, 140, 742);
+  g.font = "500 22px 'IBM Plex Mono', monospace"; g.fillStyle = "#5f5850"; g.fillText(h.job + " · " + h.el, 142, 790);
+  const t = new THREE.CanvasTexture(k); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;
+}
+const faces = H.map((h, i) => face(h, imgs[i]));
+const cv = document.getElementById("cv");
+const renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.setClearColor("#14121a");
+renderer.shadowMap.enabled = true;
+const scene = new THREE.Scene(); scene.fog = new THREE.Fog("#14121a", 11, 26);
+scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), .04).texture;
+scene.environmentIntensity = .12;
+const camera = new THREE.PerspectiveCamera(35, 1, .1, 100); camera.position.set(0, .5, 9.5); camera.lookAt(0, .2, 0);
+
+const front = new THREE.MeshStandardMaterial({ map: faces[0], roughness: .45 });
+const back = new THREE.MeshStandardMaterial({ map: faces[1], roughness: .45 });
+const edge = new THREE.MeshStandardMaterial({ color: "#2a2018", roughness: .5, metalness: .5 });
+const CW = 2.3, CH = CW * 853 / 512;
+const card = new THREE.Group();
+const slab = new THREE.Mesh(new RoundedBoxGeometry(CW + .1, CH + .1, .07, 4, .04), edge); slab.castShadow = true; card.add(slab);
+const fA = new THREE.Mesh(new THREE.PlaneGeometry(CW, CH), front); fA.position.z = .036; card.add(fA);
+const fB = new THREE.Mesh(new THREE.PlaneGeometry(CW, CH), back); fB.position.z = -.036; fB.rotation.y = Math.PI; card.add(fB);
+scene.add(card);
+
+const spot = new THREE.SpotLight("#e0b24a", 260, 34, .36, .6, 1.5);
+spot.position.set(0, 10, 2.5); spot.target = card; spot.castShadow = true; scene.add(spot);
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(50, 50), new THREE.MeshStandardMaterial({ color: "#1b1820", roughness: .8 }));
+floor.rotation.x = -Math.PI / 2; floor.position.y = -2.7; floor.receiveShadow = true; scene.add(floor);
+const beamMat = new THREE.ShaderMaterial({
+  transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
+  uniforms: { col: { value: new THREE.Color("#e0b24a") }, time: { value: 0 }, k: { value: 1 } },
+  vertexShader: `varying vec3 vN; varying vec3 vV; varying float vY; void main(){ vY = uv.y; vec4 w = modelViewMatrix * vec4(position,1.); vN = normalize(normalMatrix*normal); vV = normalize(-w.xyz); gl_Position = projectionMatrix * w; }`,
+  fragmentShader: `uniform vec3 col; uniform float time; uniform float k; varying vec3 vN; varying vec3 vV; varying float vY;
+    void main(){ float rim = pow(abs(dot(vN, vV)), 2.2); float a = rim * pow(vY, 1.5) * .5 * k * (0.92 + 0.08*sin(time*2.4 + vY*18.)); gl_FragColor = vec4(col, a); }`
+});
+const beam = new THREE.Mesh(new THREE.CylinderGeometry(.2, 2.7, 12.5, 48, 1, true), beamMat);
+beam.position.set(0, 3.6, .3); scene.add(beam);
+const DN = 700, dp = new Float32Array(DN * 3);
+for (let i = 0; i < DN; i++) { const y = Math.random(), r = (.2 + y * 2.4) * Math.sqrt(Math.random()), a = Math.random() * 7; dp.set([Math.cos(a) * r, 9.6 - y * 12.5, Math.sin(a) * r + .3], i * 3); }
+const dust = new THREE.Points(new THREE.BufferGeometry().setAttribute("position", new THREE.BufferAttribute(dp, 3)), new THREE.PointsMaterial({ color: "#ffe2a8", size: .028, transparent: true, opacity: .55, blending: THREE.AdditiveBlending, depthWrite: false }));
+scene.add(dust);
+
+const narrow = () => innerWidth < 700;
+function resize() { renderer.setSize(innerWidth, innerHeight, false); camera.aspect = innerWidth / innerHeight; camera.position.z = narrow() ? 13.5 : 9.5; camera.updateProjectionMatrix(); card.position.x = narrow() ? 0 : 2.3; }
+addEventListener("resize", resize); resize();
+
+/* ───────── 글자·스크롤 ───────── */
+const $ = id => document.getElementById(id);
+const info = $("info"), dots = [...document.querySelectorAll(".dots i")], big = $("big"), board = $("board"), ttl = $("ttl"), hint = $("hint"), dotsEl = $("dots");
+let target = 0, p = 0, mx = 0, my = 0, shown = -1;
+const maxScroll = () => document.documentElement.scrollHeight - innerHeight;
+const onScroll = () => { target = scrollY / maxScroll() * 5; if (scrollY > 8) hint.style.opacity = 0; };
+addEventListener("scroll", onScroll, { passive: true }); onScroll();
+addEventListener("pointermove", e => { if (e.pointerType === "mouse") { mx = e.clientX / innerWidth - .5; my = e.clientY / innerHeight - .5; } });
+const col = new THREE.Color(), c2 = new THREE.Color(), clock = new THREE.Clock();
+const ease = x => x * x * (3 - 2 * x);
+
+/* ───────── 진형판: 끌어 세우기 ───────── */
+const gridEl = $("grid"), handEl = $("hand"), RED = { a: -1, b: -1 };
+const cells = [...Array(12)].map((_, i) => { const e = document.createElement("div"); e.className = "cell"; gridEl.appendChild(e); return { e, occ: null, i }; });
+const slots = H.map(() => { const e = document.createElement("div"); e.className = "slot"; handEl.appendChild(e); return e; });
+const cards = H.map((h, i) => {
+  const e = document.createElement("div"); e.className = "hc";
+  e.innerHTML = `<img src="${IMG + h.img}" alt="" draggable="false"><b>${h.n}</b><i>${h.hj}</i><u></u>`;
+  document.body.appendChild(e);
+  return { h, e, x: innerWidth / 2, y: innerHeight + 260, vx: 0, vy: 0, s: .5, r: 0, mode: "home", cell: -1, slot: i, t: 0, delay: i * 90 };
+});
+const lerp = (a, b, t) => a + (b - a) * t;
+let drag = null, shake = 0;
+function center(r) { return [r.left + r.width / 2, r.top + r.height / 2]; }
+function cellAt(x, y) { for (const c of cells) { const r = c.e.getBoundingClientRect(); if (x > r.left - 4 && x < r.right + 4 && y > r.top - 4 && y < r.bottom + 4) return c; } return null; }
+function release(c) { if (c.cell >= 0) { cells[c.cell].occ = null; cells[c.cell].e.classList.remove("lit"); c.cell = -1; c.e.classList.remove("placed"); } }
+function renumber() { const placed = cards.filter(c => c.cell >= 0).sort((a, b) => a.t - b.t); cards.forEach(c => c.e.querySelector("u").textContent = ""); placed.forEach((c, i) => c.e.querySelector("u").textContent = i + 1); }
+function checkDone() { const all = cards.every(c => c.cell >= 0 && c.mode === "cell"); $("done").classList.toggle("on", all); $("ring").classList.toggle("on", all); return all; }
+function toHome(c) { release(c); c.mode = "home"; renumber(); }
+function place(c, cell) {
+  if (cell.occ && cell.occ !== c) { const o = cell.occ; release(o); o.mode = "fly"; o.vx = (Math.random() - .5) * 16; o.vy = 12; o.ft = 0; renumber(); }
+  release(c); c.cell = cell.i; cell.occ = c; c.mode = "cell"; c.t = performance.now(); c.e.classList.add("placed");
+  cell.e.style.setProperty("--cc", c.h.col); cell.e.classList.add("lit"); c.s = 1.14; c.vy = 6; // 쿵
+  renumber(); setTimeout(checkDone, 700);
+}
+cards.forEach(c => {
+  c.e.addEventListener("pointerdown", e => {
+    if (c.mode === "fly" && c.ft < 6) return;
+    c.e.setPointerCapture(e.pointerId); const [cx, cy] = [c.x, c.y];
+    drag = { c, ox: e.clientX - cx, oy: e.clientY - cy, hist: [[performance.now(), e.clientX, e.clientY]] };
+    release(c); c.mode = "drag"; c.e.classList.add("dragging"); renumber(); checkDone();
+  });
+  c.e.addEventListener("pointermove", e => {
+    if (!drag || drag.c !== c) return;
+    drag.hist.push([performance.now(), e.clientX, e.clientY]); if (drag.hist.length > 6) drag.hist.shift();
+    drag.px = e.clientX; drag.py = e.clientY;
+    const t = cellAt(c.x, c.y); cells.forEach(k => k.e.classList.toggle("over", k === t));
+  });
+  const up = e => {
+    if (!drag || drag.c !== c) return;
+    const h = drag.hist, a = h[0], b = h[h.length - 1], dt = Math.max(16, b[0] - a[0]);
+    const vx = (b[1] - a[1]) / dt * 16, vy = (b[2] - a[2]) / dt * 16; drag = null; c.e.classList.remove("dragging");
+    cells.forEach(k => k.e.classList.remove("over"));
+    const sp = Math.hypot(vx, vy), t = cellAt(c.x, c.y) || (sp < 25 ? cellAt(c.x + vx * 3, c.y + vy * 3) : null);
+    if (t && sp < 70) place(c, t);
+    else { c.mode = "fly"; c.ft = 0; c.vx = vx * 1.1; c.vy = vy * 1.1; }
+  };
+  c.e.addEventListener("pointerup", up); c.e.addEventListener("pointercancel", up);
+});
+
+// 작전 시간 예고: 붉은 칸이 번쩍이기만 하고 카드는 건드리지 않음 (보기용)
+let nextStrike = 0, phase = 0, phaseT = 0;
+function strikeTick(now, active) {
+  const done = cards.every(c => c.cell >= 0 && c.mode === "cell");
+  if (!active || done || calm) { if (phase) { cells.forEach(c => c.e.classList.remove("warn", "slam")); phase = 0; } nextStrike = now + 2500; return; }
+  if (phase === 0 && now > nextStrike) { const pick = new Set([cells[Math.random() * 12 | 0], cells[Math.random() * 12 | 0]]); RED.set = pick; pick.forEach(c => c.e.classList.add("warn")); phase = 1; phaseT = now; }
+  else if (phase === 1 && now - phaseT > 1800) { RED.set.forEach(c => { c.e.classList.remove("warn"); c.e.classList.add("slam"); }); phase = 2; phaseT = now; }
+  else if (phase === 2 && now - phaseT > 240) { cells.forEach(c => c.e.classList.remove("slam")); phase = 0; nextStrike = now + 4500; }
+}
+
+const rp = $("rp");
+let last = performance.now();
+renderer.setAnimationLoop(() => {
+  const now = performance.now(), dt = Math.min(40, now - last) / 16.67; last = now;
+  const t = clock.getElapsedTime();
+  p = calm ? target : p + (target - p) * (1 - Math.exp(-Math.min(.3, (now - (window._pl || now)) / 1000) * 5)); window._pl = now;
+  const hp = Math.min(p, 4), f = ease(Math.min(1, Math.max(0, p - 4)));
+  const i = Math.min(3, Math.floor(hp)), k = hp - i, flip = ease(Math.min(1, Math.max(0, (k - .25) / .5)));
+  front.map = faces[i]; back.map = faces[i + 1];
+  card.rotation.y = flip * Math.PI + mx * .5 * (1 - f);
+  card.rotation.x = -my * .3 + Math.sin(t * .8) * .03;
+  card.position.y = .2 + Math.sin(t * 1.1) * .06 + Math.sin(flip * Math.PI) * .5 + f * 4.5;
+  card.scale.setScalar(Math.max(.001, 1 - f * 1.1)); card.visible = f < .95;
+  const cur = flip > .5 ? i + 1 : i;
+  col.set(H[i].col).lerp(c2.set(H[i + 1].col), flip).lerp(c2.set("#efe3c8"), f * .8);
+  spot.color.copy(col); beamMat.uniforms.col.value.copy(col); dust.material.color.copy(col).lerp(c2.set("#fff"), .5);
+  beamMat.uniforms.time.value = t; beamMat.uniforms.k.value = 1 - f * .55;
+  beam.scale.set(1 + f * 1.6, 1, 1 + f * 1.6); beam.position.x = card.position.x * (1 - f) + 0 * f;
+  spot.position.x = beam.position.x; spot.target.position.x = beam.position.x; spot.target.updateMatrixWorld();
+  spot.angle = .36 + f * .25; spot.intensity = (260 - Math.sin(flip * Math.PI) * 150) * (1 - f * .35);
+  dust.position.x = beam.position.x; dust.scale.set(1 + f * 1.6, 1, 1 + f * 1.6); if (!calm) dust.rotation.y = t * .05;
+  renderer.render(scene, camera);
+
+  // 글자
+  const shownI = f > .02 ? 5 : cur;
+  if (shownI !== shown) {
+    shown = shownI; info.style.opacity = 0;
+    setTimeout(() => {
+      if (shown === 5) { info.innerHTML = ""; return; }
+      const h = H[shown]; document.documentElement.style.setProperty("--acc", h.col); big.textContent = h.hj;
+      info.innerHTML = `<small>0${shown + 1} · ${h.job} · ${h.el}</small><h2>${h.n}</h2><p>${h.t}</p><div class="u">궁극기 <b>${h.u}</b></div>`; info.style.opacity = 1;
+    }, 220);
+    dots.forEach((d, j) => d.classList.toggle("on", j === shown));
+  }
+  big.style.opacity = 1 - f; ttl.style.opacity = 1 - f * 1.4; dotsEl.style.opacity = 1 - f;
+
+  // 진형판
+  const bo = Math.max(0, (f - .45) / .55); board.style.opacity = bo; const active = bo > .85;
+  strikeTick(now, active);
+  const bx = shake > .5 ? (Math.random() - .5) * shake : 0, by = shake > .5 ? (Math.random() - .5) * shake : 0; shake *= .86;
+  board.style.transform = `translate(${bx}px,${by}px)`;
+  const sRects = slots.map(s => s.getBoundingClientRect()), cRects = cells.map(c => c.e.getBoundingClientRect());
+  for (const c of cards) {
+    let tx, ty, ts = 1;
+    if (c.mode === "home") { const r = sRects[c.slot]; [tx, ty] = center(r); ts = r.width / (cRects[0].width || 1); }
+    else if (c.mode === "cell") { [tx, ty] = center(cRects[c.cell]); ts = 1; }
+    c.e.style.opacity = Math.min(1, bo * 1.4); c.e.style.pointerEvents = active ? "auto" : "none";
+    if (c.delay > 0 && bo > .02) { c.delay -= dt * 16.67; if (c.delay > 0) { c.x = tx ?? c.x; c.y = innerHeight + 200; } }
+    if (c.mode === "home" || c.mode === "cell") {
+      c.vx = (c.vx + (tx - c.x) * .16 * dt) * Math.pow(.74, dt); c.vy = (c.vy + (ty - c.y) * .16 * dt) * Math.pow(.74, dt);
+      c.x += c.vx * dt; c.y += c.vy * dt; c.s += (ts - c.s) * .22 * dt; c.r += (c.vx * .5 - c.r) * .2 * dt;
+    } else if (c.mode === "drag") {
+      const px = drag?.px ?? c.x + drag?.ox, py = drag?.py ?? c.y + drag?.oy;
+      const nx = (drag.px ?? 0) - drag.ox, ny = (drag.py ?? 0) - drag.oy;
+      if (drag.px !== undefined) { c.vx = (nx - c.x) * .35; c.vy = (ny - c.y) * .35; c.x += c.vx * dt * 1; c.y += c.vy * dt * 1; }
+      c.s += (1.1 - c.s) * .25 * dt; c.r += (Math.max(-22, Math.min(22, c.vx * .9)) - c.r) * .25 * dt;
+    } else if (c.mode === "fly") {
+      c.ft += dt; c.vy += .6 * dt; c.x += c.vx * dt; c.y += c.vy * dt; c.vx *= Math.pow(.992, dt); c.s += (1 - c.s) * .1 * dt; c.r += c.vx * .6 * dt;
+      const m = 40;
+      if (c.x < m) { c.x = m; c.vx = Math.abs(c.vx) * .7; } if (c.x > innerWidth - m) { c.x = innerWidth - m; c.vx = -Math.abs(c.vx) * .7; }
+      if (c.y > innerHeight - m) { c.y = innerHeight - m; c.vy = -Math.abs(c.vy) * .55; c.vx *= .9; } if (c.y < m) { c.y = m; c.vy = Math.abs(c.vy) * .6; }
+      if (c.ft > 40) { c.mode = "home"; c.r = 0; }
+    }
+    const w = cRects[0].width || 120, hh = w * 1.1;
+    c.e.style.transform = `translate(${c.x - w / 2}px,${c.y - hh / 2}px) rotate(${c.r}deg) scale(${c.s})`;
+    c.e.style.zIndex = c.mode === "drag" ? 9 : c.mode === "fly" ? 8 : 7;
+    c.e.style.boxShadow = `0 0 0 1.5px rgb(30 27 25 / .9) inset, 0 ${c.mode === "drag" ? 30 : 14}px ${c.mode === "drag" ? 46 : 28}px -10px #000`;
+  }
+  // 상생 고리: 목→화→토→금→수 순서로 선 잇기 (다 세웠을 때만 보임)
+  if ($("ring").classList.contains("on")) {
+    const ord = [...cards].sort((a, b) => a.h.g - b.h.g), pts = ord.map(c => [c.x, c.y]); pts.push(pts[0]);
+    rp.setAttribute("d", pts.map((q, j) => (j ? "L" : "M") + q[0].toFixed(1) + " " + q[1].toFixed(1)).join(" "));
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,169 @@
+<!-- Claude가 만듦 (2026-11-06) — 창업실 카드 27장마다 어울리는 움직임 3개, 1순위 데모, 남은 기법의 쓸 곳 -->
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>카드마다 어울리는 움직임</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="../apply/apply.css">
+<style>
+body { overflow-x: clip }
+.top { position: static; color: var(--muted) }
+.wrap { padding: 0 var(--m) }
+.hero { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 0 clamp(12px, 1.8vw, 28px); padding: clamp(40px, 8vw, 120px) var(--m) clamp(40px, 6vw, 80px) }
+.hero h1 { grid-column: 1 / -1; font-size: clamp(44px, 8.4vw, 132px); letter-spacing: -.045em }
+.hero p { grid-column: 1 / span 6; margin-top: 28px; font-size: clamp(17px, 1.4vw, 20px); color: var(--muted) }
+.hero p b { color: var(--ink) }
+.hero .nums { grid-column: 8 / -1; align-self: end; display: flex; gap: clamp(20px, 3vw, 48px); justify-content: flex-end }
+.hero .nums div { font: 500 12.5px var(--mono); color: var(--muted) }
+.hero .nums b { display: block; font: 300 clamp(44px, 5vw, 76px)/1 var(--serif); color: var(--ink); letter-spacing: -.04em }
+/* 갈렸던 판단 */
+.why { background: var(--dark); color: var(--on-dark); padding: clamp(48px, 7vw, 100px) var(--m) }
+.why h2 { font-size: clamp(30px, 3.6vw, 52px) }
+.why ol { list-style: none; margin: clamp(28px, 4vw, 48px) 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: clamp(28px, 3vw, 44px) clamp(20px, 3vw, 48px); counter-reset: w }
+.why li { counter-increment: w }
+.why li::before { content: counter(w, decimal-leading-zero); display: block; font: 500 12.5px var(--mono); color: #8fa6ff; margin-bottom: 10px }
+.why li b { display: block; font: 600 19px/1.35 var(--sans); margin-bottom: 8px }
+.why li p { color: var(--on-dark-soft); font-size: 15.5px }
+/* 분류 */
+.cat { padding: clamp(56px, 8vw, 120px) var(--m) 0 }
+.cat > h2 { display: flex; align-items: baseline; gap: 18px; font-size: clamp(36px, 5vw, 76px); padding-bottom: 18px }
+.cat > h2 span { font: 500 13px var(--mono); color: var(--muted); letter-spacing: 0 }
+.row { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 5fr) minmax(0, 4fr); gap: clamp(16px, 2.4vw, 40px); padding: clamp(26px, 3vw, 40px) 0; border-top: 1.5px solid var(--ink) }
+.row:first-of-type { border-top-width: 3px }
+.row .who { display: grid; grid-template-columns: 112px 1fr; gap: 16px; align-items: start }
+.row .who img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; background: var(--tone) }
+.row .who h3 { font-size: clamp(20px, 1.7vw, 26px); font-weight: 400 }
+.row .who .mono { color: var(--muted); display: block; margin-top: 6px }
+.one .bar { display: flex; height: 34px; overflow: hidden }
+.one .bar span { display: flex; align-items: center; padding: 0 10px; font: 600 13px var(--sans); white-space: nowrap; overflow: hidden; color: #fff; background: var(--blue) }
+.one .bar span + span { background: #7c8fd6 }
+.one .bar span + span + span { background: #b3bde6; color: var(--ink) }
+.one .bar span i { font: 500 11.5px var(--mono); font-style: normal; margin-left: 6px; opacity: .8 }
+.one p { margin-top: 12px; text-wrap: pretty }
+.one .demo { display: inline-flex; gap: 8px; align-items: center; margin-top: 14px; min-height: 44px; padding: 0 18px; background: var(--ink); color: var(--paper); text-decoration: none; font-weight: 700; font-size: 15px; transition: background .2s }
+.one .demo:hover { background: var(--blue) }
+.alt { display: grid; gap: 14px; align-content: start }
+.alt div { display: grid; grid-template-columns: 26px 1fr; gap: 4px 10px }
+.alt .n { font: 500 12.5px var(--mono); color: var(--muted); padding-top: 3px }
+.alt a { font-weight: 600; text-decoration: none; background: linear-gradient(var(--rule), var(--rule)) 0 100% / 100% 1.5px no-repeat }
+.alt a:hover { background-image: linear-gradient(var(--blue), var(--blue)) }
+.alt p { grid-column: 2; color: var(--muted); font-size: 15px }
+/* 기법별로 몇 번 뽑혔나 */
+.tally { padding: clamp(64px, 9vw, 140px) var(--m) 0 }
+.tally h2, .left h2 { font-size: clamp(32px, 4.2vw, 64px) }
+.tally > p, .left > p { margin-top: 14px; color: var(--muted); max-width: 40em }
+.tl { margin-top: clamp(28px, 4vw, 48px); display: grid; gap: 6px }
+.tl div { display: grid; grid-template-columns: minmax(150px, 15em) 1fr 3ch; gap: 14px; align-items: center }
+.tl .nm { font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+.tl .nm small { font: 500 11.5px var(--mono); color: var(--muted); margin-left: 6px }
+.tl .bars { display: flex; height: 18px; gap: 2px }
+.tl .bars i { display: block; height: 100% }
+.tl .b1 { background: var(--blue) } .tl .b2 { background: #7c8fd6 } .tl .b3 { background: #b3bde6 }
+.tl .c { font: 500 13px var(--mono); text-align: right }
+.tl .zero .nm { color: var(--muted) } .tl .zero .c { color: #b0412e }
+.key { display: flex; gap: 18px; margin-top: 18px; font: 500 12.5px var(--mono); color: var(--muted) }
+.key i { display: inline-block; width: 12px; height: 12px; vertical-align: -1px; margin-right: 6px }
+/* 남은 것 */
+.left { padding: clamp(64px, 9vw, 140px) var(--m) clamp(64px, 8vw, 120px) }
+.left ul { list-style: none; margin: clamp(28px, 4vw, 48px) 0 0; padding: 0 }
+.left li { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: clamp(16px, 3vw, 48px); padding: 24px 0; border-top: 1.5px solid var(--ink) }
+.left li h3 { font-size: clamp(22px, 2vw, 30px) }
+.left li h3 a { text-decoration: none }
+.left li .mono { display: block; margin-top: 8px; color: var(--muted) }
+.left li .mono.zero { color: #b0412e }
+.left li ol { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px }
+.left li ol li { display: block; padding: 0; border: 0 }
+.left li ol b { font-weight: 700 }
+foot { display: block }
+@media (max-width: 900px) {
+  .hero p { grid-column: 1 / -1 } .hero .nums { grid-column: 1 / -1; justify-content: flex-start; margin-top: 32px }
+  .row { grid-template-columns: 1fr } .row .who { grid-template-columns: 96px 1fr }
+  .left li { grid-template-columns: 1fr }
+  .tl div { grid-template-columns: 9.5em 1fr 2.5ch; gap: 8px } .tl .nm small { display: none }
+}
+</style>
+</head>
+<body>
+<nav class="top mono"><a href="../index.html">← 움직이는 웹사이트</a><span class="right"><a href="../../">창업실</a></span></nav>
+<header class="hero">
+  <h1>카드마다 <b>어울리는</b> 움직임</h1>
+  <p>창업실 카드 27장에 움직이는 웹사이트 기법 21개를 하나씩 맞춰 봤어요. 카드마다 <b>딱 셋</b>을 고르고, 1순위는 그 작품 내용으로 데모를 만들었어요. 섞는 게 나을 때만 비율을 정해 섞었어요.</p>
+  <div class="nums"><div><b id="nCards">27</b>카드</div><div><b id="nMix">0</b>섞은 1순위</div><div><b id="nZero">0</b>안 뽑힌 기법</div></div>
+</header>
+
+<section class="why">
+  <h2>고르면서 <b>갈렸던 것</b></h2>
+  <ol>
+    <li><b>내용이 먼저, 기법은 그다음</b><p>게임은 세계를 보여 주고, 실물(휠·페달)은 돌려 보고 뜯어 보고, 코드·설정은 직접 치는 걸 보여 줘요. 같은 3D라도 무엇을 보여 주는지가 갈랐어요.</p></li>
+    <li><b>자주 여는 도구는 가볍게</b><p>매일 AI 공부·LMS처럼 매일 여는 카드엔 무거운 3D 비행 대신 종이 쌓기·벽돌처럼 바로 뜨는 걸 골랐어요. 첫 화면에서 3초 기다리게 하면 안 돼요.</p></li>
+    <li><b>글은 차분하게</b><p>답안·감상문·보고서는 읽는 게 목적이라 화려한 움직임이 글을 이기면 안 돼요. 빛 하나, 커서 하나 정도만.</p></li>
+    <li><b>섞을 때만 섞음</b><p>덜미는 터미널이라 커서가 맞지만 '보낸다'를 보여 주려면 점이 건너가야 해서 6:4. 프밍기 노트·Claude Code 안내는 커서 하나로 충분해서 섞지 않았어요.</p></li>
+    <li><b>폰에서도 되나</b><p>지도 비행·운전은 폰에서 조작이 어려워 1순위에서 밀린 경우가 많아요. 그래서 그랑프리·밀기는 1순위 바탕이 된 카드가 없어요.</p></li>
+    <li><b>이미 사랑받은 것은 지킴</b><p>한 학기 쌓기는 손대지 않고 생각만 빌려 새 파일에 썼어요. 점으로 그린 작품은 우리와 안 맞는다는 말 그대로 어디에도 넣지 않았어요.</p></li>
+  </ol>
+</section>
+
+<div id="list"></div>
+
+<section class="tally" id="tally">
+  <h2>기법별로 <b>몇 번</b> 뽑혔나</h2>
+  <div class="key"><span><i class="b1" style="background:var(--blue)"></i>1순위</span><span><i style="background:#7c8fd6"></i>2순위</span><span><i style="background:#b3bde6"></i>3순위</span></div>
+  <div class="tl" id="tl"></div>
+</section>
+
+<section class="left">
+  <h2>남은 기법은 <b>어디에</b></h2>
+  <p>창업실 카드엔 1순위로 안 맞았지만, 다른 활동에선 오히려 제일 잘 맞는 것들이에요.</p>
+  <ul id="leftList"></ul>
+</section>
+
+<script type="module">
+import { DESIGNS, CARDS } from "./cards.js";
+import { WORKS } from "../apply/works.js";
+const ROOT = "../../";
+const img = c => (WORKS.find(w => w.href === c.href) || { img: c.id === "board" ? "hub/shots/board.webp" : "" }).img;
+const D = k => DESIGNS[k];
+const CATS = [["게임", "game"], ["공부", "study"], ["프로젝트", "make"], ["기타", "etc"]];
+
+document.getElementById("list").innerHTML = CATS.map(([cat, id]) => {
+  const cs = CARDS.filter(c => c.cat === cat);
+  return `<section class="cat" id="${id}"><h2>${cat}<span>${cs.length}장</span></h2>${cs.map(c => {
+    const [one, two, three] = c.p;
+    return `<article class="row">
+      <div class="who"><img src="${ROOT + img(c)}" alt="" loading="lazy"><div><h3>${c.t}</h3><a class="mono" href="${ROOT + c.href}">작품 보기 →</a></div></div>
+      <div class="one"><div class="bar">${one.mix.map(([k, r]) => `<span style="flex:${r}">${D(k).n}<i>${r}</i></span>`).join("")}</div>
+        <p>${one.w}</p><a class="demo" href="./${c.id}.html">데모 →</a></div>
+      <div class="alt">${[two, three].map((x, j) => `<div><span class="n">${j + 2}</span><a href="${D(x.d).href}">${D(x.d).n}</a><p>${x.w}</p></div>`).join("")}</div>
+    </article>`;
+  }).join("")}</section>`;
+}).join("");
+
+// 몇 번 뽑혔나: 1순위는 섞은 재료까지 셈
+const cnt = Object.fromEntries(Object.keys(DESIGNS).map(k => [k, [0, 0, 0]]));
+for (const c of CARDS) { for (const [k] of c.p[0].mix) cnt[k][0]++; cnt[c.p[1].d][1]++; cnt[c.p[2].d][2]++; }
+const rows = Object.entries(cnt).sort((a, b) => (b[1][0] * 3 + b[1][1] * 2 + b[1][2]) - (a[1][0] * 3 + a[1][1] * 2 + a[1][2]));
+const max = Math.max(...rows.map(([, v]) => v[0] + v[1] + v[2]));
+document.getElementById("tl").innerHTML = rows.map(([k, v]) => {
+  const tot = v[0] + v[1] + v[2];
+  return `<div class="${tot ? "" : "zero"}"><span class="nm">${D(k).n}<small>${D(k).from}</small></span><span class="bars">${v.map((n, j) => n ? `<i class="b${j + 1}" style="width:${n / max * 100}%"></i>` : "").join("")}</span><span class="c">${tot}</span></div>`;
+}).join("");
+document.getElementById("nMix").textContent = CARDS.filter(c => c.p[0].mix.length > 1).length;
+document.getElementById("nZero").textContent = rows.filter(([, v]) => v[0] + v[1] + v[2] === 0).length;
+
+// 남은 기법의 쓸 곳 (1순위 바탕이 한 번도 안 된 것)
+const LEFT = {
+  lookup: ["<b>축제·학과 행사 부스</b> — 줄 서서 기다리는 동안 폰으로 하는 한 판 게임, 점수판은 부스 화면에", "<b>발표 시작 전</b> — 청중이 다 같이 고개 드는 손그림 게임으로 분위기 풀기"],
+  dots: ["<b>발표 첫 장</b> — 팀 이름·로고가 점으로 모였다 흩어지며 시작", "<b>기념일 사진 한 장</b> — 우리달 기념일에 사진이 점으로 모이는 깜짝 페이지"],
+  descend: ["<b>MT·행사 장소 안내</b> — 지도 → 건물 → 방까지 내려가며 길 알려 주기", "<b>신입생 길 안내</b> — 정문에서 강의실까지 하늘에서 내려오기"],
+  drive: ["<b>창공설 최종 시연</b> — 직접 만든 포스 피드백 휠을 브라우저 게임패드로 연결해 그랑프리를 진짜로 운전", "<b>오픈 캠퍼스 체험</b> — 학교 안 명소를 표지판으로 세운 짧은 코스"],
+  push: ["<b>웹으로 만든 발표 자료</b> — 쫄라맨이 다음 장을 밀어내며 넘김, 수업 발표에 그대로", "<b>팀 소개 페이지</b> — 팀원 칸을 하나씩 밀고 던지며 소개"],
+};
+document.getElementById("leftList").innerHTML = Object.entries(LEFT).map(([k, ideas]) => {
+  const v = cnt[k], tot = v[0] + v[1] + v[2], note = tot === 0 ? `<span class="mono zero">어느 카드에도 안 뽑힘</span>` : `<span class="mono">1순위 바탕 0 · ${v[0] ? `섞은 재료 ${v[0]} · ` : ""}2·3순위 ${v[1] + v[2]}</span>`;
+  return `<li><div><h3><a href="${D(k).href}">${D(k).n} →</a></h3>${note}</div><ol>${ideas.map(t => `<li>${t}</li>`).join("")}</ol></li>`;
+}).join("");
+</script>
+</body>
+</html>

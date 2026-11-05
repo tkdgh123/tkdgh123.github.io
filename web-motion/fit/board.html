@@ -1,0 +1,154 @@
+<!-- Claude가 만듦 (2026-11-06) — 새 글이 쪽지로 떨어져 쌓이고, 지금 보는 다른 사람들의 커서가 함께 떠다녀요 (진짜 데이터베이스는 읽지도 쓰지도 않는 예시 글) -->
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:,">
+<title>자유게시판 · 쪽지 쌓기</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@200..800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* 자유게시판과 같은 종이·먹·잉크 블루. 글이 쪽지로 떨어져 쌓이고, 다른 사람들의 커서가 쪽지를 밀고 던짐. 아래 입력은 이 화면 안에서만 떨어짐(저장 안 됨) */
+:root { --paper: #f2f1ec; --tone: #e4e2da; --ink: #151514; --muted: #5a5954; --blue: #2b44a6;
+  --serif: "Hahmlet", "Noto Serif KR", serif; --sans: "Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif; --mono: "IBM Plex Mono", ui-monospace, monospace; color-scheme: light }
+* { box-sizing: border-box }
+html, body { margin: 0; height: 100%; overflow: hidden }
+body { background: var(--paper); color: var(--ink); font-family: var(--sans); word-break: keep-all; -webkit-font-smoothing: antialiased; user-select: none; -webkit-user-select: none }
+canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none }
+.bar { position: fixed; z-index: 60; inset: 0 0 auto; display: flex; justify-content: space-between; padding: 16px clamp(16px, 3vw, 36px); font: 400 12px var(--mono); letter-spacing: .02em; pointer-events: none }
+.bar a { color: var(--ink); opacity: .72; text-decoration: none; pointer-events: auto; padding: 6px 0 }
+.bar a:hover { opacity: 1; text-decoration: underline; text-underline-offset: 4px }
+.ttl { position: fixed; z-index: 3; left: clamp(20px, 4vw, 56px); top: 62px; pointer-events: none }
+.ttl h1 { margin: 0; font: 250 clamp(44px, 7vw, 104px)/1 var(--serif); letter-spacing: -.045em }
+.ttl h1 b { font-weight: 700 }
+.ttl p { margin: 10px 0 0; font: 400 12px var(--mono); color: var(--muted); letter-spacing: .05em }
+form { position: fixed; z-index: 5; right: clamp(16px, 3vw, 36px); top: 62px; display: flex; width: min(340px, calc(100vw - 32px)); box-shadow: inset 0 0 0 1.5px var(--ink); background: var(--paper) }
+input { flex: 1; min-width: 0; height: 46px; border: 0; background: transparent; padding: 0 14px; font: 500 15px var(--sans); color: var(--ink); outline: none; user-select: text; -webkit-user-select: text }
+input::placeholder { color: var(--muted); opacity: .8 }
+form:focus-within { box-shadow: inset 0 0 0 2px var(--blue) }
+button { border: 0; background: var(--ink); color: var(--paper); font: 600 14px var(--sans); padding: 0 18px; cursor: pointer }
+button:active { transform: scale(.97) }
+@media (max-width: 700px) { .ttl { top: 54px } .ttl h1 { font-size: 40px } form { top: 118px; left: 16px; right: 16px; width: auto } .ttl p { display: none } }
+</style>
+</head>
+<body>
+<nav class="bar"><a href="./index.html">← 카드별 어울림</a><a href="../../board/">작품 보기 →</a></nav>
+<canvas id="cv"></canvas>
+<header class="ttl"><h1><b>자유</b>게시판</h1><p>지금 4명이 보고 있어요</p></header>
+<form id="f" autocomplete="off"><input id="in" maxlength="28" placeholder="한 줄 남기기" aria-label="한 줄 남기기"><button type="submit">남기기</button></form>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.20.0/matter.min.js"></script>
+<script>
+const { Engine, Bodies, Body, Composite, Constraint, Query } = Matter;
+const cv = document.getElementById("cv"), g = cv.getContext("2d");
+const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const SERIF = '"Hahmlet", "Noto Serif KR", serif', SANS = '"Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif', MONO = '"IBM Plex Mono", ui-monospace, monospace';
+// 예시 글(인사말 위주). 닉네임·댓글 수는 꾸민 값
+const SAMPLE = [["처음 왔어요, 안녕하세요", "별빛", 2], ["시험 기간 다들 힘내요", "민트", 5], ["창업실 구경하다 갑니다", "도토리", 1], ["여기 글 남겨도 되나요?", "구름", 3], ["오늘 날씨 좋아요", "별빛", 0], ["쫄라맨 귀여워요", "민트", 4], ["덜미 써 보고 싶어요", "도토리", 2], ["다들 점심 뭐 드셨어요?", "구름", 6]];
+const TONES = [["#ffffff", "#151514", "#5a5954"], ["#e4e2da", "#151514", "#5a5954"], ["#dde4f8", "#151514", "#4a5a9a"], ["#2b44a6", "#ffffff", "#b8c4f0"], ["#151514", "#f2f1ec", "#a9a8a2"], ["#dde9e2", "#151514", "#3f6a58"]];
+const USERS = [{ n: "별빛", c: "#2b44a6" }, { n: "민트", c: "#1f5a48" }, { n: "도토리", c: "#a3261c" }, { n: "구름", c: "#151514" }];
+
+const engine = Engine.create({ gravity: { y: 1.3 } }), world = engine.world;
+let W, H, dpr, NARROW, FS, walls = [], notes = [], held = null, cursors = [];
+function layout() {
+  dpr = Math.min(devicePixelRatio, 2); W = innerWidth; H = innerHeight; cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+  NARROW = W < 700; FS = NARROW ? 14 : 16;
+  Composite.remove(world, walls); const st = { isStatic: true, friction: .7, restitution: .1 }, T = 80;
+  walls = [Bodies.rectangle(W / 2, H + T / 2, W * 3, T, st), Bodies.rectangle(-T / 2, H / 2 - H, T, H * 4, st), Bodies.rectangle(W + T / 2, H / 2 - H, T, H * 4, st)];
+  Composite.add(world, walls);
+}
+layout(); addEventListener("resize", () => { layout(); notes.forEach(b => { if (b.position.x > W - 20) Body.setPosition(b, { x: W - 60, y: b.position.y }); }); });
+
+function wrapText(t, maxW) {
+  g.font = `700 ${FS}px ${SANS}`; const ws = t.split(" "), out = []; let cur = "";
+  for (const w of ws) { const x = cur ? cur + " " + w : w; if (g.measureText(x).width > maxW && cur) { out.push(cur); cur = w; } else cur = x; }
+  out.push(cur); return out.slice(0, 2);
+}
+function addNote([title, who, n], x, mine) {
+  const lines = wrapText(title, NARROW ? 150 : 210); g.font = `700 ${FS}px ${SANS}`;
+  const tw = Math.max(...lines.map(l => g.measureText(l).width)), w = Math.round(Math.max(tw, 90) + FS * 2), h = Math.round(lines.length * FS * 1.4 + FS * 2.8);
+  const b = Bodies.rectangle(x ?? W * (.5 + (Math.random() - .5) * .22), -h - 30, w, h, { chamfer: { radius: 4 }, restitution: .08, friction: .85, frictionAir: .02, density: .0018, angle: (Math.random() - .5) * .5 });
+  Body.setInertia(b, b.inertia * 2.5);
+  Object.assign(b, { title, who, n, lines, w, h, tone: mine ? TONES[3] : TONES[(notes.length * 5 + 1) % TONES.length], born: performance.now() });
+  Body.setVelocity(b, { x: (Math.random() - .5) * 2, y: 5 }); Body.setAngularVelocity(b, (Math.random() - .5) * .05);
+  notes.push(b); Composite.add(world, b);
+  if (notes.length > 16) { const old = notes.splice(0, 1)[0]; if (!(held && held.b === old)) Composite.remove(world, old); else notes.unshift(old); }
+}
+document.fonts.ready.then(() => SAMPLE.forEach((s, i) => setTimeout(() => addNote(s), calm ? 0 : 250 + i * 420)));
+document.getElementById("f").addEventListener("submit", e => { e.preventDefault(); const v = document.getElementById("in").value.trim(); if (!v) return; addNote([v, "나", 0], W * (.5 + (Math.random() - .5) * .16), true); document.getElementById("in").value = ""; });
+
+/* ───────── 내 손: 잡기·던지기 ───────── */
+const pt = e => { const r = cv.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
+cv.addEventListener("pointerdown", e => {
+  const p = pt(e), hit = Query.point(notes.filter(n => !n.ghost), p)[0]; if (!hit) return; cv.setPointerCapture(e.pointerId);
+  const dx = p.x - hit.position.x, dy = p.y - hit.position.y, c = Math.cos(-hit.angle), s = Math.sin(-hit.angle);
+  const con = Constraint.create({ pointA: { x: p.x, y: p.y }, bodyB: hit, pointB: { x: dx * c - dy * s, y: dx * s + dy * c }, stiffness: .2, damping: .12, length: 0 });
+  Composite.add(world, con); held = { b: hit, con };
+});
+cv.addEventListener("pointermove", e => { const p = pt(e); if (held) { held.con.pointA.x = p.x; held.con.pointA.y = p.y; cv.style.cursor = "grabbing"; } else cv.style.cursor = Query.point(notes, p).length ? "grab" : "default"; });
+const lim = b => { const v = b.velocity, s = Math.hypot(v.x, v.y); if (s > 34) Body.setVelocity(b, { x: v.x * 34 / s, y: v.y * 34 / s }); };
+const drop = () => { if (!held) return; Composite.remove(world, held.con); lim(held.b); held = null; };
+cv.addEventListener("pointerup", drop); cv.addEventListener("pointercancel", drop);
+
+/* ───────── 다른 사람들의 커서 ───────── */
+USERS.forEach((u, i) => cursors.push({ ...u, x: W * (.2 + i * .2), y: H * .35, tx: W * .5, ty: H * .4, t: performance.now() + i * 900, mode: "wander", seed: Math.random() * 100, grab: null, next: performance.now() + 9000 + i * 4000 }));
+function stepCursor(c, now, dt) {
+  c.seed += dt * .001;
+  if (c.mode === "wander") {
+    if (now > c.t) { c.tx = 40 + Math.random() * (W - 80); c.ty = 110 + Math.random() * (H * .6); c.t = now + 1400 + Math.random() * 2200; }
+    if (now > c.next && notes.length > 3 && !calm) { const cand = notes.filter(n => !(held && held.b === n) && !cursors.some(o => o.grab && o.grab.b === n)); const b = cand[Math.random() * cand.length | 0]; if (b) { c.mode = "go"; c.target = b; c.tx = b.position.x; c.ty = b.position.y; } c.next = now + 16000 + Math.random() * 9000; }
+  } else if (c.mode === "go") {
+    c.tx = c.target.position.x; c.ty = c.target.position.y;
+    if (Math.hypot(c.x - c.tx, c.y - c.ty) < 18 && !(held && held.b === c.target)) {
+      const b = c.target, con = Constraint.create({ pointA: { x: c.x, y: c.y }, bodyB: b, pointB: { x: 0, y: 0 }, stiffness: .12, damping: .15, length: 0 }); Composite.add(world, con); c.grab = { b, con };
+      c.mode = "carry"; c.t = now + 1500; c.tx = 80 + Math.random() * (W - 160); c.ty = 130 + Math.random() * (H * .25);
+    } else if (now > c.t + 6000) c.mode = "wander";
+  } else if (c.mode === "carry") {
+    if (now > c.t) { Composite.remove(world, c.grab.con); lim(c.grab.b); Body.setVelocity(c.grab.b, { x: (Math.random() - .5) * 4, y: 0 }); c.grab = null; c.mode = "wander"; c.t = now + 800; }
+  }
+  const k = 1 - Math.exp(-dt * (c.mode === "carry" ? .0035 : .0042)), px = c.x, py = c.y;
+  c.x += (c.tx - c.x) * k + Math.sin(c.seed * 3) * .4; c.y += (c.ty - c.y) * k + Math.cos(c.seed * 2.4) * .4;
+  c.sp = Math.hypot(c.x - px, c.y - py);
+  if (c.grab) { c.grab.con.pointA.x = c.x; c.grab.con.pointA.y = c.y; }
+
+}
+
+/* ───────── 그리기 ───────── */
+let last = performance.now();
+function rr(x, y, w, h, r) { g.beginPath(); g.roundRect(x, y, w, h, r); }
+function frame(now) {
+  requestAnimationFrame(frame);
+  const dt = Math.min(33, now - last); last = now;
+  Engine.update(engine, dt); cursors.forEach(c => stepCursor(c, now, dt));
+  for (const b of notes) {
+    const v = b.velocity, sp = Math.hypot(v.x, v.y); if (sp > 38) Body.setVelocity(b, { x: v.x * 38 / sp, y: v.y * 38 / sp });
+    const busy = (held && held.b === b) || cursors.some(c => c.grab && c.grab.b === b);
+    if (!busy && sp < 2.5) { const a = ((b.angle + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI; Body.setAngularVelocity(b, b.angularVelocity * .92 - a * .01); }
+  }
+  g.setTransform(dpr, 0, 0, dpr, 0, 0); g.fillStyle = "#f2f1ec"; g.fillRect(0, 0, W, H);
+  g.fillStyle = "#151514"; g.fillRect(0, H - 3, W, 3);
+  for (const b of notes) {
+    const isHeld = (held && held.b === b) || cursors.some(c => c.grab && c.grab.b === b), [bg, fg, sub] = b.tone;
+    g.save(); g.translate(b.position.x, b.position.y); g.rotate(b.angle + (Math.cos(b.angle) < 0 ? Math.PI : 0)); const sc = isHeld ? 1.05 : 1; g.scale(sc, sc);
+    g.shadowColor = "rgba(21,21,20,.24)"; g.shadowBlur = isHeld ? 24 : 7; g.shadowOffsetY = isHeld ? 12 : 2;
+    g.fillStyle = bg; rr(-b.w / 2, -b.h / 2, b.w, b.h, 4); g.fill(); g.shadowColor = "transparent";
+    g.fillStyle = fg === "#ffffff" || fg === "#f2f1ec" ? "rgba(255,255,255,.35)" : "rgba(21,21,20,.12)"; g.beginPath(); g.arc(0, -b.h / 2 + 9, 3.2, 0, 7); g.fill();
+    g.textAlign = "left"; g.textBaseline = "middle"; g.fillStyle = fg; g.font = `700 ${FS}px ${SANS}`;
+    b.lines.forEach((l, i) => g.fillText(l, -b.w / 2 + FS, -b.h / 2 + FS * 1.9 + i * FS * 1.4));
+    g.font = `400 ${FS * .72}px ${MONO}`; g.fillStyle = sub; g.fillText(b.who, -b.w / 2 + FS, b.h / 2 - FS * .95);
+    if (b.n) { g.textAlign = "right"; g.fillText(b.n, b.w / 2 - FS, b.h / 2 - FS * .95); }
+    g.restore();
+  }
+  // 다른 사람 커서
+  for (const c of cursors) {
+    g.save(); g.globalAlpha = .72; g.translate(c.x, c.y); g.scale(.85, .85); g.shadowColor = "rgba(21,21,20,.25)"; g.shadowBlur = 5; g.shadowOffsetY = 2;
+    g.fillStyle = c.c; g.beginPath(); g.moveTo(0, 0); g.lineTo(0, 17); g.lineTo(4.6, 13); g.lineTo(8, 20.5); g.lineTo(10.6, 19.4); g.lineTo(7.2, 12); g.lineTo(13, 12); g.closePath(); g.fill(); g.shadowColor = "transparent";
+    g.font = `500 12px ${SANS}`; const tw = g.measureText(c.n).width; g.fillStyle = c.c; rr(14, 17, tw + 14, 21, 4); g.fill();
+    g.fillStyle = "#fff"; g.textAlign = "left"; g.textBaseline = "middle"; g.fillText(c.n, 21, 28); g.restore();
+  }
+}
+document.fonts.ready.then(() => requestAnimationFrame(frame));
+</script>
+</body>
+</html>

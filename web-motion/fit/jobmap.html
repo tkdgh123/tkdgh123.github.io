@@ -1,0 +1,214 @@
+<!-- Claude가 만듦 (2026-11-06) — 문항 이름표를 '좋아요/별로' 통에 던지면 맞는 직무 막대가 종이처럼 쌓여 솟아요. 던지는 게 곧 검사 -->
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:,">
+<title>학과 진로 지도 · 던지는 검사</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* 학과 진로 지도 자체의 색(회청 바탕, 흰 카드, 인디고 강조)과 둥근 모서리. 왼쪽 카드는 던지는 판, 오른쪽 카드는 끌림 방향 막대. 문항·방향 이름·직무 이름은 jobmap/quiz.js, jobs.js에서 그대로 불러옴 */
+:root { --bg: #f7f8fa; --ink: #191f28; --soft: #5f6b78; --acc: #3a4bd0; --sans: "Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif; --mono: "IBM Plex Mono", ui-monospace, monospace; color-scheme: light }
+* { box-sizing: border-box }
+html, body { margin: 0; height: 100%; overflow: hidden }
+body { background: var(--bg); color: var(--ink); font-family: var(--sans); word-break: keep-all; -webkit-font-smoothing: antialiased; user-select: none; -webkit-user-select: none }
+canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none }
+.bar { position: fixed; z-index: 60; inset: 0 0 auto; display: flex; justify-content: space-between; padding: 16px clamp(16px, 3vw, 36px); font: 400 12px var(--mono); letter-spacing: .02em; pointer-events: none }
+.bar a { color: var(--ink); opacity: .7; text-decoration: none; pointer-events: auto; padding: 6px 0 }
+.bar a:hover { opacity: 1; text-decoration: underline; text-underline-offset: 4px }
+.hint { position: fixed; z-index: 3; left: 0; top: 46%; width: var(--fw, 100%); margin-left: var(--fx, 0); text-align: center; font: 500 13px var(--mono); letter-spacing: .06em; color: var(--soft); transition: opacity .5s; pointer-events: none }
+</style>
+</head>
+<body>
+<nav class="bar"><a href="./index.html">← 카드별 어울림</a><a href="../../jobmap/">작품 보기 →</a></nav>
+<canvas id="cv"></canvas>
+<p class="hint" id="hint">이름표를 통에 던져 보세요</p>
+
+<script>window.JOBMAP = {}; window.STEP = new Proxy({}, { get: () => ({}) });</script>
+<script src="../../jobmap/jobs.js"></script>
+<script src="../../jobmap/quiz.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.20.0/matter.min.js"></script>
+<script>
+const { Engine, Bodies, Body, Composite, Constraint, Query } = Matter;
+const cv = document.getElementById("cv"), g = cv.getContext("2d");
+const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const SANS = '"Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif', MONO = '"IBM Plex Mono", ui-monospace, monospace';
+
+/* ───────── 진짜 자료: 문항 30개('이럴 때 어때요?'), 끌림 방향 이름·한 줄, 직무 ───────── */
+const QZ = window.JOBMAP.quiz, JOBS = window.JOBMAP.jobs;
+const ORDER = ["I", "A", "S", "C", "E", "R"];
+const DIR = {}, LINE = {}; QZ.areas.forEach(a => { DIR[a.id] = a.name; LINE[a.id] = a.line; });
+const Q = QZ.interest.items.map(it => [it.id[0], it.q]);
+// 방향별 직무: jobs.js의 끌림 코드(riasec) 첫 글자가 그 방향인 직무, 코드가 짧은(더 순수한) 순서로 둘
+const JOB = {}; ORDER.forEach(d => JOB[d] = JOBS.filter(j => j.riasec && j.riasec[0] === d).sort((a, b) => a.riasec.length - b.riasec.length).slice(0, 2).map(j => j.name));
+const COLOR = { I: "#3a4bd0", A: "#c2478b", S: "#e08a2e", C: "#2f9e8a", E: "#d4503f", R: "#7a5af0" };
+
+const engine = Engine.create({ gravity: { y: 1.5 } }), world = engine.world;
+let W, H, dpr, NARROW, FS, M, F, B, floorY, cupH, bw, walls = [], tags = [], sheets = [], queue = [], likes = 0, nos = 0;
+const stacks = {}; ORDER.forEach(d => stacks[d] = { n: 0, bump: 0, sheets: [], inflight: 0 });
+const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+function layout() {
+  dpr = Math.min(devicePixelRatio, 2); W = innerWidth; H = innerHeight; cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+  NARROW = W < 700; FS = NARROW ? 12 : Math.max(14, Math.min(16, W / 90)); M = NARROW ? 12 : 20;
+  if (!NARROW) { const top = 64, pw = Math.round((W - 3 * M) * .6); F = { x: M, y: top, w: pw, h: H - top - M }; B = { x: 2 * M + pw, y: top, w: W - 3 * M - pw, h: H - top - M }; }
+  else { const bh = Math.round(H * .3); B = { x: M, y: 58, w: W - 2 * M, h: bh }; F = { x: M, y: 58 + bh + M, w: W - 2 * M, h: H - (58 + bh + M) - M }; }
+  floorY = F.y + F.h; cupH = Math.max(150, F.h * (NARROW ? .3 : .36)); bw = F.w * (NARROW ? .35 : .27);
+  const fw = document.documentElement.style; fw.setProperty("--fw", F.w + "px"); fw.setProperty("--fx", F.x + "px");
+  Composite.remove(world, walls);
+  const st = { isStatic: true, friction: .7, restitution: .1 }, T = 80;
+  walls = [
+    Bodies.rectangle(F.x + F.w / 2, floorY + T / 2, F.w + 200, T, st),
+    Bodies.rectangle(F.x - T / 2, H / 2 - H, T, H * 4, st),
+    Bodies.rectangle(F.x + F.w + T / 2, H / 2 - H, T, H * 4, st),
+    Bodies.rectangle(F.x + F.w / 2, floorY - cupH / 2 + 1, F.w - 2 * bw, cupH, { ...st, chamfer: { radius: 14 } }),
+  ];
+  Composite.add(world, walls);
+  tags.forEach(b => { if (b.position.x > F.x + F.w - 30) Body.setPosition(b, { x: F.x + F.w - 40, y: b.position.y }); });
+}
+function wrap(text, maxW) {
+  g.font = `600 ${FS}px ${SANS}`; const words = text.split(" "), lines = []; let cur = "";
+  for (const w of words) { const t = cur ? cur + " " + w : w; if (g.measureText(t).width > maxW && cur) { lines.push(cur); cur = w; } else cur = t; }
+  lines.push(cur); return lines.slice(0, 3);
+}
+function spawn() {
+  if (!queue.length) queue = shuffle(Q.slice());
+  const [d, text] = queue.pop(), lines = wrap(text, NARROW ? 92 : 168);
+  g.font = `600 ${FS}px ${SANS}`; const tw = Math.max(...lines.map(l => g.measureText(l).width)), w = Math.round(tw + FS * 2.2), h = Math.round(FS * 1.5 * lines.length + FS * 1.3);
+  const x = F.x + bw + (F.w - 2 * bw) * (.25 + Math.random() * .5), b = Bodies.rectangle(x, F.y + 24, w, h, { chamfer: { radius: 12 }, restitution: .22, friction: .6, frictionAir: .012, density: .002, angle: (Math.random() - .5) * .5 });
+  Body.setInertia(b, b.inertia * 2.5);
+  Object.assign(b, { d, lines, w, h, rest: 0, state: 0, flash: 0, alpha: 1, born: performance.now() });
+  Body.setVelocity(b, { x: (Math.random() - .5) * 3, y: 3 }); Composite.add(world, b); tags.push(b);
+}
+layout(); addEventListener("resize", layout);
+// 처음 빈 막대가 휑하지 않게: 문항 몇 개를 이미 '좋아요'에 넣은 것처럼 종이가 날아가 쌓임
+setTimeout(() => shuffle(Q.slice()).slice(0, 9).forEach(([d], i) => setTimeout(() => {
+  likes++; launchSheet({ d, position: { x: F.x + F.w / 2, y: F.y + F.h * .8 }, angle: (Math.random() - .5) * .6 });
+}, calm ? 0 : i * 160)), calm ? 0 : 700);
+
+/* ───────── 잡기·던지기: CSS 좌표 직접 사용 ───────── */
+let held = null; const hint = document.getElementById("hint");
+const pt = e => { const r = cv.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
+cv.addEventListener("pointerdown", e => {
+  const p = pt(e), hit = Query.point(tags.filter(b => !b.state), p)[0]; if (!hit) return;
+  cv.setPointerCapture(e.pointerId); hint.style.opacity = 0;
+  const dx = p.x - hit.position.x, dy = p.y - hit.position.y, c = Math.cos(-hit.angle), s = Math.sin(-hit.angle);
+  const con = Constraint.create({ pointA: { x: p.x, y: p.y }, bodyB: hit, pointB: { x: dx * c - dy * s, y: dx * s + dy * c }, stiffness: .2, damping: .12, length: 0 });
+  Composite.add(world, con); held = { b: hit, con };
+});
+cv.addEventListener("pointermove", e => {
+  const p = pt(e); if (held) { held.con.pointA.x = p.x; held.con.pointA.y = p.y; cv.style.cursor = "grabbing"; return; }
+  cv.style.cursor = Query.point(tags.filter(b => !b.state), p).length ? "grab" : "default";
+});
+const drop = () => { if (!held) return; Composite.remove(world, held.con); const v = held.b.velocity, s = Math.hypot(v.x, v.y); if (s > 32) Body.setVelocity(held.b, { x: v.x * 32 / s, y: v.y * 32 / s }); held = null; };
+cv.addEventListener("pointerup", drop); cv.addEventListener("pointercancel", drop);
+
+/* ───────── 막대(종이 더미) 자리 ───────── */
+function barGeo() {
+  if (NARROW) { const pad = 12, cw = (B.w - 2 * pad) / 6, base = B.y + B.h - 54; return { base, maxH: base - (B.y + 70), cw, x0: B.x + pad, sw: Math.min(40, cw * .7), th: 14 }; }
+  const pad = 28, cw = (B.w - 2 * pad) / 6, base = B.y + B.h - 168; return { base, maxH: base - (B.y + 170), cw, x0: B.x + pad, sw: Math.min(62, cw * .72), th: 22 };
+}
+const thick = geo => { const maxN = Math.max(6, ...ORDER.map(q => stacks[q].n + stacks[q].inflight)); return Math.min(geo.th, geo.maxH / (maxN + 2)); };
+function launchSheet(b) {
+  const geo = barGeo(), d = b.d, k = ORDER.indexOf(d), st = stacks[d];
+  st.inflight++; sheets.push({ d, x0: b.position.x, y0: b.position.y, ang0: b.angle, tx: geo.x0 + geo.cw * (k + .5), idx: st.n + st.inflight - 1, t0: performance.now(), dur: calm ? 1 : 780 });
+}
+
+/* ───────── 그리기 ───────── */
+let last = performance.now(), nextSpawn = 0;
+const ease = t => 1 - Math.pow(1 - t, 3);
+function rr(x, y, w, h, r) { g.beginPath(); g.roundRect(x, y, w, h, r); }
+function card(r, rad) { g.save(); g.shadowColor = "rgba(17,24,39,.08)"; g.shadowBlur = 28; g.shadowOffsetY = 8; g.fillStyle = "#fff"; rr(r.x, r.y, r.w, r.h, rad); g.fill(); g.shadowColor = "transparent"; g.shadowBlur = 0; g.fillStyle = "rgba(17,24,39,.04)"; rr(r.x, r.y, r.w, 1.5, rad); g.restore(); }
+function frame(now) {
+  requestAnimationFrame(frame);
+  const dt = Math.min(33, now - last); last = now;
+  Engine.update(engine, dt);
+  const onBoard = tags.filter(b => !b.state).length;
+  if (now > nextSpawn && onBoard < (NARROW ? 2 : 4)) { spawn(); nextSpawn = now + (calm ? 100 : 900); }
+  for (const b of tags) {
+    if (b.state) continue;
+    if (!(held && held.b === b) && b.position.x > F.x + bw && b.position.x < F.x + F.w - bw && Math.hypot(b.velocity.x, b.velocity.y) < 2.5) { const a = ((b.angle + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI; Body.setAngularVelocity(b, b.angularVelocity * .92 - a * .01); }
+    const lowY = b.position.y > floorY - cupH + 8, inL = b.position.x < F.x + bw && lowY, inR = b.position.x > F.x + F.w - bw && lowY;
+    const slow = Math.hypot(b.velocity.x, b.velocity.y) < 2 && (!held || held.b !== b);
+    b.pit = (inL || inR) && !(held && held.b === b) ? (b.pit || 0) + dt : 0;
+    if ((inL || inR) && (slow || b.pit > 1100)) { b.rest += dt; if (b.rest > 380 || b.pit > 1100) { b.state = inL ? 1 : 2; b.flash = 1; b.t1 = now; if (b.state === 1) { likes++; launchSheet(b); } else nos++; } } else b.rest = 0;
+  }
+  for (let i = tags.length - 1; i >= 0; i--) { const b = tags[i]; if (b.state && now - b.t1 > 520) { Composite.remove(world, b); tags.splice(i, 1); } else if (b.state) b.alpha = 1 - (now - b.t1) / 520; }
+
+  g.setTransform(dpr, 0, 0, dpr, 0, 0); g.fillStyle = "#f7f8fa"; g.fillRect(0, 0, W, H);
+  const geo = barGeo(), th = thick(geo), rad = NARROW ? 22 : 30;
+  card(F, rad); card(B, rad);
+
+  // 던지는 판: 큰 101, 통 둘, 가운데 인디고 선반
+  g.save(); rr(F.x, F.y, F.w, F.h, rad); g.clip();
+  const big = Math.min(F.h * .46, F.w * .62); g.textAlign = "center"; g.textBaseline = "alphabetic"; g.font = `800 ${big}px ${SANS}`; g.fillStyle = "rgba(58,75,208,.06)";
+  g.fillText("101", F.x + F.w / 2, F.y + F.h * (NARROW ? .36 : .4)); g.font = `700 ${Math.max(15, big * .12)}px ${SANS}`; g.fillText("문항", F.x + F.w / 2, F.y + F.h * (NARROW ? .36 : .4) + big * .17);
+  const pitY = floorY - cupH;
+  g.fillStyle = "#eef0fd"; g.fillRect(F.x, pitY, bw, cupH); g.fillStyle = "#eff1f4"; g.fillRect(F.x + F.w - bw, pitY, bw, cupH);
+  const sg = g.createLinearGradient(0, pitY, 0, floorY); sg.addColorStop(0, "rgba(58,75,208,.26)"); sg.addColorStop(1, "rgba(58,75,208,.05)");
+  g.fillStyle = sg; g.fillRect(F.x + bw, pitY, F.w - 2 * bw, cupH + 30);
+  g.fillStyle = "#3a4bd0"; rr(F.x + bw, pitY, F.w - 2 * bw, NARROW ? 22 : 30, [18, 18, 6, 6]); g.fill();
+  g.fillStyle = "rgba(255,255,255,.18)"; rr(F.x + bw + 12, pitY + 6, F.w - 2 * bw - 24, 2, 1); g.fill();
+  g.textBaseline = "middle"; g.font = `800 ${NARROW ? 17 : 28}px ${SANS}`; g.fillStyle = "rgba(58,75,208,.7)"; g.fillText("좋아요", F.x + bw / 2, floorY - cupH * .28);
+  g.fillStyle = "rgba(95,107,120,.7)"; g.fillText("별로", F.x + F.w - bw / 2, floorY - cupH * .28);
+  g.font = `500 ${NARROW ? 11 : 13}px ${MONO}`; g.fillStyle = "rgba(58,75,208,.55)"; if (likes) g.fillText(likes, F.x + bw / 2, floorY - cupH * .28 + (NARROW ? 20 : 30));
+  g.fillStyle = "rgba(95,107,120,.55)"; if (nos) g.fillText(nos, F.x + F.w - bw / 2, floorY - cupH * .28 + (NARROW ? 20 : 30));
+  g.restore();
+  // 판 제목
+  g.textAlign = "left"; g.textBaseline = "alphabetic"; g.fillStyle = "#191f28"; g.font = `800 ${NARROW ? 20 : 38}px ${SANS}`; g.fillText("학과 진로 지도", F.x + (NARROW ? 18 : 32), F.y + (NARROW ? 34 : 62));
+  g.font = `400 ${NARROW ? 11 : 12}px ${MONO}`; g.fillStyle = "#5f6b78"; g.fillText("101문항 진로 검사", F.x + (NARROW ? 18 : 33), F.y + (NARROW ? 52 : 86));
+
+  // 끌림 방향 카드
+  const ranked = ORDER.filter(d => stacks[d].n > 0).sort((a, b) => stacks[b].n - stacks[a].n).slice(0, 3), lead = ranked[0];
+  const hx = B.x + (NARROW ? 18 : 32);
+  g.font = `500 ${NARROW ? 11 : 12}px ${MONO}`; g.fillStyle = "#5f6b78"; g.fillText("끌림 방향", hx, B.y + (NARROW ? 28 : 46));
+  g.font = `800 ${NARROW ? 20 : 36}px ${SANS}`; g.fillStyle = lead ? COLOR[lead] : "#c8ced8"; g.fillText(lead ? DIR[lead] + " 쪽이 가장 커요" : "아직 비어 있어요", hx, B.y + (NARROW ? 54 : 94));
+  if (!NARROW) { g.font = `400 16px ${SANS}`; g.fillStyle = "#4e5968"; g.fillText(lead ? LINE[lead] : "", hx, B.y + 124); }
+  g.fillStyle = "rgba(17,24,39,.06)"; for (let r = 5; r * th < geo.maxH; r += 5) g.fillRect(B.x + (NARROW ? 12 : 24), geo.base - r * th, B.w - (NARROW ? 24 : 48), 1);
+  ORDER.forEach((d, k) => {
+    const cx = geo.x0 + geo.cw * (k + .5), st = stacks[d], top3 = ranked.includes(d);
+    g.fillStyle = "#eef1f5"; rr(cx - geo.sw * .62, geo.base, geo.sw * 1.24, 5, 2.5); g.fill();
+    st.bump *= .86;
+    st.sheets.forEach((s, i) => {
+      const y = geo.base - th * (i + 1) + (i >= st.sheets.length - 2 ? st.bump * 3 : 0);
+      g.save(); g.translate(cx + s.dx, y + th / 2); g.rotate(s.rot); g.globalAlpha = top3 || !ranked.length ? 1 : .5; g.fillStyle = COLOR[d]; rr(-geo.sw / 2, -th / 2, geo.sw, th - 1, 3.5); g.fill();
+      g.fillStyle = "rgba(255,255,255,.3)"; rr(-geo.sw / 2 + 3, -th / 2, geo.sw - 6, 1.4, 1); g.fill(); g.restore();
+    });
+    g.globalAlpha = 1; g.textAlign = "center"; g.textBaseline = "alphabetic";
+    if (st.n) { g.font = `500 ${NARROW ? 11 : 13}px ${MONO}`; g.fillStyle = COLOR[d]; g.fillText(st.n, cx, geo.base - th * st.n - 10 - st.bump * 2); }
+    g.font = `${top3 ? 800 : 600} ${NARROW ? 12 : 16}px ${SANS}`; g.fillStyle = top3 ? "#191f28" : "#8d95a3"; g.fillText(DIR[d], cx, geo.base + (NARROW ? 20 : 30));
+    if (!NARROW) {
+      g.font = `500 12.5px ${SANS}`; g.fillStyle = top3 ? COLOR[d] : "#a1a9b6"; let yy = geo.base + 54;
+      JOB[d].forEach(n => { const ls = n.length > 7 ? [n.slice(0, Math.ceil(n.length / 2)), n.slice(Math.ceil(n.length / 2))] : [n]; ls.forEach(l => { g.fillText(l, cx, yy); yy += 16; }); yy += 5; });
+    }
+  });
+  if (NARROW && ranked.length) { g.font = `600 12px ${SANS}`; g.fillStyle = "#191f28"; g.textAlign = "center"; g.fillText(ranked.map(d => JOB[d][0]).join(" · "), B.x + B.w / 2, B.y + B.h - 12); }
+
+  // 날아가는 종이
+  for (let i = sheets.length - 1; i >= 0; i--) {
+    const s = sheets[i], t = Math.min(1, (now - s.t0) / s.dur), e = ease(t), st = stacks[s.d];
+    const tyy = geo.base - th * (s.idx + 1) + th / 2;
+    const x = s.x0 + (s.tx - s.x0) * e, y = s.y0 + (tyy - s.y0) * e - Math.sin(t * Math.PI) * Math.min(150, H * .18);
+    const w = geo.sw * (.5 + .5 * e), h = th * 3 * (1 - e) + th;
+    g.save(); g.translate(x, y); g.rotate(s.ang0 * (1 - e) + (1 - e) * Math.sin(t * 9) * .15); g.fillStyle = COLOR[s.d]; rr(-w / 2, -h / 2, w, h, 4); g.fill(); g.restore();
+    if (t >= 1) { sheets.splice(i, 1); st.inflight--; st.n++; st.sheets.push({ dx: (Math.random() - .5) * 5, rot: (Math.random() - .5) * .05 }); st.bump = 1; }
+  }
+
+  // 이름표
+  for (const b of tags) {
+    const isHeld = held && held.b === b;
+    g.save(); g.globalAlpha = Math.max(0, b.alpha) * Math.min(1, (now - b.born) / 250); g.translate(b.position.x, b.position.y); g.rotate(b.angle + (Math.cos(b.angle) < 0 ? Math.PI : 0));
+    const sc = isHeld ? 1.06 : 1; g.scale(sc, sc);
+    g.shadowColor = "rgba(25,31,40,.24)"; g.shadowBlur = isHeld ? 24 : 9; g.shadowOffsetY = isHeld ? 12 : 3;
+    g.fillStyle = b.flash > 0 && b.state === 1 ? COLOR[b.d] : "#fff"; rr(-b.w / 2, -b.h / 2, b.w, b.h, 12); g.fill(); g.shadowColor = "transparent";
+    g.fillStyle = b.state === 1 ? "#fff" : "#191f28"; g.textAlign = "center"; g.textBaseline = "middle"; g.font = `600 ${FS}px ${SANS}`;
+    b.lines.forEach((l, i) => g.fillText(l, 0, (i - (b.lines.length - 1) / 2) * FS * 1.5 + 1));
+    g.restore();
+  }
+}
+document.fonts.ready.then(() => requestAnimationFrame(frame));
+</script>
+</body>
+</html>

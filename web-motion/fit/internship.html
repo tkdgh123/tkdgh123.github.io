@@ -1,0 +1,203 @@
+<!-- Claude가 만듦 (2026-11-06) — 공기업·사기업 두 빛기둥, 인턴 카드를 끌어 놓으면 그 빛 아래서 비교가 뒤집혀 나와요 -->
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:,">
+<title>표준 현장실습학기제 · 두 빛기둥</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/wanteddev/wanted-sans@v1.0.3/packages/wanted-sans/fonts/webfonts/variable/split/WantedSansVariable.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* 현장실습 수첩 어두운 장의 색(#151618, 초록 강조)과 원티드 산스 제목. 두 빛기둥 아래에 공기업·사기업이 서 있고, 인턴 카드를 끌어 놓거나 던지면 그 빛이 켜지며 비교가 드러남 */
+:root { --dark: #151618; --on: #eeece6; --soft: #9e9d97; --green: #1f5a48; --pub: #8fd4b8; --pri: #e8dcc4;
+  --display: "Wanted Sans Variable", "Wanted Sans", "Pretendard Variable", Pretendard, system-ui, sans-serif; --sans: "Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif; --mono: "IBM Plex Mono", ui-monospace, monospace;
+  --cw: 200px; --ch: 270px; color-scheme: dark }
+* { box-sizing: border-box }
+html, body { margin: 0; height: 100%; overflow: hidden }
+body { background: var(--dark); color: var(--on); font-family: var(--sans); word-break: keep-all; -webkit-font-smoothing: antialiased; user-select: none; -webkit-user-select: none }
+canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none }
+.bar { position: fixed; z-index: 60; inset: 0 0 auto; display: flex; justify-content: space-between; padding: 16px clamp(16px, 3vw, 36px); font: 400 12px var(--mono); letter-spacing: .02em; pointer-events: none }
+.bar a { color: var(--on); opacity: .72; text-decoration: none; pointer-events: auto; padding: 6px 0 }
+.bar a:hover { opacity: 1; text-decoration: underline; text-underline-offset: 4px }
+.ttl { position: fixed; z-index: 3; left: 50%; top: 70px; transform: translateX(-50%); text-align: center; pointer-events: none; width: 24vw; min-width: 200px }
+.ttl h1 { margin: 0; font: 400 clamp(20px, 2vw, 30px)/1.2 var(--display); letter-spacing: -.03em }
+.ttl h1 b { display: block; font-weight: 800 }
+.col { position: fixed; z-index: 2; top: 84px; width: 38vw; padding: 0 clamp(6px, 1vw, 16px) }
+.col.l { left: 3vw } .col.r { right: 3vw }
+.col h2 { margin: 0 0 22px; font: 800 clamp(34px, 4.4vw, 68px)/1 var(--display); letter-spacing: -.05em; color: var(--c); opacity: calc(.6 + var(--lit, 0) * .4) }
+.col.l { --c: var(--pub) } .col.r { --c: var(--pri) }
+.col dl { margin: 0 }
+.col .row { padding: 10px 0; opacity: calc(.16 + var(--lit, 0) * .84); transform: translateY(calc((1 - var(--lit, 0)) * 8px)); transition: opacity .7s, transform .7s }
+.col .row:nth-child(2) { transition-delay: .06s } .col .row:nth-child(3) { transition-delay: .12s } .col .row:nth-child(4) { transition-delay: .18s } .col .row:nth-child(5) { transition-delay: .24s }
+.col dt { font: 500 11px var(--mono); letter-spacing: .08em; color: var(--c); opacity: .85 }
+.col dd { margin: 3px 0 0; font: 300 clamp(14px, 1.25vw, 19px)/1.5 var(--sans); letter-spacing: -.01em }
+.dock { position: fixed; z-index: 1; top: 0; width: var(--cw); height: var(--ch); pointer-events: none }
+.tray { position: fixed; z-index: 1; left: 50%; bottom: 0; width: 0; height: 0 }
+.slot { position: fixed; width: 1px; height: 1px }
+
+/* 카드 */
+.card { position: fixed; z-index: 7; left: 0; top: 0; width: var(--cw); height: var(--ch); touch-action: none; cursor: grab; will-change: transform; perspective: 900px; opacity: 0 }
+.card.dragging { cursor: grabbing }
+.flip { position: absolute; inset: 0; transform-style: preserve-3d; transition: transform .75s cubic-bezier(.3, 1.3, .4, 1) }
+.card.back .flip { transform: rotateY(180deg) }
+.face { position: absolute; inset: 0; border-radius: 10px; backface-visibility: hidden; -webkit-backface-visibility: hidden; padding: calc(var(--cw) * .08); display: flex; flex-direction: column; justify-content: space-between; color: #151514; background: var(--on); box-shadow: 0 18px 40px -14px #000 }
+.face.bk { transform: rotateY(180deg); justify-content: flex-start; gap: calc(var(--cw) * .035); background: var(--on) }
+.face small { font: 500 calc(var(--cw) * .055)/1 var(--mono); letter-spacing: .08em; color: #5a5954 }
+.face h3 { margin: 0; font: 800 calc(var(--cw) * .125)/1.15 var(--display); letter-spacing: -.04em }
+.face .dot { width: calc(var(--cw) * .12); height: calc(var(--cw) * .12); border-radius: 50%; background: var(--green) }
+.face.bk .t { display: flex; justify-content: space-between; align-items: baseline; padding-bottom: calc(var(--cw) * .03); border-bottom: 2px solid #151514 }
+.face.bk .t b { font: 800 calc(var(--cw) * .08)/1 var(--display); letter-spacing: -.03em }
+.face.bk .t i { width: calc(var(--cw) * .07); height: calc(var(--cw) * .07); border-radius: 50%; background: var(--k, var(--green)) }
+.face.bk .f { font: 400 calc(var(--cw) * .068)/1.35 var(--sans) }
+.face.bk .f em { display: block; font: 500 calc(var(--cw) * .048)/1.2 var(--mono); font-style: normal; color: #5a5954; letter-spacing: .06em }
+.hint { position: fixed; z-index: 3; left: 50%; top: 52%; transform: translateX(-50%); font: 500 12px var(--mono); letter-spacing: .08em; color: var(--soft); transition: opacity .5s; pointer-events: none; white-space: nowrap }
+@media (max-width: 700px) {
+  :root { --cw: 164px; --ch: 218px }
+  .ttl { top: 54px; width: auto; min-width: 0 } .ttl h1 { font-size: 16px } .ttl h1 b { display: inline; margin-left: .3em }
+  .col { top: 84px; width: 50vw; padding: 0 12px } .col.l { left: 0 } .col.r { right: 0 }
+  .col h2 { font-size: 30px; margin-bottom: 8px } .col .row { padding: 6px 0 } .col dd { font-size: 12.5px; line-height: 1.42 } .col dt { font-size: 10px }
+  .hint { top: 72% }
+}
+@media (prefers-reduced-motion: reduce) { .flip { transition: none } }
+</style>
+</head>
+<body>
+<nav class="bar"><a href="./index.html">← 카드별 어울림</a><a href="../../internship/">작품 보기 →</a></nav>
+<canvas id="cv"></canvas>
+<header class="ttl"><h1>표준 <b>현장실습학기제</b></h1></header>
+<section class="col l" id="c0"><h2>공기업</h2><dl>
+  <div class="row"><dt>주인</dt><dd>정부. 법으로 지정되고 경영평가를 받음</dd></div>
+  <div class="row"><dt>뽑는 법</dt><dd>잡알리오 공고 → 블라인드 서류 → NCS 필기 → 면접</dd></div>
+  <div class="row"><dt>IT 직원의 일</dt><dd>전산 운영, 사업 관리 비중이 큼</dd></div>
+  <div class="row"><dt>근무지</dt><dd>지방 혁신도시 본사가 많음</dd></div>
+  <div class="row"><dt>돈·안정</dt><dd>정년까지 안정, 호봉 따라 오름</dd></div></dl></section>
+<section class="col r" id="c1"><h2>사기업</h2><dl>
+  <div class="row"><dt>주인</dt><dd>오너·주주</dd></div>
+  <div class="row"><dt>뽑는 법</dt><dd>회사마다. IT·게임은 코딩 테스트, 포트폴리오, 과제</dd></div>
+  <div class="row"><dt>IT 직원의 일</dt><dd>서비스를 직접 개발</dd></div>
+  <div class="row"><dt>근무지</dt><dd>IT·게임은 판교·서울에 몰려 있음</dd></div>
+  <div class="row"><dt>돈·안정</dt><dd>회사마다 차이 큼, 성과급과 이직</dd></div></dl></section>
+<p class="hint" id="hint">카드를 빛 아래로</p>
+<div id="slots"></div><div id="docks"></div>
+
+<script>
+const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const $ = id => document.getElementById(id);
+// 인턴 유형 셋: 현장실습 수첩 비교표 그대로
+const T = [
+  { n: "학교 현장실습", tag: "학점 있음", f: [["신분", "실습생(학생)"], ["학점", "있음"], ["한 달 돈", "162~194만 원 이상"], ["기간", "4주~16주"], ["지원", "학교 센터"]] },
+  { n: "공기업 체험형 청년인턴", tag: "기간제 근로자", f: [["신분", "기간제 근로자, 4대보험"], ["학점", "없음"], ["한 달 돈", "약 216~222만 원"], ["기간", "보통 6개월"], ["지원", "잡알리오·기관 홈페이지"]] },
+  { n: "채용형 인턴", tag: "정규직 입구", f: [["신분", "근로자"], ["학점", "없음"], ["한 달 돈", "기관·회사마다"], ["기간", "몇 달"], ["끝나면", "평가 통과하면 정규직"]] },
+];
+const COL = [{ rgb: [143, 212, 184], el: $("c0"), lit: 0, card: null, prev: 0 }, { rgb: [232, 220, 196], el: $("c1"), lit: 0, card: null, prev: 0 }];
+const NARROW = () => innerWidth < 700;
+// 슬롯(쉬는 자리)과 독(빛 아래 자리) 위치를 매 프레임 계산하는 데 쓰는 보이지 않는 요소
+const slots = T.map(() => { const e = document.createElement("div"); e.className = "slot"; $("slots").appendChild(e); return e; });
+const docks = COL.map(() => { const e = document.createElement("div"); e.className = "dock"; $("docks").appendChild(e); return e; });
+const cards = T.map((t, i) => {
+  const e = document.createElement("div"); e.className = "card";
+  e.innerHTML = `<div class="flip"><div class="face"><small>${t.tag}</small><h3>${t.n}</h3><span class="dot"></span></div>
+    <div class="face bk"><div class="t"><b>${t.n.replace("공기업 체험형 청년인턴", "체험형 청년인턴")}</b><i></i></div>${t.f.map(([k, v]) => `<div class="f"><em>${k}</em>${v}</div>`).join("")}</div></div>`;
+  document.body.appendChild(e);
+  return { t, e, i, x: innerWidth / 2, y: innerHeight + 300, vx: 0, vy: 0, s: .5, r: 0, mode: "home", col: -1, ft: 0, delay: 400 + i * 160 };
+});
+
+/* ───────── 빛과 먼지 (캔버스) ───────── */
+const cv = $("cv"), g = cv.getContext("2d");
+let W, H, dpr;
+function size() { dpr = Math.min(devicePixelRatio, 2); W = innerWidth; H = innerHeight; cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+size(); addEventListener("resize", size);
+const dust = COL.map(() => [...Array(70)].map(() => ({ u: Math.random(), v: Math.random(), s: .3 + Math.random() * .9, p: Math.random() * 7 })));
+const colX = k => NARROW() ? W * (k ? .75 : .25) : W * (k ? .72 : .28);
+const beamW = () => NARROW() ? W * .5 : W * .36;
+
+/* ───────── 카드 끌기·던지기 ───────── */
+let drag = null; const lerp = (a, b, t) => a + (b - a) * t;
+function zoneOf(x, y) { if (NARROW()) return y > H * .84 ? -1 : (x < W / 2 ? 0 : 1); return Math.abs(x - W / 2) < W * .1 ? -1 : (x < W / 2 ? 0 : 1); }
+function undock(c) { if (c.col >= 0) { COL[c.col].card = null; c.col = -1; c.e.classList.remove("back"); } }
+function dockTo(c, k) {
+  const old = COL[k].card; if (old && old !== c) { undock(old); old.mode = "fly"; old.ft = 0; old.vx = (k ? 1 : -1) * 3; old.vy = 14; old.x = old.x; }
+  undock(c); c.col = k; COL[k].card = c; c.mode = "dock"; c.s = 1.14; c.vy = 5; c.e.classList.add("back");
+  c.e.querySelector(".bk i").style.setProperty("--k", `rgb(${COL[k].rgb})`);
+}
+cards.forEach(c => {
+  c.e.addEventListener("pointerdown", e => {
+    c.e.setPointerCapture(e.pointerId); $("hint").style.opacity = 0; undock(c);
+    drag = { c, ox: e.clientX - c.x, oy: e.clientY - c.y, hist: [[performance.now(), e.clientX, e.clientY]], px: e.clientX, py: e.clientY };
+    c.mode = "drag"; c.e.classList.add("dragging");
+  });
+  c.e.addEventListener("pointermove", e => { if (!drag || drag.c !== c) return; drag.px = e.clientX; drag.py = e.clientY; drag.hist.push([performance.now(), e.clientX, e.clientY]); if (drag.hist.length > 6) drag.hist.shift(); });
+  const up = () => {
+    if (!drag || drag.c !== c) return;
+    const h = drag.hist, a = h[0], b = h[h.length - 1], dt = Math.max(16, b[0] - a[0]);
+    const vx = (b[1] - a[1]) / dt * 16, vy = (b[2] - a[2]) / dt * 16, sp = Math.hypot(vx, vy); drag = null; c.e.classList.remove("dragging");
+    const z = zoneOf(c.x, c.y);
+    if (sp > 18) { c.mode = "fly"; c.ft = 0; c.vx = vx * 1.1; c.vy = vy * 1.1; }   // 던지면 날아가다 멈춘 자리의 빛에 들어감
+    else if (z >= 0) dockTo(c, z); else c.mode = "home";
+  };
+  c.e.addEventListener("pointerup", up); c.e.addEventListener("pointercancel", up);
+});
+
+/* ───────── 한 프레임 ───────── */
+let last = performance.now(), t0 = last;
+function frame(now) {
+  requestAnimationFrame(frame);
+  const dt = Math.min(40, now - last) / 16.67, rd = Math.min(.3, (now - last) / 1000); last = now;
+  const nar = NARROW(), cwv = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--cw")) || 200, chv = nar ? 218 : 270, cw = nar ? 164 : 200, ch = chv;
+  // 자리 계산
+  const dr = COL.map((c, k) => { const r = c.el.getBoundingClientRect(), dl = c.el.querySelector("dl").getBoundingClientRect(); return { x: r.left + r.width / 2, y: Math.min(H - ch * (nar ? .55 : .5) - 20, dl.bottom + ch / 2 + (nar ? 16 : 24)) }; });
+  const sl = T.map((_, i) => nar ? { x: W / 2 + (i - 1) * 108, y: H - 62, s: .5 } : { x: W / 2 + (i - 1) * 108, y: H - 138 + Math.abs(i - 1) * 10, s: .6, r: (i - 1) * 7 });
+  // 카드
+  let preview = -1;
+  for (const c of cards) {
+    let tx, ty, ts = 1, tr = 0;
+    if (c.mode === "home") { const s = sl[c.i]; tx = s.x; ty = s.y; ts = s.s; tr = s.r || 0; }
+    else if (c.mode === "dock") { tx = dr[c.col].x; ty = dr[c.col].y; ts = Math.min(1, (nar ? W * .5 - 24 : W * .38 - 40) / cw); }
+    if (c.delay > 0) { c.delay -= dt * 16.67; c.x = tx ?? c.x; c.y = H + 260; }
+    c.e.style.opacity = c.delay > 0 ? 0 : 1;
+    if (c.mode === "home" || c.mode === "dock") {
+      c.vx = (c.vx + (tx - c.x) * .14 * dt) * Math.pow(.76, dt); c.vy = (c.vy + (ty - c.y) * .14 * dt) * Math.pow(.76, dt);
+      c.x += c.vx * dt; c.y += c.vy * dt; c.s += (ts - c.s) * .2 * dt; c.r += (tr + c.vx * .35 - c.r) * .2 * dt;
+    } else if (c.mode === "drag" && drag) {
+      const nx = drag.px - drag.ox, ny = drag.py - drag.oy; c.vx = (nx - c.x) * .35; c.vy = (ny - c.y) * .35; c.x += c.vx * dt; c.y += c.vy * dt;
+      c.s += (.86 - c.s) * .25 * dt; c.r += (Math.max(-20, Math.min(20, c.vx * .9)) - c.r) * .25 * dt; preview = zoneOf(c.x, c.y);
+    } else if (c.mode === "fly") {
+      c.ft += dt; c.vy += .6 * dt; c.x += c.vx * dt; c.y += c.vy * dt; c.vx *= Math.pow(.99, dt); c.s += (.8 - c.s) * .1 * dt; c.r += c.vx * .5 * dt;
+      const mx = 60, my = 80;
+      if (c.x < mx) { c.x = mx; c.vx = Math.abs(c.vx) * .7; } if (c.x > W - mx) { c.x = W - mx; c.vx = -Math.abs(c.vx) * .7; }
+      if (c.y > H - my) { c.y = H - my; c.vy = -Math.abs(c.vy) * .5; c.vx *= .88; } if (c.y < my) { c.y = my; c.vy = Math.abs(c.vy) * .6; }
+      if (c.ft > 34 || (c.ft > 10 && Math.hypot(c.vx, c.vy) < 2.2)) { const z = zoneOf(c.x, c.y); c.r = 0; if (z >= 0) dockTo(c, z); else c.mode = "home"; }
+    }
+    c.e.style.transform = `translate(${c.x - cw / 2}px,${c.y - ch / 2}px) rotate(${c.r}deg) scale(${c.s})`;
+    c.e.style.zIndex = c.mode === "drag" ? 9 : c.mode === "fly" ? 8 : 7;
+  }
+  // 빛
+  COL.forEach((c, k) => { const goal = c.card ? 1 : (preview === k ? .5 : 0); c.lit += (goal - c.lit) * (1 - Math.exp(-rd * 5)); c.el.style.setProperty("--lit", c.lit.toFixed(3)); });
+  g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+  const t = (now - t0) / 1000;
+  COL.forEach((c, k) => {
+    const cx = colX(k), bw = beamW(), a = .07 + c.lit * .22, [r, gr, b] = c.rgb;
+    // 기둥: 위 좁고 아래 넓은 사다리꼴을 겹쳐 가장자리를 부드럽게
+    for (let L = 0; L < 4; L++) {
+      const kk = 1 - L * .2, top = 14 * kk, bot = bw * kk * .9, grd = g.createLinearGradient(0, 0, 0, H);
+      grd.addColorStop(0, `rgba(${r},${gr},${b},${a * (.5 + L * .2) * 1.4})`); grd.addColorStop(.6, `rgba(${r},${gr},${b},${a * (.5 + L * .2) * .5})`); grd.addColorStop(1, `rgba(${r},${gr},${b},${a * (.5 + L * .2) * .25})`);
+      g.fillStyle = grd; g.beginPath(); g.moveTo(cx - top, 0); g.lineTo(cx + top, 0); g.lineTo(cx + bot / 2, H); g.lineTo(cx - bot / 2, H); g.closePath(); g.fill();
+    }
+    // 바닥 빛 웅덩이
+    const pg = g.createRadialGradient(cx, H - 20, 0, cx, H - 20, bw * .6); pg.addColorStop(0, `rgba(${r},${gr},${b},${.08 + c.lit * .22})`); pg.addColorStop(1, `rgba(${r},${gr},${b},0)`);
+    g.fillStyle = pg; g.save(); g.translate(0, H - 20); g.scale(1, .22); g.translate(0, -(H - 20)); g.beginPath(); g.arc(cx, H - 20, bw * .6, 0, 7); g.fill(); g.restore();
+    // 먼지
+    for (const d of dust[k]) {
+      const y = ((d.v + t * .012 * d.s) % 1) * H, half = (14 + (bw * .9 - 14) * (y / H)) / 2, x = cx + (d.u - .5) * 2 * half * .9 + Math.sin(t * .5 + d.p) * 6;
+      g.fillStyle = `rgba(${r},${gr},${b},${(.25 + .5 * Math.sin(t * .8 + d.p) ** 2) * (.25 + c.lit * .75) * .8})`; g.beginPath(); g.arc(x, y, .8 + d.s * 1.1, 0, 7); g.fill();
+    }
+    // 전등
+    g.fillStyle = `rgba(${r},${gr},${b},${.5 + c.lit * .5})`; g.fillRect(cx - 18, 0, 36, 4);
+  });
+}
+document.fonts.ready.then(() => requestAnimationFrame(frame));
+</script>
+</body>
+</html>

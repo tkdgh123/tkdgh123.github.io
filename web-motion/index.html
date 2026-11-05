@@ -162,6 +162,7 @@ b { font-weight: 700 }
 .dlink:hover { filter: brightness(1.1) }
 .dlink:focus-visible { outline: 2px solid var(--ok); outline-offset: 3px }
 /* 창업실에 적용 */
+.ch.f { --c: #8fa6ff } .ch.f .dlink { background: #8fa6ff } .ch.f .dlink:focus-visible { outline-color: #8fa6ff }
 .ch.w { --c: #f2f1ec }
 .ch.w .dlink { background: #f2f1ec }
 .ch.w .dlink:focus-visible { outline-color: #f2f1ec }
@@ -203,7 +204,7 @@ b { font-weight: 700 }
 
 <header class="hero grid">
   <h1>스크롤하면<br>움직이는 <span>사이트</span></h1>
-  <p class="lead">보내 준 릴스 세 편 속 사이트를 실제로 열어 코드까지 확인했어요. 그리고 <b>제가 만들 수 있는지는 말보다 데모로</b> — 아래에 직접 만든 세 개가 들어 있어요. 비슷한 요즘 사이트는 <a href="#more">7곳 더</a> 모아 뒀어요. 그중 창업실에 맞는 기법은 <a href="#apply">창업실 내용으로 4개</a>, 더 역동적인 것은 <a href="#dyn">6개 더</a> 만들어 봤어요.</p>
+  <p class="lead">보내 준 릴스 세 편 속 사이트를 실제로 열어 코드까지 확인했어요. 그리고 <b>제가 만들 수 있는지는 말보다 데모로</b> — 아래에 직접 만든 세 개가 들어 있어요. 비슷한 요즘 사이트는 <a href="#more">7곳 더</a> 모아 뒀어요. 그중 창업실에 맞는 기법은 <a href="#apply">창업실 내용으로 4개</a>, 더 역동적인 것은 <a href="#dyn">6개 더</a> 만들어 봤어요. 그리고 창업실 카드마다 어울리는 기법을 <a href="#fit">셋씩 골라</a> 1순위를 데모로 만들었어요.</p>
 </header>
 
 <ol class="verdict">
@@ -458,6 +459,20 @@ b { font-weight: 700 }
 </section>
 
 <!-- 도구 -->
+<section class="ch f" id="fit">
+  <div class="ch-head grid">
+    <span class="no" aria-hidden="true">27</span>
+    <div class="ttl"><p class="src mono">2026.11.06 · 카드마다 셋</p><h2>카드마다 어울리는 움직임</h2></div>
+  </div>
+  <p class="more-lead">창업실 카드 27장에 위 기법 21개를 하나씩 맞춰 보고 카드마다 <b>딱 셋</b>을 골랐어요. 1순위는 그 작품 내용으로 데모를 만들었고, 섞는 게 나을 때만 "지형 비행 70 + 흩어지는 점 30"처럼 비율을 정해 섞었어요. 어느 카드에도 안 맞은 기법은 다른 활동에 쓸 곳을 적어 뒀어요.</p>
+  <article class="site grid">
+    <a href="fit/index.html"><img src="img/fit.webp" alt="카드마다 어울리는 움직임 페이지 첫 화면" width="960" height="600" loading="lazy"></a>
+    <div class="txt"><h3><a href="fit/index.html">카드 27장 × 셋</a></h3><p class="who mono">1순위 데모 27개 · 기법별 뽑힌 횟수 · 남은 기법의 쓸 곳</p>
+      <p>게임은 세계를 보여 주고, 휠·페달 같은 실물은 돌려 보고 뜯어 보고, 코드·설정은 직접 치는 걸 보여 주도록 골랐어요. 매일 여는 도구는 가볍게, 답안·감상문은 차분하게. 이미 있던 데모(마감 깨기·작품 고리·탑)는 그 카드에 맞게 새로 다듬었어요.</p>
+      <a class="dlink" href="fit/index.html">열어 보기 →</a></div>
+  </article>
+</section>
+
 <section class="ch" id="tools">
   <div class="ch-head grid">
     <span class="no" aria-hidden="true">→</span>
