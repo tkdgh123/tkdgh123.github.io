@@ -97,34 +97,19 @@ a.copy{text-decoration:none;line-height:1}
 <dl class="sub-info">
 <dt>과제</dt><dd>프로젝트 중간 코드 확인 및 피드백 · 중간 결과물(코드) 개인별 제출</dd>
 <dt>마감</dt><dd>11월 6일(금) 오후 11:59</dd>
-<dt>파일</dt><dd><code>deolmi.c</code> 572줄 → <code>중간결과물_학번_김창식_60%.zip</code>으로 압축</dd>
+<dt>파일</dt><dd><code>deolmi.c</code> 557줄 → <code>중간결과물_학번_김창식_60%.zip</code>으로 압축</dd>
 </dl>
-<ol class="map5"><li><button type="button" data-line="29" class=mine><b>① 통신</b><span>내 담당</span><i>29줄부터</i></button></li>
-<li><button type="button" data-line="157"><b>② 화면</b><span>같이 들어감</span><i>157줄부터</i></button></li>
-<li><button type="button" data-line="216" class=mine><b>③ 중계</b><span>내 담당</span><i>216줄부터</i></button></li>
-<li><button type="button" data-line="350"><b>④ 대화</b><span>같이 들어감</span><i>350줄부터</i></button></li>
-<li><button type="button" data-line="494"><b>⑤ 실행</b><span>같이 들어감</span><i>494줄부터</i></button></li></ol></div>
+<ol class="map5"><li><button type="button" data-line="14" class=mine><b>① 통신</b><span>내 담당</span><i>14줄부터</i></button></li>
+<li><button type="button" data-line="142"><b>② 화면</b><span>같이 들어감</span><i>142줄부터</i></button></li>
+<li><button type="button" data-line="201" class=mine><b>③ 중계</b><span>내 담당</span><i>201줄부터</i></button></li>
+<li><button type="button" data-line="335"><b>④ 대화</b><span>같이 들어감</span><i>335줄부터</i></button></li>
+<li><button type="button" data-line="479"><b>⑤ 실행</b><span>같이 들어감</span><i>479줄부터</i></button></li></ol></div>
 </section>
 <main class="one">
   <section class="panel rise" id="f">
-    <div class="bar"><span class="path">deolmi.c</span><span class="role">제출할 파일 그대로</span><span class="ll">572줄</span>
+    <div class="bar"><span class="path">deolmi.c</span><span class="role">제출할 파일 그대로</span><span class="ll">557줄</span>
       <button class="copy" type="button">복사</button><a class="copy" href="deolmi.c" download>받기</a></div>
-    <pre class="codebox"><code class="language-c">/* 덜미 — 프밍기2 팀 프로젝트 메신저 (윈도우용, 암호화 전 단계라 메시지는 평문)
-
-   같은 와이파이의 노트북끼리 터미널에서 대화한다. 한 사람이 방장으로 방을 열면 방장이 서버가 되고,
-   나머지는 참가자로 방장에게 접속한다.
-
-   빌드: cl /utf-8 deolmi.c   (Visual Studio 개발자 명령 프롬프트)
-   실행: deolmi 이름 --host   방장으로 방 열기
-         deolmi 이름 주소      참가자로 들어가기 (같은 컴퓨터면 주소 생략)
-
-   기능: 전체 대화, 1:1 대화(/dm 이름, /all), 접속한 사람 보기(/who), 나가기(/quit),
-         입장·퇴장 알림, 같은 이름·이상한 이름 거절, 남의 이름 사칭 차단, 인원 제한 없음
-
-   구조: ① 통신  ② 화면  ③ 중계(방장)  ④ 대화  ⑤ 실행   — 서버 담당은 ①·③
-
-   만든 사람: 김창식(기획·결정·실행 확인), Claude(Anthropic의 AI — 코드 작성) */
-#define _CRT_SECURE_NO_WARNINGS
+    <pre class="codebox"><code class="language-c">#define _CRT_SECURE_NO_WARNINGS
 #include &lt;winsock2.h&gt;
 #include &lt;ws2tcpip.h&gt;
 #include &lt;windows.h&gt;
