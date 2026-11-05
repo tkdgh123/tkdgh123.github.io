@@ -513,7 +513,7 @@ function entrance(b, o = {}) { // o.at = 대략 위치(가장 가까운 벽), o.
   else e = E.map(e => ({ e, d: Math.min(...walkSegs.map(([a, c]) => segD(e.mx + e.ox * 6, e.mz + e.oz * 6, a, c))) - Math.min(e.L, 40) * .05 })).sort((a, c) => a.d - c.d)[0]?.e;
   if (!e) return; const t = o.at ? cl((o.at[0] - e.p[0]) * e.ux + (o.at[1] - e.p[1]) * e.uz, 4, e.L - 4) : e.L / 2;
   const x = e.p[0] + e.ux * t, z = e.p[1] + e.uz * t, y = Y(x + e.ox * 3, z + e.oz * 3), ry = Math.atan2(-e.uz, e.ux);
-  clearings.push([x + e.ox * 4, z + e.oz * 4, 5]); box(4.4, 3, .3, doorGlass, x + e.ox * .12, y + 1.5, z + e.oz * .12, ry); // 유리문
+  clearings.push([x + e.ox * 4, z + e.oz * 4, 5]); b.door = [x + e.ox * 7, z + e.oz * 7, x, z]; box(4.4, 3, .3, doorGlass, x + e.ox * .12, y + 1.5, z + e.oz * .12, ry); // 유리문
   if (!o.bare) box(6.6, .32, 2.8, MAT.white, x + e.ox * 1.4, y + 3.7, z + e.oz * 1.4, ry); // 캐노피
   if (o.cols) for (const s2 of [-2.6, 2.6]) { const c = new THREE.Mesh(new THREE.CylinderGeometry(.35, .35, 3.7, 14), MAT.white); c.position.set(x + e.ux * s2 + e.ox * 2.4, y + 1.85, z + e.uz * s2 + e.oz * 2.4); c.castShadow = true; scene.add(c); }
   if (o.sign) { const m = signMesh(o.sign, 6.4); m.position.set(x + e.ox * .2, y + 4.9, z + e.oz * .2); m.rotation.y = Math.atan2(e.ox, e.oz); } }
@@ -642,9 +642,12 @@ function showPanel() {
 }
 $("next").onclick = () => select(sel + 1); $("prev").onclick = () => select(sel - 1);
 // 걸어서: 건물 앞 땅에 내려앉아 눈높이로. WASD로 걷고 Esc로 하늘
-function walkIn() { if (sel < 0) return; const b = named[sel], dir = new V3(fly.pos.x - b.cx, 0, fly.pos.z - b.cz).normalize();
-  let d = b.size + 14, x = b.cx + dir.x * d, z = b.cz + dir.z * d; for (let k = 0; k < 12 && !free(x, z); k++) { d += 4; x = b.cx + dir.x * d; z = b.cz + dir.z * d; }
-  walk.pos.set(x, Y(x, z) + 1.7, z); walk.yaw = Math.atan2(b.cx - x, b.cz - z); walk.pitch = cl(Math.atan2(b.h * .5, d), .05, .6);
+function walkIn() { if (sel < 0) return; const b = named[sel]; let x, z, d; // 입구 앞에 내려앉음. 입구가 없으면 지금 보는 쪽 벽 바로 바깥
+  if (b.door && free(b.door[0], b.door[1])) { [x, z] = b.door; d = Math.hypot(b.door[2] - x, b.door[3] - z); }
+  else { const dir = new V3(fly.pos.x - b.cx, 0, fly.pos.z - b.cz).normalize(); d = 0; while (d < 300 && inPoly(b.cx + dir.x * d, b.cz + dir.z * d, b.pts)) d += 1;
+    d += 8; x = b.cx + dir.x * d; z = b.cz + dir.z * d; for (let k = 0; k < 15 && !free(x, z); k++) { d += 2; x = b.cx + dir.x * d; z = b.cz + dir.z * d; } }
+  const tx = b.door && x === b.door[0] ? b.door[2] : b.cx, tz = b.door && x === b.door[0] ? b.door[3] : b.cz;
+  walk.pos.set(x, Y(x, z) + 1.7, z); walk.yaw = Math.atan2(tx - x, tz - z); walk.pitch = cl(Math.atan2(b.h * .5, Math.max(d, 6)), .05, .6);
   walk.from = camera.position.clone(); walk.aim = new V3(b.cx, b.base + b.h * .5, b.cz); walk.back = { pos: fly.pos.clone(), yaw: fly.yaw, pitch: fly.pitch };
   view.mode = "walk"; view.t = performance.now(); $("panel").classList.remove("on"); hint(); }
 $("walkB").onclick = walkIn;
