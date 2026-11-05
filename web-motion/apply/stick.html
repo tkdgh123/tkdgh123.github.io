@@ -45,7 +45,7 @@ const norm = (p, q) => { const d = Math.hypot(q[0] - p[0], q[1] - p[1]) || 1; re
 
 /* ───────── 몸 ───────── */
 // 굵은 검은 선 + 얼굴 없는 동그란 머리(몸통과 살짝 떨어짐), 손발은 둥근 끝
-const LEN = { T: .33, N: .024, R: .112, UA: .2, FA: .19, TH: .25, SH: .245, W: .062 };
+const LEN = { T: .33, N: .024, R: .112, UA: .2, FA: .19, TH: .25, SH: .245, W: .062, SW: .055 };
 const BASE = { x: 0, y: 0, t: 0, h: 0, f: 0, la1: -18, la2: -8, ra1: 18, ra2: 8, ll1: -10, ll2: -4, rl1: 10, rl2: 4, rot: 0, sq: 0,
   ik: 0, ikL: 0, ikR: 0, ikf: 0, st: 0, sw: 0, pd: 26, pg: 0, row: 0, env: 1 };
 // 넘길 때: 웅크림 → 늘어나며 뜀 → 무릎 당겨 공중제비 → 펴기 → 찌그러지며 착지 → 섬
@@ -58,12 +58,15 @@ const JUMP = [[240, "io", CROUCH], [90, "o", LAUNCH], [190, "o", TUCK], [180, "l
 
 function rig(p, S, gx, gy, now) {
   const hip = [0, 0], neck = at(hip, 180 - p.t, LEN.T), head = at(neck, 180 - p.t - p.h, LEN.N + LEN.R), sh = at(neck, -p.t, .035);
-  const eL = at(sh, p.la1, LEN.UA), hL = at(eL, p.la2, LEN.FA), eR = at(sh, p.ra1, LEN.UA), hR = at(eR, p.ra2, LEN.FA);
+  // 어깨: 앞모습이면 몸통 양옆(어깨 폭), 옆모습이면 몸통 선의 앞·뒤 가장자리(오른팔이 바라보는 쪽)
+  const o = LEN.SW * (1 - Math.abs(p.f)) + LEN.W / 2 * p.f, ct = Math.cos(p.t * D), st = Math.sin(p.t * D);
+  const shR = [sh[0] + ct * o, sh[1] + st * o], shL = [sh[0] - ct * o, sh[1] - st * o];
+  const eL = at(shL, p.la1, LEN.UA), hL = at(eL, p.la2, LEN.FA), eR = at(shR, p.ra1, LEN.UA), hR = at(eR, p.ra2, LEN.FA);
   const kL = at(hip, p.ll1, LEN.TH), fL = at(kL, p.ll2, LEN.SH), kR = at(hip, p.rl1, LEN.TH), fR = at(kR, p.rl2, LEN.SH);
   const low = Math.max(fL[1], fR[1], kL[1], kR[1]) + LEN.W / 2;
   const ox = gx + p.x * S, oy = gy - low * S + p.y * S, px = q => [ox + q[0] * S, oy + q[1] * S];
   const th = (p.t + p.h) * D;
-  return { p, S, gx, gy, now, hip: px(hip), neck: px(neck), head: px(head), sh: px(sh), eL: px(eL), hL: px(hL), eR: px(eR), hR: px(hR),
+  return { p, S, gx, gy, now, hip: px(hip), neck: px(neck), head: px(head), sh: px(sh), shL: px(shL), shR: px(shR), eL: px(eL), hL: px(hL), eR: px(eR), hR: px(hR),
     kL: px(kL), fL: px(fL), kR: px(kR), fR: px(fR), R: LEN.R * S, lw: S * LEN.W, ol: Math.max(1.3, S * .0085),
     ct: Math.cos(p.t * D), st: Math.sin(p.t * D), hc: Math.cos(th), hs: Math.sin(th) };
 }
@@ -80,7 +83,7 @@ function solve(a, b, l1, l2, bend) {
 // 팔·다리 끝을 목표에 붙임(w만큼 섞음)
 function reach(r, limb, target, w, bend) {
   if (w <= 0) return;
-  const [root, j, e, l1, l2] = { L: ["sh", "eL", "hL", LEN.UA, LEN.FA], R: ["sh", "eR", "hR", LEN.UA, LEN.FA], fL: ["hip", "kL", "fL", LEN.TH, LEN.SH], fR: ["hip", "kR", "fR", LEN.TH, LEN.SH] }[limb];
+  const [root, j, e, l1, l2] = { L: ["shL", "eL", "hL", LEN.UA, LEN.FA], R: ["shR", "eR", "hR", LEN.UA, LEN.FA], fL: ["hip", "kL", "fL", LEN.TH, LEN.SH], fR: ["hip", "kR", "fR", LEN.TH, LEN.SH] }[limb];
   const [J, X] = solve(r[root], target, l1 * r.S, l2 * r.S, bend);
   r[j] = L2(r[j], J, w); r[e] = L2(r[e], X, w);
 }
@@ -104,7 +107,7 @@ function smooth(g, pts, close) { // 점들을 부드러운 곡선으로
 const top = (r, c, len = .34, w0 = .088, w1 = .1) => [T(r, -w0, -.012), T(r, w0, -.012), T(r, w1, len), T(r, -w1, len)];
 // 옷은 굵은 팔다리보다 조금 더 두껍게
 const CW = LEN.W + .016; // 소매·바지 굵기
-function sleeves(g, r, c, k = .82) { const w = CW * r.S; band(g, r, [r.sh, r.eL, L2(r.eL, r.hL, k)], w, c); band(g, r, [r.sh, r.eR, L2(r.eR, r.hR, k)], w, c); }
+function sleeves(g, r, c, k = .82) { const w = CW * r.S; band(g, r, [r.shL, r.eL, L2(r.eL, r.hL, k)], w, c); band(g, r, [r.shR, r.eR, L2(r.eR, r.hR, k)], w, c); }
 function pants(g, r, c, k = .9) { const w = CW * r.S; band(g, r, [r.hip, r.kL, L2(r.kL, r.fL, k)], w, c); band(g, r, [r.hip, r.kR, L2(r.kR, r.fR, k)], w, c); }
 function heart(g, x, y, s, c) { g.beginPath(); g.moveTo(x, y + s * .35); g.bezierCurveTo(x - s * .9, y - s * .3, x - s * .35, y - s * .95, x, y - s * .42); g.bezierCurveTo(x + s * .35, y - s * .95, x + s * .9, y - s * .3, x, y + s * .35); g.fillStyle = c; g.fill(); }
 
@@ -112,7 +115,7 @@ function drawBody(g, r, col = INK, w = r.lw) {
   g.strokeStyle = col; g.lineWidth = w; g.lineCap = g.lineJoin = "round";
   path(g, [r.fL, r.kL, r.hip, r.kR, r.fR]); g.stroke();
   path(g, [r.hip, r.neck]); g.stroke();
-  path(g, [r.hL, r.eL, r.sh, r.eR, r.hR]); g.stroke();
+  path(g, [r.hL, r.eL, r.shL, r.shR, r.eR, r.hR]); g.stroke();
 }
 const drawHead = (g, r) => dot(g, r.head, r.R, INK);
 
@@ -220,9 +223,9 @@ const C = [
   items: [
     { at: "hip", on: "wipe", layer: "front", draw(g, r) { // 마네킹 몸
       const w = .08 * r.S, c = "#e6e3db";
-      for (const seg of [[r.fL, r.kL, r.hip], [r.hip, r.kR, r.fR], [r.hL, r.eL, r.sh, r.eR, r.hR]]) band(g, r, seg, w, c);
+      for (const seg of [[r.fL, r.kL, r.hip], [r.hip, r.kR, r.fR], [r.hL, r.eL, r.shL, r.shR, r.eR, r.hR]]) band(g, r, seg, w, c);
       band(g, r, [r.hip, L2(r.hip, r.neck, .55), r.neck], .1 * r.S, c);
-      for (const j of [r.kL, r.kR, r.eL, r.eR, r.hip, r.sh]) dot(g, j, .028 * r.S, "#ff6a1a", r.ol);
+      for (const j of [r.kL, r.kR, r.eL, r.eR, r.hip, r.shL, r.shR]) dot(g, j, .028 * r.S, "#ff6a1a", r.ol);
     } },
     { at: "head", on: "drop", layer: "head", draw(g, r) { g.beginPath(); g.ellipse(r.head[0], r.head[1] - r.R * .05, r.R * 1.0, r.R * 1.14, (r.p.t + r.p.h) * D, 0, 7); g.fillStyle = "#e6e3db"; g.fill(); g.lineWidth = r.ol; g.strokeStyle = INK; g.stroke(); } },
   ],
@@ -246,11 +249,13 @@ const C = [
   },
   on: { land(r) { for (const s of [-1, 1]) for (let i = 0; i < 4; i++) spark(r.gx + s * .12 * r.S, r.gy, { vx: s * rnd(.3, .9) * r.S, vy: -rnd(.05, .3) * r.S, life: .55, draw(g, p) { g.globalAlpha *= (1 - p.age / p.life) * .5; dot(g, [p.x, p.y], r.S * (.015 + p.age * .05), "#c9c6bc"); } }); } } },
 
-{ t: "프로그래밍기초 복습 노트", base: { f: 1, t: 8, ik: 1, ll1: 82, ll2: -72, rl1: 86, rl2: -80 },
+{ t: "프로그래밍기초 복습 노트", base: { f: 1, x: -.2, t: 10, ik: 1, ll1: 84, ll2: -2, rl1: 88, rl2: 3 },
+  // 의자에 앉아 책상 위 노트북(화면 90°)으로 타자. 가구는 땅 기준이라 몸이 움직여도 제자리
+  desk(r) { const S = r.S, X = r.gx + r.p.x * S, top = r.gy - .44 * S; return { S, X, top, kb: top - .026 * S, lid: X + .5 * S }; },
   post(r) {
-    const S = r.S, j = Math.sin(r.now / 42) * .008 * S, k = Math.cos(r.now / 37) * .008 * S;
-    reach(r, "R", [r.hip[0] + .2 * S, r.hip[1] - .05 * S + j], r.p.ik, 1);
-    reach(r, "L", [r.hip[0] + .15 * S, r.hip[1] - .045 * S + k], r.p.ik, 1);
+    const { S, X, kb } = this.desk(r), j = Math.sin(r.now / 42) * .008 * S, k = Math.cos(r.now / 37) * .008 * S;
+    reach(r, "R", [X + .37 * S, kb + j], r.p.ik, 1);
+    reach(r, "L", [X + .31 * S, kb + k], r.p.ik, 1);
   },
   items: [
     { at: "neck", on: "wipe", layer: "front", draw(g, r) { // 후드티
@@ -259,19 +264,24 @@ const C = [
       band(g, r, [T(r, .01, .01), T(r, .02, .09)], .008 * r.S, PAPER, false);
       sleeves(g, r, c, .9);
     } },
-    { at: "head", on: "drop", layer: "head", draw(g, r) { // 안경
-      const f = r.p.f, sep = .36 * (1 - .55 * Math.abs(f)), cx = .3 * f;
-      g.lineWidth = r.ol * 1.4; g.strokeStyle = PAPER;
-      for (const s of [-1, 1]) { const e = H(r, cx + s * sep / 2, -.05); g.beginPath(); g.arc(e[0], e[1], r.R * .2, 0, 7); g.stroke(); }
-      path(g, [H(r, cx - sep / 2 - .2, -.08), H(r, cx - sep / 2 - .55 * Math.sign(f || 1), -.12)]); g.stroke();
+    { at: "head", on: "drop", layer: "head", draw(g, r) { // 안경(옆모습: 앞쪽 알 하나 + 귀로 가는 다리)
+      const a = (r.p.t + r.p.h) * D, e = H(r, .72, -.1, 1);
+      g.strokeStyle = "#8d929c"; g.lineWidth = r.ol * 1.3; g.lineCap = "round"; path(g, [e, H(r, -.15, -.18, 1)]); g.stroke();
+      g.beginPath(); g.ellipse(e[0], e[1], r.R * .3, r.R * .24, a, 0, 7); g.fillStyle = "rgba(205,226,255,.9)"; g.fill(); g.lineWidth = r.ol * 1.4; g.strokeStyle = INK; g.stroke();
     } },
-    { at: "hip", on: "toss", layer: "hand", draw(g, r) { // 노트북(무릎 위)
-      const S = r.S, b0 = [r.hip[0] + .04 * S, r.hip[1] - .02 * S], b1 = [r.hip[0] + .36 * S, r.hip[1] + .005 * S], l1 = [r.hip[0] + .28 * S, r.hip[1] - .25 * S];
-      shape(g, r, [b0, b1, [b1[0], b1[1] + .018 * S], [b0[0], b0[1] + .018 * S]], "#9aa0aa");
-      shape(g, r, [b1, l1, [l1[0] + .022 * S, l1[1] - .004 * S], [b1[0] + .02 * S, b1[1]]], "#9aa0aa");
-      const sc = [L2(b1, l1, .1), L2(b1, l1, .92)];
-      band(g, r, sc, .012 * S, "#1e2230", false);
-      g.lineWidth = .006 * S; ["#7fb0ff", "#ffd27f", "#9fe0a8", "#7fb0ff"].forEach((c, i) => { g.strokeStyle = c; const p = L2(sc[0], sc[1], .15 + i * .2); path(g, [[p[0] - .004 * S, p[1]], [p[0] - .004 * S + .002 * S, p[1] - .03 * S]]); });
+    { at: "gnd", on: "pop", layer: "back", draw(g, r) { // 의자
+      const { S, X } = this.desk(r), seat = r.gy - .27 * S, x0 = X - .14 * S, x1 = X + .1 * S, c = "#8a6a4a";
+      band(g, r, [[x0 + .015 * S, seat - .34 * S], [x0 + .015 * S, r.gy]], .024 * S, c);
+      band(g, r, [[x1 - .015 * S, seat], [x1 - .015 * S, r.gy]], .02 * S, c);
+      shape(g, r, [[x0, seat], [x1, seat], [x1, seat + .028 * S], [x0, seat + .028 * S]], c);
+    } },
+    { at: "gnd", on: "drop", layer: "back", draw(g, r) { // 책상 + 노트북
+      const { S, X, top, lid } = this.desk(r), c = "#c9a77c";
+      for (const x of [.36, .66]) band(g, r, [[X + x * S, top], [X + x * S, r.gy]], .022 * S, c);
+      shape(g, r, [[X + .17 * S, top], [X + .72 * S, top], [X + .72 * S, top + .03 * S], [X + .17 * S, top + .03 * S]], c);
+      shape(g, r, [[X + .26 * S, top - .016 * S], [lid + .018 * S, top - .016 * S], [lid + .018 * S, top], [X + .26 * S, top]], "#9aa0aa");
+      shape(g, r, [[lid, top - .016 * S], [lid + .018 * S, top - .016 * S], [lid + .018 * S, top - .24 * S], [lid, top - .24 * S]], "#9aa0aa");
+      band(g, r, [[lid - .004 * S, top - .03 * S], [lid - .004 * S, top - .225 * S]], .007 * S, "#7fb0ff", false);
     } },
   ],
   keys: [
@@ -284,7 +294,8 @@ const C = [
   fx(g, r, tl, a) {
     if (tl < 2000 && Math.random() < .045) {
       const s = r.S, w = ["{", "}", ";", "int", "for", "printf", "0x1F", "&&", "++", "*p"][Math.random() * 10 | 0];
-      spark(r.hip[0] + rnd(.25, .38) * s, r.hip[1] - rnd(.18, .26) * s, { vx: rnd(.12, .3) * s, vy: -rnd(.28, .45) * s, life: 1.5, w,
+      const { X, top } = this.desk(r);
+      spark(X + .5 * s, top - rnd(.2, .26) * s, { vx: rnd(.12, .3) * s, vy: -rnd(.28, .45) * s, life: 1.5, w,
         draw(g, p) { g.globalAlpha *= Math.sin(Math.PI * p.age / p.life) * .9; g.fillStyle = p.w.length > 2 ? "#2b44a6" : INK; g.font = `500 ${Math.max(12, .055 * s)}px "IBM Plex Mono", monospace`; g.fillText(p.w, p.x, p.y); } });
     }
   },
@@ -293,17 +304,17 @@ const C = [
     dot(g, [p.x, p.y], .07 * s * sc, "#2b44a6"); g.strokeStyle = "#fff"; g.lineWidth = .014 * s * sc; g.lineCap = g.lineJoin = "round";
     path(g, [[p.x - .03 * s * sc, p.y], [p.x - .008 * s * sc, p.y + .022 * s * sc], [p.x + .033 * s * sc, p.y - .022 * s * sc]]); g.stroke(); } }); } } },
 
-{ t: "인공지능 입문 복습 노트", base: { f: 1 },
-  nodes: [[.62, -1.02], [.42, -.68], [.84, -.68], [.32, -.34], [.52, -.34], [.74, -.34], [.94, -.34]],
+{ t: "인공지능 입문 복습 노트", base: { f: 1, x: -.32 },
+  nodes: [[.92, -1.02], [.72, -.68], [1.14, -.68], [.62, -.34], [.82, -.34], [1.04, -.34], [1.24, -.34]],
   edges: [[0, 1], [0, 2], [1, 3], [1, 4], [2, 5], [2, 6]],
   visit: [[1000, 0], [1400, 1], [1800, 3], [2200, 4], [2600, 2], [3000, 5]],
-  pos(r, i) { const n = this.nodes[i]; return [r.gx + n[0] * r.S, r.gy + n[1] * r.S]; },
+  pos(r, i) { const n = this.nodes[i]; return [r.gx + (n[0] + r.p.x) * r.S, r.gy + n[1] * r.S]; },
   post(r, tl) {
     const v = this.visit; let k = 0; while (k < v.length - 1 && tl > v[k + 1][0]) k++;
     const u = k < v.length - 1 ? E.io(cl((tl - v[k + 1][0] + 260) / 260)) : 0;
     const tg = L2(this.pos(r, v[k][1]), this.pos(r, v[Math.min(k + 1, v.length - 1)][1]), u);
-    const d = norm(r.sh, tg), L = (LEN.UA + LEN.FA) * r.S * .97;
-    reach(r, "R", [r.sh[0] + d[0] * L, r.sh[1] + d[1] * L], r.p.ik, -1);
+    const d = norm(r.shR, tg), L = (LEN.UA + LEN.FA) * r.S * .97;
+    reach(r, "R", [r.shR[0] + d[0] * L, r.shR[1] + d[1] * L], r.p.ik, -1);
     r.glow = cl((tl - 3000) / 200) * cl((4500 - tl) / 300);
   },
   items: [
@@ -342,12 +353,12 @@ const C = [
     g.restore();
   } },
 
-{ t: "LMS 할 일·알림", base: { f: 1, ikL: 1 },
-  board(r) { return [r.hL[0] + .03 * r.S, r.hL[1] - .06 * r.S]; },
+{ t: "LMS 할 일·알림", base: { f: 0, ikL: 1 },
+  board(r) { return [r.hL[0] + .075 * r.S, r.hL[1] - .05 * r.S]; }, // 왼손이 판 왼쪽 가장자리를 잡음
   post(r, tl) {
-    const S = r.S; reach(r, "L", T(r, .27, .2), r.p.ikL, -1);
+    const S = r.S; reach(r, "L", [r.neck[0] - .05 * S, r.neck[1] + .25 * S], r.p.ikL, 1);
     const b = this.board(r), row = r.p.row, box = [b[0] - .04 * S, b[1] - .05 * S + row * .055 * S];
-    const u = norm(r.sh, box); reach(r, "R", [box[0] - u[0] * .19 * S, box[1] - u[1] * .19 * S], r.p.ikR, -1);
+    const u = norm(r.shR, box); reach(r, "R", [box[0] - u[0] * .19 * S, box[1] - u[1] * .19 * S], r.p.ikR, -1);
     r.checks = this.checks; r.ring = r.now - (this.ringAt || -1e9) < 900 ? 1 : 0;
   },
   checks: 0,
@@ -367,7 +378,7 @@ const C = [
       if (r.ring) { g.strokeStyle = INK; g.lineWidth = r.ol * 1.3; for (const s of [-1, 1]) for (let i = 0; i < 3; i++) { const a = -Math.PI / 2 + s * (.5 + i * .3); path(g, [[c[0] + Math.cos(a) * .15 * S, c[1] - .06 * S + Math.sin(a) * .15 * S], [c[0] + Math.cos(a) * .2 * S, c[1] - .06 * S + Math.sin(a) * .2 * S]]); g.stroke(); } }
     } },
     { at: "hL", on: "toss", layer: "hand", draw(g, r) { // 할 일 판
-      const S = r.S, b = [r.hL[0] + .03 * S, r.hL[1] - .06 * S];
+      const S = r.S, b = this.board(r);
       g.beginPath(); g.roundRect(b[0] - .085 * S, b[1] - .12 * S, .17 * S, .23 * S, .012 * S); g.fillStyle = "#b0875a"; g.fill(); g.lineWidth = r.ol; g.strokeStyle = INK; g.stroke();
       g.fillStyle = PAPER; g.fillRect(b[0] - .07 * S, b[1] - .095 * S, .14 * S, .19 * S); g.strokeRect(b[0] - .07 * S, b[1] - .095 * S, .14 * S, .19 * S);
       for (let i = 0; i < 3; i++) { const y = b[1] - .05 * S + i * .055 * S; g.strokeRect(b[0] - .055 * S, y - .015 * S, .03 * S, .03 * S);
@@ -380,15 +391,15 @@ const C = [
         g.fillStyle = "#f4a6b8"; g.fillRect(-.065 * S, -.014 * S, .025 * S, .028 * S); g.strokeRect(-.065 * S, -.014 * S, .025 * S, .028 * S); dot(g, [.195 * S, 0], .005 * S, INK); }); } },
   ],
   keys: [
-    [600, "io", { ikL: 1, ikR: 0, h: 10, ra1: 32, ra2: 64, ll1: -14, ll2: -6, rl1: 16, rl2: 6 }, "reset"],
-    [500, "io", { ikL: 1, ikR: 0, h: 12, ra1: 30, ra2: 60, ll1: -14, ll2: -6, rl1: 16, rl2: 6 }, "ring"],
-    [150, "o", { y: -.16, ikL: 1, t: -10, h: -10, ra1: 155, ra2: 172, ll1: -24, ll2: -40, rl1: 30, rl2: -12 }],
-    [260, "i", { y: 0, ikL: 1, t: 4, ra1: 70, ra2: 100, ll1: -26, ll2: 6, rl1: 30, rl2: -6 }],
-    [380, "io", { ikL: 1, ikR: 1, row: 0, h: 10, ll1: -14, ll2: -6, rl1: 16, rl2: 6 }, "tick"],
-    [320, "io", { ikL: 1, ikR: 1, row: 1, h: 10, ll1: -14, ll2: -6, rl1: 16, rl2: 6 }, "tick"],
-    [320, "io", { ikL: 1, ikR: 1, row: 2, h: 10, ll1: -14, ll2: -6, rl1: 16, rl2: 6 }, "tick"],
-    [260, "o", { ikL: 1, ikR: 0, t: -6, h: -6, ra1: 158, ra2: 172, ll1: -14, ll2: -6, rl1: 16, rl2: 6 }],
-    [860, "io", { ikL: 1, ikR: 0, t: -5, h: -4, ra1: 152, ra2: 166, ll1: -14, ll2: -6, rl1: 16, rl2: 6 }],
+    [600, "io", { ikL: 1, ikR: 0, h: 4, ra1: 22, ra2: 10 }, "reset"],
+    [500, "io", { ikL: 1, ikR: 0, h: 6, ra1: 20, ra2: 8 }, "ring"],
+    [150, "o", { y: -.16, ikL: 1, h: -4, ra1: 150, ra2: 165, ll1: -35, ll2: 10, rl1: 35, rl2: -10 }],
+    [260, "i", { y: 0, ikL: 1, h: 0, ra1: 60, ra2: 30, ll1: -24, ll2: 4, rl1: 24, rl2: -4 }],
+    [380, "io", { ikL: 1, ikR: 1, row: 0, h: 6 }, "tick"],
+    [320, "io", { ikL: 1, ikR: 1, row: 1, h: 6 }, "tick"],
+    [320, "io", { ikL: 1, ikR: 1, row: 2, h: 6 }, "tick"],
+    [260, "o", { ikL: 1, ikR: 0, h: -4, ra1: 155, ra2: 170 }],
+    [860, "io", { ikL: 1, ikR: 0, h: -2, ra1: 150, ra2: 165 }],
   ],
   on: { reset() { this.checks = 0; }, ring() { this.ringAt = performance.now(); }, tick(r) { this.checks = Math.min(3, this.checks + 1); } } },
 
@@ -521,8 +532,8 @@ const C = [
     for (let i = 0; i < 6; i++) spark(r.gx + rnd(-.3, .3) * r.S, r.neck[1] + rnd(-.1, .1) * r.S, { vx: rnd(-.1, .1) * r.S, vy: -rnd(.25, .45) * r.S, life: rnd(1, 1.6), ph: rnd(0, 6), c: i % 2 ? "#f2a5b5" : "#c7b4e8",
       draw(g, p) { g.globalAlpha *= Math.sin(Math.PI * p.age / p.life); heart(g, p.x + Math.sin(p.age * 5 + p.ph) * .03 * r.S, p.y, .05 * r.S, p.c); } }); } } },
 
-{ t: "레이싱 휠", base: { f: 0, ik: 1, y: .2, ll1: -34, ll2: 20, rl1: 34, rl2: -20 },
-  post(r) { const S = r.S, c = T(r, 0, .25), a = r.p.st * D, R = .13 * S; r.wheel = c;
+{ t: "레이싱 휠", base: { f: 0, ik: 1, y: -.08, ll1: -95, ll2: 80, rl1: 95, rl2: -80 }, // 다리는 접어 차체 뒤에
+  post(r) { const S = r.S, c = T(r, 0, .12), a = r.p.st * D, R = .13 * S; r.wheel = c;
     reach(r, "L", [c[0] - Math.cos(a) * R, c[1] - Math.sin(a) * R], r.p.ik, -1); reach(r, "R", [c[0] + Math.cos(a) * R, c[1] + Math.sin(a) * R], r.p.ik, 1); },
   items: [
     { at: "neck", on: "wipe", layer: "front", draw(g, r) { shape(g, r, top(r, 0, .34, .092, .104), "#d6332c"); for (const s of [-1, 1]) band(g, r, [T(r, s * .03, -.005), T(r, s * .03, .33)], .014 * r.S, PAPER, false); sleeves(g, r, "#d6332c", .86); dot(g, r.hL, .028 * r.S, INK); dot(g, r.hR, .028 * r.S, INK); } },
@@ -544,7 +555,7 @@ const C = [
       g.strokeStyle = "rgba(255,255,255,.7)"; g.lineWidth = r.R * .08; path(g, [[r.R * .2, -r.R * .3], [r.R * .5, r.R * .04]]); g.stroke(); g.restore();
     } },
     { at: "neck", on: "toss", layer: "hand", draw(g, r) { // 핸들
-      const c = r.wheel || T(r, 0, .25), R = .13 * r.S, a = r.p.st * D;
+      const c = r.wheel || T(r, 0, .12), R = .13 * r.S, a = r.p.st * D;
       g.save(); g.translate(c[0], c[1]); g.rotate(a);
       g.beginPath(); g.arc(0, 0, R, 0, 7); g.lineWidth = .026 * r.S + r.ol * 2; g.strokeStyle = INK; g.stroke(); g.lineWidth = .026 * r.S; g.strokeStyle = "#2a2d35"; g.stroke();
       for (const b of [-Math.PI / 2 + Math.PI, 0, Math.PI]) { path(g, [[0, 0], [Math.cos(b) * R, Math.sin(b) * R]]); g.lineWidth = .016 * r.S; g.strokeStyle = "#2a2d35"; g.stroke(); }
@@ -552,13 +563,13 @@ const C = [
     } },
   ],
   keys: [
-    [520, "io", { ik: 1, st: -55, t: -8, h: -4, y: 0 }],
+    [520, "io", { ik: 1, st: -55, t: -8, h: -4, y: -.08 }],
     [420, "io", { ik: 1, st: -55, t: -8, h: -4 }],
     [620, "io", { ik: 1, st: 50, t: 8, h: 4 }],
     [420, "io", { ik: 1, st: 50, t: 8, h: 4 }],
     [420, "io", { ik: 1, st: 0, t: 0, h: 0 }],
-    [140, "o", { ik: 1, st: 4, y: -.035 }],
-    [180, "i", { ik: 1, st: 0, y: 0 }],
+    [140, "o", { ik: 1, st: 4, y: -.115 }],
+    [180, "i", { ik: 1, st: 0, y: -.08 }],
     [300, "io", { ik: 1, st: -6 }],
   ],
   fxBack(g, r, tl, a) { // 앞으로 달리는 속도선
@@ -575,7 +586,7 @@ const C = [
   pedal(r) { const S = r.S, gx = r.gx + .38 * S, hinge = [gx - .12 * S, r.gy - .035 * S], a = r.p.pd * D, end = [hinge[0] + Math.cos(a) * .3 * S, hinge[1] - Math.sin(a) * .3 * S]; return { gx, hinge, end, a }; },
   post(r) {
     const S = r.S, P = this.pedal(r);
-    if (r.p.ikh > 0) { const bolt = L2(P.hinge, P.end, .45), sp = r.now / 120, h = [bolt[0] + Math.cos(sp) * .025 * S, bolt[1] + Math.sin(sp) * .025 * S], u = norm(r.sh, h); reach(r, "R", [h[0] - u[0] * .17 * S, h[1] - u[1] * .17 * S], r.p.ikh, 1); r.bolt = bolt; }
+    if (r.p.ikh > 0) { const bolt = L2(P.hinge, P.end, .45), sp = r.now / 120, h = [bolt[0] + Math.cos(sp) * .025 * S, bolt[1] + Math.sin(sp) * .025 * S], u = norm(r.shR, h); reach(r, "R", [h[0] - u[0] * .17 * S, h[1] - u[1] * .17 * S], r.p.ikh, 1); r.bolt = bolt; }
     if (r.p.ikf > 0) { const foot = L2(P.hinge, P.end, .62); reach(r, "fR", [foot[0], foot[1] - .022 * S], r.p.ikf, -1); }
   },
   items: [
