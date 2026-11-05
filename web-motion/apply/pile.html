@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>한 학기 쌓기 · 작업실 적용 3</title>
+<title>한 학기 쌓기 · 창업실 적용 3</title>
 <link rel="stylesheet" href="apply.css">
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
 <style>
-/* 스크롤 카메라(Quai·데모 C)를 작업실 git 기록으로: 저장 한 번 = 종이 한 장, 날마다 쌓이는 더미 위를 지나감 */
+/* 스크롤 카메라(Quai·데모 C)를 창업실 git 기록으로: 저장 한 번 = 종이 한 장, 날마다 쌓이는 더미 위를 지나감 */
 body { height: 900svh }
 canvas.bg { z-index: 0 }
 .day { position: fixed; z-index: 2; left: var(--m); top: clamp(84px, 13vh, 130px); max-width: min(760px, calc(100vw - 2 * var(--m))); pointer-events: none; transition: top .5s var(--ease), bottom .5s var(--ease) }
@@ -54,19 +54,19 @@ canvas.bg.pick { cursor: pointer }
 </style>
 </head>
 <body>
-<nav class="top mono"><a href="../#apply">← 움직이는 웹사이트</a><span class="right"><a href="dots.html">← 이전</a><span>작업실 적용 3 / 4 · 한 학기 쌓기</span><a href="stick.html">다음 →</a></span></nav>
+<nav class="top mono"><a href="../#apply">← 움직이는 웹사이트</a><span class="right"><a href="dots.html">← 이전</a><span>창업실 적용 3 / 4 · 한 학기 쌓기</span><a href="stick.html">다음 →</a></span></nav>
 <canvas class="bg" id="cv"></canvas>
 <div id="lbls"></div>
-<div class="hero" id="hero"><h1>한 학기를<br><b>쌓아</b> 보면</h1><p class="mono">작업실에 저장한 기록 한 번 = 종이 한 장 · 내려 보세요</p></div>
+<div class="hero" id="hero"><h1>한 학기를<br><b>쌓아</b> 보면</h1><p class="mono">창업실에 저장한 기록 한 번 = 종이 한 장 · 내려 보세요</p></div>
 <div class="day" id="dayBox"><div class="fade out" id="day"></div></div>
 <div class="key mono" id="key"></div>
-<div class="end" id="end"><h2 id="endT"></h2><a class="go" href="../../">작업실로 →</a></div>
+<div class="end" id="end"><h2 id="endT"></h2><a class="go" href="../../">창업실로 →</a></div>
 
 <script type="module">
 import * as THREE from "three";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { DAYS } from "./pile-data.js";
-const KIND = { s: ["공부", 0xfbfaf5], p: ["프로젝트", 0x2b44a6], g: ["게임", 0x1d1e21], e: ["작업실·기타", 0xcfcabb] };
+const KIND = { s: ["공부", 0xfbfaf5], p: ["프로젝트", 0x2b44a6], g: ["게임", 0x1d1e21], e: ["창업실·기타", 0xcfcabb] };
 const $ = id => document.getElementById(id);
 $("key").innerHTML = "spge".split("").map(k => `<span><i style="background:#${KIND[k][1].toString(16).padStart(6, "0")}"></i>${KIND[k][0]}</span>`).join("");
 
