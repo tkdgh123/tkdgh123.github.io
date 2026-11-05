@@ -104,11 +104,35 @@ function smooth(g, pts, close) { // 점들을 부드러운 곡선으로
   for (let i = 1; i < (close ? n + 1 : n - 1); i++) { const a = pts[i % n], b = pts[(i + 1) % n]; g.quadraticCurveTo(a[0], a[1], (a[0] + b[0]) / 2, (a[1] + b[1]) / 2); }
   if (close) g.closePath(); else g.lineTo(pts[n - 1][0], pts[n - 1][1]);
 }
-const top = (r, c, len = .34, w0 = .088, w1 = .1) => [T(r, -w0, -.012), T(r, w0, -.012), T(r, w1, len), T(r, -w1, len)];
+const top = (r, c, len = .34, w0 = .088, w1 = .1) => [T(r, -w0 * .55, -.03), T(r, -w0, .03), T(r, -w1, len), T(r, w1, len), T(r, w0, .03), T(r, w0 * .55, -.03)];
 // 옷은 굵은 팔다리보다 조금 더 두껍게
 const CW = LEN.W + .016; // 소매·바지 굵기
-function sleeves(g, r, c, k = .82) { const w = CW * r.S; band(g, r, [r.shL, r.eL, L2(r.eL, r.hL, k)], w, c); band(g, r, [r.shR, r.eR, L2(r.eR, r.hR, k)], w, c); }
-function pants(g, r, c, k = .9) { const w = CW * r.S; band(g, r, [r.hip, r.kL, L2(r.kL, r.fL, k)], w, c); band(g, r, [r.hip, r.kR, L2(r.kR, r.fR, k)], w, c); }
+const dark = (c, k = .8) => "#" + c.slice(1).match(/../g).map(h => Math.round(parseInt(h, 16) * k).toString(16).padStart(2, "0")).join("");
+const far = r => Math.abs(r.p.f) > .5; // 옆모습이면 왼팔·왼다리가 먼 쪽
+function limb(g, r, a, j, b, k, c, dim, cuff) { // 소매·바짓가랑이(먼 쪽은 어둡게) + 굽은 관절 안쪽 주름
+  const w = CW * r.S, e = L2(j, b, k), col = dim ? dark(c) : c;
+  band(g, r, [a, j, e], w, col);
+  if (cuff) band(g, r, [L2(j, b, k - cuff.s), e], w, dim ? dark(cuff.c) : cuff.c);
+  const u = norm(j, a), v = norm(j, b), m = [u[0] + v[0], u[1] + v[1]], n = Math.hypot(m[0], m[1]);
+  if (n > .5) { const d = [m[0] / n, m[1] / n]; g.strokeStyle = dark(col, .72); g.lineWidth = r.ol; g.lineCap = "round"; path(g, [[j[0] + d[0] * w * .5, j[1] + d[1] * w * .5], [j[0] + d[0] * w * .05, j[1] + d[1] * w * .05]]); g.stroke(); }
+}
+// side: "back" = 먼 쪽 소매만(몸통 옷보다 먼저), "front" = 나머지
+function sleeves(g, r, c, k = .82, side, cuff) {
+  const d = far(r);
+  if (side === "back") { if (d) limb(g, r, r.shL, r.eL, r.hL, k, c, true, cuff); return; }
+  if (!d) limb(g, r, r.shL, r.eL, r.hL, k, c, false, cuff);
+  limb(g, r, r.shR, r.eR, r.hR, k, c, false, cuff);
+  // 어깨 이음새는 몸통 옷 뒤로: 어깨 둘레만 몸통 옷을 다시 덮음
+  if (!r.top) return;
+  for (const q of d ? [r.shR] : [r.shL, r.shR]) { g.save(); g.beginPath(); g.arc(q[0], q[1], CW * r.S * .95, 0, 7); g.clip(); torso(g, r, ...r.top); g.restore(); }
+}
+function pants(g, r, c, k = .9, cuff) { limb(g, r, r.hip, r.kL, r.fL, k, c, far(r), cuff); limb(g, r, r.hip, r.kR, r.fR, k, c, false, cuff); }
+function torso(g, r, pts, c) { // 몸통 옷: 옆모습이면 등 쪽 그늘
+  r.top = [pts, c]; shape(g, r, pts, c); if (!far(r)) return;
+  const s = r.p.f > 0 ? -1 : 1; g.save(); path(g, pts, 1); g.clip();
+  path(g, [T(r, s * .035, -.1), T(r, s * .3, -.1), T(r, s * .3, .7), T(r, s * .035, .7)], 1); g.fillStyle = "rgba(21,21,20,.13)"; g.fill(); g.restore();
+  path(g, pts, 1); g.lineJoin = "round"; g.lineWidth = r.ol; g.strokeStyle = INK; g.stroke();
+}
 function heart(g, x, y, s, c) { g.beginPath(); g.moveTo(x, y + s * .35); g.bezierCurveTo(x - s * .9, y - s * .3, x - s * .35, y - s * .95, x, y - s * .42); g.bezierCurveTo(x + s * .35, y - s * .95, x + s * .9, y - s * .3, x, y + s * .35); g.fillStyle = c; g.fill(); }
 
 function drawBody(g, r, col = INK, w = r.lw) {
@@ -139,14 +163,15 @@ const C = [
         g.beginPath(); g.moveTo(t0[0], t0[1]); g.quadraticCurveTo(m1[0], m1[1], tip[0], tip[1]); g.quadraticCurveTo(m2[0], m2[1], t0[0], t0[1]); g.fillStyle = PAPER; g.fill(); g.stroke();
       } } },
     { at: "neck", on: "wipe", layer: "front", draw(g, r) { // 저고리 + 치마
-      shape(g, r, [T(r, -.1, .18), T(r, .1, .18), T(r, .18, .44), T(r, -.18, .44)], "#c8323c");
-      shape(g, r, top(r, 0, .22, .088, .105), PAPER);
+      const cuff = { c: "#2b6cb0", s: .16 };
+      sleeves(g, r, PAPER, .8, "back", cuff);
+      torso(g, r, [T(r, -.1, .18), T(r, .1, .18), T(r, .18, .44), T(r, -.18, .44)], "#c8323c");
+      torso(g, r, top(r, 0, .22, .088, .105), PAPER);
       band(g, r, [T(r, -.055, -.005), T(r, .03, .11)], .022 * r.S, "#2b6cb0", false);
       const sw = Math.sin(r.now / 300) * .02;
       band(g, r, [T(r, .03, .11), T(r, .05 + sw, .27)], .02 * r.S, "#c8323c");
       band(g, r, [T(r, .03, .11), T(r, .0 + sw, .24)], .02 * r.S, "#c8323c");
-      sleeves(g, r, PAPER, .8);
-      for (const [e, h] of [[r.eL, r.hL], [r.eR, r.hR]]) band(g, r, [L2(e, h, .64), L2(e, h, .8)], CW * r.S, "#2b6cb0");
+      sleeves(g, r, PAPER, .8, "front", cuff);
     } },
     { at: "head", on: "drop", layer: "head", draw(g, r) { // 여우 귀
       for (const s of [-1, 1]) {
@@ -185,12 +210,11 @@ const C = [
   items: [
     { at: "hip", on: "pop", layer: "back", draw(g, r) { const f = r.p.f < 0 ? -1 : 1; band(g, r, [[r.hip[0] - .02 * r.S * f, r.hip[1] - .03 * r.S], [r.hip[0] - .36 * r.S * f, r.hip[1] + .12 * r.S]], .03 * r.S, "#2a1d14"); } },
     { at: "neck", on: "wipe", layer: "front", draw(g, r) { // 무복
-      pants(g, r, "#4a3424", .86);
-      for (const [k, f] of [[r.kL, r.fL], [r.kR, r.fR]]) band(g, r, [L2(k, f, .56), L2(k, f, .86)], CW * r.S, "#e9e2d0");
-      shape(g, r, top(r, 0, .33, .092, .115), "#7a5232");
+      pants(g, r, "#4a3424", .86, { c: "#e9e2d0", s: .3 });
+      sleeves(g, r, "#7a5232", .78, "back"); torso(g, r, top(r, 0, .33, .092, .115), "#7a5232");
       band(g, r, [T(r, -.06, 0), T(r, .06, .17)], .03 * r.S, "#e9e2d0");
       band(g, r, [T(r, -.115, .29), T(r, .115, .29)], .042 * r.S, "#2a1d14");
-      sleeves(g, r, "#7a5232", .78);
+      sleeves(g, r, "#7a5232", .78, "front");
     } },
     { at: "head", on: "drop", layer: "head", draw(g, r) { // 상투와 붉은 머리띠
       dot(g, H(r, -.05, -1.12), r.R * .3, INK);
@@ -259,10 +283,10 @@ const C = [
   },
   items: [
     { at: "neck", on: "wipe", layer: "front", draw(g, r) { // 후드티
-      const c = "#34406b"; shape(g, r, top(r, 0, .34, .09, .1), c);
+      const c = "#34406b"; sleeves(g, r, c, .9, "back"); torso(g, r, top(r, 0, .34, .09, .1), c);
       shape(g, r, [T(r, -.1, -.03), T(r, -.02, -.06), T(r, -.04, .03)], c);
       band(g, r, [T(r, .01, .01), T(r, .02, .09)], .008 * r.S, PAPER, false);
-      sleeves(g, r, c, .9);
+      sleeves(g, r, c, .9, "front");
     } },
     { at: "head", on: "drop", layer: "head", draw(g, r) { // 안경(옆모습: 앞쪽 알 하나 + 귀로 가는 다리)
       const a = (r.p.t + r.p.h) * D, e = H(r, .72, -.1, 1);
@@ -320,10 +344,10 @@ const C = [
   items: [
     { at: "neck", on: "wipe", layer: "front", draw(g, r) { // 흰 가운
       pants(g, r, "#3b3f4a", .9);
-      shape(g, r, [T(r, -.09, -.012), T(r, .09, -.012), T(r, .125, .5), T(r, -.125, .5)], PAPER);
+      sleeves(g, r, PAPER, .88, "back"); torso(g, r, [T(r, -.05, -.03), T(r, -.09, .03), T(r, -.125, .5), T(r, .125, .5), T(r, .09, .03), T(r, .05, -.03)], PAPER);
       path(g, [T(r, -.05, -.005), T(r, 0, .16), T(r, .05, -.005)]); g.lineWidth = r.ol; g.strokeStyle = INK; g.stroke();
       band(g, r, [T(r, .045, .12), T(r, .045, .07)], .01 * r.S, "#2b44a6", false);
-      sleeves(g, r, PAPER, .88);
+      sleeves(g, r, PAPER, .88, "front");
     } },
     { at: "head", on: "drop", layer: "head", draw(g, r) { // 전구 머리띠
       g.lineWidth = r.ol * 1.4; g.strokeStyle = INK; g.beginPath(); g.arc(r.head[0], r.head[1], r.R * 1.08, Math.PI * 1.1 + (r.p.t + r.p.h) * D, Math.PI * 1.9 + (r.p.t + r.p.h) * D); g.stroke();
@@ -366,7 +390,7 @@ const C = [
     { at: "neck", on: "pop", layer: "back", draw(g, r) { const f = r.p.f < 0 ? -1 : 1; g.save(); g.translate(...T(r, -.1 * f, .14)); g.rotate(r.p.t * D);
       g.beginPath(); g.roundRect(-.08 * r.S, -.12 * r.S, .16 * r.S, .25 * r.S, .04 * r.S); g.fillStyle = "#2b44a6"; g.fill(); g.lineWidth = r.ol; g.strokeStyle = INK; g.stroke();
       g.beginPath(); g.roundRect(-.06 * r.S - f * .03 * r.S, .0, .1 * r.S, .09 * r.S, .02 * r.S); g.fillStyle = "#3a56c4"; g.fill(); g.stroke(); g.restore(); } },
-    { at: "neck", on: "wipe", layer: "front", draw(g, r) { pants(g, r, "#2c2f38", .9); shape(g, r, top(r, 0, .34, .088, .1), "#e9e5da"); band(g, r, [T(r, .06, -.01), T(r, .045, .2)], .022 * r.S, "#1f3486"); sleeves(g, r, "#e9e5da", .55); } },
+    { at: "neck", on: "wipe", layer: "front", draw(g, r) { pants(g, r, "#2c2f38", .9); sleeves(g, r, "#e9e5da", .55, "back"); torso(g, r, top(r, 0, .34, .088, .1), "#e9e5da"); band(g, r, [T(r, .06, -.01), T(r, .045, .2)], .022 * r.S, "#1f3486"); sleeves(g, r, "#e9e5da", .55, "front"); } },
     { at: "gnd", on: "drop", layer: "back", draw(g, r) { // 자명종
       const S = r.S, sh = r.ring ? Math.sin(r.now / 22) * .12 : 0, c = [r.gx - .5 * S, r.gy - .1 * S];
       inFrame(g, [c[0], r.gy], sh, () => {
@@ -404,14 +428,19 @@ const C = [
   on: { reset() { this.checks = 0; }, ring() { this.ringAt = performance.now(); }, tick(r) { this.checks = Math.min(3, this.checks + 1); } } },
 
 { t: "덜미", base: { f: 1, ik: 1 },
-  post(r) { const c = T(r, .25, .17); reach(r, "R", c, r.p.ik, 1); reach(r, "L", [c[0] - .06 * r.S, c[1] + .02 * r.S], r.p.ik, 1); r.lock = this.locked; },
+  letter(g, r, S, lock) { // 편지 한 장(지금 자리가 가운데)
+    shape(g, r, [[-.075 * S, -.05 * S], [.075 * S, -.05 * S], [.075 * S, .05 * S], [-.075 * S, .05 * S]], PAPER);
+    path(g, [[-.075 * S, -.05 * S], [0, .01 * S], [.075 * S, -.05 * S]]); g.stroke();
+    if (lock) { g.beginPath(); g.arc(0, .005 * S, .018 * S, Math.PI, 0); g.lineWidth = r.ol * 1.4; g.stroke(); g.fillStyle = "#e0b021"; g.fillRect(-.026 * S, .005 * S, .052 * S, .038 * S); g.lineWidth = r.ol; g.strokeRect(-.026 * S, .005 * S, .052 * S, .038 * S); }
+  },
+  post(r) { const c = T(r, .25, .17); reach(r, "R", c, r.p.ik, 1); reach(r, "L", [c[0] - .06 * r.S, c[1] + .02 * r.S], r.p.ik, 1); r.lock = this.locked; this.hand = [r.hR[0] + .02 * r.S, r.hR[1] - .03 * r.S]; },
   locked: 0,
   items: [
     { at: "neck", on: "wipe", layer: "front", draw(g, r) { // 검은 후드티
-      const c = "#2a2d35"; pants(g, r, "#3e4350", .9); shape(g, r, top(r, 0, .35, .092, .104), c);
+      const c = "#2a2d35"; pants(g, r, "#3e4350", .9); sleeves(g, r, c, .9, "back"); torso(g, r, top(r, 0, .35, .092, .104), c);
       shape(g, r, [T(r, -.06, .22), T(r, .06, .22), T(r, .075, .32), T(r, -.075, .32)], "#353945");
       for (const s of [-1, 1]) band(g, r, [T(r, s * .02, .01), T(r, s * .024, .1)], .008 * r.S, PAPER, false);
-      sleeves(g, r, c, .9);
+      sleeves(g, r, c, .9, "front");
     } },
     { at: "head", on: "drop", layer: "head", draw(g, r) { // 후드: 얼굴만 빼고 덮음
       const f = r.p.f;
@@ -419,12 +448,8 @@ const C = [
       g.fillStyle = "#2a2d35"; g.fill("evenodd"); g.lineWidth = r.ol; g.strokeStyle = INK; g.stroke(); g.restore();
     } },
     { at: "hR", on: "toss", layer: "hand", draw(g, r) { // 편지(잠금)
-      const k = r.p.env; if (k < .02) return; const S = r.S * k, c = [r.hR[0] + .02 * r.S, r.hR[1] - .03 * r.S];
-      g.save(); g.translate(c[0], c[1]); g.rotate(-.1);
-      shape(g, r, [[-.075 * S, -.05 * S], [.075 * S, -.05 * S], [.075 * S, .05 * S], [-.075 * S, .05 * S]], PAPER);
-      path(g, [[-.075 * S, -.05 * S], [0, .01 * S], [.075 * S, -.05 * S]]); g.stroke();
-      if (r.lock) { g.beginPath(); g.arc(0, .005 * S, .018 * S, Math.PI, 0); g.lineWidth = r.ol * 1.4; g.stroke(); g.fillStyle = "#e0b021"; g.fillRect(-.026 * S, .005 * S, .052 * S, .038 * S); g.lineWidth = r.ol; g.strokeRect(-.026 * S, .005 * S, .052 * S, .038 * S); }
-      g.restore();
+      const k = r.p.env; if (k < .02) return;
+      inFrame(g, [r.hR[0] + .02 * r.S, r.hR[1] - .03 * r.S], -.1, () => this.letter(g, r, r.S * k, r.lock));
     } },
   ],
   keys: [
@@ -435,8 +460,9 @@ const C = [
     [130, "o", { ik: 0, t: 18, h: 6, ra1: 100, ra2: 96, la1: -55, la2: -35, ll1: -30, ll2: -12, rl1: 32, rl2: 4, env: 1 }, "fly"],
     [150, "l", { ik: 0, t: 16, h: 4, ra1: 96, ra2: 90, la1: -52, la2: -32, ll1: -30, ll2: -12, rl1: 32, rl2: 4, env: 0 }],
     [700, "io", { ik: 0, t: 4, h: -10, ra1: 35, ra2: 70, la1: -28, la2: -12, ll1: -14, ll2: -6, rl1: 16, rl2: 6, env: 0 }, "incoming"],
-    [450, "io", { ik: 0, t: 8, h: -4, ra1: 95, ra2: 120, la1: 80, la2: 115, ll1: -14, ll2: -6, rl1: 16, rl2: 6, env: 0 }],
-    [220, "o", { ik: 1, t: 2, h: 6, env: 1, ll1: -14, ll2: -6, rl1: 16, rl2: 6 }],
+    [560, "io", { ik: 0, t: 8, h: -4, ra1: 95, ra2: 120, la1: 80, la2: 115, ll1: -14, ll2: -6, rl1: 16, rl2: 6, env: 0 }],
+    [10, "l", { ik: 0, t: 8, h: -4, ra1: 95, ra2: 120, la1: 80, la2: 115, ll1: -14, ll2: -6, rl1: 16, rl2: 6, env: 1 }],
+    [400, "io", { ik: 1, t: 2, h: 6, env: 1, ll1: -14, ll2: -6, rl1: 16, rl2: 6 }],
   ],
   on: { unlock() { this.locked = 0; }, lock(r) { this.locked = 1; const c = [r.hR[0] + .02 * r.S, r.hR[1] - .03 * r.S]; spark(c[0], c[1], { life: .5, draw(g, p) { const k = p.age / p.life; g.globalAlpha *= 1 - k; g.strokeStyle = "#e0b021"; g.lineWidth = r.ol * 1.5; g.beginPath(); g.arc(p.x, p.y, r.S * (.03 + .1 * k), 0, 7); g.stroke(); } }); },
     fly(r) { // 종이비행기로 접혀 날아감, 점선 자국
@@ -447,15 +473,15 @@ const C = [
         inFrame(g, [x, y], a, () => { shape(g, r, [[.07 * S, 0], [-.05 * S, -.04 * S], [-.03 * S, 0], [-.05 * S, .03 * S]], PAPER); path(g, [[.07 * S, 0], [-.03 * S, 0]]); g.stroke(); });
       } });
     },
-    incoming(r) { const S = r.S, tx = r.hR[0] + .1 * S, ty = r.hR[1] - .1 * S, sx = r.gx + 1.6 * S, sy = r.gy - .9 * S;
-      spark(sx, sy, { life: 1.15, draw(g, p) { const k = E.o(cl(p.age / 1.1)), x = lerp(sx, tx, k), y = lerp(sy, ty, k) - Math.sin(k * Math.PI) * .2 * S;
-        inFrame(g, [x, y], (1 - k) * 3, () => { shape(g, r, [[-.06 * S, -.04 * S], [.06 * S, -.04 * S], [.06 * S, .04 * S], [-.06 * S, .04 * S]], PAPER); path(g, [[-.06 * S, -.04 * S], [0, .008 * S], [.06 * S, -.04 * S]]); g.stroke(); }); } }); } } },
+    incoming(r) { const S = r.S, self = this, sx = r.gx + 1.6 * S, sy = r.gy - .9 * S;
+      spark(sx, sy, { life: .6, draw(g, p) { const k = E.io(cl(p.age / .56)), [tx, ty] = self.hand, x = lerp(sx, tx, k), y = lerp(sy, ty, k) - Math.sin(k * Math.PI) * .2 * S;
+        inFrame(g, [x, y], (1 - k) * 3 - .1 * k, () => self.letter(g, r, S, 1)); } }); } } },
 
 { t: "학과 진로 지도", base: { f: 1, ik: 1 },
   post(r) { const S = r.S, e = H(r, .5, -.02, 1); reach(r, "R", [e[0] + .03 * S * r.p.f, e[1] + .05 * S], r.p.ik, 1); reach(r, "L", [e[0] + .01 * S * r.p.f, e[1] + .06 * S], r.p.ik, 1); },
   items: [
     { at: "neck", on: "wipe", layer: "front", draw(g, r) { // 셔츠 + 조끼
-      pants(g, r, "#b9a57a", .86); shape(g, r, top(r, 0, .34, .088, .1), PAPER); sleeves(g, r, PAPER, .5);
+      pants(g, r, "#b9a57a", .86); sleeves(g, r, PAPER, .5, "back"); torso(g, r, top(r, 0, .34, .088, .1), PAPER); sleeves(g, r, PAPER, .5, "front");
       shape(g, r, [T(r, -.09, -.01), T(r, -.03, -.01), T(r, -.025, .34), T(r, -.1, .34)], "#7f8456");
       shape(g, r, [T(r, .03, -.01), T(r, .09, -.01), T(r, .1, .34), T(r, .025, .34)], "#7f8456");
       for (const s of [-1, 1]) shape(g, r, [T(r, s * .045, .2), T(r, s * .085, .2), T(r, s * .085, .27), T(r, s * .045, .27)], "#6b6f47");
@@ -499,9 +525,9 @@ const C = [
   heart: 0,
   items: [
     { at: "neck", on: "wipe", layer: "front", draw(g, r) { // 분홍 가디건
-      pants(g, r, "#9fb4d9", .9); shape(g, r, top(r, 0, .34, .09, .11), "#ffdfe6");
+      pants(g, r, "#9fb4d9", .9); sleeves(g, r, "#ffdfe6", .86, "back"); torso(g, r, top(r, 0, .34, .09, .11), "#ffdfe6");
       for (let i = 0; i < 3; i++) dot(g, T(r, .0, .08 + i * .08), .009 * r.S, "#f2a5b5", r.ol * .7);
-      sleeves(g, r, "#ffdfe6", .86);
+      sleeves(g, r, "#ffdfe6", .86, "front");
     } },
     { at: "head", on: "drop", layer: "head", draw(g, r) { // 베레모
       g.save(); g.translate(...H(r, .12, -.82)); g.rotate((r.p.t + r.p.h - 10) * D);
@@ -536,7 +562,7 @@ const C = [
   post(r) { const S = r.S, c = T(r, 0, .12), a = r.p.st * D, R = .13 * S; r.wheel = c;
     reach(r, "L", [c[0] - Math.cos(a) * R, c[1] - Math.sin(a) * R], r.p.ik, -1); reach(r, "R", [c[0] + Math.cos(a) * R, c[1] + Math.sin(a) * R], r.p.ik, 1); },
   items: [
-    { at: "neck", on: "wipe", layer: "front", draw(g, r) { shape(g, r, top(r, 0, .34, .092, .104), "#d6332c"); for (const s of [-1, 1]) band(g, r, [T(r, s * .03, -.005), T(r, s * .03, .33)], .014 * r.S, PAPER, false); sleeves(g, r, "#d6332c", .86); dot(g, r.hL, .028 * r.S, INK); dot(g, r.hR, .028 * r.S, INK); } },
+    { at: "neck", on: "wipe", layer: "front", draw(g, r) { sleeves(g, r, "#d6332c", .86, "back"); torso(g, r, top(r, 0, .34, .092, .104), "#d6332c"); for (const s of [-1, 1]) band(g, r, [T(r, s * .03, -.005), T(r, s * .03, .33)], .014 * r.S, PAPER, false); sleeves(g, r, "#d6332c", .86, "front"); dot(g, r.hL, .028 * r.S, INK); dot(g, r.hR, .028 * r.S, INK); } },
     { at: "gnd", on: "drop", layer: "front", draw(g, r) { // 경주차 앞모습
       const S = r.S, cx = r.gx, gy = r.gy, roll = r.p.st * .0016;
       g.save(); g.translate(cx, gy); g.rotate(roll);
@@ -599,7 +625,7 @@ const C = [
       dot(g, P.hinge, .016 * S, "#7d7f86", r.ol);
     } },
     { at: "neck", on: "wipe", layer: "front", draw(g, r) { // 작업복
-      pants(g, r, "#5c7290", .9); shape(g, r, top(r, 0, .34, .088, .1), PAPER); sleeves(g, r, PAPER, .45);
+      pants(g, r, "#5c7290", .9); sleeves(g, r, PAPER, .45, "back"); torso(g, r, top(r, 0, .34, .088, .1), PAPER); sleeves(g, r, PAPER, .45, "front");
       shape(g, r, [T(r, -.07, .12), T(r, .07, .12), T(r, .1, .35), T(r, -.1, .35)], "#5c7290");
       for (const s of [-1, 1]) band(g, r, [T(r, s * .055, .13), T(r, s * .05, -.005)], .018 * r.S, "#4b5f7a");
       shape(g, r, [T(r, -.035, .17), T(r, .035, .17), T(r, .035, .23), T(r, -.035, .23)], "#4b5f7a");
@@ -641,7 +667,7 @@ const C = [
 { t: "움직이는 웹사이트", base: { f: 0 }, ghost: 1,
   items: [
     { at: "fR", on: "pop", layer: "front", draw(g, r) { for (const [k, f] of [[r.kL, r.fL], [r.kR, r.fR]]) { const s = f[0] < r.hip[0] ? -1 : 1; g.beginPath(); g.roundRect(f[0] - .035 * r.S + s * .012 * r.S, f[1] - .03 * r.S, .07 * r.S, .045 * r.S, .02 * r.S); g.fillStyle = PAPER; g.fill(); g.lineWidth = r.ol; g.strokeStyle = INK; g.stroke(); g.fillStyle = "#2b44a6"; g.fillRect(f[0] - .03 * r.S + s * .012 * r.S, f[1] + .002 * r.S, .06 * r.S, .01 * r.S); } } },
-    { at: "neck", on: "wipe", layer: "front", draw(g, r) { pants(g, r, "#2c2f38", .82); shape(g, r, top(r, 0, .34, .095, .108), "#2b44a6"); sleeves(g, r, "#2b44a6", .5); band(g, r, [T(r, -.09, .3), T(r, .09, .3)], .02 * r.S, PAPER, false); } },
+    { at: "neck", on: "wipe", layer: "front", draw(g, r) { pants(g, r, "#2c2f38", .82); sleeves(g, r, "#2b44a6", .5, "back"); torso(g, r, top(r, 0, .34, .095, .108), "#2b44a6"); sleeves(g, r, "#2b44a6", .5, "front"); band(g, r, [T(r, -.09, .3), T(r, .09, .3)], .02 * r.S, PAPER, false); } },
     { at: "head", on: "drop", layer: "head", draw(g, r) { // 옆으로 쓴 모자 + 선글라스
       g.save(); g.translate(...H(r, 0, -.5)); g.rotate((r.p.t + r.p.h - 8) * D);
       g.beginPath(); g.ellipse(0, 0, r.R * 1.02, r.R * .78, 0, Math.PI, 0); g.closePath(); g.fillStyle = "#2b44a6"; g.fill();
