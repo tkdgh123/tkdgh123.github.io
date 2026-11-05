@@ -647,6 +647,21 @@ const C = [
 
 { t: "움직이는 웹사이트", base: { f: 0 }, ghost: 1,
   items: [
+    { at: "gnd", on: "pop", layer: "back", draw(g, r) { // 브라우저 창: 그 안에서 춤추고, 글줄 블록이 박자에 맞춰 들썩임
+      const S = r.S, x0 = r.gx - .66 * S, y0 = r.gy - 1.42 * S, w = 1.32 * S, h = 1.42 * S, bar = .11 * S, beat = r.now / 240 * Math.PI;
+      g.beginPath(); g.roundRect(x0, y0, w, h, .04 * S); g.fillStyle = "#fff"; g.fill();
+      g.save(); g.clip();
+      g.fillStyle = "#ecebe5"; g.fillRect(x0, y0, w, bar);
+      ["#e2557a", "#e0b021", "#3fae6a"].forEach((c, i) => dot(g, [x0 + (.06 + i * .045) * S, y0 + bar / 2], .014 * S, c));
+      g.beginPath(); g.roundRect(x0 + .24 * S, y0 + .025 * S, .8 * S, .06 * S, .03 * S); g.fillStyle = "#fff"; g.fill();
+      g.fillStyle = "#6b6f7a"; g.font = `500 ${.036 * S}px "IBM Plex Mono", monospace`; g.textAlign = "left"; g.fillText("tkdgh123.github.io/web-motion", x0 + .27 * S, y0 + .067 * S);
+      for (const [side, cx] of [[-1, x0 + .08 * S], [1, x0 + w - .25 * S]]) for (let i = 0; i < 6; i++) {
+        const k = Math.max(0, Math.sin(beat + i * .7 + (side > 0 ? 1.6 : 0))), y = y0 + bar + (.14 + i * .16) * S - k * .035 * S, ww = (i % 3 === 0 ? .17 : .12 + (i % 2) * .03) * S;
+        g.fillStyle = i % 3 === 0 ? "#2b44a6" : "#d9d4c6"; g.globalAlpha = i % 3 === 0 ? .85 : 1; g.beginPath(); g.roundRect(cx, y, ww, (i % 3 === 0 ? .05 : .028) * S, .014 * S); g.fill(); g.globalAlpha = 1; }
+      g.restore();
+      g.beginPath(); g.roundRect(x0, y0, w, h, .04 * S); g.lineWidth = r.ol * 1.4; g.strokeStyle = INK; g.stroke();
+      path(g, [[x0, y0 + bar], [x0 + w, y0 + bar]]); g.lineWidth = r.ol; g.stroke();
+    } },
     { at: "fR", on: "pop", layer: "front", draw(g, r) { for (const [k, f] of [[r.kL, r.fL], [r.kR, r.fR]]) { const s = f[0] < r.hip[0] ? -1 : 1; g.beginPath(); g.roundRect(f[0] - .035 * r.S + s * .012 * r.S, f[1] - .03 * r.S, .07 * r.S, .045 * r.S, .02 * r.S); g.fillStyle = PAPER; g.fill(); g.lineWidth = r.ol; g.strokeStyle = INK; g.stroke(); g.fillStyle = "#2b44a6"; g.fillRect(f[0] - .03 * r.S + s * .012 * r.S, f[1] + .002 * r.S, .06 * r.S, .01 * r.S); } } },
     { at: "neck", on: "wipe", layer: "front", draw(g, r) { pants(g, r, "#2c2f38", .82); sleeves(g, r, "#2b44a6", .5); torso(g, r, top(r, 0, .34, .095, .108), "#2b44a6"); band(g, r, [T(r, -.09, .3), T(r, .09, .3)], .02 * r.S, PAPER, false); } },
     { at: "head", on: "drop", layer: "head", draw(g, r) { // 옆으로 쓴 모자 + 선글라스
@@ -808,9 +823,6 @@ function frame(now) {
   // 바닥 그림자
   g.save(); g.globalAlpha = .1 * cl(1 + p.y * 2.5); g.beginPath(); g.ellipse(r.hip[0], GY, S * .26, S * .025, 0, 0, 7); g.fillStyle = INK; g.fill(); g.restore();
   if (c.fxBack && fxA > 0) c.fxBack(g, r, ltl, fxA);
-  // 잔상(움직이는 웹사이트)
-  if (c.ghost && !trans) { if (!frame.gt || now - frame.gt > 55) { frame.gt = now; ghosts.push(r); if (ghosts.length > 6) ghosts.shift(); }
-    ghosts.forEach((q, i) => { g.globalAlpha = .05 + i * .03; drawBody(g, q, "#2b44a6", q.lw * .9); }); g.globalAlpha = 1; }
   // 몸 전체 변형: 공중제비(몸 가운데 기준 회전) + 늘어남·찌그러짐(발 밑 기준)
   const mid = L2(r.hip, r.neck, .35), foot = GY + p.y * S;
   g.save(); g.translate(mid[0], mid[1]); g.rotate(p.rot * D); g.translate(-mid[0], -mid[1]);
@@ -823,6 +835,9 @@ function frame(now) {
   g.restore();
   const layer = L => worn.forEach(w => w.it.layer === L && drawItem(w, r, c));
   layer("back");
+  // 잔상(움직이는 웹사이트): 브라우저 창 위에
+  if (c.ghost && !trans) { if (!frame.gt || now - frame.gt > 55) { frame.gt = now; ghosts.push(r); if (ghosts.length > 6) ghosts.shift(); }
+    ghosts.forEach((q, i) => { g.globalAlpha = .05 + i * .03; drawBody(g, q, "#2b44a6", q.lw * .9); }); g.globalAlpha = 1; }
   drawBody(g, r);
   layer("front");
   drawHead(g, r);
