@@ -58,7 +58,7 @@ ${headLines}
 <nav class="toc" aria-label="목차">
   <a class="brand" href="${B}"><img src="${B}favicon.svg" alt="" width="28" height="28"><span>학과 진로 지도</span></a>
   <ol>${TABS.map(([t, h]) => `<li><a href="${h}"${t === tab ? ' class="on" aria-current="page"' : ""}>${t}</a></li>`).join("")}</ol>
-  <a class="back" href="/">← 작업실</a>
+  <a class="back" href="/">← 창업실</a>
 </nav>
 <main id="main">
 <nav class="crumb" aria-label="현재 위치">${trail.map(([n, p], i) => i < trail.length - 1 ? `<a href="${p}">${esc(n)}</a>` : esc(n)).join(" › ")}</nav>

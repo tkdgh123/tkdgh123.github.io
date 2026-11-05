@@ -1,4 +1,4 @@
-// 작업실 첫 화면에 있는 작품 26개 (경로는 작업실 맨 위 기준, 날짜는 작업실에 처음 올린 날)
+// 창업실 첫 화면에 있는 작품 26개 (경로는 창업실 맨 위 기준, 날짜는 창업실에 처음 올린 날)
 export const WORKS = [
   { cat: "게임", t: "넋굿", d: "10.27", href: "neokgut/", img: "neokgut/img/bg_gate.webp", s: "부서진 저승길에서 구미호 아이가 오행 술법으로 원귀를 풀어 주는 액션 로그라이트." },
   { cat: "게임", t: "브라운 로그", d: "10.27", href: "brown-rogue/", img: "brown-rogue/img/s_title.webp", s: "한·중·일 영웅 다섯을 진형에 세워 찢긴 저승 명부를 돌려주러 가는 배치 턴제 RPG." },
@@ -23,7 +23,7 @@ export const WORKS = [
   { cat: "기타", t: "포트폴리오 설계", d: "10.29", href: "career/portfolio.html", img: "hub/shots/portfolio.webp", lock: 1, s: "무엇을 어디에 어떻게 담을지 정한 포트폴리오 설계." },
   { cat: "기타", t: "표준 현장실습학기제 한눈에", d: "10.29", href: "internship/", img: "hub/shots/intern.webp", s: "현장실습학기제와 공기업·사기업 인턴을 한눈에 비교한 정리." },
   { cat: "기타", t: "무료 모델 Claude Code", d: "10.31", href: "free-claude-code/", img: "hub/shots/fcc.webp", s: "무료 NVIDIA 모델로 Claude Code를 쓰는 설정 안내." },
-  { cat: "기타", t: "첫 화면 시안", d: "11.01", href: "drafts/", img: "drafts/shots/a.webp", s: "작업실 첫 화면을 고르려고 만든 시안 모음." },
+  { cat: "기타", t: "첫 화면 시안", d: "11.01", href: "drafts/", img: "drafts/shots/a.webp", s: "창업실 첫 화면을 고르려고 만든 시안 모음." },
   { cat: "기타", t: "노트북 저장공간 정리", d: "11.03", href: "storage/", img: "hub/shots/storage.webp", lock: 1, s: "노트북 C 드라이브를 무엇이 차지했는지와 정리 결과." },
   { cat: "기타", t: "움직이는 웹사이트", d: "11.04", href: "web-motion/", img: "hub/shots/webmotion.webp", s: "릴스 속 사이트 분석과 같은 기법으로 직접 만든 데모들." },
 ];

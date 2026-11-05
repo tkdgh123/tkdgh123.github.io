@@ -24,7 +24,7 @@ canvas.bg { z-index: 1 }
 </head>
 <body>
 <nav class="hud mono"><a href="../#more">← 움직이는 웹사이트</a><span class="right"><a href="particles.html">← 이전</a><span>데모 5 / 7 · 무대 조명</span><a href="breaker.html">다음 →</a></span></nav>
-<div class="big" id="big">작업실 무대 · 작업실 무대 · 작업실 무대 ·</div>
+<div class="big" id="big">창업실 무대 · 창업실 무대 · 창업실 무대 ·</div>
 <canvas class="bg" id="cv"></canvas>
 <div class="info"><div class="fade" id="info"></div></div>
 <div class="dots" id="dots"><i></i><i></i><i></i><i></i></div>
@@ -34,7 +34,7 @@ import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 
-// 카드 네 장: 작업실의 실제 작품 이름, 그림은 코드로 그린 표지
+// 카드 네 장: 창업실의 실제 작품 이름, 그림은 코드로 그린 표지
 const works = [
   { tag: "게임", title: "넋굿", note: "동양풍 3D 로그라이트", c: "#ffb340", draw: g => { g.fillStyle = "#2a1a12"; g.fillRect(0, 0, 512, 720); for (let i = 0; i < 9; i++) { g.strokeStyle = `rgba(255,179,64,${.15 + i * .08})`; g.lineWidth = 6; g.beginPath(); g.arc(256, 300, 40 + i * 22, Math.PI * (1 + i * .05), Math.PI * (2 - i * .05)); g.stroke(); } } },
   { tag: "프로젝트", title: "우리달", note: "둘이 같이 쓰는 달력 앱", c: "#ff8fa3", draw: g => { g.fillStyle = "#2b1820"; g.fillRect(0, 0, 512, 720); for (let r = 0; r < 5; r++) for (let c = 0; c < 7; c++) { g.fillStyle = (r * 7 + c) % 9 === 3 ? "#ff8fa3" : "rgba(255,255,255,.12)"; g.beginPath(); g.roundRect(70 + c * 54, 160 + r * 62, 42, 48, 8); g.fill(); } } },

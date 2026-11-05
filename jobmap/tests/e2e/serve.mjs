@@ -1,4 +1,4 @@
-// 정적 파일 서버(node:http). `node serve.mjs <port> [root]`, root 기본값은 작업실 폴더라 ../ 링크도 열린다.
+// 정적 파일 서버(node:http). `node serve.mjs <port> [root]`, root 기본값은 창업실 폴더라 ../ 링크도 열린다.
 import http from "node:http";
 import { readFile, stat } from "node:fs/promises";
 import { join, resolve, extname, sep } from "node:path";

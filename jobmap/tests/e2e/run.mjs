@@ -1,4 +1,4 @@
-// E2E 시나리오 E1~E20·E22~E30. `node run.mjs [E1 E7 …] [--root <작업실 또는 baseline 폴더>]`
+// E2E 시나리오 E1~E20·E22~E30. `node run.mjs [E1 E7 …] [--root <창업실 또는 baseline 폴더>]`
 // 시나리오마다 PASS/FAIL/WARN(CDN)과 이유를 출력하고, FAIL이 하나라도 있으면 exit 1.
 import { launch } from "./cdp.mjs";
 import { start } from "./serve.mjs";

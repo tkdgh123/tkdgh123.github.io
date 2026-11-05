@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>쫄라맨이 넘기는 작업실 · 더 역동적인 1</title>
+<title>쫄라맨이 넘기는 창업실 · 더 역동적인 1</title>
 <link rel="stylesheet" href="../apply/apply.css">
 <style>
 /* 스크롤하면 쫄라맨이 화면(작품 칸)을 밀고, 들어 던지고, 줄로 끌어내리고, 걷어차서 넘김 — 모든 움직임이 스크롤 위치에 묶여 있어 되감기도 됨 */
@@ -30,7 +30,7 @@ canvas.bg { z-index: 20; pointer-events: none; mix-blend-mode: difference } /* �
 </style>
 </head>
 <body>
-<nav class="top mono" style="z-index:30;color:#fff;mix-blend-mode:difference"><a href="../#dyn">← 움직이는 웹사이트</a><span class="right"><span>더 역동적인 1 / 4 · 쫄라맨이 넘기는 작업실</span><a href="throw.html">다음 →</a></span></nav>
+<nav class="top mono" style="z-index:30;color:#fff;mix-blend-mode:difference"><a href="../#dyn">← 움직이는 웹사이트</a><span class="right"><span>더 역동적인 1 / 4 · 쫄라맨이 넘기는 창업실</span><a href="throw.html">다음 →</a></span></nav>
 <div id="panels"></div>
 <canvas class="bg" id="cv"></canvas>
 <div id="len"></div>
@@ -47,7 +47,7 @@ const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
 /* ───────── 칸: 첫 화면 + 작품 넷 ───────── */
 const PICK = [["넋굿", "#151618", "#eeece6", "#9e9d97", 1], ["마디", "#e4e2da", "#151514", "#5a5954", 0], ["레이싱 휠", "#2b44a6", "#ffffff", "#c3cbef", 1], ["우리달", "#f3dde2", "#151514", "#6d5a5f", 0]];
 $("panels").innerHTML = `<section class="pn hero on" style="--bg:var(--paper);--fg:var(--ink);--soft:var(--muted)">
-  <div><h1>만들면서 <b>배우는</b><br>1학년의 작업실</h1><p class="meta mono">작품 ${WORKS.length}개 중 넷 ↓</p></div></section>` +
+  <div><h1>만들면서 <b>배우는</b><br>1학년의 창업실</h1><p class="meta mono">작품 ${WORKS.length}개 중 넷 ↓</p></div></section>` +
   PICK.map(([t, bg, fg, soft, dark], i) => { const w = WORKS.find(x => x.t === t);
     return `<section class="pn" style="--bg:${bg};--fg:${fg};--soft:${soft}">
       <div><p class="meta mono">${String(i + 1).padStart(2, "0")} · ${w.cat} · ${w.d}</p><h2>${w.t}</h2><p class="s">${w.s}</p><a class="go" href="${ROOT + w.href}"${dark ? ' style="background:#fff;color:#151514"' : ""}>열어 보기 →</a></div>
@@ -56,7 +56,7 @@ const P = [...document.querySelectorAll(".pn")];
 // 겹치는 순서: 0 밀려남 > 1 들려 올라감 > 2, 3은 위에서 덮으며 내려옴, 4는 3이 넘어지면 보임
 [5, 4, 3, 6, 1].forEach((z, i) => P[i].style.zIndex = z);
 
-/* ───────── 쫄라맨 몸 (작업실 적용 4와 같은 비율) ───────── */
+/* ───────── 쫄라맨 몸 (창업실 적용 4와 같은 비율) ───────── */
 const LEN = { T: .33, N: .024, R: .112, UA: .2, FA: .19, TH: .25, SH: .245, W: .042, SW: .05 };
 const at = (p, a, l) => [p[0] + Math.sin(a * D) * l, p[1] + Math.cos(a * D) * l]; // 각도: 0 아래, 90 오른쪽, 180 위
 const ang = (p, q) => Math.atan2(q[1] - p[1], q[0] - p[0]);
