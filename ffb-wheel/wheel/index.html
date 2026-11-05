@@ -1,0 +1,686 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>휠 베이스 3D</title>
+<meta name="description" content="창공설 레이싱 휠의 핸들 부분을 우리가 산 부품의 실제 치수로 다시 만든 3D 모델">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
+<style>
+:root {
+  --sky-top: #E9EDF0; --sky-bottom: #CBD3D9;
+  --ink: #1C2228; --ink-soft: #56616B; --rule: #C3CBD2; --paper: #FFFFFF; --page: #F4F5F6;
+  --accent: #C8102E; --ok: #0E7A3E; --warn: #8A5A00;
+  --ui: "IBM Plex Sans KR", "Malgun Gothic", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--page); color: var(--ink); font: 15px/1.6 var(--ui); -webkit-font-smoothing: antialiased; }
+a { color: inherit; }
+
+.view { position: relative; height: 100vh; min-height: 600px; background: linear-gradient(180deg, var(--sky-top), var(--sky-bottom)); overflow: hidden; }
+#stage, #stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+#labels { position: absolute; inset: 0; pointer-events: none; }
+.tag { position: absolute; left: 0; top: 0; background: rgba(255,255,255,.93); border: 1px solid var(--ink); padding: 1px 6px; font-size: 12px; font-weight: 500; white-space: nowrap; line-height: 1.45; }
+.tag small { font-size: 10.5px; color: var(--ink-soft); margin-left: 5px; }
+.tag.hid { opacity: .28; }
+.tag.e { border-color: #7E868D; }
+#loading { position: absolute; inset: 0; display: grid; place-items: center; font: 13px var(--mono); color: var(--ink-soft); }
+
+.top { position: absolute; top: 0; left: 0; right: 0; display: flex; align-items: flex-start; gap: 14px; flex-wrap: wrap; padding: 14px 18px; pointer-events: none; }
+.top .back { pointer-events: auto; text-decoration: none; font-size: 13px; color: var(--ink-soft); padding-top: 2px; }
+.top h1 { margin: 0; font-size: 17px; font-weight: 700; }
+.top h1 span { font-size: 12px; font-weight: 400; color: var(--ink-soft); margin-left: 8px; }
+.flow { margin-top: 4px; font-size: 12.5px; color: var(--ink-soft); }
+.flow b { color: var(--ink); font-weight: 500; }
+.tools { margin-left: auto; display: flex; gap: 4px; flex-wrap: wrap; pointer-events: auto; }
+.tools button { font: inherit; font-size: 13px; border: 1px solid var(--rule); background: rgba(255,255,255,.78); color: var(--ink-soft); padding: 6px 11px; border-radius: 3px; cursor: pointer; }
+.tools button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
+.tools .sep { width: 10px; }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.ctl { position: absolute; left: 18px; bottom: 18px; width: min(460px, calc(100% - 36px)); background: var(--paper); border: 1px solid var(--ink); box-shadow: 6px 6px 0 rgba(28,34,40,.12); }
+.ctl .row { display: flex; align-items: center; gap: 10px; padding: 12px 14px 8px; }
+.ctl .play { width: 38px; height: 34px; border: 1px solid var(--ink); background: var(--ink); color: #fff; cursor: pointer; font-size: 13px; flex: none; }
+.ctl input[type=range] { flex: 1; accent-color: var(--accent); }
+.ctl .deg { font: 500 20px var(--mono); min-width: 70px; text-align: right; }
+.ctl dl { margin: 0; display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--rule); }
+.ctl dl div { padding: 8px 10px 10px 14px; border-right: 1px solid var(--rule); }
+.ctl dl div:last-child { border-right: 0; }
+.ctl dt { font-size: 11.5px; color: var(--ink-soft); }
+.ctl dd { margin: 2px 0 0; font: 500 15px var(--mono); white-space: nowrap; }
+.ctl dd small { font-size: 11px; color: var(--ink-soft); }
+
+main { max-width: 1180px; margin: 0 auto; padding: 72px 24px 120px; }
+section { margin-bottom: 88px; }
+.h { display: grid; grid-template-columns: 64px 1fr; align-items: baseline; margin-bottom: 24px; }
+.h .no { font: 500 15px var(--mono); color: var(--accent); }
+.h h2 { margin: 0; font-size: 30px; line-height: 1.2; font-weight: 700; }
+.h p { grid-column: 2; margin: 8px 0 0; color: var(--ink-soft); max-width: 72ch; }
+.body { padding-left: 64px; }
+table.t { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+.t th, .t td { text-align: left; padding: 9px 14px 9px 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.t th { font-size: 12.5px; color: var(--ink-soft); font-weight: 500; }
+.t td.m { font-variant-numeric: tabular-nums; }
+.t td small { display: block; color: var(--ink-soft); font-size: 12.5px; }
+.st { font-size: 12px; font-weight: 700; white-space: nowrap; }
+.st.ok { color: var(--ok); } .st.ms { color: var(--warn); } .st.as { color: var(--accent); }
+.chk { list-style: none; margin: 0; padding: 0; max-width: 920px; }
+.chk li { display: grid; grid-template-columns: 22px 1fr auto; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--rule); font-size: 14.5px; align-items: baseline; }
+.chk li i { font-style: normal; font-weight: 700; color: var(--ok); }
+.chk li i.bad { color: var(--accent); }
+.chk li .v { font-variant-numeric: tabular-nums; font-weight: 500; white-space: nowrap; }
+.chk li small { display: block; color: var(--ink-soft); font-size: 13px; }
+ol.why { margin: 0; padding: 0; list-style: none; counter-reset: s; max-width: 900px; }
+ol.why li { counter-increment: s; display: grid; grid-template-columns: 40px 1fr; padding: 11px 0; border-bottom: 1px solid var(--rule); }
+ol.why li::before { content: counter(s, decimal-leading-zero); font: 500 14px var(--mono); color: var(--accent); padding-top: 2px; }
+ol.why b { font-weight: 700; }
+.note { margin-top: 14px; font-size: 13.5px; color: var(--ink-soft); }
+
+@media (max-width: 760px) {
+  .top h1 span, .flow { display: none; }
+  .tools { margin-left: 0; width: 100%; }
+  .tools button { padding: 5px 8px; font-size: 12px; }
+  .tag { font-size: 10.5px; padding: 0 4px; }
+  .tag small { display: none; }
+  .ctl dl { grid-template-columns: repeat(2, 1fr); }
+  .ctl dl div:nth-child(2) { border-right: 0; }
+  .ctl dl div:nth-child(-n+2) { border-bottom: 1px solid var(--rule); }
+  main { padding: 56px 16px 96px; }
+  .h { grid-template-columns: 40px 1fr; }
+  .h h2 { font-size: 24px; }
+  .body { padding-left: 0; overflow-x: auto; }
+  .t { font-size: 13.5px; }
+}
+</style>
+</head>
+<body>
+
+<div class="view">
+  <div id="stage"></div>
+  <div id="labels" aria-hidden="true"></div>
+  <div id="loading">3D 모델 불러오는 중…</div>
+  <header class="top">
+    <a class="back" href="../../#make">← 작업실</a>
+    <div>
+      <h1>휠 베이스<span>우리 부품 실제 치수 · mm</span></h1>
+      <div class="flow"><b>게임</b> 힘 명령(시리얼) → <b>우노</b> D9·D10 PWM → <b>BTS7960</b> → <b>MY1016</b> → 20T:60T 벨트(1:3) → <b>핸들</b> · 각도는 <b>AS5600</b>이 I2C로 돌려줘요</div>
+    </div>
+    <div class="tools" role="group" aria-label="보기">
+      <button type="button" data-cam="iso" aria-pressed="true">비스듬히</button>
+      <button type="button" data-cam="side" aria-pressed="false">옆</button>
+      <button type="button" data-cam="front" aria-pressed="false">앞</button>
+      <button type="button" data-cam="back" aria-pressed="false">뒤</button>
+      <span class="sep"></span>
+      <button type="button" id="tNames" aria-pressed="true">이름</button>
+    </div>
+  </header>
+  <div class="ctl">
+    <div class="row">
+      <button class="play" id="play" type="button" aria-label="자동 돌리기 멈춤">❚❚</button>
+      <input id="sl" type="range" min="-450" max="450" step="1" value="0" aria-label="핸들 각도">
+      <span class="deg" id="deg">0°</span>
+    </div>
+    <dl>
+      <div><dt>AS5600 값</dt><dd id="vRaw">0</dd></div>
+      <div><dt>바퀴 수</dt><dd id="vTurn">0</dd></div>
+      <div><dt>모터</dt><dd id="vMot">0°</dd></div>
+      <div><dt>스프링 효과</dt><dd id="vPwm">0%</dd></div>
+    </dl>
+  </div>
+</div>
+
+<main>
+  <section>
+    <div class="h"><span class="no">01</span><h2>부품과 치수</h2>
+      <p>모델은 아래 치수로 그렸어요. <span class="st ms">판매처 값</span>은 판매처마다 조금씩 달라서, 부품을 받으면 자로 재서 맞춰야 해요.</p></div>
+    <div class="body"><table class="t" id="parts"></table></div>
+  </section>
+
+  <section>
+    <div class="h"><span class="no">02</span><h2>숫자 검사</h2>
+      <p>위 치수로 계산한 값이에요. 부품끼리 닿지 않는지, 벨트가 맞는지 봐요.</p></div>
+    <div class="body"><ul class="chk" id="chk"></ul></div>
+  </section>
+
+  <section>
+    <div class="h"><span class="no">03</span><h2>실제로 만들 수 있게 정한 것</h2></div>
+    <div class="body"><ol class="why" id="why"></ol></div>
+  </section>
+
+  <section>
+    <div class="h"><span class="no">04</span><h2>자를 나무 조각</h2>
+      <p>전부 15T 집성목(400×1200)에서 나와요. 페달 조각도 같은 판에서 잘라요.</p></div>
+    <div class="body"><table class="t" id="cut"></table><p class="note" id="cutSum"></p></div>
+  </section>
+
+  <section>
+    <div class="h"><span class="no">05</span><h2>구매 목록에 없는데 필요한 것</h2></div>
+    <div class="body"><table class="t" id="extra"></table></div>
+  </section>
+</main>
+
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+/* ================= 치수 (mm). 책상 윗면 y=0, 운전자 쪽 +z, 오른쪽 +x ================= */
+const T = 15;                                   // 집성목 두께
+const BT = T;                                   // 바닥판 윗면
+const NUT_H = 6.5, NUT_R = 7.5, WASH_T = 1, WASH_R = 8.5;   // M8 너트(맞변 13), 와셔 17×1T
+const BRG = { od: 22, w: 7 };                   // 608ZZ 8×22×7
+const PD = n => n * 2 / Math.PI;                // GT2 피치원 지름
+const P20 = { n: 20, pd: PD(20), flange: 16, hub: 16, hubL: 7 };
+const P60 = { n: 60, pd: PD(60), flange: 42, hub: 25, hubL: 8 };
+const BELT = { L: 200, w: 6 };
+const MOT = { r: 40, shaft: 23, rearCap: 10, can: 60, frontCap: 10, br: { w: 110, d: 55, t: 3, hx: 95, hz: 41 } };
+const WHEEL = { d: 350, grip: 30, pcd: 70, dish: 70, bore: 50 };
+const AS = { board: 23, mag: 6, magT: 2.5, gap: 1.5, chip: 1.4, pcb: 1.6 };
+const SHIM = 2;                                 // 모터판 밑 와셔 2장 (벨트 장력)
+
+// 벨트 길이로 축간 거리 풀기 (열린 벨트 정확식)
+function beltLen(C, D, d) { const a = Math.asin((D - d) / (2 * C)); return 2 * Math.sqrt(C * C - ((D - d) / 2) ** 2) + Math.PI * (D + d) / 2 + (D - d) * a; }
+function solveC(L, D, d) { let lo = (D - d) / 2 + 1, hi = L; for (let i = 0; i < 80; i++) { const m = (lo + hi) / 2; beltLen(m, D, d) > L ? hi = m : lo = m; } return (lo + hi) / 2; }
+const C = solveC(BELT.L, P60.pd, P20.pd);
+
+// 높이
+const RISER = 2;                                          // 모터 받침 15T 2장
+const MPLATE_Y = BT + RISER * T;                          // 모터판 밑면
+const BR_Y = MPLATE_Y + T + SHIM;                         // 모터 받침쇠 밑면
+const Y_M = BR_Y + MOT.br.t + MOT.r;                      // 모터 축
+const Y_A = Y_M + C;                                      // 조향축
+// 앞뒤 (z)
+const BZ = 30;                                            // 벨트 가운데 면
+const PB = { z0: -7.5, z1: 7.5 }, PF = { z0: 140, z1: 155 };
+const PLATE = { w: 200, h: 200 };
+const MF = BZ - 4.5 - 0.5 + MOT.shaft;                    // 모터 축 쪽 면 (축 끝이 20T 끝과 맞게)
+const M_END = MF + MOT.rearCap + MOT.can + MOT.frontCap;
+const HUB = { r: 50, z0: 190, z1: 220 };
+const RIM_Z = HUB.z1 + WHEEL.dish - WHEEL.grip / 2;       // 그립 중심 면
+const RIM_R = WHEEL.d / 2 - WHEEL.grip / 2;
+const ROD = { z0: -12, z1: HUB.z1 + WASH_T + 2 * NUT_H + 2 };
+const TIE = { x: 85, ys: [BT + 25, BT + 180], z0: PB.z0 - WASH_T - NUT_H - 5, z1: PF.z1 + WASH_T + NUT_H + 4 };
+const SB = { z1: ROD.z0 - AS.magT - AS.gap - AS.chip - AS.pcb, w: 80 };   // 센서 받침 앞면
+SB.z0 = SB.z1 - T; SB.top = Y_A + 30;
+const BASE = { w: 280, z0: SB.z0 - 11, z1: 165 };
+const DESK_EDGE = BASE.z1;
+const EB = { x0: -470, x1: -170, z0: -150, z1: 50 };      // 전자부 판
+const TORQ = { motor: 0.87 };
+
+const f1 = v => (Math.round(v * 10) / 10).toString();
+
+/* ================= 장면 ================= */
+const stage = document.getElementById("stage");
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
+stage.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+const cam = new THREE.PerspectiveCamera(32, 1, 5, 8000);
+const controls = new OrbitControls(cam, renderer.domElement);
+controls.enableDamping = true; controls.dampingFactor = .08; controls.minDistance = 250; controls.maxDistance = 2600;
+controls.maxPolarAngle = Math.PI * 0.62;
+
+scene.add(new THREE.HemisphereLight(0xffffff, 0x8a8f96, 1.15));
+const sun = new THREE.DirectionalLight(0xffffff, 1.9);
+sun.position.set(500, 900, 600); sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+Object.assign(sun.shadow.camera, { left: -700, right: 500, top: 500, bottom: -400, near: 100, far: 2500 });
+sun.shadow.bias = -0.0004;
+scene.add(sun);
+const fill = new THREE.DirectionalLight(0xdfe8ff, .55); fill.position.set(-700, 300, -400); scene.add(fill);
+
+/* ---------- 텍스처 ---------- */
+function canvasTex(w, h, draw, srgb = true) { const c = document.createElement("canvas"); c.width = w; c.height = h; draw(c.getContext("2d"), w, h); const t = new THREE.CanvasTexture(c); if (srgb) t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return t; }
+const woodTex = canvasTex(512, 512, (g, w, h) => {
+  const tones = ["#d8b98b", "#cfae7d", "#dec29a", "#d3b384", "#e2c7a0", "#caa874", "#d9bb8f", "#cdab7a"];
+  for (let i = 0; i < 8; i++) { g.fillStyle = tones[i]; g.fillRect(i * 64, 0, 64, h); }   // 집성목 쪽 이음
+  for (let i = 0; i < 220; i++) {
+    const x = Math.random() * w; g.strokeStyle = `rgba(120,80,40,${.05 + Math.random() * .12})`; g.lineWidth = .6 + Math.random() * 1.6;
+    g.beginPath(); g.moveTo(x, 0); for (let y = 0; y <= h; y += 24) g.lineTo(x + Math.sin(y / 70 + i) * 3, y); g.stroke();
+  }
+  g.fillStyle = "rgba(90,60,30,.18)"; for (let i = 1; i < 8; i++) g.fillRect(i * 64, 0, 1, h);
+});
+woodTex.wrapS = woodTex.wrapT = THREE.RepeatWrapping;
+const threadTex = canvasTex(16, 16, (g) => { g.fillStyle = "#c9ced3"; g.fillRect(0, 0, 16, 16); g.fillStyle = "#7d858c"; g.fillRect(0, 9, 16, 4); g.fillStyle = "#eef1f3"; g.fillRect(0, 3, 16, 2); });
+threadTex.wrapS = threadTex.wrapT = THREE.RepeatWrapping;
+function pcbTex(bg, title, sub) {
+  return canvasTex(256, 256, (g, w, h) => {
+    g.fillStyle = bg; g.fillRect(0, 0, w, h);
+    g.strokeStyle = "rgba(255,255,255,.18)"; g.lineWidth = 3; for (let i = 0; i < 9; i++) { g.beginPath(); g.moveTo(20 + i * 26, 40); g.lineTo(20 + i * 26, 120 + (i % 3) * 30); g.lineTo(60 + i * 18, 220); g.stroke(); }
+    g.fillStyle = "#f4f1e4"; g.font = "bold 40px monospace"; g.textAlign = "center"; g.fillText(title, w / 2, 70);
+    if (sub) { g.font = "26px monospace"; g.fillText(sub, w / 2, 236); }
+  });
+}
+const motorLabel = canvasTex(1024, 128, (g, w, h) => { g.fillStyle = "#26292d"; g.fillRect(0, 0, w, h); g.fillStyle = "#e9e3cf"; g.fillRect(30, 26, 520, 76); g.fillStyle = "#1c2228"; g.font = "bold 46px monospace"; g.fillText("MY1016  24V 250W", 44, 80); });
+const perfTex = canvasTex(256, 128, (g, w, h) => { g.fillStyle = "#b4babf"; g.fillRect(0, 0, w, h); g.fillStyle = "#4a5056"; for (let x = 8; x < w * .55; x += 10) for (let y = 8; y < h; y += 10) { g.beginPath(); g.arc(x + (y / 10 % 2) * 5, y, 2.6, 0, 7); g.fill(); } g.fillStyle = "#eef0ea"; g.fillRect(w * .62, 30, 84, 54); g.fillStyle = "#1c2228"; g.font = "bold 12px monospace"; g.fillText("MEAN WELL", w * .64, 50); g.fillText("LRS-350-24", w * .64, 70); });
+
+/* ---------- 재질 ---------- */
+const mat = (color, o = {}) => new THREE.MeshStandardMaterial(Object.assign({ color, roughness: .55, metalness: 0 }, o));
+const M = {
+  wood: mat(0xffffff, { map: woodTex, roughness: .8 }),
+  woodEnd: mat(0xc49e6c, { roughness: .9 }),
+  steel: mat(0xc6cbd0, { metalness: .85, roughness: .32 }),
+  zinc: mat(0xbfc4c8, { metalness: .8, roughness: .4 }),
+  alu: mat(0xd9dde0, { metalness: .8, roughness: .28 }),
+  aluDark: mat(0x9aa1a7, { metalness: .8, roughness: .35 }),
+  black: mat(0x1e2023, { roughness: .6 }),
+  rubber: mat(0x222427, { roughness: .92 }),
+  shield: mat(0x30353b, { metalness: .5, roughness: .4 }),
+  belt: mat(0x18191b, { roughness: .85 }),
+  tick: mat(0x8d949a, { roughness: .7 }),
+  red: mat(0xc8102e, { roughness: .5 }), blue: mat(0x2463b4, { roughness: .5 }),
+  copper: mat(0xc9a24a, { metalness: .8, roughness: .3 }),
+  desk: mat(0xeceeef, { roughness: .7 }),
+  yellow: mat(0xf2b807, { roughness: .6 }),
+};
+const threadMat = len => { const t = threadTex.clone(); t.needsUpdate = true; t.repeat.set(1, len / 1.25); return mat(0xffffff, { map: t, metalness: .8, roughness: .38 }); };
+
+/* ---------- 모양 도우미 (z 방향 부품은 z0..z1로) ---------- */
+function add(geo, material, parent = scene, pos, rot) {
+  const m = new THREE.Mesh(geo, material); if (pos) m.position.set(...pos); if (rot) m.rotation.set(...rot);
+  m.castShadow = true; m.receiveShadow = true; parent.add(m); return m;
+}
+const box = (w, h, d) => new THREE.BoxGeometry(w, h, d);
+function boxAt(x0, x1, y0, y1, z0, z1, material, parent) { return add(box(x1 - x0, y1 - y0, z1 - z0), material, parent, [(x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2]); }
+function cylZ(r, z0, z1, seg = 40, r2) { const g = new THREE.CylinderGeometry(r2 ?? r, r, z1 - z0, seg); g.rotateX(Math.PI / 2); g.translate(0, 0, (z0 + z1) / 2); return g; }
+function ringZ(rO, rI, z0, z1, seg = 48) { const s = new THREE.Shape(); s.absarc(0, 0, rO, 0, Math.PI * 2, false); const h = new THREE.Path(); h.absarc(0, 0, rI, 0, Math.PI * 2, true); s.holes.push(h); const g = new THREE.ExtrudeGeometry(s, { depth: z1 - z0, bevelEnabled: false, curveSegments: seg }); g.translate(0, 0, z0); return g; }
+function nutZ(parent, z0, z1 = z0 + NUT_H) { const g = new THREE.CylinderGeometry(NUT_R, NUT_R, z1 - z0, 6); g.rotateX(Math.PI / 2); g.rotateZ(Math.PI / 6); g.translate(0, 0, (z0 + z1) / 2); return add(g, M.zinc, parent); }
+function washerZ(parent, z0) { return add(ringZ(WASH_R, 4.2, z0, z0 + WASH_T, 32), M.steel, parent); }
+function rodZ(parent, z0, z1) { return add(cylZ(4, z0, z1, 18), threadMat(z1 - z0), parent); }
+function bearing(parent, zFront) { const z0 = zFront - BRG.w, z1 = zFront, g = new THREE.Group(); parent.add(g); add(ringZ(11, 9.4, z0, z1), M.steel, g); add(ringZ(9.4, 6.3, z0 + .3, z1 - .3), M.shield, g); add(ringZ(6.3, 4.05, z0, z1), M.steel, g); return g; }
+function pulley(parent, P, zc, hubSide = 1) {
+  const g = new THREE.Group(); parent.add(g);
+  const ro = P.pd / 2 - 0.254, rr = ro - 0.75, s = new THREE.Shape();
+  for (let i = 0; i < P.n; i++) {
+    const a = i / P.n * Math.PI * 2, p = Math.PI * 2 / P.n;
+    const pts = [[rr, a], [ro, a + p * .22], [ro, a + p * .58], [rr, a + p * .8]];
+    pts.forEach(([r, t], k) => (i === 0 && k === 0 ? s.moveTo : s.lineTo).call(s, r * Math.cos(t), r * Math.sin(t)));
+  }
+  s.closePath(); const bore = new THREE.Path(); bore.absarc(0, 0, 4, 0, Math.PI * 2, true); s.holes.push(bore);
+  const tg = new THREE.ExtrudeGeometry(s, { depth: 7, bevelEnabled: false, curveSegments: 4 }); tg.translate(0, 0, zc - 3.5);
+  add(tg, M.alu, g);
+  add(ringZ(P.flange / 2, 4, zc - 4.5, zc - 3.5), M.alu, g);
+  add(ringZ(P.flange / 2, 4, zc + 3.5, zc + 4.5), M.alu, g);
+  const h0 = hubSide > 0 ? zc + 4.5 : zc - 4.5 - P.hubL, h1 = h0 + P.hubL;
+  add(ringZ(P.hub / 2, 4, h0, h1), M.alu, g);
+  for (const a of [Math.PI / 2, 0]) { const sc = add(cylZ(1.6, -1, 1, 12), M.black, g); sc.rotation.set(0, Math.PI / 2, a); sc.position.set(Math.cos(a) * (P.hub / 2 - .6), Math.sin(a) * (P.hub / 2 - .6), (h0 + h1) / 2); }
+  return g;
+}
+function wire(points, color, r = 1.6, parent = scene) {
+  const curve = new THREE.CatmullRomCurve3(points.map(p => new THREE.Vector3(...p)), false, "centripetal");
+  add(new THREE.TubeGeometry(curve, Math.max(48, points.length * 30), r, 8, false), mat(color, { roughness: .6 }), parent);
+}
+
+/* ================= 책상 · 바닥판 · 앞판 · 뒤판 ================= */
+boxAt(-620, 520, -25, 0, -450, DESK_EDGE, M.desk);
+boxAt(-BASE.w / 2, BASE.w / 2, 0, BT, BASE.z0, BASE.z1, M.wood);
+for (const P of [PB, PF]) {
+  const g = new THREE.Group(); scene.add(g);
+  const s = new THREE.Shape(); s.moveTo(-PLATE.w / 2, BT); s.lineTo(PLATE.w / 2, BT); s.lineTo(PLATE.w / 2, BT + PLATE.h); s.lineTo(-PLATE.w / 2, BT + PLATE.h); s.closePath();
+  const hp = new THREE.Path(); hp.absarc(0, Y_A, BRG.od / 2, 0, Math.PI * 2, true); s.holes.push(hp);
+  for (const x of [-TIE.x, TIE.x]) for (const y of TIE.ys) { const t = new THREE.Path(); t.absarc(x, y, 4.25, 0, Math.PI * 2, true); s.holes.push(t); }
+  const geo = new THREE.ExtrudeGeometry(s, { depth: P.z1 - P.z0, bevelEnabled: false, curveSegments: 32 }); geo.translate(0, 0, P.z0);
+  const uv = geo.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) / 200, uv.getY(i) / 200);
+  add(geo, M.wood, g);
+  const b = bearing(g, P.z1); b.position.set(0, Y_A, 0);
+}
+// 앞판·뒤판을 잇는 전산볼트 4개
+for (const x of [-TIE.x, TIE.x]) for (const y of TIE.ys) {
+  const g = new THREE.Group(); g.position.set(x, y, 0); scene.add(g);
+  rodZ(g, TIE.z0, TIE.z1);
+  washerZ(g, PB.z0 - WASH_T); nutZ(g, PB.z0 - WASH_T - NUT_H); washerZ(g, PB.z1); nutZ(g, PB.z1 + WASH_T);
+  washerZ(g, PF.z0 - WASH_T); nutZ(g, PF.z0 - WASH_T - NUT_H); washerZ(g, PF.z1); nutZ(g, PF.z1 + WASH_T);
+}
+// 모터 받침 2장 + 모터판 + 와셔(장력)
+const RW = 140, RD = 80, RZ = (MF + M_END) / 2;
+for (let i = 0; i < RISER; i++) boxAt(-RW / 2, RW / 2, BT + i * T, BT + (i + 1) * T, RZ - RD / 2, RZ + RD / 2, M.wood);
+boxAt(-RW / 2, RW / 2, MPLATE_Y + SHIM, MPLATE_Y + SHIM + T, RZ - RD / 2, RZ + RD / 2, M.wood);
+for (const sx of [-1, 1]) for (const sz of [-1, 1]) {
+  const g = new THREE.Group(); g.position.set(sx * (RW / 2 - 9), 0, RZ + sz * (RD / 2 - 9)); scene.add(g);
+  for (let k = 0; k < SHIM; k++) { const w = add(ringZ(WASH_R, 4.2, 0, WASH_T, 24), M.steel, g); w.rotation.x = -Math.PI / 2; w.position.y = MPLATE_Y + k * WASH_T; }
+  add(new THREE.CylinderGeometry(4.2, 4.2, 1.6, 20), M.zinc, g, [0, MPLATE_Y + SHIM + T + .8, 0]);   // 피스 머리
+}
+// 책상 고정 C클램프 2개
+for (const x of [-120, 120]) {
+  const g = new THREE.Group(); g.position.x = x; scene.add(g);
+  boxAt(-6, 6, -48, 28, DESK_EDGE + 10, DESK_EDGE + 22, M.red, g);
+  boxAt(-6, 6, 18, 28, BASE.z1 - 40, DESK_EDGE + 22, M.red, g);
+  boxAt(-6, 6, -48, -40, BASE.z1 - 40, DESK_EDGE + 22, M.red, g);
+  add(new THREE.CylinderGeometry(4, 4, 26, 16), threadMat(26), g, [0, -38, BASE.z1 - 29]);
+  boxAt(-9, 9, -28, -25, BASE.z1 - 38, BASE.z1 - 20, M.black, g);
+  add(box(46, 6, 6), M.black, g, [0, -53, BASE.z1 - 29]);
+}
+
+/* ================= 조향축 (돌아가는 부분) ================= */
+const steer = new THREE.Group(); steer.position.set(0, Y_A, 0); scene.add(steer);
+rodZ(steer, ROD.z0, ROD.z1);
+// 앞판 608ZZ 안쪽 고리를 앞뒤 너트로 잡음 → 축이 앞뒤로 안 빠짐
+washerZ(steer, PF.z1 - BRG.w - WASH_T); nutZ(steer, PF.z1 - BRG.w - WASH_T - NUT_H);
+washerZ(steer, PF.z1); nutZ(steer, PF.z1 + WASH_T);
+// 60T 풀리 + 양쪽 너트
+const p60 = pulley(steer, P60, BZ, 1);
+nutZ(steer, BZ - 4.5 - NUT_H); nutZ(steer, BZ + 4.5 + P60.hubL);
+// 허브판: 15T 2장, 뒤 너트 + 앞 너트 2개(잠금)
+nutZ(steer, HUB.z0 - WASH_T - NUT_H); washerZ(steer, HUB.z0 - WASH_T);
+const hubGeo = cylZ(HUB.r, HUB.z0, HUB.z1, 64); add(hubGeo, M.wood, steer);
+add(ringZ(HUB.r + .05, HUB.r - 2, HUB.z0 + T - .4, HUB.z0 + T + .4, 64), M.woodEnd, steer);
+washerZ(steer, HUB.z1); nutZ(steer, HUB.z1 + WASH_T); nutZ(steer, HUB.z1 + WASH_T + NUT_H);
+// 자석 Ø6×2.5 (지름 방향 N/S)
+const mag = new THREE.Group(); steer.add(mag);
+const halfDisc = (a0, m) => { const g = new THREE.CylinderGeometry(AS.mag / 2, AS.mag / 2, AS.magT, 24, 1, false, a0, Math.PI); g.rotateX(Math.PI / 2); g.translate(0, 0, ROD.z0 - AS.magT / 2); add(g, m, mag); };
+halfDisc(0, M.red); halfDisc(Math.PI, M.blue);
+
+/* ---------- 핸들 350mm (PCD 70 × 6, 디쉬 70으로 그림) ---------- */
+const wheel = new THREE.Group(); steer.add(wheel);
+add(ringZ(WHEEL.bore / 2 + 22, WHEEL.bore / 2, HUB.z1, HUB.z1 + 5, 64), M.aluDark, wheel);
+for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2 + Math.PI / 6; add(cylZ(4, HUB.z1 + 5, HUB.z1 + 8, 16), M.zinc, wheel, [Math.cos(a) * WHEEL.pcd / 2, Math.sin(a) * WHEEL.pcd / 2, 0]); }
+add(new THREE.TorusGeometry(RIM_R, WHEEL.grip / 2, 28, 180), M.rubber, wheel, [0, 0, RIM_Z]);
+add(new THREE.TorusGeometry(RIM_R, WHEEL.grip / 2 + .4, 16, 12, 0.11), M.yellow, wheel, [0, 0, RIM_Z], [0, 0, Math.PI / 2 - 0.055]);
+const SP = { r0: 42, r1: RIM_R - 8, z0: HUB.z1 + 2.5, z1: RIM_Z - 4 };
+SP.phi = Math.atan2(SP.z1 - SP.z0, SP.r1 - SP.r0); SP.len = Math.hypot(SP.z1 - SP.z0, SP.r1 - SP.r0);
+function spokeShape(len, w0, w1) {
+  const s = new THREE.Shape(); s.moveTo(0, -w0 / 2); s.lineTo(len, -w1 / 2); s.lineTo(len, w1 / 2); s.lineTo(0, w0 / 2); s.closePath();
+  [[.3, .13], [.66, .12]].forEach(([c, hw]) => { const cx = len * c, h = len * hw, r = w1 * .2, p = new THREE.Path(); p.moveTo(cx - h, -r); p.lineTo(cx + h, -r); p.absarc(cx + h, 0, r, -Math.PI / 2, Math.PI / 2, false); p.lineTo(cx - h, r); p.absarc(cx - h, 0, r, Math.PI / 2, Math.PI * 1.5, false); s.holes.push(p); });
+  return s;
+}
+const spokeGeo = new THREE.ExtrudeGeometry(spokeShape(SP.len, 40, 30), { depth: 5, bevelEnabled: true, bevelThickness: .6, bevelSize: .6, bevelSegments: 2, curveSegments: 16 });
+spokeGeo.translate(0, 0, -2.5);
+const paddles = [];
+[0, Math.PI, -Math.PI / 2].forEach((a, i) => {
+  const holder = new THREE.Group(); holder.rotation.z = a; wheel.add(holder);
+  const sf = new THREE.Group(); sf.position.set(SP.r0, 0, SP.z0); sf.rotation.y = -SP.phi; holder.add(sf);
+  add(spokeGeo, M.alu, sf);
+  if (i < 2) {   // 3시·9시 살 뒷면에 패들 (리미트 스위치 모듈), 레버는 바깥쪽 — 손끝으로 당기면 눌림
+    const pm = new THREE.Group(); pm.position.set(SP.len * .6, 0, 0); sf.add(pm);
+    add(box(34, 17, 1.6), mat(0xffffff, { map: pcbTex("#1f4fa8", "LIMIT SW", "VCC GND OUT"), roughness: .5 }), pm, [0, 0, -4.1]);
+    add(box(20, 6.4, 10), M.black, pm, [4, 0, -9.9]);
+    const lever = new THREE.Group(); lever.position.set(-4, 0, -15.6); pm.add(lever);
+    add(box(30, 4, .6), M.steel, lever, [15, 0, 0], [0, -0.08, 0]);
+    add(cylZ(2.5, -2, 2, 16), M.black, lever, [30, 0, 1.4], [Math.PI / 2, 0, 0]);
+    paddles.push(pm);
+  }
+});
+
+/* ================= 모터 MY1016 (앞판·뒤판 사이, 조향축 아래 C만큼) ================= */
+const motor = new THREE.Group(); motor.position.set(0, Y_M, 0); scene.add(motor);
+add(cylZ(14, MF - 3, MF, 40), M.alu, motor);                                     // 축 쪽 베어링 자리
+add(cylZ(MOT.r - 1, MF, MF + MOT.rearCap, 64), M.alu, motor);
+add(cylZ(MOT.r, MF + MOT.rearCap, MF + MOT.rearCap + MOT.can, 64), mat(0x2b2f33, { metalness: .5, roughness: .42 }), motor);
+const lab = new THREE.CylinderGeometry(MOT.r + .3, MOT.r + .3, 26, 64, 1, true, Math.PI * .65, Math.PI * .7); lab.rotateX(Math.PI / 2); lab.translate(0, 0, MF + MOT.rearCap + MOT.can / 2);
+add(lab, mat(0xffffff, { map: motorLabel, roughness: .6, side: THREE.DoubleSide }), motor);
+add(cylZ(MOT.r - 1, MF + MOT.rearCap + MOT.can, M_END, 64), M.alu, motor);
+for (let i = 0; i < 8; i++) { const a = i / 8 * Math.PI * 2; add(box(3, 7, 5), M.black, motor, [Math.cos(a) * (MOT.r - 1.5), Math.sin(a) * (MOT.r - 1.5), M_END - 4], [0, 0, a]); }
+// 받침쇠 110×55, 구멍 95×41 M6 (밑에서 모터판을 지나 볼트로)
+const brk = new THREE.Group(); brk.position.set(0, -MOT.r - MOT.br.t / 2, RZ); motor.add(brk);
+add(box(MOT.br.w, MOT.br.t, MOT.br.d), mat(0x7b8188, { metalness: .7, roughness: .4 }), brk);
+for (const sx of [-1, 1]) { add(box(3, 16, MOT.br.d), mat(0x7b8188, { metalness: .7, roughness: .4 }), brk, [sx * 30, 8, 0]); for (const sz of [-1, 1]) add(new THREE.CylinderGeometry(3, 3, 4, 12), M.zinc, brk, [sx * MOT.br.hx / 2, 2.5, sz * MOT.br.hz / 2]); }
+const rotor = new THREE.Group(); motor.add(rotor);
+add(cylZ(4, BZ - 5, MF - 3, 20), M.steel, rotor);
+const p20 = pulley(rotor, P20, BZ, 1);
+// 모터 선 2가닥 (14AWG 빨강·검정)
+for (const sx of [-8, 8]) add(cylZ(3, M_END, M_END + 4, 12), M.copper, motor, [sx, 18, 0]);
+
+/* ---------- GT2 벨트 200mm ---------- */
+const R1 = P60.pd / 2, R2 = P20.pd / 2;
+function beltPath(r1, r2, s) {
+  const th = -Math.PI / 2, b = Math.acos((R1 - R2) / C);
+  s.absarc(0, Y_A, r1, th + b, th + 2 * Math.PI - b, false); s.absarc(0, Y_M, r2, th - b, th + b, false); s.closePath(); return s;
+}
+const bs = beltPath(R1 + .9, R2 + .9, new THREE.Shape()); bs.holes.push(beltPath(R1 - .45, R2 - .45, new THREE.Path()));
+const beltGeo = new THREE.ExtrudeGeometry(bs, { depth: BELT.w, bevelEnabled: false, curveSegments: 96 }); beltGeo.translate(0, 0, BZ - BELT.w / 2);
+add(beltGeo, M.belt);
+const pitchPts = beltPath(R1 + .2, R2 + .2, new THREE.Shape()).getSpacedPoints(600);
+const ticks = []; const NT = 26;
+for (let i = 0; i < NT; i++) ticks.push(add(box(2.2, .5, BELT.w + .2), M.tick));
+function placeTicks(s) {
+  const n = pitchPts.length - 1;
+  ticks.forEach((t, i) => {
+    let u = (i / NT + s / BELT.L) % 1; if (u < 0) u += 1;
+    const k = Math.floor(u * n), p = pitchPts[k], q = pitchPts[(k + 1) % n];
+    const dx = q.x - p.x, dy = q.y - p.y, l = Math.hypot(dx, dy) || 1;
+    t.position.set(p.x + dy / l * .85, p.y - dx / l * .85, BZ); t.rotation.z = Math.atan2(dy, dx);
+  });
+}
+
+/* ================= 조향 센서 AS5600 (축 끝 자석과 1.5 떨어짐) ================= */
+boxAt(-SB.w / 2, SB.w / 2, BT, SB.top, SB.z0, SB.z1, M.wood);
+const asb = new THREE.Group(); asb.position.set(0, Y_A, 0); scene.add(asb);
+add(box(AS.board, AS.board, AS.pcb), mat(0xffffff, { map: pcbTex("#5b3aa8", "AS5600", "I2C 0x36"), roughness: .5 }), asb, [0, 0, SB.z1 + AS.pcb / 2]);
+add(box(5, 4, AS.chip), M.black, asb, [0, 0, SB.z1 + AS.pcb + AS.chip / 2]);
+for (let i = 0; i < 4; i++) add(box(.8, 7, .8), M.copper, asb, [-6 + i * 4, -AS.board / 2 - 3.5, SB.z1 + AS.pcb + 1]);
+
+/* ================= 전자부 ================= */
+boxAt(EB.x0, EB.x1, 0, T, EB.z0, EB.z1, M.wood);
+// LRS-350-24 215×115×30
+const SM = { x0: -458, x1: -243, z0: -140, z1: -25 };
+const smps = new THREE.Group(); scene.add(smps);
+add(box(SM.x1 - SM.x0, 30, SM.z1 - SM.z0), [mat(0xb4babf, { metalness: .6, roughness: .45 }), mat(0xb4babf, { metalness: .6 }), mat(0xffffff, { map: perfTex, metalness: .5, roughness: .45 }), mat(0x9ea4a9), mat(0xb4babf, { metalness: .6 }), mat(0xb4babf, { metalness: .6 })], smps, [(SM.x0 + SM.x1) / 2, T + 15, (SM.z0 + SM.z1) / 2]);
+add(box(12, 22, SM.z1 - SM.z0 - 8), M.black, smps, [SM.x1 + 6, T + 12, (SM.z0 + SM.z1) / 2]);
+const TERM = []; for (let i = 0; i < 9; i++) { const z = SM.z0 + 9 + i * 12.2; TERM.push(z); add(new THREE.CylinderGeometry(2.6, 2.6, 2, 12), M.steel, smps, [SM.x1 + 6, T + 24, z]); }
+// 24V 스위치 (구매 목록 없음)
+boxAt(-222, -192, T, T + 22, -110, -88, M.black);
+add(box(16, 6, 12), M.red, scene, [-207, T + 24, -99], [0, 0, .25]);
+// BTS7960 50×50×43
+const BX = -235, BZc = 18;
+add(box(50, 1.6, 50), mat(0xffffff, { map: pcbTex("#b5161f", "BTS7960", "43A"), roughness: .5 }), scene, [BX, T + 9, BZc]);
+for (const i of [-1, 1]) for (const j of [-1, 1]) add(new THREE.CylinderGeometry(1.5, 1.5, 8, 8), M.steel, scene, [BX + i * 21, T + 4, BZc + j * 21]);
+add(box(40, 4, 40), M.alu, scene, [BX, T + 12, BZc]);
+for (let i = 0; i < 9; i++) add(box(1.6, 30, 40), M.alu, scene, [BX - 18 + i * 4.5, T + 29, BZc]);
+add(box(12, 10, 34), M.blue, scene, [BX - 27, T + 15, BZc]);
+// 아두이노 우노 68.6×53.4
+const UX = -420, UZ = 18;
+add(box(68.6, 1.6, 53.4), mat(0xffffff, { map: pcbTex("#0e7c86", "UNO", "ATmega328P"), roughness: .5 }), scene, [UX, T + 8, UZ]);
+add(box(16, 11, 12), M.steel, scene, [UX - 30, T + 14, UZ - 12]);
+add(box(14, 11, 9), M.black, scene, [UX - 30, T + 14, UZ + 16]);
+add(box(52, 8, 2.5), M.black, scene, [UX + 4, T + 13, UZ - 25]);
+add(box(52, 8, 2.5), M.black, scene, [UX + 4, T + 13, UZ + 25]);
+for (const i of [-1, 1]) for (const j of [-1, 1]) add(new THREE.CylinderGeometry(1.5, 1.5, 6, 8), M.steel, scene, [UX + i * 30, T + 3.5, UZ + j * 22]);
+
+/* ---------- 선 ---------- */
+const RED = 0xc8102e, BLK = 0x1b1c1e;
+const tx = SM.x1 + 6, ty = T + 25;
+wire([[tx, ty, TERM[8]], [tx + 20, ty + 4, TERM[8]], [-214, T + 14, -104], [-207, T + 20, -96]], RED, 2);            // +V → 스위치
+wire([[-200, T + 18, -92], [-195, T + 10, -40], [BX - 27, T + 22, BZc - 12]], RED, 2);                                  // 스위치 → B+
+wire([[tx, ty, TERM[4]], [tx + 30, ty + 6, TERM[4] + 30], [BX - 34, T + 20, BZc - 30], [BX - 27, T + 22, BZc - 4]], BLK, 2); // −V → B−
+// M+ M− → 모터 (바닥판 위로, 앞판·뒤판 사이 열린 옆으로)
+for (const [dz, c, mx] of [[4, RED, -8], [12, BLK, 8]]) wire([[BX - 27, T + 22, BZc + dz], [BX - 40, T + 6, BZc + dz + 30], [-170, T + 3, 80], [-120, BT + 2, M_END + 6], [-30, BT + 2, M_END + 6], [mx * 1.6, BT + 4, M_END + 6], [mx, Y_M + 18, M_END + 6], [mx, Y_M + 18, M_END + 3]], c, 2);
+// 우노 ↔ BTS7960 신호선 (D8 EN, D9 RPWM, D10 LPWM, 5V, GND)
+[[0xf2b807, -8], [0x2a7fd4, -4], [0x2fa84f, 0], [RED, 4], [BLK, 8]].forEach(([c, d]) => wire([[UX + 20 + d, T + 17, UZ - 25], [UX + 60, T + 30, UZ - 34 + d], [BX - 40, T + 26, BZc - 30 + d], [BX + 25, T + 12, BZc - 20 + d]], c, .9));
+// AS5600 → A4·A5·5V·GND (센서 받침 옆으로 내려 바닥판 뒤로)
+[0x7a3fd0, 0x9b6ad8, RED, BLK].forEach((c, i) => wire([[-6 + i * 4, Y_A - AS.board / 2 - 7, SB.z1 + 2], [-6 + i * 4, Y_A - 26, SB.z1 + 4], [-SB.w / 2 - 6, Y_A - 50, SB.z0 + 4], [-SB.w / 2 - 6, BT + 2, SB.z0 + 2 + i * 2], [-140, BT + 2, SB.z0 + 2 + i * 2], [-175, T + 2, -60], [UX + 24 - i * 3, T + 13, UZ - 25]], c, .8));
+// 패들 선: 축에 느슨하게 3바퀴 → 앞판 앞으로 내려 바닥판 → 우노 D4·D7
+const coil = []; const CR = 26, CZ0 = PF.z1 + WASH_T + NUT_H + 3, CZ1 = HUB.z0 - WASH_T - NUT_H - 3;
+for (let i = 0; i <= 120; i++) { const t = i / 120, a = -Math.PI / 2 + t * Math.PI * 6; coil.push([Math.cos(a) * CR, Y_A + Math.sin(a) * CR, CZ0 + t * (CZ1 - CZ0)]); }
+wire(coil, 0x3a3f45, 1.4);
+wire([[0, Y_A - CR, CZ0], [-20, Y_A - 60, CZ0 - 2], [-40, BT + 20, PF.z1 + 4], [-60, BT + 2, PF.z1 + 4], [-150, BT + 2, BASE.z1 - 10], [-175, T + 2, 50], [UX + 28, T + 13, UZ + 25]], 0x3a3f45, 1.4);
+for (const pm of paddles) {   // 패들 → 살 뒤 → 허브 가장자리 → 감은 선 끝 (핸들과 같이 돔)
+  steer.updateMatrixWorld(true); const p = pm.localToWorld(new THREE.Vector3(-10, 0, -4)); wheel.worldToLocal(p);
+  const s = Math.sign(p.x);
+  wire([[p.x, p.y, p.z], [s * 60, 0, HUB.z1 + 3], [s * (HUB.r + 2), 0, HUB.z1 - 4], [s * (HUB.r + 2), 0, HUB.z0 - 2], [s * CR, 0, CZ1 + 1]], 0x3a3f45, 1.1, wheel);
+}
+// USB → PC, 220V 전원선
+wire([[UX - 38, T + 14, UZ - 12], [UX - 80, T + 6, UZ - 20], [-560, 2, -120], [-610, 2, -300]], 0x3a3f45, 2.4);
+wire([[tx, ty, TERM[0]], [tx + 14, ty, TERM[0] - 16], [-300, T + 6, -160], [-380, 2, -230], [-560, 2, -400]], 0x2c3136, 2.8);
+
+/* ================= 이름표 ================= */
+const LBL = [
+  ["핸들", "350mm · PCD 70×6", [-RIM_R * .72, Y_A + RIM_R * .72 + 26, RIM_Z]],
+  ["허브판", "15T 2장 Ø100", [-HUB.r - 6, Y_A + 34, (HUB.z0 + HUB.z1) / 2]],
+  ["패들 (리미트 스위치)", "3시·9시 살 뒤", null, () => paddles[0]],
+  ["감은 패들 선", "±450° 여유", [0, Y_A + CR + 12, (CZ0 + CZ1) / 2]],
+  ["앞판", "608ZZ", [PLATE.w / 2 - 20, BT + PLATE.h + 10, (PF.z0 + PF.z1) / 2]],
+  ["뒤판", "608ZZ", [PLATE.w / 2 - 20, BT + PLATE.h + 10, 0]],
+  ["조향축", "M8 전산볼트", [0, Y_A + 12, 95]],
+  ["60T 풀리", "보어 8", [0, Y_A + 30, BZ]],
+  ["GT2 벨트", "200mm 폭 6", [R1 + 4, (Y_A + Y_M) / 2 + 6, BZ]],
+  ["20T 풀리", "모터 축", [0, Y_M - 16, BZ]],
+  ["MY1016", "24V 250W", [0, Y_M + MOT.r + 14, RZ]],
+  ["모터판 + 와셔", "벨트 장력", [RW / 2 + 4, MPLATE_Y + 10, RZ + RD / 2]],
+  ["AS5600 + 자석", "틈 1.5", [0, Y_A + 26, SB.z1]],
+  ["C클램프", "책상에 고정", [120, 40, DESK_EDGE + 16]],
+  ["LRS-350-24", "24V 14.6A", [(SM.x0 + SM.x1) / 2, T + 40, (SM.z0 + SM.z1) / 2]],
+  ["24V 스위치", "", [-207, T + 40, -99]],
+  ["BTS7960", "", [BX, T + 54, BZc]],
+  ["아두이노 우노", "", [UX, T + 26, UZ]],
+];
+const labelsEl = document.getElementById("labels");
+const labels = LBL.map(([t, s, p, fn]) => { const e = document.createElement("div"); e.className = "tag" + (p && p[0] < -150 ? " e" : ""); e.innerHTML = t + (s ? `<small>${s}</small>` : ""); labelsEl.appendChild(e); return { e, v: p ? new THREE.Vector3(...p) : new THREE.Vector3(), fn }; });
+let showNames = true;
+document.getElementById("tNames").addEventListener("click", e => { showNames = !showNames; e.currentTarget.setAttribute("aria-pressed", showNames); });
+
+/* ================= 카메라 ================= */
+const VIEWS = {
+  iso: { p: [760, 420, 480], t: [-70, 105, 80] },
+  side: { p: [900, 190, 90], t: [0, 120, 90] },
+  front: { p: [-60, 300, 1080], t: [-120, 110, 60] },
+  back: { p: [-420, 420, -720], t: [-90, 110, 20] },
+};
+let camAnim = null;
+function setView(k, instant) {
+  const v0 = VIEWS[k], kf = stage.clientWidth < 700 ? 1.7 : 1, v = { t: v0.t, p: v0.p.map((x, i) => v0.t[i] + (x - v0.t[i]) * kf) }; document.querySelectorAll("[data-cam]").forEach(b => b.setAttribute("aria-pressed", b.dataset.cam === k));
+  if (instant || matchMedia("(prefers-reduced-motion: reduce)").matches) { cam.position.set(...v.p); controls.target.set(...v.t); return; }
+  camAnim = { t: 0, p0: cam.position.clone(), t0: controls.target.clone(), p1: new THREE.Vector3(...v.p), t1: new THREE.Vector3(...v.t) };
+}
+document.querySelectorAll("[data-cam]").forEach(b => b.addEventListener("click", () => setView(b.dataset.cam)));
+setView(VIEWS[location.hash.slice(1)] ? location.hash.slice(1) : "iso", true);
+function resize() { const w = stage.clientWidth, h = stage.clientHeight; renderer.setSize(w, h, false); cam.aspect = w / h; if (w < 700) cam.fov = 44; else cam.fov = 32; cam.updateProjectionMatrix(); }
+new ResizeObserver(resize).observe(stage); resize();
+
+/* ================= 돌리기 · 읽은 값 ================= */
+const $ = id => document.getElementById(id);
+const play = $("play"), sl = $("sl");
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+let auto = !reduce, t = 0, last = performance.now(), ang = 0;
+const syncPlay = () => { play.textContent = auto ? "❚❚" : "▶"; play.setAttribute("aria-label", auto ? "자동 돌리기 멈춤" : "자동 돌리기"); };
+syncPlay();
+play.addEventListener("click", () => { auto = !auto; syncPlay(); });
+sl.addEventListener("input", () => { auto = false; syncPlay(); });
+const MAX_OUT = 30;   // SRS M 기본 30%
+// 부품 뒤에 가려진 이름표는 흐리게
+const ray = new THREE.Raycaster(), meshes = []; scene.traverse(o => o.isMesh && meshes.push(o));
+let fc = 0;
+function frame(now) {
+  requestAnimationFrame(frame);
+  const dt = Math.min(.05, (now - last) / 1000); last = now;
+  if (auto) { t += dt; ang = 300 * Math.sin(t * .7) + 90 * Math.sin(t * 1.9); sl.value = Math.round(ang); } else ang = +sl.value;
+  const rad = ang * Math.PI / 180;
+  steer.rotation.z = -rad;                 // 시계 방향(오른쪽) = + (SRS)
+  rotor.rotation.z = -rad * P60.n / P20.n;
+  placeTicks(-rad * R1);
+  const raw = Math.floor((((ang % 360) + 360) % 360) / 360 * 4096) % 4096, turns = Math.floor(ang / 360);
+  const pwm = -Math.max(-1, Math.min(1, ang / 450)) * MAX_OUT;
+  $("deg").textContent = Math.round(ang) + "°";
+  $("vRaw").innerHTML = raw + "<small>/4095</small>";
+  $("vTurn").textContent = turns;
+  $("vMot").textContent = Math.round(ang * 3) + "°";
+  $("vPwm").innerHTML = Math.abs(pwm).toFixed(0) + "%<small> " + (Math.abs(pwm) < 1 ? "" : pwm < 0 ? "왼쪽으로" : "오른쪽으로") + "</small>";
+  if (camAnim) { camAnim.t = Math.min(1, camAnim.t + dt * 1.6); const e = 1 - Math.pow(1 - camAnim.t, 3); cam.position.lerpVectors(camAnim.p0, camAnim.p1, e); controls.target.lerpVectors(camAnim.t0, camAnim.t1, e); if (camAnim.t >= 1) camAnim = null; }
+  controls.update(); fc++;
+  const w = stage.clientWidth, h = stage.clientHeight;
+  labels.forEach(l => {
+    if (l.fn) l.fn().getWorldPosition(l.v);
+    const p = l.v.clone().project(cam), vis = showNames && p.z < 1 && Math.abs(p.x) < 1.05 && Math.abs(p.y) < 1.05;
+    l.e.style.display = vis ? "block" : "none";
+    if (vis) l.e.style.transform = `translate(${(p.x * .5 + .5) * w}px,${(-p.y * .5 + .5) * h}px) translate(-50%,-50%)`;
+    if (vis && fc % 6 === 0) { const d = l.v.distanceTo(cam.position); ray.set(cam.position, l.v.clone().sub(cam.position).normalize()); ray.far = d; l.e.classList.toggle("hid", ray.intersectObjects(meshes, false).some(x => x.distance < d - 6)); }
+  });
+  renderer.render(scene, cam);
+}
+requestAnimationFrame(frame);
+document.getElementById("loading").remove();
+
+/* ================= 아래 문서 ================= */
+const SRC = {
+  esp: ["electricscooterparts", "https://electricscooterparts.com/motors-my1016.html"],
+  sw: ["scooterworks", "https://www.scooterworks.com/products/universal-parts-24v-250w-my1016-electric-motor-220-21"],
+  kg: ["kitsguru", "https://kitsguru.com/products/24v-250w-my1016-motor-for-electric-bike-electric-tricycle-electric-motor"],
+  p60: ["판매처 예", "https://www.robocraze.com/products/gt2-6mm-belt-width-60-teeth-8mm-bore-timing-pulley"],
+  ams: ["ams 평가 키트 설명서", "https://en.eeworld.com.cn/datasheet/view/21982494.html"],
+  mw: ["Bravo Electro", "https://www.bravoelectro.com/lrs-350-24.html"],
+  bts: ["ElectroPeak", "https://electropeak.com/bts7960-43a-high-power-motor-driver-module"],
+  pcd: ["Circuit Performance", "https://circuitperformance.com/?p=2674"],
+  uno: ["Arduino 공식", "https://docs.arduino.cc/hardware/uno-rev3/"],
+};
+const src = (...k) => k.map(x => `<a href="${SRC[x][1]}" target="_blank" rel="noopener">${SRC[x][0]}</a>`).join(" · ");
+const ST = { ok: '<span class="st ok">규격</span>', ms: '<span class="st ms">판매처 값</span>', as: '<span class="st as">가정</span>', calc: '<span class="st ok">계산</span>' };
+const PARTS = [
+  ["MY1016 모터", `몸통 Ø${MOT.r * 2} · 축 포함 길이 ${MOT.shaft + MOT.rearCap + MOT.can + MOT.frontCap}<small>받침쇠 ${MOT.br.w}×${MOT.br.d}, 구멍 ${MOT.br.hx}×${MOT.br.hz} M6 · 축 Ø8 한 면 깎음(끝은 왼나사) · 2650~2750rpm, 정격 약 13.5A, 약 ${TORQ.motor} N·m</small>`, ST.ms, src("esp", "sw", "kg")],
+  ["GT2 20T 풀리", `피치원 Ø${f1(P20.pd)} · 플랜지 Ø${P20.flange} · 보어 8<small>모터 축에. 원래 달린 풀리(왼나사 너트)를 빼고 끼움</small>`, ST.ms, "옵션 20T8"],
+  ["GT2 60T 풀리", `피치원 Ø${f1(P60.pd)} · 플랜지 Ø${P60.flange} · 허브 Ø${P60.hub} · 보어 8`, ST.ms, src("p60")],
+  ["2GT-200-6 벨트", `200mm (이 100개) · 폭 6 → 축간 ${f1(C)}`, ST.calc, "길이 식으로 풂"],
+  ["핸들", `Ø350 · 볼트 PCD 70 × 6 · 그립 굵기 ${WHEEL.grip}<small>디쉬(장착면→앞면) ${WHEEL.dish}로 그림. 제품마다 0~95라 받으면 재기</small>`, ST.as, src("pcd")],
+  ["608ZZ", "안 8 · 바깥 22 · 폭 7", ST.ok, "베어링 규격"],
+  ["M8 전산볼트·너트·와셔", `너트 맞변 13 · 높이 6.5 · 와셔 17×1T · 나사 피치 1.25`, ST.ok, "M8 규격"],
+  ["AS5600 모듈", `기판 ${AS.board}×${AS.board} · 자석 Ø6×2.5 지름 방향 · 자석–칩 ${AS.gap}<small>틈 권장 0.5~3. 기판 크기는 판매처마다 20×13.5~23×23</small>`, ST.ms, src("ams")],
+  ["리미트 스위치 모듈", "기판 34×17 · 스위치 20×10×6.4", ST.as, "흔한 KW11 모듈로 그림"],
+  ["BTS7960", "50×50 · 방열판 포함 높이 43", ST.ms, src("bts")],
+  ["LRS-350-24", "215×115×30 · 24V 14.6A", ST.ok, src("mw")],
+  ["아두이노 우노", "68.6×53.4", ST.ok, src("uno")],
+];
+$("parts").innerHTML = `<thead><tr><th>부품</th><th>그린 치수 (mm)</th><th></th><th>근거</th></tr></thead><tbody>` + PARTS.map(([a, b, c, d]) => `<tr><td>${a}</td><td class="m">${b}</td><td>${c}</td><td><small>${d}</small></td></tr>`).join("") + "</tbody>";
+
+const gapRodMotor = C - MOT.r - 4;
+const gapFlangeMotor = MF - (BZ + 4.5);       // 60T 플랜지 앞면 ↔ 모터 면 (지름이 모터 위에 걸침)
+const gapHubMotor = MF - 3 - (BZ + 4.5 + P20.hubL);
+const gapMotorF = PF.z0 - M_END;
+const rimLow = Y_A - WHEEL.d / 2;
+const wheelTorque = TORQ.motor * P60.n / P20.n;
+const CHK = [
+  [true, "벨트 축간 거리", f1(C) + "mm", `GT2 200mm, 20T(Ø${f1(P20.pd)})·60T(Ø${f1(P60.pd)}) 피치원으로 계산. 앞판·뒤판의 축 높이 차가 이 값`],
+  [gapRodMotor > 5, "조향축 ↔ 모터 몸통", f1(gapRodMotor) + "mm", `${f1(C)} − 모터 반지름 ${MOT.r} − 축 반지름 4. 모터 지름이 ${f1(2 * (C - 4))} 넘으면 닿아요 — 받으면 지름부터 재기`],
+  [gapFlangeMotor > 3, "60T 플랜지 ↔ 모터 면 (앞뒤)", f1(gapFlangeMotor) + "mm", "60T가 모터 위로 걸쳐서 앞뒤로 떨어져 있어야 해요"],
+  [gapHubMotor > 1, "20T 허브 ↔ 모터 베어링 자리", f1(gapHubMotor) + "mm", ""],
+  [gapMotorF > 5, "모터 끝 ↔ 앞판", f1(gapMotorF) + "mm", "모터 선이 나오는 쪽"],
+  [true, "자석 ↔ AS5600 칩", AS.gap + "mm", "권장 0.5~3. 칩 아래 기판을 받침에 바로 붙임"],
+  [true, "핸들 아래 끝", `책상 윗면 ${rimLow < 0 ? "아래 " + f1(-rimLow) : "위 " + f1(rimLow)}mm`, `핸들은 책상 모서리보다 ${f1(HUB.z1 - DESK_EDGE)}mm 앞이라 닿지 않아요`],
+  [true, "핸들 힘 (정격)", f1(wheelTorque) + " N·m", `모터 약 ${TORQ.motor} N·m × 3 → 그립에서 약 ${f1(wheelTorque / (WHEEL.d / 2000) / 9.8)}kgf. 펌웨어 상한 M 기본 30%`],
+  [true, "조향축 길이", Math.ceil(ROD.z1 - ROD.z0) + "mm", "자석 끝 ~ 허브 앞 잠금 너트"],
+];
+$("chk").innerHTML = CHK.map(([ok, n, v, s]) => `<li><i class="${ok ? "" : "bad"}">${ok ? "✓" : "!"}</i><span>${n}${s ? `<small>${s}</small>` : ""}</span><span class="v">${v}</span></li>`).join("");
+
+$("why").innerHTML = [
+  `<b>모터는 앞판·뒤판 사이, 조향축 바로 아래.</b> 벨트가 200mm라 두 축 사이가 ${f1(C)}로 정해져요. 모터 몸통(Ø${MOT.r * 2})이 뒤판 뒤로 나가면 축 끝 AS5600 자리와 겹쳐서, 모터를 안쪽에 두고 뒤판 뒤에는 센서만 남겼어요.`,
+  `<b>벨트 장력은 모터판 밑 와셔로.</b> 모터는 모터판(15T)에 M6 볼트 4개로 달고, 모터판을 받침에 피스 4개로 조여요. 와셔를 빼면 모터가 내려가 벨트가 팽팽해지고, 넣으면 느슨해져요. 지금 그림은 2장.`,
+  `<b>60T 풀리와 허브판은 전산볼트에 미끄러지지 않게.</b> 60T 고정나사가 닿는 자리는 전산볼트 나사산을 줄로 평평하게 갈고, 양옆을 너트로 조여요. 허브판은 뒤 너트와 앞 너트 2개(서로 잠금) 사이에 꽉 끼워요.`,
+  `<b>축이 앞뒤로 안 빠지게 앞판 베어링만 잡아요.</b> 앞판 608ZZ 안쪽 고리를 앞뒤 너트로 물리고, 뒤판 베어링은 받치기만 해요. 두 판 모두 Ø22로 뚫어 베어링을 앞면에 맞춰 끼워요.`,
+  `<b>핸들은 피스 6×25로 허브판에.</b> 핸들의 PCD 70 구멍 6개에 피스를 넣어 15T 2장(30) 허브판에 박아요. 핸들 가운데 구멍으로 앞 너트가 보여요.`,
+  `<b>센서는 축 끝 자석과 ${AS.gap} 떨어지게.</b> 전산볼트 끝을 줄로 평평하게 다듬고 자석을 가운데에 붙여요(중심 어긋남 0.25 이내). AS5600 기판은 뒤판 뒤 센서 받침에 붙여요. 1:1로 붙어 있어서 핸들 한 바퀴 = 4096, 바퀴 수는 펌웨어가 세요.`,
+  `<b>패들 선은 축에 3바퀴 느슨하게 감아요.</b> 패들이 핸들과 같이 돌아서, 앞판과 허브판 사이에 감아 둔 선이 ±450°(SRS 기본 900°) 동안 풀렸다 감겼다 해요. 1080°로 쓰면 한 바퀴 더 감기.`,
+  `<b>책상 모서리에 C클램프 2개.</b> 모터가 핸들을 돌리면 반대로 베이스가 돌려고 해서, 바닥판을 책상에 꽉 물려야 해요.`,
+].map(s => `<li><span>${s}</span></li>`).join("");
+
+const CUT = [
+  ["앞판·뒤판", `${PLATE.w}×${PLATE.h}`, 2, `Ø22 (축 높이 ${f1(Y_A - BT)}) · Ø8.5 4개`],
+  ["바닥판", `${BASE.w}×${f1(BASE.z1 - BASE.z0)}`, 1, ""],
+  ["모터 받침", `${RW}×${RD}`, RISER, ""],
+  ["모터판", `${RW}×${RD}`, 1, `Ø6.5 4개 (${MOT.br.hx}×${MOT.br.hz})`],
+  ["허브판", `Ø${HUB.r * 2}`, 2, "Ø8.5 가운데"],
+  ["센서 받침", `${SB.w}×${f1(SB.top - BT)}`, 1, ""],
+  ["전자부 판", `${EB.x1 - EB.x0}×${EB.z1 - EB.z0}`, 1, ""],
+];
+const area = CUT.reduce((s, [, d, q]) => { const m = d.match(/Ø(\d+)/); const [a, b] = m ? [+m[1], +m[1]] : d.split("×").map(Number); return s + a * b * q; }, 0);
+$("cut").innerHTML = `<thead><tr><th>조각</th><th>크기</th><th>수량</th><th>구멍</th></tr></thead><tbody>` + CUT.map(([a, b, c, d]) => `<tr><td>${a}</td><td class="m">${b}</td><td class="m">${c}</td><td><small>${d}</small></td></tr>`).join("") + "</tbody>";
+$("cutSum").textContent = `넓이 합계 약 ${Math.round(area / 1000)}천 mm² — 판(400×1200) ${Math.round(400 * 1200 / 1000)}천 mm²의 ${Math.round(area / 4800)}%.`;
+
+$("extra").innerHTML = `<thead><tr><th>물건</th><th>수량</th><th>쓰는 곳</th></tr></thead><tbody>` + [
+  ["M6 볼트 (길이 25 안팎)", "4", "모터 받침쇠 ↔ 모터판. 받침쇠 구멍이 M6 암나사"],
+  ["C클램프", "2", "바닥판을 책상에. 학교에서 빌릴 수 있는지 먼저"],
+  ["220V 전원선 (플러그)", "1", "LRS-350-24는 나사 단자라 선이 따로 있어야 해요. 220V 단자 덮개 꼭"],
+  ["24V 전원 스위치", "1", "SMPS +V와 BTS7960 B+ 사이, 손이 닿는 자리"],
+].map(([a, b, c]) => `<tr><td>${a}</td><td class="m">${b}</td><td><small>${c}</small></td></tr>`).join("") + "</tbody>";
+</script>
+</body>
+</html>
