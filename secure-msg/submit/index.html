@@ -1,0 +1,1286 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>덜미 제출 코드</title>
+<meta name="description" content="프밍기2 중간결과물로 낼 deolmi.c 를 제출 전에 확인하는 페이지.">
+<script>document.documentElement.classList.add("js")</script>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="../site.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/base16/tomorrow-night.min.css">
+<style>
+.app{display:grid;grid-template-columns:268px minmax(0,1fr);gap:var(--gap);align-items:start}
+.side{position:sticky;top:calc(var(--top) + var(--gap) * 2);display:grid;gap:var(--gap)}
+.vers{display:grid;gap:var(--gap)}
+.ver{display:flex;flex-direction:column;gap:4px;text-align:left;font:inherit;color:var(--ink);cursor:pointer;background:var(--tile);border:0;border-radius:var(--r);padding:20px 22px;transition:background-color .15s,color .15s}
+.ver b{font-size:16px}
+.ver span{font-size:14px;color:var(--ink-2);line-height:1.5}
+.ver code{font-size:.85em}
+.ver:hover{background:var(--paper)}
+.ver[aria-selected=true]{background:var(--ink);color:var(--tile)}
+.ver[aria-selected=true] span{color:inherit;opacity:.8}
+.ver[aria-selected=true] code{background:rgb(255 255 255 / .14);color:inherit}
+.rail{background:var(--tile);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:2px;max-height:calc(100svh - var(--top) - 260px);overflow:auto}
+.rail[hidden]{display:none}
+.grp{margin:16px 14px 6px}
+.grp:first-child{margin-top:4px}
+.grp-t{font-size:13.5px;font-weight:600;color:var(--ink-2)}
+.tab{display:flex;flex-direction:column;gap:1px;text-align:left;background:none;border:0;padding:10px 14px;border-radius:6px;cursor:pointer;color:var(--ink);font:inherit;width:100%;transition:background-color .15s}
+.tab:hover{background:var(--sheet)}
+.tab[aria-selected=true]{background:var(--ink);color:var(--tile)}
+.tab .nm{font-family:var(--f-mono);font-size:14px;font-weight:500}
+.tab .meta{font-size:13px;opacity:.8}
+.panel .bar{display:flex;align-items:center;gap:14px;background:var(--tile);border-radius:var(--r) var(--r) 0 0;padding:16px 22px;flex-wrap:wrap}
+.panel .path{font-family:var(--f-mono);font-weight:600;font-size:15px}
+.panel .role{font-size:14px;color:var(--ink-2)}
+.panel .ll{margin-left:auto;font-size:14px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.copy{font:600 14px/1 var(--f-body);background:var(--steel);color:var(--steel-ink);border:0;border-radius:6px;padding:9px 14px;cursor:pointer;transition:filter .15s}
+.copy:hover{filter:brightness(1.12)}
+.copy.ok{background:var(--seal)}
+a.copy{text-decoration:none;line-height:1}
+.codebox{margin:0;border-radius:0 0 var(--r) var(--r);background:var(--term-bg);overflow:auto;max-height:calc(100svh - var(--top) - 90px)}
+.codebox code{font-family:var(--f-mono);font-size:15px;line-height:1.7;tab-size:4}
+.hljs{background:var(--term-bg);color:var(--term-ink);padding:16px 0}
+.hljs-keyword,.hljs-type{color:var(--t-blue);font-weight:500}
+.hljs-string,.hljs-char,.hljs-char.escape_{color:var(--t-green)}
+.hljs-comment{color:var(--t-dim);font-style:normal}
+.hljs-meta,.hljs-meta .hljs-keyword{color:var(--t-yel)}
+.hljs-meta .hljs-string{color:var(--t-green)}
+.hljs-number,.hljs-literal{color:var(--t-red)}
+.hljs-title,.hljs-title.function_{color:var(--term-ink);font-weight:600}
+.hljs-title.class_,.hljs-built_in{color:var(--t-yel)}
+.hljs-params{color:var(--term-ink)}
+.hljs-ln{border-collapse:collapse}
+.hljs-ln td{padding:0}
+.hljs-ln-numbers{user-select:none;text-align:right;color:var(--t-dim);padding-right:14px !important;padding-left:14px !important;white-space:nowrap;vertical-align:top;background:rgb(255 255 255 / .03)}
+.hljs-ln-code{padding-left:16px !important;padding-right:16px !important}
+@media (max-width:1000px){.app{grid-template-columns:minmax(0,1fr)}.side{position:static}.rail{max-height:none;flex-direction:row;flex-wrap:wrap}.grp{flex-basis:100%;margin:6px 8px 0}.tab{width:auto}.tab .meta{display:none}.vers{grid-template-columns:1fr 1fr}}
+@media (max-width:560px){.vers{grid-template-columns:1fr}}
+.map5{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.map5 button{width:100%;display:grid;grid-template-columns:7.5em 1fr auto;gap:12px;align-items:baseline;text-align:left;background:#1B2836;color:var(--term-ink);border:0;border-radius:6px;padding:18px 20px;font:500 17px/1.3 var(--f-body);cursor:pointer;transition:background-color .15s}
+.map5 button:hover,.map5 button:focus-visible{background:#26384B}
+.map5 b{font-weight:700}
+.map5 span{color:var(--t-dim);font-size:15px}
+.map5 i{font-style:normal;font-family:var(--f-mono);font-size:15px;color:var(--t-yel)}
+.codebox td,.codebox th{border:0}
+.ln-hit td{background:rgb(241 197 108 / .14)}
+@media (max-width:560px){.map5 button{grid-template-columns:1fr auto}.map5 span{display:none}}
+
+.sub-info{display:grid;grid-template-columns:4em 1fr;gap:8px 14px;margin:0 0 18px;color:var(--term-ink);font-size:16px}
+.sub-info dt{color:var(--t-dim)}
+.sub-info dd{margin:0}
+.sub-info code{color:var(--t-yel);background:rgb(255 255 255 / .08)}
+.map5 button.mine{background:#20405A}
+.map5 button.mine span{color:var(--t-yel)}
+.one{display:grid;grid-template-columns:minmax(0,1fr)}
+</style>
+</head>
+<body>
+<div class="board">
+<header class="topbar">
+  <a class="logo" href="../guide/" aria-label="덜미 설명서">덜미<i>.</i></a>
+  <nav class="pages" aria-label="덜미 페이지"><a href="../guide/">설명서</a><a href="../run/">시작하기</a><a href="../code/">전체 코드</a><a href="../plan/">암호화 계획</a><a href="../log/">작업 기록</a><a class="home" href="/">← 작업실</a></nav>
+  <a class="get" href="../code/src/deolmi.c" download>deolmi.c 받기 <span aria-hidden="true">↓</span></a>
+</header>
+<section class="hero" aria-label="제출 코드">
+  <div class="t h-name rise"><h1>제출 코드</h1></div>
+  <div class="h-low">
+    <div class="t h-say rise" style="--i:1"><p>프밍기2 중간결과물로 낼 코드다. 아래가 제출할 <code>deolmi.c</code> 그대로이고, 확인이 끝나면 이 파일 하나를 압축해서 낸다. 칸을 누르면 그 줄로 간다.</p><div class="by">만든 사람 <b>김창식</b>(기획·결정·확인) · <b>Claude</b>(코드 작성)</div></div>
+    <a class="t h-next rise" style="--i:2" href="../code/"><span>다른 버전·테스트 코드</span><b>전체 코드 <span aria-hidden="true">→</span></b></a>
+  </div>
+  <div class="h-ui rise" data-ui><p class="cap">제출할 것 — 코드 한 파일</p>
+<dl class="sub-info">
+<dt>과제</dt><dd>프로젝트 중간 코드 확인 및 피드백 · 중간 결과물(코드) 개인별 제출</dd>
+<dt>마감</dt><dd>11월 6일(금) 오후 11:59</dd>
+<dt>파일</dt><dd><code>deolmi.c</code> 1140줄 → <code>중간결과물_학번_김창식_60%.zip</code>으로 압축</dd>
+</dl>
+<ol class="map5"><li><button type="button" data-line="75" class=mine><b>① 통신</b><span>내 담당</span><i>75줄부터</i></button></li>
+<li><button type="button" data-line="286"><b>② 화면</b><span>같이 들어감</span><i>286줄부터</i></button></li>
+<li><button type="button" data-line="450" class=mine><b>③ 중계</b><span>내 담당</span><i>450줄부터</i></button></li>
+<li><button type="button" data-line="635"><b>④ 대화</b><span>같이 들어감</span><i>635줄부터</i></button></li>
+<li><button type="button" data-line="1041"><b>⑤ 실행</b><span>같이 들어감</span><i>1041줄부터</i></button></li></ol></div>
+</section>
+<main class="one">
+  <section class="panel rise" id="f">
+    <div class="bar"><span class="path">deolmi.c</span><span class="role">제출할 파일 그대로</span><span class="ll">1140줄</span>
+      <button class="copy" type="button">복사</button><a class="copy" href="deolmi.c" download>받기</a></div>
+    <pre class="codebox"><code class="language-c">/* 덜미 — 프밍기2 메신저. 이 파일 하나가 프로그램 전부다 (평문 단계).
+
+   빌드:  리눅스·맥·WSL     gcc -Wall -Wextra -o deolmi deolmi.c      (또는 make)
+          윈도우 MSYS2/MinGW  gcc -Wall -Wextra -o deolmi.exe deolmi.c -lws2_32
+          윈도우 Visual Studio 개발자 명령 창에서  cl /utf-8 deolmi.c   (→ deolmi.exe)
+          (Visual Studio 프로젝트로 빌드할 때는 C/C++ → 명령줄 → 추가 옵션에 /utf-8 — 한글이 깨지지 않게)
+
+   ./deolmi 이름 --host       방장 — 방을 연다. 방장이 서버가 되어 중계하면서 대화에도 낀다
+   ./deolmi 이름 [주소]        참가자 — 방장에게 접속 (주소 생략 시 127.0.0.1)
+   (윈도우에서는 ./deolmi 대신 .\deolmi)
+
+   차례: ① 통신(패킷 주고받기)  ② 화면  ③ 중계(방장)  ④ 대화  ⑤ main
+
+   누가 무엇을 했나
+     김창식 — 기획, 방향 결정(암호화는 나중에·한 파일·주소 표시 등), 실제로 돌려 보고 문제 찾기
+     Claude (Anthropic의 AI) — 이 코드 작성, 테스트 작성·실행, 작업실 사이트(설명서·코드·시작하기·작업 기록) 작성
+     자세한 내역: https://tkdgh123.github.io/secure-msg/log/
+
+   ※ 암호화는 아직 안 넣은 단계다. 메시지는 평문으로 오가고, 패킷에도 암호화용 칸이 없다.
+     통신이 먼저 되게 만든 것이고, 암호화는 이 위에 다음 단계로 얹는다. */
+#ifdef _WIN32   /* 윈도우: 소켓은 winsock, 키보드·화면은 콘솔 API로 */
+#define _CRT_SECURE_NO_WARNINGS
+#undef  _WIN32_WINNT
+#define _WIN32_WINNT 0x0601   /* 윈도우 7 이후 기능까지 쓴다 (WSAPoll = 윈도우판 poll) */
+#include &lt;winsock2.h&gt;
+#include &lt;ws2tcpip.h&gt;
+#include &lt;windows.h&gt;
+#include &lt;shellapi.h&gt;
+#ifdef _MSC_VER
+#pragma comment(lib, &quot;ws2_32.lib&quot;)
+#pragma comment(lib, &quot;shell32.lib&quot;)
+#endif
+#else
+#include &lt;poll.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;termios.h&gt;
+#include &lt;fcntl.h&gt;
+#include &lt;netdb.h&gt;
+#include &lt;arpa/inet.h&gt;
+#include &lt;ifaddrs.h&gt;
+#include &lt;net/if.h&gt;
+#include &lt;sys/ioctl.h&gt;
+#include &lt;sys/socket.h&gt;
+#endif
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;stdarg.h&gt;
+#include &lt;stdint.h&gt;
+#include &lt;stddef.h&gt;
+#include &lt;string.h&gt;
+#include &lt;signal.h&gt;
+#include &lt;errno.h&gt;
+
+#ifdef _WIN32
+#define close(s) closesocket(s)   /* 윈도우는 소켓을 close가 아니라 closesocket으로 닫는다 */
+#define poll     WSAPoll
+#ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
+#define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
+#endif
+
+/* 윈도우 소켓 오류는 errno가 아니라 WSAGetLastError()에 있다. perror 대신 이걸로 (윈도우 한국어 설명이 나온다) */
+static void sock_perror(const char *what)
+{
+    int e = WSAGetLastError();
+    wchar_t w[256];
+    char s[768] = &quot;&quot;;
+    if (FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, e, 0, w, 256, NULL))
+        WideCharToMultiByte(CP_UTF8, 0, w, -1, s, sizeof(s), NULL, NULL);
+    s[strcspn(s, &quot;\r\n&quot;)] = &#x27;\0&#x27;;
+    fprintf(stderr, &quot;%s: %s (오류 %d)\n&quot;, what, s, e);
+}
+#define perror(s) sock_perror(s)
+#endif
+
+/* ================= ① 통신: 길이 붙인 패킷 =================
+   TCP는 &quot;어디까지가 한 메시지&quot;인지 모른다. 그래서 보낼 때 맨 앞에 길이 4바이트를 붙이고,
+   받을 때는 그 길이만큼 다 모일 때까지 기다렸다가 한 통으로 꺼낸다 (conn_take).
+
+   한 통 = 길이 4바이트 + 헤더 33바이트(type 1 · from 16 · to 16) + 본문 */
+
+#ifndef MSG_NOSIGNAL        /* 맥에는 없다. 대신 main에서 SIGPIPE를 무시한다 */
+#define MSG_NOSIGNAL 0
+#endif
+
+#define NAME_LEN   16       /* 이름 최대 15바이트 (한글 5글자) + 끝 표시 */
+#define HDR_LEN    (1 + NAME_LEN + NAME_LEN)   /* 33 */
+#define MAX_BODY   65536
+#define PKT_MAX    (4 + HDR_LEN + MAX_BODY)
+
+/* 패킷 종류: HELLO(접속하며 이름 밝히기, 본문 없음) · MSG(대화) · SYS(방장 프로그램의 알림) */
+enum { T_HELLO = 1, T_MSG, T_SYS };
+
+struct packet {
+    uint8_t  type;
+    char     from[NAME_LEN], to[NAME_LEN];   /* 보낸 사람, 받을 사람 (MSG의 to가 비면 모두에게) */
+    uint32_t body_len;
+    uint8_t  body[MAX_BODY];
+};
+
+struct conn {                 /* 받는 중인 바이트를 모아 두는 곳 */
+    int     fd;
+    uint8_t buf[PKT_MAX];
+    size_t  len;
+};
+
+/* port번에서 접속을 기다리는 소켓을 만든다. 실패하면 -1 */
+int net_listen(int port)
+{
+    int fd = (int)socket(AF_INET, SOCK_STREAM, 0);
+    if (fd &lt; 0) {
+        perror(&quot;socket&quot;);
+        return -1;
+    }
+
+#ifndef _WIN32
+    /* 껐다 바로 켜도 Address already in use가 안 나게.
+       윈도우에서는 이 옵션이 &quot;같은 포트를 둘이 같이 쓰기&quot;라서 방이 두 개 열려 버린다 → 안 쓴다 */
+    int on = 1;
+    setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &amp;on, sizeof(on));
+#endif
+
+    struct sockaddr_in addr = {0};
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons((uint16_t)port);
+    addr.sin_addr.s_addr = htonl(INADDR_ANY);   /* 0.0.0.0: 다른 노트북에서도 접속 가능 */
+
+    if (bind(fd, (struct sockaddr *)&amp;addr, sizeof(addr)) &lt; 0) {
+        perror(&quot;bind&quot;);
+        close(fd);
+        return -1;
+    }
+    if (listen(fd, 16) &lt; 0) {
+        perror(&quot;listen&quot;);
+        close(fd);
+        return -1;
+    }
+    return fd;
+}
+
+/* host:port에 접속한다. host는 IP나 이름. 실패하면 -1 */
+int net_connect(const char *host, int port)
+{
+    struct addrinfo hints = {0}, *res;
+    char port_str[8];
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_STREAM;
+    snprintf(port_str, sizeof(port_str), &quot;%d&quot;, port);
+    if (getaddrinfo(host, port_str, &amp;hints, &amp;res) != 0) {
+        fprintf(stderr, &quot;%s: 주소를 찾을 수 없음\n&quot;, host);
+        return -1;
+    }
+
+    int fd = (int)socket(AF_INET, SOCK_STREAM, 0);
+    if (fd &lt; 0) {
+        perror(&quot;socket&quot;);
+        freeaddrinfo(res);
+        return -1;
+    }
+
+    /* 5초 안에 안 붙으면 포기한다. 중간에서 막힌 네트워크면 그냥 두면 2분 넘게 아무 말 없이 멈춘다.
+       그래서 잠깐 기다리지 않는 모드로 접속을 걸어 두고, poll로 5초만 기다린다 */
+#ifdef _WIN32
+    u_long nb = 1;
+    ioctlsocket(fd, FIONBIO, &amp;nb);
+    int r = connect(fd, res-&gt;ai_addr, (int)res-&gt;ai_addrlen);
+    int err = r &lt; 0 ? WSAGetLastError() : 0;
+    if (err == WSAEWOULDBLOCK) {     /* 리눅스의 EINPROGRESS: 접속 거는 중 */
+        struct pollfd p = { .fd = fd, .events = POLLOUT };
+        int len = sizeof(err);
+        err = WSAETIMEDOUT;
+        if (poll(&amp;p, 1, 5000) == 1)
+            getsockopt(fd, SOL_SOCKET, SO_ERROR, (char *)&amp;err, &amp;len);
+    }
+    nb = 0;
+    ioctlsocket(fd, FIONBIO, &amp;nb);
+    WSASetLastError(err);            /* perror가 이 번호로 설명을 찾는다 */
+    /* main이 errno로 이유를 고르므로 리눅스와 같은 이름으로 바꿔 둔다 */
+    errno = err == WSAECONNREFUSED ? ECONNREFUSED : err == WSAETIMEDOUT ? ETIMEDOUT
+          : err == WSAEHOSTUNREACH ? EHOSTUNREACH : err == WSAENETUNREACH ? ENETUNREACH : err;
+    r = err ? -1 : 0;
+#else
+    int flags = fcntl(fd, F_GETFL, 0);
+    fcntl(fd, F_SETFL, flags | O_NONBLOCK);
+    int r = connect(fd, res-&gt;ai_addr, res-&gt;ai_addrlen);
+    if (r &lt; 0 &amp;&amp; errno == EINPROGRESS) {
+        struct pollfd p = { .fd = fd, .events = POLLOUT };
+        int err = ETIMEDOUT;
+        socklen_t len = sizeof(err);
+        if (poll(&amp;p, 1, 5000) == 1)
+            getsockopt(fd, SOL_SOCKET, SO_ERROR, &amp;err, &amp;len);
+        errno = err;
+        r = err ? -1 : 0;
+    }
+    fcntl(fd, F_SETFL, flags);
+#endif
+    freeaddrinfo(res);
+    if (r &lt; 0) {
+        int e = errno;   /* 왜 실패했는지는 부른 쪽에서 errno로 본다 */
+        perror(&quot;connect&quot;);
+        close(fd);
+        errno = e;
+        return -1;
+    }
+    return fd;
+}
+
+/* 패킷을 길이 4바이트 + 헤더 + body 바이트로 늘어놓고, 보낼 바이트 수를 돌려준다.
+   구조체는 패딩이 끼므로 그대로 보내지 않고 한 칸씩 복사한다 */
+size_t pack_packet(const struct packet *p, uint8_t *out)
+{
+    uint32_t len = HDR_LEN + p-&gt;body_len;
+    uint32_t nlen = htonl(len);
+    uint8_t *q = out;
+
+    memcpy(q, &amp;nlen, 4);             q += 4;
+    *q++ = p-&gt;type;
+    memcpy(q, p-&gt;from, NAME_LEN);    q += NAME_LEN;
+    memcpy(q, p-&gt;to, NAME_LEN);      q += NAME_LEN;
+    memcpy(q, p-&gt;body, p-&gt;body_len);
+    return 4 + len;
+}
+
+int send_packet(int fd, const struct packet *p)
+{
+    static uint8_t out[PKT_MAX];
+    size_t total = pack_packet(p, out), sent = 0;
+
+    while (sent &lt; total) {           /* send는 일부만 보낼 수 있다 */
+        int n = (int)send(fd, (const char *)out + sent, (int)(total - sent), MSG_NOSIGNAL);
+        if (n &lt;= 0)
+            return -1;
+        sent += (size_t)n;
+    }
+    return 0;
+}
+
+/* 소켓에서 읽은 만큼 버퍼 뒤에 붙인다. &gt;0 받음, 0 끊김, -1 오류 */
+int conn_read(struct conn *c)
+{
+    int n = (int)recv(c-&gt;fd, (char *)c-&gt;buf + c-&gt;len, (int)(sizeof(c-&gt;buf) - c-&gt;len), 0);
+    if (n &lt; 0)
+        return -1;
+    c-&gt;len += n;
+    return n;
+}
+
+/* 버퍼에 패킷이 통째로 모였으면 하나 꺼낸다. 1 꺼냄, 0 덜 옴, -1 잘못된 길이 */
+int conn_take(struct conn *c, struct packet *p)
+{
+    uint32_t len;
+    if (c-&gt;len &lt; 4)
+        return 0;
+    memcpy(&amp;len, c-&gt;buf, 4);
+    len = ntohl(len);
+    if (len &lt; HDR_LEN || len &gt; HDR_LEN + MAX_BODY)
+        return -1;
+    if (c-&gt;len &lt; 4 + len)
+        return 0;                    /* 아직 덜 왔음: 다음 recv를 기다림 */
+
+    const uint8_t *q = c-&gt;buf + 4;
+    p-&gt;type = *q++;
+    memcpy(p-&gt;from, q, NAME_LEN);    q += NAME_LEN;
+    memcpy(p-&gt;to, q, NAME_LEN);      q += NAME_LEN;
+    p-&gt;from[NAME_LEN - 1] = p-&gt;to[NAME_LEN - 1] = &#x27;\0&#x27;;
+    p-&gt;body_len = len - HDR_LEN;
+    memcpy(p-&gt;body, q, p-&gt;body_len);
+
+    c-&gt;len -= 4 + len;               /* 꺼낸 만큼 앞으로 당긴다 */
+    memmove(c-&gt;buf, c-&gt;buf + 4 + len, c-&gt;len);
+    return 1;
+}
+
+#ifndef NET_ONLY   /* tests/ 는 위의 ① 통신 부분만 가져다 쓴다 */
+
+#define PORT        9000
+#define MAX_CLIENTS 16
+#define INPUT_MAX   1000
+
+enum { M_HOST, M_JOIN };  /* 실행 방식: 방장 / 참가자 */
+
+static int  mode;
+static char my_name[NAME_LEN];       /* 내 이름 */
+static char dm_to[NAME_LEN];         /* 비어 있으면 전체 대화 */
+static struct packet pkt, out;       /* 받는 패킷 / 보내는 패킷 (64KB가 넘어서 전역) */
+
+/* ================= ② 화면 ================= */
+
+static int tty;                      /* 키보드로 대화 중인가 (입력을 파이프로 주면 0) */
+static char input[INPUT_MAX + 1];
+static size_t input_len;
+static int drawn_rows;               /* 입력 줄이 화면에서 몇 줄 넘어갔나 */
+
+static void prompt(char *buf, size_t size)
+{
+    if (dm_to[0])
+        snprintf(buf, size, &quot;%s→%s&gt; &quot;, my_name, dm_to);
+    else
+        snprintf(buf, size, &quot;%s&gt; &quot;, my_name);
+}
+
+/* 글자 하나가 화면에서 몇 칸인가: 한글·한자·이모지 같은 넓은 글자는 2칸 (윈도우에는 wcwidth가 없어서 직접) */
+static int char_width(uint32_t c)
+{
+    return (c &gt;= 0x1100 &amp;&amp; c &lt;= 0x115F) || (c &gt;= 0x2E80 &amp;&amp; c &lt;= 0xA4CF) || (c &gt;= 0xAC00 &amp;&amp; c &lt;= 0xD7A3)
+        || (c &gt;= 0xF900 &amp;&amp; c &lt;= 0xFAFF) || (c &gt;= 0xFE30 &amp;&amp; c &lt;= 0xFE4F) || (c &gt;= 0xFF00 &amp;&amp; c &lt;= 0xFF60)
+        || (c &gt;= 0xFFE0 &amp;&amp; c &lt;= 0xFFE6) || (c &gt;= 0x1F300 &amp;&amp; c &lt;= 0x1FAFF) || (c &gt;= 0x20000 &amp;&amp; c &lt;= 0x3FFFD)
+        ? 2 : 1;
+}
+
+/* 터미널 폭 cols에서 s를 찍으면 줄이 몇 번 넘어가나. s는 UTF-8: 첫 바이트가 글자 길이를 알려 준다 */
+static int rows_after(const char *s, int cols)
+{
+    int x = 0, rows = 0;
+    while (*s) {
+        unsigned char b = (unsigned char)*s;
+        int n = b &gt;= 0xF0 ? 4 : b &gt;= 0xE0 ? 3 : b &gt;= 0xC0 ? 2 : 1;
+        uint32_t c = n == 1 ? b : (uint32_t)(b &amp; (0x3F &gt;&gt; (n - 1)));
+        for (int k = 1; k &lt; n; k++) {
+            if ((s[k] &amp; 0xC0) != 0x80) {   /* 글자가 중간에 끊겼으면 거기까지만 */
+                n = k;
+                break;
+            }
+            c = (c &lt;&lt; 6) | (s[k] &amp; 0x3F);
+        }
+        int cw = char_width(c);
+        if (x + cw &gt; cols) {
+            rows++;
+            x = 0;
+        }
+        x += cw;
+        s += n;
+    }
+    return rows;
+}
+
+static int term_cols(void)   /* 터미널 폭 (모르면 80) */
+{
+#ifdef _WIN32
+    CONSOLE_SCREEN_BUFFER_INFO b;
+    if (GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &amp;b) &amp;&amp; b.dwSize.X &gt; 0)
+        return b.dwSize.X;
+#else
+    struct winsize ws;
+    if (ioctl(1, TIOCGWINSZ, &amp;ws) == 0 &amp;&amp; ws.ws_col &gt; 0)
+        return ws.ws_col;
+#endif
+    return 80;
+}
+
+#define C_ACCENT (tty ? &quot;\033[36m&quot; : &quot;&quot;)
+#define C_RESET  (tty ? &quot;\033[0m&quot;  : &quot;&quot;)
+
+static void clear_input(void)
+{
+    if (!tty)
+        return;
+    if (drawn_rows &gt; 0)
+        printf(&quot;\033[%dA&quot;, drawn_rows);
+    printf(&quot;\r\033[J&quot;);
+}
+
+static void draw_input(void)
+{
+    if (!tty)
+        return;
+    char line[64 + INPUT_MAX];
+
+    prompt(line, sizeof(line));
+    strcat(line, input);
+    printf(&quot;%s&quot;, line);
+    drawn_rows = rows_after(line, term_cols());
+    fflush(stdout);
+}
+
+/* 치던 입력 줄을 잠깐 지우고 한 줄 찍은 뒤 다시 그린다. 맨 앞 [태그]는 청록 */
+static void put_line(const char *text)
+{
+    clear_input();
+    if (tty &amp;&amp; text[0] == &#x27;[&#x27;) {
+        const char *close = strchr(text, &#x27;]&#x27;);
+        if (close)
+            printf(&quot;\033[36m%.*s\033[0m%s\n&quot;, (int)(close - text + 1), text, close + 1);
+        else
+            printf(&quot;%s\n&quot;, text);
+    } else
+        printf(&quot;%s\n&quot;, text);
+    draw_input();
+    fflush(stdout);
+}
+
+static void show(const char *fmt, ...)
+{
+    char text[2100];
+    va_list ap;
+    va_start(ap, fmt);
+    vsnprintf(text, sizeof(text), fmt, ap);
+    va_end(ap);
+    put_line(text);
+}
+
+static void clean(char *s)   /* 받은 글자 중 제어 문자는 ? 로 */
+{
+    for (; *s; s++)
+        if ((unsigned char)*s &lt; 0x20 || *s == 0x7f)
+            *s = &#x27;?&#x27;;
+}
+
+static int valid_name(const char *s)
+{
+    size_t n = strlen(s);
+    if (n == 0 || n &gt;= NAME_LEN)
+        return 0;
+    for (; *s; s++)
+        if (*s == &#x27; &#x27; || *s == &#x27;/&#x27; || (unsigned char)*s &lt; 0x20)
+            return 0;
+    return 1;
+}
+
+/* 대화 화면에서 아는 사람들 (방장·참가자 공통). /who, /dm 에 쓴다 */
+struct peer { char name[NAME_LEN]; };
+static struct peer peers[MAX_CLIENTS];
+static int npeers;
+
+static int find_peer(const char *name)
+{
+    for (int i = 0; i &lt; npeers; i++)
+        if (strncmp(peers[i].name, name, NAME_LEN) == 0)
+            return i;
+    return -1;
+}
+
+static void add_peer(const char *name)
+{
+    if (name[0] == &#x27;\0&#x27; || strncmp(name, my_name, NAME_LEN) == 0
+        || find_peer(name) &gt;= 0 || npeers &gt;= MAX_CLIENTS)
+        return;
+    strncpy(peers[npeers++].name, name, NAME_LEN - 1);
+}
+
+static void remove_peer(const char *name)
+{
+    int i = find_peer(name);
+    if (i &lt; 0)
+        return;
+    if (strncmp(dm_to, name, NAME_LEN) == 0)
+        dm_to[0] = &#x27;\0&#x27;;
+    peers[i] = peers[--npeers];
+}
+
+/* ================= ③ 중계: 방장 =================
+   방장이 서버다. 참가자들은 방장에게 접속하고, 방장은 패킷의 to 를 보고 그 사람에게만 전한다.
+   to 가 비어 있으면 보낸 사람을 뺀 모두에게 전한다 */
+
+struct client {
+    struct conn c;
+    char    name[NAME_LEN];
+    int     registered;
+};
+
+/* 한 칸 더: 17번째의 HELLO까지 읽은 뒤에 &quot;꽉 참&quot;을 보내야 알림이 사라지지 않는다
+   (안 읽은 데이터가 남은 채 close하면 RST가 나가서 받는 쪽이 알림을 못 읽는다) */
+static struct client clients[MAX_CLIENTS + 1];
+static int nclients;
+
+static int find_client(const char *name)
+{
+    for (int i = 0; i &lt; nclients; i++)
+        if (clients[i].registered &amp;&amp; strncmp(clients[i].name, name, NAME_LEN) == 0)
+            return i;
+    return -1;
+}
+
+static void pkt_init(struct packet *p, uint8_t type, const char *from, const char *to)
+{
+    memset(p, 0, sizeof(*p));
+    p-&gt;type = type;
+    strncpy(p-&gt;from, from, NAME_LEN - 1);
+    if (to)
+        strncpy(p-&gt;to, to, NAME_LEN - 1);
+}
+
+/* i번에게 알림 한 줄 */
+static void send_sys(int i, const char *fmt, ...)
+{
+    va_list ap;
+    pkt_init(&amp;out, T_SYS, &quot;&quot;, clients[i].name);
+    va_start(ap, fmt);
+    int n = vsnprintf((char *)out.body, MAX_BODY, fmt, ap);
+    va_end(ap);
+    out.body_len = n &lt; MAX_BODY ? n : MAX_BODY - 1;
+    send_packet(clients[i].c.fd, &amp;out);
+}
+
+/* i번에게 &quot;name이 방에 있다&quot; (HELLO, 본문 없음) */
+static void send_hello(int i, const char *name)
+{
+    pkt_init(&amp;out, T_HELLO, name, clients[i].name);
+    send_packet(clients[i].c.fd, &amp;out);
+}
+
+static void add_client(int fd)
+{
+    if (fd &lt; 0)
+        return;
+    if (nclients == MAX_CLIENTS + 1) {   /* 남는 칸까지 찼으면 말없이 닫는다 */
+        close(fd);
+        return;
+    }
+    memset(&amp;clients[nclients], 0, sizeof(clients[0]));
+    clients[nclients].c.fd = fd;
+    nclients++;
+}
+
+/* i번을 지우고 마지막 칸을 i번 자리로 옮긴다 */
+static void drop_client(int i)
+{
+    char name[NAME_LEN];
+    int was_registered = clients[i].registered;
+    memcpy(name, clients[i].name, NAME_LEN);
+
+    close(clients[i].c.fd);
+    clients[i] = clients[--nclients];
+
+    if (was_registered) {
+        show(&quot;[알림] %s 퇴장&quot;, name);
+        remove_peer(name);
+        for (int k = 0; k &lt; nclients; k++)
+            if (clients[k].registered)
+                send_sys(k, &quot;%s 퇴장&quot;, name);
+    }
+}
+
+static int handle_hello(int i, const struct packet *p)
+{
+    if (clients[i].registered) {
+        send_sys(i, &quot;이미 HELLO를 보냈습니다&quot;);
+        return 0;
+    }
+    if (!valid_name(p-&gt;from) || find_client(p-&gt;from) &gt;= 0
+        || strncmp(p-&gt;from, my_name, NAME_LEN) == 0) {
+        send_sys(i, &quot;이름 사용 중이거나 쓸 수 없음: %s&quot;, p-&gt;from);
+        drop_client(i);
+        return -1;
+    }
+    int registered = 0;
+    for (int k = 0; k &lt; nclients; k++)
+        registered += clients[k].registered;
+    if (registered == MAX_CLIENTS) {
+        send_sys(i, &quot;방이 꽉 찼습니다 (%d명)&quot;, MAX_CLIENTS);
+        drop_client(i);
+        return -1;
+    }
+
+    struct client *me = &amp;clients[i];
+    memcpy(me-&gt;name, p-&gt;from, NAME_LEN);
+    me-&gt;registered = 1;
+    show(&quot;[알림] %s 입장&quot;, me-&gt;name);
+
+    /* 새 사람에게 이미 방에 있는 사람들을 알린다. 방장도 방에 있는 한 사람이다.
+       기존 사람들은 아래 &quot;입장&quot; 알림으로 새 사람을 안다 */
+    for (int k = 0; k &lt; nclients; k++)
+        if (k != i &amp;&amp; clients[k].registered)
+            send_hello(i, clients[k].name);
+    send_hello(i, my_name);
+    add_peer(me-&gt;name);
+    for (int k = 0; k &lt; nclients; k++)
+        if (clients[k].registered)
+            send_sys(k, &quot;%s 입장&quot;, me-&gt;name);
+    return 0;
+}
+
+/* to에게 중계 */
+static void relay(int to, struct packet *p)
+{
+    send_packet(clients[to].c.fd, p);   /* 실패해도 다음 poll에서 끊김으로 잡힌다 */
+}
+
+static void display_msg(const struct packet *p);   /* ④에 있음 */
+static void show_guide(void);                      /* ⑤ 바로 위에 있음 */
+
+/* 패킷 하나 처리. 이 사람을 끊었으면 -1 */
+static int handle_packet(int i, struct packet *p)
+{
+    if (!clients[i].registered &amp;&amp; p-&gt;type != T_HELLO) {
+        send_sys(i, &quot;먼저 HELLO를 보내야 합니다&quot;);
+        drop_client(i);
+        return -1;
+    }
+    if (p-&gt;type == T_HELLO)
+        return handle_hello(i, p);
+    if (p-&gt;type != T_MSG) {   /* 참가자가 보내는 건 MSG뿐 (SYS는 방장만 만든다) */
+        send_sys(i, &quot;모르는 type: %d&quot;, p-&gt;type);
+        return 0;
+    }
+    if (strncmp(p-&gt;from, clients[i].name, NAME_LEN) != 0) {
+        send_sys(i, &quot;보낸 사람 이름이 다릅니다: %s&quot;, p-&gt;from);   /* 남의 이름으로 보내기 차단 */
+        return 0;
+    }
+    if (p-&gt;to[0] == &#x27;\0&#x27;) {   /* 모두에게: 방장 화면에 띄우고, 보낸 사람 빼고 전원에게 */
+        display_msg(p);
+        for (int k = 0; k &lt; nclients; k++)
+            if (k != i &amp;&amp; clients[k].registered)
+                relay(k, p);
+        return 0;
+    }
+    if (strncmp(p-&gt;to, my_name, NAME_LEN) == 0) {
+        display_msg(p);   /* 방장한테만 온 것 */
+        return 0;
+    }
+
+    int to = find_client(p-&gt;to);
+    if (to &lt; 0) {
+        send_sys(i, &quot;%s는 접속해 있지 않습니다&quot;, p-&gt;to);
+        return 0;
+    }
+    relay(to, p);
+    return 0;
+}
+
+/* i번 소켓에 온 것을 읽어서 패킷마다 처리 */
+static void serve(int i)
+{
+    if (conn_read(&amp;clients[i].c) &lt;= 0) {
+        drop_client(i);
+        return;
+    }
+    int r;
+    while ((r = conn_take(&amp;clients[i].c, &amp;pkt)) == 1)
+        if (handle_packet(i, &amp;pkt) &lt; 0)
+            return;   /* 이미 drop_client(i) 됨 */
+    if (r &lt; 0)
+        drop_client(i);   /* 길이가 잘못됨: 버퍼를 늘리지 않고 끊는다 */
+}
+
+/* ================= ④ 대화: 방장·참가자 ================= */
+
+static struct conn srv;   /* 참가자: 방장과의 연결 */
+
+static void display_msg(const struct packet *p)
+{
+    char from[NAME_LEN + 1];
+    static char text[MAX_BODY];
+    memcpy(from, p-&gt;from, NAME_LEN);
+    from[NAME_LEN] = &#x27;\0&#x27;;
+    clean(from);
+    size_t n = p-&gt;body_len &lt; MAX_BODY ? p-&gt;body_len : MAX_BODY - 1;
+    memcpy(text, p-&gt;body, n);
+    text[n] = &#x27;\0&#x27;;
+    clean(text);
+    if (p-&gt;to[0])   /* to가 있으면 나에게만 온 1:1 */
+        show(&quot;[%s → 나] %s&quot;, from, text);
+    else
+        show(&quot;[%s] %s&quot;, from, text);
+}
+
+/* SYS &quot;이름 입장/퇴장&quot; 이면 명단을 고친다 (참가자 쪽) */
+static void sys_update(const char *text)
+{
+    size_t L = strlen(text);
+    const char *in = &quot; 입장&quot;, *ou = &quot; 퇴장&quot;;
+    size_t li = strlen(in), lo = strlen(ou);
+    char nm[NAME_LEN];
+    if (L &gt; li &amp;&amp; strcmp(text + L - li, in) == 0 &amp;&amp; L - li &lt; NAME_LEN) {
+        memcpy(nm, text, L - li);
+        nm[L - li] = &#x27;\0&#x27;;
+        add_peer(nm);
+    } else if (L &gt; lo &amp;&amp; strcmp(text + L - lo, ou) == 0 &amp;&amp; L - lo &lt; NAME_LEN) {
+        memcpy(nm, text, L - lo);
+        nm[L - lo] = &#x27;\0&#x27;;
+        remove_peer(nm);
+    }
+}
+
+/* 참가자: 방장에게서 받기 */
+static void join_read(void)
+{
+    if (conn_read(&amp;srv) &lt;= 0) {
+        show(&quot;[알림] 연결이 끊어졌습니다&quot;);
+        exit(1);
+    }
+    int r;
+    while ((r = conn_take(&amp;srv, &amp;pkt)) == 1) {
+        if (pkt.type == T_HELLO) {
+            clean(pkt.from);
+            add_peer(pkt.from);
+        } else if (pkt.type == T_MSG) {
+            display_msg(&amp;pkt);
+        } else if (pkt.type == T_SYS) {
+            static char text[MAX_BODY];
+            size_t n = pkt.body_len &lt; MAX_BODY ? pkt.body_len : MAX_BODY - 1;
+            memcpy(text, pkt.body, n);
+            text[n] = &#x27;\0&#x27;;
+            clean(text);
+            show(&quot;[알림] %s&quot;, text);
+            sys_update(text);
+        }
+    }
+    if (r &lt; 0) {
+        show(&quot;[알림] 이상한 패킷이 와서 끊습니다&quot;);
+        exit(1);
+    }
+}
+
+/* 한 통 보낸다. 1:1이면 to = 그 사람, 전체면 to 를 비운다.
+   참가자는 방장에게 한 통만 보내고, 방장은 직접 그 사람(전체면 모두)에게 전한다 */
+static void send_text(const char *text)
+{
+    if (npeers == 0) {
+        show(&quot;[알림] 아직 아무도 없습니다&quot;);
+        return;
+    }
+    size_t len = strlen(text);
+    if (len &gt; INPUT_MAX)
+        len = INPUT_MAX;
+    pkt_init(&amp;out, T_MSG, my_name, dm_to);
+    memcpy(out.body, text, len);
+    out.body_len = (uint32_t)len;
+
+    if (mode == M_JOIN)
+        send_packet(srv.fd, &amp;out);
+    else
+        for (int k = 0; k &lt; nclients; k++)
+            if (clients[k].registered &amp;&amp; (!dm_to[0] || strncmp(clients[k].name, dm_to, NAME_LEN) == 0))
+                relay(k, &amp;out);
+}
+
+static void cmd_who(void)
+{
+    char line[64 + MAX_CLIENTS * (NAME_LEN + 2)];
+    int off = snprintf(line, sizeof(line), &quot;[접속 중] %s(나%s)&quot;, my_name, mode == M_HOST ? &quot;·방장&quot; : &quot;&quot;);
+    for (int i = 0; i &lt; npeers; i++)
+        off += snprintf(line + off, sizeof(line) - off, &quot;, %s&quot;, peers[i].name);
+    show(&quot;%s&quot;, line);
+}
+
+static void echo_line(const char *line)   /* 친 줄을 화면에 남긴다 */
+{
+    if (!tty)
+        return;
+    char p[64];
+    prompt(p, sizeof(p));
+    clear_input();
+    printf(&quot;%s%s\n&quot;, p, line);
+    draw_input();
+    fflush(stdout);
+}
+
+static void on_line(const char *line)
+{
+    if (strcmp(line, &quot;/quit&quot;) == 0) {
+        clear_input();
+        exit(0);
+    } else if (strcmp(line, &quot;/all&quot;) == 0) {
+        dm_to[0] = &#x27;\0&#x27;;
+        show(&quot;[전체 대화] 접속한 사람 모두에게 갑니다&quot;);
+    } else if (strncmp(line, &quot;/dm &quot;, 4) == 0) {
+        const char *name = line + 4;
+        while (*name == &#x27; &#x27;)   /* &quot;/dm  친구&quot; 처럼 띄어쓰기를 두 번 해도 */
+            name++;
+        if (strcmp(name, my_name) == 0 || !name[0])
+            show(&quot;[1:1 대화] 쓰는 법: /dm 이름&quot;);
+        else if (find_peer(name) &lt; 0)
+            show(&quot;[1:1 대화] %s는 접속해 있지 않습니다 (/who 로 확인)&quot;, name);
+        else {
+            strncpy(dm_to, name, NAME_LEN - 1);
+            show(&quot;[1:1 대화] %s에게만 갑니다 · /all 로 돌아오기&quot;, name);
+        }
+    } else if (strcmp(line, &quot;/who&quot;) == 0) {
+        cmd_who();
+    } else if (strcmp(line, &quot;/help&quot;) == 0) {
+        show_guide();
+    } else if (line[0] == &#x27;/&#x27;) {
+        show(&quot;[알림] 모르는 명령입니다 · /help&quot;);
+    } else {
+        send_text(line);
+    }
+}
+
+/* 앞뒤 공백을 지운다. 복사해 붙이면 끝에 공백이나 NBSP(눈에 안 보이는 공백, C2 A0)가 딸려 오기 쉽다 */
+static char *trim(char *s)
+{
+    for (;;) {
+        if (*s == &#x27; &#x27; || *s == &#x27;\t&#x27;)
+            s++;
+        else if ((unsigned char)s[0] == 0xC2 &amp;&amp; (unsigned char)s[1] == 0xA0)
+            s += 2;
+        else
+            break;
+    }
+    size_t n = strlen(s);
+    for (;;) {
+        if (n &gt; 0 &amp;&amp; (s[n - 1] == &#x27; &#x27; || s[n - 1] == &#x27;\t&#x27;))
+            n--;
+        else if (n &gt; 1 &amp;&amp; (unsigned char)s[n - 2] == 0xC2 &amp;&amp; (unsigned char)s[n - 1] == 0xA0)
+            n -= 2;
+        else
+            break;
+    }
+    s[n] = &#x27;\0&#x27;;
+    return s;
+}
+
+/* 키 하나. 엔터면 한 줄 처리, 지우기·Ctrl+U·Ctrl+C·Ctrl+D, 화살표 같은 ESC 줄은 무시 */
+static void on_key(unsigned char ch)
+{
+    static int esc;
+    if (esc == 1) {
+        esc = (ch == &#x27;[&#x27;) ? 2 : 0;
+        return;
+    }
+    if (esc == 2) {
+        if (ch &gt;= 0x40 &amp;&amp; ch &lt;= 0x7e)
+            esc = 0;
+        return;
+    }
+    if (ch == 0x1b) {
+        esc = 1;
+    } else if (ch == &#x27;\n&#x27; || ch == &#x27;\r&#x27;) {
+        char line[INPUT_MAX + 1];
+        if (input_len == 0)
+            return;
+        strcpy(line, input);
+        input_len = 0;
+        input[0] = &#x27;\0&#x27;;
+        char *text = trim(line);   /* &quot;/who &quot; 처럼 끝에 공백이 붙어도 명령으로 알아듣게 */
+        if (text[0] == &#x27;\0&#x27;)
+            return;
+        echo_line(text);
+        on_line(text);
+    } else if (ch == 0x7f || ch == 0x08) {
+        while (input_len &gt; 0 &amp;&amp; (input[input_len - 1] &amp; 0xC0) == 0x80)
+            input_len--;   /* 한글은 여러 바이트: 글자 하나를 통째로 지운다 */
+        if (input_len &gt; 0)
+            input_len--;
+        input[input_len] = &#x27;\0&#x27;;
+    } else if (ch == 0x03 || (ch == 0x04 &amp;&amp; input_len == 0)) {
+        clear_input();
+        exit(0);
+    } else if (ch == 0x15) {
+        input_len = 0;
+        input[0] = &#x27;\0&#x27;;
+    } else if (ch &gt;= 0x20) {
+        int lead = (ch &amp; 0xC0) != 0x80;
+        if (input_len &gt;= INPUT_MAX || (lead &amp;&amp; input_len &gt;= INPUT_MAX - 4))
+            return;
+        input[input_len++] = (char)ch;
+        input[input_len] = &#x27;\0&#x27;;
+    }
+}
+
+#ifdef _WIN32
+/* 윈도우: 키보드는 소켓이 아니라서 WSAPoll로 못 기다린다. main이 0.05초마다 이걸로 확인한다 */
+static int keys_waiting(void)
+{
+    HANDLE h = GetStdHandle(STD_INPUT_HANDLE);
+    DWORD n = 0;
+    if (GetConsoleMode(h, &amp;n))   /* 키보드 */
+        return GetNumberOfConsoleInputEvents(h, &amp;n) &amp;&amp; n &gt; 0;
+    if (GetFileType(h) == FILE_TYPE_PIPE)   /* 파이프: 끊긴 것도 &quot;읽을 것 있음&quot; → 읽다가 끝난다 */
+        return !PeekNamedPipe(h, NULL, 0, NULL, &amp;n, NULL) || n &gt; 0;
+    return 1;                    /* 파일 */
+}
+
+/* 받은 입력을 UTF-8 바이트로 buf에. 끝(EOF)이면 -1 */
+static int read_stdin(unsigned char *buf, int size)
+{
+    HANDLE h = GetStdHandle(STD_INPUT_HANDLE);
+    DWORD got = 0, m;
+    if (!GetConsoleMode(h, &amp;m))   /* 파이프·파일: 바이트 그대로 */
+        return ReadFile(h, buf, size, &amp;got, NULL) &amp;&amp; got &gt; 0 ? (int)got : -1;
+
+    /* 키보드: 누른 키를 하나씩 받는다. 글자는 UTF-16이라 UTF-8로 바꾼다.
+       화살표처럼 글자가 없는 키, 키를 뗀 것, 마우스·창 이벤트는 건너뛴다.
+       단 이모지처럼 자판에 없는 글자는 &quot;Alt 키를 뗀 것&quot;에 실려 온다 (Alt+숫자판 입력과 같은 길) */
+    static wchar_t high;          /* 이모지처럼 UTF-16 두 개로 된 글자의 앞 반쪽 */
+    INPUT_RECORD rec[32];
+    int n = 0;
+    ReadConsoleInputW(h, rec, 32, &amp;got);
+    for (DWORD i = 0; i &lt; got; i++) {
+        const KEY_EVENT_RECORD *k = &amp;rec[i].Event.KeyEvent;
+        wchar_t w[2] = { high, k-&gt;uChar.UnicodeChar };
+        if (rec[i].EventType != KEY_EVENT || !w[1] || !(k-&gt;bKeyDown || k-&gt;wVirtualKeyCode == VK_MENU))
+            continue;
+        if (w[1] &gt;= 0xD800 &amp;&amp; w[1] &lt; 0xDC00) {
+            high = w[1];
+            continue;
+        }
+        n += WideCharToMultiByte(CP_UTF8, 0, high ? w : w + 1, high ? 2 : 1,
+                                 (char *)buf + n, size - n, NULL, NULL);
+        high = 0;
+    }
+    return n;
+}
+
+static DWORD saved_mode;
+
+static void restore_tty(void)
+{
+    if (tty)
+        SetConsoleMode(GetStdHandle(STD_INPUT_HANDLE), saved_mode);
+}
+
+/* 색·커서 이동(\033[…)을 켜고, Ctrl+C도 글자로 받아서 on_key가 정리하고 끝내게 한다 */
+static void raw_tty(void)
+{
+    HANDLE in = GetStdHandle(STD_INPUT_HANDLE), scr = GetStdHandle(STD_OUTPUT_HANDLE);
+    DWORD m;
+    tty = GetConsoleMode(in, &amp;saved_mode) &amp;&amp; GetConsoleMode(scr, &amp;m)
+       &amp;&amp; SetConsoleMode(scr, m | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+    if (!tty)
+        return;
+    SetConsoleMode(in, saved_mode &amp; ~ENABLE_PROCESSED_INPUT);
+    atexit(restore_tty);
+}
+#else
+static int read_stdin(unsigned char *buf, int size)   /* 끝(EOF)이면 -1 */
+{
+    ssize_t n = read(0, buf, size);
+    return n &gt; 0 ? (int)n : -1;
+}
+
+static struct termios saved_tio;
+
+static void restore_tty(void)
+{
+    if (tty)
+        tcsetattr(0, TCSANOW, &amp;saved_tio);
+}
+
+/* 키를 누르는 즉시 받도록 (엔터 기다리지 않음, 화면에 저절로 찍지 않음) */
+static void raw_tty(void)
+{
+    tty = isatty(0) &amp;&amp; isatty(1);
+    if (!tty)
+        return;
+    tcgetattr(0, &amp;saved_tio);
+    struct termios t = saved_tio;
+    t.c_lflag &amp;= ~(ICANON | ECHO | ISIG);
+    t.c_cc[VMIN] = 1;
+    t.c_cc[VTIME] = 0;
+    tcsetattr(0, TCSANOW, &amp;t);
+    atexit(restore_tty);
+}
+#endif
+
+static void read_keys(void)
+{
+    unsigned char buf[256];
+    int n = read_stdin(buf, sizeof(buf));
+    if (n &lt; 0) {
+        clear_input();
+        exit(0);
+    }
+    for (int i = 0; i &lt; n; i++)
+        on_key(buf[i]);
+    clear_input();
+    draw_input();
+}
+
+/* 방장: 다른 컴퓨터가 들어올 때 칠 내 주소를 보여 준다 */
+#ifdef _WIN32
+/* 윈도우: 인터넷으로 나갈 때 쓰는 주소 하나. UDP는 connect만 하면 패킷이 안 나가고 주소만 정해진다 */
+static void show_my_address(void)
+{
+    struct sockaddr_in to = {0}, me;
+    socklen_t len = sizeof(me);
+    char ip[INET_ADDRSTRLEN];
+    int fd = (int)socket(AF_INET, SOCK_DGRAM, 0);
+
+    to.sin_family = AF_INET;
+    to.sin_port = htons(53);
+    inet_pton(AF_INET, &quot;8.8.8.8&quot;, &amp;to.sin_addr);
+    if (fd &gt;= 0 &amp;&amp; connect(fd, (struct sockaddr *)&amp;to, sizeof(to)) == 0
+        &amp;&amp; getsockname(fd, (struct sockaddr *)&amp;me, &amp;len) == 0
+        &amp;&amp; inet_ntop(AF_INET, &amp;me.sin_addr, ip, sizeof(ip)))
+        show(&quot;[주소] %s — 다른 컴퓨터는  .\\deolmi 이름 %s  으로 들어와요&quot;, ip, ip);
+    else
+        show(&quot;[주소] 주소를 못 찾았어요 — 명령 창에 ipconfig 를 쳐서 IPv4 주소를 보세요 (같은 컴퓨터에서는  .\\deolmi 이름)&quot;);
+    if (fd &gt;= 0)
+        close(fd);
+    show(&quot;[주소] 처음 켤 때 Windows 방화벽 창이 뜨면 &#x27;액세스 허용&#x27;을 눌러요 (공용 네트워크도 체크)&quot;);
+}
+#else
+/* 루프백(127.0.0.1 같은 자기 자신용)과 169.254.x(주소를 못 받았을 때 임시)는 뺀다 */
+static void show_my_address(void)
+{
+    struct ifaddrs *list;
+    char ip[INET_ADDRSTRLEN], others[160] = &quot;&quot;;
+    int n = 0;
+
+    if (getifaddrs(&amp;list) == 0) {
+        for (struct ifaddrs *a = list; a; a = a-&gt;ifa_next) {
+            if (!a-&gt;ifa_addr || a-&gt;ifa_addr-&gt;sa_family != AF_INET
+                || (a-&gt;ifa_flags &amp; IFF_LOOPBACK) || !(a-&gt;ifa_flags &amp; IFF_UP))
+                continue;
+            inet_ntop(AF_INET, &amp;((struct sockaddr_in *)a-&gt;ifa_addr)-&gt;sin_addr, ip, sizeof(ip));
+            if (strncmp(ip, &quot;169.254.&quot;, 8) == 0)
+                continue;
+            if (n++ == 0)
+                show(&quot;[주소] %s — 다른 컴퓨터는  ./deolmi 이름 %s  으로 들어와요&quot;, ip, ip);
+            else
+                snprintf(others + strlen(others), sizeof(others) - strlen(others), &quot; %s&quot;, ip);
+            int b = atoi(ip + 4);   /* 172.16~31 은 WSL 안쪽 주소일 수 있다 */
+            if (strncmp(ip, &quot;172.&quot;, 4) == 0 &amp;&amp; b &gt;= 16 &amp;&amp; b &lt;= 31)
+                show(&quot;[주소] 172.로 시작하면 WSL 안쪽 주소일 수 있어요 — 미러링을 켜야 밖에서 들어와요 (시작하기 05)&quot;);
+        }
+        freeifaddrs(list);
+    }
+    if (others[0])
+        show(&quot;[주소] 안 되면 이 주소로:%s&quot;, others);
+    if (n == 0)
+        show(&quot;[주소] 네트워크 주소를 못 찾았어요 — 같은 컴퓨터에서는  ./deolmi 이름  으로 들어와요&quot;);
+}
+#endif
+
+/* 시작할 때와 /help 때 보여 주는 설명. 처음 쓰는 사람도 이것만 보고 쓸 수 있게 */
+static void show_guide(void)
+{
+    const char *rule = &quot;────────────────────────────────────────────&quot;;
+    show(&quot;%s&quot;, rule);
+    if (mode == M_HOST) {
+        show(&quot;이 창이 방이에요. 내가 서버가 되어 중계하면서 같이 대화해요.&quot;);
+        show_my_address();
+        show(&quot;같은 와이파이여야 들어와요. 학교 와이파이에서 안 되면 둘 다 휴대폰 핫스팟에 연결하세요.&quot;);
+    } else {
+        show(&quot;방에 들어왔어요. 방장이 나가면 방이 닫혀요.&quot;);
+    }
+    show(&quot;사용법&quot;);
+    show(&quot;  그냥 치고 엔터   방에 있는 모두에게 보내기&quot;);
+    show(&quot;  /dm 이름         그 사람하고만 1:1  (/all 로 다시 모두에게)&quot;);
+    show(&quot;  /who             지금 들어와 있는 사람&quot;);
+    show(&quot;  /help            이 설명 다시 보기&quot;);
+    show(&quot;  /quit            나가기%s&quot;, mode == M_HOST ? &quot; (방장이 나가면 방이 닫혀요)&quot; : &quot;&quot;);
+    show(&quot;받은 글은 [이름] 내용, 나에게만 온 1:1은 [이름 → 나] 내용 으로 떠요.&quot;);
+    show(&quot;지금은 암호화 전 단계라 메시지가 평문(그대로)으로 오가요.&quot;);
+    show(&quot;만든 사람: 김창식(기획·결정·실행 확인) · Claude(AI — 코드와 사이트 작성)&quot;);
+    show(&quot;누가 무엇을 했는지: https://tkdgh123.github.io/secure-msg/log/&quot;);
+    show(&quot;%s&quot;, rule);
+}
+
+/* ================= ⑤ 실행 ================= */
+
+int main(int argc, char **argv)
+{
+#ifdef _WIN32
+    WSADATA wsa;
+    if (WSAStartup(MAKEWORD(2, 2), &amp;wsa) != 0) {
+        fprintf(stderr, &quot;WSAStartup 실패\n&quot;);
+        return 1;
+    }
+    SetConsoleOutputCP(CP_UTF8);   /* 화면에 UTF-8 한글이 깨지지 않게 */
+
+    /* 윈도우의 argv는 UTF-8이 아니라 CP949라서, 한글 이름이 다른 사람(리눅스·맥)에게 깨져 보인다.
+       그래서 명령줄을 UTF-16으로 다시 받아 UTF-8로 바꾼다 */
+    static char arg_buf[8][256], *arg_ptr[8];
+    wchar_t **wargv = CommandLineToArgvW(GetCommandLineW(), &amp;argc);
+    if (argc &gt; 8)
+        argc = 8;
+    for (int i = 0; i &lt; argc; i++) {
+        WideCharToMultiByte(CP_UTF8, 0, wargv[i], -1, arg_buf[i], sizeof(arg_buf[i]), NULL, NULL);
+        arg_ptr[i] = arg_buf[i];
+    }
+    argv = arg_ptr;
+#else
+    signal(SIGPIPE, SIG_IGN);
+    setvbuf(stdout, NULL, _IOLBF, 0);   /* 파일로 돌려도 줄마다 바로 나오게 */
+#endif
+
+    int lfd = -1;
+    if (argc &gt;= 2 &amp;&amp; argv[1][0] != &#x27;-&#x27; &amp;&amp; valid_name(argv[1])) {
+        strncpy(my_name, argv[1], NAME_LEN - 1);
+        mode = (argc &gt;= 3 &amp;&amp; strcmp(argv[2], &quot;--host&quot;) == 0) ? M_HOST : M_JOIN;
+        if (mode == M_HOST) {
+            lfd = net_listen(PORT);
+            if (lfd &lt; 0)
+                return 1;
+            raw_tty();
+            show(&quot;%s덜미%s · %s · 방장&quot;, C_ACCENT, C_RESET, my_name);
+        } else {
+            const char *host = argc &gt;= 3 ? argv[2] : &quot;127.0.0.1&quot;;
+            printf(&quot;%s 에 접속하는 중… (5초)\n&quot;, host);
+            fflush(stdout);
+            srv.fd = net_connect(host, PORT);
+            if (srv.fd &lt; 0) {
+                if (errno == ECONNREFUSED)
+                    fprintf(stderr, &quot;→ 그 주소에 열린 방이 없어요. 방장이 먼저 --host 로 방을 열었는지, 주소가 맞는지 보세요\n&quot;);
+                else if (errno == ETIMEDOUT || errno == EHOSTUNREACH || errno == ENETUNREACH)
+                    fprintf(stderr, &quot;→ 연결이 중간에서 막혔어요. 방장 노트북 방화벽, 같은 네트워크인지 보세요.\n&quot;
+                                    &quot;  학교 와이파이는 기기끼리 연결을 막는 경우가 많아요 — 둘 다 휴대폰 핫스팟에 연결해 보세요\n&quot;);
+                return 1;
+            }
+            pkt_init(&amp;out, T_HELLO, my_name, NULL);
+            send_packet(srv.fd, &amp;out);
+            raw_tty();
+            show(&quot;%s덜미%s · %s · %s 에 접속&quot;, C_ACCENT, C_RESET, my_name, host);
+        }
+        show_guide();
+    } else {
+        fprintf(stderr, &quot;덜미 — 터미널 채팅 (프밍기2 팀 프로젝트)\n\n&quot;);
+        fprintf(stderr, &quot;  %s 이름 --host       방을 연다 (방장: 내가 서버가 되어 중계하면서 대화)\n&quot;, argv[0]);
+        fprintf(stderr, &quot;  %s 이름 [주소]       방에 들어간다 (주소는 방장 화면의 [주소] 줄, 같은 컴퓨터면 생략)\n\n&quot;, argv[0]);
+        fprintf(stderr, &quot;이름은 한글 5글자(15바이트)까지, 띄어쓰기와 / 없이.\n&quot;);
+        fprintf(stderr, &quot;만든 사람: 김창식(기획·결정·실행 확인) · Claude(AI — 코드와 사이트 작성)\n&quot;);
+        fprintf(stderr, &quot;자세한 안내: https://tkdgh123.github.io/secure-msg/run/\n&quot;);
+        return 1;
+    }
+
+    struct pollfd fds[2 + MAX_CLIENTS + 1];
+    for (;;) {
+        int n = nclients;   /* 이번 바퀴에 지켜볼 사람 수 (참가자는 0) */
+        fds[0] = (struct pollfd){ .fd = 0, .events = POLLIN };   /* 키보드 */
+        fds[1] = (struct pollfd){ .fd = mode == M_JOIN ? srv.fd : lfd, .events = POLLIN };
+        for (int i = 0; i &lt; n; i++)
+            fds[2 + i] = (struct pollfd){ .fd = clients[i].c.fd, .events = POLLIN };
+
+#ifdef _WIN32   /* WSAPoll은 소켓만 본다: 키보드(fds[0])는 빼고 0.05초마다 따로 확인 */
+        if (poll(fds + 1, 1 + n, 50) &lt; 0)
+            continue;
+        fds[0].revents = keys_waiting() ? POLLIN : 0;
+#else
+        if (poll(fds, 2 + n, -1) &lt; 0)
+            continue;
+#endif
+
+        /* 뒤에서부터: 도중에 지워도 아직 안 본 칸이 밀려오지 않는다 */
+        for (int i = n - 1; i &gt;= 0; i--)
+            if (fds[2 + i].revents &amp; (POLLIN | POLLHUP | POLLERR))
+                serve(i);
+        if (fds[1].revents &amp; (POLLIN | POLLHUP | POLLERR)) {
+            if (mode == M_JOIN)
+                join_read();
+            else
+                add_client((int)accept(lfd, NULL, NULL));
+        }
+        if (fds[0].revents &amp; (POLLIN | POLLHUP))
+            read_keys();
+    }
+}
+
+#endif /* NET_ONLY */
+</code></pre>
+  </section>
+</main>
+<footer class="end">
+  <div class="e-by"><p><b>김창식</b> — 기획 · 결정 · 실제로 돌려 보고 문제 찾기</p><p><b>Claude</b> (Anthropic의 AI) — 코드와 이 사이트 작성</p><p><a href="../log/#who">누가 무엇을 했나 자세히</a></p></div>
+  <nav class="e-nav" aria-label="덜미 페이지"><ul><li><a href="../guide/">설명서</a></li><li><a href="../run/">시작하기</a></li><li><a href="../code/" aria-current="page">전체 코드</a></li><li><a href="../plan/">암호화 계획</a></li><li><a href="../log/">작업 기록</a></li><li><a href="/">작업실로</a></li></ul></nav>
+  <a class="e-next" href="../plan/"><span>다음 페이지</span><b>암호화 계획 <span aria-hidden="true">→</span></b></a>
+  <p class="e-word" aria-hidden="true">덜미<i>.</i></p>
+</footer>
+</div>
+<script src="../site.js" defer></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js"></script>
+<script>
+const el = document.querySelector('pre code'), raw = el.textContent;
+hljs.highlightElement(el);
+hljs.lineNumbersBlock(el);
+document.querySelector('button.copy').addEventListener('click', async e => {
+  const b = e.currentTarget;
+  try { await navigator.clipboard.writeText(raw); b.textContent = '복사됨'; b.classList.add('ok');
+    setTimeout(() => { b.textContent = '복사'; b.classList.remove('ok') }, 1400); } catch (_) { b.textContent = '실패'; }
+});
+document.querySelectorAll('.map5 button').forEach(b => b.addEventListener('click', () => {
+  const p = document.getElementById('f'), box = p.querySelector('.codebox');
+  const tr = p.querySelectorAll('.hljs-ln tr')[+b.dataset.line - 1];
+  if (!tr) return;
+  p.querySelectorAll('.ln-hit').forEach(r => r.classList.remove('ln-hit'));
+  tr.classList.add('ln-hit');
+  p.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+  box.scrollTop = tr.offsetTop - 8;
+}));
+</script>
+</body>
+</html>
