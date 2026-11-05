@@ -129,8 +129,8 @@ for (let i = 0; i < 26000; i++) { g.fillStyle = `rgba(${rnd() < .5 ? "70,80,40" 
 const path = (pts, close = true) => { g.beginPath(); pts.forEach(([x, z], i) => i ? g.lineTo(tx(x), tz(z)) : g.moveTo(tx(x), tz(z))); if (close) g.closePath(); };
 path(CAMPUS); g.fillStyle = "#d8d0bf"; g.fill();
 const AREA = { "pitch:soccer": "#4f9a3a", "track:running": "#b5675c", "pitch:running": "#b5675c", "pitch:basketball": "#2f6db0", "pitch:tennis": "#3f7f55", pitch: "#5f8a4a", track: "#b5634a", park: "#7d9a5a", garden: "#7d9a5a", grass: "#8aa463", playground: "#c9b08a", forest: "#4f6b3a", wood: "#4f6b3a", scrub: "#6d7f48", meadow: "#93a866", recreation_ground: "#86a05e", village_green: "#86a05e", sports_centre: "#9db07a", stadium: "#9db07a" };
-const green = [];
-for (const a of SSU.areas) { const p = pairs(a.p); path(p); g.fillStyle = AREA[a.k] || "#8aa463"; g.fill(); if (a.k === "pitch") { g.strokeStyle = "rgba(255,255,255,.75)"; g.lineWidth = S * .4; g.stroke(); } if (/park|garden|grass|forest|wood|scrub|meadow|recreation|village/.test(a.k)) green.push(p); }
+const green = [], forestP = new Set();
+for (const a of SSU.areas) { const p = pairs(a.p); path(p); g.fillStyle = AREA[a.k] || "#8aa463"; g.fill(); if (a.k === "pitch") { g.strokeStyle = "rgba(255,255,255,.75)"; g.lineWidth = S * .4; g.stroke(); } if (/park|garden|grass|forest|wood|scrub|meadow|recreation|village/.test(a.k)) { green.push(p); if (/forest|wood/.test(a.k)) forestP.add(p); } }
 { const inOBB = (o, f) => { g.save(); g.translate(tx(o.cx), tz(o.cz)); g.rotate(Math.atan2(o.uz, o.ux)); g.scale(S, S); f(); g.restore(); }; // 운동장·농구장 (미터 단위로 그림)
   const tr = SPORT_P.find(a => a.k === "track:running"), pi = SPORT_P.find(a => a.k === "pitch:soccer"), bc = SPORT_P.find(a => a.k === "pitch:basketball");
   if (tr && pi) { const t = obb(tr.pts), p = obb(pi.pts);
@@ -148,7 +148,7 @@ const BLD = SSU.buildings.map(b => ({ ...b, pts: pairs(b.p) }));
 g.save(); g.filter = `blur(${Math.round(S * 3)}px)`; g.fillStyle = "rgba(40,30,20,.45)"; for (const b of BLD) { path(b.pts); g.fill(); } g.restore(); // 건물 밑 그늘(바닥에 구운 빛 가림)
 const ROADC = w => w >= 10 ? "#5d5d60" : w >= 5 ? "#6e6d6c" : "#cfc6b2";
 for (const pass of [0, 1]) for (const r of [...SSU.roads].sort((a, b) => a.w - b.w)) { const p = pairs(r.p); path(p, false); g.lineCap = g.lineJoin = "round";
-  if (pass === 0) { g.strokeStyle = r.w >= 5 ? "#a59d8c" : "rgba(0,0,0,0)"; g.lineWidth = (r.w + 1.6) * S; g.stroke(); } else { g.strokeStyle = ROADC(r.w); g.lineWidth = r.w * S; g.stroke();
+  if (pass === 0) { g.strokeStyle = r.w >= 5 ? "#a59d8c" : "rgba(0,0,0,0)"; g.lineWidth = (r.w + 1.6) * S; g.stroke(); } else { g.strokeStyle = r.w >= 5 && r.w < 10 && inPoly(...p[p.length >> 1], CAMPUS) ? "#9d9990" : ROADC(r.w); g.lineWidth = r.w * S; g.stroke();
     if (r.w >= 10) { g.setLineDash([3 * S, 4 * S]); g.strokeStyle = "rgba(255,240,210,.7)"; g.lineWidth = .3 * S; g.stroke(); g.setLineDash([]); } } }
 { const RED = [[-250, 6], [-252, -12], [-246, -32], [-236, -48], [-222, -59], [-204, -66], [-186, -68], [-172, -73]]; // 붉은 자전거·보행로 (위성사진의 휜 띠, 영상)
   path(RED, false); g.lineCap = g.lineJoin = "round"; g.strokeStyle = "#f2efe8"; g.lineWidth = 6 * S; g.stroke(); g.strokeStyle = "#94524b"; g.lineWidth = 5.2 * S; g.stroke();
@@ -278,8 +278,8 @@ const STYLE = {
   창신관: { kind: "punch", wall: "#d9a89c", band: "#f2e8e0", bandH: .1, glass: "#56606a", frame: "#6b5545", ww: .7, wh: .44, lv: 4, roof: GREENROOF, note: "살구색 벽 + 흰 띠" },
   글로벌브레인홀: { kind: "punch", mat: "tile", wall: "#d8be9e", band: "#b0654a", bandH: .09, glass: "#3f7a78", frame: "#2f7a5a", ww: .5, wh: .44, lv: 9, roof: "#e3e1d6", note: "베이지 타일, 초록 창틀" },
   레지던스홀: { kind: "scatter", wall: "#8a8d96", glass: "#2c3542", sky: "#6d7c8c", lv: 12, roof: "#6e7078", note: "짙은 회색, 흩어진 창", vroof: true },
-  정보과학관: { kind: "band", mat: "tile", wall: "#d9cdb8", glass: "#4f8b8a", frame: "#4a4f54", lv: 6, roof: GREENROOF, note: "크림색 + 청록 유리", skylights: true },
-  창의관: { kind: "curtain", wall: "#46494f", glass: "#4f6a82", glass2: "#33404e", sky: "#a3b6c6", frame: "#1c1c1c", spandrel: "#46494f", lv: 7, roof: "#555", note: "짙은 회색 쐐기 + 유리" },
+  정보과학관: { kind: "band", mat: "tile", wall: "#d9cdb8", glass: "#4f8b8a", frame: "#4a4f54", lv: 6, roof: LIGHTROOF, note: "크림색 + 청록 유리", skylights: true },
+  창의관: { kind: "curtain", wall: "#46494f", glass: "#4f6a82", glass2: "#33404e", sky: "#a3b6c6", frame: "#1c1c1c", spandrel: "#46494f", lv: 7, roof: LIGHTROOF, note: "짙은 회색 쐐기 + 유리" },
 };
 const SHADE = { kind: "punch", wall: "#c8c2b6", glass: "#4a545c", frame: "#333", ww: .5 }; // 이름 없는 학교 건물
 const roofMat = r => r === "deck" ? new THREE.MeshStandardMaterial({ map: planks("#7a5236"), roughness: .9 }) : new THREE.MeshStandardMaterial({ color: r, roughness: .95 });
@@ -300,7 +300,8 @@ for (const b of BLD) {
   if (b.pts.length < 3) continue;
   { const mx = b.pts.reduce((s, p) => s + p[0], 0) / b.pts.length, mz = b.pts.reduce((s, p) => s + p[1], 0) / b.pts.length, k = `${Math.round(mx / 2)},${Math.round(mz / 2)}`;
     const rf = OSM_ROOF.find(([x, z]) => Math.hypot(mx - x, mz - z) < 2); if (rf) { if (rf[2]) canopies.push(b.pts); continue; }
-    if (!b.n && b.c && area(b.pts) < 60) continue; // 층수 정보 없는 아주 작은 학교 건물(경비실·계단탑 등)이 16m 기둥으로 서던 것
+    if (!b.n && b.c && area(b.pts) < 60) continue;
+    if (!b.n && b.pts.filter(p => NAMEDP.some(n => inPoly(p[0], p[1], n.pts))).length >= b.pts.length * .4) continue; // 이름 있는 건물과 크게 겹치는 옛 윤곽 (학생회관 동쪽 동 위 초록 지붕) // 층수 정보 없는 아주 작은 학교 건물(경비실·계단탑 등)이 16m 기둥으로 서던 것
     if (!b.n && (seenAt.has(k) || NAMEDP.some(n => inPoly(mx, mz, n.pts)))) continue; seenAt.add(k); } // 겹친 조각·중복은 빼서 벽이 깜빡이지 않게
   const st = b.c && b.n ? STYLE[b.n] : null;
   if (st) { b.lv = st.lv; b.h = st.lv * FH + 1.2; b.note = st.note; }
@@ -376,7 +377,7 @@ const edgeFacing = (b, nx, nz) => { let best = null; b.pts.forEach((p, i) => { c
   const m = new THREE.Mesh(new THREE.BoxGeometry(9, 13, 1.6), mats); m.rotation.y = Math.atan2(-uz, ux); m.position.set(end[0] + k * ux * 5.5 + e.ox * .9, Y(end[0], end[1]) + 6, end[1] + k * uz * 5.5 + e.oz * .9);
   m.castShadow = m.receiveShadow = true; scene.add(m); } }
 // 신양관: 옥상 유리 피라미드
-{ const b = byName("신양관"); if (b) { const s = Math.min(26, b.size * 1.1), py = new THREE.Mesh(new THREE.ConeGeometry(s * .72, s * .55, 4, 1), MAT.glassY); py.rotation.y = Math.PI / 4 + (edgeFacing(b, 0, 1)?.ang || 0);
+{ const b = byName("신양관"); if (b) { const s = Math.min(16, b.size * .8), py = new THREE.Mesh(new THREE.ConeGeometry(s * .72, s * .55, 4, 1), MAT.glassY); py.rotation.y = Math.PI / 4 + (edgeFacing(b, 0, 1)?.ang || 0);
   py.position.set(b.cx, b.top + s * .275, b.cz); py.castShadow = true; scene.add(py); const fr = new THREE.LineSegments(new THREE.EdgesGeometry(py.geometry), new THREE.LineBasicMaterial({ color: 0x9a9a9a })); fr.position.copy(py.position); fr.rotation.copy(py.rotation); scene.add(fr); } }
 // 한경직기념관 (카카오 로드뷰 2026-06): 정면 = 북쪽 면. 윗벽에 '한경직기념관' 어두운 글자, 그 서쪽에 검은 십자가 + 아래 큰 LED 화면, 동쪽 끝 살구색 철골 유리 계단실, 1층 파란 캐노피·기둥
 { const b = byName("한경직기념관"); if (b) { const e = edgeFacing(b, 0, -1); if (e) { const ux = (e.q[0] - e.p[0]) / e.L, uz = (e.q[1] - e.p[1]) / e.L, east = ux > 0 ? 1 : -1, at = k => [e.mx + ux * east * e.L * k + e.ox * .4, e.mz + uz * east * e.L * k + e.oz * .4];
@@ -405,7 +406,13 @@ const glassRail = new THREE.MeshStandardMaterial({ color: 0xdfeaee, transparent:
 // 학생회관 (최문규, 2012 서울시 건축상 대상 — 건축도시정책정보센터 사진): 광장 쪽은 얇고 깊게 튀어나온 흰 콘크리트 지붕 아래 유리 한 층 + 둥근 흰 기둥·전광판·'학생회관' 글자,
 // 운동장 쪽은 12m 단차를 층층 테라스·유리 난간으로, 지붕은 풀 + 나무 스카이데크, 가운데 트인 곳은 광장에서 운동장으로 내려가는 중앙계단
 { const b = byName("학생회관"); if (b) { const R = b.top, n0 = b.pts.length, lip = offsetPoly(b.pts, 3.2), plaza = [];
-  flat(lip, R - .6, .7, MAT.white); flat(offsetPoly(b.pts, 2.4), R + .1, .1, new THREE.MeshStandardMaterial({ color: 0x86a25f, roughness: 1 })); flat(offsetPoly(b.pts, -6), R + .2, .06, MAT.wood); // 풀 지붕 + 큰 나무 데크
+  flat(lip, R - .6, .7, MAT.white); { const top = offsetPoly(b.pts, 2.4), xs = top.map(p => p[0]), zs = top.map(p => p[1]), x0 = Math.min(...xs), z0 = Math.min(...zs), Wd = Math.max(...xs) - x0, Hd = Math.max(...zs) - z0, K = 1024 / Math.max(Wd, Hd);
+    const t = textTex(Math.round(Wd * K), Math.round(Hd * K), x => { const P = pts => { x.beginPath(); pts.forEach(([a, c], i) => x[i ? "lineTo" : "moveTo"]((a - x0) * K, (c - z0) * K)); x.closePath(); };
+      x.fillStyle = "#86a25f"; x.fillRect(0, 0, Wd * K, Hd * K); P(b.pts); x.fillStyle = "#8a6446"; x.fill(); // 나무 데크
+      for (let i = 0; i < Wd * K; i += K * .5) { x.fillStyle = "rgba(0,0,0,.08)"; x.fillRect(i, 0, 1, Hd * K); }
+      x.lineJoin = "round"; x.strokeStyle = "#86a25f"; x.lineWidth = 7 * K; x.stroke(); // 풀 테두리
+      P([[-41, -121], [-30, -121], [-35, -152], [-39, -152]]); x.fillStyle = "#2b2e30"; x.fill(); x.strokeStyle = "#cfd3d4"; x.lineWidth = .6 * K; x.stroke(); }); // 채광 틈: 중앙계단 트인 곳에서 북쪽으로 좁아지는 쐐기 (위성사진)
+    t.repeat.set(1 / Wd, 1 / Hd); t.offset.set(-x0 / Wd, (z0 + Hd) / Hd); flat(top, R + .1, .1, new THREE.MeshStandardMaterial({ map: t, roughness: 1 })); } // 풀 테두리 + 나무 데크 + 채광 틈
   lip.forEach((p, i) => { const q = lip[(i + 1) % lip.length], dx = q[0] - p[0], dz = q[1] - p[1], L = Math.hypot(dx, dz); if (L > 1) box(L, 1.1, .06, glassRail, (p[0] + q[0]) / 2, R + .65, (p[1] + q[1]) / 2, Math.atan2(-dz, dx)); });
   b.pts.forEach((p, i) => { const q = b.pts[(i + 1) % n0], dx = q[0] - p[0], dz = q[1] - p[1], L = Math.hypot(dx, dz); if (L < 6) return;
     let ox = dz / L, oz = -dx / L; const mx = (p[0] + q[0]) / 2, mz = (p[1] + q[1]) / 2; if (inPoly(mx + ox, mz + oz, b.pts)) { ox = -ox; oz = -oz; }
@@ -487,6 +494,9 @@ for (const pts of canopies) { const y = Math.max(...pts.map(p => Y(...p))) + 4; 
 for (const r of SSU.roads) { if (r.k !== "steps") continue; const p = pairs(r.p), [a, z] = [p[0], p[p.length - 1]]; if (!inPoly(a[0], a[1], CAMPUS) && !NAMEDP.some(n => Math.hypot(n.pts[0][0] - a[0], n.pts[0][1] - a[1]) < 60)) continue;
   let [lo, hi] = Y(a[0], a[1]) < Y(z[0], z[1]) ? [a, z] : [z, a]; const L = Math.hypot(hi[0] - lo[0], hi[1] - lo[1]), dh = Math.max(1.6, Y(hi[0], hi[1]) - Y(lo[0], lo[1])), n = Math.max(5, Math.min(40, Math.round(dh / .17)));
   steps(lo[0], lo[1], hi[0], hi[1], Y(lo[0], lo[1]) - .1, n, dh / n, L / n, Math.hypot(a[0] + 108, a[1] + 72) < 15 ? MAT.brickStep : MAT.granite, 3.2); }
+{ const arc = []; for (let k = 0; k <= 24; k++) { const a = Math.PI / 2 + Math.PI * k / 24; arc.push([-243 + Math.cos(a) * 5.8, -17 + Math.sin(a) * 5.8]); } // 흰 화강석 반원 기념벽: 서쪽 반원, 동쪽 평지를 향해 열림
+  for (let k = 24; k >= 0; k--) { const a = Math.PI / 2 + Math.PI * k / 24; arc.push([-243 + Math.cos(a) * 5, -17 + Math.sin(a) * 5]); }
+  flat(arc, Y(-243, -17) - .3, 2.9, new THREE.MeshStandardMaterial({ color: 0xeeece6, roughness: .6 })); clearings.push([-243, -17, 8]); }
 /* 돌계단(슈파크): 동쪽 중심의 큰 원호를 따라 서쪽으로 살짝 휜 단. 단마다 잔디 + 앞 가장자리 붉은 회갈색 화강석 띠, 사이사이 돌 통로 */
 { const grass = [], stone = [], dr = (FAN_R[1] - FAN_R[0]) / FAN_ROWS, rise = .34;
   for (let k = 0; k < FAN_ROWS; k++) { const r = FAN_R[1] - (k + .5) * dr, top = FAN_Y + (k + 1) * rise, n = Math.ceil(r * .9 / 2.2), da = .9 / n;
@@ -549,7 +559,7 @@ let isForest = () => false; const V = []; // 채운 빌라 [x, z, 너비, 깊이
   for (const r of SSU.roads) { op(pairs(r.p), false); o.lineWidth = (r.w + 5) / R; o.stroke(); }
   const occ = o.getImageData(0, 0, cw, ch).data, px4 = (x, z) => (((z - Z0) / R | 0) * cw + ((x - X0) / R | 0)) * 4 + 3, taken = (x, z) => x < X0 || x > X1 || z < Z0 || z > Z1 || occ[px4(x, z)] > 0;
   // 동네 = 차 다니는 길이나 건물 가까이. 오솔길만 있는 언덕은 숲으로 남김
-  o.clearRect(0, 0, cw, ch); o.lineWidth = 80 / R; for (const r of SSU.roads) if (r.w >= 5) { op(pairs(r.p), false); o.stroke(); } o.lineWidth = 50 / R; for (const b of BLD) { op(b.pts); o.fill(); o.stroke(); }
+  o.clearRect(0, 0, cw, ch); o.lineWidth = 48 / R; for (const r of SSU.roads) if (r.w >= 5) { op(pairs(r.p), false); o.stroke(); } o.lineWidth = 50 / R; for (const b of BLD) { op(b.pts); o.fill(); o.stroke(); }
   const nearD = o.getImageData(0, 0, cw, ch).data, near = (x, z) => nearD[px4(x, z)] > 0;
   isForest = (x, z) => !near(x, z) && !inPoly(x, z, CAMPUS); // 녹지로 그려진 숲도 포함
   { const fd = o.createImageData(cw, ch); for (let i = 3; i < fd.data.length; i += 4) if (!occ[i] && !nearD[i]) { fd.data[i - 3] = 78; fd.data[i - 2] = 104; fd.data[i - 1] = 58; fd.data[i] = 235; } // 숲 바닥을 땅 그림에 칠함
@@ -571,14 +581,14 @@ function free(x, z) { if (SPORT_P.some(a => inPoly(x, z, a.pts)) || Math.hypot(x
   for (const b of BLD) { if (Math.abs(b.cx - x) > b.size + 4 || Math.abs(b.cz - z) > b.size + 4) continue; if (inPoly(x, z, b.pts)) return false; }
   for (const [[ax, az], [bx, bz], w] of roadSegs) { const dx = bx - ax, dz = bz - az, L = dx * dx + dz * dz || 1, t = cl(((x - ax) * dx + (z - az) * dz) / L, 0, 1); if (Math.hypot(ax + dx * t - x, az + dz * t - z) < w) return false; } return true; }
 const trees = [];
-for (const p of green) { const xs = p.map(q => q[0]), zs = p.map(q => q[1]), [a, b2, c, d] = [Math.min(...xs), Math.max(...xs), Math.min(...zs), Math.max(...zs)], n = Math.min(260, ((b2 - a) * (d - c)) / 90 | 0);
+for (const p of green) { const xs = p.map(q => q[0]), zs = p.map(q => q[1]), [a, b2, c, d] = [Math.min(...xs), Math.max(...xs), Math.min(...zs), Math.max(...zs)], wood = forestP.has(p), n = Math.min(wood ? 2500 : 260, ((b2 - a) * (d - c)) / (wood ? 30 : 90) | 0);
   for (let k = 0; k < n; k++) { const x = lerp(a, b2, rnd()), z = lerp(c, d, rnd()); if (inPoly(x, z, p) && free(x, z) && !inFan(x, z) && !cleared(x, z)) trees.push([x, z]); } }
 for (let k = 0; k < 3500 && trees.length < 2600; k++) { const x = lerp(-330, 330, rnd()), z = lerp(-260, 260, rnd()); if (inPoly(x, z, CAMPUS) && rnd() < .55 && free(x, z) && !inFan(x, z) && !cleared(x, z)) trees.push([x, z]); }
 for (let k = 0; k < 30000 && trees.length < 9000; k++) { const x = lerp(X0, X1, rnd()), z = lerp(Z0, Z1, rnd()); if (isForest(x, z) && free(x, z)) trees.push([x, z]); } // 동네 밖 언덕은 숲
 { // 활엽수 = 줄기 위에 덩어리 셋(가로수·느티나무 느낌), 소나무 = 원뿔 둘. 숲·언덕은 소나무를 더 많이
-  const blob = mergeGeometries([[0, 0, 0, 1], [.55, -.25, .2, .72], [-.45, -.2, -.35, .78], [.1, .35, -.1, .7]].map(([x, y, z, r]) => new THREE.IcosahedronGeometry(r, 1).translate(x, y, z)));
+  const blob = mergeGeometries([[0, 0, 0, 1], [.55, -.25, .2, .72], [-.45, -.2, -.35, .78], [.1, .35, -.1, .7]].map(([x, y, z, r]) => new THREE.IcosahedronGeometry(r, 0).translate(x, y, z)));
   const pine = mergeGeometries([new THREE.ConeGeometry(1, 1.1, 7).translate(0, .25, 0), new THREE.ConeGeometry(.75, .9, 7).translate(0, .85, 0), new THREE.ConeGeometry(.45, .7, 7).translate(0, 1.35, 0)]);
-  const leafM = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: .9, flatShading: true }), list = trees.map(([x, z]) => ({ x, z, pine: isForest(x, z) ? rnd() < .55 : rnd() < .18 }));
+  const leafM = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: .9, flatShading: true }), list = trees.map(([x, z]) => ({ x, z, pine: isForest(x, z) || [...forestP].some(p => inPoly(x, z, p)) ? rnd() < .55 : rnd() < .18 }));
   const nP = list.filter(t => t.pine).length, F = new THREE.InstancedMesh(blob, leafM, list.length - nP), P = new THREE.InstancedMesh(pine, leafM, nP), Tk = new THREE.InstancedMesh(new THREE.CylinderGeometry(.1, .16, 1, 6), new THREE.MeshStandardMaterial({ color: 0x5a4636 }), list.length);
   const mm = new THREE.Matrix4(), q = new THREE.Quaternion(), col = new THREE.Color(), GREENS = ["#6a8f45", "#5b8040", "#7a9a4c", "#4f7a3a", "#86a356", "#62883f"], PINES = ["#3f5f3a", "#4a6b40", "#38553a"];
   let fi = 0, pi = 0; list.forEach((t, i) => { const y = Y(t.x, t.z); q.setFromEuler(new THREE.Euler(0, rnd() * 6, 0));
