@@ -44,26 +44,32 @@ const ang = (p, q) => Math.atan2(q[1] - p[1], q[0] - p[0]);
 const norm = (p, q) => { const d = Math.hypot(q[0] - p[0], q[1] - p[1]) || 1; return [(q[0] - p[0]) / d, (q[1] - p[1]) / d]; };
 
 /* ───────── 몸 ───────── */
-const LEN = { T: .34, N: .035, R: .13, UA: .2, FA: .19, TH: .245, SH: .245 };
-const BASE = { x: 0, y: 0, g: 1, t: 0, h: 0, f: 0, la1: -14, la2: -6, ra1: 14, ra2: 6, ll1: -9, ll2: -5, rl1: 9, rl2: 5, m: 0,
+// 굵은 검은 선 + 얼굴 없는 동그란 머리(몸통과 살짝 떨어짐), 손발은 둥근 끝
+const LEN = { T: .33, N: .024, R: .112, UA: .2, FA: .19, TH: .25, SH: .245, W: .062 };
+const BASE = { x: 0, y: 0, t: 0, h: 0, f: 0, la1: -18, la2: -8, ra1: 18, ra2: 8, ll1: -10, ll2: -4, rl1: 10, rl2: 4, rot: 0, sq: 0,
   ik: 0, ikL: 0, ikR: 0, ikf: 0, st: 0, sw: 0, pd: 26, pg: 0, row: 0, env: 1 };
-const STAND = {}, CROUCH = { la1: -38, la2: -18, ra1: 38, ra2: 18, ll1: -42, ll2: 4, rl1: 42, rl2: -4, m: 2 };
-const HOP = { la1: -155, la2: -172, ra1: 155, ra2: 172, ll1: -16, ll2: -30, rl1: 16, rl2: 30, y: -.4, m: 3 };
-const LAND = { la1: -70, la2: -95, ra1: 70, ra2: 95, ll1: -12, ll2: -6, rl1: 12, rl2: 6 };
+// 넘길 때: 웅크림 → 늘어나며 뜀 → 무릎 당겨 공중제비 → 펴기 → 찌그러지며 착지 → 섬
+const STAND = {}, CROUCH = { h: 8, la1: -38, la2: -22, ra1: 38, ra2: 22, ll1: -58, ll2: 16, rl1: 58, rl2: -16, sq: -.1 };
+const LAUNCH = { la1: -168, la2: -174, ra1: 168, ra2: 174, ll1: -5, ll2: -2, rl1: 5, rl2: 2, sq: .14 };
+const TUCK = { h: 10, la1: -80, la2: -150, ra1: 80, ra2: 150, ll1: -140, ll2: -14, rl1: 140, rl2: 14 };
+const OPEN = { la1: -115, la2: -125, ra1: 115, ra2: 125, ll1: -14, ll2: -6, rl1: 14, rl2: 6 };
+const LAND = { h: -6, la1: -95, la2: -112, ra1: 95, ra2: 112, ll1: -55, ll2: 14, rl1: 55, rl2: -14, sq: -.16 };
+const JUMP = [[240, "io", CROUCH], [90, "o", LAUNCH], [190, "o", TUCK], [180, "l", TUCK], [160, "io", OPEN], [100, "o", LAND], [290, "io", STAND], [250, "l", STAND]];
 
 function rig(p, S, gx, gy, now) {
-  const hip = [0, 0], neck = at(hip, 180 - p.t, LEN.T), head = at(neck, 180 - p.t - p.h, LEN.N + LEN.R), sh = at(neck, -p.t, .03);
+  const hip = [0, 0], neck = at(hip, 180 - p.t, LEN.T), head = at(neck, 180 - p.t - p.h, LEN.N + LEN.R), sh = at(neck, -p.t, .035);
   const eL = at(sh, p.la1, LEN.UA), hL = at(eL, p.la2, LEN.FA), eR = at(sh, p.ra1, LEN.UA), hR = at(eR, p.ra2, LEN.FA);
   const kL = at(hip, p.ll1, LEN.TH), fL = at(kL, p.ll2, LEN.SH), kR = at(hip, p.rl1, LEN.TH), fR = at(kR, p.rl2, LEN.SH);
-  const low = p.g ? Math.max(fL[1], fR[1], kL[1], kR[1]) + .018 : .47;
+  const low = Math.max(fL[1], fR[1], kL[1], kR[1]) + LEN.W / 2;
   const ox = gx + p.x * S, oy = gy - low * S + p.y * S, px = q => [ox + q[0] * S, oy + q[1] * S];
   const th = (p.t + p.h) * D;
   return { p, S, gx, gy, now, hip: px(hip), neck: px(neck), head: px(head), sh: px(sh), eL: px(eL), hL: px(hL), eR: px(eR), hR: px(hR),
-    kL: px(kL), fL: px(fL), kR: px(kR), fR: px(fR), R: LEN.R * S, lw: S * .034, ol: Math.max(1.3, S * .0085),
+    kL: px(kL), fL: px(fL), kR: px(kR), fR: px(fR), R: LEN.R * S, lw: S * LEN.W, ol: Math.max(1.3, S * .0085),
     ct: Math.cos(p.t * D), st: Math.sin(p.t * D), hc: Math.cos(th), hs: Math.sin(th) };
 }
 // 몸통 기준 점(목이 원점, y는 엉덩이 쪽, 단위 S) · 머리 기준 점(머리 가운데가 원점, 단위 머리 반지름)
-const T = (r, x, y) => [r.neck[0] + (x * r.ct - y * r.st) * r.S, r.neck[1] + (x * r.st + y * r.ct) * r.S];
+const SLIM = .6; // 옷은 몸에 붙게: 몸통 기준 가로 폭을 줄임
+const T = (r, x, y) => (x *= SLIM, [r.neck[0] + (x * r.ct - y * r.st) * r.S, r.neck[1] + (x * r.st + y * r.ct) * r.S]);
 const H = (r, x, y, d) => { if (d) x *= r.p.f; return [r.head[0] + (x * r.hc - y * r.hs) * r.R, r.head[1] + (x * r.hs + y * r.hc) * r.R]; };
 function solve(a, b, l1, l2, bend) {
   const d = Math.hypot(b[0] - a[0], b[1] - a[1]), dd = cl(d, 1e-3, l1 + l2 - 1e-3), base = ang(a, b);
@@ -96,8 +102,10 @@ function smooth(g, pts, close) { // 점들을 부드러운 곡선으로
   if (close) g.closePath(); else g.lineTo(pts[n - 1][0], pts[n - 1][1]);
 }
 const top = (r, c, len = .34, w0 = .088, w1 = .1) => [T(r, -w0, -.012), T(r, w0, -.012), T(r, w1, len), T(r, -w1, len)];
-function sleeves(g, r, c, w = .062, k = .82) { band(g, r, [r.sh, r.eL, L2(r.eL, r.hL, k)], w * r.S, c); band(g, r, [r.sh, r.eR, L2(r.eR, r.hR, k)], w * r.S, c); }
-function pants(g, r, c, w = .07, k = .9) { band(g, r, [r.hip, r.kL, L2(r.kL, r.fL, k)], w * r.S, c); band(g, r, [r.hip, r.kR, L2(r.kR, r.fR, k)], w * r.S, c); }
+// 옷은 굵은 팔다리보다 조금 더 두껍게
+const CW = LEN.W + .016; // 소매·바지 굵기
+function sleeves(g, r, c, k = .82) { const w = CW * r.S; band(g, r, [r.sh, r.eL, L2(r.eL, r.hL, k)], w, c); band(g, r, [r.sh, r.eR, L2(r.eR, r.hR, k)], w, c); }
+function pants(g, r, c, k = .9) { const w = CW * r.S; band(g, r, [r.hip, r.kL, L2(r.kL, r.fL, k)], w, c); band(g, r, [r.hip, r.kR, L2(r.kR, r.fR, k)], w, c); }
 function heart(g, x, y, s, c) { g.beginPath(); g.moveTo(x, y + s * .35); g.bezierCurveTo(x - s * .9, y - s * .3, x - s * .35, y - s * .95, x, y - s * .42); g.bezierCurveTo(x + s * .35, y - s * .95, x + s * .9, y - s * .3, x, y + s * .35); g.fillStyle = c; g.fill(); }
 
 function drawBody(g, r, col = INK, w = r.lw) {
@@ -106,19 +114,7 @@ function drawBody(g, r, col = INK, w = r.lw) {
   path(g, [r.hip, r.neck]); g.stroke();
   path(g, [r.hL, r.eL, r.sh, r.eR, r.hR]); g.stroke();
 }
-function drawHead(g, r) { dot(g, r.head, r.R, PAPER, r.lw * .9); eyes(g, r); }
-function eyes(g, r) {
-  const f = r.p.f, sep = .36 * (1 - .55 * Math.abs(f)), cx = .3 * f, m = Math.round(r.p.m);
-  const blink = (r.now % 3700) < 120 && m === 0;
-  g.fillStyle = g.strokeStyle = INK; g.lineWidth = r.R * .1; g.lineCap = "round";
-  for (const s of [-1, 1]) {
-    const e = H(r, cx + s * sep / 2, -.05);
-    if (m === 1) { g.beginPath(); g.arc(e[0], e[1] + r.R * .06, r.R * .11, Math.PI * 1.1, Math.PI * 1.9); g.stroke(); }
-    else if (m === 2) { const k = r.R * .1; path(g, [[e[0] - k * s * -1, e[1] - k], [e[0] + k * s, e[1]], [e[0] - k * s * -1, e[1] + k]]); g.stroke(); }
-    else if (blink) { path(g, [[e[0] - r.R * .08, e[1]], [e[0] + r.R * .08, e[1]]]); g.stroke(); }
-    else dot(g, e, r.R * (m === 3 ? .12 : .085), INK);
-  }
-}
+const drawHead = (g, r) => dot(g, r.head, r.R, INK);
 
 /* ───────── 효과(입자) ───────── */
 const FX = [];
@@ -140,15 +136,14 @@ const C = [
         g.beginPath(); g.moveTo(t0[0], t0[1]); g.quadraticCurveTo(m1[0], m1[1], tip[0], tip[1]); g.quadraticCurveTo(m2[0], m2[1], t0[0], t0[1]); g.fillStyle = PAPER; g.fill(); g.stroke();
       } } },
     { at: "neck", on: "wipe", layer: "front", draw(g, r) { // 저고리 + 치마
-      const xs = [r.kL[0], r.kR[0]], hy = Math.max(r.kL[1], r.kR[1]) + .05 * r.S;
-      shape(g, r, [T(r, -.1, .2), T(r, .1, .2), [Math.max(...xs) + .08 * r.S, hy], [Math.min(...xs) - .08 * r.S, hy]], "#c8323c");
+      shape(g, r, [T(r, -.1, .18), T(r, .1, .18), T(r, .18, .44), T(r, -.18, .44)], "#c8323c");
       shape(g, r, top(r, 0, .22, .088, .105), PAPER);
       band(g, r, [T(r, -.055, -.005), T(r, .03, .11)], .022 * r.S, "#2b6cb0", false);
       const sw = Math.sin(r.now / 300) * .02;
       band(g, r, [T(r, .03, .11), T(r, .05 + sw, .27)], .02 * r.S, "#c8323c");
       band(g, r, [T(r, .03, .11), T(r, .0 + sw, .24)], .02 * r.S, "#c8323c");
-      sleeves(g, r, PAPER, .062, .8);
-      for (const [e, h] of [[r.eL, r.hL], [r.eR, r.hR]]) band(g, r, [L2(e, h, .64), L2(e, h, .8)], .062 * r.S, "#2b6cb0");
+      sleeves(g, r, PAPER, .8);
+      for (const [e, h] of [[r.eL, r.hL], [r.eR, r.hR]]) band(g, r, [L2(e, h, .64), L2(e, h, .8)], CW * r.S, "#2b6cb0");
     } },
     { at: "head", on: "drop", layer: "head", draw(g, r) { // 여우 귀
       for (const s of [-1, 1]) {
@@ -165,11 +160,11 @@ const C = [
       }); } },
   ],
   keys: [
-    [650, "io", { t: -3, h: -4, ra1: 168, ra2: -100, la1: -22, la2: 72, ll1: -13, ll2: -5, rl1: 13, rl2: 5 }],
-    [380, "io", { t: -12, h: -8, ra1: -168, ra2: -150, la1: -42, la2: 28, ll1: -16, ll2: -6, rl1: 26, rl2: 8 }],
-    [150, "o", { t: 15, h: 6, ra1: 98, ra2: 94, la1: -48, la2: -28, ll1: -26, ll2: -12, rl1: 33, rl2: 6, m: 2 }, "throw"],
-    [820, "io", { t: 9, h: 2, ra1: 92, ra2: 88, la1: 24, la2: 108, ll1: -24, ll2: -10, rl1: 30, rl2: 6, m: 0 }],
-    [450, "io", { t: 2, ra1: 60, ra2: 40, la1: -10, la2: 40, ll1: -14, ll2: -6, rl1: 16, rl2: 6 }],
+    [600, "io", { t: 4, h: 2, ra1: 40, ra2: 115, la1: -44, la2: -20, ll1: -16, ll2: -6, rl1: 18, rl2: 8 }],
+    [380, "io", { t: -14, h: -10, ra1: -130, ra2: -100, la1: 70, la2: 85, ll1: -24, ll2: -8, rl1: 24, rl2: 12 }],
+    [130, "o", { t: 20, h: 8, ra1: 95, ra2: 92, la1: -60, la2: -40, ll1: -32, ll2: -12, rl1: 32, rl2: 4 }, "throw"],
+    [520, "io", { t: 15, h: 6, ra1: 50, ra2: 35, la1: -55, la2: -30, ll1: -32, ll2: -12, rl1: 32, rl2: 4 }],
+    [500, "io", { t: 5, h: 2, ra1: 35, ra2: 100, la1: -42, la2: -18, ll1: -16, ll2: -6, rl1: 18, rl2: 8 }],
   ],
   on: { throw(r) { // 부적이 날아가 오행 다섯 색으로 터짐
     const s = r.S, h = [...r.hR], a = ang(r.eR, r.hR);
@@ -187,19 +182,19 @@ const C = [
   items: [
     { at: "hip", on: "pop", layer: "back", draw(g, r) { const f = r.p.f < 0 ? -1 : 1; band(g, r, [[r.hip[0] - .02 * r.S * f, r.hip[1] - .03 * r.S], [r.hip[0] - .36 * r.S * f, r.hip[1] + .12 * r.S]], .03 * r.S, "#2a1d14"); } },
     { at: "neck", on: "wipe", layer: "front", draw(g, r) { // 무복
-      pants(g, r, "#4a3424", .088, .86);
-      for (const [k, f] of [[r.kL, r.fL], [r.kR, r.fR]]) band(g, r, [L2(k, f, .56), L2(k, f, .86)], .062 * r.S, "#e9e2d0");
+      pants(g, r, "#4a3424", .86);
+      for (const [k, f] of [[r.kL, r.fL], [r.kR, r.fR]]) band(g, r, [L2(k, f, .56), L2(k, f, .86)], CW * r.S, "#e9e2d0");
       shape(g, r, top(r, 0, .33, .092, .115), "#7a5232");
       band(g, r, [T(r, -.06, 0), T(r, .06, .17)], .03 * r.S, "#e9e2d0");
       band(g, r, [T(r, -.115, .29), T(r, .115, .29)], .042 * r.S, "#2a1d14");
-      sleeves(g, r, "#7a5232", .078, .78);
+      sleeves(g, r, "#7a5232", .78);
     } },
     { at: "head", on: "drop", layer: "head", draw(g, r) { // 상투와 붉은 머리띠
       dot(g, H(r, -.05, -1.12), r.R * .3, INK);
       const f = r.p.f < 0 ? -1 : 1, start = H(r, -f * .92, -.32), pts = [start];
       for (let j = 1; j <= 5; j++) pts.push([start[0] - f * j * r.R * .34, start[1] + j * r.R * .16 + Math.sin(r.now / 110 + j * .9) * r.R * .14 * j / 5]);
       band(g, r, pts, r.R * .16, "#b8272c");
-      g.save(); g.beginPath(); g.arc(r.head[0], r.head[1], r.R + r.lw * .45, 0, 7); g.clip();
+      g.save(); g.beginPath(); g.arc(r.head[0], r.head[1], r.R + r.ol, 0, 7); g.clip();
       band(g, r, [H(r, -1.2, -.32), H(r, 1.2, -.32)], r.R * .26, "#b8272c"); g.restore();
     } },
     { at: "hR", on: "toss", layer: "hand", draw(g, r) { // 환도
@@ -210,37 +205,38 @@ const C = [
       }); } },
   ],
   keys: [
-    [520, "io", { t: 4, ra1: 35, ra2: 150, sw: 140, la1: -15, la2: 60, ll1: -30, ll2: -12, rl1: 30, rl2: 12 }],
-    [380, "io", { t: -8, h: -6, ra1: 175, ra2: 185, sw: 200, la1: -30, la2: 20, ll1: -26, ll2: -8, rl1: 34, rl2: 14 }],
-    [130, "o", { t: 18, h: 6, ra1: 76, ra2: 70, sw: 55, la1: -50, la2: -30, ll1: -34, ll2: -14, rl1: 44, rl2: 4, m: 2 }, "slash"],
-    [380, "io", { t: 15, h: 4, ra1: 68, ra2: 62, sw: 50, la1: -48, la2: -26, ll1: -34, ll2: -14, rl1: 44, rl2: 4, m: 2 }],
-    [320, "io", { f: -1, t: -6, ra1: -95, ra2: -100, sw: -100, la1: 20, la2: -10, ll1: -22, ll2: -8, rl1: 22, rl2: 8, m: 0 }],
-    [140, "o", { f: 1, t: 10, ra1: 95, ra2: 98, sw: 100, la1: -60, la2: -70, ll1: -32, ll2: -14, rl1: 36, rl2: 8, m: 2 }, "slash"],
-    [520, "io", { f: 1, t: 8, ra1: 92, ra2: 96, sw: 98, la1: -55, la2: -66, ll1: -32, ll2: -14, rl1: 36, rl2: 8, m: 2 }],
+    [520, "io", { t: 6, h: 2, ra1: 45, ra2: 110, sw: 150, la1: -35, la2: -15, ll1: -32, ll2: -12, rl1: 34, rl2: 12 }],
+    [360, "io", { t: -8, h: -6, ra1: 165, ra2: 190, sw: 215, la1: 55, la2: 80, ll1: -28, ll2: -8, rl1: 36, rl2: 14 }],
+    [120, "o", { t: 22, h: 8, ra1: 80, ra2: 72, sw: 45, la1: -60, la2: -40, ll1: -40, ll2: -14, rl1: 48, rl2: 4 }, "slash"],
+    [380, "io", { t: 18, h: 6, ra1: 72, ra2: 64, sw: 40, la1: -56, la2: -36, ll1: -40, ll2: -14, rl1: 48, rl2: 4 }],
+    [340, "io", { f: -1, t: -8, h: -6, ra1: -165, ra2: 170, sw: 145, la1: -55, la2: -80, ll1: -36, ll2: -14, rl1: 28, rl2: 8 }],
+    [120, "o", { f: -1, t: -22, h: -8, ra1: -80, ra2: -72, sw: -45, la1: 60, la2: 40, ll1: -48, ll2: -4, rl1: 40, rl2: 14 }, "slash"],
+    [420, "io", { f: -1, t: -18, h: -6, ra1: -72, ra2: -64, sw: -40, la1: 56, la2: 36, ll1: -48, ll2: -4, rl1: 40, rl2: 14 }],
+    [480, "io", { f: 1, t: 6, h: 2, ra1: 45, ra2: 110, sw: 150, la1: -35, la2: -15, ll1: -32, ll2: -12, rl1: 34, rl2: 12 }],
   ],
   on: { slash(r) { const tip = at(r.hR, r.p.sw, .56 * r.S); for (let i = 0; i < 7; i++) spark(tip[0], tip[1], { vx: rnd(-1, 1) * r.S, vy: rnd(-1.2, .3) * r.S, g: r.S * 2.5, life: .5, c: i % 2 ? "#b8272c" : INK, draw(g, p) { g.globalAlpha *= 1 - p.age / p.life; dot(g, [p.x, p.y], r.S * .012, p.c); } }); } } },
 
 { t: "마디", base: { f: 1 },
   items: [
     { at: "hip", on: "wipe", layer: "front", draw(g, r) { // 마네킹 몸
-      const w = .056 * r.S, c = "#e6e3db";
+      const w = .08 * r.S, c = "#e6e3db";
       for (const seg of [[r.fL, r.kL, r.hip], [r.hip, r.kR, r.fR], [r.hL, r.eL, r.sh, r.eR, r.hR]]) band(g, r, seg, w, c);
-      band(g, r, [r.hip, L2(r.hip, r.neck, .55), r.neck], .085 * r.S, c);
-      for (const j of [r.kL, r.kR, r.eL, r.eR, r.hip, r.sh]) dot(g, j, .022 * r.S, "#ff6a1a", r.ol);
+      band(g, r, [r.hip, L2(r.hip, r.neck, .55), r.neck], .1 * r.S, c);
+      for (const j of [r.kL, r.kR, r.eL, r.eR, r.hip, r.sh]) dot(g, j, .028 * r.S, "#ff6a1a", r.ol);
     } },
     { at: "head", on: "drop", layer: "head", draw(g, r) { g.beginPath(); g.ellipse(r.head[0], r.head[1] - r.R * .05, r.R * 1.0, r.R * 1.14, (r.p.t + r.p.h) * D, 0, 7); g.fillStyle = "#e6e3db"; g.fill(); g.lineWidth = r.ol; g.strokeStyle = INK; g.stroke(); } },
   ],
   keys: (() => { const W = [
-      [250, "io", { t: 5, rl1: 26, rl2: 18, ll1: -22, ll2: -50, la1: 26, la2: 40, ra1: -26, ra2: -14 }],
-      [250, "io", { t: 5, y: -.025, rl1: 4, rl2: 2, ll1: 18, ll2: -38, la1: 2, la2: 10, ra1: -2, ra2: 6 }],
-      [250, "io", { t: 5, ll1: 26, ll2: 18, rl1: -22, rl2: -50, ra1: 26, ra2: 40, la1: -26, la2: -14 }],
-      [250, "io", { t: 5, y: -.025, ll1: 4, ll2: 2, rl1: 18, rl2: -38, ra1: 2, ra2: 10, la1: -2, la2: 6 }]];
+      [250, "io", { t: 6, rl1: 28, rl2: 16, ll1: -24, ll2: -52, la1: 38, la2: 115, ra1: -40, ra2: 20 }],
+      [250, "io", { t: 6, y: -.025, rl1: 4, rl2: 2, ll1: 18, ll2: -40, la1: 12, la2: 95, ra1: -14, ra2: 70 }],
+      [250, "io", { t: 6, ll1: 28, ll2: 16, rl1: -24, rl2: -52, ra1: 38, ra2: 115, la1: -40, la2: 20 }],
+      [250, "io", { t: 6, y: -.025, ll1: 4, ll2: 2, rl1: 18, rl2: -40, ra1: 12, ra2: 95, la1: -14, la2: 70 }]];
     return [...W, ...W, ...W,
-      [220, "io", { t: 18, ll1: 32, ll2: -32, rl1: 40, rl2: -26, la1: -40, la2: -20, ra1: -34, ra2: -14 }],
-      [260, "o", { t: -4, y: -.44, ll1: 64, ll2: -58, rl1: 74, rl2: -48, la1: -158, la2: -170, ra1: 158, ra2: 170, m: 1 }],
-      [170, "io", { t: -6, y: -.47, ll1: 70, ll2: -64, rl1: 80, rl2: -54, la1: -150, la2: -165, ra1: 150, ra2: 165, m: 1 }],
-      [240, "i", { t: 14, ll1: 32, ll2: -32, rl1: 40, rl2: -26, la1: -60, la2: -40, ra1: 60, ra2: 40 }, "land"],
-      [320, "io", { t: 5, rl1: 26, rl2: 18, ll1: -22, ll2: -50, la1: 26, la2: 40, ra1: -26, ra2: -14 }]]; })(),
+      [220, "io", { t: 22, h: 6, ll1: 40, ll2: -30, rl1: 50, rl2: -24, la1: -38, la2: -20, ra1: -30, ra2: -14 }],
+      [240, "o", { t: -4, y: -.44, ll1: 70, ll2: -8, rl1: 82, rl2: 4, la1: 137, la2: 152, ra1: 132, ra2: 148 }],
+      [170, "io", { t: -6, y: -.47, ll1: 88, ll2: -4, rl1: 100, rl2: 8, la1: 145, la2: 160, ra1: 140, ra2: 156 }],
+      [240, "i", { t: 16, ll1: 40, ll2: -30, rl1: 50, rl2: -24, la1: 70, la2: 90, ra1: 60, ra2: 80 }, "land"],
+      [320, "io", { t: 6, rl1: 28, rl2: 16, ll1: -24, ll2: -52, la1: 38, la2: 115, ra1: -40, ra2: 20 }]]; })(),
   fx(g, r, tl, a) { // 무릎 각도가 따라 나옴
     g.save(); g.globalAlpha *= a;
     const a1 = ang(r.hip, r.kR), a2 = ang(r.kR, r.fR), deg = Math.round(Math.abs(((a2 - a1) / D + 540) % 360 - 180));
@@ -261,11 +257,11 @@ const C = [
       const c = "#34406b"; shape(g, r, top(r, 0, .34, .09, .1), c);
       shape(g, r, [T(r, -.1, -.03), T(r, -.02, -.06), T(r, -.04, .03)], c);
       band(g, r, [T(r, .01, .01), T(r, .02, .09)], .008 * r.S, PAPER, false);
-      sleeves(g, r, c, .066, .9);
+      sleeves(g, r, c, .9);
     } },
     { at: "head", on: "drop", layer: "head", draw(g, r) { // 안경
       const f = r.p.f, sep = .36 * (1 - .55 * Math.abs(f)), cx = .3 * f;
-      g.lineWidth = r.ol * 1.2; g.strokeStyle = INK;
+      g.lineWidth = r.ol * 1.4; g.strokeStyle = PAPER;
       for (const s of [-1, 1]) { const e = H(r, cx + s * sep / 2, -.05); g.beginPath(); g.arc(e[0], e[1], r.R * .2, 0, 7); g.stroke(); }
       path(g, [H(r, cx - sep / 2 - .2, -.08), H(r, cx - sep / 2 - .55 * Math.sign(f || 1), -.12)]); g.stroke();
     } },
@@ -279,11 +275,11 @@ const C = [
     } },
   ],
   keys: [
-    [1800, "l", { ik: 1, m: 0 }],
-    [300, "io", { ik: 1, t: 12, m: 2 }],
-    [330, "o", { ik: 0, t: -4, ra1: 158, ra2: 176, la1: 60, la2: 120, m: 1 }, "ok"],
-    [520, "io", { ik: 0, t: -4, ra1: 152, ra2: 170, la1: 60, la2: 120, m: 1 }],
-    [420, "io", { ik: 1, t: 8, m: 0 }],
+    [1800, "l", { ik: 1 }],
+    [300, "io", { ik: 1, t: 16, h: 10 }],
+    [260, "o", { ik: 0, t: -10, h: -12, ra1: 165, ra2: 176, la1: 130, la2: 150 }, "ok"],
+    [560, "io", { ik: 0, t: -8, h: -10, ra1: 160, ra2: 172, la1: 126, la2: 146 }],
+    [420, "io", { ik: 1, t: 8, h: 0 }],
   ],
   fx(g, r, tl, a) {
     if (tl < 2000 && Math.random() < .045) {
@@ -312,11 +308,11 @@ const C = [
   },
   items: [
     { at: "neck", on: "wipe", layer: "front", draw(g, r) { // 흰 가운
-      pants(g, r, "#3b3f4a", .06, .9);
+      pants(g, r, "#3b3f4a", .9);
       shape(g, r, [T(r, -.09, -.012), T(r, .09, -.012), T(r, .125, .5), T(r, -.125, .5)], PAPER);
       path(g, [T(r, -.05, -.005), T(r, 0, .16), T(r, .05, -.005)]); g.lineWidth = r.ol; g.strokeStyle = INK; g.stroke();
       band(g, r, [T(r, .045, .12), T(r, .045, .07)], .01 * r.S, "#2b44a6", false);
-      sleeves(g, r, PAPER, .066, .88);
+      sleeves(g, r, PAPER, .88);
     } },
     { at: "head", on: "drop", layer: "head", draw(g, r) { // 전구 머리띠
       g.lineWidth = r.ol * 1.4; g.strokeStyle = INK; g.beginPath(); g.arc(r.head[0], r.head[1], r.R * 1.08, Math.PI * 1.1 + (r.p.t + r.p.h) * D, Math.PI * 1.9 + (r.p.t + r.p.h) * D); g.stroke();
@@ -329,11 +325,11 @@ const C = [
     { at: "hR", on: "toss", layer: "hand", draw(g, r) { const a = ang(r.eR, r.hR); band(g, r, [r.hR, [r.hR[0] + Math.cos(a) * .3 * r.S, r.hR[1] + Math.sin(a) * .3 * r.S]], .014 * r.S, "#6b4a2e"); dot(g, [r.hR[0] + Math.cos(a) * .3 * r.S, r.hR[1] + Math.sin(a) * .3 * r.S], .012 * r.S, PAPER, r.ol); } },
   ],
   keys: [
-    [700, "io", { t: -4, h: -6, ik: 0, ra1: 40, ra2: 150, la1: -20, la2: -10 }],
-    [300, "io", { t: 6, ik: 1 }],
-    [2900, "l", { t: 6, ik: 1 }],
-    [450, "io", { t: -2, ik: 0, ra1: 150, ra2: 170, la1: -40, la2: -60, m: 1 }],
-    [450, "io", { t: -2, ik: 0, ra1: 145, ra2: 168, la1: -40, la2: -60, m: 1 }],
+    [700, "io", { t: -4, h: -8, ik: 0, ra1: 40, ra2: 145, la1: -30, la2: -12 }],
+    [300, "io", { t: 6, ik: 1, la1: -30, la2: -14 }],
+    [2900, "l", { t: 6, ik: 1, la1: -30, la2: -14 }],
+    [240, "o", { t: -8, h: -8, ik: 0, ra1: 155, ra2: 170, la1: -140, la2: -160 }],
+    [660, "io", { t: -6, h: -6, ik: 0, ra1: 150, ra2: 166, la1: -135, la2: -155 }],
   ],
   fx(g, r, tl, a) { // 탐색 나무: 자라고 → 차례로 방문 → 목표 찾으면 길이 파랗게
     const S = r.S, grow = i => E.b(cl((tl - 120 - i * 90) / 300)), fade = cl((4700 - tl) / 400) * a;
@@ -349,7 +345,7 @@ const C = [
 { t: "LMS 할 일·알림", base: { f: 1, ikL: 1 },
   board(r) { return [r.hL[0] + .03 * r.S, r.hL[1] - .06 * r.S]; },
   post(r, tl) {
-    const S = r.S; reach(r, "L", T(r, .16, .2), r.p.ikL, -1);
+    const S = r.S; reach(r, "L", T(r, .27, .2), r.p.ikL, -1);
     const b = this.board(r), row = r.p.row, box = [b[0] - .04 * S, b[1] - .05 * S + row * .055 * S];
     const u = norm(r.sh, box); reach(r, "R", [box[0] - u[0] * .19 * S, box[1] - u[1] * .19 * S], r.p.ikR, -1);
     r.checks = this.checks; r.ring = r.now - (this.ringAt || -1e9) < 900 ? 1 : 0;
@@ -359,7 +355,7 @@ const C = [
     { at: "neck", on: "pop", layer: "back", draw(g, r) { const f = r.p.f < 0 ? -1 : 1; g.save(); g.translate(...T(r, -.1 * f, .14)); g.rotate(r.p.t * D);
       g.beginPath(); g.roundRect(-.08 * r.S, -.12 * r.S, .16 * r.S, .25 * r.S, .04 * r.S); g.fillStyle = "#2b44a6"; g.fill(); g.lineWidth = r.ol; g.strokeStyle = INK; g.stroke();
       g.beginPath(); g.roundRect(-.06 * r.S - f * .03 * r.S, .0, .1 * r.S, .09 * r.S, .02 * r.S); g.fillStyle = "#3a56c4"; g.fill(); g.stroke(); g.restore(); } },
-    { at: "neck", on: "wipe", layer: "front", draw(g, r) { pants(g, r, "#2c2f38", .064, .9); shape(g, r, top(r, 0, .34, .088, .1), "#e9e5da"); band(g, r, [T(r, .06, -.01), T(r, .045, .2)], .022 * r.S, "#1f3486"); sleeves(g, r, "#e9e5da", .058, .55); } },
+    { at: "neck", on: "wipe", layer: "front", draw(g, r) { pants(g, r, "#2c2f38", .9); shape(g, r, top(r, 0, .34, .088, .1), "#e9e5da"); band(g, r, [T(r, .06, -.01), T(r, .045, .2)], .022 * r.S, "#1f3486"); sleeves(g, r, "#e9e5da", .55); } },
     { at: "gnd", on: "drop", layer: "back", draw(g, r) { // 자명종
       const S = r.S, sh = r.ring ? Math.sin(r.now / 22) * .12 : 0, c = [r.gx - .5 * S, r.gy - .1 * S];
       inFrame(g, [c[0], r.gy], sh, () => {
@@ -384,27 +380,27 @@ const C = [
         g.fillStyle = "#f4a6b8"; g.fillRect(-.065 * S, -.014 * S, .025 * S, .028 * S); g.strokeRect(-.065 * S, -.014 * S, .025 * S, .028 * S); dot(g, [.195 * S, 0], .005 * S, INK); }); } },
   ],
   keys: [
-    [600, "io", { ikL: 1, ikR: 0, h: 10, ra1: 22, ra2: 40, m: 0 }, "reset"],
-    [500, "io", { ikL: 1, ikR: 0, h: 12, ra1: 20, ra2: 38 }, "ring"],
-    [170, "o", { y: -.14, ikL: 1, t: -6, h: -4, ra1: 140, ra2: 165, ll1: -16, rl1: 18, m: 3 }],
-    [260, "i", { y: 0, ikL: 1, t: 0, ra1: 60, ra2: 100, m: 3 }],
-    [380, "io", { ikL: 1, ikR: 1, row: 0, h: 10, m: 0 }, "tick"],
-    [320, "io", { ikL: 1, ikR: 1, row: 1, h: 10 }, "tick"],
-    [320, "io", { ikL: 1, ikR: 1, row: 2, h: 10 }, "tick"],
-    [420, "io", { ikL: 1, ikR: 0, t: -4, h: -4, ra1: 150, ra2: 168, m: 1 }],
-    [700, "io", { ikL: 1, ikR: 0, t: -4, h: -4, ra1: 146, ra2: 165, m: 1 }],
+    [600, "io", { ikL: 1, ikR: 0, h: 10, ra1: 32, ra2: 64, ll1: -14, ll2: -6, rl1: 16, rl2: 6 }, "reset"],
+    [500, "io", { ikL: 1, ikR: 0, h: 12, ra1: 30, ra2: 60, ll1: -14, ll2: -6, rl1: 16, rl2: 6 }, "ring"],
+    [150, "o", { y: -.16, ikL: 1, t: -10, h: -10, ra1: 155, ra2: 172, ll1: -24, ll2: -40, rl1: 30, rl2: -12 }],
+    [260, "i", { y: 0, ikL: 1, t: 4, ra1: 70, ra2: 100, ll1: -26, ll2: 6, rl1: 30, rl2: -6 }],
+    [380, "io", { ikL: 1, ikR: 1, row: 0, h: 10, ll1: -14, ll2: -6, rl1: 16, rl2: 6 }, "tick"],
+    [320, "io", { ikL: 1, ikR: 1, row: 1, h: 10, ll1: -14, ll2: -6, rl1: 16, rl2: 6 }, "tick"],
+    [320, "io", { ikL: 1, ikR: 1, row: 2, h: 10, ll1: -14, ll2: -6, rl1: 16, rl2: 6 }, "tick"],
+    [260, "o", { ikL: 1, ikR: 0, t: -6, h: -6, ra1: 158, ra2: 172, ll1: -14, ll2: -6, rl1: 16, rl2: 6 }],
+    [860, "io", { ikL: 1, ikR: 0, t: -5, h: -4, ra1: 152, ra2: 166, ll1: -14, ll2: -6, rl1: 16, rl2: 6 }],
   ],
   on: { reset() { this.checks = 0; }, ring() { this.ringAt = performance.now(); }, tick(r) { this.checks = Math.min(3, this.checks + 1); } } },
 
 { t: "덜미", base: { f: 1, ik: 1 },
-  post(r) { const c = T(r, .15, .17); reach(r, "R", c, r.p.ik, 1); reach(r, "L", [c[0] - .06 * r.S, c[1] + .02 * r.S], r.p.ik, 1); r.lock = this.locked; },
+  post(r) { const c = T(r, .25, .17); reach(r, "R", c, r.p.ik, 1); reach(r, "L", [c[0] - .06 * r.S, c[1] + .02 * r.S], r.p.ik, 1); r.lock = this.locked; },
   locked: 0,
   items: [
     { at: "neck", on: "wipe", layer: "front", draw(g, r) { // 검은 후드티
-      const c = "#2a2d35"; pants(g, r, "#3e4350", .064, .9); shape(g, r, top(r, 0, .35, .092, .104), c);
+      const c = "#2a2d35"; pants(g, r, "#3e4350", .9); shape(g, r, top(r, 0, .35, .092, .104), c);
       shape(g, r, [T(r, -.06, .22), T(r, .06, .22), T(r, .075, .32), T(r, -.075, .32)], "#353945");
       for (const s of [-1, 1]) band(g, r, [T(r, s * .02, .01), T(r, s * .024, .1)], .008 * r.S, PAPER, false);
-      sleeves(g, r, c, .066, .9);
+      sleeves(g, r, c, .9);
     } },
     { at: "head", on: "drop", layer: "head", draw(g, r) { // 후드: 얼굴만 빼고 덮음
       const f = r.p.f;
@@ -421,15 +417,15 @@ const C = [
     } },
   ],
   keys: [
-    [550, "io", { ik: 1, h: 10, env: 1, m: 0 }, "unlock"],
-    [450, "io", { ik: 1, h: 12, env: 1 }, "lock"],
-    [450, "io", { ik: 1, h: 8, env: 1, m: 1 }],
-    [320, "io", { ik: 0, t: -12, h: -4, ra1: -150, ra2: -120, la1: -30, la2: 30, ll1: -14, rl1: 24, env: 1, m: 0 }],
-    [150, "o", { ik: 0, t: 14, h: 4, ra1: 104, ra2: 100, la1: -50, la2: -30, ll1: -24, ll2: -10, rl1: 30, env: 1, m: 2 }, "fly"],
-    [150, "l", { ik: 0, t: 14, h: 4, ra1: 104, ra2: 100, la1: -50, la2: -30, ll1: -24, ll2: -10, rl1: 30, env: 0, m: 2 }],
-    [700, "io", { ik: 0, t: 4, h: -10, ra1: 40, ra2: 70, la1: -20, la2: -10, env: 0, m: 0 }, "incoming"],
-    [450, "io", { ik: 0, t: 6, ra1: 80, ra2: 60, env: 0, m: 3 }],
-    [220, "o", { ik: 1, t: 2, h: 6, env: 1, m: 1 }],
+    [550, "io", { ik: 1, h: 10, env: 1, ll1: -14, ll2: -6, rl1: 16, rl2: 6 }, "unlock"],
+    [450, "io", { ik: 1, h: 12, env: 1, ll1: -14, ll2: -6, rl1: 16, rl2: 6 }, "lock"],
+    [450, "io", { ik: 1, h: 8, env: 1, ll1: -14, ll2: -6, rl1: 16, rl2: 6 }],
+    [320, "io", { ik: 0, t: -14, h: -8, ra1: -140, ra2: -110, la1: 55, la2: 80, ll1: -24, ll2: -8, rl1: 24, rl2: 10, env: 1 }],
+    [130, "o", { ik: 0, t: 18, h: 6, ra1: 100, ra2: 96, la1: -55, la2: -35, ll1: -30, ll2: -12, rl1: 32, rl2: 4, env: 1 }, "fly"],
+    [150, "l", { ik: 0, t: 16, h: 4, ra1: 96, ra2: 90, la1: -52, la2: -32, ll1: -30, ll2: -12, rl1: 32, rl2: 4, env: 0 }],
+    [700, "io", { ik: 0, t: 4, h: -10, ra1: 35, ra2: 70, la1: -28, la2: -12, ll1: -14, ll2: -6, rl1: 16, rl2: 6, env: 0 }, "incoming"],
+    [450, "io", { ik: 0, t: 8, h: -4, ra1: 95, ra2: 120, la1: 80, la2: 115, ll1: -14, ll2: -6, rl1: 16, rl2: 6, env: 0 }],
+    [220, "o", { ik: 1, t: 2, h: 6, env: 1, ll1: -14, ll2: -6, rl1: 16, rl2: 6 }],
   ],
   on: { unlock() { this.locked = 0; }, lock(r) { this.locked = 1; const c = [r.hR[0] + .02 * r.S, r.hR[1] - .03 * r.S]; spark(c[0], c[1], { life: .5, draw(g, p) { const k = p.age / p.life; g.globalAlpha *= 1 - k; g.strokeStyle = "#e0b021"; g.lineWidth = r.ol * 1.5; g.beginPath(); g.arc(p.x, p.y, r.S * (.03 + .1 * k), 0, 7); g.stroke(); } }); },
     fly(r) { // 종이비행기로 접혀 날아감, 점선 자국
@@ -448,7 +444,7 @@ const C = [
   post(r) { const S = r.S, e = H(r, .5, -.02, 1); reach(r, "R", [e[0] + .03 * S * r.p.f, e[1] + .05 * S], r.p.ik, 1); reach(r, "L", [e[0] + .01 * S * r.p.f, e[1] + .06 * S], r.p.ik, 1); },
   items: [
     { at: "neck", on: "wipe", layer: "front", draw(g, r) { // 셔츠 + 조끼
-      pants(g, r, "#b9a57a", .066, .86); shape(g, r, top(r, 0, .34, .088, .1), PAPER); sleeves(g, r, PAPER, .06, .5);
+      pants(g, r, "#b9a57a", .86); shape(g, r, top(r, 0, .34, .088, .1), PAPER); sleeves(g, r, PAPER, .5);
       shape(g, r, [T(r, -.09, -.01), T(r, -.03, -.01), T(r, -.025, .34), T(r, -.1, .34)], "#7f8456");
       shape(g, r, [T(r, .03, -.01), T(r, .09, -.01), T(r, .1, .34), T(r, .025, .34)], "#7f8456");
       for (const s of [-1, 1]) shape(g, r, [T(r, s * .045, .2), T(r, s * .085, .2), T(r, s * .085, .27), T(r, s * .045, .27)], "#6b6f47");
@@ -468,15 +464,15 @@ const C = [
     } },
   ],
   keys: [
-    [500, "io", { ik: 1, t: -4, h: -8, m: 3 }],
-    [700, "io", { ik: 1, t: 2, h: -2, m: 3 }],
-    [450, "io", { f: -1, ik: 1, t: -2, h: -6, m: 3 }],
-    [600, "io", { f: -1, ik: 1, t: 2, h: 0, m: 3 }],
-    [450, "io", { f: 1, ik: 1, t: -2, h: -4, m: 3 }],
-    [380, "io", { ik: 0, t: 0, ra1: 20, ra2: 40, la1: -20, la2: -10, m: 0 }],
-    [280, "o", { ik: 0, t: 6, ra1: 98, ra2: 94, la1: -24, la2: -14, ll1: -20, rl1: 22, m: 1 }, "path"],
-    [1200, "io", { ik: 0, t: 6, ra1: 96, ra2: 92, la1: -24, la2: -14, ll1: -20, rl1: 22, m: 1 }],
-    [450, "io", { ik: 1, t: -2, h: -6, m: 3 }],
+    [500, "io", { ik: 1, t: -4, h: -8, ll1: -16, ll2: -6, rl1: 18, rl2: 8 }],
+    [700, "io", { ik: 1, t: 2, h: -2, ll1: -16, ll2: -6, rl1: 18, rl2: 8 }],
+    [450, "io", { f: -1, ik: 1, t: -2, h: -6, ll1: -18, ll2: -8, rl1: 16, rl2: 6 }],
+    [600, "io", { f: -1, ik: 1, t: 2, h: 0, ll1: -18, ll2: -8, rl1: 16, rl2: 6 }],
+    [450, "io", { f: 1, ik: 1, t: -2, h: -4, ll1: -16, ll2: -6, rl1: 18, rl2: 8 }],
+    [380, "io", { ik: 0, t: 0, ra1: 38, ra2: 70, la1: -32, la2: -14, ll1: -16, ll2: -6, rl1: 18, rl2: 8 }],
+    [220, "o", { ik: 0, t: 10, h: 4, ra1: 98, ra2: 94, la1: -40, la2: -22, ll1: -24, ll2: -10, rl1: 30, rl2: 6 }, "path"],
+    [1260, "io", { ik: 0, t: 8, h: 2, ra1: 95, ra2: 92, la1: -38, la2: -20, ll1: -24, ll2: -10, rl1: 30, rl2: 6 }],
+    [450, "io", { ik: 1, t: -2, h: -6, ll1: -16, ll2: -6, rl1: 18, rl2: 8 }],
   ],
   on: { path(r) { // 발끝에서 앞으로 점선 길과 깃발 셋
     const S = r.S, x0 = r.gx + .15 * S, y0 = r.gy - .01 * S;
@@ -492,12 +488,11 @@ const C = [
   heart: 0,
   items: [
     { at: "neck", on: "wipe", layer: "front", draw(g, r) { // 분홍 가디건
-      pants(g, r, "#9fb4d9", .064, .9); shape(g, r, top(r, 0, .34, .09, .11), "#ffdfe6");
+      pants(g, r, "#9fb4d9", .9); shape(g, r, top(r, 0, .34, .09, .11), "#ffdfe6");
       for (let i = 0; i < 3; i++) dot(g, T(r, .0, .08 + i * .08), .009 * r.S, "#f2a5b5", r.ol * .7);
-      sleeves(g, r, "#ffdfe6", .066, .86);
+      sleeves(g, r, "#ffdfe6", .86);
     } },
-    { at: "head", on: "drop", layer: "head", draw(g, r) { // 베레모 + 볼터치
-      for (const s of [-1, 1]) { g.save(); g.globalAlpha *= .55; dot(g, H(r, s * .5, .28), r.R * .17, "#f4a6b8"); g.restore(); }
+    { at: "head", on: "drop", layer: "head", draw(g, r) { // 베레모
       g.save(); g.translate(...H(r, .12, -.82)); g.rotate((r.p.t + r.p.h - 10) * D);
       g.beginPath(); g.ellipse(0, 0, r.R * 1.18, r.R * .42, 0, 0, 7); g.fillStyle = "#f2a5b5"; g.fill(); g.lineWidth = r.ol; g.strokeStyle = INK; g.stroke();
       band(g, r, [[0, -r.R * .4], [r.R * .05, -r.R * .62]], r.R * .14, "#f2a5b5"); g.restore();
@@ -513,14 +508,14 @@ const C = [
     } },
   ],
   keys: [
-    [700, "io", { ik: 1, pg: 0, y: 0, m: 0 }, "reset"],
-    [480, "io", { ik: 1, pg: .999, t: 3, m: 0 }],
+    [700, "io", { ik: 1, pg: 0, y: 0 }, "reset"],
+    [480, "io", { ik: 1, pg: .999, t: 3 }],
     [10, "l", { ik: 1, pg: 0 }],
-    [260, "o", { ik: 1, y: -.07, m: 1 }, "heart"],
-    [260, "i", { ik: 1, y: 0, m: 1 }],
-    [240, "o", { ik: 1, y: -.04, m: 1 }],
-    [240, "i", { ik: 1, y: 0, m: 1 }],
-    [700, "io", { ik: 1, t: -3, h: -6, m: 1 }],
+    [260, "o", { ik: 1, y: -.07 }, "heart"],
+    [260, "i", { ik: 1, y: 0 }],
+    [240, "o", { ik: 1, y: -.04 }],
+    [240, "i", { ik: 1, y: 0 }],
+    [700, "io", { ik: 1, t: -3, h: -6 }],
   ],
   on: { reset() { this.heart = 0; }, heart(r) { this.heart = .01; const self = this, t0 = performance.now(); (function grow() { self.heart = Math.min(1, (performance.now() - t0) / 350); if (self.heart < 1) requestAnimationFrame(grow); })();
     for (let i = 0; i < 6; i++) spark(r.gx + rnd(-.3, .3) * r.S, r.neck[1] + rnd(-.1, .1) * r.S, { vx: rnd(-.1, .1) * r.S, vy: -rnd(.25, .45) * r.S, life: rnd(1, 1.6), ph: rnd(0, 6), c: i % 2 ? "#f2a5b5" : "#c7b4e8",
@@ -530,7 +525,7 @@ const C = [
   post(r) { const S = r.S, c = T(r, 0, .25), a = r.p.st * D, R = .13 * S; r.wheel = c;
     reach(r, "L", [c[0] - Math.cos(a) * R, c[1] - Math.sin(a) * R], r.p.ik, -1); reach(r, "R", [c[0] + Math.cos(a) * R, c[1] + Math.sin(a) * R], r.p.ik, 1); },
   items: [
-    { at: "neck", on: "wipe", layer: "front", draw(g, r) { shape(g, r, top(r, 0, .34, .092, .104), "#d6332c"); for (const s of [-1, 1]) band(g, r, [T(r, s * .03, -.005), T(r, s * .03, .33)], .014 * r.S, PAPER, false); sleeves(g, r, "#d6332c", .064, .86); dot(g, r.hL, .028 * r.S, INK); dot(g, r.hR, .028 * r.S, INK); } },
+    { at: "neck", on: "wipe", layer: "front", draw(g, r) { shape(g, r, top(r, 0, .34, .092, .104), "#d6332c"); for (const s of [-1, 1]) band(g, r, [T(r, s * .03, -.005), T(r, s * .03, .33)], .014 * r.S, PAPER, false); sleeves(g, r, "#d6332c", .86); dot(g, r.hL, .028 * r.S, INK); dot(g, r.hR, .028 * r.S, INK); } },
     { at: "gnd", on: "drop", layer: "front", draw(g, r) { // 경주차 앞모습
       const S = r.S, cx = r.gx, gy = r.gy, roll = r.p.st * .0016;
       g.save(); g.translate(cx, gy); g.rotate(roll);
@@ -593,7 +588,7 @@ const C = [
       dot(g, P.hinge, .016 * S, "#7d7f86", r.ol);
     } },
     { at: "neck", on: "wipe", layer: "front", draw(g, r) { // 작업복
-      pants(g, r, "#5c7290", .07, .9); shape(g, r, top(r, 0, .34, .088, .1), PAPER); sleeves(g, r, PAPER, .06, .45);
+      pants(g, r, "#5c7290", .9); shape(g, r, top(r, 0, .34, .088, .1), PAPER); sleeves(g, r, PAPER, .45);
       shape(g, r, [T(r, -.07, .12), T(r, .07, .12), T(r, .1, .35), T(r, -.1, .35)], "#5c7290");
       for (const s of [-1, 1]) band(g, r, [T(r, s * .055, .13), T(r, s * .05, -.005)], .018 * r.S, "#4b5f7a");
       shape(g, r, [T(r, -.035, .17), T(r, .035, .17), T(r, .035, .23), T(r, -.035, .23)], "#4b5f7a");
@@ -609,16 +604,16 @@ const C = [
         g.beginPath(); g.arc(.17 * S, 0, .03 * S, .7, Math.PI * 2 - .7); g.lineWidth = .02 * S + r.ol * 2; g.strokeStyle = INK; g.stroke(); g.lineWidth = .02 * S; g.strokeStyle = "#a8adb5"; g.stroke(); }); } },
   ],
   keys: [
-    [600, "io", { x: .14, t: 42, h: 12, rl1: 86, rl2: 4, ll1: 2, ll2: -88, ikh: 1, ikf: 0, la1: 40, la2: 70, pd: 26, m: 2 }],
-    [1400, "l", { x: .14, t: 44, h: 14, rl1: 86, rl2: 4, ll1: 2, ll2: -88, ikh: 1, ikf: 0, la1: 40, la2: 70, pd: 26, m: 2 }],
-    [460, "io", { x: .1, t: 2, h: 0, ikh: 0, ra1: 20, ra2: 30, la1: -14, la2: -6, rl1: 20, rl2: 10, ll1: -6, ll2: -4, m: 0 }],
+    [600, "io", { x: .14, t: 42, h: 12, rl1: 86, rl2: 4, ll1: 2, ll2: -88, ikh: 1, ikf: 0, la1: 40, la2: 70, pd: 26 }],
+    [1400, "l", { x: .14, t: 44, h: 14, rl1: 86, rl2: 4, ll1: 2, ll2: -88, ikh: 1, ikf: 0, la1: 40, la2: 70, pd: 26 }],
+    [460, "io", { x: .1, t: 2, h: 0, ikh: 0, ra1: 30, ra2: 50, la1: -28, la2: -12, rl1: 20, rl2: 10, ll1: -6, ll2: -4 }],
     [260, "io", { x: .1, t: -2, ikf: 1, ra1: 30, ra2: 40, la1: -24, la2: -10, ll1: -6, ll2: -4, pd: 26 }],
-    [220, "o", { x: .1, t: -6, ikf: 1, ra1: 34, ra2: 44, la1: -28, la2: -14, ll1: -8, ll2: -4, pd: 8, m: 2 }, "vroom"],
-    [480, "l", { x: .1, t: -6, ikf: 1, ra1: 34, ra2: 44, la1: -28, la2: -14, ll1: -8, ll2: -4, pd: 8, m: 2 }],
-    [240, "io", { x: .1, t: -2, ikf: 1, ra1: 30, ra2: 40, la1: -24, la2: -10, ll1: -6, ll2: -4, pd: 26, m: 0 }],
-    [180, "o", { x: .1, t: -6, ikf: 1, ra1: 34, ra2: 44, la1: -28, la2: -14, ll1: -8, ll2: -4, pd: 8, m: 2 }, "vroom"],
-    [420, "io", { x: .1, t: -3, ikf: 1, ra1: 30, ra2: 40, la1: -24, la2: -10, ll1: -6, ll2: -4, pd: 26, m: 1 }],
-    [420, "io", { x: .12, t: 10, ikf: 0, rl1: 20, rl2: 10, ll1: -6, ll2: -4, pd: 26, m: 0 }],
+    [220, "o", { x: .1, t: -6, ikf: 1, ra1: 34, ra2: 44, la1: -28, la2: -14, ll1: -8, ll2: -4, pd: 8 }, "vroom"],
+    [480, "l", { x: .1, t: -6, ikf: 1, ra1: 34, ra2: 44, la1: -28, la2: -14, ll1: -8, ll2: -4, pd: 8 }],
+    [240, "io", { x: .1, t: -2, ikf: 1, ra1: 30, ra2: 40, la1: -24, la2: -10, ll1: -6, ll2: -4, pd: 26 }],
+    [180, "o", { x: .1, t: -6, ikf: 1, ra1: 34, ra2: 44, la1: -28, la2: -14, ll1: -8, ll2: -4, pd: 8 }, "vroom"],
+    [420, "io", { x: .1, t: -3, ikf: 1, ra1: 30, ra2: 40, la1: -24, la2: -10, ll1: -6, ll2: -4, pd: 26 }],
+    [420, "io", { x: .12, t: 10, ikf: 0, rl1: 20, rl2: 10, ll1: -6, ll2: -4, pd: 26 }],
   ],
   fx(g, r, tl, a) { // 페달 위 눈금: 밟은 만큼 바늘이 올라감
     const S = r.S, P = this.pedal(r), c = [P.gx + .34 * S, r.gy - .62 * S], R = .12 * S, k = cl((26 - r.p.pd) / 18);
@@ -635,27 +630,27 @@ const C = [
 { t: "움직이는 웹사이트", base: { f: 0 }, ghost: 1,
   items: [
     { at: "fR", on: "pop", layer: "front", draw(g, r) { for (const [k, f] of [[r.kL, r.fL], [r.kR, r.fR]]) { const s = f[0] < r.hip[0] ? -1 : 1; g.beginPath(); g.roundRect(f[0] - .035 * r.S + s * .012 * r.S, f[1] - .03 * r.S, .07 * r.S, .045 * r.S, .02 * r.S); g.fillStyle = PAPER; g.fill(); g.lineWidth = r.ol; g.strokeStyle = INK; g.stroke(); g.fillStyle = "#2b44a6"; g.fillRect(f[0] - .03 * r.S + s * .012 * r.S, f[1] + .002 * r.S, .06 * r.S, .01 * r.S); } } },
-    { at: "neck", on: "wipe", layer: "front", draw(g, r) { pants(g, r, "#2c2f38", .07, .82); shape(g, r, top(r, 0, .34, .095, .108), "#2b44a6"); sleeves(g, r, "#2b44a6", .07, .5); band(g, r, [T(r, -.09, .3), T(r, .09, .3)], .02 * r.S, PAPER, false); } },
+    { at: "neck", on: "wipe", layer: "front", draw(g, r) { pants(g, r, "#2c2f38", .82); shape(g, r, top(r, 0, .34, .095, .108), "#2b44a6"); sleeves(g, r, "#2b44a6", .5); band(g, r, [T(r, -.09, .3), T(r, .09, .3)], .02 * r.S, PAPER, false); } },
     { at: "head", on: "drop", layer: "head", draw(g, r) { // 옆으로 쓴 모자 + 선글라스
       g.save(); g.translate(...H(r, 0, -.5)); g.rotate((r.p.t + r.p.h - 8) * D);
-      g.beginPath(); g.ellipse(0, 0, r.R * 1.02, r.R * .78, 0, Math.PI, 0); g.closePath(); g.fillStyle = INK; g.fill();
+      g.beginPath(); g.ellipse(0, 0, r.R * 1.02, r.R * .78, 0, Math.PI, 0); g.closePath(); g.fillStyle = "#2b44a6"; g.fill();
       g.beginPath(); g.ellipse(r.R * 1.2, -r.R * .02, r.R * .62, r.R * .14, -.15, 0, 7); g.fill(); g.restore();
-      g.save(); g.translate(r.head[0], r.head[1]); g.rotate((r.p.t + r.p.h) * D); g.fillStyle = INK;
-      for (const s of [-1, 1]) { g.beginPath(); g.roundRect(s * r.R * .48 - r.R * .3 + r.p.f * r.R * .3, -r.R * .2, r.R * .6, r.R * .32, r.R * .12); g.fill(); }
+      g.save(); g.translate(r.head[0], r.head[1]); g.rotate((r.p.t + r.p.h) * D); g.fillStyle = INK; g.strokeStyle = PAPER; g.lineWidth = r.ol;
+      for (const s of [-1, 1]) { g.beginPath(); g.roundRect(s * r.R * .48 - r.R * .3 + r.p.f * r.R * .3, -r.R * .2, r.R * .6, r.R * .32, r.R * .12); g.fill(); g.stroke(); }
       g.fillRect(-r.R * .2 + r.p.f * r.R * .3, -r.R * .16, r.R * .4, r.R * .07); g.restore();
     } },
   ],
   keys: [
-    [240, "o", { x: -.05, t: -8, la1: -125, la2: -165, ra1: 40, ra2: -20, ll1: -22, ll2: -10, rl1: 6, rl2: 4, m: 1 }],
+    [240, "o", { x: -.05, t: -8, la1: -125, la2: -165, ra1: 40, ra2: -20, ll1: -22, ll2: -10, rl1: 6, rl2: 4 }],
     [240, "o", { x: .05, t: 8, ra1: 125, ra2: 165, la1: -40, la2: 20, rl1: 22, rl2: 10, ll1: -6, ll2: -4 }],
     [240, "o", { x: -.04, t: -6, la1: -90, la2: -88, ra1: 90, ra2: 92, y: -.04, ll1: -14, rl1: 14 }],
     [240, "o", { x: .04, t: 6, la1: -90, la2: -40, ra1: 90, ra2: 150, ll1: -10, rl1: 10 }],
-    [240, "o", { x: 0, t: 0, la1: -60, la2: -150, ra1: 60, ra2: 150, ll1: -36, ll2: 8, rl1: 36, rl2: -8, m: 2 }],
-    [170, "l", { f: 1, la1: -100, la2: -100, ra1: 100, ra2: 100, ll1: -8, rl1: 8, y: -.06, m: 0 }],
+    [240, "o", { x: 0, t: 0, la1: -60, la2: -150, ra1: 60, ra2: 150, ll1: -36, ll2: 8, rl1: 36, rl2: -8 }],
+    [170, "l", { f: 1, la1: -100, la2: -100, ra1: 100, ra2: 100, ll1: -8, rl1: 8, y: -.06 }],
     [170, "l", { f: -1, la1: -100, la2: -100, ra1: 100, ra2: 100, ll1: -8, rl1: 8, y: -.1 }],
     [170, "l", { f: 0, la1: -100, la2: -100, ra1: 100, ra2: 100, ll1: -8, rl1: 8, y: -.04 }],
-    [200, "o", { f: 0, t: -6, la1: -150, la2: -168, ra1: 40, ra2: -62, ll1: -14, ll2: -6, rl1: 26, rl2: 34, y: 0, m: 1 }, "pose"],
-    [650, "l", { f: 0, t: -6, la1: -152, la2: -170, ra1: 40, ra2: -62, ll1: -14, ll2: -6, rl1: 26, rl2: 34, m: 1 }],
+    [200, "o", { f: 0, t: -6, la1: -150, la2: -168, ra1: 40, ra2: -62, ll1: -14, ll2: -6, rl1: 26, rl2: 34, y: 0 }, "pose"],
+    [650, "l", { f: 0, t: -6, la1: -152, la2: -170, ra1: 40, ra2: -62, ll1: -14, ll2: -6, rl1: 26, rl2: 34 }],
   ],
   on: { pose(r) { const s = r.S, h = r.hL; for (let i = 0; i < 8; i++) { const a = i / 8 * Math.PI * 2; spark(h[0], h[1], { vx: Math.cos(a) * .7 * s, vy: Math.sin(a) * .7 * s, life: .5, draw(g, p) { g.globalAlpha *= 1 - p.age / p.life; g.strokeStyle = "#2b44a6"; g.lineWidth = r.ol * 1.4; path(g, [[p.x, p.y], [p.x - p.vx * .06, p.y - p.vy * .06]]); g.stroke(); } }); } } } },
 ];
@@ -664,7 +659,23 @@ for (const c of C) { const w = WORKS.find(x => x.t === c.t); c.href = ROOT + w.h
 
 /* ───────── 자세 계산 ───────── */
 const full = (c, p) => Object.assign({}, BASE, c ? c.base : null, p);
-const mix = (a, b, k) => { const o = {}; for (const key in a) o[key] = lerp(a[key], b[key] ?? a[key], k); return o; };
+// 각도는 짧은 쪽으로 돌아감(크게 휘두를 땐 키를 180° 안쪽으로 나눔)
+const ANG = new Set(["t", "h", "la1", "la2", "ra1", "ra2", "ll1", "ll2", "rl1", "rl2", "sw"]);
+const wrap = d => ((d % 360) + 540) % 360 - 180;
+const mix = (a, b, k) => { const o = {}; for (const key in a) { const B = b[key] ?? a[key]; o[key] = ANG.has(key) ? a[key] + wrap(B - a[key]) * k : lerp(a[key], B, k); } return o; };
+// 관절마다 스프링: 멈출 때 살짝 넘쳤다 돌아오고, 머리·팔뚝은 늦게 따라옴 [세기, 감쇠]
+const SPR = { t: [380, .6], h: [200, .4], la1: [340, .5], ra1: [340, .5], la2: [210, .38], ra2: [210, .38], ll1: [560, .72], rl1: [560, .72], ll2: [480, .66], rl2: [480, .66], sw: [260, .45], sq: [300, .28] };
+const cur = {}, vel = {};
+function follow(p, dt) {
+  const o = { ...p };
+  for (const k in SPR) {
+    if (!(k in cur)) { cur[k] = p[k]; vel[k] = 0; }
+    const [K, z] = SPR[k], c = 2 * z * Math.sqrt(K), h = dt / 4;
+    for (let i = 0; i < 4; i++) { const e = k === "sq" ? p[k] - cur[k] : wrap(p[k] - cur[k]); vel[k] += (K * e - c * vel[k]) * h; cur[k] += vel[k] * h; }
+    o[k] = cur[k];
+  }
+  return o;
+}
 function loopPose(c, tl) {
   tl = ((tl % c.total) + c.total) % c.total;
   let s = 0;
@@ -716,7 +727,7 @@ function swapTitle(c) {
 /* ───────── 상태 ───────── */
 const idxEl = document.getElementById("idx");
 let ci = cl(parseInt(location.hash.slice(1)) - 1 || 0, 0, C.length - 1), loopT0 = performance.now(), prevTl = 0, trans = null, queued = null;
-let worn = C[ci].items.map(it => ({ it, k: 1 })), sprites = [], ghosts = [], trail = [];
+let worn = C[ci].items.map(it => ({ it, k: 1 })), sprites = [], ghosts = [], trail = [], smear = [];
 const showIdx = () => { idxEl.innerHTML = `<b>${String(ci + 1).padStart(2, "0")}</b> / ${C.length}`; };
 
 function go(d) {
@@ -756,12 +767,11 @@ function frame(now) {
   let c = C[ci], p, fxA = 1, tl = now - loopT0;
   if (trans) {
     const tt = now - trans.t0, A = C[trans.from], B = C[trans.to];
-    const seg = [[260, "io", null], [300, "o", HOP], [300, "i", LAND], [140, "o", { ...CROUCH, m: 0 }], [250, "io", STAND], [250, "l", STAND]];
-    const poseA = loopPose(A, trans.aT + tt);
-    if (tt < 260) p = mix(full(A, poseA), full(null, CROUCH), E.io(tt / 260));
-    else { let s = 260, prev = full(null, CROUCH); p = null;
-      for (const [d, e, q] of seg.slice(1)) { if (tt < s + d) { p = mix(prev, full(null, q), E[e](cl((tt - s) / d))); break; } s += d; prev = full(null, q); }
-      if (!p) p = mix(full(null, STAND), loopPose(B, tt - 1500), E.io(cl((tt - 1500) / 400))); }
+    if (tt < 1500) { let s = 0, prev = loopPose(A, trans.aT);
+      for (const [d, e, q] of JUMP) { const nx = full(null, q); if (tt < s + d) { p = mix(prev, nx, E[e](cl((tt - s) / d))); break; } s += d; prev = nx; }
+      if (tt > 300 && tt < 900) { const u = (tt - 300) / 600; p.y = -2.2 * u * (1 - u); }
+      p.rot = 360 * E.io(cl((tt - 340) / 500));
+    } else p = mix(full(null, STAND), loopPose(B, tt - 1500), E.io(cl((tt - 1500) / 400)));
     if (tt >= 300 && !trans.off) { trans.off = true; const r0 = rig(p, S, GX, GY, now); A.post?.call(A, r0, 0); worn.forEach(w => toSprite(w, r0)); worn = []; swapTitle(B); trail = []; ghosts = []; }
     GY = lerp(trans.gy0, gyTarget, E.io(cl((tt - 300) / 560)));
     c = tt < 300 ? A : B; tl = tt < 300 ? trans.aT + tt : tt - 1500;
@@ -769,6 +779,7 @@ function frame(now) {
     if (tt >= 300) worn = B.items.map((it, i) => ({ it, k: cl((tt - 1000 - i * 120) / 520) }));
     if (tt >= 1900) { ci = trans.to; loopT0 = trans.t0 + 1500; prevTl = (now - loopT0) % B.total; trans = null; showIdx(); history.replaceState(null, "", "#" + (ci + 1)); if (queued !== null) { const q = queued; queued = null; go(q); } }
   } else p = loopPose(c, tl);
+  p = follow({ ...p, t: p.t + Math.sin(now / 650) * 1.4 }, dt); // 숨쉬기
 
   const r = rig(p, S, GX, GY, now);
   const ltl = ((tl % c.total) + c.total) % c.total;
@@ -782,6 +793,16 @@ function frame(now) {
   // 잔상(움직이는 웹사이트)
   if (c.ghost && !trans) { if (!frame.gt || now - frame.gt > 55) { frame.gt = now; ghosts.push(r); if (ghosts.length > 6) ghosts.shift(); }
     ghosts.forEach((q, i) => { g.globalAlpha = .05 + i * .03; drawBody(g, q, "#2b44a6", q.lw * .9); }); g.globalAlpha = 1; }
+  // 몸 전체 변형: 공중제비(몸 가운데 기준 회전) + 늘어남·찌그러짐(발 밑 기준)
+  const mid = L2(r.hip, r.neck, .35), foot = GY + p.y * S;
+  g.save(); g.translate(mid[0], mid[1]); g.rotate(p.rot * D); g.translate(-mid[0], -mid[1]);
+  g.translate(r.hip[0], foot); g.scale(1 - p.sq * .6, 1 + p.sq); g.translate(-r.hip[0], -foot);
+  // 빠른 손발 잔상(화면 좌표로 모아 그림)
+  const m = g.getTransform(), scr = q => { const t = m.transformPoint(new DOMPoint(q[0], q[1])); return [t.x / dpr, t.y / dpr]; };
+  smear.push([now, ...[r.hL, r.hR, r.fL, r.fR].map(scr)]); while (smear.length > 1 && now - smear[0][0] > 90) smear.shift();
+  g.save(); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.globalAlpha = .15; g.strokeStyle = INK; g.lineWidth = r.lw * .8; g.lineCap = g.lineJoin = "round";
+  for (let j = 1; j <= 4; j++) { const pts = smear.map(s => s[j]); let d = 0; for (let i = 1; i < pts.length; i++) d += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); if (d > S * .1) { path(g, pts); g.stroke(); } }
+  g.restore();
   const layer = L => worn.forEach(w => w.it.layer === L && drawItem(w, r, c));
   layer("back");
   drawBody(g, r);
@@ -793,6 +814,7 @@ function frame(now) {
     for (let i = 1; i < trail.length; i++) { const [a0, b0] = trail[i - 1], [a1, b1, t1] = trail[i]; if (Math.hypot(a1[0] - a0[0], a1[1] - a0[1]) < 6) continue;
       g.fillStyle = `rgba(21,21,20,${.28 * (1 - (now - t1) / 160)})`; path(g, [a0, a1, b1, b0], 1); g.fill(); } }
   layer("hand");
+  g.restore();
   if (c.fx && fxA > 0) c.fx(g, r, ltl, fxA);
   // 입자
   for (let i = FX.length - 1; i >= 0; i--) { const q = FX[i]; q.age += dt; q.vy += q.g * dt; q.x += q.vx * dt; q.y += q.vy * dt;
