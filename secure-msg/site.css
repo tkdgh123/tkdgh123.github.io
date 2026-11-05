@@ -168,6 +168,7 @@ td.bad{color:var(--void);font-weight:700} td.good{color:var(--seal);font-weight:
 .pk-in label.wide{grid-column:1 / -1}
 .pk-in input{font:15px var(--f-mono);color:var(--term-ink);background:#1B2836;border:1.5px solid #2C3D50;border-radius:6px;padding:8px 10px;width:100%}
 .pk-in input:focus{border-color:var(--t-blue);outline:none}
+.pk-in input:disabled{opacity:.4}
 .pk-to{display:flex;gap:10px;grid-column:1 / -1}
 .pk-to button{flex:1;font:600 15px var(--f-body);padding:8px;border-radius:6px;border:0;background:#1B2836;color:var(--t-dim);cursor:pointer;transition:background-color .15s,color .15s}
 .pk-to button[aria-pressed=true]{background:var(--t-blue);color:#0B1320}

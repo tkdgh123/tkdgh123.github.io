@@ -51,32 +51,31 @@
   };
   const from = $("#pk-from"), to = $("#pk-to"), text = $("#pk-text"), out = $("#pk-out"), sum = $("#pk-sum");
   const modes = [...pk.querySelectorAll(".pk-to button")];
-  let flag = 0;
+  let dm = 0;   // 0 = 모두에게(받을 사람 칸을 비움), 1 = 한 사람에게
   function draw() {
-    const bad = problem(from.value, "보낸 사람") || problem(to.value, "받을 사람");
-    const tb = enc.encode(text.value), body = [flag, ...tb], len = 65 + body.length;
+    to.disabled = !dm;
+    const bad = problem(from.value, "보낸 사람") || (dm && problem(to.value, "받을 사람"));
+    const body = [...enc.encode(text.value)], len = 33 + body.length;
     const lb = [len >>> 24, (len >>> 16) & 255, (len >>> 8) & 255, len & 255].map(hex).join(" ");
     const rows = [
-      line(`<span class="k">${lb}</span>`, 11, `길이 ${len} (헤더 65 + 본문 ${body.length})`),
+      line(`<span class="k">${lb}</span>`, 11, `길이 ${len} (헤더 33 + 본문 ${body.length})`),
       line(`<span class="k">02</span>`, 2, "종류 = MSG"),
       name(from.value, "보낸 사람"),
-      name(to.value, "받을 사람"),
-      line(`<span class="z">00 00 00 00 00 00 00 00</span>`, 23, "seq (지금은 0)"),
-      line(`<span class="z">00 × 24</span>`, 7, "nonce (지금은 0)")
+      dm ? name(to.value, "받을 사람") : line(`<span class="z">00 × 16</span>`, 7, "받을 사람 — 비어 있음 = 모두에게")
     ];
     const all = body.map(hex);
-    for (let i = 0; i < Math.max(all.length, 1); i += 16) {
-      const chunk = all.slice(i, i + 16), first = i === 0;
-      const html = (first ? `<span class="k">${chunk[0]}</span> ` : "") + `<span class="o">${chunk.slice(first ? 1 : 0).join(" ")}</span>`;
-      rows.push(first ? line(html, chunk.join(" ").length, `본문: ${hex(flag)} = ${flag ? "1:1" : "모두에게"}, 뒤는 "${esc(text.value.slice(0, 8))}${text.value.length > 8 ? "…" : ""}"`) : html);
+    if (!all.length) rows.push(line("", 0, "본문 0바이트"));
+    for (let i = 0; i < all.length; i += 16) {
+      const chunk = all.slice(i, i + 16).join(" "), html = `<span class="o">${chunk}</span>`;
+      rows.push(i ? html : line(html, chunk.length, `본문 "${esc(text.value.slice(0, 8))}${text.value.length > 8 ? "…" : ""}"`));
     }
     out.innerHTML = rows.join("\n");
-    const long = tb.length > 1000 ? ` <span class="bad">· 덜미 입력 줄은 1000바이트에서 더 쳐지지 않는다</span>` : "";
+    const long = body.length > 1000 ? ` <span class="bad">· 덜미 입력 줄은 1000바이트에서 더 쳐지지 않는다</span>` : "";
     sum.innerHTML = bad ? `<span class="bad">${bad}</span>`
-      : `한 번에 <b>${4 + len}바이트</b>가 나간다 — 길이 4 + 헤더 65 + 본문 ${body.length}${long}`;
+      : `한 번에 <b>${4 + len}바이트</b>가 나간다 — 길이 4 + 헤더 33 + 본문 ${body.length}${long}`;
   }
   modes.forEach(b => b.addEventListener("click", () => {
-    flag = +b.dataset.f; modes.forEach(m => m.setAttribute("aria-pressed", m === b)); draw();
+    dm = +b.dataset.f; modes.forEach(m => m.setAttribute("aria-pressed", m === b)); draw();
   }));
   [from, to, text].forEach(i => i.addEventListener("input", draw));
   draw();

@@ -41,12 +41,12 @@
 
 <section class="t sec rise">
 <div class="now">
-  <b>지금 상태 · 11월 4일</b>
+  <b>지금 상태 · 11월 5일</b>
   <ul>
-    <li>코드는 <code>deolmi.c</code> <b>한 파일</b> (1174줄). 윈도우는 <code>cl /utf-8 deolmi.c</code>, 리눅스·맥은 <code>gcc -o deolmi deolmi.c</code> 한 줄로 빌드된다. 윈도우와 리눅스가 섞여서도 대화된다.</li>
-    <li>실행할 때 둘 중 하나를 고른다: <code>이름 --host</code>(방장 — 방장이 서버가 되어 중계하면서 대화) · <code>이름 [주소]</code>(참가자). 1:1이든 여럿이든 이 방식 하나다.</li>
-    <li><b>암호화는 뺀 평문 단계.</b> 먼저 "사람끼리 통신이 되는 것"을 확실히 하는 중이다.</li>
-    <li>자동 테스트 27개 통과. 둘이 채팅하는 것도 직접 돌려 확인했다 (아래 <a href="#check">확인</a>).</li>
+    <li>코드는 <code>deolmi.c</code> <b>한 파일</b> (586줄), <b>윈도우 전용</b>. Visual Studio에서 <code>deolmi.sln</code>을 열고 F5를 누르면 켜진다 (<a href="../run/">시작하기</a>).</li>
+    <li>켜면 이름 → 1 방장(방장이 서버가 되어 중계하면서 대화) / 2 참가자 → 주소를 묻는다. 1:1이든 여럿이든 이 방식 하나이고, 인원 제한은 없다.</li>
+    <li><b>암호화 전 평문 단계.</b> 먼저 "사람끼리 통신이 되는 것"을 확실히 하는 중이다.</li>
+    <li>자동 테스트 26개 통과. 실제 콘솔 창과 Visual Studio로 켜서 대화하는 것도 확인했다 (아래 <a href="#check">확인</a>).</li>
   </ul>
 </div>
 </section>
@@ -55,7 +55,7 @@
 <div class="tbl"><table class="whot">
 <tr><th>누구</th><th>한 일</th></tr>
 <tr><td><span class="u">김창식</span></td><td>기획과 방향 결정 (암호화는 나중에, 한 파일로, 공격 명령은 빼기, 주소 표시 등), 직접 실행해 보고 문제 찾기 (<code>/who</code>가 안 됨, 다른 컴퓨터에서 안 붙음, 사이트가 처음 보는 사람에게 불친절함)</td></tr>
-<tr><td><span class="c">Claude</span><br><small>Anthropic의 AI</small></td><td><b>코드 전부 작성</b> (S1~S8, 한 파일로 합치기, 버그 수정), 자동 테스트 작성·실행, 둘이 채팅 시뮬레이션, <b>이 사이트의 모든 페이지 작성</b> (설명서·암호화 계획·코드·시작하기·작업 기록), 암호화·2인 잠금 설계, 이 노트북 방화벽 규칙 넣기, 윈도우판(같은 <code>deolmi.c</code>가 윈도우에서 돌게)과 그 시험</td></tr>
+<tr><td><span class="c">Claude</span><br><small>Anthropic의 AI</small></td><td><b>코드 전부 작성</b> (S1~S8, 한 파일로 합치기, 버그 수정), 자동 테스트 작성·실행, 둘이 채팅 시뮬레이션, <b>이 사이트의 모든 페이지 작성</b> (설명서·암호화 계획·코드·시작하기·작업 기록), 암호화·2인 잠금 설계, 이 노트북 방화벽 규칙 넣기, 윈도우판(같은 <code>deolmi.c</code>가 윈도우에서 돌게)과 그 시험, 제출용으로 줄이기(윈도우 전용·이름 정리), Visual Studio 프로젝트</td></tr>
 </table></div>
 <p class="sub">git 커밋 기록에는 작성자가 모두 김창식으로 남아 있지만, 위 표처럼 실제 코드는 Claude가 썼다. 아래 각 항목에도 누가 요청하고 누가 만들었는지 적었다.</p>
 </section>
@@ -189,36 +189,76 @@
 <li>사이트 — 설명서(켜는 방식 두 가지, 한 통이 가는 길을 방장 기준으로 다시, 윈도우 설명), 시작하기(윈도우를 먼저), 암호화 계획(P2P 질문, 서버 창 예시 바꿈)을 고쳤다. 암호화 계획 페이지에서 <code>crypto.c</code>·<code>vault.c</code> 줄 수가 <code>deolmi.c</code> 줄 수로 잘못 나오던 것도 고쳤다 (273줄·304줄).</li>
 </ul>
 <p><b>확인:</b> 리눅스 <code>make test</code> 27개 통과, 윈도우 경고 0, 윈도우 방장↔참가자 대화와 실제 키 입력 다시 확인. 설명서의 "한 통이 가는 길" 화면은 방장 민지·참가자 수빈·현우를 실제로 띄워 얻은 출력이다.</p></div>
+
+<div class="ev"><span class="d">11-05</span>
+<h3>통신만 남김 — 패킷에서 암호화 자리를 뺐다</h3>
+<p class="who">요청 <span class="u">김창식</span> — "암호화 토대를 빼고 우선 통신이 되는 코드만 넣어줘. 암호화는 아직 안했다는 가정하에" · 구현·시험 <span class="c">Claude</span></p>
+<p><b>왜:</b> 평문 <code>deolmi.c</code>에 암호화를 나중에 얹으려고 미리 맞춰 둔 자리가 남아 있었다. 쓰지 않는 칸을 0으로 채워 보내는 코드라 "통신만 하는 프로그램"으로 읽기에 헷갈렸다.</p>
+<ul>
+<li><b>헤더</b> — <code>seq</code>(8바이트)·<code>nonce</code>(24바이트) 필드를 뺐다. 헤더는 종류·보낸 사람·받을 사람 <b>33바이트</b>(전에는 65). "안녕" 한 통이 76바이트에서 43바이트가 됐다.</li>
+<li><b>HELLO</b> — 키 자리였던 본문 128바이트(늘 0)를 뺐다. 이름만 보낸다. "HELLO 길이가 잘못됨" 검사도 없어졌다.</li>
+<li><b>패킷 종류</b> — 금고용 VAULT·OPEN_REQ·SHARE·PROOF를 뺐다. HELLO(1)·MSG(2)·SYS(3)만 남았다. 참가자가 MSG 말고 다른 걸 보내면 "모르는 type".</li>
+<li><b>전체 대화</b> — 전에는 사람마다 한 통씩 따로 보냈다(사람마다 키가 다를 것을 대비한 방식). 이제는 받을 사람을 비운 <b>한 통</b>을 보내고 방장이 모두에게 나눠 준다. 본문 맨 앞의 "모두에게/1:1" 바이트도 필요 없어져서 뺐다 — 받을 사람 필드로 안다.</li>
+<li><b>입장</b> — 새 사람에게만 기존 사람들의 HELLO를 준다. 기존 사람은 "○○ 입장" 알림으로 새 사람을 안다 (전에는 키를 나누려고 양쪽에 HELLO를 줬다).</li>
+<li>테스트 — seq·nonce 확인을 빼고, "HELLO 길이"·"VAULT도 그대로" 대신 "받을 사람이 빈 한 통이 모두에게 감", "보낸 사람에게는 안 돌아옴"을 넣었다. 그대로 27개.</li>
+<li>사이트 — 설명서 04~08·15와 첫 화면의 "바이트 직접 쳐 보기", 암호화 계획(지금 상태 설명, 바뀌는 곳 표, 만드는 순서 E1·E3·V1, 금고 종류 번호 4~7)을 새 모양에 맞췄다.</li>
+</ul>
+<p><b>확인:</b> 리눅스 <code>make test</code> 27개 통과(경고 0) · 방장 + 참가자 둘을 실제로 띄워 전체 대화·<code>/dm</code>·방장에게 1:1·<code>/who</code>가 각 화면에 맞게 뜨는지(1:1은 받는 사람에게만) · 윈도우 Visual Studio 빌드 경고 0, 윈도우 방장↔참가자 대화. 폴더의 <code>deolmi.exe</code>도 새로 빌드한 것으로 바꿨다 — 패킷 모양이 바뀌어 <b>예전 버전과는 대화가 안 된다</b>(둘 다 새로 빌드해야 한다).</p></div>
+
+<div class="ev"><span class="d">11-05 저녁</span>
+<h3>제출용으로 줄이기 — 윈도우 전용, 1140줄 → 557줄</h3>
+<p class="who">요청 <span class="u">김창식</span> — "코드가 왜 이렇게 커?", "wsl 없이 윈도우에서 하게 하는 코드는 짧았잖아. 뭔가 쓸데없는건 빼줘", "일단 윈도우만 넣어줘", "16명 제한 빼줘", "당연한건 빼고, 기능들을 설명하는 거를", "함수 이름이랑 변수 이름을 … 한눈에 알아보기도 쉽고 쓰기도 쉬운 이름들로", "만든 사람 빼" · 구현·시험 <span class="c">Claude</span></p>
+<p><b>왜:</b> 프밍기2 중간결과물(코드, 개인별)로 낼 코드라서, 팀원이 한눈에 읽을 수 있게 줄였다. 테스트하기 힘든 리눅스·맥 부분은 뺐다.</p>
+<ul>
+<li><b>윈도우 전용</b> — 리눅스·맥 코드(<code>#ifdef _WIN32</code>로 나눠 둔 부분)를 뺐다.</li>
+<li><b>입력 방식</b> — 키를 한 글자씩 받아 입력 줄을 다시 그리던 화면 처리를 빼고, 입력 스레드가 한 줄씩 받는 방식으로 바꿨다. 김창식이 준 <code>test.c</code>와 같은 구조다. 받기는 <code>poll</code> 대신 <code>select</code>. 글을 치는 도중에 남의 글이 오면 치던 줄 사이에 끼어 보이지만, 치던 내용은 그대로 간다.</li>
+<li><b>인원 제한</b> — 16명 제한과 "방이 꽉 찼습니다"를 뺐다. 사람을 담는 배열만 60칸이다(윈도우 <code>select</code>가 한 번에 64개까지 본다).</li>
+<li>그 밖에 뺀 것 — 접속 5초 제한, 여러 주소를 찾아 보여 주기(이제 주소 하나), 긴 시작 안내문과 <code>/help</code>, 같은 사람이 HELLO를 두 번 보내는 경우 검사, 맨 위 설명 주석(만든 사람 포함).</li>
+<li><b>주석과 이름</b> — 주석은 기능 설명만 짧게. 이름은 풀어 썼다: <code>net_listen</code>→<code>open_room</code>, <code>conn_take</code>→<code>take_packet</code>, <code>handle_hello</code>→<code>handle_join</code>, <code>serve</code>→<code>read_from_client</code>, <code>send_sys</code>→<code>send_notice</code>, <code>peers</code>→<code>members</code>, <code>T_SYS</code>→<code>TYPE_NOTICE</code> 등.</li>
+<li><b>창을 클릭하면 멈추던 문제</b> — 실제 콘솔 창으로 시연하다가 찾았다. 윈도우 콘솔은 창을 클릭하면 "선택" 모드가 되어 그 프로그램의 화면 출력이 멈추는데, 방장이면 방 전체 중계가 멈춘다. 켤 때 빠른 편집 모드를 끄게 했다.</li>
+</ul>
+<p><b>확인:</b> Visual Studio 가장 엄격한 경고(<code>/W4</code>)에서 경고 0 · 자동 테스트를 윈도우로 옮김(<code>tests\run.bat</code>, 26개 — 16·17명 검사 2개를 빼고 "20명째도 들어옴"을 넣었다) · 실제 콘솔 창 4개로 시연(입장·전체 대화·1:1·<code>/who</code>·같은 이름 거절·나가기·나간 사람에게 <code>/dm</code>) · 키보드로 친 한글·이모지 · 빠른 편집은 수정 전 켜짐/수정 후 꺼짐을 콘솔 설정값으로 확인하고, 수정 후 방장 창을 실제 마우스로 클릭해도 글이 계속 오는 것을 봤다.</p></div>
+
+<div class="ev"><span class="d">11-05 밤</span>
+<h3>Visual Studio에서 F5로 바로 실행</h3>
+<p class="who">요청 <span class="u">김창식</span> — "VS에서 작동하게 하면 안돼? 빌드말고 그냥 저거 바탕화면에 있는거 들어가서" · 구현·시험 <span class="c">Claude</span></p>
+<p><b>왜:</b> 명령 프롬프트에서 <code>cl /utf-8</code>로 빌드하고 이름을 붙여 켜야 했다. Visual Studio에서 열고 실행 버튼만 누르면 되게 했다.</p>
+<ul>
+<li><b>한글</b> — VS 새 프로젝트는 <code>/utf-8</code> 옵션이 없어서 화면 한글이 깨진다. 코드 파일 앞에 UTF-8 표시(BOM)를 넣고 <code>#pragma execution_character_set("utf-8")</code> 한 줄을 넣어 옵션 없이도 안 깨지게 했다.</li>
+<li><b>그냥 켜면 묻기</b> — 이름 없이 켜지면(F5, exe 더블클릭) 이름 → 1 방장 / 2 참가자 → 주소를 묻는다. 잘못되면 다시 묻는다. 명령줄로 켜는 방식도 그대로 된다.</li>
+<li><b>프로젝트 파일</b> — <code>deolmi.sln</code>·<code>deolmi.vcxproj</code>(VS 기본 설정 그대로). <a href="../code/">코드</a> 페이지와 <a href="../run/">시작하기</a>에서 <code>deolmi_vs.zip</code>으로 받는다.</li>
+</ul>
+<p><b>확인:</b> VS 기본 설정으로 빌드 경고 0 · exe 안의 한글이 UTF-8로 들어간 것을 확인 · 실제 Visual Studio로 <code>deolmi.sln</code>을 열어 실행(방장)하고, exe를 더블클릭한 창 2개(참가자)와 대화 · 띄어쓰기 넣은 이름은 다시 묻는 것까지. 화면은 <a href="../run/#chat">시작하기</a>에 옮겨 두었다.</p></div>
 </div>
 </section>
 <section class="t sec rise" id="check">
 <h2 id="check"><span class="n">02</span>어떻게 확인했나</h2>
-<h3>자동 테스트 — <code>make test</code>, 27개 모두 통과</h3>
-<p>방장(<code>./deolmi H --host</code>)을 켜 놓고 가짜 참가자들이 붙어서 확인한다.</p>
+<h3>자동 테스트 — <code>tests\run.bat</code>, 26개 모두 통과</h3>
+<p>방장(<code>deolmi H --host</code>)을 켜 놓고 가짜 참가자들이 붙어서 확인한다. Visual Studio 개발자 명령 프롬프트에서 <code>tests\run.bat</code> 하나로 빌드부터 끝까지 돈다.</p>
 <ul>
 <li><b>패킷 5개</b> — 1바이트씩 쪼개 보내도 한 통으로 받는다 · 붙어서 온 두 통을 따로 꺼낸다 · 말도 안 되는 길이를 보내면 그 사람만 끊고 나머지는 계속된다 · 본문 0바이트</li>
-<li><b>중계 22개</b> — 입장하면 서로의(방장 포함) HELLO와 입장 알림을 받는다 · 같은 이름·빈 이름·방장 이름 거절 · 방장에게 보낸 글은 남에게 안 감 · <code>to</code>에게만 간다 · 남의 이름으로 보내기 차단 · 없는 사람·모르는 종류 처리 · 퇴장 알림 · 같은 이름으로 다시 입장 · 16명까지 받고 17번째는 "꽉 찼습니다"</li>
+<li><b>중계 21개</b> — 새로 들어온 사람은 기존 사람(방장 포함)의 HELLO를, 기존 사람은 입장 알림을 받는다 · 같은 이름·빈 이름·방장 이름 거절 · 방장에게 보낸 글은 남에게 안 감 · <code>to</code>에게만 간다 · <code>to</code>가 비면 보낸 사람 빼고 모두에게 · 남의 이름으로 보내기 차단 · 없는 사람·모르는 종류 처리 · 퇴장 알림 · 같은 이름으로 다시 입장 · 인원 제한 없이 20명째도 들어옴</li>
 </ul>
 <h3>둘이서 채팅 — 직접 돌림</h3>
 <p>한 컴퓨터에서 프로그램 두 개를 띄우고, 정해 둔 순서대로 글을 넣어 양쪽 화면을 확인했다. 전체 대화, <code>/dm</code> 1:1, <code>/who</code>, 나가기까지 모두 맞게 떴다. 화면은 <a href="../run/#chat">시작하기</a>에 옮겨 두었다.</p>
 <ul>
 <li><b>방장 모드</b> — 민지(<code>--host</code>)와 현우</li>
 <li><b>셋이서</b> — 방장 민지 + 수빈 + 현우. 수빈이 모두에게 보낸 글이 방장 화면과 현우 화면에 뜨는 것까지 확인 (<a href="../guide/#path">설명서 06</a>)</li>
-<li><b>윈도우</b> — 윈도우끼리, 윈도우와 리눅스가 섞여서 (위 11-04 오후)</li>
+<li><b>실제 창</b> — 콘솔 창 4개로 시연, Visual Studio로 켠 방장 + exe 더블클릭 참가자 (위 11-05)</li>
 </ul>
 <p>위 자동 테스트와 시뮬레이션은 <span class="c">Claude</span>가 돌렸고, 실제 노트북에서 띄워 대화해 본 것은 <span class="u">김창식</span>이다.</p>
-<div class="tip"><b>아직 확인 못 한 것</b> — 다른 컴퓨터에서 접속: 11-03 다른 데스크탑에서 시도했지만 연결이 이 노트북까지 오지 않았다. 학교 와이파이(SSU_INFO_WI-FI)가 기기끼리 연결을 막는 것으로 보고, 휴대폰 핫스팟으로 다시 해 볼 예정. 맥에서 빌드, 윈도우 MinGW(gcc) 빌드도 아직.</div>
+<div class="tip"><b>아직 확인 못 한 것</b> — 다른 컴퓨터에서 접속: 11-03 다른 데스크탑에서 시도했지만 연결이 이 노트북까지 오지 않았다. 학교 와이파이(SSU_INFO_WI-FI)가 기기끼리 연결을 막는 것으로 보고, 휴대폰 핫스팟으로 다시 해 볼 예정.</div>
 </section>
 <section class="t sec rise" id="s03">
 <h2 id="s03"><span class="n">03</span>deolmi.c 지도</h2>
-<p>위에서부터 이 순서로 놓여 있다. 고치고 싶은 게 있으면 해당 칸부터 보면 된다. 맨 위 <code>#ifdef _WIN32</code> 부분은 윈도우와 리눅스·맥이 다른 곳(소켓·키보드·화면)만 모아 둔 것이다.</p>
+<p>위에서부터 이 순서로 놓여 있다. 고치고 싶은 게 있으면 해당 칸부터 보면 된다.</p>
 <div class="tbl"><table class="map">
 <tr><th>칸</th><th>하는 일</th><th>주요 함수</th></tr>
-<tr><td>① 통신</td><td>패킷 모양, 접속, 길이 붙여 보내기, 덜 온 바이트 모았다가 한 통씩 꺼내기</td><td><code>net_listen</code> <code>net_connect</code> <code>send_packet</code> <code>conn_read</code> <code>conn_take</code></td></tr>
-<tr><td>② 화면</td><td>입력 줄을 맨 아래에 두고, 받은 글은 그 위에 찍기. 한글 폭 계산, 색</td><td><code>show</code> <code>put_line</code> <code>draw_input</code> · 아는 사람 목록 <code>add_peer</code></td></tr>
-<tr><td>③ 중계</td><td>방장이 하는 일. 이름 등록, <code>to</code>에게 전하기, 입장·퇴장 알림, 규칙 검사</td><td><code>handle_hello</code> <code>handle_packet</code> <code>relay</code> <code>serve</code></td></tr>
-<tr><td>④ 대화</td><td>방장·참가자 공통. 받은 글 띄우기, 보내기, <code>/dm</code> 같은 명령, 키 입력</td><td><code>display_msg</code> <code>send_text</code> <code>on_line</code> <code>on_key</code></td></tr>
-<tr><td>⑤ main</td><td>실행 방식 고르기, 그다음 <code>poll</code> 하나로 키보드·접속·소켓을 같이 지켜보는 반복</td><td><code>main</code></td></tr>
+<tr><td>① 통신</td><td>패킷 모양, 접속, 길이 붙여 보내기, 덜 온 바이트 모았다가 한 통씩 꺼내기</td><td><code>open_room</code> <code>connect_to_host</code> <code>send_packet</code> <code>receive_bytes</code> <code>take_packet</code></td></tr>
+<tr><td>② 화면</td><td>글 찍기, 받은 글 청소, 이름 검사, 방에 있는 사람 목록</td><td><code>print_line</code> <code>remove_control_chars</code> <code>is_valid_name</code> · 목록 <code>add_member</code></td></tr>
+<tr><td>③ 중계</td><td>방장이 하는 일. 이름 등록, <code>to</code>에게 전하기, 입장·퇴장 알림, 규칙 검사</td><td><code>handle_join</code> <code>handle_packet</code> <code>read_from_client</code> <code>remove_client</code></td></tr>
+<tr><td>④ 대화</td><td>방장·참가자 공통. 받은 글 띄우기, 보내기, <code>/dm</code> 같은 명령, 키보드 입력 스레드</td><td><code>print_message</code> <code>send_message</code> <code>handle_input</code> <code>keyboard_thread</code> <code>read_line</code></td></tr>
+<tr><td>⑤ main</td><td>이름·방장/참가자 묻기, 입력 스레드 띄우기, 그다음 <code>select</code> 하나로 접속·소켓을 같이 지켜보는 반복</td><td><code>main</code></td></tr>
 </table></div>
 </section>
 <section class="t sec rise" id="s04">
