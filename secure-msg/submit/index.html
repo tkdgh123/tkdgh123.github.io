@@ -97,7 +97,7 @@ a.copy{text-decoration:none;line-height:1}
 <dl class="sub-info">
 <dt>과제</dt><dd>프로젝트 중간 코드 확인 및 피드백 · 중간 결과물(코드) 개인별 제출</dd>
 <dt>마감</dt><dd>11월 6일(금) 오후 11:59</dd>
-<dt>파일</dt><dd><code>deolmi.c</code> 567줄 → <code>중간결과물_학번_김창식_60%.zip</code>으로 압축</dd>
+<dt>파일</dt><dd><code>deolmi.c</code> 572줄 → <code>중간결과물_학번_김창식_60%.zip</code>으로 압축</dd>
 </dl>
 <ol class="map5"><li><button type="button" data-line="29" class=mine><b>① 통신</b><span>내 담당</span><i>29줄부터</i></button></li>
 <li><button type="button" data-line="157"><b>② 화면</b><span>같이 들어감</span><i>157줄부터</i></button></li>
@@ -107,7 +107,7 @@ a.copy{text-decoration:none;line-height:1}
 </section>
 <main class="one">
   <section class="panel rise" id="f">
-    <div class="bar"><span class="path">deolmi.c</span><span class="role">제출할 파일 그대로</span><span class="ll">567줄</span>
+    <div class="bar"><span class="path">deolmi.c</span><span class="role">제출할 파일 그대로</span><span class="ll">572줄</span>
       <button class="copy" type="button">복사</button><a class="copy" href="deolmi.c" download>받기</a></div>
     <pre class="codebox"><code class="language-c">/* 덜미 — 프밍기2 팀 프로젝트 메신저 (윈도우용, 암호화 전 단계라 메시지는 평문)
 
@@ -614,6 +614,11 @@ int main(void)
     WSAStartup(MAKEWORD(2, 2), &amp;wsa);
     InitializeCriticalSection(&amp;lock);
     SetConsoleOutputCP(CP_UTF8);
+    /* 창을 클릭해도 프로그램이 멈추지 않게 빠른 편집(선택) 모드를 끈다 */
+    HANDLE console_in = GetStdHandle(STD_INPUT_HANDLE);
+    DWORD console_mode;
+    if (GetConsoleMode(console_in, &amp;console_mode))
+        SetConsoleMode(console_in, (console_mode &amp; ~ENABLE_QUICK_EDIT_MODE) | ENABLE_EXTENDED_FLAGS);
     /* 한글 이름이 깨지지 않게 명령줄을 UTF-8로 바꿔 받는다 */
     wchar_t **wide_args = CommandLineToArgvW(GetCommandLineW(), &amp;arg_count);
     for (int i = 0; i &lt; arg_count &amp;&amp; i &lt; 3; i++)

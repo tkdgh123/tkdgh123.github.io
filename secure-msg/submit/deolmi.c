@@ -503,6 +503,11 @@ int main(void)
     WSAStartup(MAKEWORD(2, 2), &wsa);
     InitializeCriticalSection(&lock);
     SetConsoleOutputCP(CP_UTF8);
+    /* 창을 클릭해도 프로그램이 멈추지 않게 빠른 편집(선택) 모드를 끈다 */
+    HANDLE console_in = GetStdHandle(STD_INPUT_HANDLE);
+    DWORD console_mode;
+    if (GetConsoleMode(console_in, &console_mode))
+        SetConsoleMode(console_in, (console_mode & ~ENABLE_QUICK_EDIT_MODE) | ENABLE_EXTENDED_FLAGS);
     /* 한글 이름이 깨지지 않게 명령줄을 UTF-8로 바꿔 받는다 */
     wchar_t **wide_args = CommandLineToArgvW(GetCommandLineW(), &arg_count);
     for (int i = 0; i < arg_count && i < 3; i++)
