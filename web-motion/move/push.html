@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>쫄라맨이 넘기는 작업실 · 더 역동적인 1</title>
+<link rel="stylesheet" href="../apply/apply.css">
+<style>
+/* 스크롤하면 쫄라맨이 화면(작품 칸)을 밀고, 들어 던지고, 줄로 끌어내리고, 걷어차서 넘김 — 모든 움직임이 스크롤 위치에 묶여 있어 되감기도 됨 */
+body { background: var(--paper) }
+.pn { position: fixed; inset: 0; display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); align-items: center; gap: 5vw; padding: 76px var(--m) 30svh;
+  background: var(--bg); color: var(--fg); transform-origin: 0 100%; will-change: transform; visibility: hidden }
+.pn.on { visibility: visible }
+.pn.move { box-shadow: 0 0 80px rgb(0 0 0 / .28) }
+.pn .meta { color: var(--soft) }
+.pn h2 { font-size: clamp(64px, 10vw, 168px); margin: 14px 0 22px; letter-spacing: -.04em }
+.pn p.s { max-width: 30ch; font-size: clamp(16px, 1.4vw, 20px); color: var(--soft2, var(--fg)) }
+.pn .go { margin-top: 28px }
+.pn figure { margin: 0; align-self: center }
+.pn figure img { display: block; width: 100%; height: auto; box-shadow: 0 30px 60px -30px rgb(0 0 0 / .45) }
+.hero { grid-template-columns: 1fr; align-content: center }
+.hero h1 { font-size: clamp(54px, 9.4vw, 160px); letter-spacing: -.04em }
+.hero .meta { margin-top: 28px }
+canvas.bg { z-index: 20; pointer-events: none; mix-blend-mode: difference } /* 흰색으로 그려서 밑 색의 반대가 됨: 종이 위 검정, 어두운 칸 위 밝게 */
+@media (max-width: 760px) {
+  .pn { grid-template-columns: 1fr; align-content: start; gap: 22px; padding-top: 84px }
+  .pn h2 { margin: 8px 0 12px }
+  .pn figure { order: 2 }
+}
+</style>
+</head>
+<body>
+<nav class="top mono" style="z-index:30;color:#fff;mix-blend-mode:difference"><a href="../#dyn">← 움직이는 웹사이트</a><span class="right"><span>더 역동적인 1 / 4 · 쫄라맨이 넘기는 작업실</span><a href="throw.html">다음 →</a></span></nav>
+<div id="panels"></div>
+<canvas class="bg" id="cv"></canvas>
+<div id="len"></div>
+
+<script type="module">
+import { WORKS, ROOT } from "../apply/works.js";
+const $ = id => document.getElementById(id);
+const D = Math.PI / 180, cl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x)), lerp = (a, b, k) => a + (b - a) * k;
+const E = { io: k => k < .5 ? 4 * k * k * k : 1 - (-2 * k + 2) ** 3 / 2, o: k => 1 - (1 - k) ** 3, i: k => k * k * k, b: k => 1 + 2.7 * (k - 1) ** 3 + 1.7 * (k - 1) ** 2 };
+const bounce = k => { const n = 7.5625, d = 2.75; return k < 1 / d ? n * k * k : k < 2 / d ? n * (k -= 1.5 / d) * k + .75 : k < 2.5 / d ? n * (k -= 2.25 / d) * k + .9375 : n * (k -= 2.625 / d) * k + .984375; };
+const rnd = (a, b) => a + Math.random() * (b - a);
+const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ───────── 칸: 첫 화면 + 작품 넷 ───────── */
+const PICK = [["넋굿", "#151618", "#eeece6", "#9e9d97", 1], ["마디", "#e4e2da", "#151514", "#5a5954", 0], ["레이싱 휠", "#2b44a6", "#ffffff", "#c3cbef", 1], ["우리달", "#f3dde2", "#151514", "#6d5a5f", 0]];
+$("panels").innerHTML = `<section class="pn hero on" style="--bg:var(--paper);--fg:var(--ink);--soft:var(--muted)">
+  <div><h1>만들면서 <b>배우는</b><br>1학년의 작업실</h1><p class="meta mono">작품 ${WORKS.length}개 중 넷 ↓</p></div></section>` +
+  PICK.map(([t, bg, fg, soft, dark], i) => { const w = WORKS.find(x => x.t === t);
+    return `<section class="pn" style="--bg:${bg};--fg:${fg};--soft:${soft}">
+      <div><p class="meta mono">${String(i + 1).padStart(2, "0")} · ${w.cat} · ${w.d}</p><h2>${w.t}</h2><p class="s">${w.s}</p><a class="go" href="${ROOT + w.href}"${dark ? ' style="background:#fff;color:#151514"' : ""}>열어 보기 →</a></div>
+      <figure><img src="${ROOT + w.img}" alt="${w.t} 대표 화면" loading="${i ? "lazy" : "eager"}"></figure></section>`; }).join("");
+const P = [...document.querySelectorAll(".pn")];
+// 겹치는 순서: 0 밀려남 > 1 들려 올라감 > 2, 3은 위에서 덮으며 내려옴, 4는 3이 넘어지면 보임
+[5, 4, 3, 6, 1].forEach((z, i) => P[i].style.zIndex = z);
+
+/* ───────── 쫄라맨 몸 (작업실 적용 4와 같은 비율) ───────── */
+const LEN = { T: .33, N: .024, R: .112, UA: .2, FA: .19, TH: .25, SH: .245, W: .042, SW: .05 };
+const at = (p, a, l) => [p[0] + Math.sin(a * D) * l, p[1] + Math.cos(a * D) * l]; // 각도: 0 아래, 90 오른쪽, 180 위
+const ang = (p, q) => Math.atan2(q[1] - p[1], q[0] - p[0]);
+function rig(p, S, gx, gy) {
+  const hip = [0, 0], neck = at(hip, 180 - p.t, LEN.T), head = at(neck, 180 - p.t - p.h, LEN.N + LEN.R), sh = at(neck, -p.t, .035);
+  const o = LEN.SW * (1 - Math.abs(p.f)) + LEN.W / 2 * p.f, ct = Math.cos(p.t * D), st = Math.sin(p.t * D);
+  const shR = [sh[0] + ct * o, sh[1] + st * o], shL = [sh[0] - ct * o, sh[1] - st * o];
+  const eL = at(shL, p.la1, LEN.UA), hL = at(eL, p.la2, LEN.FA), eR = at(shR, p.ra1, LEN.UA), hR = at(eR, p.ra2, LEN.FA);
+  const kL = at(hip, p.ll1, LEN.TH), fL = at(kL, p.ll2, LEN.SH), kR = at(hip, p.rl1, LEN.TH), fR = at(kR, p.rl2, LEN.SH);
+  const low = Math.max(fL[1], fR[1], kL[1], kR[1]) + LEN.W / 2;
+  const ox = gx, oy = gy - low * S + (p.y || 0) * S, px = q => [ox + q[0] * S, oy + q[1] * S];
+  return { p, S, hip: px(hip), neck: px(neck), head: px(head), shL: px(shL), shR: px(shR), eL: px(eL), hL: px(hL), eR: px(eR), hR: px(hR), kL: px(kL), fL: px(fL), kR: px(kR), fR: px(fR), R: LEN.R * S, lw: LEN.W * S };
+}
+function solve(a, b, l1, l2, bend) {
+  const d = Math.hypot(b[0] - a[0], b[1] - a[1]), dd = cl(d, 1e-3, l1 + l2 - 1e-3), base = ang(a, b);
+  const t = base + bend * Math.acos(cl((l1 * l1 + dd * dd - l2 * l2) / (2 * l1 * dd), -1, 1));
+  const j = [a[0] + Math.cos(t) * l1, a[1] + Math.sin(t) * l1], e = ang(j, b);
+  return [j, [j[0] + Math.cos(e) * l2, j[1] + Math.sin(e) * l2]];
+}
+function reach(r, side, target, w, bend) { // 손을 목표에 붙임 (w만큼)
+  if (w <= 0) return;
+  const [root, j, e] = side === "L" ? ["shL", "eL", "hL"] : ["shR", "eR", "hR"];
+  const [J, X] = solve(r[root], target, LEN.UA * r.S, LEN.FA * r.S, bend);
+  r[j] = [lerp(r[j][0], J[0], w), lerp(r[j][1], J[1], w)]; r[e] = [lerp(r[e][0], X[0], w), lerp(r[e][1], X[1], w)];
+}
+function path(g, pts) { g.beginPath(); g.moveTo(...pts[0]); for (let i = 1; i < pts.length; i++) g.lineTo(...pts[i]); }
+function drawMan(g, r, col) {
+  g.strokeStyle = g.fillStyle = col; g.lineWidth = r.lw; g.lineCap = g.lineJoin = "round";
+  path(g, [r.fL, r.kL, r.hip, r.kR, r.fR]); g.stroke();
+  path(g, [r.hip, r.neck]); g.stroke();
+  path(g, [r.hL, r.eL, r.shL, r.shR, r.eR, r.hR]); g.stroke();
+  g.beginPath(); g.arc(r.head[0], r.head[1], r.R, 0, 7); g.fill();
+}
+
+/* ───────── 자세 (오른쪽을 보는 기준으로 적고, 왼쪽을 볼 땐 뒤집음) ───────── */
+const BASE = { t: 0, h: 0, f: 0, y: 0, la1: -14, la2: -6, ra1: 14, ra2: 6, ll1: -7, ll2: -2, rl1: 7, rl2: 2 };
+const ANG = ["t", "h", "la1", "la2", "ra1", "ra2", "ll1", "ll2", "rl1", "rl2"];
+const pose = o => Object.assign({}, BASE, o);
+const mir = p => { const o = { ...p, f: -p.f }; ANG.forEach(k => o[k] = -p[k]); return o; };
+const mix = (a, b, k) => { const o = {}; for (const key in a) o[key] = lerp(a[key], b[key] ?? a[key], k); return o; };
+const STAND = pose({});
+const TADA = pose({ t: -3, la1: -24, la2: -12, ra1: 128, ra2: 150, ll1: -11, ll2: -4, rl1: 9, rl2: 3 });
+function stride(ph, amp, off) { // 걷기·밀기 한 걸음 (ph: 걸은 거리로 정해지는 위상, off: 다리를 뒤로 미는 정도)
+  const leg = s => { const th = off + amp * Math.sin(s); return [th, th - (amp * 1.3 + 8) * Math.max(0, Math.cos(s)) - 4]; };
+  const [rl1, rl2] = leg(ph), [ll1, ll2] = leg(ph + Math.PI);
+  return { f: 1, rl1, rl2, ll1, ll2 };
+}
+const walk = ph => pose({ t: 5, ...stride(ph, 24, 0), la1: -24 * Math.sin(ph), la2: -24 * Math.sin(ph) + 18, ra1: 24 * Math.sin(ph), ra2: 24 * Math.sin(ph) + 18 });
+const pushP = (ph, effort) => pose({ t: 34 + effort, h: -10, ...stride(ph, 30 + effort * .5, -14), ra1: 96, ra2: 101, la1: 90, la2: 97 });
+const DEAD = pose({ f: 1, t: 58, h: -24, ll1: 44, ll2: -6, rl1: 52, rl2: 0, la1: 0, la2: 0, ra1: 4, ra2: 4 }); // 엉덩이 뒤로, 정강이 세움, 팔은 무릎 앞으로 늘어뜨림
+const UPRIGHT = pose({ f: 1, t: 4, h: 0, ll1: 2, ll2: -2, rl1: 8, rl2: 2 });
+const PRESS = pose({ f: 1, t: -6, h: -16, ll1: -4, ll2: -2, rl1: 10, rl2: 4 });
+const PULL = pose({ f: 1, t: -8, h: -12, ll1: -14, ll2: -22, rl1: 22, rl2: 6 });
+const CHAMBER = pose({ f: 1, t: -16, h: 4, ll1: -6, ll2: -2, rl1: 100, rl2: -6, la1: 40, la2: 150, ra1: -26, ra2: 170 });
+const KICK = pose({ f: 1, t: -30, h: 10, ll1: -8, ll2: -4, rl1: 94, rl2: 92, la1: 30, la2: 120, ra1: -70, ra2: -40 });
+
+/* ───────── 스프링(관절이 넘쳤다 돌아오고 머리·팔뚝은 늦게 따라옴) ───────── */
+const SPR = { t: [300, .62], h: [180, .45], la1: [320, .55], ra1: [320, .55], la2: [200, .42], ra2: [200, .42], ll1: [520, .75], rl1: [520, .75], ll2: [460, .7], rl2: [460, .7], f: [260, .8], y: [600, .8] };
+const cur = {}, vel = {};
+function follow(p, dt) {
+  const o = { ...p };
+  for (const k in SPR) {
+    if (!(k in cur)) { cur[k] = p[k]; vel[k] = 0; }
+    const [K, z] = SPR[k], c = 2 * z * Math.sqrt(K), h = dt / 4;
+    for (let i = 0; i < 4; i++) { vel[k] += (K * (p[k] - cur[k]) - c * vel[k]) * h; cur[k] += vel[k] * h; }
+    o[k] = cur[k];
+  }
+  return o;
+}
+
+/* ───────── 스크롤 → 장면 ───────── */
+const cv = $("cv"), g = cv.getContext("2d");
+const HERO = .45, SEG = 1.9, N = 4, END = .9;
+let W, H, dpr, S, GY, pushEnd = 0;
+function layout() {
+  dpr = Math.min(devicePixelRatio, 2); W = innerWidth; H = innerHeight;
+  cv.width = W * dpr; cv.height = H * dpr;
+  S = cl(Math.min(H * .27, W * .4), 90, 250); GY = H - 3;
+  const r0 = rig(mir(pushP(0, 0)), S, 0, GY); pushEnd = -Math.min(r0.hL[0], r0.hR[0]) + r0.lw * .5; // 다 밀었을 때 몸 자리
+  $("len").style.height = (HERO + N * SEG + END) * H + H + "px";
+}
+addEventListener("resize", layout); layout();
+
+const walkX = q => E.io(cl(q / .18));            // 앞 동작 끝 자리 → 이번 자리로 걸어가기
+const act = q => cl((q - .2) / .66);             // 이번 동작 진행
+const START = () => [W + S, W * .5, W * .64, W * .72];
+const ROPE = () => ({ top: GY - 1.1 * S, span: .4 * S, dx: .12 * S }); // 줄 잡는 높이·한 번 당기는 길이·몸에서 떨어진 거리
+
+function scene(s, now, v) {
+  const x = (s - HERO) / SEG, j = cl(Math.floor(x), 0, N - 1), q = cl(x - j), a = act(q), st = START();
+  const done = i => i < j || (i === j && a >= 1);
+  const out = { j, a, tf: ["", "", "", "", ""], cord: null, ring: null, dust: 0, shake: 0, gx: 0 };
+  // 앞 동작이 끝난 자리에서 이번 시작 자리로 걷기
+  const from = [st[0], pushEnd, st[1], st[2]][j], to = st[j];
+  const wk = walkX(q), gxWalk = lerp(from, to, wk), dir = Math.sign(to - from) || 1;
+  const walking = j > 0 && q < .2 && wk > 0 && wk < 1;
+  const wp0 = walk(Math.abs(gxWalk - from) / (.36 * S) * Math.PI), wp = dir < 0 ? mir(wp0) : wp0;
+  let p, gx = gxWalk;
+
+  /* 1. 밀기: 첫 화면을 왼쪽으로 밀어냄 */
+  let ex = W * (1 - (j > 0 ? 1 : a));
+  if (j === 0 && a === 0 && !calm) { const k = (now % 2600) / 2600; ex -= k < .22 ? Math.sin(k / .22 * Math.PI) * W * .03 : 0; }
+  out.tf[0] = `translateX(${ex - W}px)`;
+  if (j === 0) {
+    const effort = cl(Math.abs(v) * 6, 0, 12);
+    p = a < 1 || q < .86 ? mir(pushP((W - ex) / (.5 * S) * Math.PI, effort)) : TADA;
+    if (q >= .86) gx = pushEnd; else out.pushHands = ex; // 손이 칸 가장자리에 닿게 frame()에서 맞춤
+    out.dust = a > 0 && a < 1 ? Math.abs(v) : 0;
+  }
+
+  /* 2. 들어 던지기: 넋굿 칸을 바닥에서 들어 올려 머리 위로 던짐 → 마디 칸 */
+  if (j === 1) {
+    if (q < .2) p = walking ? wp : STAND;
+    else if (a < .14) { p = mix(STAND, DEAD, E.io(a / .14)); out.lift = { y: GY - .2 * S, x: .28, w: E.io(a / .14) }; }
+    else if (a < .5) { const k = E.io((a - .14) / .36); p = mix(DEAD, UPRIGHT, k); out.lift = { y: lerp(GY - .2 * S, GY - .62 * S, k), x: lerp(.28, .2, k), w: 1 }; }
+    else if (a < .72) { const k = E.io((a - .5) / .22); p = mix(UPRIGHT, PRESS, k); out.lift = { y: lerp(GY - .62 * S, GY - 1.24 * S, k), x: lerp(.2, .07, k), w: 1 }; }
+    else if (a < .86) { const k = (a - .72) / .14; p = { ...PRESS, y: -.5 * Math.sin(Math.PI * k) }; out.lift = { y: GY - 1.24 * S, x: .07, w: 1 - k, fly: E.o(k) }; }
+    else p = q < .9 ? STAND : TADA;
+  }
+
+  /* 3. 줄 당기기: 레이싱 휠 칸이 위에서 내려옴 */
+  const { top, span } = ROPE(), yb0 = H * .07, yStop = top - .05 * S;
+  let yb = j < 2 ? 0 : j > 2 ? H : yb0;
+  if (j === 2) {
+    if (q < .2) { p = walking ? wp : STAND; yb = yb0 * cl(q / .2); }
+    else if (a < .1) { p = mix(STAND, PULL, E.io(a / .1)); out.cord = { grab: E.io(a / .1) }; }
+    else if (a < .78) { const k = (a - .1) / .68; yb = lerp(yb0, yStop, k); p = PULL; out.cord = { grab: 1, u: (yb - yb0) * .6 / span }; }
+    else { const k = cl((a - .78) / .12); yb = lerp(yStop, H, bounce(k)); p = q < .9 ? mix(PULL, STAND, E.io(k)) : TADA; out.cord = { grab: 0, fall: k }; }
+  }
+  out.tf[3] = `translateY(${yb - H}px)`; out.yb = yb;
+
+  /* 4. 발차기: 우리달 칸이 드러나게 레이싱 휠 칸을 걷어차 넘어뜨림 */
+  let th = 0;
+  if (j === 3) {
+    if (q < .2) p = walking ? wp : STAND;
+    else if (a < .3) p = mix(STAND, CHAMBER, E.io(a / .3));
+    else if (a < .4) p = mix(CHAMBER, KICK, E.o((a - .3) / .1));
+    else if (a < .52) p = KICK;
+    else p = q < .9 ? mix(KICK, STAND, E.io(cl((a - .52) / .2))) : TADA;
+    if (p !== TADA && q >= .2) p = mir(p);
+    if (a > .36) { th = 3 + 92 * E.i(cl((a - .36) / .44)); out.ring = (a - .36) / .12; out.shake = Math.max(0, 1 - (a - .36) / .1); }
+  }
+  out.tf[3] += ` rotate(${-th}deg)`;
+  // 보이는 칸: 다 밀려나거나 다 덮인 칸은 숨김
+  out.on = [ex > 0, !done(1), j < 2 || (j === 2 && yb < H - 1), j >= 2, j >= 3];
+  out.thump = j === 3 ? cl((a - .8) / .1) : 0;
+  out.p = p || STAND; out.gx = gx;
+  return out;
+}
+
+/* ───────── 그리기 ───────── */
+let sPrev = scrollY / innerHeight, vS = 0, last = 0, puffs = [];
+function frame(now) {
+  requestAnimationFrame(frame);
+  const dt = Math.min(.05, (now - (last || now)) / 1000); last = now;
+  const s = scrollY / H; vS = lerp(vS, dt ? (s - sPrev) / dt : 0, .15); sPrev = s;
+  const sc = scene(s, now, vS);
+  const p = follow(sc.p, dt || .016);
+  let r = rig(p, S, sc.gx, GY);
+  if (sc.pushHands !== undefined) { // 밀기: 앞손이 칸 가장자리에 닿게 몸을 옮김
+    const hx = Math.min(r.hL[0], r.hR[0]); r = rig(p, S, sc.gx + sc.pushHands - hx + r.lw * .5, GY);
+  }
+  // 들기: 손 = 칸 아랫변
+  let liftY = null;
+  if (sc.lift) { const L = sc.lift, f = p.f >= 0 ? 1 : -1, x0 = r.hip[0] + f * L.x * S;
+    reach(r, "R", [x0, L.y - 2], L.w, -f); reach(r, "L", [x0 - f * .05 * S, L.y - 2], L.w, -f);
+    const hy = Math.min(r.hL[1], r.hR[1]);
+    liftY = L.fly !== undefined ? lerp(hy, -H * .02, L.fly) : lerp(H, hy, L.w);
+  }
+  const ly = sc.j > 1 || (sc.j === 1 && sc.a >= .86) ? 0 : liftY ?? H; // 칸 아랫변 높이
+  sc.tf[1] = `translateY(${ly - H}px)`;
+  // 줄: 칸 아랫변 가운데에서 손으로
+  let cord = null;
+  if (sc.cord) { const C = sc.cord, { top, span, dx } = ROPE(), cx = r.hip[0] + dx;
+    if (C.grab > 0) { const hand = (u, side) => { const ph = ((u % 1) + 1) % 1; const y = ph < .6 ? top + ph / .6 * span : top + span - (ph - .6) / .4 * span; reach(r, side, [cx, y], C.grab, -1); };
+      hand(C.u || 0, "R"); hand((C.u || 0) + .5, "L"); }
+    cord = { x: cx, y0: sc.yb, y1: C.grab > 0 ? Math.max(r.hL[1], r.hR[1]) + .25 * S : sc.yb + (1 - (C.fall || 0)) * .5 * S, grab: C.grab };
+  }
+  if (calm) sc.shake = 0;
+  const shx = sc.shake ? Math.sin(now / 18) * 10 * sc.shake : 0, shy = sc.shake ? Math.cos(now / 23) * 6 * sc.shake : 0;
+  P.forEach((el, i) => { el.classList.toggle("on", !!sc.on[i]); el.style.transform = (shx ? `translate(${shx}px,${shy}px) ` : "") + sc.tf[i]; });
+  P[0].classList.toggle("move", sc.j === 0 && sc.a > 0 && sc.a < 1); P[1].classList.toggle("move", sc.j === 1 && sc.a > .14); P[3].classList.toggle("move", sc.j >= 2 && sc.on[3]);
+
+  const c = "#fff";
+
+  g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+  g.translate(shx, shy);
+  // 그림자
+  g.globalAlpha = .14 * cl(1 + p.y * 2.5); g.fillStyle = c; g.beginPath(); g.ellipse(r.hip[0], GY, S * .26, S * .022, 0, 0, 7); g.fill(); g.globalAlpha = 1;
+  // 발밑 먼지(밀 때) · 넘어진 칸이 바닥을 칠 때
+  if (sc.dust > .02 && !calm && Math.random() < sc.dust * 2) puffs.push({ x: Math.max(r.fL[0], r.fR[0]), y: GY, vx: rnd(10, 60), vy: -rnd(10, 40), age: 0, life: rnd(.4, .7), s: rnd(.02, .045) * S });
+  if (sc.thump > 0 && sc.thump < 1 && !calm && Math.random() < .5) puffs.push({ x: rnd(0, W * .35), y: GY, vx: rnd(-30, 80), vy: -rnd(20, 70), age: 0, life: rnd(.5, .9), s: rnd(.02, .05) * S });
+  for (let i = puffs.length - 1; i >= 0; i--) { const d = puffs[i]; d.age += dt; d.x += d.vx * dt; d.y += d.vy * dt; d.vy *= .96;
+    if (d.age > d.life) { puffs.splice(i, 1); continue; }
+    g.globalAlpha = .22 * (1 - d.age / d.life); g.beginPath(); g.arc(d.x, d.y, d.s * (1 + d.age * 1.5), 0, 7); g.fillStyle = c; g.fill(); }
+  g.globalAlpha = 1;
+  // 줄
+  if (cord) { g.strokeStyle = c; g.lineWidth = Math.max(2, r.lw * .32); g.lineCap = "round";
+    g.beginPath(); g.moveTo(cord.x, cord.y0); const sway = Math.sin(now / 500) * .04 * S * (1 - cord.grab);
+    g.quadraticCurveTo(cord.x + sway, (cord.y0 + cord.y1) / 2, cord.x + sway * 2, cord.y1); g.stroke();
+    g.beginPath(); g.arc(cord.x + sway * 2, cord.y1, r.lw * .45, 0, 7); g.fillStyle = c; g.fill(); }
+  // 발차기 맞은 자리
+  if (sc.ring !== null && sc.ring > 0 && sc.ring < 1) { const f = r.fR[0] < r.hip[0] ? r.fR : r.fL; g.strokeStyle = c; g.globalAlpha = 1 - sc.ring; g.lineWidth = 3;
+    for (let i = 0; i < 8; i++) { const a = i / 8 * Math.PI * 2, r0 = S * (.08 + sc.ring * .25), r1 = r0 + S * .08 * (1 - sc.ring); path(g, [[f[0] + Math.cos(a) * r0, f[1] + Math.sin(a) * r0], [f[0] + Math.cos(a) * r1, f[1] + Math.sin(a) * r1]]); g.stroke(); }
+    g.globalAlpha = 1; }
+  drawMan(g, r, c);
+  // 땀(힘줄 때)
+  if (sc.j === 0 && sc.a > 0 && sc.a < 1 && Math.abs(vS) > .25 && !calm) { const k = (now / 400) % 1; g.globalAlpha = 1 - k; g.fillStyle = c;
+    g.beginPath(); g.arc(r.head[0] + r.R * (1.1 + k), r.head[1] - r.R * (.6 + k * .8), r.lw * .3, 0, 7); g.fill(); g.globalAlpha = 1; }
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

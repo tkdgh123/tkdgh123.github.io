@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>늘어나고 튀는 글자 · 더 역동적인 4</title>
+<link rel="stylesheet" href="../apply/apply.css">
+<style>
+/* 스크롤 속도만큼 글자가 늘어나고 굵어지고 기울고, 멈추면 고무줄처럼 돌아옴. 글자마다 조금씩 늦게 따라와 물결이 짐 */
+body { background: var(--paper) }
+.hero { height: 100svh; display: grid; place-items: center; overflow: hidden; position: relative }
+.big { font: 300 clamp(110px, 27vw, 420px)/.9 var(--serif); letter-spacing: -.05em; display: flex; cursor: default }
+.big i { font-style: normal; display: inline-block; transform-origin: 50% 85%; will-change: transform }
+.hero .meta { position: absolute; left: var(--m); right: var(--m); bottom: 28px; display: flex; justify-content: space-between; color: var(--muted) }
+.band { overflow: hidden; background: var(--blue); color: #fff; padding: 18px 0; white-space: nowrap }
+.band.ink { background: var(--ink); color: var(--on-dark) }
+.band p { display: inline-block; font: 300 clamp(40px, 6vw, 92px)/1.1 var(--serif); letter-spacing: -.03em; will-change: transform }
+.band p b { font-weight: 700 } .band p span { margin: 0 .35em; opacity: .5 }
+.list { padding: 16svh 0 20svh }
+.row { display: flex; align-items: baseline; gap: 2vw; padding: 0 var(--m); text-decoration: none; color: var(--ink); line-height: 1; position: relative }
+.row .n { flex: none; width: 3.2em; color: var(--muted); align-self: center }
+.row .t { font: 300 clamp(44px, 8.4vw, 150px)/1.06 var(--serif); letter-spacing: -.04em; white-space: nowrap; transform-origin: 0 50%; will-change: transform }
+.row .t i { font-style: normal; display: inline-block; white-space: pre; will-change: transform }
+.row .c { flex: none; margin-left: auto; color: var(--muted); align-self: center }
+#peek { position: fixed; z-index: 5; left: 0; top: 0; width: min(360px, 30vw); pointer-events: none; opacity: 0; transition: opacity .25s; box-shadow: 0 30px 60px -20px rgb(0 0 0 / .4) }
+#peek img { display: block; width: 100%; height: auto }
+.count { min-height: 100svh; background: var(--ink); color: var(--on-dark); display: grid; align-content: center; gap: 3vh; padding: 12svh var(--m); overflow: hidden }
+.count .num { display: flex; font: 700 clamp(160px, 38vw, 620px)/1 var(--serif); letter-spacing: -.06em; height: 1em; overflow: hidden }
+.count .num span { display: block; height: 1em; overflow: hidden }
+.count .num span b { display: block; font-weight: 700; will-change: transform }
+.count .num span b em { display: block; font-style: normal; height: 1em }
+.count p { font: 300 clamp(26px, 3.4vw, 54px)/1.2 var(--serif); color: var(--on-dark-soft) }
+.count p b { color: var(--on-dark) }
+.count a { color: var(--on-dark) }
+@media (max-width: 700px) { .row .c { display: none } .row .n { width: 2.4em } #peek { display: none } }
+</style>
+</head>
+<body>
+<nav class="top mono" style="color:#fff;mix-blend-mode:difference"><a href="../#dyn">← 움직이는 웹사이트</a><span class="right"><a href="drive.html">← 이전</a><span>더 역동적인 4 / 4 · 늘어나고 튀는 글자</span></span></nav>
+<section class="hero"><h1 class="big" id="big">작업실</h1><div class="meta mono"><span>2026.10.20 — 11.04</span><span>↓</span></div></section>
+<div class="band"><p id="m1"></p></div>
+<section class="list" id="list"></section>
+<div class="band ink"><p id="m2"></p></div>
+<section class="count" id="count"><div class="num" id="num"></div><p><b>17일</b> 동안 만든 작품. <a href="../../">작업실로 →</a></p></section>
+<div id="peek"><img id="peekImg" alt=""></div>
+
+<script type="module">
+import { WORKS, ROOT } from "../apply/works.js";
+const $ = id => document.getElementById(id);
+const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const cl = (x, a, b) => Math.min(b, Math.max(a, x)), lerp = (a, b, k) => a + (b - a) * k;
+const wrap = el => { el.innerHTML = [...el.textContent].map(c => `<i>${c === " " ? " " : c}</i>`).join(""); return [...el.children]; };
+
+// 큰 제목: 글자가 위에서 떨어져 튕기며 자리 잡음
+const bigL = wrap($("big"));
+if (!calm) bigL.forEach((el, i) => el.animate([{ transform: "translateY(-120vh) rotate(-30deg)" }, { transform: "translateY(0) scaleY(.7) scaleX(1.2)", offset: .62 }, { transform: "translateY(-8vh) scaleY(1.08)", offset: .8 }, { transform: "none" }],
+  { duration: 1100, delay: 120 + i * 140, easing: "cubic-bezier(.5,0,.4,1)", fill: "backwards" }));
+
+// 흐르는 띠 두 줄
+const cats = ["게임", "공부", "프로젝트", "기타"].map(c => `<b>${c}</b> ${WORKS.filter(w => w.cat === c).length}`).join("<span>/</span>");
+$("m1").innerHTML = (cats + "<span>/</span>").repeat(6);
+$("m2").innerHTML = (WORKS.slice(0, 12).map(w => w.t).join("<span>·</span>") + "<span>·</span>").repeat(3);
+
+// 작품 26줄
+$("list").innerHTML = WORKS.map((w, i) => `<a class="row" href="${ROOT + w.href}" data-i="${i}"><span class="n mono">${String(i + 1).padStart(2, "0")}</span><span class="t">${w.t}</span><span class="c mono">${w.cat} · ${w.d}</span></a>`).join("");
+const rows = [...document.querySelectorAll(".row")].map(el => ({ el, t: el.querySelector(".t"), L: wrap(el.querySelector(".t")), w: 300, y: 0, h: 0 }));
+
+// 숫자 26: 자리마다 0~9 띠가 굴러감
+$("num").innerHTML = "26".split("").map(() => `<span><b>${Array.from({ length: 20 }, (_, k) => `<em>${k % 10}</em>`).join("")}</b></span>`).join("");
+const reels = [...$("num").querySelectorAll("b")];
+
+/* ───────── 속도 → 모양 ───────── */
+let sy = scrollY, v = 0, vs = 0, vv = 0; // v: 실제 속도, vs: 스프링으로 따라가는 속도(멈추면 넘쳤다 돌아옴)
+const hist = new Array(40).fill(0); // 지난 속도(글자마다 늦게 따라오게)
+let mx = -1e4, my = -1e4, px = 0, py = 0, pvx = 0, hover = null, last = performance.now(), off1 = 0, off2 = 0;
+addEventListener("pointermove", e => { mx = e.clientX; my = e.clientY; });
+const peek = $("peek"), peekImg = $("peekImg");
+rows.forEach(r => { r.el.addEventListener("pointerenter", () => { hover = r; peekImg.src = ROOT + WORKS[r.el.dataset.i].img; peek.style.opacity = 1; });
+  r.el.addEventListener("pointerleave", () => { if (hover === r) { hover = null; peek.style.opacity = 0; } }); });
+let bands = [];
+function measure() { rows.forEach(r => { const b = r.el.getBoundingClientRect(); r.y = b.top + scrollY; r.h = b.height; });
+  bands = [[$("m1"), 6, 1], [$("m2"), 3, -1]].map(([el, n, k]) => [el, el.scrollWidth / n, k]); } // 띠 한 묶음 너비
+addEventListener("resize", measure); document.fonts.ready.then(measure); measure();
+
+function frame(now) {
+  requestAnimationFrame(frame);
+  const dt = Math.min(50, now - last) / 1000; last = now;
+  const y = scrollY; v = lerp(v, dt ? (y - sy) / dt / 1000 : 0, .35); sy = y; // 화면 px/ms
+  // 스프링: 실제 속도를 쫓되 멈추면 반대로 살짝 튐
+  vv += ((calm ? 0 : v) - vs) * 160 * dt - vv * 11 * dt; vs += vv * dt;
+  const vt = vs / (1 + Math.abs(vs) * .6); // 아주 빠르게 내려도 끝없이 커지지 않게 부드럽게 눌러 둠 (-1.7~1.7)
+  hist.unshift(vt); hist.pop();
+  const H = innerHeight, sp = Math.abs(vt);
+
+  // 큰 제목: 속도만큼 늘어나고 굵어짐 + 마우스 가까운 글자는 부풀어 오름
+  const hb = $("big").getBoundingClientRect();
+  if (hb.bottom > 0) bigL.forEach((el, i) => {
+    const b = el.getBoundingClientRect(), d = Math.hypot(mx - (b.left + b.width / 2), my - (b.top + b.height / 2)), near = calm ? 0 : Math.max(0, 1 - d / (b.width * 1.4));
+    const lag = hist[Math.min(39, i * 5)];
+    el.style.transform = `translateY(${-lag * 50}px) scaleY(${1 + Math.abs(lag) * .3 + near * .12}) scaleX(${1 - Math.abs(lag) * .08 + near * .06})`;
+    el.style.fontWeight = Math.round(300 + Math.min(500, Math.abs(lag) * 300 + near * 420));
+  });
+
+  // 띠: 스크롤 방향으로 빨라지고 기울어짐
+  off1 -= (60 + vt * 1400) * dt; off2 += (50 + vt * 1100) * dt;
+  for (const [el, w, k] of bands) { const o = k > 0 ? off1 : off2, x = ((o % w) - w) % w;
+    el.style.transform = `translateX(${x}px) skewX(${cl(-vt * 12 * k, -18, 18)}deg)`; }
+
+  // 작품 줄: 화면 가운데 줄이 가장 굵고 진함, 속도만큼 기울고 글자마다 늦게 따라와 물결
+  for (const r of rows) {
+    const top = r.y - y; if (top > H + 50 || top + r.h < -50) continue;
+    const c = (top + r.h / 2 - H / 2) / (H / 2), focus = Math.max(0, 1 - Math.abs(c) * 1.3);
+    const wt = Math.round(250 + focus * focus * 450 + sp * 80);
+    if (wt !== r.w) { r.w = wt; r.t.style.fontWeight = wt; }
+    r.el.style.color = `rgba(21,21,20,${.28 + focus * .72})`;
+    r.t.style.transform = `skewX(${-vt * 7}deg) scaleY(${1 + sp * .12})`;
+    r.L.forEach((el, i) => { el.style.transform = `translateY(${-hist[Math.min(39, i * 3)] * .14}em)`; }); // 글자마다 늦게: 물결
+  }
+  // 마우스 따라오는 작품 그림(움직인 방향으로 기울어짐)
+  const nx = lerp(px, mx + 28, .16), ny = lerp(py, my - 120, .16); pvx = lerp(pvx, nx - px, .2); px = nx; py = ny;
+  peek.style.transform = `translate(${px}px,${py}px) rotate(${cl(pvx * .6, -14, 14)}deg)`;
+
+  // 숫자: 화면에 들어오는 만큼 굴러서 26에 멈춤
+  const cb = $("count").getBoundingClientRect(), k = calm ? 1 : cl((H - cb.top) / (H * .75), 0, 1), e = 1 - (1 - k) ** 3;
+  reels.forEach((b, i) => { const goal = [12, 16][i]; b.style.transform = `translateY(${-e * goal}em) skewY(${-vt * 5}deg)`; });
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
