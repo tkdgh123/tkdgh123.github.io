@@ -45,7 +45,7 @@ const norm = (p, q) => { const d = Math.hypot(q[0] - p[0], q[1] - p[1]) || 1; re
 
 /* ───────── 몸 ───────── */
 // 굵은 검은 선 + 얼굴 없는 동그란 머리(몸통과 살짝 떨어짐), 손발은 둥근 끝
-const LEN = { T: .33, N: .024, R: .112, UA: .2, FA: .19, TH: .25, SH: .245, W: .062, SW: .055 };
+const LEN = { T: .33, N: .024, R: .112, UA: .2, FA: .19, TH: .25, SH: .245, W: .042, SW: .05 };
 const BASE = { x: 0, y: 0, t: 0, h: 0, f: 0, la1: -18, la2: -8, ra1: 18, ra2: 8, ll1: -10, ll2: -4, rl1: 10, rl2: 4, rot: 0, sq: 0,
   ik: 0, ikL: 0, ikR: 0, ikf: 0, st: 0, sw: 0, pd: 26, pg: 0, row: 0, env: 1 };
 // 넘길 때: 웅크림 → 늘어나며 뜀 → 무릎 당겨 공중제비 → 펴기 → 찌그러지며 착지 → 섬
@@ -222,10 +222,10 @@ const C = [
 { t: "마디", base: { f: 1 },
   items: [
     { at: "hip", on: "wipe", layer: "front", draw(g, r) { // 마네킹 몸
-      const w = .08 * r.S, c = "#e6e3db";
+      const w = .062 * r.S, c = "#e6e3db";
       for (const seg of [[r.fL, r.kL, r.hip], [r.hip, r.kR, r.fR], [r.hL, r.eL, r.shL, r.shR, r.eR, r.hR]]) band(g, r, seg, w, c);
-      band(g, r, [r.hip, L2(r.hip, r.neck, .55), r.neck], .1 * r.S, c);
-      for (const j of [r.kL, r.kR, r.eL, r.eR, r.hip, r.shL, r.shR]) dot(g, j, .028 * r.S, "#ff6a1a", r.ol);
+      band(g, r, [r.hip, L2(r.hip, r.neck, .55), r.neck], .08 * r.S, c);
+      for (const j of [r.kL, r.kR, r.eL, r.eR, r.hip, r.shL, r.shR]) dot(g, j, .024 * r.S, "#ff6a1a", r.ol);
     } },
     { at: "head", on: "drop", layer: "head", draw(g, r) { g.beginPath(); g.ellipse(r.head[0], r.head[1] - r.R * .05, r.R * 1.0, r.R * 1.14, (r.p.t + r.p.h) * D, 0, 7); g.fillStyle = "#e6e3db"; g.fill(); g.lineWidth = r.ol; g.strokeStyle = INK; g.stroke(); } },
   ],
