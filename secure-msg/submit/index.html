@@ -97,19 +97,20 @@ a.copy{text-decoration:none;line-height:1}
 <dl class="sub-info">
 <dt>과제</dt><dd>프로젝트 중간 코드 확인 및 피드백 · 중간 결과물(코드) 개인별 제출</dd>
 <dt>마감</dt><dd>11월 6일(금) 오후 11:59</dd>
-<dt>파일</dt><dd><code>deolmi.c</code> 557줄 → <code>중간결과물_학번_김창식_60%.zip</code>으로 압축</dd>
+<dt>파일</dt><dd><code>deolmi.c</code> 586줄 → <code>중간결과물_학번_김창식_60%.zip</code>으로 압축</dd>
 </dl>
-<ol class="map5"><li><button type="button" data-line="14" class=mine><b>① 통신</b><span>내 담당</span><i>14줄부터</i></button></li>
-<li><button type="button" data-line="142"><b>② 화면</b><span>같이 들어감</span><i>142줄부터</i></button></li>
-<li><button type="button" data-line="201" class=mine><b>③ 중계</b><span>내 담당</span><i>201줄부터</i></button></li>
-<li><button type="button" data-line="335"><b>④ 대화</b><span>같이 들어감</span><i>335줄부터</i></button></li>
-<li><button type="button" data-line="479"><b>⑤ 실행</b><span>같이 들어감</span><i>479줄부터</i></button></li></ol></div>
+<ol class="map5"><li><button type="button" data-line="15" class=mine><b>① 통신</b><span>내 담당</span><i>15줄부터</i></button></li>
+<li><button type="button" data-line="143"><b>② 화면</b><span>같이 들어감</span><i>143줄부터</i></button></li>
+<li><button type="button" data-line="202" class=mine><b>③ 중계</b><span>내 담당</span><i>202줄부터</i></button></li>
+<li><button type="button" data-line="336"><b>④ 대화</b><span>같이 들어감</span><i>336줄부터</i></button></li>
+<li><button type="button" data-line="495"><b>⑤ 실행</b><span>같이 들어감</span><i>495줄부터</i></button></li></ol></div>
 </section>
 <main class="one">
   <section class="panel rise" id="f">
-    <div class="bar"><span class="path">deolmi.c</span><span class="role">제출할 파일 그대로</span><span class="ll">557줄</span>
+    <div class="bar"><span class="path">deolmi.c</span><span class="role">제출할 파일 그대로</span><span class="ll">586줄</span>
       <button class="copy" type="button">복사</button><a class="copy" href="deolmi.c" download>받기</a></div>
     <pre class="codebox"><code class="language-c">#define _CRT_SECURE_NO_WARNINGS
+#pragma execution_character_set(&quot;utf-8&quot;)   /* 한글 글자를 UTF-8로 넣는다 (VS에서 /utf-8 옵션 없이도 안 깨지게) */
 #include &lt;winsock2.h&gt;
 #include &lt;ws2tcpip.h&gt;
 #include &lt;windows.h&gt;
@@ -542,33 +543,48 @@ static void handle_input(const char *line)
     }
 }
 
-/* 키보드 입력 스레드: 받기와 따로 돌아서, 글을 치는 중에도 받은 글이 뜬다. 한글 입력도 여기서 처리한다 */
-static DWORD WINAPI keyboard_thread(LPVOID unused)
+/* 키보드에서 한 줄을 읽는다. 한글이 깨지지 않게 UTF-16으로 받아 UTF-8로 바꾼다. 끝이면 0 */
+static int read_line(char *line, int size)
 {
     static wchar_t wide[MAX_INPUT + 2];
-    static char line[4 * MAX_INPUT];
     HANDLE input = GetStdHandle(STD_INPUT_HANDLE);
     DWORD console_mode, read_count;
+    if (GetConsoleMode(input, &amp;console_mode)) {
+        if (!ReadConsoleW(input, wide, MAX_INPUT, &amp;read_count, NULL) || read_count == 0)
+            return 0;
+        line[WideCharToMultiByte(CP_UTF8, 0, wide, (int)read_count, line, size - 1, NULL, NULL)] = &#x27;\0&#x27;;
+    } else if (!fgets(line, size, stdin)) {   /* 파이프 입력 (자동 테스트용) */
+        return 0;
+    }
+    size_t n = strcspn(line, &quot;\r\n&quot;);
+    while (n &gt; 0 &amp;&amp; line[n - 1] == &#x27; &#x27;)
+        n--;
+    line[n] = &#x27;\0&#x27;;
+    return 1;
+}
+
+/* 키보드 입력 스레드: 받기와 따로 돌아서, 글을 치는 중에도 받은 글이 뜬다 */
+static DWORD WINAPI keyboard_thread(LPVOID unused)
+{
+    static char line[4 * MAX_INPUT];
     (void)unused;
-    for (;;) {
-        if (GetConsoleMode(input, &amp;console_mode)) {
-            if (!ReadConsoleW(input, wide, MAX_INPUT, &amp;read_count, NULL) || read_count == 0)
-                break;
-            line[WideCharToMultiByte(CP_UTF8, 0, wide, (int)read_count, line, sizeof(line) - 1, NULL, NULL)] = &#x27;\0&#x27;;
-        } else if (!fgets(line, sizeof(line), stdin)) {   /* 파이프 입력 (자동 테스트용) */
-            break;
-        }
-        size_t n = strcspn(line, &quot;\r\n&quot;);
-        while (n &gt; 0 &amp;&amp; line[n - 1] == &#x27; &#x27;)
-            n--;
-        line[n] = &#x27;\0&#x27;;
-        if (n == 0)
+    while (read_line(line, sizeof(line))) {
+        if (line[0] == &#x27;\0&#x27;)
             continue;
         EnterCriticalSection(&amp;lock);
         handle_input(line);
         LeaveCriticalSection(&amp;lock);
     }
     exit(0);
+}
+
+/* 질문을 띄우고 답을 한 줄 받는다 */
+static void ask_line(const char *question, char *answer, int size)
+{
+    printf(&quot;%s&quot;, question);
+    fflush(stdout);
+    if (!read_line(answer, size))
+        exit(1);
 }
 
 /* 방장 화면에 내 주소를 띄워서, 다른 컴퓨터가 무엇을 치고 들어오면 되는지 알려 준다 */
@@ -584,7 +600,7 @@ static void print_my_address(void)
     if (connect(sock, (struct sockaddr *)&amp;to, sizeof(to)) == 0 &amp;&amp; getsockname(sock, (struct sockaddr *)&amp;me, &amp;len) == 0)
         inet_ntop(AF_INET, &amp;me.sin_addr, ip, sizeof(ip));
     closesocket(sock);
-    print_line(&quot;[주소] 다른 컴퓨터는  deolmi 이름 %s  으로 들어와요 (같은 와이파이)&quot;, ip);
+    print_line(&quot;[주소] %s — 다른 사람은 이 주소로 들어와요 (같은 와이파이)&quot;, ip);
 }
 
 /* ================= ⑤ 실행 =================
@@ -609,26 +625,39 @@ int main(void)
     for (int i = 0; i &lt; arg_count &amp;&amp; i &lt; 3; i++)
         WideCharToMultiByte(CP_UTF8, 0, wide_args[i], -1, args[i], sizeof(args[i]), NULL, NULL);
 
-    if (arg_count &lt; 2 || !is_valid_name(args[1])) {
-        printf(&quot;쓰는 법: deolmi 이름 --host (방을 연다) / deolmi 이름 [주소] (방에 들어간다)\n&quot;
-               &quot;이름은 한글 5글자까지, 띄어쓰기와 / 없이\n&quot;);
-        return 1;
+    /* 명령줄로 켜면(deolmi 이름 --host / deolmi 이름 주소) 그대로 쓰고,
+       그냥 켜면(Visual Studio에서 실행, exe 더블클릭) 화면에서 물어본다. 잘못되면 다시 묻는다 */
+    char answer[256], host[256] = &quot;127.0.0.1&quot;;
+    for (;;) {
+        if (arg_count &lt; 2) {
+            ask_line(&quot;이름 (한글 5글자까지): &quot;, args[1], sizeof(args[1]));
+            ask_line(&quot;1 = 방 열기(방장), 2 = 방에 들어가기: &quot;, answer, sizeof(answer));
+            is_host = answer[0] == &#x27;1&#x27;;
+            if (!is_host) {
+                ask_line(&quot;방장 주소 (같은 컴퓨터면 그냥 엔터): &quot;, answer, sizeof(answer));
+                strcpy(host, answer[0] ? answer : &quot;127.0.0.1&quot;);
+            }
+        } else {
+            is_host = arg_count &gt;= 3 &amp;&amp; strcmp(args[2], &quot;--host&quot;) == 0;
+            if (!is_host &amp;&amp; arg_count &gt;= 3)
+                strcpy(host, args[2]);
+        }
+        if (!is_valid_name(args[1]))
+            printf(&quot;이름은 한글 5글자까지, 띄어쓰기와 / 없이 써 주세요\n&quot;);
+        else if (is_host &amp;&amp; (listen_sock = open_room(PORT)) &lt; 0)
+            printf(&quot;%d번 포트로 방을 열 수 없어요 (이미 켜 둔 방장이 있나요?)\n&quot;, PORT);
+        else if (!is_host &amp;&amp; (host_conn.sock = connect_to_host(host, PORT)) &lt; 0)
+            printf(&quot;%s 에 접속하지 못했어요. 방장이 방을 열었는지, 주소와 와이파이가 맞는지 보세요\n&quot;, host);
+        else
+            break;
+        if (arg_count &gt;= 2)
+            return 1;
     }
     strcpy(my_name, args[1]);
-    is_host = arg_count &gt;= 3 &amp;&amp; strcmp(args[2], &quot;--host&quot;) == 0;
     if (is_host) {
-        if ((listen_sock = open_room(PORT)) &lt; 0) {
-            printf(&quot;%d번 포트로 방을 열 수 없어요 (이미 켜 둔 방장이 있나요?)\n&quot;, PORT);
-            return 1;
-        }
         print_line(&quot;덜미 · %s · 방장&quot;, my_name);
         print_my_address();
     } else {
-        const char *host = arg_count &gt;= 3 ? args[2] : &quot;127.0.0.1&quot;;
-        if ((host_conn.sock = connect_to_host(host, PORT)) &lt; 0) {
-            printf(&quot;%s 에 접속하지 못했어요. 방장이 방을 열었는지, 주소와 와이파이가 맞는지 보세요\n&quot;, host);
-            return 1;
-        }
         make_packet(&amp;send_pkt, TYPE_HELLO, my_name, &quot;&quot;);
         send_packet(host_conn.sock, &amp;send_pkt);
         print_line(&quot;덜미 · %s · %s 에 접속&quot;, my_name, host);

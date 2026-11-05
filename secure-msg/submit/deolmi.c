@@ -1,4 +1,5 @@
-#define _CRT_SECURE_NO_WARNINGS
+﻿#define _CRT_SECURE_NO_WARNINGS
+#pragma execution_character_set("utf-8")   /* 한글 글자를 UTF-8로 넣는다 (VS에서 /utf-8 옵션 없이도 안 깨지게) */
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <windows.h>
@@ -431,33 +432,48 @@ static void handle_input(const char *line)
     }
 }
 
-/* 키보드 입력 스레드: 받기와 따로 돌아서, 글을 치는 중에도 받은 글이 뜬다. 한글 입력도 여기서 처리한다 */
-static DWORD WINAPI keyboard_thread(LPVOID unused)
+/* 키보드에서 한 줄을 읽는다. 한글이 깨지지 않게 UTF-16으로 받아 UTF-8로 바꾼다. 끝이면 0 */
+static int read_line(char *line, int size)
 {
     static wchar_t wide[MAX_INPUT + 2];
-    static char line[4 * MAX_INPUT];
     HANDLE input = GetStdHandle(STD_INPUT_HANDLE);
     DWORD console_mode, read_count;
+    if (GetConsoleMode(input, &console_mode)) {
+        if (!ReadConsoleW(input, wide, MAX_INPUT, &read_count, NULL) || read_count == 0)
+            return 0;
+        line[WideCharToMultiByte(CP_UTF8, 0, wide, (int)read_count, line, size - 1, NULL, NULL)] = '\0';
+    } else if (!fgets(line, size, stdin)) {   /* 파이프 입력 (자동 테스트용) */
+        return 0;
+    }
+    size_t n = strcspn(line, "\r\n");
+    while (n > 0 && line[n - 1] == ' ')
+        n--;
+    line[n] = '\0';
+    return 1;
+}
+
+/* 키보드 입력 스레드: 받기와 따로 돌아서, 글을 치는 중에도 받은 글이 뜬다 */
+static DWORD WINAPI keyboard_thread(LPVOID unused)
+{
+    static char line[4 * MAX_INPUT];
     (void)unused;
-    for (;;) {
-        if (GetConsoleMode(input, &console_mode)) {
-            if (!ReadConsoleW(input, wide, MAX_INPUT, &read_count, NULL) || read_count == 0)
-                break;
-            line[WideCharToMultiByte(CP_UTF8, 0, wide, (int)read_count, line, sizeof(line) - 1, NULL, NULL)] = '\0';
-        } else if (!fgets(line, sizeof(line), stdin)) {   /* 파이프 입력 (자동 테스트용) */
-            break;
-        }
-        size_t n = strcspn(line, "\r\n");
-        while (n > 0 && line[n - 1] == ' ')
-            n--;
-        line[n] = '\0';
-        if (n == 0)
+    while (read_line(line, sizeof(line))) {
+        if (line[0] == '\0')
             continue;
         EnterCriticalSection(&lock);
         handle_input(line);
         LeaveCriticalSection(&lock);
     }
     exit(0);
+}
+
+/* 질문을 띄우고 답을 한 줄 받는다 */
+static void ask_line(const char *question, char *answer, int size)
+{
+    printf("%s", question);
+    fflush(stdout);
+    if (!read_line(answer, size))
+        exit(1);
 }
 
 /* 방장 화면에 내 주소를 띄워서, 다른 컴퓨터가 무엇을 치고 들어오면 되는지 알려 준다 */
@@ -473,7 +489,7 @@ static void print_my_address(void)
     if (connect(sock, (struct sockaddr *)&to, sizeof(to)) == 0 && getsockname(sock, (struct sockaddr *)&me, &len) == 0)
         inet_ntop(AF_INET, &me.sin_addr, ip, sizeof(ip));
     closesocket(sock);
-    print_line("[주소] 다른 컴퓨터는  deolmi 이름 %s  으로 들어와요 (같은 와이파이)", ip);
+    print_line("[주소] %s — 다른 사람은 이 주소로 들어와요 (같은 와이파이)", ip);
 }
 
 /* ================= ⑤ 실행 =================
@@ -498,26 +514,39 @@ int main(void)
     for (int i = 0; i < arg_count && i < 3; i++)
         WideCharToMultiByte(CP_UTF8, 0, wide_args[i], -1, args[i], sizeof(args[i]), NULL, NULL);
 
-    if (arg_count < 2 || !is_valid_name(args[1])) {
-        printf("쓰는 법: deolmi 이름 --host (방을 연다) / deolmi 이름 [주소] (방에 들어간다)\n"
-               "이름은 한글 5글자까지, 띄어쓰기와 / 없이\n");
-        return 1;
+    /* 명령줄로 켜면(deolmi 이름 --host / deolmi 이름 주소) 그대로 쓰고,
+       그냥 켜면(Visual Studio에서 실행, exe 더블클릭) 화면에서 물어본다. 잘못되면 다시 묻는다 */
+    char answer[256], host[256] = "127.0.0.1";
+    for (;;) {
+        if (arg_count < 2) {
+            ask_line("이름 (한글 5글자까지): ", args[1], sizeof(args[1]));
+            ask_line("1 = 방 열기(방장), 2 = 방에 들어가기: ", answer, sizeof(answer));
+            is_host = answer[0] == '1';
+            if (!is_host) {
+                ask_line("방장 주소 (같은 컴퓨터면 그냥 엔터): ", answer, sizeof(answer));
+                strcpy(host, answer[0] ? answer : "127.0.0.1");
+            }
+        } else {
+            is_host = arg_count >= 3 && strcmp(args[2], "--host") == 0;
+            if (!is_host && arg_count >= 3)
+                strcpy(host, args[2]);
+        }
+        if (!is_valid_name(args[1]))
+            printf("이름은 한글 5글자까지, 띄어쓰기와 / 없이 써 주세요\n");
+        else if (is_host && (listen_sock = open_room(PORT)) < 0)
+            printf("%d번 포트로 방을 열 수 없어요 (이미 켜 둔 방장이 있나요?)\n", PORT);
+        else if (!is_host && (host_conn.sock = connect_to_host(host, PORT)) < 0)
+            printf("%s 에 접속하지 못했어요. 방장이 방을 열었는지, 주소와 와이파이가 맞는지 보세요\n", host);
+        else
+            break;
+        if (arg_count >= 2)
+            return 1;
     }
     strcpy(my_name, args[1]);
-    is_host = arg_count >= 3 && strcmp(args[2], "--host") == 0;
     if (is_host) {
-        if ((listen_sock = open_room(PORT)) < 0) {
-            printf("%d번 포트로 방을 열 수 없어요 (이미 켜 둔 방장이 있나요?)\n", PORT);
-            return 1;
-        }
         print_line("덜미 · %s · 방장", my_name);
         print_my_address();
     } else {
-        const char *host = arg_count >= 3 ? args[2] : "127.0.0.1";
-        if ((host_conn.sock = connect_to_host(host, PORT)) < 0) {
-            printf("%s 에 접속하지 못했어요. 방장이 방을 열었는지, 주소와 와이파이가 맞는지 보세요\n", host);
-            return 1;
-        }
         make_packet(&send_pkt, TYPE_HELLO, my_name, "");
         send_packet(host_conn.sock, &send_pkt);
         print_line("덜미 · %s · %s 에 접속", my_name, host);
