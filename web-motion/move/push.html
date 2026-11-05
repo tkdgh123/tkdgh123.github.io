@@ -129,7 +129,7 @@ function follow(p, dt) {
 
 /* ───────── 스크롤 → 장면 ───────── */
 const cv = $("cv"), g = cv.getContext("2d");
-const HERO = .45, SEG = 1.9, N = 4, END = .9;
+const HERO = .6, SEG = 3.8, N = 4, END = 1.2; // SEG: 한 번 넘기는 데 드는 스크롤(화면 높이 단위) — 길수록 천천히
 let W, H, dpr, S, GY, pushEnd = 0;
 function layout() {
   dpr = Math.min(devicePixelRatio, 2); W = innerWidth; H = innerHeight;
@@ -208,11 +208,12 @@ function scene(s, now, v) {
 }
 
 /* ───────── 그리기 ───────── */
-let sPrev = scrollY / innerHeight, vS = 0, last = 0, puffs = [];
+let sPrev = scrollY / innerHeight, sSm = sPrev, vS = 0, last = 0, puffs = [];
 function frame(now) {
   requestAnimationFrame(frame);
   const dt = Math.min(.05, (now - (last || now)) / 1000); last = now;
-  const s = scrollY / H; vS = lerp(vS, dt ? (s - sPrev) / dt : 0, .15); sPrev = s;
+  sSm += (scrollY / H - sSm) * (calm ? 1 : 1 - Math.exp(-dt * 5)); // 휠 한 칸에 툭 건너뛰지 않고 부드럽게 따라감
+  const s = sSm; vS = lerp(vS, dt ? (s - sPrev) / dt : 0, .15); sPrev = s;
   const sc = scene(s, now, vS);
   const p = follow(sc.p, dt || .016);
   let r = rig(p, S, sc.gx, GY);
