@@ -184,7 +184,7 @@ function go(i) {
   i = (i + ORDER.length) % ORDER.length; if (fly) return;
   const from = cur < 0 ? HOME : pad(ORDER[cur]);
   fly = { i, t0: performance.now(), n0: from.n.clone(), p0: ship.position.clone() };
-  fly.d = fly.p0.distanceTo(pad(ORDER[i]).pos); fly.dur = calm ? 400 : cl(2600 + fly.d * 28, 3200, 6500);
+  fly.d = fly.p0.distanceTo(pad(ORDER[i]).pos); fly.dur = calm ? 400 : cl(3400 + fly.d * 30, 4200, 7500);
   $("intro").classList.remove("on"); $("info").classList.remove("on");
 }
 function arrive(i) {
@@ -202,6 +202,8 @@ $("gl").addEventListener("click", e => { ray.setFromCamera(new THREE.Vector2(e.c
   const hit = ray.intersectObjects(planets.map(p => p.ball))[0]; if (hit) go(ORDER.findIndex(p => p.ball === hit.object)); });
 
 /* ───────── 매 프레임 ───────── */
+const smooth = (a, b, x) => { const t = cl((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+function bezD(a, b, c, d, t) { const u = 1 - t; return b.clone().sub(a).multiplyScalar(3 * u * u).addScaledVector(c.clone().sub(b), 6 * u * t).addScaledVector(d.clone().sub(c), 3 * t * t); }
 function bez(a, b, c, d, t) { const u = 1 - t; return a.clone().multiplyScalar(u * u * u).addScaledVector(b, 3 * u * u * t).addScaledVector(c, 3 * u * t * t).addScaledVector(d, t * t * t); }
 function landedShot(p, outPos, outLook) { // 행성은 화면 오른쪽(폰은 위), 그 위에 선 우주선이 보이게
   const portrait = camera.aspect < 1, { dir, right } = view(p), dist = p.R * (portrait ? 6.2 : 3.6) + 9;
@@ -219,19 +221,19 @@ function frame(now) {
   planets.forEach(p => place(p, dt));
   const portrait = camera.aspect < 1;
   if (fly) {
-    const p = ORDER[fly.i], tg = pad(p), k = cl((now - fly.t0) / fly.dur, 0, 1);
-    const A = fly.p0.clone().addScaledVector(fly.n0, 6), B = tg.pos.clone().addScaledVector(tg.n, 9);
-    const h = B.clone().sub(A).setY(0).normalize();
-    let pos, look;
-    if (k < .16) { const e = easeIn(k / .16); pos = fly.p0.clone().lerp(A, e); look = fly.n0; thrust = 1; } // 이륙: 곧장 위로
-    else if (k < .8) { const e = ease((k - .16) / .64), c1 = A.clone().addScaledVector(fly.n0, fly.d * .25), c2 = B.clone().addScaledVector(tg.n, fly.d * .25);
-      pos = bez(A, c1, c2, B, e); look = bez(A, c1, c2, B, Math.min(1, e + .015)).sub(pos).normalize(); thrust = .85; }
-    else { const e = easeOut((k - .8) / .2); pos = B.clone().lerp(tg.pos, e); look = tg.n; thrust = .9 - e * .7; } // 착륙: 꼬리부터 천천히 내려앉음
-    ship.position.copy(pos); ship.quaternion.slerp(qUp(look), 1 - Math.exp(-dt * (k < .8 ? 6 : 9)));
-    // 3인칭: 가는 방향 뒤·위에서 따라감 → 끝에 도착 장면으로
+    // 한 줄로 이어진 곡선: 이륙 방향(하늘)으로 떠올라 → 날아가 → 도착 행성 위에서 꼬리부터 내려앉음. 속도는 천천히 → 빠르게 → 천천히
+    const p = ORDER[fly.i], tg = pad(p), k = cl((now - fly.t0) / fly.dur, 0, 1), u = .5 - Math.cos(Math.PI * k) / 2;
+    const c1 = fly.p0.clone().addScaledVector(fly.n0, fly.d * .45 + 4), c2 = tg.pos.clone().addScaledVector(tg.n, fly.d * .45 + 4);
+    const pos = bez(fly.p0, c1, c2, tg.pos, u), tan = bezD(fly.p0, c1, c2, tg.pos, cl(u, .002, .998)).normalize();
+    // 앞머리: 처음엔 하늘 → 나아가는 방향 → 내리기 한참 전부터 천천히 다시 하늘로 (갑자기 돌지 않게 비율로 섞음)
+    const q = qUp(fly.n0).slerp(qUp(tan), smooth(0, .25, u)); q.slerp(qUp(tg.n), smooth(.5, .86, u));
+    ship.position.copy(pos); ship.quaternion.copy(q);
+    thrust = u < .25 ? 1 : u < .6 ? .65 : .9 * (1 - smooth(.94, 1, u)) + .1;
+    const h = c2.clone().sub(c1).setY(0).normalize();
+    // 3인칭: 가는 방향 뒤·위에서 따라가다가 → 후반부터 천천히 도착 장면으로
     wantPos.copy(pos).addScaledVector(h, -14).addScaledVector(UP, 5); wantLook.copy(pos).addScaledVector(h, 8);
-    if (k > .68) { landedShot(p, tmpP, tmpL); const s = ease((k - .68) / .32); wantPos.lerp(tmpP, s); wantLook.lerp(tmpL, s); }
-    if (k >= 1) { const i = fly.i; fly = null; shake = .5; arrive(i); }
+    { landedShot(p, tmpP, tmpL); const s2 = smooth(.45, 1, k); wantPos.lerp(tmpP, s2); wantLook.lerp(tmpL, s2); }
+    if (k >= 1) { const i = fly.i; fly = null; arrive(i); }
   } else if (cur >= 0) {
     const p = ORDER[cur], tg = pad(p); ship.position.copy(tg.pos); ship.quaternion.slerp(qUp(tg.n), 1 - Math.exp(-dt * 6));
     thrust += (0 - thrust) * Math.min(1, dt * 3);
