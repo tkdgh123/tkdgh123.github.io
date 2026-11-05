@@ -150,6 +150,9 @@ const ROADC = w => w >= 10 ? "#5d5d60" : w >= 5 ? "#6e6d6c" : "#cfc6b2";
 for (const pass of [0, 1]) for (const r of [...SSU.roads].sort((a, b) => a.w - b.w)) { const p = pairs(r.p); path(p, false); g.lineCap = g.lineJoin = "round";
   if (pass === 0) { g.strokeStyle = r.w >= 5 ? "#a59d8c" : "rgba(0,0,0,0)"; g.lineWidth = (r.w + 1.6) * S; g.stroke(); } else { g.strokeStyle = ROADC(r.w); g.lineWidth = r.w * S; g.stroke();
     if (r.w >= 10) { g.setLineDash([3 * S, 4 * S]); g.strokeStyle = "rgba(255,240,210,.7)"; g.lineWidth = .3 * S; g.stroke(); g.setLineDash([]); } } }
+{ const RED = [[-250, 6], [-252, -12], [-246, -32], [-236, -48], [-222, -59], [-204, -66], [-186, -68], [-172, -73]]; // 붉은 자전거·보행로 (위성사진의 휜 띠, 영상)
+  path(RED, false); g.lineCap = g.lineJoin = "round"; g.strokeStyle = "#f2efe8"; g.lineWidth = 6 * S; g.stroke(); g.strokeStyle = "#94524b"; g.lineWidth = 5.2 * S; g.stroke();
+  g.setLineDash([1.2 * S, 2.4 * S]); g.strokeStyle = "#a6483f"; g.stroke(); g.setLineDash([2 * S, 2 * S]); g.strokeStyle = "rgba(240,200,60,.85)"; g.lineWidth = .18 * S; g.stroke(); g.setLineDash([]); }
 { const o = document.createElement("canvas"); o.width = TW; o.height = TH; const x = o.getContext("2d"); x.fillStyle = "rgba(214,211,203,.78)"; x.fillRect(0, 0, TW, TH); // 캠퍼스 밖 땅은 흰 모형처럼
   x.globalCompositeOperation = "destination-out"; x.filter = `blur(${Math.round(S * 6)}px)`; x.fillStyle = x.strokeStyle = "#000"; x.lineJoin = "round"; x.lineWidth = S * 40;
   const p2 = pts => { x.beginPath(); pts.forEach(([a, b], i) => i ? x.lineTo(tx(a), tz(b)) : x.moveTo(tx(a), tz(b))); x.closePath(); };
@@ -157,7 +160,20 @@ for (const pass of [0, 1]) for (const r of [...SSU.roads].sort((a, b) => a.w - b
 const groundTex = new THREE.CanvasTexture(cvs); groundTex.colorSpace = THREE.SRGBColorSpace; groundTex.anisotropy = renderer.capabilities.getMaxAnisotropy();
 const tg = new THREE.PlaneGeometry(WX, WZ, nx - 1, nz - 1); tg.rotateX(-Math.PI / 2); tg.translate((X0 + X1) / 2, 0, (Z0 + Z1) / 2);
 { const pa = tg.attributes.position; for (let i = 0; i < pa.count; i++) pa.setY(i, Y(pa.getX(i), pa.getZ(i))); tg.computeVertexNormals(); }
-const terrain = new THREE.Mesh(tg, new THREE.MeshStandardMaterial({ map: groundTex, roughness: 1 })); terrain.receiveShadow = true; scene.add(terrain);
+const detailTex = (() => { const c = document.createElement("canvas"); c.width = c.height = 256; const x = c.getContext("2d"), im = x.createImageData(256, 256), d = im.data; // R 보도블록 · G 잔디 · B 아스팔트 결
+  for (let j = 0; j < 256; j++) for (let i = 0; i < 256; i++) { const k = (j * 256 + i) * 4, bi = i % 64, bj = (j + (Math.floor(i / 64) % 2) * 32) % 64, grout = bi < 2 || bj < 2; // 0.3m 블록, 줄 어긋남
+    d[k] = grout ? 70 : 150 + ((Math.floor(i / 64) * 7 + Math.floor((j + (Math.floor(i / 64) % 2) * 32) / 64) * 13) % 5) * 12 + rnd() * 30;
+    d[k + 1] = 110 + rnd() * 120; d[k + 2] = 140 + rnd() * 60 + (rnd() < .02 ? 60 : 0); d[k + 3] = 255; }
+  x.putImageData(im, 0, 0); const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 8; return t; })();
+const terrainMat = new THREE.MeshStandardMaterial({ map: groundTex, roughness: 1 });
+terrainMat.onBeforeCompile = sh => { sh.uniforms.detailMap = { value: detailTex };
+  sh.vertexShader = sh.vertexShader.replace("#include <common>", "#include <common>\nvarying vec3 vWp;").replace("#include <begin_vertex>", "#include <begin_vertex>\nvWp = (modelMatrix * vec4(transformed, 1.0)).xyz;");
+  sh.fragmentShader = sh.fragmentShader.replace("#include <common>", "#include <common>\nvarying vec3 vWp; uniform sampler2D detailMap;").replace("#include <map_fragment>", `#include <map_fragment>
+    { vec3 c = diffuseColor.rgb; float green = clamp((c.g - max(c.r, c.b)) * 8., 0., 1.), red = clamp((c.r - c.g) * 6., 0., 1.) * (1. - green), dark = 1. - smoothstep(.2, .34, dot(c, vec3(.333))); // 차도(어두운 회색)는 아스팔트 결
+      float pave = texture2D(detailMap, vWp.xz / 1.2).r, grass = texture2D(detailMap, vWp.xz / 2.7).g, asph = texture2D(detailMap, vWp.xz / 1.7).b;
+      float dt = mix(mix(pave, asph, max(dark, red)), grass, green), fade = 1. - smoothstep(30., 140., distance(vWp, cameraPosition));
+      diffuseColor.rgb *= mix(1., .72 + .55 * dt, fade); }`); };
+const terrain = new THREE.Mesh(tg, terrainMat); terrain.receiveShadow = true; scene.add(terrain);
 // 바깥 땅(안개 속으로 이어짐)
 let edgeH = 0, edgeN = 0; for (let i = 0; i < nx; i++) for (const j of [0, nz - 1]) { edgeH += HD[j * nx + i] / 10; edgeN++; } for (let j = 0; j < nz; j++) for (const i of [0, nx - 1]) { edgeH += HD[j * nx + i] / 10; edgeN++; } edgeH = edgeH / edgeN - H0;
 const landTex = (() => { const c = document.createElement("canvas"); c.width = c.height = 1024; const x = c.getContext("2d"); x.fillStyle = "#a9a385"; x.fillRect(0, 0, 1024, 1024); // 바깥 땅: 숲·동네 얼룩
@@ -442,7 +458,7 @@ const SPORT = SSU.areas.filter(a => a.k.includes(":")).map(a => ({ k: a.k, pts: 
   const base = new THREE.CatmullRomCurve3(MID.map(([x, z]) => new THREE.Vector3(x, 0, z))), GL = base.getLength(), up = new THREE.Vector3(0, 1, 0), arc = [];
   for (let k = 0; k <= 48; k++) { const u = k / 48, p = base.getPointAt(u); p.y = Y(p.x, p.z) + 4.2 + 5.4 * Math.sin(u * Math.PI); arc.push(p); }
   const curve = new THREE.CatmullRomCurve3(arc), shape = new THREE.Shape([new THREE.Vector2(0, -2.6), new THREE.Vector2(.55, -2.6), new THREE.Vector2(.55, 2.6), new THREE.Vector2(0, 2.6)]); // 곡선의 법선=위아래라 두께는 x, 폭은 y
-  const rm = new THREE.Mesh(new THREE.ExtrudeGeometry(shape, { steps: 96, extrudePath: curve }), new THREE.MeshStandardMaterial({ color: 0x6b7075, roughness: .5, metalness: .4 })); rm.castShadow = rm.receiveShadow = true; scene.add(rm);
+  const rm = new THREE.Mesh(new THREE.ExtrudeGeometry(shape, { steps: 96, extrudePath: curve }), new THREE.MeshStandardMaterial({ color: 0x8a9096, roughness: .55, metalness: .25 })); rm.castShadow = rm.receiveShadow = true; scene.add(rm);
   const side = u => { const t = base.getTangentAt(u); let nx = -t.z, nz = t.x; if (nx * -.6 + nz * .8 < 0) { nx = -nx; nz = -nz; } return [nx, nz, t]; }; // 상도로 쪽 (남서)
   for (const u of [.14, .38, .62, .86]) { const sg = u < .5 ? -1 : 1, [nx, nz, t] = side(u), r = curve.getPointAt(u), b0 = base.getPointAt(cl(u - sg * (Math.abs(u - .5) > .25 ? 3.4 : 2.4) / GL, 0, 1)); // 위로 갈수록 바깥으로 기울고 지붕 위로 조금 솟음
     const top = new THREE.Vector3(r.x + t.x * sg * 1.2 + nx * 2.4, r.y + 1.6, r.z + t.z * sg * 1.2 + nz * 2.4), bx = b0.x + nx * 3, bz = b0.z + nz * 3, bot = new THREE.Vector3(bx, Y(bx, bz) - .3, bz);
@@ -558,15 +574,25 @@ const trees = [];
 for (const p of green) { const xs = p.map(q => q[0]), zs = p.map(q => q[1]), [a, b2, c, d] = [Math.min(...xs), Math.max(...xs), Math.min(...zs), Math.max(...zs)], n = Math.min(260, ((b2 - a) * (d - c)) / 90 | 0);
   for (let k = 0; k < n; k++) { const x = lerp(a, b2, rnd()), z = lerp(c, d, rnd()); if (inPoly(x, z, p) && free(x, z) && !inFan(x, z) && !cleared(x, z)) trees.push([x, z]); } }
 for (let k = 0; k < 3500 && trees.length < 2600; k++) { const x = lerp(-330, 330, rnd()), z = lerp(-260, 260, rnd()); if (inPoly(x, z, CAMPUS) && rnd() < .55 && free(x, z) && !inFan(x, z) && !cleared(x, z)) trees.push([x, z]); }
-for (let k = 0; k < 16000 && trees.length < 5000; k++) { const x = lerp(X0, X1, rnd()), z = lerp(Z0, Z1, rnd()); if (isForest(x, z) && free(x, z)) trees.push([x, z]); } // 동네 밖 언덕은 숲
-{ const fol = new THREE.IcosahedronGeometry(1, 1), trunk = new THREE.CylinderGeometry(.12, .18, 1, 6);
-  const F = new THREE.InstancedMesh(fol, new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: .9, flatShading: true }), trees.length), Tk = new THREE.InstancedMesh(trunk, new THREE.MeshStandardMaterial({ color: 0x5a4636 }), trees.length);
-  const mm = new THREE.Matrix4(), q = new THREE.Quaternion(), col = new THREE.Color(), GREENS = ["#55703f", "#6b8448", "#46612f", "#7a8e4c", "#5d7a3e"];
-  trees.forEach(([x, z], i) => { const s = 2.6 + rnd() * 2.6, y = Y(x, z); q.setFromEuler(new THREE.Euler(0, rnd() * 6, 0));
-    mm.compose(new THREE.Vector3(x, y + s * 1.25, z), q, new THREE.Vector3(s, s * 1.15, s)); F.setMatrixAt(i, mm); F.setColorAt(i, col.set(GREENS[i % 5]));
-    mm.compose(new THREE.Vector3(x, y + s * .5, z), q, new THREE.Vector3(s * .9, s, s * .9)); Tk.setMatrixAt(i, mm); });
-  F.castShadow = true; F.receiveShadow = true; Tk.castShadow = true; scene.add(F, Tk); }
+for (let k = 0; k < 30000 && trees.length < 9000; k++) { const x = lerp(X0, X1, rnd()), z = lerp(Z0, Z1, rnd()); if (isForest(x, z) && free(x, z)) trees.push([x, z]); } // 동네 밖 언덕은 숲
+{ // 활엽수 = 줄기 위에 덩어리 셋(가로수·느티나무 느낌), 소나무 = 원뿔 둘. 숲·언덕은 소나무를 더 많이
+  const blob = mergeGeometries([[0, 0, 0, 1], [.55, -.25, .2, .72], [-.45, -.2, -.35, .78], [.1, .35, -.1, .7]].map(([x, y, z, r]) => new THREE.IcosahedronGeometry(r, 1).translate(x, y, z)));
+  const pine = mergeGeometries([new THREE.ConeGeometry(1, 1.1, 7).translate(0, .25, 0), new THREE.ConeGeometry(.75, .9, 7).translate(0, .85, 0), new THREE.ConeGeometry(.45, .7, 7).translate(0, 1.35, 0)]);
+  const leafM = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: .9, flatShading: true }), list = trees.map(([x, z]) => ({ x, z, pine: isForest(x, z) ? rnd() < .55 : rnd() < .18 }));
+  const nP = list.filter(t => t.pine).length, F = new THREE.InstancedMesh(blob, leafM, list.length - nP), P = new THREE.InstancedMesh(pine, leafM, nP), Tk = new THREE.InstancedMesh(new THREE.CylinderGeometry(.1, .16, 1, 6), new THREE.MeshStandardMaterial({ color: 0x5a4636 }), list.length);
+  const mm = new THREE.Matrix4(), q = new THREE.Quaternion(), col = new THREE.Color(), GREENS = ["#6a8f45", "#5b8040", "#7a9a4c", "#4f7a3a", "#86a356", "#62883f"], PINES = ["#3f5f3a", "#4a6b40", "#38553a"];
+  let fi = 0, pi = 0; list.forEach((t, i) => { const y = Y(t.x, t.z); q.setFromEuler(new THREE.Euler(0, rnd() * 6, 0));
+    if (t.pine) { const h = 6 + rnd() * 4, r = h * .28; mm.compose(new THREE.Vector3(t.x, y + 1.6 + h * .3, t.z), q, new THREE.Vector3(r, h * .55, r)); P.setMatrixAt(pi, mm); P.setColorAt(pi++, col.set(PINES[i % 3])); mm.compose(new THREE.Vector3(t.x, y + 1, t.z), q, new THREE.Vector3(1.1, 2, 1.1)); }
+    else { const th = 2.4 + rnd() * 1.8, r = 1.7 + rnd() * 1.5; mm.compose(new THREE.Vector3(t.x, y + th + r * .55, t.z), q, new THREE.Vector3(r, r * .85, r)); F.setMatrixAt(fi, mm); F.setColorAt(fi++, col.set(GREENS[i % 6])); mm.compose(new THREE.Vector3(t.x, y + th / 2 + .3, t.z), q, new THREE.Vector3(1.4, th + .6, 1.4)); }
+    Tk.setMatrixAt(i, mm); });
+  for (const m of [F, P]) { m.castShadow = m.receiveShadow = true; scene.add(m); } Tk.castShadow = true; scene.add(Tk); }
 
+/* ───────── 가로등: 캠퍼스 안 보행로·좁은 길 한쪽 가장자리에 22m마다 ───────── */
+{ const L = []; for (const r of SSU.roads) { if (r.k === "steps" || r.w > 7) continue; const p = pairs(r.p); let acc = 11;
+    for (let i = 1; i < p.length; i++) { const [a, b] = [p[i - 1], p[i]], dx = b[0] - a[0], dz = b[1] - a[1], len = Math.hypot(dx, dz); if (!len) continue;
+      for (; acc < len; acc += 22) { const x = a[0] + dx / len * acc + dz / len * (r.w / 2 + .8), z = a[1] + dz / len * acc - dx / len * (r.w / 2 + .8); if (inPoly(x, z, CAMPUS) && free(x, z) && !inFan(x, z)) L.push([x, z]); } acc -= len; } }
+  const pole = new THREE.InstancedMesh(new THREE.CylinderGeometry(.06, .09, 4.6, 6).translate(0, 2.3, 0), MAT.steel, L.length), head = new THREE.InstancedMesh(new THREE.BoxGeometry(.5, .18, .5).translate(0, 4.65, 0), new THREE.MeshStandardMaterial({ color: 0xf4f1e6, emissive: 0x3a3527 }), L.length), mm = new THREE.Matrix4();
+  L.forEach(([x, z], i) => { mm.makeTranslation(x, Y(x, z), z); pole.setMatrixAt(i, mm); head.setMatrixAt(i, mm); }); pole.castShadow = true; scene.add(pole, head); }
 /* ───────── 구름: 높이 300~420m 층 ───────── */
 const cloudTex = (() => { const c = document.createElement("canvas"); c.width = 512; c.height = 256; const x = c.getContext("2d");
   for (let i = 0; i < 140; i++) { const r = 14 + rnd() * 46, px = 256 + (rnd() - .5) * 380 * (1 - Math.abs(rnd() - .5)), py = 140 + (rnd() - .5) * 70 - r * .3, gr = x.createRadialGradient(px, py, 0, px, py, r); gr.addColorStop(0, `rgba(255,255,255,${.16 + rnd() * .2})`); gr.addColorStop(1, "rgba(255,255,255,0)"); x.fillStyle = gr; x.fillRect(0, 0, 512, 256); }
