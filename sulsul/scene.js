@@ -2,6 +2,8 @@
 // 덩어리(chunk) = [영어, 뜻, 왜 이렇게 말하는지]
 const CAFE = {
   who: "Leo", whoKo: "바리스타", pos: "62% 50%", voices: { them: "m", guest: "f" },
+  // 움직이는 겹: 바리스타를 지운 배경 + 몸(숨 쉬듯) + 손(팔꿈치 축으로 인사) + 앞 메뉴판. 좌표는 원본 2752×1536 기준
+  layers: { w: 2752, h: 1536, plate: "img/scenes/cafe/plate.webp", box: [1560, 340, 430, 455], body: "img/scenes/cafe/body.png", hand: "img/scenes/cafe/hand.png", pivot: [1650, 705], front: ["img/scenes/cafe/menu.png", 1800, 652, 172, 144] },
   overhear: [
     ["them", "Good morning! What can I get for you?"],
     ["guest", "Hi, can I get a hot latte, please?", [["can I get", "~ 주세요", "주문할 때 가장 흔한 말이에요. Give me보다 부드러워요."]]],
@@ -67,10 +69,31 @@ let SC = null;
 const PHASES = ["엿듣기", "내 차례", "수첩"];
 function openScene(sc) {
   SC = { sc, phase: 0, line: 0, turn: 0, log: [], hint: 0, tries: 0, played: false };
-  nav("scene"); $("scbg").src = sc.img; $("scbg").style.objectPosition = sc.pos || "50% 50%";
+  nav("scene"); buildStage(sc);
   $("sctitle").innerHTML = `<time>${sc.time}</time> ${sc.title}`;
   phase(0);
 }
+// 장면 그림: 겹이 있으면 사람만 살짝 움직이고, 없으면 그림 한 장
+function buildStage(sc) {
+  const L2 = sc.layers, el = $("scimg");
+  if (!L2) { el.innerHTML = `<img src="${sc.img}" alt="">`; el.dataset.w = 16; el.dataset.h = 10; return fitStage() }
+  const pc = (v, t) => (100 * v / t) + "%", [bx, by, bw, bh] = L2.box;
+  el.dataset.w = L2.w; el.dataset.h = L2.h;
+  el.innerHTML = `<img src="${L2.plate}" alt="">
+    <div class="breath" style="left:${pc(bx, L2.w)};top:${pc(by, L2.h)};width:${pc(bw, L2.w)};height:${pc(bh, L2.h)}">
+      <img src="${L2.body}" alt=""><img class="handwave" src="${L2.hand}" alt="" style="transform-origin:${pc(L2.pivot[0] - bx, bw)} ${pc(L2.pivot[1] - by, bh)}">
+    </div>
+    ${L2.front ? `<img class="front" src="${L2.front[0]}" alt="" style="left:${pc(L2.front[1], L2.w)};top:${pc(L2.front[2], L2.h)};width:${pc(L2.front[3], L2.w)};height:${pc(L2.front[4], L2.h)}">` : ""}`;
+  fitStage();
+}
+// object-fit: cover 처럼 무대를 꽉 채우되, 사람 쪽(pos)이 보이게
+function fitStage() {
+  const el = $("scimg"), st = el?.parentElement; if (!el || !SC || !st.clientWidth) return;
+  const W = st.clientWidth, H = st.clientHeight, A = el.dataset.w / el.dataset.h, [px, py] = (SC.sc.pos || "50% 50%").split(" ").map(v => parseFloat(v) / 100);
+  const cw = W / H > A ? W : H * A, ch = cw / A;
+  Object.assign(el.style, { width: cw + "px", height: ch + "px", left: (W - cw) * px + "px", top: (H - ch) * py + "px" });
+}
+addEventListener("resize", fitStage);
 function phase(n) {
   SC.phase = n;
   $("scsteps").innerHTML = PHASES.map((p, i) => `<span class="${i === n ? "on" : i < n ? "done" : ""}">${p}</span>`).join("");

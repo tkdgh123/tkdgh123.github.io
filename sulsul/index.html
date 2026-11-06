@@ -103,8 +103,15 @@ label.f { display: grid; gap: 4px; margin-top: 12px; font-size: 15px; font-weigh
 /* 장면 */
 .view.scene { padding: 0 }
 .scstage { position: relative; height: 46vh; min-height: 280px; max-height: 420px; overflow: hidden; background: #e8e2d0 }
-.scstage img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; animation: kenburns 24s ease-in-out infinite alternate }
-@keyframes kenburns { to { transform: scale(1.06) translateX(-1.5%) } }
+.scimg { position: absolute }
+.scimg > img:first-child { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover }
+.scimg .breath, .scimg .front { position: absolute }
+.scimg .breath img { position: absolute; inset: 0; width: 100%; height: 100% }
+/* 사람만 아주 조금: 숨 쉬듯 커졌다 작아지고, 손은 가끔 인사한다 */
+.breath { transform-origin: 50% 100%; animation: breathe 4.8s ease-in-out infinite }
+@keyframes breathe { 0%, 100% { transform: scale(1) } 50% { transform: scale(1.014) } }
+.handwave { animation: handwave 4s ease-in-out infinite }
+@keyframes handwave { 0%, 48%, 100% { transform: rotate(0) } 10% { transform: rotate(-9deg) } 20% { transform: rotate(6deg) } 30% { transform: rotate(-7deg) } 40% { transform: rotate(3deg) } }
 .sctop { position: absolute; left: 0; right: 0; top: 0; display: flex; align-items: center; gap: 10px; padding: 14px 16px }
 .sctop button { width: 40px; height: 40px; border-radius: 50%; background: rgba(250,251,250,.9); font-size: 20px; display: grid; place-items: center }
 .sctop p { margin: 0; padding: 6px 12px; border-radius: 12px; background: rgba(250,251,250,.9); font-weight: 700 }
@@ -383,7 +390,7 @@ canvas { display: block; width: 100%; height: 100% }
   <!-- 장면 -->
   <section class="view scene" id="v-scene" hidden>
     <div class="scstage">
-      <img id="scbg" alt="">
+      <div class="scimg" id="scimg" role="img" aria-label="장면 그림"></div>
       <div class="sctop"><button id="scclose" aria-label="장면 나가기"><i class="ph-bold ph-x"></i></button><p id="sctitle"></p></div>
       <div class="steps" id="scsteps"></div>
       <div class="bubble2" id="scbubble" hidden></div>
