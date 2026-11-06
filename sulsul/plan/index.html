@@ -11,8 +11,8 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
 :root {
-  --bg: #fff; --surface: #f3f3f3; --ink: #0a0a0a; --muted: #5e5e5e;
-  --blue: #2436ff; --red: #ff3b1f; --black: #0a0a0a; --navy: #050a5c;
+  --bg: #f5f6f5; --surface: #e9ebe9; --ink: #17191c; --muted: #5e6168;
+  --blue: #0b6e5b; --red: #f0a23b; --black: #17191c; --navy: #0f2a26;
   --m: clamp(16px, 2.2vw, 32px);
   --small: clamp(.8125rem, .79rem + .1vw, .875rem);
   --body: clamp(1.0625rem, 1rem + .25vw, 1.1875rem);
@@ -44,7 +44,7 @@ h1, h2, h3, p { margin: 0 }
 .bar a:last-child { justify-self: end }
 .band { position: absolute; left: 0; right: 0; top: calc(360px - .5 * var(--fs)); --fs: clamp(150px, 15vw, 230px); height: var(--fs); }
 .band .shot { position: absolute; left: 50%; top: 50%; width: max(272px, 19vw); aspect-ratio: 1; transform: translate(-50%, -50%) }
-.band .shot img { width: 100%; height: 100%; object-fit: cover }
+.band .shot img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) contrast(1.05) }
 .line { position: absolute; inset: 0; z-index: 2; margin: 0; display: flex; white-space: nowrap; font-size: var(--fs); font-weight: 500; font-stretch: 150%; letter-spacing: -.02em; line-height: 1; align-items: center; color: #fff; mix-blend-mode: difference }
 .line span { display: flex; align-items: center; animation: run 38s linear infinite; padding-right: .3em }
 .line span::after { content: ""; width: .3em; height: .3em; border-radius: 50%; background: currentColor; margin-left: .3em; flex: none }
@@ -55,9 +55,9 @@ h1, h2, h3, p { margin: 0 }
 .foot { position: absolute; left: var(--m); right: var(--m); bottom: 40px; display: flex; justify-content: space-between; align-items: center; gap: 16px }
 
 /* 내 이야기: 계단 문장 */
-.stairs { position: relative; min-height: 100svh; background: var(--red); color: #fff; padding: 14svh 4vw 12svh; display: grid; grid-template-columns: 1fr 20vw; gap: 4vw; align-items: start }
+.stairs { position: relative; min-height: 100svh; background: var(--navy); color: #fff; padding: 14svh 4vw 12svh; display: grid; grid-template-columns: 1fr 20vw; gap: 4vw; align-items: start }
 .s p { font-size: clamp(36px, 4.4vw, 64px); font-weight: 800; line-height: 1.02; letter-spacing: -.02em; padding-left: calc(var(--k) * 6vw) }
-.s p:nth-child(odd) { color: var(--black) }
+.s p:nth-child(odd) { color: var(--red) }
 .kept { display: grid; gap: 16px }
 .kept figure { min-width: 0; margin: 0; aspect-ratio: 3 / 2; background: #fff; color: var(--ink); padding: 14px; display: flex; flex-direction: column; justify-content: space-between }
 .kept figcaption { font-size: var(--small); font-weight: 600 }
@@ -65,8 +65,8 @@ h1, h2, h3, p { margin: 0 }
 .call i { background: var(--blue); display: grid; place-items: end start; padding: 6px; color: #fff; font-style: normal; font-size: 12px; font-weight: 600 }
 .call i + i { background: var(--surface); color: var(--ink) }
 .pron { font-size: clamp(26px, 2.6vw, 40px); font-weight: 800; letter-spacing: -.02em }
-.pron s { color: var(--red); text-decoration-thickness: .08em }
-.note { grid-column: 1 / -1; align-self: end; color: var(--ink); font-size: 16px; font-weight: 500; max-width: 36ch; margin-top: 8svh }
+.pron s { color: #c77a12; text-decoration-thickness: .08em }
+.note { grid-column: 1 / -1; align-self: end; color: #fff; font-size: 16px; font-weight: 500; max-width: 36ch; margin-top: 8svh }
 
 /* 하루 10분 */
 .loop { padding: 180px var(--m) 200px }
@@ -275,7 +275,7 @@ h2.st { color: var(--ink); text-transform: none; letter-spacing: -.04em; font-st
   <p class="st rise" style="--i:3" aria-hidden="true">말해 봐.</p>
   <div class="facts">
     <p class="rise">열면 레슨 목록이 아니라 상대의 말이 먼저 나와요. 지난번 내가 한 얘기를 기억해서 이어 물어요. 그 아래엔 막혔던 말 세 개가 오늘 써 볼 말로 올라와 있어요.</p>
-    <p class="rise" style="--i:1">마이크를 켜면 진짜로 들어요. 1.2초 넘게 멈추면 파형에 빨간 칸이 생기고, 써 볼 말을 말하면 위 칸이 채워져요. 옆 화면은 예시라서 대화 상대 없이 파형만 움직여요.</p>
+    <p class="rise" style="--i:1">마이크를 켜면 진짜로 들어요. 1.2초 넘게 멈추면 파형에 주황 칸이 생기고, 써 볼 말을 말하면 위 칸이 채워져요. 옆 화면은 예시라서 대화 상대 없이 파형만 움직여요.</p>
     <a class="open rise" style="--i:2" href="../">술술 열기 →</a>
   </div>
   </div>
@@ -289,8 +289,8 @@ h2.st { color: var(--ink); text-transform: none; letter-spacing: -.04em; font-st
     <div class="cards">
       <article class="card on"><h3>나를 기억하는 상대</h3><img src="../img/cafe.webp" alt="카페 카운터에서 커피를 내주는 바리스타" width="1400" height="934" loading="lazy"><p>어제 한 말을 기억하고 오늘 이어서 물어요. 단골 카페 점원처럼요.</p></article>
       <article class="card"><h3>메워지는 구멍</h3>
-        <div class="gap" aria-label="첫날은 빨간 구멍이 많고 4주 뒤엔 거의 없는 파형"><span>첫날</span><div><b style="--w:3"></b><b class="h" style="--w:2"></b><b style="--w:2"></b><b class="h" style="--w:3"></b><b style="--w:1"></b><b class="h" style="--w:2"></b><b style="--w:2"></b></div><span>4주 뒤</span><div><b style="--w:6"></b><b class="h" style="--w:.6"></b><b style="--w:7"></b><b class="h" style="--w:.4"></b><b style="--w:4"></b></div></div>
-        <p>매주 같은 질문에 다시 답해요. 빨간 구멍이 줄어드는 게 보이고 들려요.</p></article>
+        <div class="gap" aria-label="첫날은 주황 구멍이 많고 4주 뒤엔 거의 없는 파형"><span>첫날</span><div><b style="--w:3"></b><b class="h" style="--w:2"></b><b style="--w:2"></b><b class="h" style="--w:3"></b><b style="--w:1"></b><b class="h" style="--w:2"></b><b style="--w:2"></b></div><span>4주 뒤</span><div><b style="--w:6"></b><b class="h" style="--w:.6"></b><b style="--w:7"></b><b class="h" style="--w:.4"></b><b style="--w:4"></b></div></div>
+        <p>매주 같은 질문에 다시 답해요. 주황 구멍이 줄어드는 게 보이고 들려요.</p></article>
       <article class="card"><h3>바깥 퀘스트</h3><img src="../img/airport.webp" alt="공항 출발 안내판" width="1400" height="933" loading="lazy"><p>4주마다 진짜 사람 앞에서. 영어로 주문, 길 안내, 3분 발표 녹화.</p></article>
       <article class="card"><h3>내 영어 이야기책</h3><img src="../img/diary.webp" alt="손글씨로 채운 오래된 일기장" width="1400" height="933" loading="lazy"><p>한 달 동안 말한 문장이 내 이야기 한 권이 돼요. 내 목소리로 다시 들어요.</p></article>
     </div>

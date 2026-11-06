@@ -10,45 +10,46 @@
 <link href="https://fonts.googleapis.com/css2?family=TikTok+Sans:wdth,wght@75..150,300..900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
-:root { --bg: #fff; --surface: #f3f3f3; --line: #e3e3e3; --ink: #0a0a0a; --muted: #5e5e5e; --blue: #2436ff; --red: #ff3b1f; --navy: #050a5c }
+:root { --bg: #fafbfa; --page: #e9ebe9; --surface: #eff1ef; --line: #dcdfdc; --ink: #17191c; --muted: #62656b; --accent: #0b6e5b; --accent-soft: #dcefe9; --warm: #f0a23b; --warm-ink: #8f5300; --alert: #b4441b; --deep: #0f2a26 }
 * { box-sizing: border-box }
 html, body { margin: 0; min-height: 100% }
-body { background: var(--surface); color: var(--ink); font: 400 17px/1.45 "TikTok Sans", "Pretendard Variable", Pretendard, sans-serif; word-break: keep-all; overflow-wrap: anywhere; -webkit-font-smoothing: antialiased }
+body { background: var(--page); color: var(--ink); font: 400 17px/1.45 "TikTok Sans", "Pretendard Variable", Pretendard, sans-serif; word-break: keep-all; overflow-wrap: anywhere; -webkit-font-smoothing: antialiased }
 button, input, select, textarea { font: inherit; color: inherit }
 button { border: 0; background: none; cursor: pointer; padding: 0 }
 button:disabled { opacity: .4; cursor: default }
-:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px }
 [hidden] { display: none !important }
 .app { max-width: 460px; min-height: 100vh; margin: 0 auto; background: var(--bg); display: flex; flex-direction: column }
 .top { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px 0 }
 .mark { font-weight: 800; font-size: 24px; letter-spacing: -.03em; text-decoration: none; color: var(--ink) }
+.mark::after { content: ""; display: inline-block; width: 7px; height: 7px; margin-left: 3px; border-radius: 50%; background: var(--warm) }
 .day { font-weight: 600; font-size: 15px; color: var(--muted) }
 .view { flex: 1; padding: 14px 20px 24px; display: flex; flex-direction: column }
 h2 { margin: 22px 0 10px; font-size: 15px; font-weight: 700 }
 h2:first-child { margin-top: 6px }
 .big { margin: 10px 0 0; font-size: 28px; line-height: 1.2; font-weight: 800; letter-spacing: -.02em }
 .soft { color: var(--muted); font-size: 15px }
-.btn { display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 0 22px; background: var(--blue); color: #fff; font-weight: 700; transition: transform .12s, background .2s; text-decoration: none }
+.btn { display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 0 22px; background: var(--accent); color: #fff; font-weight: 700; transition: transform .12s, background .2s; text-decoration: none }
 .btn:hover { background: var(--ink) }
 .btn:active { transform: scale(.97) }
 .btn.ghost { background: var(--surface); color: var(--ink) }
 .btn.ghost:hover { background: var(--line) }
 .btn.wide { width: 100% }
-.link { color: var(--blue); font-weight: 700; font-size: 15px }
-.err { color: var(--red); font-weight: 600; font-size: 15px; margin: 8px 0 0 }
+.link { color: var(--accent); font-weight: 700; font-size: 15px }
+.err { color: var(--alert); font-weight: 600; font-size: 15px; margin: 8px 0 0 }
 .err:empty { display: none }
 
 /* 탭 */
 .tabs { position: sticky; bottom: 0; display: grid; grid-template-columns: repeat(5, 1fr); background: var(--bg); border-top: 1px solid var(--line) }
 .tabs button { padding: 12px 0 14px; font-size: 14px; font-weight: 700; color: var(--muted) }
-.tabs button[aria-current=page] { color: var(--ink); box-shadow: inset 0 3px var(--blue) }
-.tabs button i { display: block; font-style: normal; font-size: 12px; font-weight: 600; color: var(--blue); min-height: 1em }
+.tabs button[aria-current=page] { color: var(--ink); box-shadow: inset 0 3px var(--accent) }
+.tabs button i { display: block; font-style: normal; font-size: 12px; font-weight: 600; color: var(--accent); min-height: 1em }
 
 /* 시작 */
 .pick { display: grid; gap: 10px; margin-top: 18px }
 .pick button { text-align: left; padding: 18px; background: var(--surface); transition: background .2s }
 .pick button:hover { background: var(--line) }
-.pick button[aria-pressed=true] { background: var(--blue); color: #fff }
+.pick button[aria-pressed=true] { background: var(--accent); color: #fff }
 .pick b { display: block; font-size: 20px; font-weight: 800 }
 .pick span { font-size: 15px; opacity: .85 }
 label.f { display: grid; gap: 4px; margin-top: 12px; font-size: 15px; font-weight: 600 }
@@ -57,28 +58,28 @@ label.f { display: grid; gap: 4px; margin-top: 12px; font-size: 15px; font-weigh
 
 /* 오늘 */
 .who { display: flex; align-items: center; gap: 12px }
-.face { width: 44px; height: 44px; border-radius: 50%; background: var(--blue); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 20px; flex: none }
+.face { width: 44px; height: 44px; border-radius: 50%; background: var(--accent); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 20px; flex: none }
 .who b { display: block; font-size: 18px }
 .who span { font-size: 14px; color: var(--muted) }
 .scenes { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin: 14px -20px 0; padding: 0 20px }
 .scenes button { flex: none; padding: 8px 12px; background: var(--surface); font-size: 15px; font-weight: 600 }
-.scenes button[aria-pressed=true] { background: var(--ink); color: #fff }
+.scenes button[aria-pressed=true] { background: var(--accent); color: #fff }
 .say { margin: 14px 0 0; font-size: 23px; line-height: 1.25; font-weight: 600; letter-spacing: -.01em; min-height: 2.5em }
 .say.wait { color: var(--muted) }
 .ko { margin: 6px 0 0; font-size: 16px; color: var(--muted) }
 .ko:empty { display: none }
 .sub { display: flex; gap: 14px; margin-top: 8px }
-.sub button { font-size: 15px; font-weight: 700; color: var(--blue) }
+.sub button { font-size: 15px; font-weight: 700; color: var(--accent) }
 .chips { display: grid; gap: 8px }
 .chip { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 11px 14px; background: var(--surface); transition: background .3s, color .3s }
 .chip > div { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px }
 .chip b { font-size: 17px; font-weight: 650 }
 .chip span { font-size: 14px; color: var(--muted) }
 .dots { display: flex; gap: 5px; flex: none }
-.dots::before, .dots::after { content: ""; width: 10px; height: 10px; border-radius: 50%; background: #cfcfcf }
-[data-n="1"] .dots::before, [data-n="2"] .dots::before, [data-n="2"] .dots::after { background: var(--blue) }
-.chip[data-n="2"] { background: var(--blue); color: #fff }
-.chip[data-n="2"] span { color: #dfe2ff }
+.dots::before, .dots::after { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--line) }
+[data-n="1"] .dots::before, [data-n="2"] .dots::before, [data-n="2"] .dots::after { background: var(--accent) }
+.chip[data-n="2"] { background: var(--accent); color: #fff }
+.chip[data-n="2"] span { color: #d2ece5 }
 .chip[data-n="2"] .dots::before, .chip[data-n="2"] .dots::after { background: #fff }
 .chip.hit { animation: hit .5s }
 @keyframes hit { 40% { transform: scale(1.03) } }
@@ -86,74 +87,75 @@ label.f { display: grid; gap: 4px; margin-top: 12px; font-size: 15px; font-weigh
 .wave { margin-top: 16px; height: 64px; background: var(--surface) }
 canvas { display: block; width: 100%; height: 100% }
 .heard { margin: 8px 0 0; min-height: 2.9em; font-size: 16px; line-height: 1.45 }
-.heard em { font-style: normal; color: var(--red); font-weight: 700 }
+.heard em { font-style: normal; color: var(--warm-ink); background: #fbe7c4; padding: 0 3px; font-weight: 700 }
 .heard i { font-style: normal; color: var(--muted) }
 .go { margin-top: auto; padding-top: 10px; display: flex; align-items: center; gap: 14px }
-.mic { width: 76px; height: 76px; border-radius: 50%; background: var(--ink); color: #fff; display: grid; place-items: center; flex: none; transition: transform .15s, background .2s }
+.mic { width: 76px; height: 76px; border-radius: 50%; background: var(--accent); color: #fff; display: grid; place-items: center; flex: none; transition: transform .15s, background .2s }
 .mic:hover { transform: scale(1.05) }
 .mic:active { transform: scale(.96) }
 .mic svg { width: 30px; height: 30px }
 .mic .cut { transition: opacity .2s }
-.live .mic { background: var(--red) }
+.live .mic { background: var(--accent); animation: ring 1.6s ease-out infinite }
+@keyframes ring { from { box-shadow: 0 0 0 0 rgba(11, 110, 91, .45) } to { box-shadow: 0 0 0 18px rgba(11, 110, 91, 0) } }
 .live .mic .cut { opacity: 0 }
 .go .st b { display: block; font-size: 20px; font-weight: 800 }
 .go .st span { font-size: 15px; color: var(--muted); font-variant-numeric: tabular-nums }
 .go .side { margin-left: auto; display: grid; gap: 8px; justify-items: end }
-.go .side button { font-size: 15px; font-weight: 700; color: var(--blue) }
+.go .side button { font-size: 15px; font-weight: 700; color: var(--accent) }
 .type { display: flex; gap: 8px; margin-top: 10px }
 .type input { flex: 1; min-width: 0; padding: 12px; border: 0; background: var(--surface); font-size: 16px }
-.result { margin-top: 14px; padding: 16px; background: var(--navy); color: #fff; display: grid; gap: 8px }
+.result { margin-top: 14px; padding: 16px; background: var(--deep); color: #fff; display: grid; gap: 8px }
 .result b { font-size: 20px }
 .result .btn { background: #fff; color: var(--ink) }
 
 /* 연습 */
 .card { padding: 18px; background: var(--surface); margin-top: 10px }
 .card .k { font-size: 20px; font-weight: 700 }
-.card .e { margin-top: 8px; font-size: 22px; font-weight: 700; color: var(--blue) }
+.card .e { margin-top: 8px; font-size: 22px; font-weight: 700; color: var(--accent) }
 .card .e[hidden] { display: none }
 .card .meta { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; font-size: 14px; color: var(--muted) }
 .tools { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px }
-.tools button { padding: 10px 14px; background: var(--bg); color: var(--blue); font-weight: 700; font-size: 15px }
-.tools button.on { background: var(--red); color: #fff }
+.tools button { padding: 10px 14px; background: var(--bg); color: var(--accent); font-weight: 700; font-size: 15px }
+.tools button.on { background: var(--warm); color: var(--ink) }
 .score { margin: 10px 0 0; font-weight: 600 }
 .score:empty { display: none }
-.score.ok { color: var(--blue) }
-.score.no { color: var(--red) }
-.score s { color: var(--red) }
+.score.ok { color: var(--accent) }
+.score.no { color: var(--alert) }
+.score s { color: var(--alert) }
 .grad { margin-top: 26px; font-size: 15px; color: var(--muted) }
 
 /* 발음 */
 .pchips { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin: 0 -20px 12px; padding: 0 20px }
 .pchips button { flex: none; padding: 8px 12px; background: var(--surface); font-weight: 600; font-size: 15px; color: var(--muted) }
-.pchips button[aria-pressed=true] { background: var(--ink); color: #fff }
+.pchips button[aria-pressed=true] { background: var(--accent); color: #fff }
 .pbar { height: 6px; background: var(--line); margin-bottom: 12px }
-.pbar i { display: block; height: 100%; width: 0; background: var(--blue); transition: width .3s }
+.pbar i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .3s }
 .pcard { background: var(--surface); padding: 24px 20px 20px }
-.tag { display: inline-block; padding: 3px 10px; background: var(--ink); color: #fff; font-weight: 700; font-size: 14px }
+.tag { display: inline-block; padding: 3px 10px; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 14px }
 .word { margin: 16px 0 2px; font-size: clamp(40px, 12vw, 58px); font-weight: 800; letter-spacing: -.03em; line-height: 1.05 }
-.word s { text-decoration: none; color: var(--red); opacity: .5 }
-.ask { display: block; width: 100%; margin-top: 22px; padding: 16px; background: var(--blue); color: #fff; font-weight: 700; font-size: 18px }
+.word s { text-decoration: none; color: var(--warm) }
+.ask { display: block; width: 100%; margin-top: 22px; padding: 16px; background: var(--accent); color: #fff; font-weight: 700; font-size: 18px }
 .ans { margin-top: 18px; display: grid; gap: 12px }
-.wrong { color: var(--red); font-size: 19px; font-weight: 600 }
+.wrong { color: var(--alert); font-size: 19px; font-weight: 600 }
 .right { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 14px }
 .right strong { font-size: 34px; font-weight: 500; letter-spacing: -.02em }
-.right strong b { font-weight: 850; color: var(--blue) }
+.right strong b { font-weight: 850; color: var(--accent) }
 .ipa { font-size: 16px; color: var(--muted) }
 .tip { margin: 0; padding: 12px 14px; background: var(--bg); font-weight: 500 }
 .next { display: grid; grid-template-columns: 1fr 1fr; gap: 8px }
 .next button { padding: 15px; font-weight: 700; font-size: 17px; background: var(--bg) }
-.next button + button { background: var(--blue); color: #fff }
+.next button + button { background: var(--accent); color: #fff }
 .pcount { margin-top: 10px; font-size: 14px; color: var(--muted) }
 
 /* 기록 */
 .chart { display: flex; align-items: flex-end; gap: 6px; height: 140px; padding-top: 10px }
 .chart div { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; font-size: 12px; color: var(--muted) }
-.chart i { width: 100%; background: var(--red); min-height: 3px }
+.chart i { width: 100%; background: var(--warm); min-height: 3px }
 .sess { margin-top: 8px; background: var(--surface) }
 .sess summary { padding: 12px 14px; cursor: pointer; display: flex; justify-content: space-between; gap: 10px; font-weight: 600 }
 .sess summary span { color: var(--muted); font-weight: 400; font-size: 15px }
 .sess ol { margin: 0; padding: 0 14px 14px 32px; display: grid; gap: 6px; font-size: 15px }
-.sess li.me { color: var(--blue) }
+.sess li.me { color: var(--accent) }
 
 @media (min-width: 700px) { .app { margin-top: 24px; margin-bottom: 24px; min-height: calc(100vh - 48px) } }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important } }
@@ -204,7 +206,7 @@ canvas { display: block; width: 100%; height: 100% }
     <div class="sub" id="lsub" hidden><button id="again">다시 듣기</button><button id="tr">한국어로 보기</button></div>
     <h2>오늘 다시 써 볼 말</h2>
     <div class="chips" id="chips"></div>
-    <div class="wave" id="wave"><canvas id="cv" aria-label="내 목소리 파형, 멈춘 곳은 빨간 칸"></canvas></div>
+    <div class="wave" id="wave"><canvas id="cv" aria-label="내 목소리 파형, 멈춘 곳은 주황 칸"></canvas></div>
     <p class="heard" id="heard" aria-live="polite"></p>
     <form class="type" id="typed" hidden><input id="tin" placeholder="영어로 쓰기 (한국어 섞어도 돼요)" autocomplete="off" lang="en"><button class="btn" style="min-height:44px;padding:0 16px">보내기</button></form>
     <div class="result" id="result" hidden></div>
@@ -436,7 +438,7 @@ function speak(text, rate = .95) {
     speechSynthesis.speak(u);
   });
 }
-// 파형: 막대 하나 = 1/30초. 말한 뒤 1.2초 넘게 조용하면 빨간 칸(멈춤)
+// 파형: 막대 하나 = 1/30초. 말한 뒤 1.2초 넘게 조용하면 주황 칸(멈춤)
 const cv = $("cv"), g = cv.getContext("2d");
 let bars = [], listening = false, stream, actx, meter;
 function size() { const r = cv.getBoundingClientRect(); if (!r.width) return; const d = devicePixelRatio || 1; cv.width = r.width * d; cv.height = r.height * d; g.setTransform(d, 0, 0, d, 0, 0); draw() }
@@ -445,10 +447,10 @@ function draw() {
   const w = cv.clientWidth, h = cv.clientHeight, step = 4, vis = bars.slice(-Math.floor(w / step));
   g.clearRect(0, 0, w, h);
   vis.forEach((b, i) => {
-    if (b.gap) { g.fillStyle = "#ff3b1f"; g.fillRect(i * step, 0, step, h) }
-    else { const bh = Math.max(3, b.v * h * .9); g.fillStyle = "#0a0a0a"; g.fillRect(i * step + 1, (h - bh) / 2, step - 2, bh) }
+    if (b.gap) { g.fillStyle = "#f0a23b"; g.fillRect(i * step, 0, step, h) }
+    else { const bh = Math.max(3, b.v * h * .9); g.fillStyle = "#17191c"; g.fillRect(i * step + 1, (h - bh) / 2, step - 2, bh) }
   });
-  g.fillStyle = "#fff"; g.font = "700 14px 'TikTok Sans', sans-serif"; g.textBaseline = "middle";
+  g.fillStyle = "#17191c"; g.font = "700 14px 'TikTok Sans', sans-serif"; g.textBaseline = "middle";
   vis.forEach((b, i) => { if (b.gap && !vis[i - 1]?.gap) { let j = i; while (vis[j]?.gap) j++; if ((j - i) * step > 34) g.fillText("uhm", i * step + 6, h / 2) } });
 }
 let quiet = 0, spoke = false, gapOpen = false;
