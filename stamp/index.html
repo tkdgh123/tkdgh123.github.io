@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>뒤집기 도장</title>
-<meta name="description" content="찍으면 칸이 뒤집히는 도장으로 한 줄을 잉크로 채워 지우는 퍼즐">
+<meta name="description" content="빈칸에 찍으면 잉크, 잉크에 찍으면 지워지는 도장으로 줄을 채우는 퍼즐. 찍을 곳이 없으면 끝">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
-:root { --bg: #1d2232; --bg2: #262c40; --paper: #f3f4f6; --ink: #2f45b8; --on: #eef0f6; --soft: #9aa1b6; --red: #e0574c }
+:root { --bg: #1d2232; --paper: #f3f4f6; --ink: #2f45b8; --on: #eef0f6; --soft: #9aa1b6; --red: #e0574c }
 * { box-sizing: border-box }
 html, body { height: 100% }
 body { margin: 0; background: radial-gradient(120% 70% at 50% 0, #2a3150, var(--bg) 70%); color: var(--on); font: 500 16px/1.4 "Pretendard Variable", Pretendard, system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow: hidden; -webkit-user-select: none; user-select: none }
@@ -18,17 +18,14 @@ body { margin: 0; background: radial-gradient(120% 70% at 50% 0, #2a3150, var(--
 .score { text-align: center; line-height: 1 }
 .score b { display: block; font-weight: 800; font-size: 42px; font-variant-numeric: tabular-nums; letter-spacing: -.02em }
 .score span { font-size: 13px; color: var(--soft) }
-.left { justify-self: end; text-align: right; line-height: 1 }
-.left b { display: inline-flex; align-items: center; gap: 6px; font-size: 26px; font-weight: 800; font-variant-numeric: tabular-nums }
-.left b::before { content: ""; width: 14px; height: 18px; border-radius: 4px 4px 2px 2px; background: var(--on); box-shadow: 0 6px 0 -2px var(--on); transform: translateY(-3px) }
-.left span { display: block; font-size: 12px; color: var(--soft); margin-top: 4px }
-.left.low b { color: var(--red) } .left.low b::before { background: var(--red); box-shadow: 0 6px 0 -2px var(--red) }
-.left .gain { position: absolute; right: 100%; margin-right: 10px; top: 2px; font-size: 22px; font-weight: 800; color: #8fa2ff; animation: gain .8s forwards; pointer-events: none }
-@keyframes gain { to { transform: translateY(-18px); opacity: 0 } }
+.combo { justify-self: end; font-weight: 800; font-size: 20px; color: #8fa2ff; opacity: 0; transition: opacity .25s, transform .25s; transform: scale(.8) }
+.combo.on { opacity: 1; transform: none }
 .stage { flex: 1; min-height: 0; display: grid; place-items: center }
 .board { position: relative }
 canvas { display: block; touch-action: none }
-.ov { position: absolute; inset: 0 0 auto; display: grid; place-content: center; justify-items: center; text-align: center; gap: 14px; padding: 24px; background: rgb(29 34 50 / .8); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); border-radius: 16px; transition: opacity .3s }
+.tip { position: absolute; left: 50%; top: 12px; transform: translateX(-50%); width: max-content; max-width: calc(100% - 24px); padding: 9px 16px; border-radius: 20px; background: var(--bg); color: var(--on); font-weight: 700; font-size: 15px; text-align: center; box-shadow: 0 8px 20px -8px rgb(0 0 0 / .5); pointer-events: none; transition: opacity .25s }
+.tip[hidden] { display: block; opacity: 0 }
+.ov { position: absolute; inset: 0 0 auto; display: grid; place-content: center; justify-items: center; text-align: center; gap: 14px; padding: 24px; background: rgb(29 34 50 / .84); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); border-radius: 16px; transition: opacity .3s }
 .ov[hidden] { display: grid; opacity: 0; pointer-events: none }
 .ov h1 { margin: 0; font-weight: 800; font-size: clamp(40px, 11vw, 58px); letter-spacing: -.04em; line-height: 1 }
 .ov h1 span { display: inline-block; padding: 0 .12em; color: var(--paper); background: var(--ink); border-radius: 8px; transform: rotate(-4deg) }
@@ -37,6 +34,7 @@ canvas { display: block; touch-action: none }
 .ov button { margin-top: 10px; min-width: 160px; min-height: 52px; border: 0; border-radius: 26px; background: var(--paper); color: var(--bg); font: 800 17px Pretendard, system-ui, sans-serif; cursor: pointer; transition: transform .15s }
 .ov button:active { transform: scale(.96) }
 .ov button:focus-visible { outline: 2px solid var(--on); outline-offset: 3px }
+.ov .link { margin: 0; min-height: 0; min-width: 0; background: none; color: var(--soft); font-weight: 600; font-size: 14px; text-decoration: underline; text-underline-offset: 4px }
 </style>
 </head>
 <body>
@@ -44,42 +42,44 @@ canvas { display: block; touch-action: none }
   <header class="top">
     <a class="back" href="../">← 창업실</a>
     <div class="score"><b id="score">0</b><span id="best">최고 0</span></div>
-    <div class="left" id="left" style="position:relative"><b id="stamps">15</b><span>남은 도장</span></div>
+    <div class="combo" id="combo"></div>
   </header>
   <div class="stage" id="stage"><div class="board">
     <canvas id="cv" aria-label="뒤집기 도장 판"></canvas>
-    <div class="ov" id="ov">
-      <h1>뒤집기 <span>도장</span></h1>
-      <p>찍은 칸은 뒤집혀요. 한 줄을 잉크로 채우면 지워지고 도장 2개를 돌려받아요</p>
-      <button id="go">시작</button>
-    </div>
+    <div class="tip" id="tip" hidden></div>
+    <div class="ov" id="ov"></div>
   </div></div>
 </main>
 <script>
-const N = 8, START = 15, GIVE = 2;
-const C = { paper: "#f3f4f6", dot: "#d8dbe3", ink: "#2f45b8", inkHi: "#6d82f0" };
+const N = 8;
+const C = { paper: "#f3f4f6", dot: "#d8dbe3", ink: "#2f45b8", inkHi: "#6d82f0", red: "#e0574c" };
 const $ = id => document.getElementById(id);
 const cv = $("cv"), ctx = cv.getContext("2d");
 
-// 조각: 기본 모양 14개를 돌려서 겹치지 않는 33개
-const BASE = [[[0,0]],[[0,0],[1,0]],[[0,0],[1,0],[2,0]],[[0,0],[1,0],[2,0],[3,0]],[[0,0],[1,0],[2,0],[3,0],[4,0]],
+// 조각: 기본 모양 13개(한 칸짜리 없음)를 돌려서 겹치지 않는 것만
+const BASE = [[[0,0],[1,0]],[[0,0],[1,0],[2,0]],[[0,0],[1,0],[2,0],[3,0]],[[0,0],[1,0],[2,0],[3,0],[4,0]],
   [[0,0],[1,0],[0,1],[1,1]],[[0,0],[1,0],[2,0],[0,1],[1,1],[2,1],[0,2],[1,2],[2,2]],[[0,0],[1,0],[2,0],[0,1],[1,1],[2,1]],
   [[0,0],[0,1],[1,1]],[[0,0],[0,1],[0,2],[1,2]],[[1,0],[1,1],[1,2],[0,2]],[[0,0],[1,0],[2,0],[1,1]],[[1,0],[2,0],[0,1],[1,1]],[[0,0],[1,0],[1,1],[2,1]]];
 const norm = c => { const mx = Math.min(...c.map(p => p[0])), my = Math.min(...c.map(p => p[1])); return c.map(([x, y]) => [x - mx, y - my]).sort((a, b) => a[1] - b[1] || a[0] - b[0]) };
 const SHAPES = [], seen = new Set();
 for (const b of BASE) { let c = b; for (let r = 0; r < 4; r++) { c = norm(c.map(([x, y]) => [-y, x])); const k = JSON.stringify(c); if (!seen.has(k)) { seen.add(k); SHAPES.push(c) } } }
 const wOf = s => Math.max(...s.map(p => p[0])) + 1, hOf = s => Math.max(...s.map(p => p[1])) + 1;
+const rndShape = () => SHAPES[Math.random() * SHAPES.length | 0];
 
-let grid, hand, score = 0, stamps = START, playing = false, best = 0;
-let S = 40, TRAY = 0, drag = null, fx = [], pops = [], flash = [];
+let grid, hand, score = 0, combo = 0, since = 0, playing = false, best = 0, tut = 0, target = null;
+let S = 40, TRAY = 0, drag = null, fx = [], pops = [], flash = [], texts = [];
 try { best = +localStorage.getItem("stamp-best") || 0 } catch {}
 $("best").textContent = "최고 " + best;
 
-const newHand = () => hand = [0, 1, 2].map(() => SHAPES[Math.random() * SHAPES.length | 0]);
-function newBoard() {
-  grid = new Array(N * N).fill(0);
-  for (let k = 0; k < 14; k++) grid[Math.random() * N * N | 0] = 1;
-  newHand();
+// 규칙: 전부 빈칸이거나 전부 잉크인 자리에만 찍을 수 있다
+function canPlace(s, gx, gy) {
+  if (gx < 0 || gy < 0 || gx + wOf(s) > N || gy + hOf(s) > N) return false;
+  const v = grid[(gy + s[0][1]) * N + gx + s[0][0]];
+  return s.every(([x, y]) => grid[(gy + y) * N + gx + x] === v);
+}
+function fitsAnywhere(s) {
+  for (let gy = 0; gy <= N - hOf(s); gy++) for (let gx = 0; gx <= N - wOf(s); gx++) if (canPlace(s, gx, gy)) return true;
+  return false;
 }
 // 이 자리에 찍으면: 뒤집힌 판과 지워질 줄
 function tryPlace(s, gx, gy) {
@@ -94,6 +94,7 @@ function tryPlace(s, gx, gy) {
   return { g, rows, cols };
 }
 
+const LINE = [0, 10, 30, 60, 100, 150, 210];
 function place(i, gx, gy) {
   const s = hand[i], { g, rows, cols } = tryPlace(s, gx, gy), now = performance.now();
   for (const [x, y] of s) fx.push({ x: gx + x, y: gy + y, to: g[(gy + y) * N + gx + x], t0: now });
@@ -104,26 +105,27 @@ function place(i, gx, gy) {
   rows.forEach(r => flash.push({ r, t0: now + 80 })); cols.forEach(c => flash.push({ c, t0: now + 80 }));
   grid = g; hand[i] = null;
   const n = rows.length + cols.length;
-  score += s.length + n * n * 40;
-  stamps -= 1;
+  let pts = s.length;
   if (n) {
-    const gain = n * GIVE + (n > 1 ? n - 1 : 0);
-    stamps += gain;
-    const el = document.createElement("i"); el.className = "gain"; el.textContent = "+" + gain;
-    $("left").append(el); setTimeout(() => el.remove(), 800);
+    combo++; since = 0;
+    const got = LINE[Math.min(n, 6)] * combo;
+    pts += got;
+    let cx = 0, cy = 0; cleared.forEach(k => { cx += k % N; cy += k / N | 0 });
+    texts.push({ x: cx / cleared.size, y: cy / cleared.size, s: "+" + got, sub: combo > 1 ? "콤보 ×" + combo : n > 1 ? n + "줄" : "", t0: now + 150 });
     try { navigator.vibrate && navigator.vibrate(n > 1 ? [20, 40, 30] : 20) } catch {}
-  }
+  } else if (++since >= 3) combo = 0;
+  score += pts;
   $("score").textContent = score;
-  $("stamps").textContent = stamps;
-  $("left").classList.toggle("low", stamps <= 3);
-  if (hand.every(h => !h)) newHand();
-  if (stamps <= 0) setTimeout(end, 650);
+  $("combo").textContent = "콤보 ×" + combo;
+  $("combo").classList.toggle("on", combo > 1);
+  if (tut) return tutNext();
+  if (hand.every(h => !h)) hand = [rndShape(), rndShape(), rndShape()];
+  if (!hand.some(h => h && fitsAnywhere(h))) { playing = false; setTimeout(end, 900) }
 }
 
 // 그리기
 let grain;
 function makeGrain() {
-  // 도장 잉크 결: 고르지 않은 점
   const c = document.createElement("canvas"); c.width = c.height = 64;
   const g = c.getContext("2d");
   for (let i = 0; i < 420; i++) { g.fillStyle = `rgb(255 255 255 / ${Math.random() * .16})`; g.fillRect(Math.random() * 64, Math.random() * 64, 1.4, 1.4) }
@@ -138,6 +140,7 @@ function inkCell(x, y, s, a = 1, k = 1, col = C.ink) {
   ctx.fillStyle = "rgb(255 255 255 / .1)"; rr(x + o, y + o, w, w * .18, [s * .14, s * .14, 0, 0]); ctx.fill();
   ctx.globalAlpha = 1;
 }
+// 끌고 있는 조각이 놓일 칸(판 밖이면 null)과 놓을 수 있는지
 function hoverCell() {
   if (!drag) return null;
   const s = hand[drag.i], w = wOf(s), h = hOf(s);
@@ -145,15 +148,15 @@ function hoverCell() {
   let gx = Math.round(left / S), gy = Math.round(top / S);
   if (gx < -1 || gy < -1 || gx > N - w + 1 || gy > N - h + 1) return null;
   gx = Math.max(0, Math.min(N - w, gx)); gy = Math.max(0, Math.min(N - h, gy));
-  return { gx, gy, left, top };
+  const ok = canPlace(s, gx, gy) && (!target || (gx === target.gx && gy === target.gy));
+  return { gx, gy, ok };
 }
 function slotRect(i) { const w = N * S / 3; return [i * w, N * S + S * .5, w, TRAY] }
 function draw(now) {
   const W = N * S;
   ctx.clearRect(0, 0, cv.width, cv.height);
-  // 종이 판
   ctx.fillStyle = C.paper; rr(0, 0, W, W, 16); ctx.fill();
-  const hv = hoverCell(), pre = hv && tryPlace(hand[drag.i], hv.gx, hv.gy);
+  const hv = hoverCell(), pre = hv && hv.ok && tryPlace(hand[drag.i], hv.gx, hv.gy);
   const willClear = new Set();
   if (pre) { pre.rows.forEach(r => { for (let j = 0; j < N; j++) willClear.add(r * N + j) }); pre.cols.forEach(c => { for (let j = 0; j < N; j++) willClear.add(j * N + c) }) }
   for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
@@ -168,9 +171,14 @@ function draw(now) {
     else if (grid[k]) inkCell(X, Y, S);
     else { ctx.fillStyle = C.dot; ctx.beginPath(); ctx.arc(X + S / 2, Y + S / 2, Math.max(1.5, S * .045), 0, 7); ctx.fill() }
   }
-  // 놓을 자리 미리보기: 잉크가 될 칸은 옅은 잉크, 하얗게 될 칸은 구멍
-  if (pre) for (const [x, y] of hand[drag.i]) {
+  // 따라 하기: 찍을 자리를 깜빡여 보여 준다
+  if (target && !drag) {
+    ctx.strokeStyle = `rgb(224 87 76 / ${.55 + .45 * Math.sin(now / 180)})`; ctx.lineWidth = 3;
+    for (const [x, y] of hand[target.i] || []) { rr((target.gx + x) * S + 3, (target.gy + y) * S + 3, S - 6, S - 6, S * .16); ctx.stroke() }
+  }
+  if (hv) for (const [x, y] of hand[drag.i]) {
     const X = (hv.gx + x) * S, Y = (hv.gy + y) * S;
+    if (!hv.ok) { ctx.strokeStyle = C.red; ctx.lineWidth = 3; rr(X + 4, Y + 4, S - 8, S - 8, S * .14); ctx.stroke(); continue }
     if (willClear.has((hv.gy + y) * N + hv.gx + x)) continue;
     if (grid[(hv.gy + y) * N + hv.gx + x]) { ctx.fillStyle = C.paper; rr(X + S * .22, Y + S * .22, S * .56, S * .56, S * .1); ctx.fill() }
     else inkCell(X, Y, S, .38);
@@ -184,11 +192,22 @@ function draw(now) {
   pops = pops.filter(p => now - p.t0 < 360);
   for (const p of pops) { const t = (now - p.t0) / 360; if (t < 0) { inkCell(p.x * S, p.y * S, S); continue } inkCell(p.x * S, p.y * S - t * S * .3, S, 1 - t, 1 + .3 * t) }
   fx = fx.filter(e => now - e.t0 < 260);
-  // 조각 칸
+  texts = texts.filter(t => now - t.t0 < 1000);
+  for (const t of texts) {
+    const k = (now - t.t0) / 1000; if (k < 0) continue;
+    const X = Math.min(W - S * 1.4, Math.max(S * 1.4, (t.x + .5) * S)), Y = (t.y + .5) * S - k * S * .6;
+    ctx.globalAlpha = k < .7 ? 1 : 1 - (k - .7) / .3;
+    ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.lineJoin = "round";
+    ctx.font = `800 ${S * .72}px Pretendard, system-ui, sans-serif`;
+    ctx.lineWidth = 6; ctx.strokeStyle = C.paper; ctx.strokeText(t.s, X, Y); ctx.fillStyle = C.ink; ctx.fillText(t.s, X, Y);
+    if (t.sub) { ctx.font = `800 ${S * .4}px Pretendard, system-ui, sans-serif`; ctx.strokeText(t.sub, X, Y + S * .6); ctx.fillStyle = C.red; ctx.fillText(t.sub, X, Y + S * .6) }
+    ctx.globalAlpha = 1;
+  }
+  // 조각 칸: 어디에도 못 찍는 조각은 흐리게
   for (let i = 0; i < 3; i++) {
     const s = hand[i]; if (!s || (drag && drag.i === i)) continue;
-    const [sx, sy, sw, sh] = slotRect(i), cs = S * .5, w = wOf(s) * cs, h = hOf(s) * cs;
-    for (const [x, y] of s) inkCell(sx + (sw - w) / 2 + x * cs, sy + (sh - h) / 2 + y * cs, cs);
+    const [sx, sy, sw, sh] = slotRect(i), cs = S * .5, w = wOf(s) * cs, h = hOf(s) * cs, a = fitsAnywhere(s) ? 1 : .28;
+    for (const [x, y] of s) inkCell(sx + (sw - w) / 2 + x * cs, sy + (sh - h) / 2 + y * cs, cs, a);
   }
   if (drag) {
     const s = hand[drag.i], w = wOf(s), h = hOf(s);
@@ -230,25 +249,65 @@ cv.addEventListener("pointerup", () => {
   if (!drag) return;
   const hv = hoverCell(), i = drag.i;
   drag = null;
-  if (hv && playing) place(i, hv.gx, hv.gy);
+  if (hv && hv.ok && playing) place(i, hv.gx, hv.gy);
 });
 cv.addEventListener("pointercancel", () => drag = null);
 
+// 처음 한 번: 두 수를 따라 해 보며 규칙을 익힌다
+const H3 = [[0, 0], [1, 0], [2, 0]], O2 = [[0, 0], [1, 0], [0, 1], [1, 1]];
+function tip(t) { $("tip").textContent = t || ""; $("tip").hidden = !t }
+function tutStep(n) {
+  tut = n; grid = new Array(N * N).fill(0);
+  if (n === 1) {
+    [0, 1, 5, 6, 7].forEach(x => grid[4 * N + x] = 1);
+    hand = [null, H3, null]; target = { i: 1, gx: 2, gy: 4 };
+    tip("빈칸에 찍으면 잉크. 한 줄을 채우면 지워져요");
+  } else {
+    [[2, 2], [3, 2], [2, 3], [3, 3], [5, 5], [6, 5], [5, 6], [6, 6]].forEach(([x, y]) => grid[y * N + x] = 1);
+    hand = [null, O2, null]; target = { i: 1, gx: 2, gy: 2 };
+    tip("잉크 위에 찍으면 거꾸로 지워져요");
+  }
+}
+function tutNext() {
+  if (tut === 1) return setTimeout(() => tutStep(2), 900);
+  tut = 0; target = null; playing = false;
+  try { localStorage.setItem("stamp-tut", 1) } catch {}
+  setTimeout(() => {
+    tip("");
+    menu(`<p style="color:var(--on);font-weight:700">빈칸과 잉크가 섞인 자리엔 못 찍어요.<br>찍을 곳이 없으면 끝나요.</p><button id="go">시작</button>`);
+  }, 900);
+}
+
+function reset() {
+  score = 0; combo = 0; since = 0; fx = []; pops = []; flash = []; texts = [];
+  $("score").textContent = 0; $("combo").classList.remove("on");
+}
 function start() {
-  newBoard(); score = 0; stamps = START; fx = []; pops = []; flash = [];
-  $("score").textContent = 0; $("stamps").textContent = stamps; $("left").classList.remove("low");
+  reset(); tut = 0; target = null; tip("");
+  grid = new Array(N * N).fill(0);
+  hand = [rndShape(), rndShape(), rndShape()];
   $("ov").hidden = true; playing = true;
+}
+function lesson() { reset(); tutStep(1); $("ov").hidden = true; playing = true }
+function menu(html) {
+  $("ov").innerHTML = html; $("ov").hidden = false;
+  $("go").onclick = start;
+  if ($("how")) $("how").onclick = lesson;
 }
 function end() {
   playing = false; drag = null;
   if (score > best) { best = score; try { localStorage.setItem("stamp-best", best) } catch {} }
   $("best").textContent = "최고 " + best;
-  $("ov").innerHTML = `<p>점수</p><div class="big">${score}</div><p>최고 ${best}</p><button id="go">다시</button>`;
-  $("go").onclick = start;
-  $("ov").hidden = false;
+  menu(`<p style="color:var(--on);font-weight:700">찍을 곳이 없어요</p><div class="big">${score}</div><p>최고 ${best}</p><button id="go">다시</button>`);
 }
-$("go").onclick = start;
-size(); newBoard(); requestAnimationFrame(loop);
+
+let learned = false;
+try { learned = !!localStorage.getItem("stamp-tut") } catch {}
+size();
+grid = new Array(N * N).fill(0); hand = [null, null, null];
+menu(`<h1>뒤집기 <span>도장</span></h1><p>빈칸에 찍으면 잉크, 잉크에 찍으면 지워져요</p><button id="go">시작</button>${learned ? '<button class="link" id="how">방법 다시 보기</button>' : ""}`);
+if (!learned) $("go").onclick = lesson;
+requestAnimationFrame(loop);
 </script>
 </body>
 </html>

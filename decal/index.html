@@ -51,13 +51,13 @@ canvas { display: block; background: var(--paper); border-radius: 20px; box-shad
     <canvas id="cv" aria-label="데칼코마니 판"></canvas>
     <div class="ov" id="ov">
       <h1>데칼<b>코마니</b></h1>
-      <p id="msg">선을 그어 반으로 접으면, 똑같이 겹치는 색이 터져요</p>
+      <p id="msg">선을 그어 반으로 접었을 때 같은 색이 두 쌍 이상 겹치면 터져요. 많이 겹칠수록 점수가 커져요</p>
       <button id="go">시작</button>
     </div>
   </div></div>
 </main>
 <script>
-const N = 8, TIME = 60, DENSITY = 0.45;
+const N = 8, TIME = 60, DENSITY = 0.45, MIN = 2, PENALTY = 3;
 const COLORS = ["#2f6be0", "#e4473f", "#21985f", "#8a55e8", "#f08a24"];
 const $ = id => document.getElementById(id);
 const cv = $("cv"), ctx = cv.getContext("2d");
@@ -121,7 +121,7 @@ function refill() {
     grid[i] = Math.random() * COLORS.length | 0;
     born[i] = now + Math.random() * 160;
   }
-  if (Math.max(...AXES.map(a => pairsFor(a).length)) < 3) plant();
+  if (Math.max(...AXES.map(a => pairsFor(a).length)) < 4) plant();
 }
 function newBoard() {
   grid = new Array(N * N).fill(-1);
@@ -151,8 +151,11 @@ function axisEnds(ax) {
 
 function fold(ax) {
   const ps = pairsFor(ax), now = performance.now();
-  if (!ps.length) {
-    miss = now; left = Math.max(0, left - 2);
+  if (ps.length < MIN) {
+    // 한 쌍뿐이면 그 쌍을 깜빡여 보여 주고, 시간만 깎인다
+    miss = now; missPairs = ps; left = Math.max(0, left - PENALTY);
+    const [x1, y1, x2, y2] = axisEnds(ax), cx = Math.min(N - 1.5, Math.max(.5, (x1 + x2) / 2)), cy = Math.min(N - 1, Math.max(.5, (y1 + y2) / 2));
+    texts.push({ x: cx, y: cy, s: "-" + PENALTY + "초", red: true, t0: now });
     cv.classList.remove("shake"); void cv.offsetWidth; cv.classList.add("shake");
     return;
   }
@@ -164,7 +167,7 @@ function fold(ax) {
   score += pts; $("score").textContent = score;
   let cx = 0, cy = 0;
   ps.forEach(p => { cx += p[2]; cy += p[3] });
-  texts.push({ x: cx / n, y: cy / n, s: "+" + pts, big: n >= 3, t0: now + 220 });
+  texts.push({ x: cx / n, y: cy / n, s: "+" + pts, sub: n + "쌍", big: n >= 3, t0: now + 220 });
   try { navigator.vibrate && navigator.vibrate(n >= 3 ? [20, 40, 30] : 15) } catch {}
   setTimeout(() => playing && refill(), 520);
 }
@@ -216,6 +219,10 @@ function draw(now) {
   }
   if (axis) line(axis, "rgb(28 27 25 / .5)", 3, [8, 8]);
   if (now - miss < 320 && missAx) line(missAx, "rgb(216 68 60 / " + (1 - (now - miss) / 320) + ")", 4);
+  if (now - miss < 600) for (const [x, y, mx, my] of missPairs) for (const [a, b] of [[x, y], [mx, my]]) {
+    ctx.strokeStyle = `rgb(216 68 60 / ${Math.abs(Math.sin((now - miss) / 600 * Math.PI * 3))})`; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(px(a), px(b), S * .44, 0, 7); ctx.stroke();
+  }
   anims = anims.filter(a => now - a.t0 < 760);
   for (const a of anims) {
     const t = (now - a.t0) / 760;
@@ -241,11 +248,12 @@ function draw(now) {
     ctx.textAlign = "center"; ctx.textBaseline = "middle";
     ctx.lineWidth = 5; ctx.strokeStyle = "#fbfaf7"; ctx.lineJoin = "round";
     const yy = px(t.y) - S * .5 - k * S * .7;
-    ctx.strokeText(t.s, px(t.x), yy); ctx.fillStyle = "#1c1b19"; ctx.fillText(t.s, px(t.x), yy);
+    ctx.strokeText(t.s, px(t.x), yy); ctx.fillStyle = t.red ? "#d8443c" : "#1c1b19"; ctx.fillText(t.s, px(t.x), yy);
+    if (t.sub) { ctx.font = `700 ${S * .36}px Pretendard, system-ui, sans-serif`; ctx.strokeText(t.sub, px(t.x), yy + S * .55); ctx.fillStyle = "#6f6c66"; ctx.fillText(t.sub, px(t.x), yy + S * .55) }
     ctx.globalAlpha = 1;
   }
 }
-let missAx = null, lastAx = null, lastT = 0;
+let missAx = null, missPairs = [], lastAx = null, lastT = 0;
 
 function loop(now) {
   if (playing) {
@@ -275,7 +283,7 @@ cv.addEventListener("pointermove", e => { if (drag) axis = snap(drag, cell(e)) }
 const up = () => {
   if (drag && axis && playing) {
     const ps = pairsFor(axis).length;
-    if (ps) { lastAx = axis; lastT = performance.now() } else missAx = axis;
+    if (ps >= MIN) { lastAx = axis; lastT = performance.now() } else missAx = axis;
     fold(axis);
   }
   drag = null; axis = null;
