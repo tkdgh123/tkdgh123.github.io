@@ -33,7 +33,7 @@ h1, h2, h3, p { margin: 0 }
 .btn:hover { background: var(--ink) }
 .btn:active { transform: scale(.97) }
 .rise { opacity: 0; transform: translateY(24px); transition: opacity .7s var(--ease), transform .7s var(--ease); transition-delay: calc(var(--i, 0) * 80ms) }
-.rise.in, .no-js .rise { opacity: 1; transform: none }
+.rise.in, .no-js .rise, .q .rise { opacity: 1; transform: none }
 
 /* 첫 화면 */
 .hero { position: relative; height: 100svh; min-height: 640px; overflow: hidden }
@@ -89,6 +89,21 @@ h2.st { color: var(--ink); text-transform: none; letter-spacing: -.04em; font-st
 .facts { margin: 64px 0 0; max-width: 34em; display: grid; gap: 18px; font-size: 20px; line-height: 1.5 }
 .facts .open { font-size: 17px; font-weight: 700; color: var(--blue); text-decoration: none }
 .facts .open:hover { text-decoration: underline }
+
+/* 다음 판: 하루 살기 */
+.day { padding: 160px var(--m) 180px; background: var(--bg) }
+.day h2 { font-size: clamp(48px, 6.4vw, 104px); font-weight: 800; letter-spacing: -.03em; line-height: 1 }
+.day .lead { margin-top: 24px; font-size: var(--lead); max-width: 30ch }
+.day .pair { display: grid; grid-template-columns: 1.25fr 1fr; gap: 24px; margin-top: 56px; align-items: start }
+.day figure { margin: 0 }
+.day figure img { width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; display: block }
+.day figcaption { margin-top: 14px; font-size: 17px; max-width: 46ch }
+.day figcaption b { display: block; font-size: 20px; margin-bottom: 4px }
+.day figure.pick figcaption b { color: var(--blue) }
+.day ol { margin: 56px 0 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; counter-reset: d }
+.day li { font-size: 18px; line-height: 1.5 }
+.day li b { display: block; font-size: 22px; margin-bottom: 6px }
+@media (max-width: 760px) { .day { padding: 110px var(--m) 120px } .day .pair, .day ol { grid-template-columns: 1fr } .day h2 { font-size: 13vw } }
 
 /* 동기 네 가지: 부채 */
 .fan { position: relative; height: 240svh; background: var(--navy); color: #fff }
@@ -282,6 +297,20 @@ h2.st { color: var(--ink); text-transform: none; letter-spacing: -.04em; font-st
   <div class="phone"><iframe src="../?demo#learn" title="술술 첫 화면 예시, 실타래" allow="microphone" loading="lazy"></iframe></div>
 </section>
 
+<section class="day" id="day" aria-labelledby="h-day">
+  <h2 id="h-day" class="rise">다음 판: 하루 살기</h2>
+  <p class="lead rise" style="--i:1">영어로 사는 하루를 장면마다 오른쪽으로 걸어가요. 보기 고르기 대신 뜻만 보고 내가 직접 말해요.</p>
+  <div class="pair">
+    <figure class="pick rise" style="--i:2"><img src="../img/scenes/cafe-gemini.webp" alt="납작한 그림체의 아침 커피숍, 카운터 뒤에서 바리스타가 손을 흔드는 넓은 장면" width="1600" height="893" loading="lazy"><figcaption><b>Gemini · 이걸로 골랐어요</b>가게 전체가 넓게 보이고 사람이 작아요. 아래 바닥에 말풍선을 얹기 좋고, 다른 장면과 그림체를 맞추기 쉬워요.</figcaption></figure>
+    <figure class="rise" style="--i:3"><img src="../img/scenes/cafe-chatgpt.webp" alt="부드러운 그림체의 커피숍, 바리스타가 정면에서 손님을 반기는 장면" width="1600" height="900" loading="lazy"><figcaption><b>ChatGPT</b>따뜻하고 예쁘지만 인물이 크고 정면이라, 장면마다 얼굴이 달라지면 따로 놀 수 있어요.</figcaption></figure>
+  </div>
+  <ol>
+    <li class="rise"><b>엿듣기</b>그림 위로 대화가 흘러가요. 표현 덩어리를 누르면 뜻과 왜 그렇게 말하는지 한 줄.</li>
+    <li class="rise" style="--i:1"><b>내 차례</b>한국어로 하고 싶은 말만 보고 직접 말해요. 뜻이 통하면 통과, 막히면 힌트 세 단계.</li>
+    <li class="rise" style="--i:2"><b>수첩</b>내가 한 말과 더 자연스러운 말을 나란히 남겨요. 막힌 말만 다음 날 다른 장면에서 한 번 더.</li>
+  </ol>
+</section>
+
 <section class="fan" aria-labelledby="h-fan">
   <div class="stage">
     <h2 id="h-fan" class="rise">장부 대신 네 가지</h2>
@@ -393,14 +422,14 @@ h2.st { color: var(--ink); text-transform: none; letter-spacing: -.04em; font-st
   <a class="big" href="../">술술 시작하기</a>
   <div class="meta">
     <div><a href="../../">창업실</a><a href="../">써 보기</a></div>
-    <p>사진: "Unidyne Shure 55S Microphone" Ethan Long, CC BY-SA 2.0 · "Baristas serve espresso and cappuccino at a busy cafe" Shixart1985, CC BY 2.0 · "Melbourne Airport departures board" Marek Ślusarczyk (Tupungato), CC BY 3.0 · "G-C-Woolley page of diary No2" CEphoto, Uwe Aranas, CC BY-SA 3.0 — 모두 Wikimedia Commons</p>
+    <p>장면 그림: Gemini·ChatGPT로 생성 · 사진: "Unidyne Shure 55S Microphone" Ethan Long, CC BY-SA 2.0 · "Baristas serve espresso and cappuccino at a busy cafe" Shixart1985, CC BY 2.0 · "Melbourne Airport departures board" Marek Ślusarczyk (Tupungato), CC BY 3.0 · "G-C-Woolley page of diary No2" CEphoto, Uwe Aranas, CC BY-SA 3.0 — 모두 Wikimedia Commons</p>
     <p>서울 · 2026</p>
   </div>
 </footer>
 
 <script>
 document.body.classList.replace("no-js", "js");
-const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target) } }), { threshold: .2 });
+const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target) } }), { threshold: 0, rootMargin: "0px 0px -8% 0px" });
 document.querySelectorAll(".rise, .loop").forEach(el => io.observe(el));
 // 부채: 스크롤 4분의 1마다 카드 한 장씩
 const fan = document.querySelector(".fan"), cards = [...document.querySelectorAll(".card")];
