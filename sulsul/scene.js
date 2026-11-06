@@ -3,9 +3,11 @@
 const CAFE = {
   who: "Leo", whoKo: "바리스타", pos: "62% 50%", voices: { them: "m", guest: "f" },
   // 움직이는 겹: 바리스타를 지운 배경 + 팔 없는 몸(숨 쉬듯) + 팔 한 층(카운터 위 팔꿈치 축으로 인사) + 앞 카운터 선반·메뉴판. 좌표는 원본 2752×1536 기준
-  layers: { w: 2752, h: 1536, plate: "img/scenes/cafe/plate.webp", box: [1560, 340, 430, 455], body: "img/scenes/cafe/body.png", hand: "img/scenes/cafe/hand.png", pivot: [1630, 720], front: [["img/scenes/cafe/counter.png", 1560, 716, 90, 54], ["img/scenes/cafe/menu.png", 1800, 652, 172, 144]] },
+  layers: { w: 2752, h: 1536, plate: "img/scenes/cafe/plate.webp", box: [1560, 340, 430, 455], body: "img/scenes/cafe/body.png", hand: "img/scenes/cafe/hand.png", pivot: [1630, 720], front: [["img/scenes/cafe/counter.png", 1560, 716, 90, 54], ["img/scenes/cafe/menu.png", 1800, 652, 172, 144]],
+    // 배경도 살짝: 햇살이 밝아졌다 흐려지고, 화분이 흔들리고, 김이 피어오른다 (Gemini로 각각 지운·더한 그림에서 떼어 냄)
+    amb: [["img/scenes/cafe/light.webp", 0, 1, 2094, 1207, "glow"], ["img/scenes/cafe/plant.png", 570, 672, 224, 392, "sway"], ["img/scenes/cafe/steam.png", 1106, 0, 558, 479, "steam"]] },
   overhear: [
-    ["them", "Good morning! What can I get for you?"],
+    ["them", "Next, please! Hi there, what can I get for you?"],
     ["guest", "Hi, can I get a hot latte, please?", [["can I get", "~ 주세요", "주문할 때 가장 흔한 말이에요. Give me보다 부드러워요."]]],
     ["them", "Sure. What size?"],
     ["guest", "A small one, please.", [["a small one", "작은 거", "one은 앞에서 말한 라테를 가리켜요. 같은 말을 또 하지 않아도 돼요."]]],
@@ -14,7 +16,7 @@ const CAFE = {
     ["them", "That's four fifty. Here's your receipt.", [["four fifty", "4달러 50센트", "가격은 숫자를 둘로 끊어 읽어요."], ["receipt", "영수증", "p는 소리 없어요. '리싯'에 가까워요."]]]
   ],
   turns: [
-    { say: "Next, please! Hi there, what can I get for you?", want: "아이스 아메리카노 하나 주문하기", need: [["아메리카노", ["americano"]]], hint: ["Can I get ~?", "Can I get an…", "Can I get an iced americano, please?"], model: "Can I get an iced americano, please?" },
+    { say: "Good morning! What can I get for you?", want: "아이스 아메리카노 하나 주문하기", need: [["아메리카노", ["americano"]]], hint: ["Can I get ~?", "Can I get an…", "Can I get an iced americano, please?"], model: "Can I get an iced americano, please?" },
     { say: "Sure! What size would you like?", want: "큰 걸로 달라고 하기", need: [["큰 것", ["large", "big", "grande", "venti"]]], hint: ["a ___ one", "A large…", "A large one, please."], model: "A large one, please." },
     { say: "For here or to go?", want: "가져갈 거라고 말하기", need: [["가져가기", ["to go", "take out", "takeout", "take it", "take away", "takeaway"]]], hint: ["To ~, please.", "To go…", "To go, please."], model: "To go, please." },
     { say: "That's five twenty. Cash or card?", want: "카드로 낸다고 하기", need: [["카드", ["card"]]], hint: ["Can I pay by ~?", "Can I pay…", "Can I pay by card?"], model: "Can I pay by card?" },
@@ -66,7 +68,7 @@ $("daystrip").onclick = e => {
 
 // ───── 장면 ─────
 let SC = null;
-const PHASES = ["엿듣기", "내 차례", "수첩"];
+const PHASES = ["나", "듣기", "수첩"];
 function openScene(sc) {
   SC = { sc, phase: 0, line: 0, turn: 0, log: [], hint: 0, tries: 0, played: false };
   nav("scene"); buildStage(sc);
@@ -80,6 +82,7 @@ function buildStage(sc) {
   const pc = (v, t) => (100 * v / t) + "%", [bx, by, bw, bh] = L2.box;
   el.dataset.w = L2.w; el.dataset.h = L2.h;
   el.innerHTML = `<img src="${L2.plate}" alt="">
+    ${(L2.amb || []).map(([src, x, y, w, h, c]) => `<img class="amb ${c}" src="${src}" alt="" style="left:${pc(x, L2.w)};top:${pc(y, L2.h)};width:${pc(w, L2.w)};height:${pc(h, L2.h)}">`).join("")}
     <div class="breath" style="left:${pc(bx, L2.w)};top:${pc(by, L2.h)};width:${pc(bw, L2.w)};height:${pc(bh, L2.h)}">
       <img src="${L2.body}" alt=""><img class="handwave" src="${L2.hand}" alt="" style="transform-origin:${pc(L2.pivot[0] - bx, bw)} ${pc(L2.pivot[1] - by, bh)}">
     </div>
@@ -98,23 +101,23 @@ function phase(n) {
   SC.phase = n;
   $("scsteps").innerHTML = PHASES.map((p, i) => `<span class="${i === n ? "on" : i < n ? "done" : ""}">${p}</span>`).join("");
   $("scbubble").hidden = true; $("chunkcard").hidden = true;
-  if (n === 0) overhear();
-  if (n === 1) myTurn();
+  if (n === 0) myTurn();
+  if (n === 1) overhear();
   if (n === 2) notebook();
 }
 const chunked = (en, chunks = []) => chunks.reduce((h, [c], i) => h.replace(new RegExp(c.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"), m => `<span class="chunk" role="button" tabindex="0" data-c="${i}">${m}</span>`), esc(en));
 function bubble(who, en, ko) {
   const b = $("scbubble"); b.hidden = false; b.className = "bubble2 " + who;
-  b.innerHTML = `<small>${who === "them" ? `${SC.sc.who} · ${SC.sc.whoKo}` : who === "guest" ? "앞 손님" : "나"}</small><span lang="en">${esc(en)}</span>${ko ? `<em>${esc(ko)}</em>` : ""}`;
+  b.innerHTML = `<small>${who === "them" ? `${SC.sc.who} · ${SC.sc.whoKo}` : who === "guest" ? "다음 손님" : "나"}</small><span lang="en">${esc(en)}</span>${ko ? `<em>${esc(ko)}</em>` : ""}`;
   b.style.animation = "none"; void b.offsetWidth; b.style.animation = "";
 }
-// 1. 엿듣기: 점원과 앞 손님 대화가 흘러간다. 밑줄 덩어리를 누르면 뜻과 이유
+// 2. 듣기: 내가 먼저 말해 본 뒤, 다른 손님이 같은 주문을 하는 걸 듣는다. 밑줄 덩어리를 누르면 뜻과 이유
 async function overhear() {
   const lines = SC.sc.overhear;
-  $("scpanel").innerHTML = `<p class="lead2">앞 손님이 주문하는 걸 엿들어요. 밑줄 친 말을 누르면 뜻이 나와요.</p><ol class="script" id="script"></ol>
-    <div class="scfoot"><button class="btn ghost" id="replay"><i class="ph-fill ph-speaker-high"></i>다시 듣기</button><button class="btn" id="tome" disabled>내 차례 <i class="ph-bold ph-arrow-right"></i></button></div>`;
+  $("scpanel").innerHTML = `<p class="lead2">이번엔 다른 손님이 주문하는 걸 들어요. 내가 막혔던 말이 어떻게 나오는지 들어 보세요. 밑줄 친 말을 누르면 뜻이 나와요.</p><ol class="script" id="script"></ol>
+    <div class="scfoot"><button class="btn ghost" id="replay"><i class="ph-fill ph-speaker-high"></i>다시 듣기</button><button class="btn" id="tome" disabled>수첩 보기 <i class="ph-bold ph-arrow-right"></i></button></div>`;
   $("replay").onclick = () => playScript();
-  $("tome").onclick = () => phase(1);
+  $("tome").onclick = () => phase(2);
   $("script").onclick = e => { const c = e.target.closest(".chunk"); if (!c) return; const li = c.closest("li"), ch = lines[+li.dataset.i][2][+c.dataset.c]; showChunk(ch) };
   $("script").onkeydown = e => { if ((e.key === "Enter" || e.key === " ") && e.target.closest(".chunk")) { e.preventDefault(); e.target.click() } };
   playScript();
@@ -124,9 +127,9 @@ async function playScript() {
   const run = ++playing, lines = SC.sc.overhear;
   $("script").innerHTML = "";
   for (let i = 0; i < lines.length; i++) {
-    if (run !== playing || SC?.phase !== 0) return;
+    if (run !== playing || SC?.phase !== 1) return;
     const [who, en, ch] = lines[i];
-    $("script").insertAdjacentHTML("beforeend", `<li class="${who}" data-i="${i}"><small>${who === "them" ? SC.sc.who : "앞 손님"}</small><span lang="en">${chunked(en, ch)}</span></li>`);
+    $("script").insertAdjacentHTML("beforeend", `<li class="${who}" data-i="${i}"><small>${who === "them" ? SC.sc.who : "다음 손님"}</small><span lang="en">${chunked(en, ch)}</span></li>`);
     $("script").lastElementChild.scrollIntoView({ block: "nearest", behavior: "smooth" });
     bubble(who, en);
     if (listenOn()) await speak(en, S.prefs.rate, SC.sc.voices[who]); else await new Promise(r => setTimeout(r, 900 + en.length * 25));
@@ -140,10 +143,10 @@ function showChunk([c, m, why]) {
   k.querySelector("button").onclick = () => speak(c);
   speak(c);
 }
-// 2. 내 차례: 상대 말을 듣고, 한국어 '하고 싶은 말'만 보고 내가 직접 말한다
+// 1. 나: 바리스타가 나에게 말을 건다. 한국어 '하고 싶은 말'만 보고 내가 먼저 직접 말한다
 function myTurn() {
   const t = SC.sc.turns[SC.turn];
-  if (!t) return phase(2);
+  if (!t) return phase(1);
   SC.hint = 0; SC.tries = 0;
   bubble("them", t.say);
   const typing = !speakOn();
@@ -212,7 +215,7 @@ function judgeTurn(input, spoken) {
   SC.log.push({ want: t.want, mine: said, model: t.model, hint: SC.hint, tries: SC.tries, chunk: t.chunk });
   const same = normS(said) === normS(t.model);
   $("scpanel").innerHTML = `<div class="okcard"><b><i class="ph-fill ph-check-circle"></i>통했어요</b><p class="mine" lang="en">${esc(said)}</p>${same ? "" : `<p class="better"><small>이렇게 말하면 더 자연스러워요</small><span lang="en">${esc(t.model)}</span><button class="say-mini" id="playmodel" aria-label="듣기"><i class="ph-fill ph-speaker-high"></i></button></p>`}</div>
-    <div class="scfoot"><button class="btn" id="nextturn">${SC.turn + 1 < SC.sc.turns.length ? "다음" : "수첩 보기"} <i class="ph-bold ph-arrow-right"></i></button></div>`;
+    <div class="scfoot"><button class="btn" id="nextturn">${SC.turn + 1 < SC.sc.turns.length ? "다음" : "이제 듣기"} <i class="ph-bold ph-arrow-right"></i></button></div>`;
   if (!same) { $("playmodel").onclick = () => speak(t.model); speak(t.model) }
   $("nextturn").onclick = () => { SC.turn++; myTurn() };
   void spoken;
