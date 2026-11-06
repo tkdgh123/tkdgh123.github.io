@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>뒤집기 도장</title>
-<meta name="description" content="누르면 색이 뒤집히는 도장으로 한 줄을 한 색으로 채워 지우는 퍼즐. 찍으면 맞닿은 칸도 내 색으로 물든다">
+<meta name="description" content="다른 색 위에 찍으면 내 색으로 뒤집히는 도장으로, 한 줄을 한 색으로 채워 지우는 퍼즐">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
 :root { --bg: #1d2232; --paper: #f3f4f6; --blue: #2f45b8; --red: #d9473a; --on: #eef0f6; --soft: #9aa1b6 }
@@ -66,28 +66,29 @@ const norm = c => { const mx = Math.min(...c.map(p => p[0])), my = Math.min(...c
 const SHAPES = [], seen = new Set();
 for (const b of BASE) { let c = b; for (let r = 0; r < 4; r++) { c = norm(c.map(([x, y]) => [-y, x])); const k = JSON.stringify(c); if (!seen.has(k)) { seen.add(k); SHAPES.push(c) } } }
 const wOf = s => Math.max(...s.map(p => p[0])) + 1, hOf = s => Math.max(...s.map(p => p[1])) + 1;
-const newPiece = () => ({ s: SHAPES[Math.random() * SHAPES.length | 0], c: 1 + (Math.random() * 2 | 0), t: 0 });
+const newPiece = () => ({ s: SHAPES[Math.random() * SHAPES.length | 0], c: 1 + (Math.random() * 2 | 0) });
 
 // grid: 0 빈칸, 1 파랑, 2 빨강
 let grid, hand, score = 0, combo = 0, since = 0, playing = false, best = 0, tut = 0, target = null;
 let S = 40, TRAY = 0, drag = null, fx = [], pops = [], flash = [], texts = [];
-try { best = +localStorage.getItem("stamp2-best") || 0 } catch {}
+try { best = +localStorage.getItem("stamp3-best") || 0 } catch {}
 $("best").textContent = "최고 " + best;
 
-const canPlace = (s, gx, gy) => gx >= 0 && gy >= 0 && gx + wOf(s) <= N && gy + hOf(s) <= N && s.every(([x, y]) => !grid[(gy + y) * N + gx + x]);
-function fitsAnywhere(s) {
-  for (let gy = 0; gy <= N - hOf(s); gy++) for (let gx = 0; gx <= N - wOf(s); gx++) if (canPlace(s, gx, gy)) return true;
+// 찍을 수 있는 자리: 빈칸이나 다른 색 칸 위(같은 색 위는 안 됨), 빈칸이 한 칸은 끼어야 함
+function canPlace(p, gx, gy) {
+  if (gx < 0 || gy < 0 || gx + wOf(p.s) > N || gy + hOf(p.s) > N) return false;
+  let empty = 0;
+  for (const [x, y] of p.s) { const v = grid[(gy + y) * N + gx + x]; if (v === p.c) return false; if (!v) empty++ }
+  return empty > 0;
+}
+function fitsAnywhere(p) {
+  for (let gy = 0; gy <= N - hOf(p.s); gy++) for (let gx = 0; gx <= N - wOf(p.s); gx++) if (canPlace(p, gx, gy)) return true;
   return false;
 }
-// 이 자리에 찍으면: 맞닿은 다른 색 칸이 내 색으로 물들고, 한 색으로 꽉 찬 줄이 지워진다
+// 이 자리에 찍으면: 덮인 다른 색 칸은 내 색으로 뒤집히고, 한 색으로 꽉 찬 줄이 지워진다
 function tryPlace(p, gx, gy) {
-  const g = grid.slice(), own = new Set(p.s.map(([x, y]) => (gy + y) * N + gx + x)), dyed = [];
-  own.forEach(k => g[k] = p.c);
-  for (const [x, y] of p.s) for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
-    const X = gx + x + dx, Y = gy + y + dy, k = Y * N + X;
-    if (X < 0 || Y < 0 || X >= N || Y >= N || own.has(k) || !g[k] || g[k] === p.c) continue;
-    g[k] = p.c; dyed.push(k);
-  }
+  const g = grid.slice(), own = [], dyed = [];
+  for (const [x, y] of p.s) { const k = (gy + y) * N + gx + x; (g[k] ? dyed : own).push(k); g[k] = p.c }
   const rows = [], cols = [];
   for (let i = 0; i < N; i++) {
     let r = g[i * N], c = g[i];
@@ -97,7 +98,7 @@ function tryPlace(p, gx, gy) {
   return { g, rows, cols, dyed, own };
 }
 
-const LINE = [0, 10, 30, 60, 100, 150, 210];
+const LINE = [0, 100, 300, 600, 1000, 1500, 2100];
 function place(i, gx, gy) {
   const p = hand[i], { g, rows, cols, dyed, own } = tryPlace(p, gx, gy), now = performance.now();
   own.forEach(k => fx.push({ k, kind: "stamp", c: p.c, t0: now }));
@@ -109,7 +110,7 @@ function place(i, gx, gy) {
   rows.forEach(r => flash.push({ r, t0: now + wait })); cols.forEach(c => flash.push({ c, t0: now + wait }));
   grid = g; hand[i] = null;
   const n = rows.length + cols.length;
-  let pts = p.s.length;
+  let pts = 10 * p.s.length;
   if (n) {
     if (!tut) combo++; since = 0;
     const got = LINE[Math.min(n, 6)] * Math.max(1, combo);
@@ -124,7 +125,7 @@ function place(i, gx, gy) {
   $("combo").classList.toggle("on", combo > 1);
   if (tut) return tutNext();
   if (hand.every(h => !h)) hand = [newPiece(), newPiece(), newPiece()];
-  if (!hand.some(h => h && fitsAnywhere(h.s))) { playing = false; setTimeout(end, 1000) }
+  if (!hand.some(h => h && fitsAnywhere(h))) { playing = false; setTimeout(end, 1000) }
 }
 
 // 그리기
@@ -152,7 +153,7 @@ function hoverCell() {
   let gx = Math.round(left / S), gy = Math.round(top / S);
   if (gx < -1 || gy < -1 || gx > N - w + 1 || gy > N - h + 1) return null;
   gx = Math.max(0, Math.min(N - w, gx)); gy = Math.max(0, Math.min(N - h, gy));
-  const ok = canPlace(s, gx, gy) && (!target || (gx === target.gx && gy === target.gy && hand[drag.i].c === target.c));
+  const ok = canPlace(hand[drag.i], gx, gy) && (!target || (gx === target.gx && gy === target.gy));
   return { gx, gy, ok };
 }
 function slotRect(i) { const w = N * S / 3; return [i * w, N * S + S * .5, w, TRAY] }
@@ -183,8 +184,9 @@ function draw(now) {
   }
   if (hv) for (const [x, y] of hand[drag.i].s) {
     const X = (hv.gx + x) * S, Y = (hv.gy + y) * S;
-    if (!hv.ok) { ctx.strokeStyle = C.warn; ctx.lineWidth = 3; rr(X + 4, Y + 4, S - 8, S - 8, S * .14); ctx.stroke(); continue }
-    if (!willClear.has((hv.gy + y) * N + hv.gx + x)) inkCell(X, Y, S, INK[hand[drag.i].c], .4);
+    const k = (hv.gy + y) * N + hv.gx + x;
+    if (!hv.ok) { ctx.strokeStyle = C.warn; ctx.lineWidth = 3; rr(X + 4, Y + 4, S - 8, S - 8, S * .14); ctx.stroke(); if (grid[k] === hand[drag.i].c) { const m = S * .3; ctx.strokeStyle = "#fff"; ctx.lineWidth = Math.max(3, S * .1); ctx.lineCap = "round"; ctx.beginPath(); ctx.moveTo(X + m, Y + m); ctx.lineTo(X + S - m, Y + S - m); ctx.moveTo(X + S - m, Y + m); ctx.lineTo(X + m, Y + S - m); ctx.stroke() } continue }
+    if (!willClear.has(k) && !willDye.has(k)) inkCell(X, Y, S, INK[hand[drag.i].c], .4);
   }
   flash = flash.filter(f => now - f.t0 < 420);
   for (const f of flash) {
@@ -206,12 +208,11 @@ function draw(now) {
     if (t.sub) { ctx.font = `800 ${S * .4}px Pretendard, system-ui, sans-serif`; ctx.strokeText(t.sub, X, Y + S * .6); ctx.fillStyle = INK[2]; ctx.fillText(t.sub, X, Y + S * .6) }
     ctx.globalAlpha = 1;
   }
-  // 조각 칸: 누르면 색이 뒤집히고, 어디에도 못 놓는 조각은 흐리게
+  // 조각 칸: 어디에도 못 놓는 조각은 흐리게
   for (let i = 0; i < 3; i++) {
     const p = hand[i]; if (!p || (drag && drag.moved && drag.i === i)) continue;
-    const [sx, sy, sw, sh] = slotRect(i), cs = S * .5, w = wOf(p.s) * cs, h = hOf(p.s) * cs, a = fitsAnywhere(p.s) ? 1 : .28;
-    const t = Math.min(1, (now - p.t) / 260), col = t < .5 && p.from ? INK[p.from] : INK[p.c], sq = Math.abs(Math.cos(t * Math.PI));
-    for (const [x, y] of p.s) inkCell(sx + (sw - w) / 2 + x * cs, sy + (sh - h) / 2 + y * cs, cs, col, a, 1, t < 1 ? sq : 1);
+    const [sx, sy, sw, sh] = slotRect(i), cs = S * .5, w = wOf(p.s) * cs, h = hOf(p.s) * cs, a = fitsAnywhere(p) ? 1 : .28;
+    for (const [x, y] of p.s) inkCell(sx + (sw - w) / 2 + x * cs, sy + (sh - h) / 2 + y * cs, cs, INK[p.c], a);
   }
   if (drag && drag.moved) {
     const p = hand[drag.i], w = wOf(p.s), h = hOf(p.s);
@@ -235,7 +236,7 @@ function size() {
 }
 addEventListener("resize", size);
 
-// 조각 칸을 톡 누르면 색 뒤집기, 끌면 놓기
+// 조각 칸을 끌어 놓기
 const pos = e => { const r = cv.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top] };
 cv.addEventListener("pointerdown", e => {
   if (!playing) return;
@@ -258,37 +259,36 @@ cv.addEventListener("pointerup", () => {
   if (!drag) return;
   const d = drag, hv = hoverCell();
   drag = null;
-  if (!d.moved) { const p = hand[d.i]; p.from = p.c; p.c = 3 - p.c; p.t = performance.now(); if (tut === 2) tip("이제 빈칸에 찍어 줄을 채워 보세요"); return }
   if (hv && hv.ok && playing) place(d.i, hv.gx, hv.gy);
 });
 cv.addEventListener("pointercancel", () => drag = null);
 
 // 처음 한 번: 세 수를 따라 해 보며 규칙을 익힌다
-const H3 = [[0, 0], [1, 0], [2, 0]], ONE = [[0, 0]];
+const H3 = [[0, 0], [1, 0], [2, 0]];
 function tip(t) { $("tip").textContent = t || ""; $("tip").hidden = !t }
 function tutStep(n) {
   tut = n; grid = new Array(N * N).fill(0);
   if (n === 1) {
     [0, 1, 2, 6, 7].forEach(x => grid[4 * N + x] = 1);
-    hand = [null, { s: H3, c: 1, t: 0 }, null]; target = { i: 1, gx: 3, gy: 4, c: 1 };
+    hand = [null, { s: H3, c: 1 }, null]; target = { i: 1, gx: 3, gy: 4 };
     tip("한 줄을 한 색으로 채우면 지워져요");
   } else if (n === 2) {
-    [0, 1, 2, 3, 4].forEach(x => grid[4 * N + x] = 2);
-    hand = [null, { s: H3, c: 1, t: 0 }, null]; target = { i: 1, gx: 5, gy: 4, c: 2 };
-    tip("도장을 톡 누르면 색이 뒤집혀요");
+    [0, 1, 2, 3, 4].forEach(x => grid[4 * N + x] = 1); grid[4 * N + 5] = grid[4 * N + 6] = 2;
+    hand = [null, { s: H3, c: 1 }, null]; target = { i: 1, gx: 5, gy: 4 };
+    tip("다른 색 위에 찍으면 내 색으로 뒤집혀요");
   } else {
-    [0, 1, 2, 4, 5, 6, 7].forEach(x => grid[4 * N + x] = 1); grid[4 * N + 2] = 2;
-    hand = [null, { s: ONE, c: 1, t: 0 }, null]; target = { i: 1, gx: 3, gy: 4, c: 1 };
-    tip("찍으면 맞닿은 칸도 내 색으로 물들어요");
+    [0, 1, 2, 3, 4].forEach(x => grid[4 * N + x] = 2); grid[4 * N + 5] = grid[4 * N + 6] = 1;
+    hand = [null, { s: H3, c: 2 }, null]; target = { i: 1, gx: 5, gy: 4 };
+    tip("같은 색 위엔 못 찍고, 빈칸이 한 칸은 끼어야 해요");
   }
 }
 function tutNext() {
   if (tut < 3) { const n = tut + 1; tut = 9; return setTimeout(() => tutStep(n), 1000) }
   tut = 0; target = null; playing = false;
-  try { localStorage.setItem("stamp2-tut", 1) } catch {}
+  try { localStorage.setItem("stamp3-tut", 1) } catch {}
   setTimeout(() => {
     tip("");
-    menu(`<p style="color:var(--on);font-weight:700">색이 섞인 채 꽉 찬 줄은 안 지워져요.<br>놓을 곳이 없으면 끝나요.</p><button id="go">시작</button>`);
+    menu(`<p style="color:var(--on);font-weight:700">색이 섞인 줄은 안 지워져요.<br>놓을 곳이 없으면 끝나요.</p><button id="go">시작</button>`);
   }, 1000);
 }
 
@@ -310,16 +310,16 @@ function menu(html) {
 }
 function end() {
   playing = false; drag = null;
-  if (score > best) { best = score; try { localStorage.setItem("stamp2-best", best) } catch {} }
+  if (score > best) { best = score; try { localStorage.setItem("stamp3-best", best) } catch {} }
   $("best").textContent = "최고 " + best;
   menu(`<p style="color:var(--on);font-weight:700">놓을 곳이 없어요</p><div class="big">${score}</div><p>최고 ${best}</p><button id="go">다시</button>`);
 }
 
 let learned = false;
-try { learned = !!localStorage.getItem("stamp2-tut") } catch {}
+try { learned = !!localStorage.getItem("stamp3-tut") } catch {}
 size();
 grid = new Array(N * N).fill(0); hand = [null, null, null];
-menu(`<h1>뒤집기 <i>도</i><span>장</span></h1><p>한 줄을 한 색으로 채우면 지워져요. 도장은 누르면 색이 뒤집혀요</p><button id="go">시작</button>${learned ? '<button class="link" id="how">방법 다시 보기</button>' : ""}`);
+menu(`<h1>뒤집기 <i>도</i><span>장</span></h1><p>한 줄을 한 색으로 채우면 지워져요.<br>다른 색 위에 찍으면 내 색으로 뒤집혀요</p><button id="go">시작</button>${learned ? '<button class="link" id="how">방법 다시 보기</button>' : ""}`);
 if (!learned) $("go").onclick = lesson;
 requestAnimationFrame(loop);
 </script>
