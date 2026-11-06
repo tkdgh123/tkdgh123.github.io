@@ -186,7 +186,7 @@ function axisEnds(ax) {
   return [L, ax.a - L, R, ax.a - R];
 }
 
-// 접기: 짝이 있는 칸까지만 띠로 넘어가 덮고(T_HIT, 철썩) 잠깐 눌러 뒷면 물감이 짝과 겹쳐 보인 뒤(HOLD) 터지며 펼쳐진다(T_END). 점수·판 계산은 바로
+// 접기: 쉬움은 선 한쪽 전체, 보통은 짝이 있는 칸까지만 띠로 넘어가 덮고(T_HIT, 철썩) 잠깐 눌러 뒷면 물감이 짝과 겹쳐 보인 뒤(HOLD) 터지며 펼쳐진다(T_END). 점수·판 계산은 바로
 const T_HIT = 220, HOLD = 130, T_END = 600;
 let fl = null, streak = 0, passed = false, seen = false;
 try { seen = !!localStorage.getItem("decal-seen") } catch {}
@@ -195,7 +195,7 @@ function fold(ax, seg) {
   const [ox, oy, dx, dy] = dirOf(ax);
   let pos = 0, neg = 0;
   for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { const v = (x - ox) * -dy + (y - oy) * dx; if (v > .01) pos++; else if (v < -.01) neg++ }
-  // 접히는 넓이: 맞은 짝이 있는 칸까지만(선을 따라 짝들 사이, 선에서 가장 먼 짝까지). 헛접기는 선 바로 옆 줄.
+  // 접히는 넓이: 쉬움은 선이 판을 가르니 그쪽 전체. 보통은 그은 만큼, 맞은 짝이 있는 칸까지만(헛접기는 선 바로 옆 줄).
   // 띠의 끝은 늘 칸과 칸 사이에 오게 칸 중심에서 잰다(점이 반으로 잘리지 않게)
   const U = (x, y) => (x - ox) * dx + (y - oy) * dy, V = (x, y) => Math.abs((x - ox) * -dy + (y - oy) * dx);
   let cells = ps.map(([x, y]) => [x, y]);
@@ -206,6 +206,7 @@ function fold(ax, seg) {
   let u0 = Infinity, u1 = -Infinity, vm = 0;
   for (const [x, y] of cells) { u0 = Math.min(u0, U(x, y)); u1 = Math.max(u1, U(x, y)); vm = Math.max(vm, V(x, y)) }
   if (!cells.length) { u0 = u1 = 0; vm = 1 }
+  if (!seg) { u0 = -30; u1 = 30; vm = 30 }
   const m = ax.t[0] === "D" ? .36 : .5;
   fl = { ax, seg, ok, ps, t0: now, side: pos <= neg ? 1 : -1, u0: u0 - m, u1: u1 + m, vm: vm + m, snap: grid.slice(), bg: getComputedStyle(document.body).backgroundColor };
   FX.noise({ d: .19, vol: .22, f: 500, to: 2600, q: .8 });
