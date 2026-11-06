@@ -54,7 +54,7 @@ function renderDay() {
       <div class="cap"><time>${sc.time}</time><b>${sc.title}</b><span>${state}</span></div></button>`;
   }).join("")}</div></section>`).join("");
   const nx = $("daystrip").querySelector(".scard.next");
-  if (nx) nx.parentElement.scrollLeft = nx.offsetLeft - 20;
+  if (nx) nx.parentElement.scrollLeft = nx.offsetLeft - 12;
 }
 $("daystrip").onclick = e => {
   const b = e.target.closest("[data-sc]"); if (!b) return;
