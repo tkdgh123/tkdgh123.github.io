@@ -36,8 +36,8 @@
 
 // 패킷 종류
 // HELLO: 접속할 때 키 보내기, MESSAGE: 채팅, NOTICE: 방장이 보내는 알림
-// APPROVE: 입장 승인, LEDGER: 장부 대조
-enum { TYPE_HELLO = 1, TYPE_MESSAGE, TYPE_NOTICE, TYPE_APPROVE, TYPE_LEDGER };
+// APPROVE: 입장 승인, LEDGER: 장부 대조, EYE: 카메라 지킴이 상태
+enum { TYPE_HELLO = 1, TYPE_MESSAGE, TYPE_NOTICE, TYPE_APPROVE, TYPE_LEDGER, TYPE_EYE };
 
 
 
@@ -420,6 +420,55 @@ void ledger_next(const uint8_t prev[KEY_LEN], uint32_t index, const uint8_t *tex
 
 
 
+// 띄어쓰기 표식: 같은 글도 받는 사람마다 띄어쓰기를 조금씩 다르게 보여 준다 (캡처가 새면 누구 화면인지 찾으려고)
+// 표식 키 = 두 사람 신원 키로 만든 X25519 공유 값에서 뽑는다. 보낸 사람과 받은 사람만 알고, 다음에 켜도 같다
+int mark_key(const uint8_t my_id_sk[ID_SK_LEN], const uint8_t their_id_pk[KEY_LEN], uint8_t out[KEY_LEN])
+{
+    uint8_t my_x[KEY_LEN], their_x[KEY_LEN], shared[KEY_LEN];
+    int bad = crypto_sign_ed25519_sk_to_curve25519(my_x, my_id_sk) != 0
+           || crypto_sign_ed25519_pk_to_curve25519(their_x, their_id_pk) != 0
+           || crypto_scalarmult(shared, my_x, their_x) != 0;
+    if (!bad)
+        derive(shared, "mark", out);
+    sodium_memzero(my_x, KEY_LEN);
+    sodium_memzero(shared, KEY_LEN);
+    return bad ? -1 : 0;
+}
+
+
+
+
+// gap번째 칸을 두 칸으로 띄울지: 비트 2개가 둘 다 1이면 (4칸에 1칸꼴이라 눈에 잘 안 띈다)
+static int doubled(const uint8_t bits[KEY_LEN], int gap)
+{
+    int bit = gap * 2 % (KEY_LEN * 8);
+    return (bits[bit / 8] >> (bit % 8) & 3) == 3;
+}
+
+
+
+
+// 표식 비트 = BLAKE2b(키 = 표식 키, 글). out = 이름 뒤 칸 + 글, 칸마다 표식을 넣는다
+// out 크기는 글 길이의 2배 + 3이면 충분
+void mark_text(const uint8_t key[KEY_LEN], const char *text, char *out)
+{
+    uint8_t bits[KEY_LEN];
+    int gap = 0;
+    crypto_generichash(bits, KEY_LEN, (const uint8_t *)text, strlen(text), key, KEY_LEN);
+    *out++ = ' ';
+    if (doubled(bits, gap++))
+        *out++ = ' ';
+    for (; *text; text++) {
+        *out++ = *text;
+        if (*text == ' ' && doubled(bits, gap++))
+            *out++ = ' ';
+    }
+    *out = '\0';
+}
+
+
+
+
 #ifndef NET_ONLY   // 통신, 키 부분만 따로 테스트할 때는 여기까지만 씀
 
 #define PORT        9000
@@ -428,6 +477,7 @@ void ledger_next(const uint8_t prev[KEY_LEN], uint32_t index, const uint8_t *tex
 #define KEEP        1000              // 장부 값을 사람마다 최근 몇 개까지 기억할지
 #define MSG_HEAD    (1 + 4 + KEY_LEN) // 메시지 앞부분: 전체/1:1 + 장부 번호 + 앞 장부 값
 #define STAMP_ITEM  (NAME_LEN + 4 + KEY_LEN)
+#define MAX_KNOWN   256               // known 파일에서 읽을 사람 수
 
 
 
@@ -488,6 +538,22 @@ static void remove_control_chars(char *s)
     for (; *s; s++)
         if ((unsigned char)*s < 0x20 || *s == 0x7f)
             *s = '?';
+}
+
+
+
+
+// 앞뒤 공백을 지우고 가운데 여러 칸은 한 칸으로 (보내는 글에 두 칸이 없어야 띄어쓰기 표식과 안 헷갈림)
+static char *trim(char *s)
+{
+    char *w = s, *r = s;
+    while (*r == ' ')
+        r++;
+    for (; *r; r++)
+        if (*r != ' ' || (r[1] != ' ' && r[1] != '\0'))
+            *w++ = *r;
+    *w = '\0';
+    return s;
 }
 
 
@@ -554,26 +620,50 @@ static int load_identity(void)
 
 
 
-// known 파일: 한 번 승인한 사람의 신원 키 ("이름 키16진수" 한 줄씩)
-// 리턴값 1: 같은 키로 승인했던 사람, -1: 이름은 있는데 키가 다름, 0: 처음
-static int check_known(const char *name, const uint8_t id_pk[KEY_LEN])
+// known 파일: 한 번 승인했거나 만난 사람의 신원 키 ("이름 키16진수" 한 줄씩)
+// 같은 이름은 마지막 줄이 이긴다. 읽은 사람 수를 돌려준다
+static char    known_names[MAX_KNOWN][NAME_LEN];
+static uint8_t known_pks[MAX_KNOWN][KEY_LEN];
+
+static int load_known(void)
 {
-    char line[256], hex[2 * KEY_LEN + 1], want[2 * KEY_LEN + 1];
-    int result = 0;
+    char line[256];
+    uint8_t pk[KEY_LEN];
+    size_t pk_len;
+    int count = 0, i;
     FILE *f = open_my_file("known", L"r");
     if (!f)
         return 0;
-    sodium_bin2hex(want, sizeof(want), id_pk, KEY_LEN);
     while (fgets(line, sizeof(line), f)) {
         char *space = strchr(line, ' ');
         if (!space)
             continue;
         *space = '\0';
-        if (strcmp(line, name) == 0 && sscanf(space + 1, "%64s", hex) == 1)
-            result = strcmp(hex, want) == 0 ? 1 : -1;
+        if (strlen(line) >= NAME_LEN || sodium_hex2bin(pk, KEY_LEN, space + 1, strcspn(space + 1, "\r\n"),
+                                                       NULL, &pk_len, NULL) != 0 || pk_len != KEY_LEN)
+            continue;
+        for (i = 0; i < count && strcmp(known_names[i], line) != 0; i++)
+            ;
+        if (i == count && count < MAX_KNOWN)
+            strcpy(known_names[count++], line);
+        if (i < count)
+            memcpy(known_pks[i], pk, KEY_LEN);
     }
     fclose(f);
-    return result;
+    return count;
+}
+
+
+
+
+// 리턴값 1: 같은 키로 승인했던 사람, -1: 이름은 있는데 키가 다름, 0: 처음
+static int check_known(const char *name, const uint8_t id_pk[KEY_LEN])
+{
+    int count = load_known();
+    for (int i = 0; i < count; i++)
+        if (strcmp(known_names[i], name) == 0)
+            return memcmp(known_pks[i], id_pk, KEY_LEN) == 0 ? 1 : -1;
+    return 0;
 }
 
 
@@ -613,8 +703,10 @@ struct person {
     char     name[NAME_LEN];
     uint8_t  id_pk[KEY_LEN];
     uint8_t  send_key[KEY_LEN], recv_key[KEY_LEN];   // 이 사람과 쓰는 방향별 래칫
+    uint8_t  mark[KEY_LEN];                           // 띄어쓰기 표식 키
     uint64_t send_seq, recv_seq;
     int      state;
+    int      eye;                                     // 이 사람의 카메라 지킴이 상태 (EYE_OFF ...)
     char     approvers[MAX_PEOPLE][NAME_LEN];         // 이 사람을 승인한 사람들
     int      approver_count;
     int      shown_progress;                          // 화면에 마지막으로 보여 준 승인 수
@@ -652,6 +744,7 @@ static int member_count(void)
 
 static void check_admitted(struct person *p);
 static void send_stamp(struct person *only, int ask);
+static void send_eye(struct person *only);
 
 
 
@@ -845,7 +938,7 @@ static int handle_packet(int i, struct packet *p)
             send_notice(i, "HELLO는 한 번만 보냅니다");
         else
             return handle_join(i, p);
-    } else if (p->type != TYPE_MESSAGE && p->type != TYPE_APPROVE && p->type != TYPE_LEDGER)
+    } else if (p->type != TYPE_MESSAGE && p->type != TYPE_APPROVE && p->type != TYPE_LEDGER && p->type != TYPE_EYE)
         send_notice(i, "모르는 type: %d", p->type);
     else if (strcmp(p->from, clients[i].name) != 0)
         send_notice(i, "보낸 사람 이름이 다릅니다: %s", p->from);
@@ -975,6 +1068,7 @@ static void check_admitted(struct person *p)
         p->state = MEMBER;
         print_line("[입장 심사] %s 승인 %d/%d · 이제 %s도 대화에 들어옵니다", p->name, got, need, p->name);
         send_stamp(p, 0);             // 내 글을 몇 번부터 받는지 알려 준다
+        send_eye(p);                  // 내 카메라 지킴이를 켜 두었으면 그것도
     } else if (got != p->shown_progress && got > 0) {
         print_line("[입장 심사] %s 승인 %d/%d · %s의 승인을 기다리는 중", p->name, got, need,
                    waiting_for[0] ? waiting_for : "나");
@@ -1055,7 +1149,8 @@ static void on_hello(const struct packet *p)
     memset(n, 0, sizeof(*n));
     strcpy(n->name, p->from);
     memcpy(n->id_pk, p->body, KEY_LEN);
-    if (start_keys(my_kx_pk, my_kx_sk, p->body + KEY_LEN, n->send_key, n->recv_key) != 0)
+    if (start_keys(my_kx_pk, my_kx_sk, p->body + KEY_LEN, n->send_key, n->recv_key) != 0
+        || mark_key(my_id_sk, n->id_pk, n->mark) != 0)
         return;
     people_count++;
     key_words(n->id_pk, words);
@@ -1296,12 +1391,293 @@ static void tick(void)
 
 
 
+// 카메라 지킴이 (/eye)
+// 카메라 프로그램(eye\deolmi_eye.py)이 같은 노트북 안에서 UDP로 0.5초마다 한 단어를 보낸다: ready, clear, phone, dark, fail
+// 화면 앞에 휴대폰이 보이거나 카메라가 가려지면 글을 가리고, 방 사람들에게 암호화해서 알린다
+// 영상은 카메라 프로그램 안에서만 쓰고 저장하지도 보내지도 않는다. 덜미가 받는 건 단어 하나뿐
+
+enum { EYE_OFF, EYE_ON, EYE_PHONE, EYE_DARK };
+
+static int eye_sock = -1, eye_state = EYE_OFF;
+static HANDLE eye_job, hidden_screen;
+static ULONGLONG eye_heard;           // 카메라 프로그램한테서 마지막으로 들은 때
+
+
+
+
+// 내 지킴이 상태를 멤버들한테 (only가 있으면 그 사람한테만)
+static void send_eye(struct person *only)
+{
+    uint8_t state = (uint8_t)eye_state;
+    for (int i = 0; i < people_count; i++)
+        if (people[i].state == MEMBER && (!only || &people[i] == only))
+            send_to(&people[i], TYPE_EYE, &state, 1);
+}
+
+
+
+
+// 글 가리기: 빈 화면 버퍼로 바꿔 끼운다. 그동안 온 글은 원래 화면에 쌓였다가 돌아오면 보인다
+static void hide_screen(const wchar_t *why)
+{
+    HANDLE out = GetStdHandle(STD_OUTPUT_HANDLE);
+    DWORD mode, n;
+    if (!GetConsoleMode(out, &mode))  // 화면이 아니면 (파이프로 테스트할 때) 가리지 않음
+        return;
+    if (hidden_screen) {
+        SetConsoleActiveScreenBuffer(out);
+        CloseHandle(hidden_screen);
+        hidden_screen = NULL;
+    }
+    if (!why)
+        return;
+    hidden_screen = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, CONSOLE_TEXTMODE_BUFFER, NULL);
+    if (hidden_screen == INVALID_HANDLE_VALUE) {
+        hidden_screen = NULL;
+        return;
+    }
+    WriteConsoleW(hidden_screen, why, (DWORD)wcslen(why), &n, NULL);
+    SetConsoleActiveScreenBuffer(hidden_screen);
+}
+
+
+
+
+static void set_eye(int state)
+{
+    if (state == eye_state)
+        return;
+    if (state == EYE_PHONE)
+        print_line("[카메라] 화면 앞에 휴대폰이 보여 글을 가렸습니다 · 방 사람들에게 알렸습니다");
+    else if (state == EYE_DARK)
+        print_line("[카메라] 카메라가 가려져 글을 가렸습니다 · 방 사람들에게 알렸습니다");
+    else if (state == EYE_ON && eye_state == EYE_OFF)
+        print_line("[카메라] 켜졌습니다 · 화면 앞에 휴대폰이 보이거나 카메라를 가리면 글을 가립니다 (영상은 저장하지도 보내지도 않음)");
+    else if (state == EYE_ON)
+        print_line("[카메라] 다시 보여 줍니다");
+    hide_screen(state == EYE_PHONE ? L"\n\n   [덜미] 화면 앞에 휴대폰이 보여 글을 가렸습니다\n\n   휴대폰을 내리면 다시 보입니다\n"
+              : state == EYE_DARK  ? L"\n\n   [덜미] 카메라가 가려져 글을 가렸습니다\n\n   카메라를 가리지 않으면 다시 보입니다\n"
+              : NULL);
+    eye_state = state;
+    send_eye(NULL);
+}
+
+
+
+
+static void stop_eye(void)
+{
+    if (eye_job) {                    // job을 닫으면 카메라 프로그램도 같이 꺼진다
+        CloseHandle(eye_job);
+        eye_job = NULL;
+    }
+    if (eye_sock >= 0) {
+        closesocket(eye_sock);
+        eye_sock = -1;
+    }
+    set_eye(EYE_OFF);
+}
+
+
+
+
+// eye\deolmi_eye.py 찾기: 지금 폴더, 그다음 deolmi.exe가 있는 폴더부터 두 칸 위까지
+// (x64\Debug\deolmi.exe를 더블클릭해서 켜도 찾게)
+static int find_eye(wchar_t path[MAX_PATH])
+{
+    wchar_t dir[MAX_PATH];
+    wcscpy(path, L"eye\\deolmi_eye.py");
+    if (GetFileAttributesW(path) != INVALID_FILE_ATTRIBUTES)
+        return 1;
+    GetModuleFileNameW(NULL, dir, MAX_PATH);
+    for (int up = 0; up < 3; up++) {
+        wchar_t *slash = wcsrchr(dir, L'\\');
+        if (!slash)
+            break;
+        *slash = L'\0';
+        swprintf(path, MAX_PATH, L"%ls\\eye\\deolmi_eye.py", dir);
+        if (GetFileAttributesW(path) != INVALID_FILE_ATTRIBUTES)
+            return 1;
+    }
+    return 0;
+}
+
+
+
+
+// 카메라 프로그램 켜기. 받을 UDP 포트를 127.0.0.1에 열고 그 번호를 넘긴다
+// 테스트할 때는 DEOLMI_EYE로 가짜 카메라 프로그램을 쓸 수 있다
+static void start_eye(void)
+{
+    struct sockaddr_in addr = {0};
+    int len = sizeof(addr);
+    wchar_t cmd[2 * MAX_PATH], script[MAX_PATH];
+    const wchar_t *helper = _wgetenv(L"DEOLMI_EYE");
+    STARTUPINFOW si = { sizeof(si) };
+    PROCESS_INFORMATION pi;
+    JOBOBJECT_EXTENDED_LIMIT_INFORMATION limit = {0};
+    if (!helper && !find_eye(script)) {
+        print_line("[카메라] eye\\deolmi_eye.py를 찾지 못했습니다 (deolmi 폴더째 받았는지 확인)");
+        return;
+    }
+    eye_sock = (int)socket(AF_INET, SOCK_DGRAM, 0);
+    addr.sin_family = AF_INET;
+    addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+    if (eye_sock < 0 || bind(eye_sock, (struct sockaddr *)&addr, sizeof(addr)) != 0
+        || getsockname(eye_sock, (struct sockaddr *)&addr, &len) != 0) {
+        print_line("[카메라] 카메라 프로그램과 이야기할 포트를 열지 못했습니다");
+        stop_eye();
+        return;
+    }
+    if (helper)
+        swprintf(cmd, 2 * MAX_PATH, L"%ls %u", helper, ntohs(addr.sin_port));
+    else
+        swprintf(cmd, 2 * MAX_PATH, L"python \"%ls\" %u", script, ntohs(addr.sin_port));
+    eye_job = CreateJobObjectW(NULL, NULL);   // 덜미가 꺼지면 카메라 프로그램도 같이 꺼지게
+    limit.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
+    SetInformationJobObject(eye_job, JobObjectExtendedLimitInformation, &limit, sizeof(limit));
+    if (!CreateProcessW(NULL, cmd, NULL, NULL, FALSE, CREATE_NO_WINDOW | CREATE_SUSPENDED, NULL, NULL, &si, &pi)) {
+        print_line("[카메라] 카메라 프로그램을 켜지 못했습니다 (python이 깔려 있는지 확인)");
+        stop_eye();
+        return;
+    }
+    AssignProcessToJobObject(eye_job, pi.hProcess);
+    ResumeThread(pi.hThread);
+    CloseHandle(pi.hThread);
+    CloseHandle(pi.hProcess);
+    eye_heard = GetTickCount64();
+    print_line("[카메라] 켜는 중입니다 (몇 초 걸립니다)");
+}
+
+
+
+
+// 카메라 프로그램이 보낸 단어
+static void read_eye(void)
+{
+    char word[16];
+    struct sockaddr_in from;
+    int len = sizeof(from);
+    int n = recvfrom(eye_sock, word, sizeof(word) - 1, 0, (struct sockaddr *)&from, &len);
+    if (n <= 0 || from.sin_addr.s_addr != htonl(INADDR_LOOPBACK))
+        return;
+    word[n] = '\0';
+    eye_heard = GetTickCount64();
+    if (strcmp(word, "fail") == 0) {
+        print_line("[카메라] 카메라를 열지 못했습니다 (다른 프로그램이 쓰고 있는지 확인)");
+        stop_eye();
+    } else if (strcmp(word, "phone") == 0)
+        set_eye(EYE_PHONE);
+    else if (strcmp(word, "dark") == 0)
+        set_eye(EYE_DARK);
+    else if (strcmp(word, "ready") == 0 || strcmp(word, "clear") == 0)
+        set_eye(EYE_ON);
+}
+
+
+
+
+// 카메라 프로그램이 조용하면 멈춘 것 (켜는 중엔 모델을 읽느라 오래 걸려서 20초까지 기다림)
+static void check_eye(void)
+{
+    if (eye_sock >= 0 && GetTickCount64() - eye_heard > (eye_state == EYE_OFF ? 20000u : 3000u)) {
+        print_line("[카메라] 카메라 프로그램이 멈췄습니다 (python에 mediapipe, opencv-python이 깔려 있는지 확인)");
+        stop_eye();
+    }
+}
+
+
+
+
+// 다른 사람의 지킴이 상태
+static void on_eye(struct person *from, const uint8_t *body, int len)
+{
+    int was = from->eye;
+    if (len != 1 || body[0] > EYE_DARK || body[0] == was)
+        return;
+    from->eye = body[0];
+    if (body[0] == EYE_PHONE)
+        print_line("[덜미] %s 화면 앞에 휴대폰이 보입니다 · %s의 화면은 가려졌습니다", from->name, from->name);
+    else if (body[0] == EYE_DARK)
+        print_line("[덜미] %s의 카메라가 가려졌습니다 · %s의 화면은 가려졌습니다", from->name, from->name);
+    else if (body[0] == EYE_ON && was == EYE_OFF)
+        print_line("[카메라] %s%s 카메라 지킴이를 켰습니다", from->name, I_GA(from->name));
+    else if (body[0] == EYE_ON)
+        print_line("[카메라] %s의 화면이 다시 보입니다", from->name);
+    else
+        print_line("[카메라] %s%s 카메라 지킴이를 껐습니다", from->name, I_GA(from->name));
+}
+
+
+
+
+// 유출 추적 (/trace)
+// 새어 나간 내 글 한 줄을 붙여 넣으면, 지금 방에 있는 사람과 known 파일의 사람마다
+// 그 사람 화면에 어떻게 보였을지 표식을 다시 만들어 맞춰 본다
+static void trace(const char *leak)
+{
+    static char text[4 * MAX_INPUT], shown[8 * MAX_INPUT + 3], matched[MAX_PEOPLE * (NAME_LEN + 2)];
+    char name[NAME_LEN] = "";
+    const char *close = strchr(leak, ']'), *body = leak;
+    int count, matches = 0, gaps = 1;
+    uint8_t key[KEY_LEN];
+    if (leak[0] == '[' && close) {    // 앞의 "[이름]" 또는 "[이름 -> 나]"에서 이름만
+        size_t n = strcspn(leak + 1, " ]");
+        if (n < NAME_LEN) {
+            memcpy(name, leak + 1, n);
+            name[n] = '\0';
+        }
+        body = close + 1;
+    }
+    if (name[0] && strcmp(name, my_name) != 0) {
+        print_line("[추적] 내가 보낸 글만 추적할 수 있습니다 (이 글은 %s의 글)", name);
+        return;
+    }
+    strncpy(text, body, sizeof(text) - 1);
+    trim(text);
+    for (const char *c = text; *c; c++)
+        gaps += *c == ' ';
+    count = load_known();
+    for (int i = 0; i < people_count; i++) {   // 지금 방에 있는데 known에 없는 사람도
+        int k;
+        for (k = 0; k < count && strcmp(known_names[k], people[i].name) != 0; k++)
+            ;
+        if (k == count && count < MAX_KNOWN) {
+            strcpy(known_names[count], people[i].name);
+            memcpy(known_pks[count++], people[i].id_pk, KEY_LEN);
+        }
+    }
+    print_line("[추적] 이 글이 사람마다 이렇게 보였습니다 (띄어쓰기 %d곳 비교)", name[0] ? gaps : gaps - 1);
+    matched[0] = '\0';
+    for (int i = 0; i < count; i++) {
+        if (strcmp(known_names[i], my_name) == 0 || mark_key(my_id_sk, known_pks[i], key) != 0)
+            continue;
+        mark_text(key, text, shown);
+        // 앞에 이름이 없으면 이름 뒤 칸은 빼고 비교
+        int same = name[0] ? strcmp(shown, body) == 0 : strcmp(shown + strspn(shown, " "), body + strspn(body, " ")) == 0;
+        print_line("        [%s]%s   ← %s 화면%s", my_name, shown, known_names[i], same ? " (같음 ✔)" : "");
+        if (same && matches++ < MAX_PEOPLE)
+            strcat(strcat(matched, matches > 1 ? ", " : ""), known_names[i]);
+    }
+    sodium_memzero(key, KEY_LEN);
+    if (matches == 1)
+        print_line("[추적] %s 화면에서 나온 글입니다", matched);
+    else if (matches > 1)
+        print_line("[추적] %s 중 한 사람입니다 (글이 짧아 더 좁힐 수 없음 · 다른 줄도 넣어 보세요)", matched);
+    else
+        print_line("[추적] 띄어쓰기가 꼭 맞는 사람이 없습니다 · 캡처 사진이면 위 줄들과 띄어쓰기를 눈으로 비교하세요");
+}
+
+
+
+
 // 받은 메시지
 // 앞부분: 0 전체 / 1 1:1, 장부 번호 4, 앞 장부 값 32. 그 뒤가 글
+// 화면에는 띄어쓰기 표식을 넣어 보여 준다 (장부에는 원래 글 그대로)
 static void on_message(struct person *from, uint8_t *body, int len)
 {
     char name[NAME_LEN];
-    static char text[MAX_BODY + 1];
+    static char text[MAX_BODY + 1], shown[2 * MAX_BODY + 3];
     if (len < MSG_HEAD)
         return;
     uint32_t index = (uint32_t)body[1] << 24 | body[2] << 16 | body[3] << 8 | body[4];
@@ -1312,7 +1688,8 @@ static void on_message(struct person *from, uint8_t *body, int len)
     memcpy(text, body + MSG_HEAD, len - MSG_HEAD);
     text[len - MSG_HEAD] = '\0';
     remove_control_chars(text);
-    print_line(body[0] ? "[%s -> 나%s] %s" : "[%s%s] %s", name, from->state == WAITING ? " (승인 전)" : "", text);
+    mark_text(from->mark, text, shown);
+    print_line(body[0] ? "[%s -> 나%s]%s" : "[%s%s]%s", name, from->state == WAITING ? " (승인 전)" : "", shown);
 }
 
 
@@ -1350,6 +1727,8 @@ static void handle_incoming(struct packet *p)
         on_approve(from, text_buf, n);
     else if (p->type == TYPE_LEDGER)
         on_stamp(from, text_buf, n);
+    else if (p->type == TYPE_EYE)
+        on_eye(from, text_buf, n);
 }
 
 
@@ -1408,21 +1787,6 @@ static void send_message(const char *msg, const char *two_face, const char *othe
 
 
 
-// 앞뒤 공백 지우기
-static char *trim(char *s)
-{
-    size_t n;
-    while (*s == ' ')
-        s++;
-    n = strlen(s);
-    while (n > 0 && s[n - 1] == ' ')
-        s[--n] = '\0';
-    return s;
-}
-
-
-
-
 // 명령어 (명령어가 아니면 메시지로 보냄)
 static void handle_input(char *line)
 {
@@ -1442,10 +1806,19 @@ static void handle_input(char *line)
             print_line("[1:1 대화] %s에게만 보냅니다 (/all 입력하면 전체 대화로)", dm_target);
         }
     } else if (strcmp(line, "/who") == 0) {
-        printf("[접속 중] %s(나)", my_name);
+        printf("[접속 중] %s(나%s)", my_name, eye_state != EYE_OFF ? ", 카메라 켬" : "");
         for (int i = 0; i < people_count; i++)
-            printf(", %s%s", people[i].name, people[i].state == WAITING ? "(승인 대기)" : "");
+            printf(", %s%s", people[i].name, people[i].state == WAITING ? "(승인 대기)" : people[i].eye != EYE_OFF ? "(카메라 켬)" : "");
         print_line("");
+    } else if (strcmp(line, "/eye") == 0) {
+        if (eye_sock < 0)
+            start_eye();
+        else {
+            stop_eye();
+            print_line("[카메라] 껐습니다");
+        }
+    } else if (strncmp(line, "/trace ", 7) == 0) {
+        trace(line + 7);
     } else if (strncmp(line, "/ok ", 4) == 0) {
         if (!(p = find_person(line + 4)))
             print_line("[입장 심사] %s%s 접속해 있지 않습니다", line + 4, EUN(line + 4));
@@ -1494,12 +1867,12 @@ static void handle_input(char *line)
             print_line(drop ? "[시연] %s에게 가는 다음 메시지 한 통을 몰래 버립니다" : "[시연] %s에게 가는 다음 메시지를 1바이트 바꿉니다", name);
         }
     } else if (line[0] == '/') {
-        print_line("[알림] 명령어: /dm 이름, /all, /who, /ok 이름, /verify [이름], /check, /quit");
+        print_line("[알림] 명령어: /dm 이름, /all, /who, /ok 이름, /verify [이름], /check, /eye, /trace 새어 나간 줄, /quit");
         print_line("       시연: /twoface 이름 | 글1 | 글2, 방장 /drop 이름, /tamper 이름");
     } else if (member_count() == 0) {
         print_line("[알림] 아직 대화할 멤버가 없습니다");
     } else {
-        send_message(line, NULL, NULL);
+        send_message(trim(line), NULL, NULL);
     }
 }
 
@@ -1652,7 +2025,9 @@ int main(void)
         print_line("덜미 - %s (%s에 접속)", my_name, host);
     }
     print_line("[내 단어] %s%s", my_words, made ? " (신원 키를 새로 만들었습니다)" : "");
-    print_line("명령어: /dm 이름(1:1 대화), /all(전체 대화), /who(접속자), /ok 이름(승인), /verify 이름(단어), /check(장부 대조), /quit(나가기)");
+    print_line("명령어: /dm 이름(1:1 대화), /all(전체 대화), /who(접속자), /ok 이름(승인), /verify 이름(단어), /check(장부 대조),");
+    print_line("        /eye(카메라 지킴이 켜고 끄기), /trace 새어 나간 줄(누구 화면인지 찾기), /quit(나가기)");
+    print_line("[알림] 받은 글은 사람마다 띄어쓰기가 조금씩 다르게 보입니다 · 캡처가 새면 보낸 사람이 /trace로 누구 화면인지 찾습니다");
     CloseHandle(CreateThread(NULL, 0, keyboard_thread, NULL, 0, NULL));
 
     for (;;) {
@@ -1665,6 +2040,9 @@ int main(void)
         n = client_count;
         for (int i = 0; i < n; i++)
             FD_SET(clients[i].conn.sock, &fds);
+        int eye = eye_sock;
+        if (eye >= 0)
+            FD_SET(eye, &fds);
         LeaveCriticalSection(&lock);
         int ready = select(0, &fds, NULL, NULL, &one_second);
         EnterCriticalSection(&lock);
@@ -1682,8 +2060,11 @@ int main(void)
                 } else
                     closesocket(sock);
             }
+            if (eye >= 0 && eye == eye_sock && FD_ISSET(eye, &fds))
+                read_eye();
         }
         tick();
+        check_eye();
         LeaveCriticalSection(&lock);
     }
 }

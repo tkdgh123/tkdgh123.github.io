@@ -109,6 +109,37 @@ int main(void)
     ledger_next(h1b, 2, (const uint8_t *)"좋아", 6, h2b);
     check(memcmp(h2, h2b, KEY_LEN) != 0, "앞에서 한 번 달라지면 뒤 값도 계속 다름 (사슬)");
 
+    /* 띄어쓰기 표식 */
+    uint8_t id3_pk[KEY_LEN], id3_sk[ID_SK_LEN], m12[KEY_LEN], m21[KEY_LEN], m13[KEY_LEN];
+    char s1[512], s2[512], s3[512], plain[512];
+    const char *long_text = "내일 동아리 회비 걷는 거 잊지 마세요 다들 오천 원씩 현금으로 가져오면 됩니다 늦으면 안 돼요";
+    crypto_sign_keypair(id3_pk, id3_sk);
+    check(mark_key(id_sk, id2_pk, m12) == 0 && mark_key(id2_sk, id_pk, m21) == 0 && memcmp(m12, m21, KEY_LEN) == 0,
+          "표식 키: 보낸 사람과 받은 사람이 같은 키를 만듦");
+    mark_key(id_sk, id3_pk, m13);
+    check(memcmp(m12, m13, KEY_LEN) != 0, "표식 키: 받는 사람이 다르면 키가 다름");
+    mark_text(m12, long_text, s1);
+    mark_text(m12, long_text, s3);
+    check(strcmp(s1, s3) == 0, "같은 키, 같은 글 → 늘 같은 띄어쓰기");
+    mark_text(m13, long_text, s2);
+    check(strcmp(s1, s2) != 0, "받는 사람이 다르면 띄어쓰기가 다름");
+    int w = 0, doubles = 0, gaps = 0;
+    for (const char *c = s1 + 1; *c; c++)
+        if (*c != ' ' || c[1] != ' ')
+            plain[w++] = *c;
+    plain[w] = '\0';
+    check(strcmp(plain + (plain[0] == ' '), long_text) == 0, "두 칸을 한 칸으로 줄이면 원래 글");
+    for (int k = 0; k < 64; k++) {      /* 여러 사람에게 보낸 셈 치고 두 칸 비율 */
+        uint8_t key[KEY_LEN];
+        randombytes_buf(key, KEY_LEN);
+        mark_text(key, long_text, s3);
+        for (const char *c = s3; *c; c++) {
+            gaps += *c == ' ' && c[1] != ' ';
+            doubles += *c == ' ' && c[1] == ' ';
+        }
+    }
+    check(doubles * 6 > gaps && doubles * 3 < gaps, "두 칸은 4칸에 1칸꼴 (눈에 잘 안 띄게)");
+
     printf(fails ? "\n%d개 실패\n" : "\n전부 통과\n", fails);
     return fails != 0;
 }

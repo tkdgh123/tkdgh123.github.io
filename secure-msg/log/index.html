@@ -27,13 +27,13 @@
     <a class="t h-next rise" style="--i:2" href="../guide/"><span>다음 페이지</span><b>설명서 <span aria-hidden="true">→</span></b></a>
   </div>
   <div class="h-ui rise" data-ui><p class="cap">deolmi 저장소의 최근 커밋 (git log)</p>
-<pre class="term"><span class="k">11-06 17:54</span>  이름 뒤 조사를 받침에 맞게 (창식이 들어왔습니다, 창식과 같음)
+<pre class="term"><span class="k">11-06 21:22</span>  화면 지키기: 카메라 지킴이(/eye)와 유출 추적(/trace…
+<span class="k">11-06 17:54</span>  이름 뒤 조사를 받침에 맞게 (창식이 들어왔습니다, 창식과 같음)
 <span class="k">11-06 17:49</span>  최종 방향: 방장도 못 믿는 메신저 — 암호화 + 입장 심사 +…
 <span class="k">11-06 17:28</span>  중간결과물 제출본: 주석을 짧게, 화면 글을 ~습니다로 통일 (…
 <span class="k">11-05 21:35</span>  .bat·.sln 은 윈도우 줄바꿈(CRLF)으로 받게
 <span class="k">11-05 21:34</span>  윈도우 전용으로 정리하고 Visual Studio에서 F5로 바…
-<span class="k">11-04 15:36</span>  중계만 하는 서버(--server) 모드를 뺌: 방장이 서버를 …
-<span class="k">11-04 15:18</span>  윈도우에서도 빌드·실행: 같은 deolmi.c 를 Visual …</pre></div>
+<span class="k">11-04 15:36</span>  중계만 하는 서버(--server) 모드를 뺌: 방장이 서버를 …</pre></div>
 </section>
 <div class="doc">
 <details class="t toc" open><summary>이 페이지 차례</summary><nav aria-label="차례"><ol><li><a href="#who"><i>00</i>누가 무엇을 했나</a></li><li><a href="#s01"><i>01</i>바뀐 순서</a></li><li><a href="#check"><i>02</i>어떻게 확인했나</a></li><li><a href="#s03"><i>03</i>deolmi.c 지도</a></li><li><a href="#s04"><i>04</i>다음에 할 일</a></li></ol></nav></details>
@@ -43,11 +43,11 @@
 <div class="now">
   <b>지금 상태 · 11월 6일 저녁</b>
   <ul>
-    <li><b>최종 방향 확정: 방장도 못 믿는 메신저</b> — 끌 수 없는 종단간 암호화 + <b>입장 심사</b> + <b>장부 대조</b> + 시연 모드 (<a href="../plan/">계획</a>). 코드까지 들어갔다.</li>
-    <li>코드는 <code>deolmi.c</code> <b>한 파일</b> (1690줄) + <code>libsodium</code> 폴더, <b>윈도우 전용</b>. <code>deolmi.sln</code>을 열고 F5 (<a href="../run/">시작하기</a>).</li>
-    <li>자동 테스트 <b>85개 통과</b> — 네 명을 실제 프로그램으로 띄워 입장 심사·대화·두 얼굴·몰래 버리기·1바이트 바꾸기·다시 접속·키 바뀜까지 (아래 <a href="#check">확인</a>).</li>
+    <li><b>최종 방향: 방장도 못 믿는 메신저</b> — 끌 수 없는 종단간 암호화 + <b>입장 심사</b> + <b>장부 대조</b> + 시연 모드, 그리고 <b>화면 지키기</b>(카메라 지킴이 + 유출 추적) (<a href="../plan/">계획</a>). 코드까지 들어갔다.</li>
+    <li>코드는 <code>deolmi.c</code> <b>한 파일</b> (2,070줄쯤) + <code>libsodium</code> 폴더 + 카메라 도우미 <code>eye\deolmi_eye.py</code>, <b>윈도우 전용</b>. <code>deolmi.sln</code>을 열고 F5 (<a href="../run/">시작하기</a>).</li>
+    <li>자동 테스트 <b>105개 통과</b> — 네 명을 실제 프로그램으로 띄워 입장 심사·대화·두 얼굴·몰래 버리기·1바이트 바꾸기·유출 추적·카메라 지킴이(가짜 카메라)·다시 접속·키 바뀜까지 (아래 <a href="#check">확인</a>).</li>
     <li>11-06 중간결과물(평문)은 git 태그 <code>midterm-submit</code>으로 남겨 두었다 (<a href="../code/#m0">코드 페이지</a>).</li>
-    <li><b>아직</b>: 노트북 여러 대에서 실제 접속, 실제 콘솔 창에서 손으로 해 보기, <a href="../guide/">설명서</a>를 새 프로그램 기준으로 다시 쓰기.</li>
+    <li><b>아직</b>: 실제 휴대폰을 카메라 앞에 들어 보기, 노트북 여러 대에서 실제 접속, 실제 콘솔 창에서 손으로 해 보기, <a href="../guide/">설명서</a>를 새 프로그램 기준으로 다시 쓰기.</li>
   </ul>
 </div>
 </section>
@@ -55,8 +55,8 @@
 <h2 id="who"><span class="n">00</span>누가 무엇을 했나</h2>
 <div class="tbl"><table class="whot">
 <tr><th>누구</th><th>한 일</th></tr>
-<tr><td><span class="u">김창식</span></td><td>기획과 방향 결정 (암호화는 나중에, 한 파일로, 주소 표시, <b>11-06 최종 방향 "방장도 못 믿는 메신저" 확정</b>, 근거는 2026년 자료로 등), 직접 실행해 보고 문제 찾기 (<code>/who</code>가 안 됨, 다른 컴퓨터에서 안 붙음, 사이트가 처음 보는 사람에게 불친절함)</td></tr>
-<tr><td><span class="c">Claude</span><br><small>Anthropic의 AI</small></td><td><b>코드 전부 작성</b> (S1~S8, 한 파일로 합치기, 버그 수정), 자동 테스트 작성·실행, 둘이 채팅 시뮬레이션, <b>이 사이트의 모든 페이지 작성</b> (설명서·암호화 계획·코드·시작하기·작업 기록), 암호화·2인 잠금 설계, 이 노트북 방화벽 규칙 넣기, 윈도우판(같은 <code>deolmi.c</code>가 윈도우에서 돌게)과 그 시험, 제출용으로 줄이기(윈도우 전용·이름 정리), Visual Studio 프로젝트, <b>11-06 다른 메신저 빈틈 조사(2026년 자료)·최종 설계·암호화·입장 심사·장부 대조·시연 모드 코드·libsodium 붙이기·테스트 85개</b></td></tr>
+<tr><td><span class="u">김창식</span></td><td>기획과 방향 결정 (암호화는 나중에, 한 파일로, 주소 표시, <b>11-06 최종 방향 "방장도 못 믿는 메신저" 확정</b>, 근거는 2026년 자료로, <b>"더 창의적으로" — 카메라로 휴대폰을 잡는 아이디어</b> 등), 직접 실행해 보고 문제 찾기 (<code>/who</code>가 안 됨, 다른 컴퓨터에서 안 붙음, 사이트가 처음 보는 사람에게 불친절함)</td></tr>
+<tr><td><span class="c">Claude</span><br><small>Anthropic의 AI</small></td><td><b>코드 전부 작성</b> (S1~S8, 한 파일로 합치기, 버그 수정), 자동 테스트 작성·실행, 둘이 채팅 시뮬레이션, <b>이 사이트의 모든 페이지 작성</b> (설명서·암호화 계획·코드·시작하기·작업 기록), 암호화·2인 잠금 설계, 이 노트북 방화벽 규칙 넣기, 윈도우판(같은 <code>deolmi.c</code>가 윈도우에서 돌게)과 그 시험, 제출용으로 줄이기(윈도우 전용·이름 정리), Visual Studio 프로젝트, <b>11-06 다른 메신저 빈틈 조사(2026년 자료)·최종 설계·암호화·입장 심사·장부 대조·시연 모드 코드·libsodium 붙이기, 저녁에 띄어쓰기 표식 설계·카메라 지킴이·유출 추적 코드, 테스트 105개</b></td></tr>
 </table></div>
 <p class="sub">git 커밋 기록에는 작성자가 모두 김창식으로 남아 있지만, 위 표처럼 실제 코드는 Claude가 썼다. 아래 각 항목에도 누가 요청하고 누가 만들었는지 적었다.</p>
 </section>
@@ -254,18 +254,29 @@
 <li><b>libsodium</b> — 1.0.22 공식 Visual Studio 빌드를 받아 minisign 서명을 확인하고 <code>libsodium\</code> 폴더에 넣음. 이 빌드가 C 런타임을 정적으로 써서 프로젝트도 /MT·/MTd. git이 .lib를 글자 파일로 보고 줄바꿈을 바꾸려 해서 <code>.gitattributes</code>에 binary로 지정.</li>
 <li><b>조사 중 고친 것</b> — 시험해 보니 ① 보낸 사람의 첫 글이 빠지면 "원래 0개"와 구분이 안 됨 → 멤버로 받아 줄 때 "여기서부터" 장부를 한 번 보냄 ② 나중에 들어온 사람은 기존 멤버 키를 안 적어 둬서 다시 접속할 때 자동 승인이 안 됨 → 처음 본 키로 적어 둠 ③ 이름 뒤 조사가 "창식가"처럼 어색함 → 받침에 맞게.</li>
 </ul>
-<p><b>확인:</b> 자동 테스트 85개 통과 (아래) · Visual Studio Debug·Release 빌드 경고 0 · 사이트의 <code>deolmi_vs.zip</code>을 빈 폴더에 풀어 처음 받는 사람처럼 빌드됨 · 둘이 대화하는 실제 출력을 <a href="../run/#chat">시작하기</a>에.</p></div>
+<p><b>확인:</b> 자동 테스트 85개 통과 (그때) · Visual Studio Debug·Release 빌드 경고 0 · 사이트의 <code>deolmi_vs.zip</code>을 빈 폴더에 풀어 처음 받는 사람처럼 빌드됨.</p></div>
+
+<div class="ev"><span class="d">11-06 저녁</span>
+<h3>화면 지키기 — 찍으면 가려지고, 새면 잡힌다</h3>
+<p class="who">요청 <span class="u">김창식</span> — "창의성이 좀 떨어지는 것 같다, 더 창의적이게", "카메라를 켜서 손날 가림막처럼 핸드폰을 인식하면 덜미가 잡히게", "같이 하자" · 설계·구현·시험 <span class="c">Claude</span></p>
+<ul>
+<li><b>왜</b> — 입장 심사는 시그널의 안전 번호 확인과, 장부 대조는 학계 연구와 닮아 "이미 있는 것"으로 보일 수 있었다. 그래서 누구나 겪는 문제인 <b>캡처</b>로 넓혔다. 2026년 9월 치협 선관위 단톡방(19명) 캡처가 소송 증거로 나왔는데 누가 흘렸는지 찾지 못했다 (<a href="../plan/#why">계획 00</a>).</li>
+<li><b>카메라 지킴이</b> (<code>/eye</code>, 김창식 아이디어) — python 도우미가 MediaPipe 물체 인식으로 화면을 향한 휴대폰이나 가려진 렌즈를 찾아 한 단어만 덜미에 보낸다. 덜미는 빈 화면 버퍼로 바꿔 끼워 글을 가리고, 방 사람들에게 <code>EYE</code> 패킷(암호화, 1바이트)으로 알린다. 영상은 저장·전송하지 않는다. 덜미가 꺼지면 도우미도 같이 꺼진다(job 객체).</li>
+<li><b>유출 추적</b> (<code>/trace</code>) — 카메라만으로는 키보드 캡처를 못 봐서 같이 넣었다. 두 사람 신원 키로 만든 표식 키로, 받은 글의 칸을 4칸에 1칸꼴로 두 칸 띄운다. 새어 나간 줄을 넣으면 사람마다의 표식을 다시 만들어 맞춰 본다. 내가 보낸 글만 되고, 덜미 첫 화면에 이 사실을 알린다.</li>
+<li><b>시험하다 고친 것</b> — ① 다시 들어온 사람에게 카메라 상태가 안 갔나 했는데, 그 순간 "가려짐"이라 다른 문구로 간 것이었다 (테스트를 고침) ② 실제 창에서 가림막 화면을 읽어 보려니 다른 프로그램이 못 열게 돼 있었다 (공유 허용으로) ③ <code>x64\Debug\deolmi.exe</code>를 더블클릭하면 도우미를 못 찾았다 → exe 위쪽 폴더에서도 찾게 ④ "추적되는 방이라고 알린다"고 해 놓고 안내 줄이 빠져 있었다 → 첫 화면에 추가.</li>
+</ul>
+<p><b>확인:</b> 자동 테스트 105개 통과 · Debug·Release 빌드 경고 0 · 최소화한 실제 콘솔 창에서 휴대폰 신호 때 가림막으로 바뀌고 돌아오는 것을 화면 내용으로 확인 · 진짜 도우미를 노트북 카메라로 12초 돌려 휴대폰 없이 잘못 잡은 것 0 · 샘플 사진 5장 모두 휴대폰 찾음. <b>실제 휴대폰을 들어 보는 건 아직</b> (김창식 확인 필요).</p></div>
 </div>
 </section>
 <section class="t sec rise" id="check">
 <h2 id="check"><span class="n">02</span>어떻게 확인했나</h2>
-<h3>자동 테스트 — <code>tests\run.bat</code>, 85개 모두 통과 (11-06)</h3>
+<h3>자동 테스트 — <code>tests\run.bat</code>, 105개 모두 통과 (11-06 저녁)</h3>
 <p>Visual Studio 개발자 명령 프롬프트에서 <code>tests\run.bat</code> 하나로 빌드부터 끝까지 돈다.</p>
 <ul>
-<li><b>키 24개</b> (<code>test_crypto</code>, 방장 없이) — 같은 키면 같은 단어 8개 · HELLO의 이름·세션 키를 바꿔치기하면 서명이 안 맞음 · 방향별 키가 서로 맞물림 · 암호문에 평문 없음 · 1바이트 바뀐 암호문·받을 사람이나 번호를 바꾼 헤더는 안 열리고 키도 안 돌아감 · 한 통 빠져도 다음 통은 열림 · 장부 값은 한 글자·번호만 달라도 다르고, 한 번 달라지면 뒤로도 계속 다름</li>
+<li><b>키 30개</b> (<code>test_crypto</code>, 방장 없이) — 같은 키면 같은 단어 8개 · HELLO의 이름·세션 키를 바꿔치기하면 서명이 안 맞음 · 방향별 키가 서로 맞물림 · 암호문에 평문 없음 · 1바이트 바뀐 암호문·받을 사람이나 번호를 바꾼 헤더는 안 열리고 키도 안 돌아감 · 한 통 빠져도 다음 통은 열림 · 장부 값은 한 글자·번호만 달라도 다르고, 한 번 달라지면 뒤로도 계속 다름 · 표식 키는 두 사람이 같은 값을 만들고 받는 사람마다 다름 · 같은 글도 받는 사람마다 띄어쓰기가 다르고, 두 칸을 줄이면 원래 글 · 두 칸은 4칸에 1칸꼴</li>
 <li><b>패킷 5개</b> (<code>test_net</code>) — 쪼개져 온 바이트, 붙어 온 두 통, 말도 안 되는 길이, 본문 0바이트, 번호·nonce가 그대로 전달됨</li>
 <li><b>중계 24개</b> (<code>test_server</code>) — 서명한 HELLO만 등록, 서명이 틀리면 거절 · 새 사람은 이미 있던 사람들의 HELLO(번호 1, 방장은 마지막 번호 2)를, 있던 사람들은 새 사람의 HELLO를 받음 · 같은 이름·빈 이름·방장 이름 거절 · 받을 사람에게만 · APPROVE·LEDGER도 그대로 넘김 · 받을 사람이 빈 글은 아무에게도 안 감 · 남의 이름 막기 · 20명째도 들어옴</li>
-<li><b>시나리오 32개</b> (<code>e2e.py</code>) — 방장 H와 참가자 A·B·C를 실제 <code>deolmi.exe</code>로 띄움: 승인 전엔 글이 안 감 → 전원 승인해야 멤버 → 전체·1:1 대화(1:1은 방장 화면에도 없음) → <code>/check</code> 모두 같음, 정상 대화에선 경고 0 → 두 얼굴을 B·C·H가 모두 잡고 보낸 A에게도 보임 → 방장이 버린 글을 장부와 번호로 잡음 → 1바이트 바꾼 글은 버리고 대화는 이어짐 → 같은 키로 다시 오면 자동 승인 → 같은 이름·다른 키면 경고하고 자동 승인 안 함</li>
+<li><b>시나리오 46개</b> (<code>e2e.py</code>) — 방장 H와 참가자 A·B·C를 실제 <code>deolmi.exe</code>로 띄움: 승인 전엔 글이 안 감 → 전원 승인해야 멤버 → 전체·1:1 대화(1:1은 방장 화면에도 없음) → <code>/check</code> 모두 같음, 정상 대화에선 경고 0 → 두 얼굴을 B·C·H가 모두 잡고 보낸 A에게도 보임 → 방장이 버린 글을 장부와 번호로 잡음 → 1바이트 바꾼 글은 버리고 대화는 이어짐 → 같은 글이 H·B·C 화면에서 띄어쓰기가 서로 다르고, B·C 화면의 줄로 <code>/trace</code> 하면 각각 B·C를 찾음, 남의 글은 추적 안 함 → 가짜 카메라로 <code>/eye</code>: 휴대폰·가림을 방 사람 모두가 알고, 나중에 들어온 사람도 앎, 끄면 알림 → 같은 키로 다시 오면 자동 승인 → 같은 이름·다른 키면 경고하고 자동 승인 안 함</li>
 </ul>
 <h3>둘이서 채팅 — 직접 돌림</h3>
 <p>한 컴퓨터에서 프로그램 두 개를 띄우고, 정해 둔 순서대로 글을 넣어 양쪽 화면을 확인했다. 전체 대화, <code>/dm</code> 1:1, <code>/who</code>, 나가기까지 모두 맞게 떴다. 화면은 <a href="../run/#chat">시작하기</a>에 옮겨 두었다.</p>
@@ -274,7 +285,7 @@
 <li><b>셋이서</b> — 방장 민지 + 수빈 + 현우. 수빈이 모두에게 보낸 글이 방장 화면과 현우 화면에 뜨는 것까지 확인 (<a href="../guide/#path">설명서 06</a>)</li>
 <li><b>실제 창</b> — 콘솔 창 4개로 시연, Visual Studio로 켠 방장 + exe 더블클릭 참가자 (위 11-05)</li>
 </ul>
-<p>위 자동 테스트와 시뮬레이션은 <span class="c">Claude</span>가 돌렸고, 평문 버전을 실제 노트북에서 띄워 대화해 본 것은 <span class="u">김창식</span>이다. <b>11-06 최종 버전은 아직 사람이 직접 창을 띄워 해 보지 않았다.</b></p>
+<p>위 자동 테스트와 시뮬레이션은 <span class="c">Claude</span>가 돌렸고, 평문 버전을 실제 노트북에서 띄워 대화해 본 것은 <span class="u">김창식</span>이다. <b>11-06 최종 버전은 아직 사람이 직접 창을 띄워 해 보지 않았다.</b> 카메라 지킴이도 진짜 휴대폰을 들어 본 건 아직이다.</p>
 <div class="tip"><b>아직 확인 못 한 것</b> — 다른 컴퓨터에서 접속: 11-03 다른 데스크탑에서 시도했지만 연결이 이 노트북까지 오지 않았다. 학교 와이파이(SSU_INFO_WI-FI)가 기기끼리 연결을 막는 것으로 보고, 휴대폰 핫스팟으로 다시 해 볼 예정.</div>
 </section>
 <section class="t sec rise" id="s03">
@@ -283,22 +294,23 @@
 <div class="tbl"><table class="map">
 <tr><th>칸 (코드 속 제목)</th><th>하는 일</th><th>주요 함수</th></tr>
 <tr><td>① 통신</td><td>패킷 모양(헤더 65), 접속, 길이 붙여 보내기, 한 통씩 꺼내기</td><td><code>open_room</code> <code>connect_to_host</code> <code>send_packet</code> <code>take_packet</code> <code>header_ad</code></td></tr>
-<tr><td>② 키</td><td>단어 지문, 서명한 HELLO, 방향별 시작 키, 래칫 암호화·복호화, 장부 해시 — 네트워크를 모르는 순수 함수라 테스트가 바로 가져다 씀</td><td><code>key_words</code> <code>hello_make</code> <code>hello_ok</code> <code>start_keys</code> <code>seal_packet</code> <code>open_packet</code> <code>ledger_next</code></td></tr>
-<tr><td>③ 화면 · 파일 · 사람</td><td>글 찍기, 이름 검사, 신원 키·known 파일, 방에 있는 사람(키·래칫·승인·장부)</td><td><code>print_line</code> <code>open_my_file</code> <code>load_identity</code> <code>check_known</code> · <code>struct person</code></td></tr>
+<tr><td>② 키</td><td>단어 지문, 서명한 HELLO, 방향별 시작 키, 래칫 암호화·복호화, 장부 해시, 띄어쓰기 표식 — 네트워크를 모르는 순수 함수라 테스트가 바로 가져다 씀</td><td><code>key_words</code> <code>hello_make</code> <code>hello_ok</code> <code>start_keys</code> <code>seal_packet</code> <code>open_packet</code> <code>ledger_next</code> <code>mark_key</code> <code>mark_text</code></td></tr>
+<tr><td>③ 화면 · 파일 · 사람</td><td>글 찍기, 이름 검사, 신원 키·known 파일, 방에 있는 사람(키·래칫·승인·장부)</td><td><code>print_line</code> <code>trim</code> <code>open_my_file</code> <code>load_identity</code> <code>load_known</code> <code>check_known</code> · <code>struct person</code></td></tr>
 <tr><td>④ 중계</td><td>방장이 하는 일. HELLO 서명 확인·등록·넘기기, 받을 사람에게 넘기기, 시연 <code>/drop</code> <code>/tamper</code></td><td><code>handle_join</code> <code>handle_packet</code> <code>host_send</code> <code>remove_client</code></td></tr>
 <tr><td>⑤ 대화</td><td>한 사람에게 암호화해 보내기, 받은 통 열기(다시 보내기·빠짐·바뀜 검사)</td><td><code>send_to</code> <code>open_from</code></td></tr>
 <tr><td>⑥ 입장 심사</td><td>승인 모으기, 멤버가 되면 "여기서부터" 장부, HELLO 받기</td><td><code>check_admitted</code> <code>approve</code> <code>on_approve</code> <code>on_hello</code></td></tr>
-<tr><td>⑦ 장부 대조 · 받기 · 명령어</td><td>장부 쌓기·대조, 1초마다 확인, 받은 패킷 나누기, 보내기, 명령어, 입력 스레드</td><td><code>book_add</code> <code>send_stamp</code> <code>on_stamp</code> <code>tick</code> <code>handle_incoming</code> <code>send_message</code> <code>handle_input</code></td></tr>
-<tr><td>⑧ main</td><td>이름·방장/참가자 묻기, 신원 키·세션 키, 그다음 <code>select</code>(1초마다 깨어 <code>tick</code>)</td><td><code>main</code></td></tr>
+<tr><td>⑦ 장부 대조</td><td>장부 쌓기·대조, 1초마다 확인</td><td><code>book_add</code> <code>send_stamp</code> <code>on_stamp</code> <code>tick</code></td></tr>
+<tr><td>⑧ 카메라 지킴이 · 유출 추적 · 받기 · 명령어</td><td>도우미 켜고 끄기, 한 단어 받기, 글 가리기, <code>EYE</code> 알림, <code>/trace</code>, 받은 패킷 나누기(표식 넣어 보여 주기), 보내기, 명령어, 입력 스레드</td><td><code>start_eye</code> <code>read_eye</code> <code>set_eye</code> <code>hide_screen</code> <code>on_eye</code> <code>trace</code> <code>on_message</code> <code>handle_incoming</code> <code>send_message</code> <code>handle_input</code></td></tr>
+<tr><td>⑨ main</td><td>이름·방장/참가자 묻기, 신원 키·세션 키, 그다음 <code>select</code>(1초마다 깨어 <code>tick</code>)</td><td><code>main</code></td></tr>
 </table></div>
 </section>
 <section class="t sec rise" id="s04">
 <h2 id="s04"><span class="n">04</span>다음에 할 일</h2>
 <ul>
-<li>실제 창으로 손으로 해 보기 — 한 노트북에서 창 넷(방장 + 셋)으로 입장 심사와 시연 셋 (<a href="../run/">시작하기</a> 06)</li>
+<li>실제 창으로 손으로 해 보기 — 한 노트북에서 창 넷(방장 + 셋)으로 입장 심사와 시연 셋, 그리고 <b>진짜 휴대폰을 카메라 앞에 들어 보기</b>와 <code>/trace</code> (<a href="../run/#screen">시작하기 06</a>)</li>
 <li>노트북 두세 대로 실제 접속 (같은 핫스팟)</li>
 <li><a href="../guide/">설명서</a>를 새 프로그램 기준으로 다시 쓰기 — 지금 설명서의 패킷·HELLO 그림은 평문 버전 기준이다</li>
-<li>시간이 남으면 2인 잠금 금고 (<a href="../plan/#vault">계획 13~16</a>)</li>
+<li>시간이 남으면 2인 잠금 금고 (<a href="../plan/#vault">계획 15~18</a>)</li>
 <li>최종 제출(12-04: PPT 10장 이상·최종 코드·회의록 8회 이상)과 발표(12-09, 개인 3분) 준비</li>
 </ul>
 </section>

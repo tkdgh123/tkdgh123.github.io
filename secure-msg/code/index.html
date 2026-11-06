@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>덜미 코드</title>
-<meta name="description" content="덜미 전체 소스 코드. 지금 버전(암호화·입장 심사·장부 대조), 중간 제출 평문 버전, 11-02 첫 암호화 버전.">
+<meta name="description" content="덜미 전체 소스 코드. 지금 버전(암호화·입장 심사·장부 대조·카메라 지킴이·유출 추적), 중간 제출 평문 버전, 11-02 첫 암호화 버전.">
 <script>document.documentElement.classList.add("js")</script>
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -85,27 +85,29 @@ a.copy{text-decoration:none;line-height:1}
     <div class="t h-say rise" style="--i:1"><p>프밍기2 메신저 덜미의 소스 전부. 버전을 고르고 파일을 고르면 된다.</p><div class="by">만든 사람 <b>김창식</b>(기획·결정·확인) · <b>Claude</b>(코드·사이트 작성)</div></div>
     <a class="t h-next rise" style="--i:2" href="../plan/"><span>다음 페이지</span><b>암호화 계획 <span aria-hidden="true">→</span></b></a>
   </div>
-  <div class="h-ui rise" data-ui><p class="cap">deolmi.c 한 파일, 1690줄 — 칸을 누르면 그 줄로 간다</p>
-<ol class="map5"><li><button type="button" data-line="23"><b>① 통신</b><span>길이 붙인 패킷</span><i>23–208줄</i></button></li><li><button type="button" data-line="209"><b>② 키</b><span>서명·래칫·장부 해시</span><i>209–448줄</i></button></li><li><button type="button" data-line="449"><b>③ 화면·키 파일·사람 목록</b><span></span><i>449–675줄</i></button></li><li><button type="button" data-line="676"><b>④ 중계</b><span>방장</span><i>676–883줄</i></button></li><li><button type="button" data-line="884"><b>⑤ 대화</b><span>보내고 열기</span><i>884–936줄</i></button></li><li><button type="button" data-line="937"><b>⑥ 입장 심사</b><span></span><i>937–1093줄</i></button></li><li><button type="button" data-line="1094"><b>⑦ 장부 대조·받기·명령어</b><span></span><i>1094–1580줄</i></button></li><li><button type="button" data-line="1581"><b>⑧ 실행</b><span></span><i>1581–1690줄</i></button></li></ol></div>
+  <div class="h-ui rise" data-ui><p class="cap">deolmi.c 한 파일, 2071줄 — 칸을 누르면 그 줄로 간다</p>
+<ol class="map5"><li><button type="button" data-line="23"><b>① 통신</b><span>길이 붙인 패킷</span><i>23–208줄</i></button></li><li><button type="button" data-line="209"><b>② 키</b><span>서명·래칫·장부 해시</span><i>209–498줄</i></button></li><li><button type="button" data-line="499"><b>③ 화면·키 파일·사람 목록</b><span></span><i>499–768줄</i></button></li><li><button type="button" data-line="769"><b>④ 중계</b><span>방장</span><i>769–976줄</i></button></li><li><button type="button" data-line="977"><b>⑤ 대화</b><span>보내고 열기</span><i>977–1029줄</i></button></li><li><button type="button" data-line="1030"><b>⑥ 입장 심사</b><span></span><i>1030–1188줄</i></button></li><li><button type="button" data-line="1189"><b>⑦ 장부 대조</b><span></span><i>1189–1393줄</i></button></li><li><button type="button" data-line="1394"><b>⑧ 화면 지키기</b><span>카메라·추적·받기·명령어</span><i>1394–1953줄</i></button></li><li><button type="button" data-line="1954"><b>⑨ 실행</b><span></span><i>1954–2071줄</i></button></li></ol></div>
 </section>
 <main class="app">
   <h2 class="sr">버전과 파일</h2>
   <div class="side rise">
     <div class="vers" role="tablist" aria-label="버전">
-      <button class="ver n rise" style="--i:1" data-v="n" role="tab"><b>지금 버전 · 최종</b><span><code>deolmi.c</code> 한 파일 + libsodium. 암호화 · 입장 심사 · 장부 대조 · 시연 모드. 받기는 위의 VS 묶음(zip)으로 — libsodium이 같이 들어 있다.</span></button>
+      <button class="ver n rise" style="--i:1" data-v="n" role="tab"><b>지금 버전 · 최종</b><span><code>deolmi.c</code> 한 파일 + libsodium + 카메라 지킴이. 암호화 · 입장 심사 · 장부 대조 · 카메라 지킴이 · 유출 추적 · 시연 모드. 받기는 위의 VS 묶음(zip)으로 — libsodium과 카메라 모델이 같이 들어 있다.</span></button>
 <button class="ver m rise" style="--i:2" data-v="m" role="tab"><b>중간 제출 · 평문</b><span>11-06 중간결과물로 낸 버전. 암호화 없이 통신만 (git 태그 midterm-submit).</span></button>
 <button class="ver e rise" style="--i:3" data-v="e" role="tab"><b>11-02 첫 암호화 버전</b><span>처음 암호화까지 넣었던 여러 파일 버전 (리눅스용, 금고 포함). 보관만 하고 빌드에 안 쓴다.</span></button>
     </div>
     <nav class="rail" data-v="n" role="tablist" aria-label="지금 버전 · 최종 파일" hidden>
-<button class="tab" data-f="n0" role="tab"><span class="nm">deolmi.c</span><span class="meta">1690줄 · 프로그램 전부 — 통신 · 키 · 중계 · 대화 · 입장 심사 · 장부</span></button>
-<button class="tab" data-f="n1" role="tab"><span class="nm">deolmi.sln</span><span class="meta">19줄 · Visual Studio 솔루션 — 더블클릭해서 연다</span></button>
-<button class="tab" data-f="n2" role="tab"><span class="nm">deolmi.vcxproj</span><span class="meta">55줄 · Visual Studio 프로젝트 (libsodium 경로, /MT)</span></button>
+<button class="tab" data-f="n0" role="tab"><span class="nm">deolmi.c</span><span class="meta">2071줄 · 프로그램 전부 — 통신 · 키 · 중계 · 대화 · 입장 심사 · 장부 · 카메라 · 추적</span></button>
+<button class="tab" data-f="n1" role="tab"><span class="nm">eye/deolmi_eye.py</span><span class="meta">68줄 · 카메라 지킴이 — 화면 앞 휴대폰 찾기 (/eye 하면 덜미가 켬)</span></button>
+<button class="tab" data-f="n2" role="tab"><span class="nm">deolmi.sln</span><span class="meta">19줄 · Visual Studio 솔루션 — 더블클릭해서 연다</span></button>
+<button class="tab" data-f="n3" role="tab"><span class="nm">deolmi.vcxproj</span><span class="meta">55줄 · Visual Studio 프로젝트 (libsodium 경로, /MT)</span></button>
 <div class="grp"><span class="grp-t">확인용 · 테스트를 돌릴 때만</span></div>
-<button class="tab" data-f="n3" role="tab"><span class="nm">tests/test_crypto.c</span><span class="meta">114줄 · 키 · 래칫 · 장부 해시 테스트</span></button>
-<button class="tab" data-f="n4" role="tab"><span class="nm">tests/test_net.c</span><span class="meta">118줄 · 네트워크 테스트</span></button>
-<button class="tab" data-f="n5" role="tab"><span class="nm">tests/test_server.c</span><span class="meta">258줄 · 방장 중계 테스트</span></button>
-<button class="tab" data-f="n6" role="tab"><span class="nm">tests/e2e.py</span><span class="meta">179줄 · 네 명을 실제로 띄우는 시나리오 테스트</span></button>
-<button class="tab" data-f="n7" role="tab"><span class="nm">tests/run.bat</span><span class="meta">24줄 · 테스트 실행 (VS 개발자 명령 프롬프트에서)</span></button>
+<button class="tab" data-f="n4" role="tab"><span class="nm">tests/test_crypto.c</span><span class="meta">145줄 · 키 · 래칫 · 장부 해시 테스트</span></button>
+<button class="tab" data-f="n5" role="tab"><span class="nm">tests/test_net.c</span><span class="meta">118줄 · 네트워크 테스트</span></button>
+<button class="tab" data-f="n6" role="tab"><span class="nm">tests/test_server.c</span><span class="meta">258줄 · 방장 중계 테스트</span></button>
+<button class="tab" data-f="n7" role="tab"><span class="nm">tests/e2e.py</span><span class="meta">217줄 · 네 명을 실제로 띄우는 시나리오 테스트</span></button>
+<button class="tab" data-f="n8" role="tab"><span class="nm">tests/fake_eye.py</span><span class="meta">11줄 · 테스트용 가짜 카메라</span></button>
+<button class="tab" data-f="n9" role="tab"><span class="nm">tests/run.bat</span><span class="meta">24줄 · 테스트 실행 (VS 개발자 명령 프롬프트에서)</span></button>
     </nav>
 <nav class="rail" data-v="m" role="tablist" aria-label="중간 제출 · 평문 파일" hidden>
 <button class="tab" data-f="m0" role="tab"><span class="nm">deolmi.c</span><span class="meta">696줄 · 통신 · 화면 · 중계 · 대화 (평문)</span></button>
@@ -135,8 +137,8 @@ a.copy{text-decoration:none;line-height:1}
   </div>
   <div class="view rise" style="--i:1">
     <section class="panel" id="n0" hidden>
-  <div class="bar"><span class="path">deolmi.c</span><span class="role">프로그램 전부 — 통신 · 키 · 중계 · 대화 · 입장 심사 · 장부</span>
-    <span class="ll">1690줄</span>
+  <div class="bar"><span class="path">deolmi.c</span><span class="role">프로그램 전부 — 통신 · 키 · 중계 · 대화 · 입장 심사 · 장부 · 카메라 · 추적</span>
+    <span class="ll">2071줄</span>
     <button class="copy" data-f="n0">복사</button><a class="copy dl" href="src/deolmi.c" download>받기</a></div>
   <pre class="codebox"><code class="language-c">﻿#define _CRT_SECURE_NO_WARNINGS
 #pragma execution_character_set(&quot;utf-8&quot;)   // 한글 안 깨지게
@@ -176,8 +178,8 @@ a.copy{text-decoration:none;line-height:1}
 
 // 패킷 종류
 // HELLO: 접속할 때 키 보내기, MESSAGE: 채팅, NOTICE: 방장이 보내는 알림
-// APPROVE: 입장 승인, LEDGER: 장부 대조
-enum { TYPE_HELLO = 1, TYPE_MESSAGE, TYPE_NOTICE, TYPE_APPROVE, TYPE_LEDGER };
+// APPROVE: 입장 승인, LEDGER: 장부 대조, EYE: 카메라 지킴이 상태
+enum { TYPE_HELLO = 1, TYPE_MESSAGE, TYPE_NOTICE, TYPE_APPROVE, TYPE_LEDGER, TYPE_EYE };
 
 
 
@@ -560,6 +562,55 @@ void ledger_next(const uint8_t prev[KEY_LEN], uint32_t index, const uint8_t *tex
 
 
 
+// 띄어쓰기 표식: 같은 글도 받는 사람마다 띄어쓰기를 조금씩 다르게 보여 준다 (캡처가 새면 누구 화면인지 찾으려고)
+// 표식 키 = 두 사람 신원 키로 만든 X25519 공유 값에서 뽑는다. 보낸 사람과 받은 사람만 알고, 다음에 켜도 같다
+int mark_key(const uint8_t my_id_sk[ID_SK_LEN], const uint8_t their_id_pk[KEY_LEN], uint8_t out[KEY_LEN])
+{
+    uint8_t my_x[KEY_LEN], their_x[KEY_LEN], shared[KEY_LEN];
+    int bad = crypto_sign_ed25519_sk_to_curve25519(my_x, my_id_sk) != 0
+           || crypto_sign_ed25519_pk_to_curve25519(their_x, their_id_pk) != 0
+           || crypto_scalarmult(shared, my_x, their_x) != 0;
+    if (!bad)
+        derive(shared, &quot;mark&quot;, out);
+    sodium_memzero(my_x, KEY_LEN);
+    sodium_memzero(shared, KEY_LEN);
+    return bad ? -1 : 0;
+}
+
+
+
+
+// gap번째 칸을 두 칸으로 띄울지: 비트 2개가 둘 다 1이면 (4칸에 1칸꼴이라 눈에 잘 안 띈다)
+static int doubled(const uint8_t bits[KEY_LEN], int gap)
+{
+    int bit = gap * 2 % (KEY_LEN * 8);
+    return (bits[bit / 8] &gt;&gt; (bit % 8) &amp; 3) == 3;
+}
+
+
+
+
+// 표식 비트 = BLAKE2b(키 = 표식 키, 글). out = 이름 뒤 칸 + 글, 칸마다 표식을 넣는다
+// out 크기는 글 길이의 2배 + 3이면 충분
+void mark_text(const uint8_t key[KEY_LEN], const char *text, char *out)
+{
+    uint8_t bits[KEY_LEN];
+    int gap = 0;
+    crypto_generichash(bits, KEY_LEN, (const uint8_t *)text, strlen(text), key, KEY_LEN);
+    *out++ = &#x27; &#x27;;
+    if (doubled(bits, gap++))
+        *out++ = &#x27; &#x27;;
+    for (; *text; text++) {
+        *out++ = *text;
+        if (*text == &#x27; &#x27; &amp;&amp; doubled(bits, gap++))
+            *out++ = &#x27; &#x27;;
+    }
+    *out = &#x27;\0&#x27;;
+}
+
+
+
+
 #ifndef NET_ONLY   // 통신, 키 부분만 따로 테스트할 때는 여기까지만 씀
 
 #define PORT        9000
@@ -568,6 +619,7 @@ void ledger_next(const uint8_t prev[KEY_LEN], uint32_t index, const uint8_t *tex
 #define KEEP        1000              // 장부 값을 사람마다 최근 몇 개까지 기억할지
 #define MSG_HEAD    (1 + 4 + KEY_LEN) // 메시지 앞부분: 전체/1:1 + 장부 번호 + 앞 장부 값
 #define STAMP_ITEM  (NAME_LEN + 4 + KEY_LEN)
+#define MAX_KNOWN   256               // known 파일에서 읽을 사람 수
 
 
 
@@ -628,6 +680,22 @@ static void remove_control_chars(char *s)
     for (; *s; s++)
         if ((unsigned char)*s &lt; 0x20 || *s == 0x7f)
             *s = &#x27;?&#x27;;
+}
+
+
+
+
+// 앞뒤 공백을 지우고 가운데 여러 칸은 한 칸으로 (보내는 글에 두 칸이 없어야 띄어쓰기 표식과 안 헷갈림)
+static char *trim(char *s)
+{
+    char *w = s, *r = s;
+    while (*r == &#x27; &#x27;)
+        r++;
+    for (; *r; r++)
+        if (*r != &#x27; &#x27; || (r[1] != &#x27; &#x27; &amp;&amp; r[1] != &#x27;\0&#x27;))
+            *w++ = *r;
+    *w = &#x27;\0&#x27;;
+    return s;
 }
 
 
@@ -694,26 +762,50 @@ static int load_identity(void)
 
 
 
-// known 파일: 한 번 승인한 사람의 신원 키 (&quot;이름 키16진수&quot; 한 줄씩)
-// 리턴값 1: 같은 키로 승인했던 사람, -1: 이름은 있는데 키가 다름, 0: 처음
-static int check_known(const char *name, const uint8_t id_pk[KEY_LEN])
+// known 파일: 한 번 승인했거나 만난 사람의 신원 키 (&quot;이름 키16진수&quot; 한 줄씩)
+// 같은 이름은 마지막 줄이 이긴다. 읽은 사람 수를 돌려준다
+static char    known_names[MAX_KNOWN][NAME_LEN];
+static uint8_t known_pks[MAX_KNOWN][KEY_LEN];
+
+static int load_known(void)
 {
-    char line[256], hex[2 * KEY_LEN + 1], want[2 * KEY_LEN + 1];
-    int result = 0;
+    char line[256];
+    uint8_t pk[KEY_LEN];
+    size_t pk_len;
+    int count = 0, i;
     FILE *f = open_my_file(&quot;known&quot;, L&quot;r&quot;);
     if (!f)
         return 0;
-    sodium_bin2hex(want, sizeof(want), id_pk, KEY_LEN);
     while (fgets(line, sizeof(line), f)) {
         char *space = strchr(line, &#x27; &#x27;);
         if (!space)
             continue;
         *space = &#x27;\0&#x27;;
-        if (strcmp(line, name) == 0 &amp;&amp; sscanf(space + 1, &quot;%64s&quot;, hex) == 1)
-            result = strcmp(hex, want) == 0 ? 1 : -1;
+        if (strlen(line) &gt;= NAME_LEN || sodium_hex2bin(pk, KEY_LEN, space + 1, strcspn(space + 1, &quot;\r\n&quot;),
+                                                       NULL, &amp;pk_len, NULL) != 0 || pk_len != KEY_LEN)
+            continue;
+        for (i = 0; i &lt; count &amp;&amp; strcmp(known_names[i], line) != 0; i++)
+            ;
+        if (i == count &amp;&amp; count &lt; MAX_KNOWN)
+            strcpy(known_names[count++], line);
+        if (i &lt; count)
+            memcpy(known_pks[i], pk, KEY_LEN);
     }
     fclose(f);
-    return result;
+    return count;
+}
+
+
+
+
+// 리턴값 1: 같은 키로 승인했던 사람, -1: 이름은 있는데 키가 다름, 0: 처음
+static int check_known(const char *name, const uint8_t id_pk[KEY_LEN])
+{
+    int count = load_known();
+    for (int i = 0; i &lt; count; i++)
+        if (strcmp(known_names[i], name) == 0)
+            return memcmp(known_pks[i], id_pk, KEY_LEN) == 0 ? 1 : -1;
+    return 0;
 }
 
 
@@ -753,8 +845,10 @@ struct person {
     char     name[NAME_LEN];
     uint8_t  id_pk[KEY_LEN];
     uint8_t  send_key[KEY_LEN], recv_key[KEY_LEN];   // 이 사람과 쓰는 방향별 래칫
+    uint8_t  mark[KEY_LEN];                           // 띄어쓰기 표식 키
     uint64_t send_seq, recv_seq;
     int      state;
+    int      eye;                                     // 이 사람의 카메라 지킴이 상태 (EYE_OFF ...)
     char     approvers[MAX_PEOPLE][NAME_LEN];         // 이 사람을 승인한 사람들
     int      approver_count;
     int      shown_progress;                          // 화면에 마지막으로 보여 준 승인 수
@@ -792,6 +886,7 @@ static int member_count(void)
 
 static void check_admitted(struct person *p);
 static void send_stamp(struct person *only, int ask);
+static void send_eye(struct person *only);
 
 
 
@@ -985,7 +1080,7 @@ static int handle_packet(int i, struct packet *p)
             send_notice(i, &quot;HELLO는 한 번만 보냅니다&quot;);
         else
             return handle_join(i, p);
-    } else if (p-&gt;type != TYPE_MESSAGE &amp;&amp; p-&gt;type != TYPE_APPROVE &amp;&amp; p-&gt;type != TYPE_LEDGER)
+    } else if (p-&gt;type != TYPE_MESSAGE &amp;&amp; p-&gt;type != TYPE_APPROVE &amp;&amp; p-&gt;type != TYPE_LEDGER &amp;&amp; p-&gt;type != TYPE_EYE)
         send_notice(i, &quot;모르는 type: %d&quot;, p-&gt;type);
     else if (strcmp(p-&gt;from, clients[i].name) != 0)
         send_notice(i, &quot;보낸 사람 이름이 다릅니다: %s&quot;, p-&gt;from);
@@ -1115,6 +1210,7 @@ static void check_admitted(struct person *p)
         p-&gt;state = MEMBER;
         print_line(&quot;[입장 심사] %s 승인 %d/%d · 이제 %s도 대화에 들어옵니다&quot;, p-&gt;name, got, need, p-&gt;name);
         send_stamp(p, 0);             // 내 글을 몇 번부터 받는지 알려 준다
+        send_eye(p);                  // 내 카메라 지킴이를 켜 두었으면 그것도
     } else if (got != p-&gt;shown_progress &amp;&amp; got &gt; 0) {
         print_line(&quot;[입장 심사] %s 승인 %d/%d · %s의 승인을 기다리는 중&quot;, p-&gt;name, got, need,
                    waiting_for[0] ? waiting_for : &quot;나&quot;);
@@ -1195,7 +1291,8 @@ static void on_hello(const struct packet *p)
     memset(n, 0, sizeof(*n));
     strcpy(n-&gt;name, p-&gt;from);
     memcpy(n-&gt;id_pk, p-&gt;body, KEY_LEN);
-    if (start_keys(my_kx_pk, my_kx_sk, p-&gt;body + KEY_LEN, n-&gt;send_key, n-&gt;recv_key) != 0)
+    if (start_keys(my_kx_pk, my_kx_sk, p-&gt;body + KEY_LEN, n-&gt;send_key, n-&gt;recv_key) != 0
+        || mark_key(my_id_sk, n-&gt;id_pk, n-&gt;mark) != 0)
         return;
     people_count++;
     key_words(n-&gt;id_pk, words);
@@ -1436,12 +1533,293 @@ static void tick(void)
 
 
 
+// 카메라 지킴이 (/eye)
+// 카메라 프로그램(eye\deolmi_eye.py)이 같은 노트북 안에서 UDP로 0.5초마다 한 단어를 보낸다: ready, clear, phone, dark, fail
+// 화면 앞에 휴대폰이 보이거나 카메라가 가려지면 글을 가리고, 방 사람들에게 암호화해서 알린다
+// 영상은 카메라 프로그램 안에서만 쓰고 저장하지도 보내지도 않는다. 덜미가 받는 건 단어 하나뿐
+
+enum { EYE_OFF, EYE_ON, EYE_PHONE, EYE_DARK };
+
+static int eye_sock = -1, eye_state = EYE_OFF;
+static HANDLE eye_job, hidden_screen;
+static ULONGLONG eye_heard;           // 카메라 프로그램한테서 마지막으로 들은 때
+
+
+
+
+// 내 지킴이 상태를 멤버들한테 (only가 있으면 그 사람한테만)
+static void send_eye(struct person *only)
+{
+    uint8_t state = (uint8_t)eye_state;
+    for (int i = 0; i &lt; people_count; i++)
+        if (people[i].state == MEMBER &amp;&amp; (!only || &amp;people[i] == only))
+            send_to(&amp;people[i], TYPE_EYE, &amp;state, 1);
+}
+
+
+
+
+// 글 가리기: 빈 화면 버퍼로 바꿔 끼운다. 그동안 온 글은 원래 화면에 쌓였다가 돌아오면 보인다
+static void hide_screen(const wchar_t *why)
+{
+    HANDLE out = GetStdHandle(STD_OUTPUT_HANDLE);
+    DWORD mode, n;
+    if (!GetConsoleMode(out, &amp;mode))  // 화면이 아니면 (파이프로 테스트할 때) 가리지 않음
+        return;
+    if (hidden_screen) {
+        SetConsoleActiveScreenBuffer(out);
+        CloseHandle(hidden_screen);
+        hidden_screen = NULL;
+    }
+    if (!why)
+        return;
+    hidden_screen = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, CONSOLE_TEXTMODE_BUFFER, NULL);
+    if (hidden_screen == INVALID_HANDLE_VALUE) {
+        hidden_screen = NULL;
+        return;
+    }
+    WriteConsoleW(hidden_screen, why, (DWORD)wcslen(why), &amp;n, NULL);
+    SetConsoleActiveScreenBuffer(hidden_screen);
+}
+
+
+
+
+static void set_eye(int state)
+{
+    if (state == eye_state)
+        return;
+    if (state == EYE_PHONE)
+        print_line(&quot;[카메라] 화면 앞에 휴대폰이 보여 글을 가렸습니다 · 방 사람들에게 알렸습니다&quot;);
+    else if (state == EYE_DARK)
+        print_line(&quot;[카메라] 카메라가 가려져 글을 가렸습니다 · 방 사람들에게 알렸습니다&quot;);
+    else if (state == EYE_ON &amp;&amp; eye_state == EYE_OFF)
+        print_line(&quot;[카메라] 켜졌습니다 · 화면 앞에 휴대폰이 보이거나 카메라를 가리면 글을 가립니다 (영상은 저장하지도 보내지도 않음)&quot;);
+    else if (state == EYE_ON)
+        print_line(&quot;[카메라] 다시 보여 줍니다&quot;);
+    hide_screen(state == EYE_PHONE ? L&quot;\n\n   [덜미] 화면 앞에 휴대폰이 보여 글을 가렸습니다\n\n   휴대폰을 내리면 다시 보입니다\n&quot;
+              : state == EYE_DARK  ? L&quot;\n\n   [덜미] 카메라가 가려져 글을 가렸습니다\n\n   카메라를 가리지 않으면 다시 보입니다\n&quot;
+              : NULL);
+    eye_state = state;
+    send_eye(NULL);
+}
+
+
+
+
+static void stop_eye(void)
+{
+    if (eye_job) {                    // job을 닫으면 카메라 프로그램도 같이 꺼진다
+        CloseHandle(eye_job);
+        eye_job = NULL;
+    }
+    if (eye_sock &gt;= 0) {
+        closesocket(eye_sock);
+        eye_sock = -1;
+    }
+    set_eye(EYE_OFF);
+}
+
+
+
+
+// eye\deolmi_eye.py 찾기: 지금 폴더, 그다음 deolmi.exe가 있는 폴더부터 두 칸 위까지
+// (x64\Debug\deolmi.exe를 더블클릭해서 켜도 찾게)
+static int find_eye(wchar_t path[MAX_PATH])
+{
+    wchar_t dir[MAX_PATH];
+    wcscpy(path, L&quot;eye\\deolmi_eye.py&quot;);
+    if (GetFileAttributesW(path) != INVALID_FILE_ATTRIBUTES)
+        return 1;
+    GetModuleFileNameW(NULL, dir, MAX_PATH);
+    for (int up = 0; up &lt; 3; up++) {
+        wchar_t *slash = wcsrchr(dir, L&#x27;\\&#x27;);
+        if (!slash)
+            break;
+        *slash = L&#x27;\0&#x27;;
+        swprintf(path, MAX_PATH, L&quot;%ls\\eye\\deolmi_eye.py&quot;, dir);
+        if (GetFileAttributesW(path) != INVALID_FILE_ATTRIBUTES)
+            return 1;
+    }
+    return 0;
+}
+
+
+
+
+// 카메라 프로그램 켜기. 받을 UDP 포트를 127.0.0.1에 열고 그 번호를 넘긴다
+// 테스트할 때는 DEOLMI_EYE로 가짜 카메라 프로그램을 쓸 수 있다
+static void start_eye(void)
+{
+    struct sockaddr_in addr = {0};
+    int len = sizeof(addr);
+    wchar_t cmd[2 * MAX_PATH], script[MAX_PATH];
+    const wchar_t *helper = _wgetenv(L&quot;DEOLMI_EYE&quot;);
+    STARTUPINFOW si = { sizeof(si) };
+    PROCESS_INFORMATION pi;
+    JOBOBJECT_EXTENDED_LIMIT_INFORMATION limit = {0};
+    if (!helper &amp;&amp; !find_eye(script)) {
+        print_line(&quot;[카메라] eye\\deolmi_eye.py를 찾지 못했습니다 (deolmi 폴더째 받았는지 확인)&quot;);
+        return;
+    }
+    eye_sock = (int)socket(AF_INET, SOCK_DGRAM, 0);
+    addr.sin_family = AF_INET;
+    addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+    if (eye_sock &lt; 0 || bind(eye_sock, (struct sockaddr *)&amp;addr, sizeof(addr)) != 0
+        || getsockname(eye_sock, (struct sockaddr *)&amp;addr, &amp;len) != 0) {
+        print_line(&quot;[카메라] 카메라 프로그램과 이야기할 포트를 열지 못했습니다&quot;);
+        stop_eye();
+        return;
+    }
+    if (helper)
+        swprintf(cmd, 2 * MAX_PATH, L&quot;%ls %u&quot;, helper, ntohs(addr.sin_port));
+    else
+        swprintf(cmd, 2 * MAX_PATH, L&quot;python \&quot;%ls\&quot; %u&quot;, script, ntohs(addr.sin_port));
+    eye_job = CreateJobObjectW(NULL, NULL);   // 덜미가 꺼지면 카메라 프로그램도 같이 꺼지게
+    limit.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
+    SetInformationJobObject(eye_job, JobObjectExtendedLimitInformation, &amp;limit, sizeof(limit));
+    if (!CreateProcessW(NULL, cmd, NULL, NULL, FALSE, CREATE_NO_WINDOW | CREATE_SUSPENDED, NULL, NULL, &amp;si, &amp;pi)) {
+        print_line(&quot;[카메라] 카메라 프로그램을 켜지 못했습니다 (python이 깔려 있는지 확인)&quot;);
+        stop_eye();
+        return;
+    }
+    AssignProcessToJobObject(eye_job, pi.hProcess);
+    ResumeThread(pi.hThread);
+    CloseHandle(pi.hThread);
+    CloseHandle(pi.hProcess);
+    eye_heard = GetTickCount64();
+    print_line(&quot;[카메라] 켜는 중입니다 (몇 초 걸립니다)&quot;);
+}
+
+
+
+
+// 카메라 프로그램이 보낸 단어
+static void read_eye(void)
+{
+    char word[16];
+    struct sockaddr_in from;
+    int len = sizeof(from);
+    int n = recvfrom(eye_sock, word, sizeof(word) - 1, 0, (struct sockaddr *)&amp;from, &amp;len);
+    if (n &lt;= 0 || from.sin_addr.s_addr != htonl(INADDR_LOOPBACK))
+        return;
+    word[n] = &#x27;\0&#x27;;
+    eye_heard = GetTickCount64();
+    if (strcmp(word, &quot;fail&quot;) == 0) {
+        print_line(&quot;[카메라] 카메라를 열지 못했습니다 (다른 프로그램이 쓰고 있는지 확인)&quot;);
+        stop_eye();
+    } else if (strcmp(word, &quot;phone&quot;) == 0)
+        set_eye(EYE_PHONE);
+    else if (strcmp(word, &quot;dark&quot;) == 0)
+        set_eye(EYE_DARK);
+    else if (strcmp(word, &quot;ready&quot;) == 0 || strcmp(word, &quot;clear&quot;) == 0)
+        set_eye(EYE_ON);
+}
+
+
+
+
+// 카메라 프로그램이 조용하면 멈춘 것 (켜는 중엔 모델을 읽느라 오래 걸려서 20초까지 기다림)
+static void check_eye(void)
+{
+    if (eye_sock &gt;= 0 &amp;&amp; GetTickCount64() - eye_heard &gt; (eye_state == EYE_OFF ? 20000u : 3000u)) {
+        print_line(&quot;[카메라] 카메라 프로그램이 멈췄습니다 (python에 mediapipe, opencv-python이 깔려 있는지 확인)&quot;);
+        stop_eye();
+    }
+}
+
+
+
+
+// 다른 사람의 지킴이 상태
+static void on_eye(struct person *from, const uint8_t *body, int len)
+{
+    int was = from-&gt;eye;
+    if (len != 1 || body[0] &gt; EYE_DARK || body[0] == was)
+        return;
+    from-&gt;eye = body[0];
+    if (body[0] == EYE_PHONE)
+        print_line(&quot;[덜미] %s 화면 앞에 휴대폰이 보입니다 · %s의 화면은 가려졌습니다&quot;, from-&gt;name, from-&gt;name);
+    else if (body[0] == EYE_DARK)
+        print_line(&quot;[덜미] %s의 카메라가 가려졌습니다 · %s의 화면은 가려졌습니다&quot;, from-&gt;name, from-&gt;name);
+    else if (body[0] == EYE_ON &amp;&amp; was == EYE_OFF)
+        print_line(&quot;[카메라] %s%s 카메라 지킴이를 켰습니다&quot;, from-&gt;name, I_GA(from-&gt;name));
+    else if (body[0] == EYE_ON)
+        print_line(&quot;[카메라] %s의 화면이 다시 보입니다&quot;, from-&gt;name);
+    else
+        print_line(&quot;[카메라] %s%s 카메라 지킴이를 껐습니다&quot;, from-&gt;name, I_GA(from-&gt;name));
+}
+
+
+
+
+// 유출 추적 (/trace)
+// 새어 나간 내 글 한 줄을 붙여 넣으면, 지금 방에 있는 사람과 known 파일의 사람마다
+// 그 사람 화면에 어떻게 보였을지 표식을 다시 만들어 맞춰 본다
+static void trace(const char *leak)
+{
+    static char text[4 * MAX_INPUT], shown[8 * MAX_INPUT + 3], matched[MAX_PEOPLE * (NAME_LEN + 2)];
+    char name[NAME_LEN] = &quot;&quot;;
+    const char *close = strchr(leak, &#x27;]&#x27;), *body = leak;
+    int count, matches = 0, gaps = 1;
+    uint8_t key[KEY_LEN];
+    if (leak[0] == &#x27;[&#x27; &amp;&amp; close) {    // 앞의 &quot;[이름]&quot; 또는 &quot;[이름 -&gt; 나]&quot;에서 이름만
+        size_t n = strcspn(leak + 1, &quot; ]&quot;);
+        if (n &lt; NAME_LEN) {
+            memcpy(name, leak + 1, n);
+            name[n] = &#x27;\0&#x27;;
+        }
+        body = close + 1;
+    }
+    if (name[0] &amp;&amp; strcmp(name, my_name) != 0) {
+        print_line(&quot;[추적] 내가 보낸 글만 추적할 수 있습니다 (이 글은 %s의 글)&quot;, name);
+        return;
+    }
+    strncpy(text, body, sizeof(text) - 1);
+    trim(text);
+    for (const char *c = text; *c; c++)
+        gaps += *c == &#x27; &#x27;;
+    count = load_known();
+    for (int i = 0; i &lt; people_count; i++) {   // 지금 방에 있는데 known에 없는 사람도
+        int k;
+        for (k = 0; k &lt; count &amp;&amp; strcmp(known_names[k], people[i].name) != 0; k++)
+            ;
+        if (k == count &amp;&amp; count &lt; MAX_KNOWN) {
+            strcpy(known_names[count], people[i].name);
+            memcpy(known_pks[count++], people[i].id_pk, KEY_LEN);
+        }
+    }
+    print_line(&quot;[추적] 이 글이 사람마다 이렇게 보였습니다 (띄어쓰기 %d곳 비교)&quot;, name[0] ? gaps : gaps - 1);
+    matched[0] = &#x27;\0&#x27;;
+    for (int i = 0; i &lt; count; i++) {
+        if (strcmp(known_names[i], my_name) == 0 || mark_key(my_id_sk, known_pks[i], key) != 0)
+            continue;
+        mark_text(key, text, shown);
+        // 앞에 이름이 없으면 이름 뒤 칸은 빼고 비교
+        int same = name[0] ? strcmp(shown, body) == 0 : strcmp(shown + strspn(shown, &quot; &quot;), body + strspn(body, &quot; &quot;)) == 0;
+        print_line(&quot;        [%s]%s   ← %s 화면%s&quot;, my_name, shown, known_names[i], same ? &quot; (같음 ✔)&quot; : &quot;&quot;);
+        if (same &amp;&amp; matches++ &lt; MAX_PEOPLE)
+            strcat(strcat(matched, matches &gt; 1 ? &quot;, &quot; : &quot;&quot;), known_names[i]);
+    }
+    sodium_memzero(key, KEY_LEN);
+    if (matches == 1)
+        print_line(&quot;[추적] %s 화면에서 나온 글입니다&quot;, matched);
+    else if (matches &gt; 1)
+        print_line(&quot;[추적] %s 중 한 사람입니다 (글이 짧아 더 좁힐 수 없음 · 다른 줄도 넣어 보세요)&quot;, matched);
+    else
+        print_line(&quot;[추적] 띄어쓰기가 꼭 맞는 사람이 없습니다 · 캡처 사진이면 위 줄들과 띄어쓰기를 눈으로 비교하세요&quot;);
+}
+
+
+
+
 // 받은 메시지
 // 앞부분: 0 전체 / 1 1:1, 장부 번호 4, 앞 장부 값 32. 그 뒤가 글
+// 화면에는 띄어쓰기 표식을 넣어 보여 준다 (장부에는 원래 글 그대로)
 static void on_message(struct person *from, uint8_t *body, int len)
 {
     char name[NAME_LEN];
-    static char text[MAX_BODY + 1];
+    static char text[MAX_BODY + 1], shown[2 * MAX_BODY + 3];
     if (len &lt; MSG_HEAD)
         return;
     uint32_t index = (uint32_t)body[1] &lt;&lt; 24 | body[2] &lt;&lt; 16 | body[3] &lt;&lt; 8 | body[4];
@@ -1452,7 +1830,8 @@ static void on_message(struct person *from, uint8_t *body, int len)
     memcpy(text, body + MSG_HEAD, len - MSG_HEAD);
     text[len - MSG_HEAD] = &#x27;\0&#x27;;
     remove_control_chars(text);
-    print_line(body[0] ? &quot;[%s -&gt; 나%s] %s&quot; : &quot;[%s%s] %s&quot;, name, from-&gt;state == WAITING ? &quot; (승인 전)&quot; : &quot;&quot;, text);
+    mark_text(from-&gt;mark, text, shown);
+    print_line(body[0] ? &quot;[%s -&gt; 나%s]%s&quot; : &quot;[%s%s]%s&quot;, name, from-&gt;state == WAITING ? &quot; (승인 전)&quot; : &quot;&quot;, shown);
 }
 
 
@@ -1490,6 +1869,8 @@ static void handle_incoming(struct packet *p)
         on_approve(from, text_buf, n);
     else if (p-&gt;type == TYPE_LEDGER)
         on_stamp(from, text_buf, n);
+    else if (p-&gt;type == TYPE_EYE)
+        on_eye(from, text_buf, n);
 }
 
 
@@ -1548,21 +1929,6 @@ static void send_message(const char *msg, const char *two_face, const char *othe
 
 
 
-// 앞뒤 공백 지우기
-static char *trim(char *s)
-{
-    size_t n;
-    while (*s == &#x27; &#x27;)
-        s++;
-    n = strlen(s);
-    while (n &gt; 0 &amp;&amp; s[n - 1] == &#x27; &#x27;)
-        s[--n] = &#x27;\0&#x27;;
-    return s;
-}
-
-
-
-
 // 명령어 (명령어가 아니면 메시지로 보냄)
 static void handle_input(char *line)
 {
@@ -1582,10 +1948,19 @@ static void handle_input(char *line)
             print_line(&quot;[1:1 대화] %s에게만 보냅니다 (/all 입력하면 전체 대화로)&quot;, dm_target);
         }
     } else if (strcmp(line, &quot;/who&quot;) == 0) {
-        printf(&quot;[접속 중] %s(나)&quot;, my_name);
+        printf(&quot;[접속 중] %s(나%s)&quot;, my_name, eye_state != EYE_OFF ? &quot;, 카메라 켬&quot; : &quot;&quot;);
         for (int i = 0; i &lt; people_count; i++)
-            printf(&quot;, %s%s&quot;, people[i].name, people[i].state == WAITING ? &quot;(승인 대기)&quot; : &quot;&quot;);
+            printf(&quot;, %s%s&quot;, people[i].name, people[i].state == WAITING ? &quot;(승인 대기)&quot; : people[i].eye != EYE_OFF ? &quot;(카메라 켬)&quot; : &quot;&quot;);
         print_line(&quot;&quot;);
+    } else if (strcmp(line, &quot;/eye&quot;) == 0) {
+        if (eye_sock &lt; 0)
+            start_eye();
+        else {
+            stop_eye();
+            print_line(&quot;[카메라] 껐습니다&quot;);
+        }
+    } else if (strncmp(line, &quot;/trace &quot;, 7) == 0) {
+        trace(line + 7);
     } else if (strncmp(line, &quot;/ok &quot;, 4) == 0) {
         if (!(p = find_person(line + 4)))
             print_line(&quot;[입장 심사] %s%s 접속해 있지 않습니다&quot;, line + 4, EUN(line + 4));
@@ -1634,12 +2009,12 @@ static void handle_input(char *line)
             print_line(drop ? &quot;[시연] %s에게 가는 다음 메시지 한 통을 몰래 버립니다&quot; : &quot;[시연] %s에게 가는 다음 메시지를 1바이트 바꿉니다&quot;, name);
         }
     } else if (line[0] == &#x27;/&#x27;) {
-        print_line(&quot;[알림] 명령어: /dm 이름, /all, /who, /ok 이름, /verify [이름], /check, /quit&quot;);
+        print_line(&quot;[알림] 명령어: /dm 이름, /all, /who, /ok 이름, /verify [이름], /check, /eye, /trace 새어 나간 줄, /quit&quot;);
         print_line(&quot;       시연: /twoface 이름 | 글1 | 글2, 방장 /drop 이름, /tamper 이름&quot;);
     } else if (member_count() == 0) {
         print_line(&quot;[알림] 아직 대화할 멤버가 없습니다&quot;);
     } else {
-        send_message(line, NULL, NULL);
+        send_message(trim(line), NULL, NULL);
     }
 }
 
@@ -1792,7 +2167,9 @@ int main(void)
         print_line(&quot;덜미 - %s (%s에 접속)&quot;, my_name, host);
     }
     print_line(&quot;[내 단어] %s%s&quot;, my_words, made ? &quot; (신원 키를 새로 만들었습니다)&quot; : &quot;&quot;);
-    print_line(&quot;명령어: /dm 이름(1:1 대화), /all(전체 대화), /who(접속자), /ok 이름(승인), /verify 이름(단어), /check(장부 대조), /quit(나가기)&quot;);
+    print_line(&quot;명령어: /dm 이름(1:1 대화), /all(전체 대화), /who(접속자), /ok 이름(승인), /verify 이름(단어), /check(장부 대조),&quot;);
+    print_line(&quot;        /eye(카메라 지킴이 켜고 끄기), /trace 새어 나간 줄(누구 화면인지 찾기), /quit(나가기)&quot;);
+    print_line(&quot;[알림] 받은 글은 사람마다 띄어쓰기가 조금씩 다르게 보입니다 · 캡처가 새면 보낸 사람이 /trace로 누구 화면인지 찾습니다&quot;);
     CloseHandle(CreateThread(NULL, 0, keyboard_thread, NULL, 0, NULL));
 
     for (;;) {
@@ -1805,6 +2182,9 @@ int main(void)
         n = client_count;
         for (int i = 0; i &lt; n; i++)
             FD_SET(clients[i].conn.sock, &amp;fds);
+        int eye = eye_sock;
+        if (eye &gt;= 0)
+            FD_SET(eye, &amp;fds);
         LeaveCriticalSection(&amp;lock);
         int ready = select(0, &amp;fds, NULL, NULL, &amp;one_second);
         EnterCriticalSection(&amp;lock);
@@ -1822,8 +2202,11 @@ int main(void)
                 } else
                     closesocket(sock);
             }
+            if (eye &gt;= 0 &amp;&amp; eye == eye_sock &amp;&amp; FD_ISSET(eye, &amp;fds))
+                read_eye();
         }
         tick();
+        check_eye();
         LeaveCriticalSection(&amp;lock);
     }
 }
@@ -1831,9 +2214,83 @@ int main(void)
 </code></pre>
 </section>
 <section class="panel" id="n1" hidden>
+  <div class="bar"><span class="path">eye/deolmi_eye.py</span><span class="role">카메라 지킴이 — 화면 앞 휴대폰 찾기 (/eye 하면 덜미가 켬)</span>
+    <span class="ll">68줄</span>
+    <button class="copy" data-f="n1">복사</button><a class="copy dl" href="src/eye/deolmi_eye.py" download>받기</a></div>
+  <pre class="codebox"><code class="language-python"># 덜미 카메라 지킴이: 노트북 카메라로 화면 앞의 휴대폰을 찾아 덜미에게 한 단어로 알린다
+# 덜미에서 /eye 하면 덜미가 직접 켠다: python eye\deolmi_eye.py 포트
+# 보내는 말 (127.0.0.1로만, 0.5초마다): ready 켜짐 / clear 없음 / phone 휴대폰 보임 / dark 카메라 가려짐 / fail 카메라 못 엶
+# 영상은 이 프로그램 안에서만 쓰고 저장하지도 보내지도 않는다
+# 필요한 것: pip install mediapipe opencv-python
+import os
+import socket
+import sys
+import time
+
+import cv2
+import mediapipe as mp
+from mediapipe.tasks.python import BaseOptions, vision
+
+MODEL = os.path.join(os.path.dirname(os.path.abspath(__file__)), &quot;efficientdet_lite2.tflite&quot;)
+PHONE_SCORE = 0.35     # 이보다 확실할 때만 휴대폰으로 본다
+PHONE_FRAMES = 2       # 연달아 이만큼 보여야 휴대폰 (한 장만 잘못 잡는 것 거르기)
+CLEAR_FRAMES = 8       # 연달아 이만큼 안 보여야 사라진 것 (약 0.7초)
+DARK_MEAN = 25         # 평균 밝기가 이보다 낮고
+DARK_SPREAD = 10       # 밝기 차이도 이보다 작으면 (렌즈를 막으면 고르게 어둡다) 가려진 것
+DARK_SECONDS = 1.0
+
+
+def main():
+    port = int(sys.argv[1])
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+    def say(word):
+        sock.sendto(word.encode(), (&quot;127.0.0.1&quot;, port))
+
+    cam = cv2.VideoCapture(0, cv2.CAP_MSMF)
+    if not cam.isOpened():
+        say(&quot;fail&quot;)
+        return
+    detector = vision.ObjectDetector.create_from_options(vision.ObjectDetectorOptions(
+        base_options=BaseOptions(model_asset_path=MODEL), running_mode=vision.RunningMode.VIDEO,
+        score_threshold=PHONE_SCORE, category_allowlist=[&quot;cell phone&quot;]))
+    state, seen, unseen, dark_since, said_at = &quot;ready&quot;, 0, 0, None, 0.0
+    start = time.monotonic()
+    say(state)
+    while True:
+        ok, frame = cam.read()
+        if not ok:
+            say(&quot;fail&quot;)
+            return
+        now = time.monotonic()
+        if now - start &lt; 1.0:          # 켜자마자는 카메라가 밝기를 맞추는 중
+            continue
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        dark = gray.mean() &lt; DARK_MEAN and gray.std() &lt; DARK_SPREAD
+        dark_since = (dark_since or now) if dark else None
+        image = mp.Image(image_format=mp.ImageFormat.SRGB, data=cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+        phone = bool(detector.detect_for_video(image, int((now - start) * 1000)).detections)
+        seen, unseen = (seen + 1, 0) if phone else (0, unseen + 1)
+        new = state
+        if dark_since and now - dark_since &gt;= DARK_SECONDS:
+            new = &quot;dark&quot;
+        elif seen &gt;= PHONE_FRAMES:
+            new = &quot;phone&quot;
+        elif unseen &gt;= CLEAR_FRAMES and not dark_since:
+            new = &quot;clear&quot;
+        if new != state or now - said_at &gt;= 0.5:
+            state, said_at = new, now
+            say(state)
+
+
+if __name__ == &quot;__main__&quot;:
+    main()
+</code></pre>
+</section>
+<section class="panel" id="n2" hidden>
   <div class="bar"><span class="path">deolmi.sln</span><span class="role">Visual Studio 솔루션 — 더블클릭해서 연다</span>
     <span class="ll">19줄</span>
-    <button class="copy" data-f="n1">복사</button><a class="copy dl" href="src/deolmi.sln" download>받기</a></div>
+    <button class="copy" data-f="n2">복사</button><a class="copy dl" href="src/deolmi.sln" download>받기</a></div>
   <pre class="codebox"><code class="language-plaintext">﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
@@ -1855,10 +2312,10 @@ Global
 EndGlobal
 </code></pre>
 </section>
-<section class="panel" id="n2" hidden>
+<section class="panel" id="n3" hidden>
   <div class="bar"><span class="path">deolmi.vcxproj</span><span class="role">Visual Studio 프로젝트 (libsodium 경로, /MT)</span>
     <span class="ll">55줄</span>
-    <button class="copy" data-f="n2">복사</button><a class="copy dl" href="src/deolmi.vcxproj" download>받기</a></div>
+    <button class="copy" data-f="n3">복사</button><a class="copy dl" href="src/deolmi.vcxproj" download>받기</a></div>
   <pre class="codebox"><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
 &lt;Project DefaultTargets=&quot;Build&quot; xmlns=&quot;http://schemas.microsoft.com/developer/msbuild/2003&quot;&gt;
   &lt;ItemGroup Label=&quot;ProjectConfigurations&quot;&gt;
@@ -1916,10 +2373,10 @@ EndGlobal
 &lt;/Project&gt;
 </code></pre>
 </section>
-<section class="panel" id="n3" hidden>
+<section class="panel" id="n4" hidden>
   <div class="bar"><span class="path">tests/test_crypto.c</span><span class="role">키 · 래칫 · 장부 해시 테스트</span>
-    <span class="ll">114줄</span>
-    <button class="copy" data-f="n3">복사</button><a class="copy dl" href="src/tests/test_crypto.c" download>받기</a></div>
+    <span class="ll">145줄</span>
+    <button class="copy" data-f="n4">복사</button><a class="copy dl" href="src/tests/test_crypto.c" download>받기</a></div>
   <pre class="codebox"><code class="language-c">/* 키 부분 확인 (방장 없이 돈다): 단어 지문, 서명한 HELLO, 방향별 키, 래칫 암호화, 장부 해시 */
 #define NET_ONLY   /* deolmi.c 에서 통신·키 부분만 가져온다 */
 #include &quot;../deolmi.c&quot;
@@ -2031,15 +2488,46 @@ int main(void)
     ledger_next(h1b, 2, (const uint8_t *)&quot;좋아&quot;, 6, h2b);
     check(memcmp(h2, h2b, KEY_LEN) != 0, &quot;앞에서 한 번 달라지면 뒤 값도 계속 다름 (사슬)&quot;);
 
+    /* 띄어쓰기 표식 */
+    uint8_t id3_pk[KEY_LEN], id3_sk[ID_SK_LEN], m12[KEY_LEN], m21[KEY_LEN], m13[KEY_LEN];
+    char s1[512], s2[512], s3[512], plain[512];
+    const char *long_text = &quot;내일 동아리 회비 걷는 거 잊지 마세요 다들 오천 원씩 현금으로 가져오면 됩니다 늦으면 안 돼요&quot;;
+    crypto_sign_keypair(id3_pk, id3_sk);
+    check(mark_key(id_sk, id2_pk, m12) == 0 &amp;&amp; mark_key(id2_sk, id_pk, m21) == 0 &amp;&amp; memcmp(m12, m21, KEY_LEN) == 0,
+          &quot;표식 키: 보낸 사람과 받은 사람이 같은 키를 만듦&quot;);
+    mark_key(id_sk, id3_pk, m13);
+    check(memcmp(m12, m13, KEY_LEN) != 0, &quot;표식 키: 받는 사람이 다르면 키가 다름&quot;);
+    mark_text(m12, long_text, s1);
+    mark_text(m12, long_text, s3);
+    check(strcmp(s1, s3) == 0, &quot;같은 키, 같은 글 → 늘 같은 띄어쓰기&quot;);
+    mark_text(m13, long_text, s2);
+    check(strcmp(s1, s2) != 0, &quot;받는 사람이 다르면 띄어쓰기가 다름&quot;);
+    int w = 0, doubles = 0, gaps = 0;
+    for (const char *c = s1 + 1; *c; c++)
+        if (*c != &#x27; &#x27; || c[1] != &#x27; &#x27;)
+            plain[w++] = *c;
+    plain[w] = &#x27;\0&#x27;;
+    check(strcmp(plain + (plain[0] == &#x27; &#x27;), long_text) == 0, &quot;두 칸을 한 칸으로 줄이면 원래 글&quot;);
+    for (int k = 0; k &lt; 64; k++) {      /* 여러 사람에게 보낸 셈 치고 두 칸 비율 */
+        uint8_t key[KEY_LEN];
+        randombytes_buf(key, KEY_LEN);
+        mark_text(key, long_text, s3);
+        for (const char *c = s3; *c; c++) {
+            gaps += *c == &#x27; &#x27; &amp;&amp; c[1] != &#x27; &#x27;;
+            doubles += *c == &#x27; &#x27; &amp;&amp; c[1] == &#x27; &#x27;;
+        }
+    }
+    check(doubles * 6 &gt; gaps &amp;&amp; doubles * 3 &lt; gaps, &quot;두 칸은 4칸에 1칸꼴 (눈에 잘 안 띄게)&quot;);
+
     printf(fails ? &quot;\n%d개 실패\n&quot; : &quot;\n전부 통과\n&quot;, fails);
     return fails != 0;
 }
 </code></pre>
 </section>
-<section class="panel" id="n4" hidden>
+<section class="panel" id="n5" hidden>
   <div class="bar"><span class="path">tests/test_net.c</span><span class="role">네트워크 테스트</span>
     <span class="ll">118줄</span>
-    <button class="copy" data-f="n4">복사</button><a class="copy dl" href="src/tests/test_net.c" download>받기</a></div>
+    <button class="copy" data-f="n5">복사</button><a class="copy dl" href="src/tests/test_net.c" download>받기</a></div>
   <pre class="codebox"><code class="language-c">/* 패킷 송수신 확인 (헤더 65바이트: 번호 8 + nonce 24 포함). 방장(deolmi H --host)이 켜져 있어야 한다 — tests\run.bat 이 알아서 켠다
    ① 1바이트씩 쪼개 보내기  ② 두 통을 한 번에  ③ 길이 0xFFFFFFFF */
 #define NET_ONLY   /* deolmi.c 에서 ① 통신 부분만 가져온다 */
@@ -2160,10 +2648,10 @@ int main(void)
 }
 </code></pre>
 </section>
-<section class="panel" id="n5" hidden>
+<section class="panel" id="n6" hidden>
   <div class="bar"><span class="path">tests/test_server.c</span><span class="role">방장 중계 테스트</span>
     <span class="ll">258줄</span>
-    <button class="copy" data-f="n5">복사</button><a class="copy dl" href="src/tests/test_server.c" download>받기</a></div>
+    <button class="copy" data-f="n6">복사</button><a class="copy dl" href="src/tests/test_server.c" download>받기</a></div>
   <pre class="codebox"><code class="language-c">/* 방장 중계 확인 . 방장(deolmi H --host)이 켜져 있어야 한다 — tests\run.bat 이 알아서 켠다
    HELLO 등록·전달, to로 중계, 입장·퇴장 SYS, 처리 규칙, 인원 제한 없음 */
 #define NET_ONLY   /* deolmi.c 에서 ① 통신 부분만 가져온다 */
@@ -2424,23 +2912,26 @@ int main(void)
 }
 </code></pre>
 </section>
-<section class="panel" id="n6" hidden>
+<section class="panel" id="n7" hidden>
   <div class="bar"><span class="path">tests/e2e.py</span><span class="role">네 명을 실제로 띄우는 시나리오 테스트</span>
-    <span class="ll">179줄</span>
-    <button class="copy" data-f="n6">복사</button><a class="copy dl" href="src/tests/e2e.py" download>받기</a></div>
+    <span class="ll">217줄</span>
+    <button class="copy" data-f="n7">복사</button><a class="copy dl" href="src/tests/e2e.py" download>받기</a></div>
   <pre class="codebox"><code class="language-python"># 덜미 전체 시나리오 테스트: 방장 H와 참가자 A, B, C를 실제 deolmi.exe로 띄우고 키보드 입력 대신 파이프로 명령을 넣는다
-# 입장 심사 → 암호화 대화 → 1:1 → 장부 대조 → 시연(두 얼굴, 몰래 버리기, 1바이트 바꾸기) → 다시 접속 → 키 바뀜
+# 입장 심사 → 암호화 대화 → 1:1 → 장부 대조 → 시연(두 얼굴, 몰래 버리기, 1바이트 바꾸기)
+# → 유출 추적(띄어쓰기 표식) → 카메라 지킴이(가짜 카메라 프로그램) → 다시 접속 → 키 바뀜
 # 실행: deolmi 폴더에서 python tests\e2e.py  (deolmi.exe가 먼저 빌드돼 있어야 함)
 import os, re, subprocess, sys, tempfile, threading, time
 
-EXE = os.path.join(os.path.dirname(os.path.abspath(__file__)), &quot;..&quot;, &quot;deolmi.exe&quot;)
+HERE = os.path.dirname(os.path.abspath(__file__))
+EXE = os.path.join(HERE, &quot;..&quot;, &quot;deolmi.exe&quot;)
+FAKE_EYE = f&#x27;&quot;{sys.executable}&quot; &quot;{os.path.join(HERE, &quot;fake_eye.py&quot;)}&quot;&#x27;   # 진짜 카메라 대신
 fails = 0
 
 
 class Peer:
     def __init__(self, name, home, host=False):
         self.name, self.lines, self.seen = name, [], 0
-        env = dict(os.environ, DEOLMI_HOME=home)
+        env = dict(os.environ, DEOLMI_HOME=home, DEOLMI_EYE=FAKE_EYE)
         args = [EXE, name, &quot;--host&quot;] if host else [EXE, name, &quot;127.0.0.1&quot;]
         self.p = subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env)
         threading.Thread(target=self._read, daemon=True).start()
@@ -2474,6 +2965,11 @@ class Peer:
             self.p.kill()
 
 
+def said(who, text):
+    &quot;&quot;&quot;화면에 뜬 글 한 줄. 띄어쓰기 표식 때문에 칸은 한 칸이나 두 칸&quot;&quot;&quot;
+    return r&quot;^\[&quot; + who + r&quot;\] +&quot; + r&quot; +&quot;.join(re.escape(w) for w in text.split()) + &quot;$&quot;
+
+
 def check(ok, what):
     global fails
     print((&quot;[ok]   &quot; if ok else &quot;[FAIL] &quot;) + what)
@@ -2498,12 +2994,12 @@ def main():
         H.say(&quot;승인 전에 보낸 글&quot;)
         check(H.wait(r&quot;아직 대화할 멤버가 없습니다&quot;) is not None, &quot;승인 전에는 H가 A에게 글을 보내지 않음&quot;)
         A.say(&quot;저 A예요&quot;)
-        check(H.wait(r&quot;\[A \(승인 전\)\] 저 A예요&quot;) is not None, &quot;승인 전인 A의 글은 &#x27;(승인 전)&#x27; 표시로 보임&quot;)
+        check(H.wait(said(r&quot;A \(승인 전\)&quot;, &quot;저 A예요&quot;)) is not None, &quot;승인 전인 A의 글은 &#x27;(승인 전)&#x27; 표시로 보임&quot;)
 
         H.say(&quot;/ok A&quot;)
         check(H.wait(r&quot;A 승인 1/1 · 이제 A도 대화에 들어옵니다&quot;) is not None, &quot;H가 /ok A 하면 A가 멤버가 됨&quot;)
         check(A.wait(r&quot;모두 승인했습니다&quot;) is not None, &quot;A 화면: 모두 승인했습니다&quot;)
-        check(not A.has(&quot;승인 전에 보낸 글&quot;), &quot;승인 전 글은 A에게 끝내 안 감&quot;)
+        check(not A.has(said(&quot;H&quot;, &quot;승인 전에 보낸 글&quot;)[1:]), &quot;승인 전 글은 A에게 끝내 안 감&quot;)
 
         # B 입장: H와 A 둘 다 승인해야 함
         B = Peer(&quot;B&quot;, homes[&quot;B&quot;])
@@ -2514,7 +3010,7 @@ def main():
         check(A.wait(r&quot;B 승인 1/2 · H의 승인을 기다리는 중&quot;) is not None, &quot;A만 승인하면 1/2, H를 기다림&quot;)
         A.say(&quot;B는 아직 못 봐야 함&quot;)
         time.sleep(0.8)
-        check(not B.has(&quot;B는 아직 못 봐야 함&quot;), &quot;전원 승인 전에는 A의 글이 B에게 안 감&quot;)
+        check(not B.has(said(&quot;A&quot;, &quot;B는 아직 못 봐야 함&quot;)[1:]), &quot;전원 승인 전에는 A의 글이 B에게 안 감&quot;)
         H.say(&quot;/ok B&quot;)
         check(A.wait(r&quot;B 승인 2/2 · 이제 B도&quot;) is not None and B.wait(r&quot;모두 승인했습니다&quot;) is not None, &quot;H까지 승인하면 B가 멤버&quot;)
 
@@ -2528,12 +3024,12 @@ def main():
 
         # 암호화 대화
         A.say(&quot;안녕 모두&quot;)
-        check(all(p.wait(r&quot;^\[A\] 안녕 모두$&quot;) for p in (H, B, C)), &quot;A의 전체 글이 H, B, C에게 보임&quot;)
+        check(all(p.wait(said(&quot;A&quot;, &quot;안녕 모두&quot;)) for p in (H, B, C)), &quot;A의 전체 글이 H, B, C에게 보임&quot;)
         A.say(&quot;/dm B&quot;)
         A.say(&quot;비밀 이야기&quot;)
-        check(B.wait(r&quot;\[A -&gt; 나\] 비밀 이야기&quot;) is not None, &quot;1:1 글은 B에게&quot;)
+        check(B.wait(said(&quot;A -&gt; 나&quot;, &quot;비밀 이야기&quot;)) is not None, &quot;1:1 글은 B에게&quot;)
         time.sleep(0.5)
-        check(not C.has(&quot;비밀 이야기&quot;) and not H.has(&quot;비밀 이야기&quot;), &quot;1:1 글은 C와 방장 H 화면에 없음&quot;)
+        check(not C.has(&quot;비밀 +이야기&quot;) and not H.has(&quot;비밀 +이야기&quot;), &quot;1:1 글은 C와 방장 H 화면에 없음&quot;)
         A.say(&quot;/all&quot;)
         time.sleep(2.5)
 
@@ -2545,7 +3041,7 @@ def main():
 
         # 시연 1: 두 얼굴 (B에게만 다른 글)
         A.say(&quot;/twoface B | 4시에 만나 | 3시에 만나&quot;)
-        check(B.wait(r&quot;^\[A\] 4시에 만나$&quot;) and C.wait(r&quot;^\[A\] 3시에 만나$&quot;), &quot;두 얼굴: B는 4시, C는 3시를 받음&quot;)
+        check(B.wait(said(&quot;A&quot;, &quot;4시에 만나&quot;)) and C.wait(said(&quot;A&quot;, &quot;3시에 만나&quot;)), &quot;두 얼굴: B는 4시, C는 3시를 받음&quot;)
         # 누가 먼저 대조하느냐에 따라 문구는 셋 중 하나 (나와 남이 다름 / A가 말한 장부와 다름 / A의 앞 글이 다름)
         caught = [p.wait(r&quot;\[덜미\] A(의 글을 나와 \S+가 다르게 받았습니다|가 모두에게 보냈다는 글과|가 나에게 보낸 앞 글이)&quot;, 8)
                   for p in (B, C, H)]
@@ -2557,20 +3053,45 @@ def main():
         time.sleep(0.3)
         B.say(&quot;회의 시작합니다&quot;)
         check(H.wait(r&quot;\[시연\] C에게 가는 B의 메시지를 몰래 버렸습니다&quot;) is not None, &quot;방장 H가 C에게 가는 글을 버림&quot;)
-        check(A.wait(r&quot;^\[B\] 회의 시작합니다$&quot;) is not None and not C.has(&quot;회의 시작합니다&quot;), &quot;A는 받고 C는 못 받음&quot;)
+        check(A.wait(said(&quot;B&quot;, &quot;회의 시작합니다&quot;)) is not None and not C.has(&quot;회의 +시작합니다&quot;), &quot;A는 받고 C는 못 받음&quot;)
         check(C.wait(r&quot;\[덜미\] B의 \d+번째 글이 나에게 오지 않았습니다 \(\S+는 받음\)&quot;, 9) is not None, &quot;장부 대조로 C가 빠진 걸 알아챔&quot;)
         B.say(&quot;다음 안건&quot;)
-        check(C.wait(r&quot;^\[B\] 다음 안건$&quot;) and C.wait(r&quot;\[덜미\] B가 나에게 보낸 #\d+ 메시지가 오지 않았습니다&quot;),
+        check(C.wait(said(&quot;B&quot;, &quot;다음 안건&quot;)) and C.wait(r&quot;\[덜미\] B가 나에게 보낸 #\d+ 메시지가 오지 않았습니다&quot;),
               &quot;다음 글은 열리고, 번호 검사도 빠진 걸 알림&quot;)
 
         # 시연 3: 방장이 1바이트 바꿈
         H.say(&quot;/tamper B&quot;)
         time.sleep(0.3)
         C.say(&quot;바뀔 글&quot;)
-        check(B.wait(r&quot;\[!\] C의 #\d+ 메시지가 중간에 바뀌었습니다 · 버림&quot;) is not None and not B.has(r&quot;^\[C\] 바뀔 글&quot;),
+        check(B.wait(r&quot;\[!\] C의 #\d+ 메시지가 중간에 바뀌었습니다 · 버림&quot;) is not None and not B.has(said(&quot;C&quot;, &quot;바뀔 글&quot;)),
               &quot;1바이트 바꾼 글은 B가 버리고 경고&quot;)
         C.say(&quot;멀쩡한 글&quot;)
-        check(B.wait(r&quot;^\[C\] 멀쩡한 글$&quot;) is not None, &quot;가짜 한 통 뒤에도 대화는 이어짐&quot;)
+        check(B.wait(said(&quot;C&quot;, &quot;멀쩡한 글&quot;)) is not None, &quot;가짜 한 통 뒤에도 대화는 이어짐&quot;)
+
+        # 유출 추적: 같은 글이 사람마다 띄어쓰기가 조금 다르게 보이고, 새어 나간 줄로 누구 화면인지 찾음
+        long_text = &quot;내일 동아리 회비 걷는 거 잊지 마세요 다들 오천 원씩 현금으로 가져오면 됩니다 늦으면 안 돼요&quot;
+        A.say(long_text)
+        shown = {p.name: p.wait(said(&quot;A&quot;, long_text)) for p in (H, B, C)}
+        check(all(shown.values()) and len(set(shown.values())) == 3, &quot;같은 글도 H, B, C 화면의 띄어쓰기가 서로 다름&quot;)
+        A.say(&quot;/trace &quot; + (shown[&quot;B&quot;] or &quot;&quot;))
+        check(A.wait(r&quot;\[추적\] B 화면에서 나온 글입니다&quot;) is not None, &quot;/trace: B 화면의 줄을 넣으면 B를 찾음&quot;)
+        A.say(&quot;/trace &quot; + (shown[&quot;C&quot;] or &quot;&quot;))
+        check(A.wait(r&quot;\[추적\] C 화면에서 나온 글입니다&quot;) is not None, &quot;/trace: C 화면의 줄을 넣으면 C를 찾음&quot;)
+        B.say(&quot;/trace &quot; + (shown[&quot;B&quot;] or &quot;&quot;))
+        check(B.wait(r&quot;\[추적\] 내가 보낸 글만 추적할 수 있습니다&quot;) is not None, &quot;남이 보낸 글은 추적하지 않음&quot;)
+        A.say(&quot;/twoface B | 두 칸  띄운   글 | 두 칸  띄운   글&quot;)
+        check(B.wait(said(&quot;A&quot;, &quot;두 칸 띄운 글&quot;)) and C.wait(said(&quot;A&quot;, &quot;두 칸 띄운 글&quot;)), &quot;보내는 글의 여러 칸은 한 칸으로 줄여 보냄&quot;)
+
+        # 카메라 지킴이 (가짜 카메라: 켜짐 → 휴대폰 2초 → 없음 → 가려짐 → 없음)
+        C.say(&quot;/eye&quot;)
+        check(C.wait(r&quot;\[카메라\] 켜졌습니다&quot;) is not None, &quot;/eye: 카메라 지킴이 켜짐&quot;)
+        check(all(p.wait(r&quot;\[카메라\] C가 카메라 지킴이를 켰습니다&quot;) for p in (H, A, B)), &quot;켜면 방 사람들에게 알림&quot;)
+        check(C.wait(r&quot;\[카메라\] 화면 앞에 휴대폰이 보여 글을 가렸습니다&quot;, 8) is not None, &quot;휴대폰이 보이면 C의 글을 가림&quot;)
+        check(all(p.wait(r&quot;\[덜미\] C 화면 앞에 휴대폰이 보입니다&quot;, 8) for p in (H, A, B)), &quot;휴대폰이 보이면 H, A, B에게 [덜미]&quot;)
+        check(all(p.wait(r&quot;\[카메라\] C의 화면이 다시 보입니다&quot;, 8) for p in (H, A, B)), &quot;휴대폰이 사라지면 다시 보인다고 알림&quot;)
+        check(all(p.wait(r&quot;\[덜미\] C의 카메라가 가려졌습니다&quot;, 8) for p in (H, A, B)), &quot;카메라를 가리면 H, A, B에게 [덜미]&quot;)
+        A.say(&quot;/who&quot;)
+        check(A.wait(r&quot;\[접속 중\].*C\(카메라 켬\)&quot;) is not None, &quot;/who에 카메라 켠 사람 표시&quot;)
 
         # 다시 접속: 같은 키면 자동 승인
         A.quit()
@@ -2579,6 +3100,11 @@ def main():
         peers.append(A)
         check(all(p.wait(r&quot;전에 확인한 키라서 자동으로 승인&quot;) for p in (H, B, C)), &quot;같은 키로 다시 오면 H, B, C가 자동 승인&quot;)
         check(A.wait(r&quot;모두 승인했습니다&quot;) is not None, &quot;다시 온 A는 바로 멤버&quot;)
+        # 그때 가짜 카메라가 어느 상태냐에 따라 켜짐 / 가려짐 / 휴대폰 중 하나로 알게 된다
+        check(A.wait(r&quot;\[카메라\] C가 카메라 지킴이를 켰습니다|\[덜미\] C(의 카메라가 가려졌습니다| 화면 앞에 휴대폰)&quot;) is not None,
+              &quot;나중에 들어온 A도 C의 카메라 상태를 앎&quot;)
+        C.say(&quot;/eye&quot;)
+        check(C.wait(r&quot;\[카메라\] 껐습니다&quot;) and B.wait(r&quot;\[카메라\] C가 카메라 지킴이를 껐습니다&quot;), &quot;/eye 다시: 끄고 알림&quot;)
 
         # 같은 이름, 다른 키 (새 기기이거나 다른 사람)
         A.quit()
@@ -2609,10 +3135,27 @@ if __name__ == &quot;__main__&quot;:
     sys.exit(main())
 </code></pre>
 </section>
-<section class="panel" id="n7" hidden>
+<section class="panel" id="n8" hidden>
+  <div class="bar"><span class="path">tests/fake_eye.py</span><span class="role">테스트용 가짜 카메라</span>
+    <span class="ll">11줄</span>
+    <button class="copy" data-f="n8">복사</button><a class="copy dl" href="src/tests/fake_eye.py" download>받기</a></div>
+  <pre class="codebox"><code class="language-python"># 가짜 카메라 지킴이 (e2e 테스트용): 진짜 카메라 대신 정해진 순서로 단어를 보낸다
+# ready → 휴대폰 보임 2초 → 없음 2초 → 가려짐 2초 → 없음 (계속)
+import socket, sys, time
+
+port = int(sys.argv[1])
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+for word, seconds in [(&quot;ready&quot;, 2), (&quot;phone&quot;, 2), (&quot;clear&quot;, 2), (&quot;dark&quot;, 2), (&quot;clear&quot;, 600)]:
+    end = time.monotonic() + seconds
+    while time.monotonic() &lt; end:
+        sock.sendto(word.encode(), (&quot;127.0.0.1&quot;, port))
+        time.sleep(0.5)
+</code></pre>
+</section>
+<section class="panel" id="n9" hidden>
   <div class="bar"><span class="path">tests/run.bat</span><span class="role">테스트 실행 (VS 개발자 명령 프롬프트에서)</span>
     <span class="ll">24줄</span>
-    <button class="copy" data-f="n7">복사</button><a class="copy dl" href="src/tests/run.bat" download>받기</a></div>
+    <button class="copy" data-f="n9">복사</button><a class="copy dl" href="src/tests/run.bat" download>받기</a></div>
   <pre class="codebox"><code class="language-plaintext">@echo off
 rem 덜미 자동 테스트 (Visual Studio 개발자 명령 프롬프트에서, deolmi 폴더에서 tests\run.bat)
 rem 1) 키 부분 단위 테스트  2) 방장 H를 켜 두고 통신·중계 테스트  3) 네 명이 실제로 쓰는 시나리오 (python 필요)

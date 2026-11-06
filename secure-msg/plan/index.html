@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>덜미 암호화 계획</title>
-<meta name="description" content="방장도 못 믿는 메신저 — 끌 수 없는 암호화, 입장 심사, 장부 대조를 얹는 방식과 순서. 다른 메신저의 2026년 빈틈과 비교.">
+<meta name="description" content="방장도 못 믿는 메신저 — 끌 수 없는 암호화에 입장 심사, 장부 대조, 화면 지키기(카메라 지킴이·유출 추적)를 얹는 방식과 순서. 다른 메신저의 2026년 빈틈과 비교.">
 <script>document.documentElement.classList.add("js")</script>
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -23,7 +23,7 @@
 <section class="hero" aria-label="암호화 계획">
   <div class="t h-name rise"><h1>암호화 계획</h1></div>
   <div class="h-low">
-    <div class="t h-say rise" style="--i:1"><p>덜미는 <b>방장도 못 믿는 메신저</b>다. 끌 수 없는 종단간 암호화 위에, 큰 메신저들이 2026년에도 못 막는 두 가지 — <b>몰래 들어온 사람</b>과 <b>사람마다 다른 대화</b> — 를 잡는 <b>입장 심사</b>와 <b>장부 대조</b>를 얹는다. 빼돌리거나 바꿔치기하면 덜미가 잡힌다.</p><div class="by">방향 결정 <span class="u">김창식</span> (11-06) · 자료 조사·설계·코드·이 페이지 작성 <span class="c">Claude</span> · <b>11-06 코드에 반영</b> (금고 빼고 01~12, <code>deolmi.c</code>, 자동 테스트 85개 통과)</div></div>
+    <div class="t h-say rise" style="--i:1"><p>덜미는 <b>방장도 못 믿는 메신저</b>다. 끌 수 없는 종단간 암호화 위에, 큰 메신저들이 2026년에도 못 막는 두 가지 — <b>몰래 들어온 사람</b>과 <b>사람마다 다른 대화</b> — 를 잡는 <b>입장 심사</b>와 <b>장부 대조</b>를 얹는다. 그리고 암호화가 못 지키는 끝, <b>화면</b>까지 지킨다 — <b>찍으면 가려지고, 새면 잡힌다.</b></p><div class="by">방향 결정 <span class="u">김창식</span> (11-06) · 자료 조사·설계·코드·이 페이지 작성 <span class="c">Claude</span> · <b>11-06 코드에 반영</b> (금고 빼고 01~14, <code>deolmi.c</code> + 카메라 지킴이 <code>eye\deolmi_eye.py</code>, 자동 테스트 105개 통과) · 화면 지키기 아이디어 <span class="u">김창식</span> ("카메라를 켜서 휴대폰을 인식하면 덜미가 잡히게")</div></div>
     <a class="t h-next rise" style="--i:2" href="../log/"><span>다음 페이지</span><b>작업 기록 <span aria-hidden="true">→</span></b></a>
   </div>
   <div class="h-ui rise" data-ui><p class="cap">덜미가 잡는 순간 — 자동 시연 테스트에서 뜨는 경고 (이름은 테스트용)</p>
@@ -37,7 +37,7 @@
 <span class="k">[덜미] B의 1번째 글이 나에게 오지 않았습니다 (A는 받음)</span></pre></div>
 </section>
 <div class="doc">
-<details class="t toc" open><summary>이 페이지 차례</summary><nav aria-label="차례"><ol><li><a href="#why"><i>00</i>왜 덜미인가</a></li><li><a href="#goal"><i>01</i>무엇을 지키나</a></li><li><a href="#e2e"><i>02</i>왜 종단간 암호화인가</a></li><li><a href="#tools"><i>03</i>쓰는 도구</a></li><li><a href="#keys"><i>04</i>키는 두 종류</a></li><li><a href="#hello"><i>05</i>HELLO에 서명하기</a></li><li><a href="#words"><i>06</i>단어 지문</a></li><li><a href="#ratchet"><i>07</i>메시지 암호화</a></li><li><a href="#check"><i>08</i>받을 때 검사 순서</a></li><li><a href="#admit"><i>09</i>입장 심사</a></li><li><a href="#ledger"><i>10</i>장부 대조</a></li><li><a href="#demo"><i>11</i>시연 모드</a></li><li><a href="#change"><i>12</i>지금 코드에서 바뀌는 곳</a></li><li><a href="#vault"><i>13</i>2인 잠금</a></li><li><a href="#vflow"><i>14</i>금고 흐름</a></li><li><a href="#vbytes"><i>15</i>금고 묶음의 모양</a></li><li><a href="#vscreen"><i>16</i>금고 화면</a></li><li><a href="#holes"><i>17</i>미리 막은 구멍</a></li><li><a href="#cant"><i>18</i>못 막는 것</a></li><li><a href="#order"><i>19</i>만드는 순서</a></li><li><a href="#decide"><i>20</i>결정</a></li></ol></nav></details>
+<details class="t toc" open><summary>이 페이지 차례</summary><nav aria-label="차례"><ol><li><a href="#why"><i>00</i>왜 덜미인가</a></li><li><a href="#goal"><i>01</i>무엇을 지키나</a></li><li><a href="#e2e"><i>02</i>왜 종단간 암호화인가</a></li><li><a href="#tools"><i>03</i>쓰는 도구</a></li><li><a href="#keys"><i>04</i>키는 두 종류</a></li><li><a href="#hello"><i>05</i>HELLO에 서명하기</a></li><li><a href="#words"><i>06</i>단어 지문</a></li><li><a href="#ratchet"><i>07</i>메시지 암호화</a></li><li><a href="#check"><i>08</i>받을 때 검사 순서</a></li><li><a href="#admit"><i>09</i>입장 심사</a></li><li><a href="#ledger"><i>10</i>장부 대조</a></li><li><a href="#demo"><i>11</i>시연 모드</a></li><li><a href="#eye"><i>12</i>카메라 지킴이</a></li><li><a href="#trace"><i>13</i>유출 추적</a></li><li><a href="#change"><i>14</i>지금 코드에서 바뀌는 곳</a></li><li><a href="#vault"><i>15</i>2인 잠금</a></li><li><a href="#vflow"><i>16</i>금고 흐름</a></li><li><a href="#vbytes"><i>17</i>금고 묶음의 모양</a></li><li><a href="#vscreen"><i>18</i>금고 화면</a></li><li><a href="#holes"><i>19</i>미리 막은 구멍</a></li><li><a href="#cant"><i>20</i>못 막는 것</a></li><li><a href="#order"><i>21</i>만드는 순서</a></li><li><a href="#decide"><i>22</i>결정</a></li></ol></nav></details>
 <main class="secs">
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" class="ahp"/></marker><marker id="ahg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" class="ahg"/></marker></defs></svg>
 <section class="t sec rise">
@@ -47,6 +47,7 @@
     <li><b>끌 수 없는 암호화</b> — 두 사람마다 따로 맞춘 키로, <b>한 통마다 키를 바꿔 가며</b> 암호화한다 (X25519 + XChaCha20-Poly1305 + BLAKE2b 래칫). 일반/비밀 채팅 구분이 없다. 방장은 암호문만 넘기고 아무것도 저장하지 않는다.</li>
     <li><b>입장 심사</b> — 새로 들어온 사람(또는 새 기기)은 <b>기존 멤버 전원</b>이 한글 단어 8개를 확인하고 <code>/ok</code> 해야 대화를 열 수 있다.</li>
     <li><b>장부 대조</b> — 모두가 받은 "전체 대화"를 해시 사슬로 엮어 몰래 맞춰 본다. 누구에게만 다른 글을 보이거나 한 통을 빼먹으면 <code>[덜미]</code> 경고가 뜬다.</li>
+    <li><b>화면 지키기</b> — <b>카메라 지킴이</b>(<code>/eye</code>): 화면 앞에 휴대폰이 보이거나 카메라가 가려지면 글을 가리고 방 사람들에게 알린다. <b>유출 추적</b>(<code>/trace</code>): 같은 글도 사람마다 띄어쓰기가 조금씩 달라서, 캡처가 새면 누구 화면에서 나왔는지 찾는다.</li>
     <li>약속은 "<b>막는다</b>"보다 "<b>들킨다</b>"다. 시연 모드(<code>/twoface</code>, 방장 <code>/drop</code>)로 직접 속여 보고 들키는 걸 보여 준다.</li>
   </ul>
 </div>
@@ -63,9 +64,11 @@
 <tr><td><b>문자</b></td><td class="bad">아이폰↔안드로이드 RCS 암호화는 2026년 5월 베타, 통신사가 켜 줘야 함. 국내 채팅+ 적용은 확인되지 않음</td><td class="good">통신사를 거치지 않음</td></tr>
 <tr><td><b>시그널</b></td><td class="bad">암호는 최고 수준이지만, 2026년 가짜 "고객센터" QR로 공격자 기기를 몰래 붙여 대화를 실시간으로 읽는 피싱이 번졌다 (독일 정보기관 2월, FBI 3월 "수천 계정", 체코 10월 "NATO 5개국"). 2025년 Signalgate도 사람이 기자를 잘못 넣은 것</td><td class="good"><a href="#admit">입장 심사</a> — 새 사람·새 기기는 전원 승인 전엔 못 읽음</td></tr>
 <tr><td><b>WhatsApp · Signal · iMessage · Threema</b></td><td class="bad">USENIX Security 2026 논문 「Send and Pretend」: 그룹 대화에 "모두가 같은 대화를 받았다"는 보장이 없어서, 누구에게만 다른 글을 보이거나 빼먹고 순서를 바꿔도 경고가 없다 (투표 조작까지)</td><td class="good"><a href="#ledger">장부 대조</a> — 다르면 <code>[덜미]</code></td></tr>
+<tr><td><b>모든 메신저 · 단톡방 캡처</b></td><td class="bad">2026년 9월 치과의사협회 선거관리위원회 단톡방(19명, 비밀유지 각서까지 씀) 캡처가 소송 증거로 나왔다. 누가 흘렸는지 찾지 못해 전원 휴대폰 포렌식·일괄 사퇴까지 거론됐다. 캡처는 누구 화면에서 나왔는지 알 길이 없다</td><td class="good"><a href="#trace">유출 추적</a> — 띄어쓰기 표식으로 누구 화면인지</td></tr>
+<tr><td><b>모든 메신저 · 화면 촬영</b></td><td class="bad">종단간 암호화는 글이 화면에 뜰 때까지만 지킨다. 휴대폰으로 노트북 화면을 찍으면 어떤 메신저도 모른다. 웹캠으로 휴대폰을 알아보는 건 회사 보안 제품(2020년 테르텐 '캠큐브')에는 있지만, 메신저가 대화방 전원에게 알려 주는 건 찾지 못했다</td><td class="good"><a href="#eye">카메라 지킴이</a> — 가리고 <code>[덜미]</code></td></tr>
 </table></div>
-<p><b>덜미의 세 가지 약속</b> ① 끌 수 없는 암호화와 저장하지 않는 방장 — 기본기, 시그널도 하는 일이다. ② <b>들어오는 사람은 모두가 확인한다.</b> ③ <b>대화를 건드리면 덜미가 잡힌다.</b> 새로움은 ②와 ③에 있다. 발표 한 문장: <i>"다른 메신저는 '우리 서버를 믿으세요'라고 합니다. 덜미는 방장도 믿지 않습니다. 건드리면 덜미가 잡힙니다."</i></p>
-<p class="sub">출처 (2026년 자료 우선): <a href="https://arxiv.org/abs/2607.27510">Send and Pretend (USENIX Security 2026)</a> · <a href="https://www.helpnetsecurity.com/2026/05/13/signal-phishing-social-engineering-protections/">시그널 피싱 대응 (2026-05)</a> · <a href="https://www.techtimes.com/articles/328997/20261014/russia-compromised-signal-accounts-five-nato-nations-czech-republic-confirms-breach.htm">NATO 5개국 (2026-10)</a> · <a href="https://www.bitdefender.com/en-us/blog/hotforsecurity/meta-halt-instagram-end-to-end-encryption-dms">인스타 DM 암호화 종료</a> · <a href="https://www.techrepublic.com/article/news-discord-dave-end-to-end-encryption/">디스코드 DAVE</a> · <a href="https://anoni.net/news/en/2026/10/telegram-data-us-court/">텔레그램 법원 제출 (2026-10)</a> · <a href="https://www.fnnews.com/news/202602111351048061">카톡 약관 논란 (2026-02)</a> · <a href="https://cs.kakao.com/helps_html/1073188987?locale=ko">카카오 보관 기간</a> · <a href="https://blog.google/products-and-platforms/platforms/android/android-ios-end-to-end-encrypted-rcs-messaging">RCS 암호화 베타</a></p>
+<p><b>덜미의 세 가지 약속</b> ① 끌 수 없는 암호화와 저장하지 않는 방장 — 기본기, 시그널도 하는 일이다. ② <b>들어오는 사람은 모두가 확인한다.</b> ③ <b>대화를 건드리면 덜미가 잡힌다.</b> ④ <b>화면을 찍거나 흘리면 덜미가 잡힌다.</b> 새로움은 ②~④에 있다. 발표 한 문장: <i>"다른 메신저는 '우리 서버를 믿으세요'라고 합니다. 덜미는 방장도, 같은 방 사람의 화면도 그냥 믿지 않습니다. 건드리면, 찍으면, 흘리면 덜미가 잡힙니다."</i></p>
+<p class="sub">출처 (2026년 자료 우선): <a href="https://arxiv.org/abs/2607.27510">Send and Pretend (USENIX Security 2026)</a> · <a href="https://www.helpnetsecurity.com/2026/05/13/signal-phishing-social-engineering-protections/">시그널 피싱 대응 (2026-05)</a> · <a href="https://www.techtimes.com/articles/328997/20261014/russia-compromised-signal-accounts-five-nato-nations-czech-republic-confirms-breach.htm">NATO 5개국 (2026-10)</a> · <a href="https://www.bitdefender.com/en-us/blog/hotforsecurity/meta-halt-instagram-end-to-end-encryption-dms">인스타 DM 암호화 종료</a> · <a href="https://www.techrepublic.com/article/news-discord-dave-end-to-end-encryption/">디스코드 DAVE</a> · <a href="https://anoni.net/news/en/2026/10/telegram-data-us-court/">텔레그램 법원 제출 (2026-10)</a> · <a href="https://www.fnnews.com/news/202602111351048061">카톡 약관 논란 (2026-02)</a> · <a href="https://cs.kakao.com/helps_html/1073188987?locale=ko">카카오 보관 기간</a> · <a href="https://blog.google/products-and-platforms/platforms/android/android-ios-end-to-end-encrypted-rcs-messaging">RCS 암호화 베타</a> · <a href="https://dentalnews.or.kr/news/article.html?no=48108">치협 선관위 단톡방 유출 (2026-09)</a> · <a href="https://m.etnews.com/20201030000136">테르텐 캠큐브 (2020)</a></p>
 </section>
 <section class="t sec rise" id="goal">
 <h2 id="goal"><span class="n">01</span>무엇을 지키나</h2>
@@ -281,17 +284,58 @@ CK_n, MK_n 지움                                        <span class="c">키는 
 </table></div>
 <p class="sub">11-03엔 "통신 구현부터"라 공격 실험 명령을 뺐다. 11-06 최종 단계에서 시연용으로 다시 넣는다 (사용자 결정).</p>
 </section>
+<section class="t sec rise" id="eye">
+<h2 id="eye"><span class="n">12</span>카메라 지킴이 — 찍으면 가려진다</h2>
+<p>암호화는 글이 화면에 뜨는 순간까지만 지킨다. 그다음은 사람 눈과 휴대폰 카메라다. <code>/eye</code>를 치면 덜미가 카메라 프로그램(<code>eye\deolmi_eye.py</code>)을 켜고, 노트북 카메라에 <b>화면을 향한 휴대폰</b>이 보이는지 본다. 아이디어는 <span class="u">김창식</span>의 손날 가림막(웹캠으로 손을 알아봐 화면을 가리는 프로그램)에서 왔다.</p>
+<div class="tbl"><table>
+<tr><th>카메라에 보이는 것</th><th>내 화면</th><th>방 사람들 화면</th></tr>
+<tr><td>휴대폰 (연달아 2장, 0.2초쯤)</td><td>글이 사라지고 <code>[덜미] 화면 앞에 휴대폰이 보여 글을 가렸습니다</code>만 남음</td><td><code>[덜미] 현우 화면 앞에 휴대폰이 보입니다</code></td></tr>
+<tr><td>렌즈를 가림 (1초 넘게 고르게 어두움)</td><td>똑같이 가림</td><td><code>[덜미] 현우의 카메라가 가려졌습니다</code></td></tr>
+<tr><td>휴대폰을 내림 (0.7초 안 보임)</td><td>원래 화면 그대로 돌아옴 (그동안 온 글도 있음)</td><td><code>[카메라] 현우의 화면이 다시 보입니다</code></td></tr>
+<tr><td><code>/eye</code>로 켜고 끄기</td><td><code>/who</code>에 "카메라 켬"</td><td><code>현우가 카메라 지킴이를 켰습니다 / 껐습니다</code></td></tr>
+</table></div>
+<ul>
+<li><b>영상은 노트북 밖으로 안 나간다.</b> 카메라 프로그램은 영상을 저장하지도 보내지도 않고, 같은 노트북 안(127.0.0.1)에서 덜미에게 <code>ready</code>·<code>clear</code>·<code>phone</code>·<code>dark</code> 한 단어만 0.5초마다 보낸다. 방 사람들에게 가는 건 상태 1바이트(<code>EYE</code> 패킷)이고, 그것도 사람마다 암호화해서 방장은 못 읽는다.</li>
+<li><b>휴대폰 찾기</b> — 구글 MediaPipe의 물체 인식(EfficientDet-Lite2, 80가지 물건 중 "cell phone"). 한 장에 70ms쯤, 초당 11~14장. 샘플 사진 5장에서 모두 휴대폰을 찾았고, 휴대폰 없이 노트북 카메라를 12초 돌렸을 때 잘못 잡은 건 0번이었다.</li>
+<li><b>가리는 방법</b> — 빈 화면 버퍼로 바꿔 끼운다(<code>SetConsoleActiveScreenBuffer</code>). 그동안 온 글은 원래 화면에 쌓였다가, 돌아오면 그대로 보인다.</li>
+<li><b>강제하지 않는다</b> — 켜는 건 각자다. 대신 켰는지 껐는지가 모두에게 보인다. 몰래 감시하는 기능이 아니라 "이 방은 서로 찍지 않기로 했다"는 약속을 눈에 보이게 하는 장치다.</li>
+<li><b>덜미가 꺼지면 카메라 프로그램도 꺼진다</b> — job 객체에 넣어 둬서, 창을 닫아도 카메라가 혼자 켜져 있지 않다.</li>
+</ul>
+<p class="sub">카메라 지킴이만 python과 <code>mediapipe</code>·<code>opencv-python</code>이 필요하다. 없으면 이 기능만 안 되고 나머지는 그대로다.</p>
+</section>
+<section class="t sec rise" id="trace">
+<h2 id="trace"><span class="n">13</span>유출 추적 — 새면 잡힌다</h2>
+<p>카메라는 <b>키보드 캡처</b>(<code>Win+Shift+S</code>)를 못 본다. 콘솔 창은 윈도우가 따로 그리는 창이라 "캡처 막기"를 걸 수도 없다. 그래서 막는 대신 <b>새어 나간 뒤에 누구 화면인지</b> 찾는다.</p>
+<pre class="term" data-ui><span class="k">표식 키</span> = BLAKE2b(X25519(내 신원 키, 상대 신원 키))   <span class="c">보낸 사람과 받은 사람 둘만 앎, 다시 켜도 같음</span>
+<span class="k">표식 비트</span> = BLAKE2b(키 = 표식 키, 글)
+이름 뒤 칸과 글 안의 칸마다 비트 2개 → 둘 다 1이면 두 칸   <span class="c">4칸에 1칸꼴이라 눈에 잘 안 띔</span>
+<span class="c">── 민지가 보낸 같은 글이 화면마다 (예시) ──</span>
+<span class="o">[민지] 내일 동아리  회비 걷는 거 잊지 마세요 다들</span>    <span class="c">← 현우 화면</span>
+<span class="o">[민지]  내일 동아리 회비 걷는 거 잊지 마세요  다들</span>    <span class="c">← 수아 화면</span></pre>
+<ol class="path">
+<li>단톡방 캡처가 돌아다닌다. 보낸 민지가 그 줄을 덜미에 넣는다: <code>/trace [민지] 내일 동아리  회비 걷는 거 …</code></li>
+<li>덜미는 지금 방 사람과 <code>known</code> 파일의 사람(전에 만난 사람, 나간 사람도)마다 "그 사람 화면에 어떻게 보였을지"를 다시 만들어 줄줄이 보여 준다.</li>
+<li>꼭 맞는 사람이 있으면 <code>[추적] 현우 화면에서 나온 글입니다</code>. 캡처가 사진이면 보여 준 줄들과 띄어쓰기를 눈으로 비교한다.</li>
+</ol>
+<ul>
+<li><b>내가 보낸 글만 추적한다.</b> 표식 키는 보낸 사람과 받은 사람만 안다. 그래서 수아가 "현우 화면에서 샌 것처럼" 가짜 캡처를 만들어 현우를 모함할 수도 없다.</li>
+<li><b>장부는 원래 글로</b> — 표식은 화면에만 넣는다. 장부 대조·두 얼굴 검사는 표식과 상관없다. 보내는 글의 여러 칸은 한 칸으로 줄여 보내서 표식과 헷갈리지 않는다.</li>
+<li><b>숨기지 않는다</b> — 덜미를 켜면 첫 화면에 "받은 글은 사람마다 띄어쓰기가 조금씩 다르게 보입니다"가 뜬다. 내부 고발처럼 좋은 유출도 있으니, 몰래 추적하지 않고 다 아는 상태에서 쓴다.</li>
+</ul>
+</section>
 <section class="t sec rise" id="change">
-<h2 id="change"><span class="n">12</span>지금 코드에서 바뀌는 곳</h2>
+<h2 id="change"><span class="n">14</span>지금 코드에서 바뀌는 곳</h2>
 <p><code>deolmi.c</code> 한 파일을 유지한다 (11-03 결정). 11-02 버전 <code>crypto.c</code>의 키·서명·지문 부분을 새 <b>키</b> 칸으로 옮기고, <b>입장 심사</b>·<b>장부</b> 칸을 새로 쓴다. 금고(<code>vault.c</code>)는 시간이 남으면 마지막에. ① 통신의 헤더가 커지고, ③ 중계는 HELLO를 기존 사람에게도 넘기고 금고 종류를 넘기는 정도로 바뀐다.</p>
 <div class="tbl"><table class="tools">
 <tr><th>어디</th><th>지금</th><th>암호화 뒤</th></tr>
 <tr><td>새 칸 <b>⑥ 키</b></td><td>—</td><td><code>crypto.c</code>를 옮김: 키 교환, 래칫, 신원 키, 지문, 봉투</td></tr>
 <tr><td>새 칸 <b>⑦ 금고</b></td><td>—</td><td><code>vault.c</code>를 옮김: 묶음, 조각, 열람 요청, 승인, 증명</td></tr>
 <tr><td>① 통신의 헤더</td><td>종류 · 보낸 사람 · 받을 사람 (33바이트)</td><td>+ <code>seq</code> 8 · <code>nonce</code> 24 (65바이트)</td></tr>
-<tr><td>패킷 종류</td><td>HELLO · MSG · SYS</td><td>+ APPROVE(4) · LEDGER(5) (금고를 넣으면 + VAULT · OPEN_REQ · SHARE · PROOF)</td></tr>
+<tr><td>패킷 종류</td><td>HELLO · MSG · SYS</td><td>+ APPROVE(4) · LEDGER(5) · EYE(6) (금고를 넣으면 + VAULT · OPEN_REQ · SHARE · PROOF)</td></tr>
 <tr><td>새 칸 <b>입장 심사</b></td><td>—</td><td>대기/멤버 상태 · <code>/ok</code> · 승인 모으기 · <code>known</code> 파일</td></tr>
 <tr><td>새 칸 <b>장부</b></td><td>—</td><td>사람별 해시 사슬 · 2초마다 대조 · <code>/check</code> · <code>[덜미]</code> 경고</td></tr>
+<tr><td>새 칸 <b>카메라 지킴이 · 유출 추적</b></td><td>—</td><td>카메라 프로그램 켜고 끄기(job) · UDP 한 단어 받기 · 화면 버퍼 바꿔 끼우기 · <code>EYE</code> 알림 · 띄어쓰기 표식(<code>mark_key</code> <code>mark_text</code>) · <code>/trace</code></td></tr>
+<tr><td>새 파일 <code>eye\deolmi_eye.py</code></td><td>—</td><td>카메라 영상에서 휴대폰·가림 찾기 (python, MediaPipe) + 모델 <code>efficientdet_lite2.tflite</code></td></tr>
 <tr><td><code>main</code> · 대기</td><td>이름 확인 후 바로 접속</td><td>신원 키 읽기(없으면 만들기) · 세션 키 뽑기 · 첫 화면에 내 단어</td></tr>
 <tr><td>참가자 HELLO 보내기</td><td>본문 없음 (이름만)</td><td><code>hello_make</code> — 키 둘 + 서명</td></tr>
 <tr><td><code>handle_join</code> (방장 부분)</td><td>새 사람에게 기존 사람·방장 HELLO · <code>add_member</code></td><td>방장의 진짜 HELLO · 새 사람 HELLO를 기존 전원에게도 넘김 · <code>on_hello</code>로 확인하고 키 계산</td></tr>
@@ -300,13 +344,13 @@ CK_n, MK_n 지움                                        <span class="c">키는 
 <tr><td><code>send_message</code></td><td>평문 한 통 (전체면 받을 사람을 비움)</td><td>받을 사람마다 <code>chain_seal</code>로 잠근 한 통씩 · seq 하나 올림 · nonce</td></tr>
 <tr><td><code>print_message</code></td><td>받은 글 그대로</td><td>08의 검사를 통과한 것만</td></tr>
 <tr><td><code>handle_packet</code> (방장 앞으로 온 것)</td><td>MSG만 · 받을 사람이 비면 모두에게</td><td>MSG · VAULT · OPEN_REQ · SHARE · PROOF 모두 방장의 대화 칸으로 · 금고 종류도 받을 사람에게 그대로</td></tr>
-<tr><td><code>handle_input</code></td><td><code>/dm</code> <code>/all</code> <code>/who</code> <code>/quit</code></td><td>+ <code>/ok</code> <code>/verify</code> <code>/check</code> · 시연 <code>/twoface</code> <code>/drop</code> <code>/tamper</code> (금고: <code>/lock</code> <code>/vault</code> <code>/open</code> <code>/approve</code>)</td></tr>
+<tr><td><code>handle_input</code></td><td><code>/dm</code> <code>/all</code> <code>/who</code> <code>/quit</code></td><td>+ <code>/ok</code> <code>/verify</code> <code>/check</code> <code>/eye</code> <code>/trace</code> · 시연 <code>/twoface</code> <code>/drop</code> <code>/tamper</code> (금고: <code>/lock</code> <code>/vault</code> <code>/open</code> <code>/approve</code>)</td></tr>
 <tr><td>VS 프로젝트</td><td><code>deolmi.c</code>만</td><td>+ <code>libsodium\</code> 폴더 (설치 없이 F5)</td></tr>
 </table></div>
-<p class="sub">옮겨 올 파일들은 옛 <code>net.h</code>를 불러 쓰게 돼 있다. 한 파일에 넣으면서 그 부분은 지운다 (같은 정의가 이미 ① 통신 칸에 있다). 금고를 빼고 대략 1,300줄이 된다.</p>
+<p class="sub">옮겨 올 파일들은 옛 <code>net.h</code>를 불러 쓰게 돼 있다. 한 파일에 넣으면서 그 부분은 지운다 (같은 정의가 이미 ① 통신 칸에 있다). 11-06 저녁 기준 금고를 빼고 2,000줄 남짓이다.</p>
 </section>
 <section class="t sec rise" id="vault">
-<h2 id="vault"><span class="n">13</span>2인 잠금 — 키 두 개짜리 금고</h2>
+<h2 id="vault"><span class="n">15</span>2인 잠금 — 키 두 개짜리 금고</h2>
 <p class="sub"><b>순서상 마지막</b> — 입장 심사·장부 대조까지 끝내고 12-04 전에 시간이 남으면 붙인다. 아래 설계는 11-04 그대로다.</p>
 <p>민지가 비밀(예: 동아리 통장 비밀번호)을 금고에 넣고 <b>현우와 수아 두 사람</b>에게 맡긴다. 그 뒤로는 <b>현우와 수아가 둘 다 동의해야만</b> 열린다. 은행 금고의 열쇠 두 개, 핵 발사 열쇠 두 개와 같은 생각이다.</p>
 <div class="tbl"><table class="vs">
@@ -333,7 +377,7 @@ CK_n, MK_n 지움                                        <span class="c">키는 
 <p class="sub">실제로는 비밀을 직접 나누지 않는다. 무작위 <b>암호화 키 L</b>(32바이트)로 비밀을 암호화하고, 그 L을 위처럼 S1·S2로 나눈다. 비밀 길이와 상관없이 조각은 늘 32바이트다.</p>
 </section>
 <section class="t sec rise" id="vflow">
-<h2 id="vflow"><span class="n">14</span>금고 흐름</h2>
+<h2 id="vflow"><span class="n">16</span>금고 흐름</h2>
 <p>모든 화살표는 중계를 거친다. 중계는 받을 사람 필드만 보고 넘긴다. 중계가 아무것도 보관하지 않으니 <b>맡길 때와 열 때 관련된 사람이 접속해 있어야</b> 한다.</p>
 <figure class="seq">
 <svg viewBox="0 0 640 470" role="img" aria-label="민지가 금고를 맡기고, 현우가 열람을 요청하고, 수아가 승인해서 현우가 여는 순서">
@@ -375,7 +419,7 @@ CK_n, MK_n 지움                                        <span class="c">키는 
 </ul>
 </section>
 <section class="t sec rise" id="vbytes">
-<h2 id="vbytes"><span class="n">15</span>금고 묶음의 모양</h2>
+<h2 id="vbytes"><span class="n">17</span>금고 묶음의 모양</h2>
 <div class="pkt">
   <span style="--w:3"><b>보유자 1</b>16</span><span style="--w:3"><b>보유자 2</b>16</span><span style="--w:5"><b>현우 봉투</b>112</span><span style="--w:5"><b>수아 봉투</b>112</span><span style="--w:6"><b>내용 암호문</b>내용 + 16</span><span style="--w:4"><b>민지 서명</b>64</span>
 </div>
@@ -395,7 +439,7 @@ CK_n, MK_n 지움                                        <span class="c">키는 
 <p class="sub">APPROVE(4)·LEDGER(5) 다음이라 이 넷은 V1에서 6~9번으로 더한다. 중계는 내용을 안 보고 받을 사람에게 넘기고, <code>test_server.c</code>에 "VAULT도 to에게 그대로" 테스트를 더한다.</p>
 </section>
 <section class="t sec rise" id="vscreen">
-<h2 id="vscreen"><span class="n">16</span>금고 화면</h2>
+<h2 id="vscreen"><span class="n">18</span>금고 화면</h2>
 <pre class="term" data-ui><span class="c"># 민지</span>
 <span class="p">민지&gt; /lock 현우 수아 "통장 비번" 4512</span>
 <span class="o">[금고] '통장 비번' 금고를 현우, 수아에게 맡겼습니다. 둘이 함께여야 열리고, 이 노트북에는 남기지 않습니다</span>
@@ -424,7 +468,7 @@ CK_n, MK_n 지움                                        <span class="c">키는 
 <p class="sub">단어를 확인하지 않은 사람에게 맡기거나 승인하면 <code>[*] ○○의 단어를 아직 확인하지 않았습니다</code>가 뜬다. 중계가 처음부터 신원 키를 바꿔치기했다면 그 조각은 중계가 열 수 있어서다.</p>
 </section>
 <section class="t sec rise" id="holes">
-<h2 id="holes"><span class="n">17</span>미리 막은 구멍</h2>
+<h2 id="holes"><span class="n">19</span>미리 막은 구멍</h2>
 <p>11-02 설계를 검토하면서 찾은 구멍과 막는 법이다. 코드를 옮길 때 이 줄을 빼먹으면 구멍이 다시 열린다.</p>
 <div class="tbl"><table>
 <tr><th>심각도</th><th>구멍</th><th>막는 법</th></tr>
@@ -439,22 +483,24 @@ CK_n, MK_n 지움                                        <span class="c">키는 
 </table></div>
 </section>
 <section class="t sec rise" id="cant">
-<h2 id="cant"><span class="n">18</span>못 막는 것</h2>
+<h2 id="cant"><span class="n">20</span>못 막는 것</h2>
 <ul>
 <li><b>누가 누구에게 언제, 얼마나 긴 글을</b> 보내는지는 중계가 안다. 넘겨주려면 받을 사람 필드를 봐야 해서다.</li>
 <li><b>빼먹기·끊기·두 얼굴 자체</b>는 막지 못한다. 들킬 뿐이다. 중계가 다 버리면 대화가 안 된다.</li>
 <li><b>새로 들어온 사람 쪽</b> — 방장이 새 사람에게만 가짜 멤버를 보여 주면, 새 사람이 <code>/verify</code>로 단어를 확인하기 전까지는 모른다. 입장 심사는 "기존 방을 지키는" 장치다.</li>
 <li><b>장부 대조는 셋 이상</b>에서 의미가 있다. 둘뿐이면 번호 검사만 남는다.</li>
 <li><b>처음 만났을 때 단어를 안 맞춰 보면</b> 중계가 그때부터 끼어들 수 있다. 그래서 확인 전에는 경고를 띄운다.</li>
-<li><b>내 노트북이 해킹되면</b> 신원 키 파일과 화면이 다 털린다.</li>
+<li><b>내 노트북이 해킹되면</b> 신원 키 파일과 화면이 다 털린다. 덜미 코드를 고쳐 카메라 지킴이나 표식을 빼 버리는 것도 막지 못한다 (내 컴퓨터는 내 마음대로다).</li>
+<li><b>카메라 지킴이</b>는 카메라에 안 잡히는 곳에서 찍거나, 아예 안 켜면 못 본다. 안 켠 것은 <code>/who</code>로 모두에게 보일 뿐이다.</li>
+<li><b>유출 추적</b>은 글을 <b>다시 타이핑</b>하거나 띄어쓰기를 고쳐서 퍼뜨리면 못 잡는다. 짧은 글은 칸이 적어 후보가 여러 명 나올 수 있다. 두 사람이 화면을 나란히 놓고 보면 표식이 있다는 건 알 수 있다. 표식은 보낸 사람도 만들 수 있는 값이라 법정 증거가 아니라 방 안에서 "누구 화면인지" 좁히는 도구다.</li>
 <li>금고에서 연 내용을 <b>베껴 적거나 화면을 찍는 것</b>. 증명할 수 있는 건 "수아가 현우에게 키를 넘겼다"까지다.</li>
 <li>현우와 수아가 <b>짜고</b> 열면 열린다 — 그게 2인 잠금의 정의다. 맡긴 민지는 원래 내용을 안다.</li>
 <li>중계가 아무것도 보관하지 않으니, 맡길 때와 열 때 관련된 사람이 <b>동시에 접속</b>해 있어야 한다.</li>
 </ul>
 </section>
 <section class="t sec rise" id="order">
-<h2 id="order"><span class="n">19</span>만드는 순서</h2>
-<p>통신 때처럼 한 단계씩, 확인을 통과해야 다음으로 넘어간다. 평문 테스트 26개는 헤더가 바뀌는 만큼 고쳐 가며 단계마다 계속 통과해야 한다.</p>
+<h2 id="order"><span class="n">21</span>만드는 순서</h2>
+<p>통신 때처럼 한 단계씩, 확인을 통과해야 다음으로 넘어간다. <b>11-06 저녁까지 E1~S2를 코드에 넣었다</b> (자동 테스트 105개). 남은 건 실제 휴대폰으로 S1 확인, X, 그리고 시간이 남으면 V.</p>
 <div class="tbl"><table class="stage">
 <tr><th>단계</th><th>만들 것</th><th>확인</th></tr>
 <tr><td>E1</td><td>libsodium 붙이기 (폴더째) · 헤더에 seq·nonce 필드 더하기(33→65바이트) · <b>키</b> 칸 · 신원 키 파일 · 첫 화면에 내 단어</td><td>두 번 켜도 같은 단어 · 통신 테스트 통과</td></tr>
@@ -466,7 +512,9 @@ CK_n, MK_n 지움                                        <span class="c">키는 
 <tr><td>L1</td><td><b>장부</b> — 사람별 해시 사슬, 글 안에 번호와 앞 값</td><td>셋이 같은 글을 받으면 끝값이 같음</td></tr>
 <tr><td>L2</td><td><b>대조</b> — LEDGER, 2초마다, <code>/check</code>, <code>[덜미]</code> 경고</td><td>정상 대화에선 경고 0</td></tr>
 <tr><td>D1</td><td><b>시연 모드</b> — <code>/twoface</code> · <code>/drop</code> · <code>/tamper</code></td><td>자동 시연 테스트: 넷이 접속해 각각 해 보고 정확히 그 경고가 뜸</td></tr>
-<tr><td>X</td><td>노트북 두세 대에서 실제로</td><td>같은 핫스팟에서 J1~D1을 다시</td></tr>
+<tr><td>S1</td><td><b>카메라 지킴이</b> — <code>/eye</code>, 카메라 프로그램, 가리기, <code>EYE</code> 알림</td><td>가짜 카메라로 자동 테스트 · 실제 창이 가려졌다 돌아옴 · <b>실제 휴대폰을 들어 보기 (김창식)</b></td></tr>
+<tr><td>S2</td><td><b>유출 추적</b> — 띄어쓰기 표식, <code>/trace</code></td><td>같은 글도 화면마다 다름 · 그 줄을 넣으면 그 사람을 찾음 · 남의 글은 추적 안 함</td></tr>
+<tr><td>X</td><td>노트북 두세 대에서 실제로</td><td>같은 핫스팟에서 J1~S2를 다시</td></tr>
 <tr><td>V1~V3</td><td>2인 잠금 금고 (시간이 남으면)</td><td>11-04 계획대로</td></tr>
 </table></div>
 <ul>
@@ -475,13 +523,16 @@ CK_n, MK_n 지움                                        <span class="c">키는 
 </ul>
 </section>
 <section class="t sec rise" id="decide">
-<h2 id="decide"><span class="n">20</span>결정</h2>
+<h2 id="decide"><span class="n">22</span>결정</h2>
 <div class="tbl"><table>
 <tr><th>질문</th><th>결정</th><th>이유</th></tr>
-<tr><td>무엇이 새로운가?</td><td><b>입장 심사 + 장부 대조</b> (11-06 김창식)</td><td>2026년 큰 메신저들이 못 막은 빈틈. 암호 자체는 libsodium 그대로 — 직접 만든 암호는 오히려 위험 (2025년 bitchat 사례)</td></tr>
+<tr><td>무엇이 새로운가?</td><td><b>입장 심사 + 장부 대조</b> (11-06 김창식) + <b>화면 지키기</b> (11-06 저녁 김창식 "더 창의적으로", "카메라로 휴대폰을 인식하면")</td><td>2026년 큰 메신저들이 못 막은 빈틈. 암호 자체는 libsodium 그대로 — 직접 만든 암호는 오히려 위험 (2025년 bitchat 사례)</td></tr>
 <tr><td>한 파일로 계속 갈까?</td><td><b>유지</b></td><td>11-03 결정. 칸 제목으로 나뉘어 있어 찾기 쉽다</td></tr>
 <tr><td>래칫은?</td><td><b>표준 대칭 래칫</b>으로 바꿈</td><td>빠진 통이 있어도 대화가 이어져야 장부 대조가 쓸모 있다 (<a href="#ratchet">07</a>)</td></tr>
 <tr><td>승인 기준은?</td><td><b>기존 멤버 전원</b></td><td>한 명이라도 모르는 사람이면 안 들어온다. 과반이면 Signalgate 같은 실수를 한 사람이 못 막는다</td></tr>
+<tr><td>카메라만으로?</td><td><b>띄어쓰기 표식과 같이</b></td><td>카메라는 키보드 캡처를 못 보고, 카메라 밖에서 찍으면 끝이다. 표식은 새어 나간 뒤를, 카메라는 찍는 순간을 맡아 서로의 구멍을 메운다</td></tr>
+<tr><td>카메라를 꼭 켜야 하나?</td><td><b>각자 켬, 켰는지는 모두에게 보임</b></td><td>메신저가 늘 카메라를 켜게 하면 감시 프로그램이 된다. 대신 켜고 끈 것을 알려서 서로 약속하게 한다</td></tr>
+<tr><td>카메라 인식은 C로?</td><td><b>python 도우미 + C 본체</b></td><td>C로 카메라와 인식 모델을 다루려면 수백 줄과 큰 라이브러리가 든다. 덜미 본체는 C 그대로 두고, 도우미는 한 단어만 보낸다</td></tr>
 <tr><td>공격 실험 명령은?</td><td><b>시연 모드로 넣음</b></td><td>들키는 걸 보여 주려면 속이는 쪽이 필요하다 (11-06 "예전에 뺀 건 상관없음")</td></tr>
 <tr><td>금고·대화 기록은?</td><td>금고는 <b>시간이 남으면</b>, 기록은 <b>넣지 않음</b></td><td>12-04까지 핵심 둘을 끝내는 게 먼저. 기록은 "저장하지 않는다"는 약속과 어긋난다</td></tr>
 </table></div>
