@@ -30,7 +30,13 @@ const targets = () => S.stuck.filter(x => !x.done).slice(0, 3);
 
 // ───── 화면 전환 ─────
 const VIEWS = ["start", "learn", "talk", "review", "log", "set", "lesson", "done"];
-const RENDER = { learn: () => renderLearn(), talk: () => renderToday(), review: () => renderReview(), log: () => renderLog(), set: () => renderSet(), start: () => startStep(1) };
+const RENDER = { learn: () => renderLearn(), talk: () => renderToday(), review: () => renderReview(), log: () => renderLog(), set: () => renderSet(), start: () => { startStep(1); hello() } };
+// 처음 화면: 엉킨 실이 천천히 풀렸다 다시 엉킨다
+function hello() {
+  const svg = $("hello"), t0 = performance.now();
+  const f = now => { if ($("v-start").hidden || $("s1").hidden) return; const p = (Math.sin((now - t0) / 1300) + 1) / 2; svg.innerHTML = `<path d="${K.thread(300, 90, p, 4)}" stroke="#0b6e5b" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>${p > .96 ? K.bead(150, 45, 10, "#f0a23b") : ""}`; requestAnimationFrame(f) };
+  requestAnimationFrame(f);
+}
 let curView = null, talkUnit = null;
 function show(v) {
   if (!S.mode && !DEMO) v = "start";
@@ -57,7 +63,7 @@ function nav(v) {
 $("tabs").onclick = e => { const b = e.target.closest("button"); if (b) { fx("tap"); nav(b.dataset.v) } };
 addEventListener("hashchange", () => nav(location.hash.slice(1)));
 function header() {
-  $("stats").innerHTML = S.mode ? `<span title="연속으로 한 날"><i class="ph-fill ph-flame"></i>${streak()}</span><span title="모은 별"><i class="ph-fill ph-star"></i>${totalStars()}</span>` : "";
+  $("stats").innerHTML = S.mode ? `<span title="연속으로 한 날"><i class="ph-fill ph-flame"></i>${streak()}</span><span title="모은 구슬"><svg viewBox="-10 -10 20 20" width="18" height="18" aria-hidden="true">${K.bead(0, 0, 8, "#0b6e5b")}</svg>${totalStars()}</span>` : "";
   const n = S.stuck.filter(x => !x.done).length; $("revn").textContent = n || "";
 }
 
@@ -175,20 +181,28 @@ function speak(text, rate = S.prefs.rate) {
 const cv = $("cv"), g = cv.getContext("2d");
 let bars = [], listening = false, stream, actx, meter;
 function size() { const r = cv.getBoundingClientRect(); if (!r.width) return; const d = devicePixelRatio || 1; cv.width = r.width * d; cv.height = r.height * d; g.setTransform(d, 0, 0, d, 0, 0); draw() }
-addEventListener("resize", size);
+let lastW = innerWidth;
+addEventListener("resize", () => { size(); if (curView === "learn" && innerWidth !== lastW) { lastW = innerWidth; renderLearn() } });
+// 말 걸기 화면의 실: 말하면 실이 흐르고, 멈추면 그 자리에 매듭이 지어진다
+let tick30 = 0;
 function draw() {
-  const w = cv.clientWidth, h = cv.clientHeight, step = 4, vis = bars.slice(-Math.floor(w / step));
+  const w = cv.clientWidth, h = cv.clientHeight, step = 3, vis = bars.slice(-Math.floor(w / step));
   g.clearRect(0, 0, w, h);
+  if (!vis.length) { g.strokeStyle = "#cfd3cf"; g.lineWidth = 3; g.setLineDash([2, 9]); g.beginPath(); g.moveTo(0, h / 2); g.lineTo(w, h / 2); g.stroke(); g.setLineDash([]); return }
+  g.lineWidth = 3.2; g.lineCap = "round"; g.lineJoin = "round"; g.strokeStyle = "#17191c"; g.beginPath();
+  vis.forEach((b, i) => { const y = h / 2 + Math.sin(b.k * .42) * Math.min(1, b.v * 1.6) * h * .32; i ? g.lineTo(i * step, y) : g.moveTo(0, y) });
+  g.stroke();
   vis.forEach((b, i) => {
-    if (b.gap) { g.fillStyle = "#f0a23b"; g.fillRect(i * step, 0, step, h) }
-    else { const bh = Math.max(3, b.v * h * .9); g.fillStyle = "#17191c"; g.fillRect(i * step + 1, (h - bh) / 2, step - 2, bh) }
+    if (!b.gap || vis[i - 1]?.gap) return;
+    const r = Math.min(h * .36, 18), cx = i * step + r, cy = h / 2;
+    g.strokeStyle = "#f0a23b"; g.lineWidth = 3; g.beginPath();
+    for (let j = 0; j <= 90; j++) { const t = j / 90 * Math.PI * 6, R = r * (.45 + .55 * Math.abs(Math.sin(t * 1.7 + i))); const x = cx + R * Math.cos(t * 1.31 + i), y = cy + R * Math.sin(t); j ? g.lineTo(x, y) : g.moveTo(x, y) }
+    g.stroke();
   });
-  g.fillStyle = "#17191c"; g.font = "700 14px 'TikTok Sans', sans-serif"; g.textBaseline = "middle";
-  vis.forEach((b, i) => { if (b.gap && !vis[i - 1]?.gap) { let j = i; while (vis[j]?.gap) j++; if ((j - i) * step > 34) g.fillText("uhm", i * step + 6, h / 2) } });
 }
 let quiet = 0, spoke = false, gapOpen = false;
 function push(v) {
-  bars.push({ v, gap: false });
+  bars.push({ v, gap: false, k: tick30++ });
   if (listening && conv) conv.ms += 1000 / 30;
   if (v > .12) {
     if (gapOpen) { gapOpen = false; turnPause(quiet / 30) }
@@ -347,7 +361,7 @@ Already saved: ${S.stuck.filter(x => !x.done).map(x => x.en).join(" | ") || "non
   setState("대화 시작"); $("mic").setAttribute("aria-label", "대화 시작"); $("time").textContent = "3:00"; $("typed").hidden = true;
   $("result").hidden = false;
   $("result").innerHTML = mine.length
-    ? `<b>${c.typed ? "글로 대화했어요" : `${c.pauses}번 멈췄어요${min > .2 ? ` · 1분에 ${(c.pauses / min).toFixed(1)}번` : ""}`}</b><span>${added.length ? `막혔던 말 ${added.length}개를 연습 칸에 넣었어요.` : "막힌 말이 없었어요."}${used.size ? ` 지난번 막힌 말을 ${used.size}번 썼어요.` : ""}</span>${out.tip ? `<span>${esc(out.tip)}</span>` : ""}${c.unit && mine.length >= 2 ? `<button class="btn" id="bossdone">스테이지 깨기</button>` : added.length ? `<a class="btn" href="#review">복습하러 가기</a>` : ""}`
+    ? `<b>${c.typed ? "글로 대화했어요" : `${c.pauses}번 멈췄어요${min > .2 ? ` · 1분에 ${(c.pauses / min).toFixed(1)}번` : ""}`}</b><span>${added.length ? `막혔던 말 ${added.length}개를 연습 칸에 넣었어요.` : "막힌 말이 없었어요."}${used.size ? ` 지난번 막힌 말을 ${used.size}번 썼어요.` : ""}</span>${out.tip ? `<span>${esc(out.tip)}</span>` : ""}${c.unit && mine.length >= 2 ? `<button class="btn" id="bossdone">매듭 풀기</button>` : added.length ? `<a class="btn" href="#review">복습하러 가기</a>` : ""}`
     : `<span>말한 게 없어서 기록하지 않았어요.</span>`;
   renderToday();
   if (c.unit && mine.length >= 2) $("bossdone").onclick = () => { L = { u: c.unit, s: STAGES.at(-1), q: [], i: 0, total: mine.length, first: 1, firstOk: 1, wrongs: 0, t0: c.t0, seen: new Set() }; talkUnit = null; showDone({}) };
@@ -417,34 +431,46 @@ const nodeKey = (u, k) => u.id + ":" + k;
 const stagesOf = u => u.pron ? u.stages.map(([t, n]) => ({ k: t, name: n, icon: "ear" })) : STAGES;
 const ORDER = () => UNITS.flatMap(u => stagesOf(u).map(s => ({ u, s })));
 function nextNode() { return ORDER().find(({ u, s }) => !S.done[nodeKey(u, s.k)]) }
+// 실타래: 한 가닥 실이 화면을 따라 흐르고, 그 위의 매듭을 하나씩 푼다
+const knotSvg = (state, color, boss, seed) => {
+  if (state === "done") return boss ? `<path d="${K.ornament(0, 0, 26)}" fill="${color}" opacity=".18"/><path d="${K.ornament(0, 0, 26)}" fill="none" stroke="${color}" stroke-width="4" stroke-linejoin="round"/>${K.bead(0, 0, 9, "#f0a23b")}` : K.bead(0, 0, 15, color);
+  const r = boss ? 26 : state === "open" ? 21 : 16;
+  return `<path class="${state === "open" ? "spin" : ""}" d="${K.tangle(0, 0, r, seed)}" fill="none" stroke="${state === "open" ? color : "#c3c8c3"}" stroke-width="${state === "open" ? 4.5 : 3.5}" stroke-linecap="round" stroke-linejoin="round"/>`;
+};
 function renderLearn() {
   header();
-  const nx = nextNode(), stuckN = S.stuck.filter(x => !x.done).length, td = today();
+  const nx = nextNode(), stuck = S.stuck.filter(x => !x.done), td = today();
   const doneToday = Object.values(S.done).filter(d => d.at === td).length, talkedToday = S.sessions.some(s => s.date === td && !s.unit);
-  $("plan").innerHTML = `<h2>오늘 할 것</h2><ol>
-    <li class="${doneToday ? "ok" : ""}"><button data-go="next"><i class="ph-fill ${doneToday ? "ph-check-circle" : "ph-play"}"></i><span>${nx ? `${nx.u.title} · ${nx.s.name}` : "모든 스테이지를 깼어요"}</span><small>${doneToday ? `오늘 ${doneToday}개 깸` : "3~5분"}</small></button></li>
-    ${stuckN ? `<li><button data-go="stuck"><i class="ph-fill ph-arrow-counter-clockwise"></i><span>막혔던 말 ${stuckN}개 복습</span><small>2분</small></button></li>` : ""}
-    <li class="${talkedToday ? "ok" : ""}"><a href="#talk"><i class="ph-fill ${talkedToday ? "ph-check-circle" : "ph-chats-circle"}"></i><span>${S.mode === "me" ? "내 이야기로" : "일상 상황으로"} 3분 대화</span><small>${S.key ? "AI" : "키 필요"}</small></a></li></ol>`;
-  let started = false;
-  $("path").innerHTML = UNITS.map((u, ui) => {
-    const st = stagesOf(u), doneN = st.filter(s => S.done[nodeKey(u, s.k)]).length;
-    const anyOpen = st.some(s => !S.done[nodeKey(u, s.k)]) && !started;
-    const unitLocked = started && !doneN;
-    const nodes = st.map((s, si) => {
+  const mini = (c, sd) => `<svg viewBox="-14 -14 28 28" width="26" height="26" aria-hidden="true"><path d="${K.tangle(0, 0, 11, sd)}" fill="none" stroke="${c}" stroke-width="2.4" stroke-linecap="round"/></svg>`;
+  $("plan").innerHTML = `<h2>오늘 풀 매듭</h2><ol>
+    <li class="${doneToday ? "ok" : ""}"><button data-go="next">${doneToday ? `<svg viewBox="-14 -14 28 28" width="26" height="26" aria-hidden="true">${K.bead(0, 0, 9, "#7fd1b9")}</svg>` : mini("#f0a23b", 1)}<span>${nx ? `${nx.u.title} · ${nx.s.name}` : "모든 매듭을 풀었어요"}</span><small>${doneToday ? `오늘 ${doneToday}개 풂` : "3~5분"}</small></button></li>
+    ${stuck.length ? `<li><button data-go="stuck">${mini("#ff9f87", 3)}<span>대화에서 꼬인 말 ${stuck.length}개</span><small>2분</small></button></li>` : ""}
+    <li class="${talkedToday ? "ok" : ""}"><a href="#talk"><i class="ph-fill ${talkedToday ? "ph-check-circle" : "ph-chats-circle"}"></i><span>${S.mode === "me" ? "내 이야기로" : "일상 상황으로"} 3분 말 걸기</span><small>${S.key ? "AI" : "키 필요"}</small></a></li></ol>`;
+  const W = Math.max(300, $("path").clientWidth || 380), cx = W / 2, amp = Math.min(84, W * .22);
+  let y = 30, k = 0, started = false;
+  const pts = [], html = [];
+  UNITS.forEach((u, ui) => {
+    const st = stagesOf(u), doneN = st.filter(s => S.done[nodeKey(u, s.k)]).length, locked = started && !doneN;
+    pts.push({ x: cx, y, c: u.color, on: !started });
+    html.push(`<div class="uhead" style="--uc:${u.color};top:${y - 26}px"><div><small>타래 ${ui + 1} · ${doneN}/${st.length}</small><b>${u.title}</b></div>${locked && ui ? `<button class="jump" data-jump="${u.id}">건너뛰기 시험</button>` : ""}</div>`);
+    y += 110;
+    st.forEach((s, si) => {
       const d = S.done[nodeKey(u, s.k)], isNext = !d && !started; if (isNext) started = true;
-      const state = d ? "done" : isNext ? "open" : "lock", boss = s.k === "boss";
-      const x = Math.round(Math.sin((si + ui) * 1.1) * 62);
-      return `<div class="node ${state}${boss ? " boss" : ""}" style="--x:${x}px">
-        ${isNext ? `<span class="go-tip">${d ? "다시" : "시작"}</span>` : ""}
-        <button data-u="${u.id}" data-k="${s.k}" aria-label="${u.title} ${s.name}${d ? " 깸" : state === "lock" ? " 잠김" : ""}"><i class="ph-fill ph-${state === "lock" ? "lock-simple" : boss ? "trophy" : s.icon}"></i></button>
-        <span class="stars">${[1, 2, 3].map(n => `<i class="ph-fill ph-star${d && d.stars >= n ? " on" : ""}"></i>`).join("")}</span>
-        <label>${s.name}</label></div>`;
-    }).join("");
-    void anyOpen;
-    return `<section class="unit" style="--uc:${u.color}"><div class="uhead"><div><small>유닛 ${ui + 1} · ${doneN}/${st.length}</small><b>${u.title}</b></div>${unitLocked && ui ? `<button class="jump" data-jump="${u.id}">건너뛰기 시험</button>` : ""}</div><div class="nodes">${nodes}</div></section>`;
-  }).join("");
+      const state = d ? "done" : isNext ? "open" : "lock", boss = s.k === "boss", x = Math.round(cx + Math.sin(k * .95 + .6) * amp);
+      pts.push({ x, y, c: u.color, on: !!d || isNext });
+      const side = x >= cx ? "l" : "r";
+      html.push(`<div class="knot ${state}${boss ? " boss" : ""}" style="left:${x}px;top:${y}px;--uc:${u.color}">
+        ${isNext ? `<span class="go-tip">${boss ? "말 걸기" : "풀기"}</span>` : ""}
+        <button data-u="${u.id}" data-k="${s.k}" aria-label="${u.title} ${s.name}${d ? ", 풀었음" : state === "lock" ? ", 아직 꼬여 있음" : ""}"><svg viewBox="-36 -36 72 72" aria-hidden="true">${knotSvg(state, u.color, boss, k * 1.7)}</svg></button>
+        <span class="klabel ${side}"><b>${s.name}</b>${d ? `<i aria-label="구슬 ${d.stars}개">${[1, 2, 3].map(n => `<em class="${d.stars >= n ? "on" : ""}"></em>`).join("")}</i>` : ""}</span></div>`);
+      y += boss ? 128 : 104; k++;
+    });
+  });
+  const segs = pts.slice(1).map((b, i) => { const a = pts[i]; return `<path d="${K.link(a, b)}" stroke="${b.on ? b.c : "#cfd3cf"}" stroke-width="${b.on ? 6 : 4}" ${b.on ? "" : 'stroke-dasharray="2 10"'} fill="none" stroke-linecap="round"/>` }).join("");
+  $("path").style.height = y + "px";
+  $("path").innerHTML = `<svg class="cord" width="${W}" height="${y}" viewBox="0 0 ${W} ${y}" aria-hidden="true">${segs}</svg>${html.join("")}`;
   if (lastCleared) { const b = $("path").querySelector(`[data-u="${lastCleared.u}"][data-k="${lastCleared.k}"]`); if (b) { b.parentElement.classList.add("pop"); b.scrollIntoView({ block: "center" }) } lastCleared = null }
-  else $("path").querySelector(".node.open")?.scrollIntoView({ block: "center" });
+  else $("path").querySelector(".knot.open")?.scrollIntoView({ block: "center" });
 }
 let lastCleared = null;
 $("plan").onclick = e => {
@@ -454,10 +480,10 @@ $("plan").onclick = e => {
 };
 $("path").onclick = e => {
   const j = e.target.closest("[data-jump]");
-  if (j) { const u = UNITS.find(x => x.id === j.dataset.jump); return sheet(`<h3>${u.title}부터 시작할까요?</h3><p class="soft">앞 유닛 표현으로 10문제를 풀어요. 2개까지 틀려도 통과예요. 통과하면 앞 유닛은 모두 깬 걸로 칠게요.</p><button class="btn wide" data-a="jump">시험 보기</button><button class="btn ghost wide" data-a="close">닫기</button>`, a => a === "jump" && startJump(u)) }
+  if (j) { const u = UNITS.find(x => x.id === j.dataset.jump); return sheet(`<h3>${u.title}부터 풀까요?</h3><p class="soft">앞 타래 표현으로 10문제를 풀어요. 2개까지 틀려도 통과예요. 통과하면 앞 타래는 다 푼 걸로 칠게요.</p><button class="btn wide" data-a="jump">시험 보기</button><button class="btn ghost wide" data-a="close">닫기</button>`, a => a === "jump" && startJump(u)) }
   const b = e.target.closest("button[data-u]"); if (!b) return;
   const u = UNITS.find(x => x.id === b.dataset.u), s = stagesOf(u).find(x => x.k === b.dataset.k);
-  if (b.parentElement.classList.contains("lock")) { fx("bad"); b.parentElement.animate([{ transform: "translateX(var(--x))" }, { transform: "translateX(calc(var(--x) - 6px))" }, { transform: "translateX(calc(var(--x) + 6px))" }, { transform: "translateX(var(--x))" }], 260); return toast("앞 스테이지를 먼저 깨요") }
+  if (b.parentElement.classList.contains("lock")) { fx("bad"); b.animate([{ transform: "rotate(0)" }, { transform: "rotate(-10deg)" }, { transform: "rotate(10deg)" }, { transform: "rotate(0)" }], 300); return toast("앞 매듭부터 풀어요") }
   openNode(u, s);
 };
 function sheet(html, onPick) {
@@ -468,7 +494,7 @@ function sheet(html, onPick) {
 }
 function openNode(u, s) {
   if (s.k === "boss") {
-    if (S.key) return sheet(`<h3>${u.title} · 실전 대화</h3><p class="soft">AI 상대와 이 장면으로 3분 대화하거나, 정해진 대본으로 연습해요.</p><button class="btn wide" data-a="ai"><i class="ph-fill ph-robot"></i>AI와 3분 대화</button><button class="btn ghost wide" data-a="script"><i class="ph-bold ph-scroll"></i>대본으로 연습</button>`, a => a === "ai" ? bossAI(u) : startLesson(u, s));
+    if (S.key) return sheet(`<h3>${u.title} · 말 걸기</h3><p class="soft">AI 상대와 이 장면으로 3분 대화하거나, 정해진 대본으로 연습해요.</p><button class="btn wide" data-a="ai"><i class="ph-fill ph-robot"></i>AI와 3분 대화</button><button class="btn ghost wide" data-a="script"><i class="ph-bold ph-scroll"></i>대본으로 연습</button>`, a => a === "ai" ? bossAI(u) : startLesson(u, s));
   }
   startLesson(u, s);
 }
@@ -518,7 +544,21 @@ function adapt(x) {
 
 // ───── 레슨: 진행 ─────
 let L = null;
+// 레슨 위쪽 실: 맞힐수록 가운데 매듭이 풀린다
+let kp = 0, kAnim;
+function knotTo(p) {
+  const el = $("lknot"), w = el.clientWidth || 300, h = 44, from = kp, t0 = performance.now();
+  el.setAttribute("viewBox", `0 0 ${w} ${h}`);
+  cancelAnimationFrame(kAnim);
+  const step = now => {
+    const t = Math.min(1, (now - t0) / 450), e = 1 - (1 - t) ** 3; kp = from + (p - from) * e;
+    el.innerHTML = `<path d="${K.thread(w, h, 0)}" stroke="#dcdfdc" stroke-width="5" fill="none" stroke-linecap="round"/><path d="${K.thread(w, h, kp)}" stroke="${L?.u.color || "#0b6e5b"}" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>${kp > .99 ? K.bead(w - 10, h / 2, 9, "#f0a23b") : ""}`;
+    if (t < 1) kAnim = requestAnimationFrame(step);
+  };
+  kAnim = requestAnimationFrame(step);
+}
 function startLesson(u, s, items, extra = {}) {
+  kp = 0;
   items = items || buildLesson(u, s.k);
   L = { u, s, q: items, i: 0, total: items.length, first: 0, firstOk: 0, wrongs: 0, t0: Date.now(), seen: new Set(), learned: 0, ...extra };
   nav("lesson"); renderEx();
@@ -541,7 +581,7 @@ function renderEx(dir) {
   if (L.i >= L.q.length) return finishLesson();
   const x = L.q[L.i] = adapt(L.q[L.i]);
   pickVal = null; tilesSel = []; spokeOk = false;
-  $("lprog").style.width = (100 * Math.min(L.i, L.total) / L.total) + "%";
+  knotTo(Math.min(L.i, L.total) / L.total);
   const f = $("lfoot"); f.className = "lfoot"; $("verdict").innerHTML = "";
   $("lcheck").textContent = x.t === "learn" ? "알겠어요" : "확인"; $("lcheck").disabled = x.t !== "learn";
   $("lskip").hidden = x.t === "learn";
@@ -550,19 +590,19 @@ function renderEx(dir) {
   let h = "";
   if (x.t === "learn") h = `<span class="new"><i class="ph-fill ph-sparkle"></i>새 표현</span><div class="prompt">${sayBtns(x.p.en)}</div><div class="learn-en" lang="en">${esc(x.p.en)}</div><div class="learn-ko">${esc(x.p.ko)}</div>`;
   if (x.t === "pick") {
-    const q = { en2ko: "무슨 뜻일까요?", ko2en: "영어로 어떻게 말할까요?", hear2ko: "들리는 문장의 뜻은?", hear2en: "들리는 문장을 골라요" }[x.how];
+    const q = { en2ko: "무슨 뜻일까요?", ko2en: "영어로는 어떻게 말할까요?", hear2ko: "들리는 말의 뜻은?", hear2en: "들리는 말을 골라요" }[x.how];
     const top = x.how === "en2ko" ? `<div class="prompt">${sayBtns(x.p.en)}<div class="bubble" lang="en">${esc(x.p.en)}</div></div>` : x.how === "ko2en" ? `<div class="bubble" style="margin-bottom:18px">${esc(x.p.ko)}</div>` : `<div class="center">${sayBtns(x.p.en, 1)}</div>`;
     h = `<p class="qt">${q}</p>${top}<div class="opts">${x.opts.map((o, i) => `<button class="opt" data-o="${i}" ${/en$/.test(x.how) ? 'lang="en"' : ""}><kbd>${i + 1}</kbd>${esc(o)}</button>`).join("")}</div>${x.ear ? skipRow("ear") : ""}`;
   }
   if (x.t === "tiles") {
-    h = `<p class="qt">${x.how === "ear" ? "들리는 대로 만들어요" : "영어로 만들어요"}</p>${x.how === "ear" ? `<div class="center">${sayBtns(x.p.en, 1)}</div>` : `<div class="bubble">${esc(x.p.ko)}</div>`}
-      <div class="answer" id="ans" lang="en"></div><div class="bank" id="bank" lang="en">${x.bank.map((w, i) => `<button class="tile" data-t="${i}">${esc(w)}</button>`).join("")}</div>${x.ear ? skipRow("ear") : ""}`;
+    h = `<p class="qt">${x.how === "ear" ? "들리는 대로 구슬을 꿰어요" : "구슬을 꿰어 영어로 말해요"}</p>${x.how === "ear" ? `<div class="center">${sayBtns(x.p.en, 1)}</div>` : `<div class="bubble">${esc(x.p.ko)}</div>`}
+      <div class="answer" id="ans" lang="en"></div><div class="bank" id="bank" lang="en">${x.bank.map((w, i) => `<button class="tile" data-t="${i}" style="--r:${(i * 37 % 11) - 5}deg">${esc(w)}</button>`).join("")}</div>${x.ear ? skipRow("ear") : ""}`;
   }
   if (x.t === "speak") h = `<p class="qt">소리 내어 말해요</p><div class="prompt">${sayBtns(x.p.en)}<div class="bubble" lang="en">${esc(x.p.en)}<small>${esc(x.p.ko)}</small></div></div><button class="mic-big" id="smic" aria-label="말하기"><i class="ph-fill ph-microphone"></i></button><p class="heardw" id="sheard"></p>${skipRow("mouth")}`;
   if (x.t === "pairs") {
     const L2 = shuffle(x.ps.map((p, i) => ({ i, t: p.ko })));
     pairState = { a: null, left: x.ps.length };
-    h = `<p class="qt">짝을 맞춰요</p><div class="pairs"><div class="opts">${x.ps.map((p, i) => `<button class="opt" data-pe="${i}" lang="en">${esc(p.en)}</button>`).join("")}</div><div class="opts">${L2.map(o => `<button class="opt" data-pk="${o.i}">${esc(o.t)}</button>`).join("")}</div></div>`;
+    h = `<p class="qt">같은 뜻끼리 이어요</p><div class="pairs"><div class="opts">${x.ps.map((p, i) => `<button class="opt" data-pe="${i}" lang="en">${esc(p.en)}</button>`).join("")}</div><div class="opts">${L2.map(o => `<button class="opt" data-pk="${o.i}">${esc(o.t)}</button>`).join("")}</div></div>`;
   }
   if (x.t === "reply") h = `<p class="qt">대답을 골라요</p><div class="who" style="margin-bottom:14px"><div class="face">${(SCENES[L.u.scene] || SCENES.me).name[0]}</div><div class="bubble" lang="en" style="flex:1">${esc(x.line)}</div></div>
       <div class="prompt">${sayBtns(x.line)}</div><div class="opts">${x.opts.map((o, i) => `<button class="opt" data-o="${i}" lang="en"><kbd>${i + 1}</kbd>${esc(o)}</button>`).join("")}</div>`;
@@ -638,9 +678,11 @@ function check(skipped) {
   if (x.t === "learn") return next();
   $("ex").querySelectorAll("[data-o]").forEach(b => { if (x.opts?.[+b.dataset.o] === x.ans) b.classList.add("right"); else if (b.classList.contains("sel")) b.classList.add("wrong") });
   f.classList.add(ok ? "good" : "bad"); fx(ok ? "good" : "bad");
-  const praise = ["좋아요!", "정확해요!", "술술 나오네요!", "완벽해요!"][Math.floor(Math.random() * 4)];
+  const lk = $("lknot"); lk.classList.remove("tug", "loose"); void lk.getBoundingClientRect(); lk.classList.add(ok ? "loose" : "tug");
+  if (ok) knotTo(Math.min(L.i + 1, L.total) / L.total);
+  const praise = ["술술 풀렸어요!", "매끄러워요!", "구슬이 꿰어졌어요!", "좋아요!"][Math.floor(Math.random() * 4)];
   $("verdict").innerHTML = ok ? `<b><i class="ph-fill ph-check-circle"></i>${praise}</b>${x.ear || x.t === "speak" ? `<p lang="en">${esc(x.p.en)}</p>` : ""}${x.t === "pron" ? `<p>${esc(x.w[6])}</p>` : ""}`
-    : `<b><i class="ph-fill ph-x-circle"></i>${skipped ? "다음에 다시 나와요" : "정답은"}</b><p lang="en">${esc(answerText(x))}</p>`;
+    : `<b><svg viewBox="-14 -14 28 28" width="24" height="24" aria-hidden="true"><path d="${K.tangle(0, 0, 11, 2)}" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>${skipped ? "끝에 다시 풀어요" : "여기서 꼬였어요"}</b><p lang="en">${esc(answerText(x))}</p>`;
   $("lcheck").disabled = false; $("lcheck").textContent = "계속";
   if (!ok) {
     L.wrongs++;
@@ -654,7 +696,7 @@ function check(skipped) {
 function next() { if (!L || L.adv) return; L.adv = true; $("ex").classList.add("out"); setTimeout(() => { if (!L) return; L.adv = false; L.i++; renderEx() }, 180) }
 $("lcheck").onclick = () => { if (L && !L.adv) check() };
 $("lskip").onclick = () => { if (L && !L.adv) check(true) };
-$("lclose").onclick = () => sheet(`<h3>그만할까요?</h3><p class="soft">지금 그만두면 이 스테이지 진행은 저장되지 않아요.</p><button class="btn wide" data-a="stay">계속하기</button><button class="btn ghost wide" data-a="quit">그만하기</button>`, a => { if (a === "quit") { speechSynthesis.cancel(); L = null; nav("learn") } });
+$("lclose").onclick = () => sheet(`<h3>그만할까요?</h3><p class="soft">지금 그만두면 이 매듭은 다시 엉켜요.</p><button class="btn wide" data-a="stay">계속하기</button><button class="btn ghost wide" data-a="quit">그만하기</button>`, a => { if (a === "quit") { speechSynthesis.cancel(); L = null; nav("learn") } });
 addEventListener("keydown", e => {
   if ($("v-lesson").hidden || document.querySelector(".sheet") || e.target.closest("input")) return;
   if (e.key === "Enter" && !$("lcheck").disabled) { e.preventDefault(); $("lcheck").click() }
@@ -667,27 +709,34 @@ function finishLesson() { showDone({}) }
 function showDone({ fail }) {
   const acc = L.first ? L.firstOk / L.first : 1, stars = acc >= .95 ? 3 : acc >= .75 ? 2 : 1, sec = Math.round((Date.now() - L.t0) / 1000);
   markDay();
-  let title = "스테이지 클리어!", sub = `${L.u.title} · ${L.s.name}`, btn = "계속";
-  if (fail) { title = "아깝게 떨어졌어요"; sub = "앞 유닛부터 차근차근 가요" }
-  else if (L.jump) { const idx = UNITS.indexOf(L.jump); UNITS.slice(0, idx).forEach(u => stagesOf(u).forEach(s => S.done[nodeKey(u, s.k)] = S.done[nodeKey(u, s.k)] || { stars: 1, at: today() })); title = "건너뛰기 통과!"; sub = `${L.jump.title}부터 시작해요` }
-  else if (L.review) { title = "복습 끝!"; sub = L.u.title }
+  let title = L.s.k === "boss" ? "타래 하나를 다 풀었어요" : "매듭을 풀었어요", sub = L.s.k === "boss" ? `${L.u.title} · 매듭 장식을 얻었어요` : `${L.u.title} · ${L.s.name}`, btn = "계속";
+  if (fail) { title = "아직 꼬여 있어요"; sub = "앞 타래부터 차근차근 풀어요" }
+  else if (L.jump) { const idx = UNITS.indexOf(L.jump); UNITS.slice(0, idx).forEach(u => stagesOf(u).forEach(s => S.done[nodeKey(u, s.k)] = S.done[nodeKey(u, s.k)] || { stars: 1, at: today() })); title = "건너뛰기 통과"; sub = `${L.jump.title}부터 풀어요` }
+  else if (L.review) { title = "꼬인 말을 풀었어요"; sub = L.u.title }
   else { const key = nodeKey(L.u, L.s.k), old = S.done[key]; S.done[key] = { stars: Math.max(stars, old?.stars || 0), at: today() }; lastCleared = { u: L.u.id, k: L.s.k } }
   save();
   const learned = L.q.filter(x => x.t === "learn").length;
-  $("v-done").innerHTML = `<i class="ph-fill ${fail ? "ph-arrow-counter-clockwise" : L.s.k === "boss" ? "ph-crown" : "ph-trophy"} trophy"></i><h1>${title}</h1><p class="soft">${sub}</p>
-    ${fail || L.jump ? "" : `<div class="bigstars">${[1, 2, 3].map(n => `<i class="ph-fill ph-star${stars >= n ? " on" : ""}"></i>`).join("")}</div>`}
-    <div class="dstats"><div><b>${Math.round(acc * 100)}%</b><span>정확도</span></div><div><b>${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, "0")}</b><span>걸린 시간</span></div><div><b>${learned || L.total}</b><span>${learned ? "새 표현" : "문제"}</span></div></div>
+  const boss = L.s.k === "boss" && !L.review && !L.jump && !fail, uc = L.u.color || "#0b6e5b";
+  $("v-done").innerHTML = `<svg class="untie" id="untie" viewBox="0 0 300 120" aria-hidden="true"></svg><h1>${title}</h1><p class="soft">${sub}</p>
+    ${fail || L.jump ? "" : `<div class="beads" aria-label="구슬 ${stars}개">${[1, 2, 3].map(n => `<em class="${stars >= n ? "on" : ""}"></em>`).join("")}</div>`}
+    <div class="dstats"><div><b>${Math.round(acc * 100)}%</b><span>첫 시도에 맞힘</span></div><div><b>${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, "0")}</b><span>걸린 시간</span></div><div><b>${learned || L.total}</b><span>${learned ? "새 구슬" : "문제"}</span></div></div>
     <button class="btn" id="donego">${btn}</button>`;
-  nav("done"); fx(fail ? "bad" : "done"); if (!fail) confetti();
+  untie($("untie"), uc, fail, boss);
+  nav("done"); fx(fail ? "bad" : "done");
   $("donego").onclick = () => { const back = L?.review ? "review" : "learn"; L = null; nav(back) };
 }
-function confetti() {
-  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  const c = document.createElement("canvas"); $("v-done").append(c);
-  const d = devicePixelRatio || 1; c.width = innerWidth * d; c.height = innerHeight * d; const g2 = c.getContext("2d"); g2.scale(d, d);
-  const cols = ["#0b6e5b", "#f0a23b", "#7fd1b9", "#0f2a26", "#fbe9cc"], ps = Array.from({ length: 90 }, () => ({ x: innerWidth / 2, y: innerHeight * .35, vx: (Math.random() - .5) * 12, vy: -Math.random() * 12 - 4, s: 5 + Math.random() * 6, r: Math.random() * 6, vr: (Math.random() - .5) * .3, c: cols[Math.floor(Math.random() * cols.length)] }));
-  let n = 0;
-  (function f() { g2.clearRect(0, 0, innerWidth, innerHeight); ps.forEach(p => { p.vy += .32; p.vx *= .99; p.x += p.vx; p.y += p.vy; p.r += p.vr; g2.save(); g2.translate(p.x, p.y); g2.rotate(p.r); g2.fillStyle = p.c; g2.fillRect(-p.s / 2, -p.s / 3, p.s, p.s * .66); g2.restore() }); if (++n < 140) requestAnimationFrame(f); else c.remove() })();
+// 끝 화면: 엉킨 실이 스르르 풀려 곧게 펴지고 구슬이 꿰인다 (실전이면 매듭 장식을 맺는다)
+function untie(svg, color, fail, boss) {
+  const w = 300, h = 120, t0 = performance.now(), dur = matchMedia("(prefers-reduced-motion: reduce)").matches ? 1 : 1300;
+  const f = now => {
+    const t = Math.min(1, (now - t0) / dur), e = fail ? .25 * t : 1 - (1 - t) ** 3;
+    let out = `<path d="${K.thread(w, h, e, 4)}" stroke="${fail ? "#c3c8c3" : color}" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+    if (t === 1 && !fail) out = boss ? `<line x1="0" y1="${h / 2}" x2="${w}" y2="${h / 2}" stroke="${color}" stroke-width="6" stroke-linecap="round"/><path class="draw" d="${K.ornament(w / 2, h / 2, 46)}" fill="${color}" fill-opacity=".14" stroke="${color}" stroke-width="5" stroke-linejoin="round"/><g class="popin">${K.bead(w / 2, h / 2, 13, "#f0a23b")}</g>`
+      : out + `<g class="popin">${K.bead(w / 2, h / 2, 16, color)}</g>`;
+    svg.innerHTML = out;
+    if (t < 1) requestAnimationFrame(f);
+  };
+  requestAnimationFrame(f);
 }
 
 // ───── 복습 ─────
@@ -695,8 +744,8 @@ function renderReview() {
   header();
   const list = S.stuck.filter(x => !x.done);
   $("revStuck").disabled = !list.length;
-  $("stucklist").innerHTML = list.length ? list.map(x => `<article class="card"><div class="k">${esc(x.ko)}</div><div class="e" lang="en">${esc(x.en)}</div><div class="meta"><span>대화에서 ${x.uses}/2번${x.key ? ` · 핵심: ${esc(x.key)}` : ""}</span><button class="link" data-del="${x.id}" style="color:var(--muted)">빼기</button></div></article>`).join("")
-    : `<p class="none" style="margin-top:12px">${S.sessions.length ? "지금은 막힌 말이 없어요." : "대화를 한 번 하면 막혔던 말이 여기 모여요."}</p>`;
+  $("stucklist").innerHTML = list.length ? list.map(x => `<article class="card"><svg class="ck" viewBox="-14 -14 28 28" aria-hidden="true"><path d="${K.tangle(0, 0, 11, x.en.length)}" fill="none" stroke="#f0a23b" stroke-width="2.4" stroke-linecap="round"/></svg><div class="k">${esc(x.ko)}</div><div class="e" lang="en">${esc(x.en)}</div><div class="meta"><span>대화에서 ${x.uses}/2번${x.key ? ` · 핵심: ${esc(x.key)}` : ""}</span><button class="link" data-del="${x.id}" style="color:var(--muted)">빼기</button></div></article>`).join("")
+    : `<p class="none" style="margin-top:12px">${S.sessions.length ? "지금은 꼬인 말이 없어요." : "말 걸기를 한 번 하면 꼬인 말이 여기 모여요."}</p>`;
   $("mistinfo").textContent = S.mist.length ? `${S.mist.length}개가 모여 있어요. 맞히면 목록에서 빠져요.` : "아직 틀린 문제가 없어요.";
   $("revMist").disabled = !S.mist.length;
 }
@@ -707,7 +756,8 @@ $("stucklist").onclick = e => { const b = e.target.closest("[data-del]"); if (!b
 // ───── 기록 ─────
 function renderLog() {
   header();
-  $("lognums").innerHTML = `<div><b>${Object.keys(S.done).length}</b><span>깬 스테이지</span></div><div><b>${S.sessions.length}</b><span>대화</span></div><div><b>${S.stuck.filter(x => x.done).length}</b><span>뚫린 막힌 말</span></div>`;
+  $("lognums").innerHTML = `<div><b>${Object.keys(S.done).length}</b><span>푼 매듭</span></div><div><b>${S.sessions.length}</b><span>말 걸기</span></div><div><b>${S.stuck.filter(x => x.done).length}</b><span>풀린 꼬인 말</span></div>`;
+  $("shelf").innerHTML = UNITS.map(u => { const all = stagesOf(u).every(s => S.done[nodeKey(u, s.k)]); return `<div class="${all ? "got" : ""}"><svg viewBox="-34 -34 68 68" aria-hidden="true">${all ? `<path d="${K.ornament(0, 0, 28)}" fill="${u.color}" fill-opacity=".14" stroke="${u.color}" stroke-width="3.5"/>${K.bead(0, 0, 7, "#f0a23b")}` : `<path d="${K.tangle(0, 0, 20, u.title.length)}" fill="none" stroke="#cfd3cf" stroke-width="3" stroke-linecap="round"/>`}</svg><span>${u.title}</span></div>` }).join("");
   const ss = S.sessions.filter(s => !s.typed).slice(-14), rate = s => s.min > .2 ? s.pauses / s.min : s.pauses, max = Math.max(1, ...ss.map(rate));
   $("chart").innerHTML = ss.length ? ss.map(s => `<div title="${s.date}"><span>${rate(s).toFixed(1)}</span><i style="height:${Math.max(3, 100 * rate(s) / max)}%"></i>${s.date.slice(5).replace("-", ".")}</div>`).join("") : `<p class="none" style="align-self:center;flex:1">대화를 하면 막대가 생겨요.</p>`;
   $("slist").innerHTML = S.sessions.slice().reverse().map(s => `<details class="sess"><summary>${s.date.slice(5).replace("-", ".")} ${SCENES[s.scene]?.ko || ""}<span>${s.typed ? "글로" : `멈춤 ${s.pauses}`} · 새로 막힌 말 ${s.added}</span></summary><ol>${s.turns.map(t => `<li class="${t.who}" lang="en">${esc(t.text)}</li>`).join("")}</ol></details>`).join("") || `<p class="none">아직 대화가 없어요.</p>`;

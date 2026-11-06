@@ -90,31 +90,39 @@ label.f { display: grid; gap: 4px; margin-top: 12px; font-size: 15px; font-weigh
 .plan li.ok i { color: #7fd1b9 }
 .plan li span { flex: 1 }
 .plan li small { color: #b9cfc8; font-size: 13px; font-weight: 500 }
-.unit { margin-top: 26px }
-.uhead { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 16px; background: var(--uc, var(--accent)); color: #fff }
+#path { position: relative; margin: 18px -20px 0; overflow: hidden }
+.cord { position: absolute; inset: 0 }
+.uhead { position: absolute; left: 20px; right: 20px; display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 16px; background: var(--uc, var(--accent)); color: #fff; z-index: 1 }
 .uhead div { flex: 1 }
 .uhead small { display: block; font-size: 13px; opacity: .8; font-weight: 600 }
 .uhead b { font-size: 19px; font-weight: 800 }
 .uhead .jump { padding: 8px 10px; border-radius: 10px; background: rgba(255,255,255,.16); color: #fff; font-size: 13px; font-weight: 700 }
-.nodes { position: relative; display: grid; justify-items: center; gap: 34px; padding: 40px 0 6px }
-.node { position: relative; transform: translateX(var(--x, 0)); display: grid; justify-items: center; gap: 4px }
-.node button { width: 70px; height: 64px; border-radius: 50%; background: var(--line); color: #fff; font-size: 30px; display: grid; place-items: center; box-shadow: 0 6px 0 #c6cac6; transition: transform .1s, box-shadow .1s }
-.node button:active { transform: translateY(5px); box-shadow: 0 1px 0 #c6cac6 }
-.node.open button, .node.done button { background: var(--uc, var(--accent)); box-shadow: 0 6px 0 rgba(0,0,0,.22) }
-.node.lock button { color: #fff; font-size: 24px }
-.node.boss button { width: 86px; height: 78px; font-size: 36px }
-.node.done.boss button { background: var(--warm); color: var(--ink); box-shadow: 0 6px 0 var(--warm-2) }
-.node .stars { display: flex; gap: 1px; font-size: 14px; color: var(--line); height: 16px }
-.node .stars .on { color: var(--warm-2) }
-.node.open::before { content: ""; position: absolute; top: -4px; left: 50%; width: 82px; height: 76px; margin-left: -41px; border-radius: 50%; border: 4px solid var(--uc, var(--accent)); opacity: .35; animation: halo 1.8s ease-out infinite; pointer-events: none }
-.node.boss.open::before { width: 98px; height: 90px; margin-left: -49px }
-@keyframes halo { from { transform: scale(.9); opacity: .5 } to { transform: scale(1.25); opacity: 0 } }
-.node .go-tip { position: absolute; bottom: calc(100% + 2px); white-space: nowrap; padding: 6px 12px; border-radius: 10px; background: var(--bg); color: var(--uc, var(--accent)); font-weight: 800; font-size: 14px; box-shadow: 0 0 0 2px var(--line); animation: bob 1.4s ease-in-out infinite; pointer-events: none }
-.node .go-tip::after { content: ""; position: absolute; left: 50%; top: 100%; margin-left: -6px; border: 6px solid transparent; border-top-color: var(--bg) }
-@keyframes bob { 50% { transform: translateY(-4px) } }
-.node.pop button { animation: pop .6s var(--spring) }
-@keyframes pop { 30% { transform: scale(1.25) } }
-.node label { font-size: 13px; color: var(--muted); font-weight: 600 }
+.knot { position: absolute; width: 0; height: 0; z-index: 2 }
+.knot button { position: absolute; left: -36px; top: -36px; width: 72px; height: 72px; border-radius: 50%; display: grid; place-items: center; transition: transform .15s var(--spring) }
+.knot button:active { transform: scale(.92) }
+.knot svg { width: 72px; height: 72px; overflow: visible }
+.knot.boss button { left: -44px; top: -44px; width: 88px; height: 88px }
+.knot.boss svg { width: 88px; height: 88px }
+.knot.open button { background: var(--bg) }
+.knot.open button::after { content: ""; position: absolute; inset: -6px; border-radius: 50%; border: 3px solid var(--uc); opacity: .3; animation: halo 1.8s ease-out infinite; pointer-events: none }
+.spin { transform-origin: 0 0; animation: wobble 6s ease-in-out infinite }
+@keyframes wobble { 50% { transform: rotate(14deg) scale(1.04) } }
+@keyframes halo { from { transform: scale(.85); opacity: .5 } to { transform: scale(1.3); opacity: 0 } }
+.knot .go-tip { position: absolute; left: 50%; bottom: 44px; transform: translateX(-50%); white-space: nowrap; padding: 5px 12px; border-radius: 10px; background: var(--uc); color: #fff; font-weight: 800; font-size: 14px; animation: bob 1.4s ease-in-out infinite; pointer-events: none }
+.knot.boss .go-tip { bottom: 52px }
+.knot .go-tip::after { content: ""; position: absolute; left: 50%; top: 100%; margin-left: -6px; border: 6px solid transparent; border-top-color: var(--uc) }
+@keyframes bob { 50% { margin-bottom: 4px } }
+.klabel { position: absolute; top: -18px; width: 120px; display: grid; gap: 4px; font-size: 14px; line-height: 1.2 }
+.klabel.l { right: 46px; text-align: right; justify-items: end }
+.klabel.r { left: 46px }
+.knot.boss .klabel.l { right: 54px } .knot.boss .klabel.r { left: 54px }
+.klabel b { font-weight: 700 }
+.knot.lock .klabel b { color: var(--muted); font-weight: 600 }
+.klabel i { display: flex; gap: 3px }
+.klabel em, .beads em { width: 10px; height: 10px; border-radius: 50%; background: var(--line) }
+.klabel em.on, .beads em.on { background: var(--warm) }
+.knot.pop button { animation: pop .7s var(--spring) }
+@keyframes pop { 30% { transform: scale(1.3) rotate(-8deg) } }
 .sheet { position: fixed; inset: 0; z-index: 20; display: grid; align-items: end; background: rgba(15, 42, 38, .35); animation: fade .2s both }
 .sheet > div { max-width: 460px; width: 100%; margin: 0 auto; padding: 22px 20px calc(22px + env(safe-area-inset-bottom)); background: var(--bg); border-radius: 22px 22px 0 0; animation: up .3s var(--ease) both; display: grid; gap: 10px }
 .sheet h3 { margin: 0; font-size: 22px }
@@ -126,9 +134,7 @@ label.f { display: grid; gap: 4px; margin-top: 12px; font-size: 15px; font-weigh
 .lesson { padding-bottom: 0 }
 .lbar { display: flex; align-items: center; gap: 14px }
 .lbar button { font-size: 26px; color: var(--muted) }
-.prog { flex: 1; height: 16px; border-radius: 8px; background: var(--line); overflow: hidden }
-.prog i { display: block; height: 100%; width: 0; border-radius: 8px; background: var(--accent); transition: width .45s var(--ease); position: relative }
-.prog i::after { content: ""; position: absolute; left: 8px; right: 8px; top: 4px; height: 4px; border-radius: 2px; background: rgba(255,255,255,.3) }
+.lknot { flex: 1; height: 44px; overflow: visible }
 .ex { flex: 1; display: flex; flex-direction: column; padding-top: 22px; animation: exIn .4s var(--ease) both }
 .ex.out { animation: exOut .2s ease both }
 @keyframes exIn { from { opacity: 0; transform: translateX(28px) } }
@@ -155,13 +161,14 @@ label.f { display: grid; gap: 4px; margin-top: 12px; font-size: 15px; font-weigh
 .opt.right { background: var(--accent-soft); box-shadow: inset 0 0 0 2px var(--accent) }
 .opt.wrong { background: var(--warm-soft); box-shadow: inset 0 0 0 2px var(--warm-2); animation: shake .35s }
 @keyframes shake { 25% { transform: translateX(-6px) } 75% { transform: translateX(6px) } }
-.answer { min-height: 112px; display: flex; flex-wrap: wrap; align-content: flex-start; gap: 8px; padding: 8px 0; border-bottom: 2px solid var(--line) }
-.bank { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 20px }
-.tile { padding: 9px 13px; border-radius: 12px; background: var(--bg); box-shadow: inset 0 0 0 2px var(--line), 0 3px 0 var(--line); font-size: 17px; font-weight: 600; transition: transform .15s var(--spring), opacity .15s }
-.tile:active { transform: translateY(2px) }
-.tile.used { opacity: .25; pointer-events: none; box-shadow: inset 0 0 0 2px var(--line) }
-.answer .tile { animation: tileIn .25s var(--spring) }
-@keyframes tileIn { from { transform: scale(.7); opacity: 0 } }
+.answer { min-height: 116px; display: flex; flex-wrap: wrap; align-content: flex-start; gap: 6px 4px; padding: 6px 0; background: repeating-linear-gradient(transparent 0 27px, #cfe1da 27px 30px, transparent 30px 58px) }
+.bank { display: flex; flex-wrap: wrap; gap: 10px 8px; justify-content: center; margin-top: 22px }
+.tile { position: relative; padding: 10px 16px; border-radius: 999px; background: var(--bg); box-shadow: inset 0 0 0 2px var(--line), 0 3px 0 var(--line); font-size: 17px; font-weight: 600; transform: rotate(var(--r, 0deg)); transition: transform .2s var(--spring), opacity .15s }
+.tile::before { content: ""; position: absolute; left: 7px; top: 7px; width: 6px; height: 4px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 1px var(--line) }
+.tile:active { transform: translateY(2px) rotate(var(--r, 0deg)) }
+.tile.used { opacity: .2; pointer-events: none; box-shadow: inset 0 0 0 2px var(--line) }
+.answer .tile { --r: 0deg; background: var(--accent-soft); box-shadow: inset 0 0 0 2px var(--accent), 0 3px 0 #a9d3c6; animation: thread .3s var(--spring) }
+@keyframes thread { from { transform: translateY(-26px) scale(.8); opacity: 0 } }
 .pairs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px }
 .pairs .opt { font-size: 15px; min-height: 66px }
 .pairs .opt.gone { opacity: .25; pointer-events: none; box-shadow: inset 0 0 0 2px var(--line) }
@@ -180,9 +187,16 @@ label.f { display: grid; gap: 4px; margin-top: 12px; font-size: 15px; font-weigh
 .lfoot { position: sticky; bottom: 0; margin: 16px -20px 0; padding: 14px 20px calc(16px + env(safe-area-inset-bottom)); background: var(--bg); box-shadow: 0 -2px 0 var(--line); display: flex; flex-wrap: wrap; gap: 10px; transition: background .25s }
 .lfoot .btn { flex: 1 }
 .lfoot .skip { flex: 0 0 auto; padding: 0 16px }
-.lfoot.good { background: var(--accent-soft); box-shadow: none }
-.lfoot.bad { background: var(--warm-soft); box-shadow: none }
-.verdict { display: none; flex-basis: 100%; margin-bottom: 4px }
+.lfoot.good, .lfoot.bad { background: var(--bg) }
+.verdict { display: none; flex-basis: 100%; margin-bottom: 4px; padding: 12px 14px 12px 18px; border-radius: 14px; position: relative; overflow: hidden }
+.verdict::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: currentColor }
+.lfoot.good .verdict { background: var(--accent-soft); color: var(--accent) }
+.lfoot.bad .verdict { background: var(--warm-soft); color: var(--warm-ink) }
+.verdict p { color: var(--ink) }
+.lknot.tug { animation: tug .45s }
+@keyframes tug { 20% { transform: translateX(-7px) scaleX(.97) } 45% { transform: translateX(6px) } 70% { transform: translateX(-3px) } }
+.lknot.loose { animation: loose .5s }
+@keyframes loose { 40% { transform: scaleY(1.25) } }
 .lfoot.good .verdict, .lfoot.bad .verdict { display: block; animation: up .3s var(--ease) both }
 .verdict b { display: flex; align-items: center; gap: 8px; font-size: 21px; font-weight: 800 }
 .lfoot.good .verdict b { color: var(--accent) }
@@ -193,14 +207,15 @@ label.f { display: grid; gap: 4px; margin-top: 12px; font-size: 15px; font-weigh
 
 /* 끝 화면 */
 .done { align-items: center; text-align: center; justify-content: center; gap: 10px; position: relative }
-.done canvas { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 40 }
-.trophy { font-size: 92px; color: var(--warm); animation: pop .8s var(--spring) both }
-.done h1 { margin: 0; font-size: 30px; font-weight: 800; letter-spacing: -.02em }
-.bigstars { display: flex; gap: 6px; font-size: 40px; color: var(--line) }
-.bigstars i { animation: starIn .5s var(--spring) both }
-.bigstars i.on { color: var(--warm-2) }
-.bigstars i:nth-child(2) { animation-delay: .15s } .bigstars i:nth-child(3) { animation-delay: .3s }
-@keyframes starIn { from { transform: scale(0) rotate(-40deg) } }
+.untie { width: 300px; max-width: 90%; height: 120px; overflow: visible }
+.popin { animation: popin .5s var(--spring) both; transform-box: fill-box; transform-origin: center }
+@keyframes popin { from { transform: scale(0) } }
+.draw { stroke-dasharray: 700; stroke-dashoffset: 700; animation: drawin 1.2s var(--ease) forwards }
+@keyframes drawin { to { stroke-dashoffset: 0 } }
+.done h1 { margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -.02em }
+.beads { display: flex; gap: 10px; margin-top: 4px }
+.beads em { width: 22px; height: 22px; animation: popin .4s var(--spring) both }
+.beads em:nth-child(2) { animation-delay: .12s } .beads em:nth-child(3) { animation-delay: .24s }
 .dstats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: 100%; margin: 12px 0 }
 .dstats div { padding: 12px 6px; border-radius: 14px; box-shadow: inset 0 0 0 2px var(--line) }
 .dstats b { display: block; font-size: 24px; font-variant-numeric: tabular-nums }
@@ -256,7 +271,12 @@ canvas { display: block; width: 100%; height: 100% }
 .result .btn { background: #fff; color: var(--ink); box-shadow: 0 4px 0 #b9cfc8 }
 
 /* 복습 */
-.card { padding: 16px; border-radius: 14px; background: var(--surface); margin-top: 10px }
+.card { position: relative; padding: 16px 16px 16px 52px; border-radius: 14px; background: var(--surface); margin-top: 10px }
+.card .ck { position: absolute; left: 14px; top: 16px; width: 26px; height: 26px }
+.shelf { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px }
+.shelf div { display: grid; justify-items: center; gap: 4px; padding: 10px 4px; border-radius: 14px; background: var(--surface); font-size: 12px; font-weight: 600; color: var(--muted); text-align: center }
+.shelf div.got { color: var(--ink); background: var(--bg); box-shadow: inset 0 0 0 2px var(--line) }
+.shelf svg { width: 52px; height: 52px }
 .card .k { font-size: 18px; font-weight: 700 }
 .card .e { margin-top: 6px; font-size: 17px; font-weight: 600; color: var(--accent) }
 .card .meta { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 14px; color: var(--muted) }
@@ -298,7 +318,9 @@ canvas { display: block; width: 100%; height: 100% }
   <!-- 처음 -->
   <section class="view" id="v-start" hidden>
     <div id="s1">
-      <p class="big">누구와 이야기할까요?</p>
+      <svg id="hello" viewBox="0 0 300 90" style="width:100%;height:90px;margin-top:8px" aria-hidden="true"></svg>
+      <p class="big">꼬이는 말을<br>술술 풀어 봐요</p>
+      <p class="soft" style="margin:8px 0 0">누구와 이야기할까요?</p>
       <div class="pick" id="modes">
         <button data-mode="me"><i class="ph-fill ph-user-sound"></i><div><b>내 이야기로</b><span>상대가 내 하루와 하는 일을 물어요</span></div></button>
         <button data-mode="daily"><i class="ph-fill ph-storefront"></i><div><b>일상 상황으로</b><span>카페·길·공항 같은 장면에서 말해요</span></div></button>
@@ -318,7 +340,7 @@ canvas { display: block; width: 100%; height: 100% }
     </div>
     <div id="s3" hidden>
       <p class="big">AI 대화 상대를 깨울 열쇠</p>
-      <p class="soft" style="margin-top:8px">스테이지는 키 없이도 다 할 수 있어요. 자유 대화와 AI 실전 대화만 Google Gemini 무료 키가 필요해요. 키는 이 기기에만 저장되고, 무료 키로 보낸 대화는 Google이 학습에 쓸 수 있어요.</p>
+      <p class="soft" style="margin-top:8px">실타래는 키 없이도 다 풀 수 있어요. 말 걸기와 AI 실전 대화만 Google Gemini 무료 키가 필요해요. 키는 이 기기에만 저장되고, 무료 키로 보낸 대화는 Google이 학습에 쓸 수 있어요.</p>
       <p style="margin:14px 0 0"><a class="link" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">무료 키 받기 (Google AI Studio) →</a></p>
       <label class="f">Gemini API 키<input id="key1" autocomplete="off" spellcheck="false" placeholder="붙여 넣기"></label>
       <p class="err" id="keyerr1"></p>
@@ -356,9 +378,9 @@ canvas { display: block; width: 100%; height: 100% }
 
   <!-- 복습 -->
   <section class="view" id="v-review" hidden>
-    <h2>내가 막혔던 말</h2>
-    <p class="soft">대화하다 막힌 말이에요. 대화에서 핵심 표현을 두 번 쓰면 빠져요.</p>
-    <div class="row" style="margin-top:12px"><button class="btn wide" id="revStuck"><i class="ph-fill ph-play"></i>막힌 말 연습</button></div>
+    <h2>말 걸기에서 꼬인 말</h2>
+    <p class="soft">멈추거나 한국어로 바꿔 말한 곳이에요. 다음 말 걸기에서 핵심 표현을 두 번 쓰면 풀려요.</p>
+    <div class="row" style="margin-top:12px"><button class="btn wide" id="revStuck"><i class="ph-fill ph-scribble-loop"></i>꼬인 말 풀기</button></div>
     <div id="stucklist"></div>
     <h2>틀렸던 문제</h2>
     <p class="soft" id="mistinfo"></p>
@@ -368,8 +390,10 @@ canvas { display: block; width: 100%; height: 100% }
   <!-- 기록 -->
   <section class="view" id="v-log" hidden>
     <div class="tiles3" id="lognums"></div>
-    <h2>메워지는 구멍</h2>
-    <p class="soft">자유 대화에서 1분에 몇 번 멈췄는지예요. 막대가 낮아질수록 술술 나와요.</p>
+    <h2>매듭 장식</h2>
+    <div class="shelf" id="shelf"></div>
+    <h2>줄어드는 매듭</h2>
+    <p class="soft">말 걸기에서 1분에 몇 번 멈췄는지예요. 낮아질수록 술술 나와요.</p>
     <div class="chart" id="chart"></div>
     <h2>지난 대화</h2>
     <div id="slist"></div>
@@ -409,7 +433,7 @@ canvas { display: block; width: 100%; height: 100% }
 
   <!-- 레슨 -->
   <section class="view lesson" id="v-lesson" hidden>
-    <div class="lbar"><button id="lclose" aria-label="레슨 그만하기"><i class="ph-bold ph-x"></i></button><div class="prog"><i id="lprog"></i></div></div>
+    <div class="lbar"><button id="lclose" aria-label="레슨 그만하기"><i class="ph-bold ph-x"></i></button><svg class="lknot" id="lknot" height="44" aria-hidden="true"></svg></div>
     <div class="ex" id="ex"></div>
     <div class="lfoot" id="lfoot">
       <div class="verdict" id="verdict" aria-live="assertive"></div>
@@ -422,9 +446,9 @@ canvas { display: block; width: 100%; height: 100% }
   <section class="view done" id="v-done" hidden></section>
 
   <nav class="tabs" id="tabs" aria-label="메뉴" hidden>
-    <button data-v="learn"><i class="ph-fill ph-path"></i>배우기</button>
-    <button data-v="talk"><i class="ph-fill ph-chats-circle"></i>대화</button>
-    <button data-v="review"><i class="ph-fill ph-arrow-counter-clockwise"></i>복습<b id="revn"></b></button>
+    <button data-v="learn"><i class="ph-fill ph-spiral"></i>실타래</button>
+    <button data-v="talk"><i class="ph-fill ph-chats-circle"></i>말 걸기</button>
+    <button data-v="review"><i class="ph-fill ph-scribble-loop"></i>꼬인 말<b id="revn"></b></button>
     <button data-v="log"><i class="ph-fill ph-chart-bar"></i>기록</button>
     <button data-v="set"><i class="ph-fill ph-gear-six"></i>설정</button>
   </nav>
@@ -432,6 +456,7 @@ canvas { display: block; width: 100%; height: 100% }
 </main>
 <script src="words.js"></script>
 <script src="course.js"></script>
+<script src="knot.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

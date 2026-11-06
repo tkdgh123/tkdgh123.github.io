@@ -36,7 +36,7 @@ const UNITS = [
     ]
   },
   {
-    id: "pron", title: "발음 함정", pron: true, color: "#0f2a26",
+    id: "pron", title: "혀 꼬이는 단어", pron: true, color: "#0f2a26",
     stages: [["묵음", "소리 없는 글자"], ["외래어", "외래어와 달라요"], ["강세", "세게 읽는 곳"], ["음절", "박자 수"]]
   },
   {
@@ -108,12 +108,12 @@ const UNITS = [
     ]
   }
 ];
-// 스테이지 5개 + 실전. 이름은 무엇을 하는지 바로 알 수 있게.
+// 타래 하나 = 매듭 6개: 새 구슬(표현) 둘, 귀로·꿰기·입으로 풀기, 마지막 말 걸기(실전)
 const STAGES = [
-  { k: "meet1", name: "표현 만나기 1", icon: "sparkle" },
-  { k: "meet2", name: "표현 만나기 2", icon: "sparkle" },
-  { k: "listen", name: "듣고 알아듣기", icon: "headphones" },
-  { k: "build", name: "문장 만들기", icon: "puzzle-piece" },
-  { k: "speak", name: "입으로 말하기", icon: "microphone" },
-  { k: "boss", name: "실전 대화", icon: "chats-circle" }
+  { k: "meet1", name: "새 구슬 1", icon: "sparkle" },
+  { k: "meet2", name: "새 구슬 2", icon: "sparkle" },
+  { k: "listen", name: "귀로 풀기", icon: "headphones" },
+  { k: "build", name: "구슬 꿰기", icon: "puzzle-piece" },
+  { k: "speak", name: "입으로 풀기", icon: "microphone" },
+  { k: "boss", name: "말 걸기", icon: "chats-circle" }
 ];

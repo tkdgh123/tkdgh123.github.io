@@ -260,10 +260,10 @@ h2.st { color: var(--ink); text-transform: none; letter-spacing: -.04em; font-st
 <section class="loop" id="loop" aria-labelledby="h-loop">
   <h2 id="h-loop" class="rise">하루 10분, 한 바퀴</h2>
   <div class="stages" data-ui>
-    <div style="flex-grow:4;--g:4"><div class="seg" style="background:var(--blue)">4분</div><p><b>먼저</b> 스테이지 하나를 깨요. 8~9문제, 하트 없이.</p></div>
+    <div style="flex-grow:4;--g:4"><div class="seg" style="background:var(--blue)">4분</div><p><b>먼저</b> 매듭 하나를 풀어요. 8~9문제, 하트 없이.</p></div>
     <div style="flex-grow:3;--g:3"><div class="seg" style="background:var(--black)">3분</div><p><b>그다음</b> AI 상대와 말해요. 지난번 얘기를 기억해요.</p></div>
-    <div style="flex-grow:.6;--g:1"><div class="seg" style="background:var(--red);color:var(--ink)">몇 초</div><p><b>끝나면</b> 멈춘 곳, 한국어로 바꾼 곳에서 막힌 말을 뽑아요.</p></div>
-    <div style="flex-grow:2;--g:2"><div class="seg" style="background:var(--navy)">다음 날 2분</div><p><b>다음 날</b> 그 말을 복습하고, 대화에서 두 번 쓰면 끝.</p></div>
+    <div style="flex-grow:.6;--g:1"><div class="seg" style="background:var(--red);color:var(--ink)">몇 초</div><p><b>끝나면</b> 멈춘 곳마다 지어진 매듭에서 꼬인 말을 뽑아요.</p></div>
+    <div style="flex-grow:2;--g:2"><div class="seg" style="background:var(--navy)">다음 날 2분</div><p><b>다음 날</b> 꼬인 말을 풀고, 대화에서 두 번 쓰면 끝.</p></div>
   </div>
 </section>
 
@@ -274,12 +274,12 @@ h2.st { color: var(--ink); text-transform: none; letter-spacing: -.04em; font-st
   <p class="st rise" style="--i:2" aria-hidden="true">다시</p>
   <p class="st rise" style="--i:3" aria-hidden="true">말해 봐.</p>
   <div class="facts">
-    <p class="rise">열면 스테이지 길이 나와요. 유닛마다 표현 만나기 두 번, 듣고 알아듣기, 문장 만들기, 입으로 말하기, 실전 대화를 차례로 깨요. 맨 위 '오늘 할 것'엔 다음 스테이지, 막혔던 말 복습, 3분 대화가 올라와요.</p>
-    <p class="rise" style="--i:1">하트는 없고 틀린 문제는 레슨 끝에 다시 나와요. 말하기·듣기가 어려운 곳에선 '지금 말할 수 없어요'를 누르면 1시간 빠지고, 설정에서 계속 끌 수도 있어요. 옆 화면은 눌러서 풀어 볼 수 있는 예시예요.</p>
+    <p class="rise">열면 한 가닥 실이 화면을 따라 흐르고, 그 위에 매듭이 엉켜 있어요. 매듭 하나가 레슨 하나예요. 맞힐수록 위쪽 매듭이 풀리고, 다 풀면 실이 곧게 펴지며 구슬이 꿰여요. 한 타래를 다 풀면 그 실로 맺은 매듭 장식을 얻어요.</p>
+    <p class="rise" style="--i:1">말 걸기에서는 내 목소리가 실을 그려요. 1.2초 넘게 멈추면 그 자리에 매듭이 지어지고, 그게 꼬인 말이 돼요. 말하기·듣기가 어려운 곳에선 '지금 말할 수 없어요'를 누르면 1시간 빠져요. 옆 화면은 눌러서 풀어 볼 수 있는 예시예요.</p>
     <a class="open rise" style="--i:2" href="../">술술 열기 →</a>
   </div>
   </div>
-  <div class="phone"><iframe src="../?demo#learn" title="술술 첫 화면 예시, 스테이지 길" allow="microphone" loading="lazy"></iframe></div>
+  <div class="phone"><iframe src="../?demo#learn" title="술술 첫 화면 예시, 실타래" allow="microphone" loading="lazy"></iframe></div>
 </section>
 
 <section class="fan" aria-labelledby="h-fan">
@@ -340,10 +340,17 @@ h2.st { color: var(--ink); text-transform: none; letter-spacing: -.04em; font-st
     <div class="a rise" style="--i:1"><p>Gemini Live API가 무료 등급에 있어요. 듣고 바로 소리로 대답해서 3분 대화에 가장 자연스러워요. 아직 미리보기 단계이고 무료 한도를 확인 못 해서, 2단계에서 시험해요.</p></div>
   </div>
   <div class="q">
+    <h3 class="rise">왜 실과 매듭이에요?</h3>
+    <div class="a rise" style="--i:1">
+      <p>영어가 막히는 걸 우리는 "말이 꼬인다"고 해요. 술술은 "실타래가 술술 풀린다"에서 온 말이고요. 그래서 막힌 곳은 매듭, 배우는 건 매듭 풀기, 문장 만들기는 구슬 꿰기예요.</p>
+      <p>"구슬이 서 말이라도 꿰어야 보배"라는 말처럼, 단어를 알아도 꿰어 말해야 내 것이 돼요. 말해보카를 그만둔 이유(단어만 외우고 못 씀)에 대한 답이에요.</p>
+    </div>
+  </div>
+  <div class="q">
     <h3 class="rise">다른 앱에서 가져온 것</h3>
     <div class="a rise" style="--i:1">
       <ol>
-        <li>듀오링고: 스테이지 길, 말하기·듣기 건너뛰기, 틀린 것 복습, 레슨 끝 별</li>
+        <li>듀오링고: 하나씩 풀어 가는 순서, 말하기·듣기 건너뛰기, 틀린 것 복습</li>
         <li>스픽: 오늘 할 것 목록, 대화 중 글로 쓰기, 내가 만드는 상황극</li>
         <li>말해보카: 대화에서 막힌 말을 복습 목록으로</li>
         <li>링글: 대화가 끝나면 돌아보기 한마디</li>
@@ -354,7 +361,7 @@ h2.st { color: var(--ink); text-transform: none; letter-spacing: -.04em; font-st
   <div class="q">
     <h3 class="rise">발음 채점은 직접 만들어요</h3>
     <div class="a rise" style="--i:1">
-      <p>지금은 길 위 '발음 함정' 유닛에서 흔히 잘못 읽는 단어(salmon처럼 소리 없는 글자 등)를 풀고, 말해 보면 알아들었는지만 봐요. 다음엔 서버 없이 브라우저 안에서 들린 소리를 음소로 받아 적고, 정답 음소와 맞춰서 빠지거나 바뀐 소리를 짚어요.</p>
+      <p>지금은 '혀 꼬이는 단어' 타래에서 흔히 잘못 읽는 단어(salmon처럼 소리 없는 글자 등)를 풀고, 말해 보면 알아들었는지만 봐요. 다음엔 서버 없이 브라우저 안에서 들린 소리를 음소로 받아 적고, 정답 음소와 맞춰서 빠지거나 바뀐 소리를 짚어요.</p>
       <div class="ph" data-ui lang="en" aria-label="salmon 채점 예시: l은 소리 없음, 다섯 소리 중 하나가 틀림">
         <span>s<small>OK</small></span><span class="bad">æ<small>ɑ로 들림</small></span><span class="ghost">l<small>묵음</small></span><span>m<small>OK</small></span><span>ə<small>OK</small></span><span>n<small>OK</small></span>
       </div>
@@ -371,10 +378,10 @@ h2.st { color: var(--ink); text-transform: none; letter-spacing: -.04em; font-st
     <h3 class="rise">만드는 순서</h3>
     <div class="a rise" style="--i:1">
       <ol>
-        <li>지금: 7유닛 스테이지 길, 12가지 문제, 건너뛰기, 실전 대화, 막힌 말·틀린 것 복습, 3분 대화까지 만들었어요.</li>
+        <li>지금: 일곱 타래(매듭 40개), 12가지 문제, 건너뛰기, 말 걸기 실전, 꼬인 말·틀린 것 복습, 매듭 장식까지 만들었어요.</li>
         <li>2주 동안 직접 써 보고 고쳐요.</li>
         <li>발음 채점을 붙이고 노트북 속도를 재요.</li>
-        <li>유닛을 늘리고, 바깥 퀘스트·이야기책·중계 서버를 붙여요.</li>
+        <li>타래를 늘리고, 바깥 퀘스트·이야기책·중계 서버를 붙여요.</li>
       </ol>
     </div>
   </div>
