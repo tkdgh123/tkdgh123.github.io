@@ -84,7 +84,7 @@ const newPiece = () => ({ s: SHAPES[Math.random() * SHAPES.length | 0], c: 1 + (
 // grid: 0 빈칸, 1 파랑, 2 빨강
 let grid, hand, score = 0, combo = 0, since = 0, playing = false, best = 0, tut = 0, target = null;
 let S = 40, TRAY = 0, drag = null, fx = [], pops = [], texts = [];
-let passed = false, shown = 0, dealt = 0, overT = 0, ret = null, hvKey = "", lines = [], marks = [], danger = false;
+let passed = false, shown = 0, dealt = 0, overT = 0, ret = null, hvKey = "", lines = [], marks = [], rings = [], glow = null, danger = false;
 const backOut = t => 1 + 2.7 * (t - 1) ** 3 + 1.7 * (t - 1) ** 2;
 const scr = k => { const r = cv.getBoundingClientRect(); return [r.left + (k % N + .5) * S, r.top + ((k / N | 0) + .5) * S] };
 // 콤보 옆 점 3개 = 줄을 못 지워도 콤보가 버티는 남은 수
@@ -126,12 +126,32 @@ function place(i, gx, gy) {
   FX.shake(.16); FX.punch(-.012);
   own.concat(dyed).forEach(k => FX.burst(...scr(k), INK[p.c], { n: 2, v: 150, up: 0, size: S * .05, life: 420, g: 300 }));
   dyed.forEach((k, j) => FX.tone(760 + j * 70, { d: .04, type: "square", vol: .05, at: .27 + j * .04 }));
-  // 줄 지우기: 뒤집기가 끝난 T에 빛줄기가 줄을 훑고, 지나간 칸부터 하얗게 부풀었다 조각나 튄다
+  // 줄 지우기: 뒤집기가 끝난 T에 줄이 하얗게 모였다가(80ms), 도장 찍은 자리에서 양쪽으로 빛이 퍼지며
+  // 지나간 칸부터 부풀었다 조각나 튄다. 이웃 줄은 출렁이고, 찍은 자리에서 고리가 퍼진다
   const n = rows.length + cols.length, wait = 140 + dyed.length * 40, T = now + wait, cleared = new Map();
-  const mark = (k, j) => cleared.set(k, Math.min(cleared.get(k) ?? Infinity, T + 60 + j * 32));
-  rows.forEach(r => { lines.push({ row: 1, i: r, c: g[r * N], t0: T }); for (let j = 0; j < N; j++) mark(r * N + j, j) });
-  cols.forEach(c => { lines.push({ row: 0, i: c, c: g[c], t0: T }); for (let j = 0; j < N; j++) mark(j * N + c, j) });
-  cleared.forEach((t0, k) => pops.push({ k, c: g[k], t0 }));
+  const nc = (tut ? 0 : combo) + 1, gold = nc >= 3, cells = p.s.map(([x, y]) => [gx + x, gy + y]);
+  // 모으기(80ms)가 끝나는 순간 잠깐 멈칫(HS) → 그다음 빛이 퍼진다(S0)
+  const HS = n ? 50 + 25 * n : 0, S0 = T + 80 + HS;
+  const mark = (k, d) => cleared.set(k, Math.min(cleared.get(k) ?? Infinity, S0 + d * 34));
+  rows.forEach(r => {
+    const o = cells.filter(c => c[1] === r).reduce((a, c, _, A) => a + c[0] / A.length, 0);
+    lines.push({ row: 1, i: r, o, c: g[r * N], t0: T, s0: S0, gold, w: Math.min(nc, 4) });
+    rings.push({ x: o, y: r, c: g[r * N], t0: S0, gold });
+    for (let j = 0; j < N; j++) mark(r * N + j, Math.abs(j - o));
+  });
+  cols.forEach(c => {
+    const o = cells.filter(q => q[0] === c).reduce((a, q, _, A) => a + q[1] / A.length, 0);
+    lines.push({ row: 0, i: c, o, c: g[c], t0: T, s0: S0, gold, w: Math.min(nc, 4) });
+    rings.push({ x: c, y: o, c: g[c], t0: S0, gold });
+    for (let j = 0; j < N; j++) mark(j * N + c, Math.abs(j - o));
+  });
+  if (n) glow = { c: lines[lines.length - 1].c, gold, t0: S0 };
+  const bs = Math.min(Math.max(0, nc - 2), 7);
+  cleared.forEach((t0, k) => {
+    const cross = rows.includes(k / N | 0) && cols.includes(k % N);
+    pops.push({ k, c: g[k], t0, gold, cross });
+    FX.tone(FX.pent(bs + Math.round((t0 - S0) / 34)) * 2, { d: .06, type: "triangle", vol: .05, at: (t0 - now + 90) / 1000 });
+  });
   cleared.forEach((_, k) => g[k] = 0);
   grid = g; hand[i] = null;
   let pts = 10 * p.s.length;
@@ -140,22 +160,24 @@ function place(i, gx, gy) {
     const got = LINE[Math.min(n, 6)] * Math.max(1, combo), empty = g.every(v => !v);
     pts += got;
     let cx = 0, cy = 0; cleared.forEach((_, k) => { cx += k % N; cy += k / N | 0 });
-    texts.push({ x: cx / cleared.size, y: cy / cleared.size, s: "+" + got, big: true, t0: T + 180 });
+    texts.push({ x: cx / cleared.size, y: cy / cleared.size, s: "+" + got, big: true, t0: S0 + 120 });
     // 여러 줄·콤보·판 비움은 빨간 도장이 쾅 찍힌다
     const label = empty ? "다 비움" : [n > 1 ? n + "줄" : "", combo > 1 ? "콤보 " + combo : ""].filter(Boolean).join(" · ");
-    if (label) marks.push({ s: label, big: empty, t0: T + 330, y: empty ? .45 : cy / cleared.size < N / 2 ? .7 : .28 });
+    if (label) marks.push({ s: label, big: empty, t0: S0 + 280, y: empty ? .45 : cy / cleared.size < N / 2 ? .7 : .28 });
     try { navigator.vibrate && navigator.vibrate(n > 1 ? [20, 40, 30] : 20) } catch {}
     // 소리: 쓱 훑는 소리 → 줄 수만큼 올라가는 화음(콤보가 쌓일수록 높게) → 도장 쿵
     const at = wait / 1000, b = Math.min(Math.max(0, combo - 1), 7);
-    FX.noise({ d: .3, vol: .12, f: 1200, to: 7000, type: "bandpass", q: 1.5, at });
-    FX.tone(320, { d: .28, type: "triangle", vol: .08, to: 1300, at });
-    for (let j = 0; j < 2 + n; j++) FX.tone(FX.pent(b + j), { d: .35, type: "triangle", vol: .16, at: at + .26 + j * .06 });
-    if (label) { FX.tone(110, { d: .2, vol: .45, to: 48, at: at + .33 }); FX.noise({ d: .09, vol: .25, f: 800, type: "lowpass", at: at + .33 }) }
-    if (empty) [0, 2, 4, 5, 7, 9].forEach((k, j) => FX.tone(FX.pent(k + b), { d: .4, type: "triangle", vol: .13, at: at + .45 + j * .07 }));
-    setTimeout(() => { FX.stop(50 + 25 * n); FX.shake(.2 + .1 * n); FX.punch(.01 * n) }, wait);
-    if (label) setTimeout(() => { FX.shake(.3 + (empty ? .3 : 0)); FX.punch(-.015) }, wait + 330);
+    FX.noise({ d: .3, vol: .12, f: 1200, to: 7000, type: "bandpass", q: 1.5, at: (S0 - now) / 1000 });
+    FX.tone(320, { d: .28, type: "triangle", vol: .08, to: 1300, at: (S0 - now) / 1000 });
+    for (let j = 0; j < 2 + n; j++) FX.tone(FX.pent(b + j), { d: .35, type: "triangle", vol: .16, at: (S0 - now) / 1000 + .26 + j * .06 });
+    const as = (S0 - now) / 1000;
+    FX.tone(FX.pent(bs + 4, 523.25), { d: .09, type: "sine", vol: .1, at, to: FX.pent(bs + 9, 523.25) });
+    if (label) { FX.tone(110, { d: .2, vol: .45, to: 48, at: as + .28 }); FX.noise({ d: .09, vol: .25, f: 800, type: "lowpass", at: as + .28 }) }
+    if (empty) [0, 2, 4, 5, 7, 9].forEach((k, j) => FX.tone(FX.pent(k + b), { d: .4, type: "triangle", vol: .13, at: (S0 - now) / 1000 + .4 + j * .07 }));
+    setTimeout(() => { FX.stop(HS); FX.shake(.2 + .1 * n); FX.punch(.01 * n) }, wait + 75);
+    if (label) setTimeout(() => { FX.shake(.3 + (empty ? .3 : 0)); FX.punch(-.015) }, S0 - now + 280);
     // 지워진 줄에서 잉크가 점수로 날아간다
-    lines.slice(-n).forEach((l, j) => [1, 4, 6].forEach(q => FX.home(...scr(l.row ? l.i * N + q : q * N + l.i), HI[l.c], $("score"), { n: 1, size: S * .1, delay: wait + 320 + j * 60, hit: () => FX.pop($("score")) })));
+    lines.slice(-n).forEach((l, j) => [1, 4, 6].forEach(q => FX.home(...scr(l.row ? l.i * N + q : q * N + l.i), HI[l.c], $("score"), { n: 1, size: S * .1, delay: S0 - now + 260 + j * 60, hit: () => FX.pop($("score")) })));
     if (combo > 1) { $("combo").classList.remove("up"); void $("combo").offsetWidth; $("combo").classList.add("up") }
   } else if (++since >= 3) {
     if (combo > 1) FX.tone(330, { d: .3, type: "triangle", vol: .12, to: 150 });
@@ -222,7 +244,15 @@ function draw(now) {
   const willClear = new Set(), willDye = new Set(pre ? pre.dyed : []);
   if (pre) { pre.rows.forEach(r => { for (let j = 0; j < N; j++) willClear.add(r * N + j) }); pre.cols.forEach(c => { for (let j = 0; j < N; j++) willClear.add(j * N + c) }) }
   for (let k = 0; k < N * N; k++) {
-    const X = (k % N) * S, Y = (k / N | 0) * S;
+    // 지워지는 줄에서 멀어질수록 늦고 약하게, 줄 바깥쪽으로 출렁
+    let ox = 0, oy = 0;
+    for (const l of lines) {
+      const d = l.row ? (k / N | 0) - l.i : (k % N) - l.i, q = (now - l.s0 - Math.abs(d) * 45) / 240;
+      if (!d || q < 0 || q > 1) continue;
+      const a = Math.sin(q * Math.PI) * S * .22 * Math.exp(-(Math.abs(d) - 1) * .45) * Math.sign(d);
+      if (l.row) oy += a; else ox += a;
+    }
+    const X = (k % N) * S + ox, Y = (k / N | 0) * S + oy;
     const f = fx.find(e => e.k === k && now - e.t0 < 300 && now >= e.t0);
     if (f && f.kind === "stamp") { const t = (now - f.t0) / 260; inkCell(X, Y, S, INK[f.c], Math.min(1, t * 2), 1.25 - .25 * Math.min(1, t * 1.6)); continue }
     if (f && f.kind === "dye") { const t = (now - f.t0) / 300; inkCell(X, Y, S, INK[t < .5 ? f.from : f.c], 1, 1, Math.abs(Math.cos(t * Math.PI))); continue }
@@ -252,8 +282,9 @@ function draw(now) {
   pops = pops.filter(p => {
     if (now - p.t0 < 90) return true;
     const [x, y] = scr(p.k);
-    FX.burst(x, y, INK[p.c], { n: 4, v: 300, up: 240, size: S * .11, shape: "s", life: 750 });
-    FX.burst(x, y, "#fff", { n: 2, v: 220, up: 60, size: S * .07, shape: "k", life: 380, g: 0 });
+    FX.burst(x, y, INK[p.c], { n: p.cross ? 10 : 5, v: p.cross ? 460 : 320, up: 240, size: S * .11, shape: "s", life: 800 });
+    FX.burst(x, y, p.gold ? "#ffd25e" : "#fff", { n: p.gold ? 4 : 2, v: 240, up: 60, size: S * .08, shape: "k", life: 450, g: 0 });
+    if (p.cross) FX.burst(x, y, "#ffd25e", { n: 14, v: 520, up: 80, size: S * .1, shape: "k", life: 700, g: 200 });
     return false;
   });
   for (const p of pops) {
@@ -261,18 +292,33 @@ function draw(now) {
     inkCell(X, Y, S, INK[p.c], 1, 1 + .22 * t);
     if (t > 0) { ctx.fillStyle = `rgb(255 255 255 / ${.8 * t})`; rr(X + S * .06 - S * .11 * t, Y + S * .06 - S * .11 * t, S * (.88 + .22 * t), S * (.88 + .22 * t), S * .14); ctx.fill() }
   }
-  lines = lines.filter(l => now - l.t0 < 60 + N * 32 + 220);
+  lines = lines.filter(l => now - l.s0 < N * 34 + 240);
   for (const l of lines) {
-    const t = now - l.t0 - 60, head = Math.min(N, t / 32 + .5) * S; if (head < 2) continue;
-    const a = t > N * 32 ? Math.max(0, 1 - (t - N * 32) / 220) : 1, g = l.row ? ctx.createLinearGradient(0, 0, head, 0) : ctx.createLinearGradient(0, 0, 0, head);
-    g.addColorStop(0, "rgb(255 255 255 / 0)"); g.addColorStop(.75, HI[l.c]); g.addColorStop(1, "#fff");
-    ctx.save(); ctx.globalAlpha = a; ctx.fillStyle = g;
-    if (l.row) rr(0, l.i * S + S * .2, head, S * .6, S * .3); else rr(l.i * S + S * .2, 0, S * .6, head, S * .3);
+    const t = now - l.t0, col = l.gold ? "#ffd25e" : HI[l.c];
+    // 모으기: 줄 전체가 하얗게 부풀며 번쩍
+    if (t >= 0 && now < l.s0) {
+      const q = Math.min(1, t / 80), m = S * .1 * q;
+      ctx.fillStyle = `rgb(255 255 255 / ${.55 * q})`;
+      if (l.row) rr(-m, l.i * S - m, N * S + 2 * m, S + 2 * m, S * .25); else rr(l.i * S - m, -m, S + 2 * m, N * S + 2 * m, S * .25);
+      ctx.fill(); continue;
+    }
+    const d = (now - l.s0) / 34; if (d < 0) continue;
+    const far = Math.max(l.o, N - 1 - l.o) + 1, a = d > far ? Math.max(0, 1 - (now - l.s0 - far * 34) / 240) : 1;
+    const lo = Math.max(-.5, l.o - d), hi = Math.min(N - .5, l.o + d), th = S * (.5 + .1 * l.w);
+    ctx.save(); ctx.globalAlpha = a * .75; ctx.fillStyle = col;
+    if (l.row) rr((lo + .5) * S, (l.i + .5) * S - th / 2, (hi - lo) * S, th, th / 2); else rr((l.i + .5) * S - th / 2, (lo + .5) * S, th, (hi - lo) * S, th / 2);
     ctx.fill();
-    ctx.shadowColor = HI[l.c]; ctx.shadowBlur = S * .8; ctx.fillStyle = "#fff";
-    ctx.beginPath(); ctx.arc(l.row ? head : (l.i + .5) * S, l.row ? (l.i + .5) * S : head, S * .28, 0, 7); ctx.fill();
+    ctx.globalAlpha = a; ctx.shadowColor = col; ctx.shadowBlur = S * .9; ctx.fillStyle = "#fff";
+    for (const h of [l.o - d, l.o + d]) if (h > -.6 && h < N - .4) { ctx.beginPath(); ctx.arc(l.row ? (h + .5) * S : (l.i + .5) * S, l.row ? (l.i + .5) * S : (h + .5) * S, th * .55, 0, 7); ctx.fill() }
     ctx.restore();
   }
+  rings = rings.filter(r => now - r.t0 < 500);
+  for (const r of rings) {
+    const q = (now - r.t0) / 500; if (q < 0) continue;
+    ctx.strokeStyle = r.gold ? "#ffd25e" : HI[r.c]; ctx.globalAlpha = 1 - q; ctx.lineWidth = S * .16 * (1 - q) + 1;
+    ctx.beginPath(); ctx.arc((r.x + .5) * S, (r.y + .5) * S, S * (.4 + 3.6 * Math.sqrt(q)), 0, 7); ctx.stroke(); ctx.globalAlpha = 1;
+  }
+  if (glow) { const q = (now - glow.t0) / 450; if (q > 1) glow = null; else if (q > 0) { ctx.strokeStyle = glow.gold ? "#ffd25e" : HI[glow.c]; ctx.globalAlpha = 1 - q; ctx.lineWidth = S * .22 * (1 - q) + 1; rr(1, 1, W - 2, W - 2, 16); ctx.stroke(); ctx.globalAlpha = 1 } }
   marks = marks.filter(m => now - m.t0 < 1300);
   for (const m of marks) {
     const t = now - m.t0; if (t < 0) continue;
@@ -294,8 +340,11 @@ function draw(now) {
     const X = Math.min(W - S * 1.4, Math.max(S * 1.4, (t.x + .5) * S)), Y = (t.y + .5) * S - k * S * .6;
     ctx.globalAlpha = k < .7 ? 1 : 1 - (k - .7) / .3;
     ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.lineJoin = "round";
+    const pk = Math.min(1, (now - t.t0) / 160), sc = t.big ? 1 + .7 * (1 - pk) ** 2 : 1;
+    ctx.save(); ctx.translate(X, Y); ctx.scale(sc, sc); ctx.translate(-X, -Y);
     ctx.font = `800 ${S * (t.big ? .95 : .72)}px Pretendard, system-ui, sans-serif`;
     ctx.lineWidth = 6; ctx.strokeStyle = C.paper; ctx.strokeText(t.s, X, Y); ctx.fillStyle = "#1d2232"; ctx.fillText(t.s, X, Y);
+    ctx.restore();
     if (t.sub) { ctx.font = `800 ${S * .4}px Pretendard, system-ui, sans-serif`; ctx.strokeText(t.sub, X, Y + S * .6); ctx.fillStyle = INK[2]; ctx.fillText(t.sub, X, Y + S * .6) }
     ctx.globalAlpha = 1;
   }
@@ -414,7 +463,7 @@ function tutNext() {
 }
 
 function reset() {
-  score = shown = 0; combo = 0; since = 0; fx = []; pops = []; lines = []; marks = []; texts = []; overT = 0; ret = null; danger = false;
+  score = shown = 0; combo = 0; since = 0; fx = []; pops = []; lines = []; marks = []; rings = []; glow = null; texts = []; overT = 0; ret = null; danger = false;
   $("score").textContent = 0; showCombo();
 }
 function start() {
