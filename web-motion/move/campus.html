@@ -43,6 +43,18 @@ body.locked::after { content: ""; position: fixed; z-index: 5; left: 50%; top: 5
 .walk { position: fixed; z-index: 6; left: var(--m); bottom: clamp(12px, 3vh, 24px); max-width: min(520px, calc(100vw - 340px)); text-align: left; white-space: normal; line-height: 1.5; color: #fff; text-shadow: 0 1px 8px rgb(0 0 0 / .5); font: 500 12px var(--mono); opacity: 0; transition: opacity .4s } .walk.on { opacity: 1 }
 .credit { position: fixed; z-index: 4; right: 8px; bottom: 4px; font: 500 10px var(--mono); color: rgb(21 21 20 / .55) }
 .credit a { color: inherit }
+.shots { position: fixed; z-index: 7; right: var(--m); top: 60px; width: 340px; max-height: calc(100svh - 120px); display: none; flex-direction: column; background: rgb(242 241 236 / .95); backdrop-filter: blur(8px); box-shadow: 0 8px 28px rgb(0 0 0 / .14) } .shots.on { display: flex }
+.shots header { display: flex; align-items: baseline; justify-content: space-between; padding: 14px 16px 6px } .shots h2 { font: 700 18px var(--sans); margin: 0 } .shots .cnt { color: var(--muted); font-size: 12px }
+.shots .tips { margin: 0; padding: 0 0 10px 18px; font-size: 13px; line-height: 1.5; color: #3a3a38; border-bottom: 1.5px solid var(--rule) }
+.shots .list { overflow-y: auto; overscroll-behavior: contain; padding: 0 16px 14px }
+.shots h3 { font: 700 12px var(--mono); color: var(--muted); margin: 14px 0 2px }
+.shot { display: grid; grid-template-columns: 22px 1fr; gap: 2px 8px; padding: 8px 0 }
+.shot input { width: 18px; height: 18px; margin: 2px 0 0; accent-color: var(--ink) }
+.shot .sname { padding: 0; border: 0; background: none; font: 700 15px var(--sans); color: var(--ink); text-align: left; cursor: pointer } .shot button.sname:hover, .shot.on .sname { color: #2b44a6 }
+.shot .tag { margin-left: 6px; font: 700 11px var(--sans); color: #d23b2f }
+.shot ul { grid-column: 2; margin: 2px 0 0; padding-left: 16px; font-size: 13px; line-height: 1.5; color: #3a3a38 } .shot li.base { color: var(--muted) }
+.shot.done .sname, .shot.done ul { opacity: .45 }
+@media (max-width: 700px) { .shots { left: 12px; right: 12px; top: auto; bottom: 12px; width: auto; max-height: 56svh } }
 @media (max-width: 700px) { .panel { top: auto; bottom: 72px; transform: translateY(24px) } .panel.on { transform: none } .panel h2 { margin: 6px 0 8px }
   .map { right: 12px; top: 52px; bottom: auto; width: 176px; padding: 8px } .walk { max-width: calc(100vw - 32px) } #mapC { height: 128px } .mapName { font-size: 13px; margin: 4px 2px 6px } }
 </style>
@@ -55,8 +67,10 @@ body.locked::after { content: ""; position: fixed; z-index: 5; left: 50%; top: 5
 <section class="panel" id="panel"><p class="meta mono" id="pMeta"></p><h2 id="pT"></h2><dl id="pDl"></dl>
   <div class="row"><button class="b" id="prev" type="button" aria-label="이전 건물">←</button><button class="b main" id="walkB" type="button">걸어서 보기</button><button class="b" id="next" type="button" aria-label="다음 건물">→</button></div></section>
 <section class="map off" id="map" aria-label="캠퍼스 지도"><canvas id="mapC"></canvas><p class="mapName" id="mapName"></p>
-  <div class="mapRow"><button class="b sm" id="allB" type="button">전체 보기</button><button class="b sm" id="skB" type="button" aria-pressed="false">스케치</button></div>
+  <div class="mapRow"><button class="b sm" id="allB" type="button">전체 보기</button><button class="b sm" id="skB" type="button" aria-pressed="false">스케치</button><button class="b sm" id="shotB" type="button" aria-pressed="false">촬영 목록</button></div>
   <div class="skRow"><button class="b sm" id="skUndo" type="button">되돌리기</button><button class="b sm main" id="skFile" type="button">파일로 저장</button><button class="b sm" id="skClear" type="button">모두 지우기</button></div></section>
+<section class="shots" id="shots" aria-label="촬영 목록"><header><h2>촬영 목록</h2><span class="cnt mono" id="shotCnt"></span></header>
+  <div class="list"><ol class="tips"><li>카메라 위치 태그 켜기 — 갤럭시: 카메라 설정 → 위치 태그 / 아이폰: 설정 → 개인정보 보호 및 보안 → 위치 서비스 → 카메라</li><li>맑은 낮, 1배 줌, 가로로</li><li>모서리에 서면 두 면이 같이 나와요. 같은 곳 여러 장·짧은 영상도 좋아요</li><li><b style="color:#d23b2f">짐작</b> = 지금 추측으로 만든 곳이라 꼭</li><li>카톡으로 보내면 위치가 지워져요 → 구글 드라이브나 케이블로</li></ol><div id="shotList"></div></div></section>
 <div class="note" id="note"><input id="noteIn" type="text" maxlength="200" placeholder="여기에 뭐가 있나요?" aria-label="메모"><button class="b sm main" id="noteOk" type="button">저장</button></div>
 <p class="toast" id="toast" role="status"></p>
 <p class="walk" id="walkHint"></p>
@@ -733,6 +747,8 @@ function drawMap() { if ($("map").classList.contains("off")) return; const d = m
   for (const a of SPORT_P) { mapPath(a.pts); mg.fillStyle = a.k.includes("basketball") ? "#8fb0dc" : "#a9c896"; mg.fill(); }
   named.forEach((b, i) => { mapPath(b.pts); mg.fillStyle = i === sel ? "#151514" : i === mapHover ? "#2b44a6" : "#a39d90"; mg.fill(); });
   mg.strokeStyle = "#d23b2f"; mg.lineWidth = 2 * d; mg.lineJoin = mg.lineCap = "round"; for (const s of strokes) { mapPath(s.pts, false); mg.stroke(); } if (skCur?.pts.length > 1) { mapPath(skCur.pts, false); mg.stroke(); }
+  if ($("shots").classList.contains("on") || shotOn >= 0) SHOT_ALL.forEach((it, i) => { const p = shotPos(it); if (!p) return; const [x, y] = mp(...p); mg.beginPath(); mg.arc(x, y, (i === shotOn ? 5 : 3) * d, 0, 7); // 찍을 곳 (다 찍은 곳은 회색)
+    mg.fillStyle = shotDone.has(it.n) ? "#9a968c" : "#d23b2f"; mg.fill(); if (i === shotOn) { mg.lineWidth = 1.5 * d; mg.strokeStyle = "#fff"; mg.stroke(); } });
   const o = view.mode === "walk" ? walk : fly, [cx, cy] = mp(camera.position.x, camera.position.z), a = Math.atan2(Math.cos(o.yaw), Math.sin(o.yaw)); // 지금 보는 방향 부채꼴
   mg.beginPath(); mg.moveTo(cx, cy); mg.arc(cx, cy, 30 * d, a - .45, a + .45); mg.closePath(); mg.fillStyle = "rgb(43 68 166 / .22)"; mg.fill();
   mg.beginPath(); mg.arc(cx, cy, 4 * d, 0, 7); mg.fillStyle = "#2b44a6"; mg.fill(); mg.lineWidth = 1.5 * d; mg.strokeStyle = "#fff"; mg.stroke(); }
@@ -776,6 +792,66 @@ $("skFile").onclick = () => { noteDone(true); if (!strokes.length) return toast(
   const data = { page: location.href, saved: d.toISOString(), coords: "x = 동쪽(m), z = 남쪽(m), y = 해발 - 50m (ssu-data.js 좌표)", view: snap(1280), strokes: skPlain() };
   const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(data)], { type: "application/json" })); a.download = `숭실대-스케치-${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}.json`; a.click();
   setTimeout(() => URL.revokeObjectURL(a.href), 4000); toast("다운로드 폴더에 저장했어요"); };
+
+/* ───────── 촬영 목록: 사용자가 캠퍼스에서 찍어 올 사진. q = 지금 짐작으로 만든 곳, b = 같은 이름 건물, at = [x, z]. 누르면 그곳으로 날아감, 체크는 이 브라우저에만 ───────── */
+const BASIC = "건물 기본: 네 모서리에서 1장씩 + 입구 정면 + 이름판 가까이(있으면)";
+const SHOTS = [
+  ["정문·역 쪽", [
+    { n: "정문", at: [-255, 18], d: 80, s: ["상도로 건너편에서 정문 전체", "정문 안에서 바깥 보고", "아치 지붕 아래 올려다보기", "날개 기둥 하나 가까이", "표석 가까이"] },
+    { n: "7호선 출구 1~4", at: [-270, 60], d: 140, q: 1, s: ["출구마다 1장 — 번호판·계단 방향이 보이게", "출구 앞에서 학교 쪽 보고 1장씩"] },
+    { n: "문화관", b: 1, q: 1, s: ["옥상 철탑이 보이게 멀리서"] },
+    { n: "안익태기념관", b: 1, q: 1, s: ["정문 쪽 나무 벽과 전광판", "'안익태기념관' 검은 돌 간판벽"] },
+    { n: "형남공학관", b: 1, s: ["15층 탑 전체 — 꼭대기 '숭실대학교' 글자 보이게 (정문에서)", "서쪽 입구 램프와 금색 글자 담", "은색 곡면 벽 가까이"] },
+    { n: "숭덕경상관", b: 1, s: ["돌계단 쪽 면의 건물 이름 글자", "짙은 유리·세로 핀 가까이"] },
+    { n: "돌계단 (슈파크)", at: [-214, -40], d: 70, q: 1, s: ["서쪽 평지에서 계단 정면", "계단 맨 위에서 내려다보기", "남쪽 끝·북쪽 끝에서 옆모습 — 단 높이가 보이게", "흰 반원 기념벽", "둘레 붉은 자전거길"] }]],
+  ["운동장 둘레", [
+    { n: "베어드홀", b: 1, q: 1, s: ["학생회관 사이 붉은 벽돌 계단 — 아래에서·위에서"] },
+    { n: "학생회관", b: 1, q: 1, s: ["광장 쪽 긴 면 전체", "전광판(서쪽 끝)과 '학생회관' 글자(동쪽 끝)", "운동장에서 층층 테라스 전체", "가운데 중앙계단 — 위에서·아래에서", "지붕 풀밭·나무 데크 (올라갈 수 있으면)"] },
+    { n: "운동장·북쪽 스탠드", at: "field", d: 170, q: 1, s: ["운동장 가운데에서 북쪽(스탠드·백마관)·남쪽·동쪽·서쪽 1장씩", "스탠드 정면 가까이 — 좌석·태양광 지붕", "스탠드 위 보행로에서 왼쪽·오른쪽", "조명탑 하나"] },
+    { n: "백마관", b: 1, s: ["스탠드 위 보행로에서 입구"] },
+    { n: "교육관", b: 1, q: 1 },
+    { n: "벤처중소기업센터", b: 1, q: 1 }]],
+  ["가운데", [
+    { n: "진리관", b: 1 },
+    { n: "조만식기념관", b: 1 },
+    { n: "나무계단", at: [88, -101], d: 70, q: 1, s: ["아래 끝에서 위 보고", "위 끝에서 아래 보고", "옆에서 전체 — 폭·단 수·화분이 보이게", "위 데크 광장 둘러보기 2장"] },
+    { n: "웨스트민스터홀", b: 1, q: 1, s: ["나무계단 위 데크 광장 쪽 면"] },
+    { n: "신양관", b: 1, q: 1, s: ["옥상 유리 피라미드가 보이게 멀리서"] },
+    { n: "중앙도서관", b: 1, s: ["앞 나무 차양 — 밖에서·아래에서"] },
+    { n: "분수 광장", at: [8, -25], d: 60, s: ["분수와 둘레 화단", "분수에서 네 방향 1장씩"] },
+    { n: "한경직기념관", b: 1, s: ["십자가와 파란 기둥"] },
+    { n: "한국기독교박물관", b: 1, q: 1 }]],
+  ["동쪽", [
+    { n: "미래관", b: 1, q: 1 },
+    { n: "농구장", at: [104, 80], d: 60, s: ["바닥 색과 철망", "골대"] },
+    { n: "연구관", b: 1, q: 1 },
+    { n: "창신관", b: 1, q: 1 },
+    { n: "전산관", b: 1, q: 1, s: ["파란 지붕 — 높은 곳에서 보이면"] },
+    { n: "글로벌브레인홀", b: 1, q: 1 },
+    { n: "레지던스홀", b: 1, s: ["V자 지붕이 보이게 멀리서", "기둥 입구와 'Residence Hall'"] },
+    { n: "정보과학관", b: 1, q: 1, s: ["옥상 채광창 — 높은 곳에서 보이면"] },
+    { n: "창의관", b: 1, q: 1, s: ["쐐기 모양이 보이게 멀리서"] }]],
+  ["어디서든", [
+    { n: "바닥·나무·길", s: ["보도블록·아스팔트·잔디 가까이 1장씩", "가로등", "큰 활엽수·소나무 1장씩", "캠퍼스 길 주차 모습", "언덕 숲 가장자리"] }]]];
+const SHOT_ALL = SHOTS.flatMap(([, items]) => items), SHOTK = "ssu-shots";
+const shotDone = (() => { try { return new Set(JSON.parse(localStorage.getItem(SHOTK)) || []); } catch { return new Set(); } })();
+let shotOn = -1; const narrow = () => matchMedia("(max-width: 700px)").matches;
+const shotPos = it => { if (it.b) { const b = byName(it.n); return b && [b.cx, b.cz]; } return it.at === "field" ? FIELD && [FIELD.cx, FIELD.cz] : it.at; };
+const shotCount = () => $("shotCnt").textContent = `${SHOT_ALL.filter(it => shotDone.has(it.n)).length} / ${SHOT_ALL.length}`;
+$("shotList").innerHTML = SHOTS.map(([h, items]) => `<h3>${h}</h3>` + items.map(it => { const i = SHOT_ALL.indexOf(it);
+  return `<div class="shot${shotDone.has(it.n) ? " done" : ""}" data-i="${i}"><input type="checkbox" aria-label="${it.n} 다 찍음"${shotDone.has(it.n) ? " checked" : ""}><div>${it.b || it.at ? `<button class="sname" type="button">${it.n}</button>` : `<span class="sname">${it.n}</span>`}${it.q ? '<span class="tag">짐작</span>' : ""}</div>`
+    + `<ul>${it.b ? `<li class="base">${BASIC}</li>` : ""}${(it.s || []).map(s => `<li>${s}</li>`).join("")}</ul></div>`; }).join("")).join(""); shotCount();
+$("shotList").addEventListener("change", e => { const row = e.target.closest(".shot"), it = SHOT_ALL[row.dataset.i]; e.target.checked ? shotDone.add(it.n) : shotDone.delete(it.n); row.classList.toggle("done", e.target.checked);
+  try { localStorage.setItem(SHOTK, JSON.stringify([...shotDone])); } catch {} shotCount(); });
+$("shotList").addEventListener("click", e => { if (!e.target.matches("button.sname")) return; const i = +e.target.closest(".shot").dataset.i, it = SHOT_ALL[i];
+  if (view.mode === "walk") walkOut(); if (view.mode !== "fly") return; shotOn = i; document.querySelectorAll(".shot").forEach(r => r.classList.toggle("on", +r.dataset.i === i));
+  if (it.b) { const k = named.findIndex(b => b.n === it.n); if (k >= 0) select(k); }
+  else { const p = shotPos(it), d = it.d, g = Y(...p); sel = -1; showPanel(); flyTo(new V3(p[0] - Math.sin(fly.yaw) * d, g + d * .8, p[1] - Math.cos(fly.yaw) * d), new V3(p[0], g, p[1])); }
+  if (narrow()) shotsShow(false); });
+function shotFit() { $("shots").style.maxHeight = narrow() ? "" : `${$("map").getBoundingClientRect().top - 72}px`; } // PC: 오른쪽 위 ~ 작은 지도 위까지
+new ResizeObserver(shotFit).observe($("map")); addEventListener("resize", shotFit);
+function shotsShow(on) { $("shots").classList.toggle("on", on); $("shotB").setAttribute("aria-pressed", on); shotFit(); }
+$("shotB").onclick = () => shotsShow(!$("shots").classList.contains("on"));
 
 let last = performance.now(); const tmp = new V3(), lookNow = new V3().copy(INTRO_LOOK);
 function frame(now) {
