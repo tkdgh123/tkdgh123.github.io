@@ -38,8 +38,12 @@ body[data-s="3"] { background: #efdcd6 }
 .stage { flex: 1; min-height: 0; display: grid; place-items: center }
 .board { position: relative }
 canvas { display: block; background: var(--paper); border-radius: 20px; box-shadow: 0 1px 0 rgb(0 0 0 / .04), 0 18px 40px -18px rgb(40 30 20 / .28); touch-action: none; cursor: crosshair }
-.shake { animation: shake .32s }
-@keyframes shake { 20% { transform: translateX(-7px) } 45% { transform: translateX(6px) } 70% { transform: translateX(-3px) } }
+.snd { border: 0; background: none; color: var(--muted); padding: 6px; margin-left: 4px; cursor: pointer; display: grid }
+.snd:hover { color: var(--ink) }
+.score b.pop { animation: pop .35s }
+@keyframes pop { 30% { transform: scale(1.18) } }
+.ov .nb { color: var(--red); font: 700 22px/1 Hahmlet, serif; animation: nb .5s both }
+@keyframes nb { from { transform: scale(2.4) rotate(-8deg); opacity: 0 } 60% { transform: scale(.94) rotate(-3deg); opacity: 1 } to { transform: rotate(-3deg) } }
 .ov { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; text-align: center; gap: 14px; padding: 24px; background: rgb(233 232 228 / .82); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); border-radius: 20px; transition: opacity .3s }
 .ov[hidden] { display: grid; opacity: 0; pointer-events: none }
 .ov h1 { margin: 0; font: 300 clamp(40px, 11vw, 60px)/1 Hahmlet, serif; letter-spacing: -.03em }
@@ -60,6 +64,7 @@ canvas { display: block; background: var(--paper); border-radius: 20px; box-shad
 <main class="app">
   <header class="top">
     <a class="back" href="../">← 창업실</a>
+    <button class="snd" id="snd"></button>
     <i class="mult" id="mult">×1</i>
     <div class="score"><b id="score">0</b><span id="best">최고 0</span></div>
   </header>
@@ -73,6 +78,7 @@ canvas { display: block; background: var(--paper); border-radius: 20px; box-shad
     </div>
   </div></div>
 </main>
+<script src="../game-fx.js"></script>
 <script>
 const N = 8, TIME = 120, DENSITY = 0.4, MIN = 1, PENALTY = 3, HINT = 10000;
 const COLORS = ["#2f6be0", "#e4473f", "#21985f", "#8a55e8", "#f08a24", "#33312d"];
@@ -176,7 +182,8 @@ function fold(ax, seg) {
     miss = now; missPairs = ps; left = Math.max(0, left - PENALTY);
     const [x1, y1, x2, y2] = seg ? [...at(ax, seg[0]), ...at(ax, seg[1])] : axisEnds(ax), cx = Math.min(N - 1.5, Math.max(.5, (x1 + x2) / 2)), cy = Math.min(N - 1, Math.max(.5, (y1 + y2) / 2));
     texts.push({ x: cx, y: cy, s: "-" + PENALTY + "초", red: true, t0: now });
-    cv.classList.remove("shake"); void cv.offsetWidth; cv.classList.add("shake");
+    FX.shake(.6);
+    FX.tone(190, { d: .24, type: "triangle", vol: .3, to: 70 }); FX.noise({ d: .16, vol: .18, f: 320, type: "lowpass" });
     return;
   }
   for (const [x, y, mx, my, c] of ps) {
@@ -184,11 +191,19 @@ function fold(ax, seg) {
     anims.push({ x, y, mx, my, c, t0: now, seed: Math.random() * 1e4 });
   }
   const n = ps.length, pts = 10 * n * 2 ** (n - 1) * mult;
-  score += pts; $("score").textContent = score;
+  score += pts;
   let cx = 0, cy = 0;
   ps.forEach(p => { cx += p[2]; cy += p[3] });
   texts.push({ x: cx / n, y: cy / n, s: "+" + pts, sub: n + "쌍" + (mult > 1 ? " ×" + mult : ""), big: n >= 3, t0: now + 220 });
   try { navigator.vibrate && navigator.vibrate(n >= 3 ? [20, 40, 30] : 15) } catch {}
+  rings.push({ x: cx / n, y: cy / n, n, t0: now + 230 });
+  // 종이 접는 바람 소리 → 쌍마다 물방울 소리가 한 음씩 올라감(점수 배수가 클수록 높게)
+  FX.noise({ d: .2, vol: .22, f: 500, to: 2600, q: .8 });
+  const base = (mult - 1) * 2;
+  ps.forEach((p, i) => FX.tone(FX.pent(base + i) * 2, { d: .22, vol: .2, at: .23 + i * .07, to: FX.pent(base + i) }));
+  if (n >= 3) [0, 2, 4].forEach(k => FX.tone(FX.pent(base + n + k, 261.63), { d: .7, type: "triangle", vol: .1, at: .23 + n * .07 }));
+  setTimeout(() => { FX.shake(.12 + .13 * n); FX.punch(.012 * n) }, 230);
+  $("score").classList.remove("pop"); void $("score").offsetWidth; $("score").classList.add("pop");
   setTimeout(() => playing && refill(), 520);
 }
 
@@ -263,11 +278,24 @@ function draw(now) {
       dot(px(a.mx), px(a.my), S * .34, COLORS[a.c]);
       dot(px(a.x + (a.mx - a.x) * k), px(a.y + (a.my - a.y) * k), S * .34 * (1 + .25 * Math.sin(k * Math.PI)), COLORS[a.c]);
     } else {
-      if (!a.st) { a.st = 1; stains.push({ x: a.mx, y: a.my, c: a.c, t0: now, seed: a.seed }, { x: a.x, y: a.y, c: a.c, t0: now, seed: a.seed + 7 }); }
+      if (!a.st) { a.st = 1; stains.push({ x: a.mx, y: a.my, c: a.c, t0: now, seed: a.seed }, { x: a.x, y: a.y, c: a.c, t0: now, seed: a.seed + 7 }); splash(a.mx, a.my, a.c, 5, now); splash(a.x, a.y, a.c, 5, now) }
       const k = (t - .3) / .7;
       for (const [x, y, sd] of [[a.mx, a.my, a.seed], [a.x, a.y, a.seed + 7]])
         blot(px(x), px(y), S * .34 * (1 + 1.1 * Math.sqrt(k)), COLORS[a.c], 1 - k, sd);
     }
+  }
+  rings = rings.filter(r => now - r.t0 < 600);
+  for (const r of rings) {
+    const k = (now - r.t0) / 600; if (k < 0) continue;
+    ctx.strokeStyle = `rgb(28 27 25 / ${.35 * (1 - k)})`; ctx.lineWidth = S * .08 * (1 - k) + 1;
+    ctx.beginPath(); ctx.arc(px(r.x), px(r.y), S * (.4 + (1 + r.n * .8) * Math.sqrt(k)), 0, 7); ctx.stroke();
+  }
+  drawParts(now);
+  if (now - stageT < 900) {
+    const k = (now - stageT) / 900;
+    ctx.save(); ctx.beginPath(); ctx.roundRect(0, 0, S * N, S * N, 20); ctx.clip();
+    ctx.strokeStyle = mult === 3 ? `rgb(216 68 60 / ${1 - k})` : `rgb(240 138 36 / ${1 - k})`; ctx.lineWidth = S * .5 * (1 - k);
+    ctx.strokeRect(0, 0, S * N, S * N); ctx.restore();
   }
   if (lastAx && now - lastT < 520) line(lastAx, "rgb(28 27 25 / " + .8 * (1 - (now - lastT) / 520) + ")", 3, null, lastSeg);
   texts = texts.filter(t => now - t.t0 < 900);
@@ -283,6 +311,24 @@ function draw(now) {
     if (t.sub) { ctx.font = `700 ${S * .36}px Pretendard, system-ui, sans-serif`; ctx.strokeText(t.sub, px(t.x), yy + S * .55); ctx.fillStyle = "#6f6c66"; ctx.fillText(t.sub, px(t.x), yy + S * .55) }
     ctx.globalAlpha = 1;
   }
+}
+// 튀는 물감 방울: 칸 단위 좌표, 시간으로 위치를 바로 계산
+let parts = [], rings = [], stageT = -1e4, shown = 0, axKey = "";
+function splash(x, y, c, k, now, v0 = 4, up = 1.5, r) {
+  for (let i = 0; i < k; i++) {
+    const a = Math.random() * 6.28, v = v0 * (.5 + Math.random());
+    parts.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - up, r: r || .05 + Math.random() * .1, c, t0: now, life: 450 + Math.random() * 450 });
+  }
+}
+function drawParts(now) {
+  parts = parts.filter(p => now - p.t0 < p.life);
+  for (const p of parts) {
+    const t = (now - p.t0) / 1000; if (t < 0) continue;
+    const tau = (1 - Math.exp(-3 * t)) / 3, k = (now - p.t0) / p.life;
+    ctx.globalAlpha = 1 - k * k; ctx.fillStyle = COLORS[p.c];
+    ctx.beginPath(); ctx.arc(px(p.x + p.vx * tau), px(p.y + p.vy * tau + 5 * t * t), S * p.r * (1 - .5 * k), 0, 7); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
 }
 let missAx = null, missSeg = null, missPairs = [], lastAx = null, lastSeg = null, lastT = 0;
 let cur = null, lastAct = 0, hint = null;
@@ -307,7 +353,10 @@ function stage(m, fx) {
   $("mult").textContent = "×" + m;
   if (!fx) return;
   $("mult").classList.remove("up"); void $("mult").offsetWidth; $("mult").classList.add("up");
-  texts.push({ x: (N - 1) / 2, y: 1.2, s: "점수 ×" + m, big: true, t0: performance.now() });
+  texts.push({ x: (N - 1) / 2, y: 1.2, s: "점수 ×" + m, big: true, t0: stageT = performance.now() });
+  FX.shake(.45);
+  [0, 1, 2, 3].forEach(i => FX.tone(FX.pent(m * 2 + i, 392), { d: .3, type: "triangle", vol: .16, at: i * .07 }));
+  FX.noise({ d: .5, vol: .08, f: 4000, type: "highpass", at: .2 });
   try { navigator.vibrate && navigator.vibrate([30, 60, 30]) } catch {}
 }
 function loop(now) {
@@ -315,11 +364,16 @@ function loop(now) {
     if (last) { const dt = (now - last) / 1000; left -= dt; el += dt; }
     const m = el < 40 ? 1 : el < 80 ? 2 : 3;
     if (m !== mult) stage(m, true);
-    if (left < 5 && Math.ceil(left) !== tick) { tick = Math.ceil(left); try { navigator.vibrate && navigator.vibrate(12) } catch {} }
+    if (left < 10 && Math.ceil(left) !== tick) {
+      tick = Math.ceil(left);
+      FX.tone(left < 5 ? 1320 : 990, { d: .07, type: "triangle", vol: left < 5 ? .14 : .07 });
+      if (left < 5) try { navigator.vibrate && navigator.vibrate(12) } catch {}
+    }
     if (left <= 0) end();
     $("bar").style.transform = `scaleX(${Math.max(0, left) / TIME})`;
     $("time").classList.toggle("low", left < 10);
   }
+  if (shown < score) { shown += Math.ceil((score - shown) * .2); $("score").textContent = shown }
   last = now;
   draw(now);
   requestAnimationFrame(loop);
@@ -336,8 +390,13 @@ function size() {
 addEventListener("resize", size);
 
 const cell = e => { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) / S - .5, (e.clientY - r.top) / S - .5] };
-cv.addEventListener("pointerdown", e => { if (!playing) return; cv.setPointerCapture(e.pointerId); drag = cur = cell(e); axis = null; lastAct = performance.now(); hint = null });
-cv.addEventListener("pointermove", e => { if (drag) { cur = cell(e); axis = snap(drag, cur) } });
+cv.addEventListener("pointerdown", e => { if (!playing) return; cv.setPointerCapture(e.pointerId); drag = cur = cell(e); axis = null; axKey = ""; lastAct = performance.now(); hint = null });
+cv.addEventListener("pointermove", e => {
+  if (!drag) return;
+  cur = cell(e); axis = snap(drag, cur);
+  const k = axis ? axis.t + axis.a : "";
+  if (k !== axKey) { axKey = k; if (k) FX.tone(2000, { d: .025, type: "triangle", vol: .05 }) }
+});
 const up = () => {
   if (drag && axis && playing) {
     const seg = segNow(), ps = pairsFor(axis, seg).length;
@@ -357,19 +416,29 @@ const bind = () => $("ov").querySelectorAll("[data-m]").forEach(b => b.onclick =
 function start(m) {
   mode = m; try { localStorage.setItem("decal-mode", m) } catch {}
   loadBest();
-  newBoard(); score = 0; left = TIME; last = 0; anims = []; stains = []; texts = []; hint = null; lastAct = performance.now(); el = 0; stage(1);
+  newBoard(); score = shown = 0; left = TIME; parts = []; rings = []; last = 0; anims = []; stains = []; texts = []; hint = null; lastAct = performance.now(); el = 0; stage(1);
   $("score").textContent = 0;
   $("ov").hidden = true; playing = true;
+  [0, 1, 2, 3, 4].forEach(i => FX.tone(FX.pent(i) * 2, { d: .18, vol: .1, at: .05 + i * .05, to: FX.pent(i) }));
 }
 function end() {
   playing = false; left = 0; drag = null; axis = null; stage(1);
-  if (score > best) { best = score; try { localStorage.setItem(KEY[mode], best) } catch {} }
+  const now = performance.now(), nb = score > best;
+  grid.forEach((c, i) => { if (c >= 0) splash(i % N, i / N | 0, c, 1, now + Math.random() * 250, 1.5, 2, .32) });
+  grid.fill(-1); anims = []; texts = [];
+  FX.shake(.5);
+  [3, 2, 0].forEach((i, j) => FX.tone(FX.pent(i, 392), { d: .35, type: "triangle", vol: .16, at: j * .13 }));
+  if (nb) { best = score; try { localStorage.setItem(KEY[mode], best) } catch {} }
   $("best").textContent = NAME[mode] + " 최고 " + best;
-  $("ov").innerHTML = `<p>점수</p><div class="big">${score}</div><p>${NAME[mode]} 최고 ${best}</p>${modes()}`;
-  bind();
-  $("ov").hidden = false;
+  setTimeout(() => {
+    $("ov").innerHTML = `<p>점수</p><div class="big">${score}</div>${nb ? '<p class="nb">최고 기록</p>' : `<p>${NAME[mode]} 최고 ${best}</p>`}${modes()}`;
+    bind();
+    $("ov").hidden = false;
+    if (nb) [0, 2, 4, 5, 7].forEach((i, j) => FX.tone(FX.pent(i), { d: j === 4 ? .8 : .2, type: "triangle", vol: .16, at: j * .09 }));
+  }, 900);
 }
 $("ov").insertAdjacentHTML("beforeend", modes()); bind(); loadBest();
+FX.button($("snd")); FX.board(cv.parentNode);
 newBoard(); size(); requestAnimationFrame(loop);
 </script>
 </body>
