@@ -51,14 +51,14 @@ canvas { display: block; background: var(--paper); border-radius: 20px; box-shad
     <canvas id="cv" aria-label="데칼코마니 판"></canvas>
     <div class="ov" id="ov">
       <h1>데칼<b>코마니</b></h1>
-      <p id="msg">선을 그어 반으로 접었을 때 같은 색이 두 쌍 이상 겹치면 터져요. 많이 겹칠수록 점수가 커져요</p>
+      <p id="msg">선을 그어 반으로 접으면 똑같이 겹치는 색이 터져요. 한 번에 많이 겹칠수록 점수가 커져요</p>
       <button id="go">시작</button>
     </div>
   </div></div>
 </main>
 <script>
-const N = 8, TIME = 60, DENSITY = 0.45, MIN = 2, PENALTY = 3;
-const COLORS = ["#2f6be0", "#e4473f", "#21985f", "#8a55e8", "#f08a24"];
+const N = 8, TIME = 60, DENSITY = 0.4, MIN = 1, PENALTY = 3;
+const COLORS = ["#2f6be0", "#e4473f", "#21985f", "#8a55e8", "#f08a24", "#33312d"];
 const $ = id => document.getElementById(id);
 const cv = $("cv"), ctx = cv.getContext("2d");
 let grid, born, S = 40, playing = false, score = 0, left = TIME, last = 0;
@@ -152,7 +152,6 @@ function axisEnds(ax) {
 function fold(ax) {
   const ps = pairsFor(ax), now = performance.now();
   if (ps.length < MIN) {
-    // 한 쌍뿐이면 그 쌍을 깜빡여 보여 주고, 시간만 깎인다
     miss = now; missPairs = ps; left = Math.max(0, left - PENALTY);
     const [x1, y1, x2, y2] = axisEnds(ax), cx = Math.min(N - 1.5, Math.max(.5, (x1 + x2) / 2)), cy = Math.min(N - 1, Math.max(.5, (y1 + y2) / 2));
     texts.push({ x: cx, y: cy, s: "-" + PENALTY + "초", red: true, t0: now });
