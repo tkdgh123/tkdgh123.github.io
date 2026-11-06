@@ -19,6 +19,8 @@ body { margin: 0; background: radial-gradient(120% 70% at 50% 0, #2a3150, var(--
 .snd:hover { color: var(--on) }
 .score b.pop { animation: pop .35s }
 @keyframes pop { 30% { transform: scale(1.2) } }
+.combo { text-align: right; line-height: 1.1 }
+.combo i { display: block; font-style: normal; font-size: 10px; letter-spacing: 3px; opacity: .85 }
 .combo.up { animation: up .45s }
 @keyframes up { 30% { transform: scale(1.5) } }
 .ov .nb { margin: 0; padding: 4px 12px; border-radius: 8px; background: var(--red); color: var(--paper); font-weight: 800; font-size: 18px; animation: nb .5s both }
@@ -27,6 +29,7 @@ body { margin: 0; background: radial-gradient(120% 70% at 50% 0, #2a3150, var(--
 .score { text-align: center; line-height: 1 }
 .score b { display: block; font-weight: 800; font-size: 42px; font-variant-numeric: tabular-nums; letter-spacing: -.02em }
 .score span { font-size: 13px; color: var(--soft) }
+.score span.hot { color: #ff8a7e; font-weight: 700 }
 .combo { justify-self: end; font-weight: 800; font-size: 20px; color: #ff8a7e; opacity: 0; transition: opacity .25s, transform .25s; transform: scale(.8) }
 .combo.on { opacity: 1; transform: none }
 .stage { flex: 1; min-height: 0; display: grid; place-items: center }
@@ -80,28 +83,12 @@ const newPiece = () => ({ s: SHAPES[Math.random() * SHAPES.length | 0], c: 1 + (
 
 // grid: 0 빈칸, 1 파랑, 2 빨강
 let grid, hand, score = 0, combo = 0, since = 0, playing = false, best = 0, tut = 0, target = null;
-let S = 40, TRAY = 0, drag = null, fx = [], pops = [], flash = [], texts = [];
-let parts = [], shown = 0, dealt = 0, overT = 0, ret = null, hvKey = "";
+let S = 40, TRAY = 0, drag = null, fx = [], pops = [], texts = [];
+let passed = false, shown = 0, dealt = 0, overT = 0, ret = null, hvKey = "", lines = [], marks = [], danger = false;
 const backOut = t => 1 + 2.7 * (t - 1) ** 3 + 1.7 * (t - 1) ** 2;
-// 튀는 잉크(동그라미)와 지워진 칸 조각(네모): 칸 단위 좌표, 시간으로 위치를 바로 계산
-function burst(k, c, n, now, v0, up, sq) {
-  for (let i = 0; i < n; i++) {
-    const a = Math.random() * 6.28, v = v0 * (.5 + Math.random());
-    parts.push({ x: k % N + .5, y: (k / N | 0) + .5, vx: Math.cos(a) * v, vy: Math.sin(a) * v - up, r: sq ? .07 + Math.random() * .09 : .03 + Math.random() * .05, c, sq, rot: Math.random() * 6, vr: (Math.random() * 2 - 1) * 9, t0: now, life: 500 + Math.random() * 400 });
-  }
-}
-function drawParts(now) {
-  parts = parts.filter(p => now - p.t0 < p.life);
-  for (const p of parts) {
-    const t = (now - p.t0) / 1000; if (t < 0) continue;
-    const tau = (1 - Math.exp(-3 * t)) / 3, k = (now - p.t0) / p.life, r = S * p.r * (1 - .4 * k);
-    const X = (p.x + p.vx * tau) * S, Y = (p.y + p.vy * tau + 6 * t * t) * S;
-    ctx.globalAlpha = 1 - k * k; ctx.fillStyle = INK[p.c];
-    if (p.sq) { ctx.save(); ctx.translate(X, Y); ctx.rotate(p.rot + p.vr * t); ctx.fillRect(-r, -r, 2 * r, 2 * r); ctx.restore() }
-    else { ctx.beginPath(); ctx.arc(X, Y, r, 0, 7); ctx.fill() }
-  }
-  ctx.globalAlpha = 1;
-}
+const scr = k => { const r = cv.getBoundingClientRect(); return [r.left + (k % N + .5) * S, r.top + ((k / N | 0) + .5) * S] };
+// 콤보 옆 점 3개 = 줄을 못 지워도 콤보가 버티는 남은 수
+function showCombo() { $("combo").innerHTML = `콤보 ×${combo}<i>${"●".repeat(3 - since)}${"○".repeat(since)}</i>`; $("combo").classList.toggle("on", combo > 1) }
 function dealSound() { [0, 1, 2].forEach(i => FX.tone(FX.pent(i + 2) * 2, { d: .1, type: "triangle", vol: .06, at: .1 + i * .07 })) }
 try { best = +localStorage.getItem("stamp3-best") || 0 } catch {}
 $("best").textContent = "최고 " + best;
@@ -137,41 +124,62 @@ function place(i, gx, gy) {
   dyed.forEach((k, j) => fx.push({ k, kind: "dye", from: grid[k], c: p.c, t0: now + 120 + j * 40 }));
   FX.tone(150, { d: .16, vol: .45, to: 55 }); FX.noise({ d: .07, vol: .22, f: 900, type: "lowpass" });
   FX.shake(.16); FX.punch(-.012);
-  own.concat(dyed).forEach(k => burst(k, p.c, 2, now, 2.5, 0));
+  own.concat(dyed).forEach(k => FX.burst(...scr(k), INK[p.c], { n: 2, v: 150, up: 0, size: S * .05, life: 420, g: 300 }));
   dyed.forEach((k, j) => FX.tone(760 + j * 70, { d: .04, type: "square", vol: .05, at: .27 + j * .04 }));
-  const cleared = new Set(), wait = 140 + dyed.length * 40;
-  rows.forEach(r => { for (let j = 0; j < N; j++) cleared.add(r * N + j) });
-  cols.forEach(c => { for (let j = 0; j < N; j++) cleared.add(j * N + c) });
-  cleared.forEach(k => { const t0 = now + wait + 120 + ((k % N) + (k / N | 0)) * 14; pops.push({ k, c: g[k], t0 }); burst(k, g[k], 3, t0, 3, 3, true); g[k] = 0 });
-  rows.forEach(r => flash.push({ r, t0: now + wait })); cols.forEach(c => flash.push({ c, t0: now + wait }));
+  // 줄 지우기: 뒤집기가 끝난 T에 빛줄기가 줄을 훑고, 지나간 칸부터 하얗게 부풀었다 조각나 튄다
+  const n = rows.length + cols.length, wait = 140 + dyed.length * 40, T = now + wait, cleared = new Map();
+  const mark = (k, j) => cleared.set(k, Math.min(cleared.get(k) ?? Infinity, T + 60 + j * 32));
+  rows.forEach(r => { lines.push({ row: 1, i: r, c: g[r * N], t0: T }); for (let j = 0; j < N; j++) mark(r * N + j, j) });
+  cols.forEach(c => { lines.push({ row: 0, i: c, c: g[c], t0: T }); for (let j = 0; j < N; j++) mark(j * N + c, j) });
+  cleared.forEach((t0, k) => pops.push({ k, c: g[k], t0 }));
+  cleared.forEach((_, k) => g[k] = 0);
   grid = g; hand[i] = null;
-  const n = rows.length + cols.length;
   let pts = 10 * p.s.length;
   if (n) {
     if (!tut) combo++; since = 0;
-    const got = LINE[Math.min(n, 6)] * Math.max(1, combo);
+    const got = LINE[Math.min(n, 6)] * Math.max(1, combo), empty = g.every(v => !v);
     pts += got;
-    let cx = 0, cy = 0; cleared.forEach(k => { cx += k % N; cy += k / N | 0 });
-    texts.push({ x: cx / cleared.size, y: cy / cleared.size, s: "+" + got, sub: combo > 1 ? "콤보 ×" + combo : n > 1 ? n + "줄" : "", t0: now + wait });
+    let cx = 0, cy = 0; cleared.forEach((_, k) => { cx += k % N; cy += k / N | 0 });
+    texts.push({ x: cx / cleared.size, y: cy / cleared.size, s: "+" + got, big: true, t0: T + 180 });
+    // 여러 줄·콤보·판 비움은 빨간 도장이 쾅 찍힌다
+    const label = empty ? "다 비움" : [n > 1 ? n + "줄" : "", combo > 1 ? "콤보 " + combo : ""].filter(Boolean).join(" · ");
+    if (label) marks.push({ s: label, big: empty, t0: T + 330, y: empty ? .45 : cy / cleared.size < N / 2 ? .7 : .28 });
     try { navigator.vibrate && navigator.vibrate(n > 1 ? [20, 40, 30] : 20) } catch {}
-    // 줄이 지워지는 소리: 줄 수만큼 길게, 콤보가 쌓일수록 높게
+    // 소리: 쓱 훑는 소리 → 줄 수만큼 올라가는 화음(콤보가 쌓일수록 높게) → 도장 쿵
     const at = wait / 1000, b = Math.min(Math.max(0, combo - 1), 7);
-    FX.noise({ d: .45, vol: .1, f: 3500, type: "highpass", at });
-    for (let j = 0; j < 2 + n; j++) FX.tone(FX.pent(b + j), { d: .3, type: "triangle", vol: .16, at: at + j * .06 });
-    setTimeout(() => {
-      FX.shake(.25 + .12 * n); FX.punch(.01 * n);
-      $("score").classList.remove("pop"); void $("score").offsetWidth; $("score").classList.add("pop");
-    }, wait);
+    FX.noise({ d: .3, vol: .12, f: 1200, to: 7000, type: "bandpass", q: 1.5, at });
+    FX.tone(320, { d: .28, type: "triangle", vol: .08, to: 1300, at });
+    for (let j = 0; j < 2 + n; j++) FX.tone(FX.pent(b + j), { d: .35, type: "triangle", vol: .16, at: at + .26 + j * .06 });
+    if (label) { FX.tone(110, { d: .2, vol: .45, to: 48, at: at + .33 }); FX.noise({ d: .09, vol: .25, f: 800, type: "lowpass", at: at + .33 }) }
+    if (empty) [0, 2, 4, 5, 7, 9].forEach((k, j) => FX.tone(FX.pent(k + b), { d: .4, type: "triangle", vol: .13, at: at + .45 + j * .07 }));
+    setTimeout(() => { FX.stop(50 + 25 * n); FX.shake(.2 + .1 * n); FX.punch(.01 * n) }, wait);
+    if (label) setTimeout(() => { FX.shake(.3 + (empty ? .3 : 0)); FX.punch(-.015) }, wait + 330);
+    // 지워진 줄에서 잉크가 점수로 날아간다
+    lines.slice(-n).forEach((l, j) => [1, 4, 6].forEach(q => FX.home(...scr(l.row ? l.i * N + q : q * N + l.i), HI[l.c], $("score"), { n: 1, size: S * .1, delay: wait + 320 + j * 60, hit: () => FX.pop($("score")) })));
     if (combo > 1) { $("combo").classList.remove("up"); void $("combo").offsetWidth; $("combo").classList.add("up") }
-  } else if (++since >= 3) combo = 0;
+  } else if (++since >= 3) {
+    if (combo > 1) FX.tone(330, { d: .3, type: "triangle", vol: .12, to: 150 });
+    combo = 0;
+  }
   score += pts;
-  $("combo").textContent = "콤보 ×" + combo;
-  $("combo").classList.toggle("on", combo > 1);
+  showCombo();
+  // 판이 3/4 넘게 차면 테두리가 붉게 뛴다
+  const dg = !tut && grid.filter(v => !v).length <= 16;
+  if (dg && !danger) { FX.tone(70, { d: .14, vol: .4, to: 48 }); FX.tone(62, { d: .12, vol: .28, to: 45, at: .18 }) }
+  danger = dg;
+  if (!tut) FX.music(true, { bpm: danger ? 104 : 72 });
+  // 게임 중 최고 기록을 넘는 순간
+  if (!tut && !passed && best > 0 && score > best) {
+    passed = true; $("best").textContent = "새 최고 기록"; $("best").classList.add("hot");
+    const b = $("best").getBoundingClientRect();
+    FX.burst(b.left + b.width / 2, b.top + b.height / 2, "#ff8a7e", { n: 16, v: 300, up: 60, size: 5, shape: "k", life: 900, g: 200 });
+    [4, 5, 7, 9].forEach((k, j) => FX.tone(FX.pent(k), { d: .25, type: "triangle", vol: .12, at: .5 + j * .08 }));
+  }
   if (tut) return tutNext();
   if (hand.every(h => !h)) { hand = [newPiece(), newPiece(), newPiece()]; dealt = now; dealSound() }
   // 못 놓으면: 판이 줄마다 어두워지고 내려가는 소리
   if (!hand.some(h => h && fitsAnywhere(h))) {
-    playing = false; overT = now + 350; setTimeout(end, 1400);
+    playing = false; overT = now + 350; setTimeout(end, 1400); FX.music(false);
     [4, 2, 0, -2].forEach((i, j) => FX.tone(FX.pent(i, 392), { d: .4, type: "triangle", vol: .14, at: .35 + j * .15 }));
   }
 }
@@ -187,11 +195,12 @@ function makeGrain() {
 function rr(x, y, w, h, r) { ctx.beginPath(); ctx.roundRect(x, y, w, h, r) }
 // 잉크 칸 하나. sx는 가로 눌림(뒤집힐 때 0까지 줄었다 돌아온다)
 function inkCell(x, y, s, col, a = 1, k = 1, sx = 1) {
-  const p = s * .06, w = (s - p * 2) * k, o = (s - w) / 2, ww = w * sx;
+  const p = s * .06, w = (s - p * 2) * k, o = (s - w) / 2, ww = w * sx, r = Math.min(s * .14, ww / 2);
+  if (!(w > 0 && ww > 0)) return;
   ctx.globalAlpha = a;
-  ctx.fillStyle = col; rr(x + (s - ww) / 2, y + o, ww, w, Math.min(s * .14, ww / 2)); ctx.fill();
+  ctx.fillStyle = col; rr(x + (s - ww) / 2, y + o, ww, w, r); ctx.fill();
   ctx.fillStyle = grain; ctx.fill();
-  ctx.fillStyle = "rgb(255 255 255 / .1)"; rr(x + (s - ww) / 2, y + o, ww, w * .18, [Math.min(s * .14, ww / 2), Math.min(s * .14, ww / 2), 0, 0]); ctx.fill();
+  ctx.fillStyle = "rgb(255 255 255 / .1)"; rr(x + (s - ww) / 2, y + o, ww, w * .18, [r, r, 0, 0]); ctx.fill();
   ctx.globalAlpha = 1;
 }
 function hoverCell() {
@@ -219,7 +228,7 @@ function draw(now) {
     if (f && f.kind === "dye") { const t = (now - f.t0) / 300; inkCell(X, Y, S, INK[t < .5 ? f.from : f.c], 1, 1, Math.abs(Math.cos(t * Math.PI))); continue }
     const v = grid[k], pending = fx.find(e => e.k === k && e.kind === "dye" && now < e.t0);
     if (pending) { inkCell(X, Y, S, INK[pending.from]); continue }
-    if (willClear.has(k) && !willDye.has(k)) inkCell(X, Y, S, HI[hand[drag.i].c]);
+    if (willClear.has(k) && !willDye.has(k)) { inkCell(X, Y, S, HI[hand[drag.i].c]); ctx.fillStyle = `rgb(255 255 255 / ${.2 + .18 * Math.sin(now / 70)})`; rr(X + S * .06, Y + S * .06, S * .88, S * .88, S * .14); ctx.fill() }
     else if (v) inkCell(X, Y, S, INK[v]);
     else { ctx.fillStyle = C.dot; ctx.beginPath(); ctx.arc(X + S / 2, Y + S / 2, Math.max(1.5, S * .045), 0, 7); ctx.fill() }
     // 물들 칸: 내 색 테두리
@@ -240,15 +249,44 @@ function draw(now) {
     const a = Math.min(1, Math.max(0, (now - overT - (k / N | 0) * 70) / 250));
     if (a > 0 && grid[k]) { ctx.fillStyle = `rgb(29 34 50 / ${.55 * a})`; rr((k % N) * S + S * .06, (k / N | 0) * S + S * .06, S * .88, S * .88, S * .14); ctx.fill() }
   }
-  flash = flash.filter(f => now - f.t0 < 420);
-  for (const f of flash) {
-    const t = (now - f.t0) / 420; if (t < 0) continue;
-    ctx.fillStyle = `rgb(255 255 255 / ${.85 * (1 - t)})`;
-    if (f.r !== undefined) { rr(0, f.r * S, W, S, 8); ctx.fill() } else { rr(f.c * S, 0, S, W, 8); ctx.fill() }
+  pops = pops.filter(p => {
+    if (now - p.t0 < 90) return true;
+    const [x, y] = scr(p.k);
+    FX.burst(x, y, INK[p.c], { n: 4, v: 300, up: 240, size: S * .11, shape: "s", life: 750 });
+    FX.burst(x, y, "#fff", { n: 2, v: 220, up: 60, size: S * .07, shape: "k", life: 380, g: 0 });
+    return false;
+  });
+  for (const p of pops) {
+    const X = (p.k % N) * S, Y = (p.k / N | 0) * S, t = Math.max(0, (now - p.t0) / 90);
+    inkCell(X, Y, S, INK[p.c], 1, 1 + .22 * t);
+    if (t > 0) { ctx.fillStyle = `rgb(255 255 255 / ${.8 * t})`; rr(X + S * .06 - S * .11 * t, Y + S * .06 - S * .11 * t, S * (.88 + .22 * t), S * (.88 + .22 * t), S * .14); ctx.fill() }
   }
-  pops = pops.filter(p => now - p.t0 < 360);
-  for (const p of pops) { const X = (p.k % N) * S, Y = (p.k / N | 0) * S, t = (now - p.t0) / 360; if (t < 0) { inkCell(X, Y, S, INK[p.c]); continue } inkCell(X, Y - t * S * .3, S, INK[p.c], 1 - t, 1 + .3 * t) }
-  drawParts(now);
+  lines = lines.filter(l => now - l.t0 < 60 + N * 32 + 220);
+  for (const l of lines) {
+    const t = now - l.t0 - 60, head = Math.min(N, t / 32 + .5) * S; if (head < 2) continue;
+    const a = t > N * 32 ? Math.max(0, 1 - (t - N * 32) / 220) : 1, g = l.row ? ctx.createLinearGradient(0, 0, head, 0) : ctx.createLinearGradient(0, 0, 0, head);
+    g.addColorStop(0, "rgb(255 255 255 / 0)"); g.addColorStop(.75, HI[l.c]); g.addColorStop(1, "#fff");
+    ctx.save(); ctx.globalAlpha = a; ctx.fillStyle = g;
+    if (l.row) rr(0, l.i * S + S * .2, head, S * .6, S * .3); else rr(l.i * S + S * .2, 0, S * .6, head, S * .3);
+    ctx.fill();
+    ctx.shadowColor = HI[l.c]; ctx.shadowBlur = S * .8; ctx.fillStyle = "#fff";
+    ctx.beginPath(); ctx.arc(l.row ? head : (l.i + .5) * S, l.row ? (l.i + .5) * S : head, S * .28, 0, 7); ctx.fill();
+    ctx.restore();
+  }
+  marks = marks.filter(m => now - m.t0 < 1300);
+  for (const m of marks) {
+    const t = now - m.t0; if (t < 0) continue;
+    const sc = t < 110 ? 1.9 - .9 * (t / 110) ** 2 : 1, a = t < 110 ? t / 110 : t > 950 ? 1 - (t - 950) / 350 : 1;
+    ctx.save(); ctx.translate(W / 2, W * m.y); ctx.rotate(-.13); ctx.scale(sc, sc); ctx.globalAlpha = a;
+    ctx.font = `900 ${S * (m.big ? 1.05 : .8)}px Pretendard, system-ui, sans-serif`;
+    const tw = ctx.measureText(m.s).width + S * .9, th = S * (m.big ? 1.7 : 1.35);
+    ctx.fillStyle = "rgb(243 244 246 / .88)"; rr(-tw / 2, -th / 2, tw, th, S * .2); ctx.fill();
+    ctx.strokeStyle = INK[2]; ctx.lineWidth = S * .12; ctx.stroke();
+    ctx.fillStyle = INK[2]; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(m.s, 0, S * .05);
+    ctx.fillStyle = grain; ctx.fillRect(-tw / 2, -th / 2, tw, th);
+    ctx.restore();
+  }
+  if (danger && playing) { ctx.strokeStyle = `rgb(224 87 76 / ${.45 + .4 * Math.sin(now / 160)})`; ctx.lineWidth = 4; rr(2, 2, W - 4, W - 4, 15); ctx.stroke() }
   fx = fx.filter(e => now - e.t0 < 300);
   texts = texts.filter(t => now - t.t0 < 1000);
   for (const t of texts) {
@@ -256,7 +294,7 @@ function draw(now) {
     const X = Math.min(W - S * 1.4, Math.max(S * 1.4, (t.x + .5) * S)), Y = (t.y + .5) * S - k * S * .6;
     ctx.globalAlpha = k < .7 ? 1 : 1 - (k - .7) / .3;
     ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.lineJoin = "round";
-    ctx.font = `800 ${S * .72}px Pretendard, system-ui, sans-serif`;
+    ctx.font = `800 ${S * (t.big ? .95 : .72)}px Pretendard, system-ui, sans-serif`;
     ctx.lineWidth = 6; ctx.strokeStyle = C.paper; ctx.strokeText(t.s, X, Y); ctx.fillStyle = "#1d2232"; ctx.fillText(t.s, X, Y);
     if (t.sub) { ctx.font = `800 ${S * .4}px Pretendard, system-ui, sans-serif`; ctx.strokeText(t.sub, X, Y + S * .6); ctx.fillStyle = INK[2]; ctx.fillText(t.sub, X, Y + S * .6) }
     ctx.globalAlpha = 1;
@@ -287,7 +325,8 @@ function draw(now) {
 }
 function loop(now) {
   if (shown < score) { shown += Math.ceil((score - shown) * .2); $("score").textContent = shown }
-  draw(now); requestAnimationFrame(loop);
+  if (!FX.stopped()) draw(now);
+  requestAnimationFrame(loop);
 }
 
 function size() {
@@ -325,7 +364,12 @@ cv.addEventListener("pointermove", e => {
   [drag.x, drag.y] = [x, y];
   if (Math.hypot(drag.x - drag.x0, drag.y - drag.y0) > 8) drag.moved = true;
   const h = hoverCell(), k = h ? h.gx + "," + h.gy : "";
-  if (k !== hvKey) { hvKey = k; if (h) FX.tone(h.ok ? 1500 : 480, { d: .03, type: "triangle", vol: .05 }) }
+  if (k !== hvKey) {
+    hvKey = k;
+    const pr = h && h.ok && tryPlace(hand[drag.i], h.gx, h.gy);
+    if (pr && pr.rows.length + pr.cols.length) { FX.tone(FX.pent(7), { d: .12, type: "triangle", vol: .08 }); FX.tone(FX.pent(9), { d: .16, type: "triangle", vol: .08, at: .05 }) }
+    else if (h) FX.tone(h.ok ? 1500 : 480, { d: .03, type: "triangle", vol: .05 });
+  }
 });
 cv.addEventListener("pointerup", () => {
   if (!drag) return;
@@ -370,13 +414,14 @@ function tutNext() {
 }
 
 function reset() {
-  score = shown = 0; combo = 0; since = 0; fx = []; pops = []; flash = []; texts = []; parts = []; overT = 0; ret = null;
-  $("score").textContent = 0; $("combo").classList.remove("on");
+  score = shown = 0; combo = 0; since = 0; fx = []; pops = []; lines = []; marks = []; texts = []; overT = 0; ret = null; danger = false;
+  $("score").textContent = 0; showCombo();
 }
 function start() {
   reset(); tut = 0; target = null; tip("");
   grid = new Array(N * N).fill(0);
   hand = [newPiece(), newPiece(), newPiece()]; dealt = performance.now(); dealSound();
+  passed = false; $("best").textContent = "최고 " + best; $("best").classList.remove("hot"); FX.music(true, { bpm: 72, root: 220 });
   $("ov").hidden = true; playing = true;
 }
 function lesson() { reset(); tutStep(1); $("ov").hidden = true; playing = true }
@@ -389,8 +434,9 @@ function end() {
   playing = false; drag = null;
   const nb = score > best;
   if (nb) { best = score; try { localStorage.setItem("stamp3-best", best) } catch {} }
-  $("best").textContent = "최고 " + best;
+  $("best").textContent = "최고 " + best; $("best").classList.remove("hot");
   menu(`<p style="color:var(--on);font-weight:700">놓을 곳이 없어요</p><div class="big">${score}</div>${nb ? '<p class="nb">최고 기록</p>' : `<p>최고 ${best}</p>`}<button id="go">다시</button>`);
+  FX.count($("ov").querySelector(".big"), score);
   if (nb) [0, 2, 4, 5, 7].forEach((i, j) => FX.tone(FX.pent(i), { d: j === 4 ? .8 : .2, type: "triangle", vol: .16, at: j * .09 }));
 }
 

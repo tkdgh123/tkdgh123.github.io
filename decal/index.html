@@ -21,6 +21,16 @@ body { margin: 0; background: var(--bg); color: var(--ink); font: 500 16px/1.4 "
 .score { text-align: right; line-height: 1 }
 .score b { display: block; font: 700 44px/1 Hahmlet, serif; font-variant-numeric: tabular-nums; letter-spacing: -.02em }
 .score span { font-size: 13px; color: var(--muted) }
+.score span.hot { color: var(--red); font-weight: 700 }
+.timer { display: flex; align-items: center; gap: 12px }
+.timer .time { flex: 1 }
+.sec { min-width: 3.4em; text-align: right; font: 700 20px/1 Hahmlet, serif; font-variant-numeric: tabular-nums; transition: color .3s }
+.sec.low { color: var(--red) }
+.sec.pop { animation: pop .3s }
+.sec.hit { animation: jolt .6s }
+@keyframes jolt { 0%, 70% { color: var(--red) } 20% { transform: translateX(-6px) scale(1.25) } 50% { transform: translateX(5px) } 75% { transform: translateX(-2px) } }
+body::after { content: ""; position: fixed; inset: 0; pointer-events: none; box-shadow: inset 0 0 110px rgb(216 68 60 / .5); opacity: 0; transition: opacity .5s }
+body.low::after { opacity: 1; animation: beat .5s infinite alternate }
 .time { height: 6px; border-radius: 3px; background: #d6d4ce; overflow: hidden }
 .time i { display: block; height: 100%; width: 100%; background: var(--ink); transform-origin: left; border-radius: 3px }
 .time[data-s="2"] i { background: #f08a24 }
@@ -68,7 +78,7 @@ canvas { display: block; background: var(--paper); border-radius: 20px; box-shad
     <i class="mult" id="mult">×1</i>
     <div class="score"><b id="score">0</b><span id="best">최고 0</span></div>
   </header>
-  <div class="time" id="time"><i id="bar"></i></div>
+  <div class="timer"><div class="time" id="time"><i id="bar"></i></div><b class="sec" id="sec">120초</b></div>
   <div class="stage" id="stage"><div class="board">
     <canvas id="cv" aria-label="데칼코마니 판"></canvas>
     <div class="ov" id="ov">
@@ -85,7 +95,7 @@ const COLORS = ["#2f6be0", "#e4473f", "#21985f", "#8a55e8", "#f08a24", "#33312d"
 const $ = id => document.getElementById(id);
 const cv = $("cv"), ctx = cv.getContext("2d");
 let grid, born, S = 40, playing = false, score = 0, left = TIME, last = 0;
-let drag = null, axis = null, miss = 0, anims = [], stains = [], texts = [];
+let drag = null, axis = null, miss = 0, texts = [];
 let best = 0, mode = "easy";
 try { mode = localStorage.getItem("decal-mode") === "normal" ? "normal" : "easy" } catch {}
 
@@ -176,43 +186,75 @@ function axisEnds(ax) {
   return [L, ax.a - L, R, ax.a - R];
 }
 
+// 접기: 판의 작은 쪽 반이 실제로 넘어가 덮였다가(T_HIT) 펼쳐진다(T_END). 점수·판 계산은 바로, 보이는 건 덮이는 순간에
+const T_HIT = 190, T_END = 450;
+let fl = null, streak = 0, passed = false, seen = false;
+try { seen = !!localStorage.getItem("decal-seen") } catch {}
 function fold(ax, seg) {
-  const ps = pairsFor(ax, seg), now = performance.now();
-  if (ps.length < MIN) {
-    miss = now; missPairs = ps; left = Math.max(0, left - PENALTY);
-    const [x1, y1, x2, y2] = seg ? [...at(ax, seg[0]), ...at(ax, seg[1])] : axisEnds(ax), cx = Math.min(N - 1.5, Math.max(.5, (x1 + x2) / 2)), cy = Math.min(N - 1, Math.max(.5, (y1 + y2) / 2));
-    texts.push({ x: cx, y: cy, s: "-" + PENALTY + "초", red: true, t0: now });
-    FX.shake(.6);
-    FX.tone(190, { d: .24, type: "triangle", vol: .3, to: 70 }); FX.noise({ d: .16, vol: .18, f: 320, type: "lowpass" });
+  const ps = pairsFor(ax, seg), now = performance.now(), ok = ps.length >= MIN;
+  const [ox, oy, dx, dy] = dirOf(ax);
+  let pos = 0, neg = 0;
+  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { const v = (x - ox) * -dy + (y - oy) * dx; if (v > .01) pos++; else if (v < -.01) neg++ }
+  fl = { ax, seg, ok, ps, t0: now, side: pos <= neg ? 1 : -1, snap: grid.slice(), bg: getComputedStyle(document.body).backgroundColor };
+  FX.noise({ d: .19, vol: .22, f: 500, to: 2600, q: .8 });
+  if (!ok) { left = Math.max(0, left - PENALTY); streak = 0; return }
+  for (const [x, y, mx, my] of ps) grid[idx(x, y)] = grid[idx(mx, my)] = -1;
+  const n = ps.length;
+  fl.pts = 10 * n * 2 ** (n - 1) * mult;
+  score += fl.pts; streak++;
+}
+// 덮이는 순간: 맞은 짝은 물감이 터지며 점수 칸으로 날아가고, 틀리면 붉게 튕긴다
+function impact(now) {
+  const f = fl, [x1, y1, x2, y2] = f.seg ? [...at(f.ax, f.seg[0]), ...at(f.ax, f.seg[1])] : axisEnds(f.ax);
+  const lx = Math.min(N - 1.5, Math.max(.5, (x1 + x2) / 2)), ly = Math.min(N - 1, Math.max(.5, (y1 + y2) / 2));
+  FX.noise({ d: .12, vol: .35, f: 700, type: "lowpass" }); FX.tone(120, { d: .14, vol: .3, to: 55 });
+  if (!f.ok) {
+    miss = now; missAx = f.ax; missSeg = f.seg;
+    texts.push({ x: lx, y: ly, s: "-" + PENALTY + "초", red: true, t0: now });
+    FX.shake(.6); FX.tone(190, { d: .24, type: "triangle", vol: .3, to: 70 });
+    $("sec").classList.remove("hit"); void $("sec").offsetWidth; $("sec").classList.add("hit");
+    try { navigator.vibrate && navigator.vibrate(40) } catch {}
     return;
   }
-  for (const [x, y, mx, my, c] of ps) {
-    grid[idx(x, y)] = grid[idx(mx, my)] = -1;
-    anims.push({ x, y, mx, my, c, t0: now, seed: Math.random() * 1e4 });
+  lastAx = f.ax; lastSeg = f.seg; lastT = now;
+  if (!seen) { seen = true; try { localStorage.setItem("decal-seen", 1) } catch {} }
+  if (!passed && best > 0 && score > best) {
+    passed = true; $("best").textContent = "새 최고 기록"; $("best").classList.add("hot");
+    const b = $("best").getBoundingClientRect();
+    FX.burst(b.left + b.width / 2, b.top + b.height / 2, "#d8443c", { n: 16, v: 300, up: 60, size: 5, shape: "k", life: 900, g: 200 });
+    [4, 5, 7, 9].forEach((k, j) => FX.tone(FX.pent(k), { d: .25, type: "triangle", vol: .12, at: .25 + j * .08 }));
   }
-  const n = ps.length, pts = 10 * n * 2 ** (n - 1) * mult;
-  score += pts;
+  const n = f.ps.length, r = cv.getBoundingClientRect(), scr = (x, y) => [r.left + px(x), r.top + px(y)];
   let cx = 0, cy = 0;
-  ps.forEach(p => { cx += p[2]; cy += p[3] });
-  texts.push({ x: cx / n, y: cy / n, s: "+" + pts, sub: n + "쌍" + (mult > 1 ? " ×" + mult : ""), big: n >= 3, t0: now + 220 });
+  f.ps.forEach(([x, y, mx, my, c], i) => {
+    cx += mx; cy += my;
+    for (const [a, b] of [[x, y], [mx, my]]) {
+      blots.push({ x: a, y: b, c, t0: now, seed: Math.random() * 1e4 });
+      FX.burst(...scr(a, b), COLORS[c], { n: 6, v: 220 + 40 * n, size: S * .07, life: 650 });
+    }
+    FX.home(...scr(mx, my), COLORS[c], $("score"), { n: 2, size: S * .08, delay: 120 + i * 50, hit: () => FX.pop($("score")) });
+  });
+  cx /= n; cy /= n;
+  texts.push({ x: cx, y: cy, s: "+" + f.pts, sub: n + "쌍" + (mult > 1 ? " ×" + mult : "") + (streak > 1 ? " · 연속 " + streak : ""), big: n >= 3, t0: now });
+  rings.push({ x: cx, y: cy, n, t0: now });
+  // 쌍마다 물방울 소리가 한 음씩 올라감(배수·연속이 클수록 높게)
+  const base = (mult - 1) * 2 + Math.min(streak - 1, 4);
+  f.ps.forEach((p, i) => FX.tone(FX.pent(base + i) * 2, { d: .22, vol: .2, at: .03 + i * .07, to: FX.pent(base + i) }));
+  FX.shake(.12 + .13 * n); FX.punch(.012 * n);
+  if (n >= 3) {
+    FX.stop(90); flashT = now;
+    [0, 2, 4].forEach(k => FX.tone(FX.pent(base + n + k, 261.63), { d: .7, type: "triangle", vol: .1, at: .03 + n * .07 }));
+    FX.burst(...scr(cx, cy), "#f2c14e", { n: 10 + 3 * n, v: 420, up: 60, size: S * .09, shape: "k", life: 800, g: 300 });
+  }
   try { navigator.vibrate && navigator.vibrate(n >= 3 ? [20, 40, 30] : 15) } catch {}
-  rings.push({ x: cx / n, y: cy / n, n, t0: now + 230 });
-  // 종이 접는 바람 소리 → 쌍마다 물방울 소리가 한 음씩 올라감(점수 배수가 클수록 높게)
-  FX.noise({ d: .2, vol: .22, f: 500, to: 2600, q: .8 });
-  const base = (mult - 1) * 2;
-  ps.forEach((p, i) => FX.tone(FX.pent(base + i) * 2, { d: .22, vol: .2, at: .23 + i * .07, to: FX.pent(base + i) }));
-  if (n >= 3) [0, 2, 4].forEach(k => FX.tone(FX.pent(base + n + k, 261.63), { d: .7, type: "triangle", vol: .1, at: .23 + n * .07 }));
-  setTimeout(() => { FX.shake(.12 + .13 * n); FX.punch(.012 * n) }, 230);
-  $("score").classList.remove("pop"); void $("score").offsetWidth; $("score").classList.add("pop");
-  setTimeout(() => playing && refill(), 520);
 }
 
 // 그리기
 const px = v => (v + 0.5) * S;
-const easeIO = t => t < .5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2;
 const backOut = t => 1 + 2.7 * (t - 1) ** 3 + 1.7 * (t - 1) ** 2;
 function rnd(seed) { let s = seed; return () => (s = (s * 9301 + 49297) % 233280) / 233280 }
 function dot(x, y, r, c, a = 1) {
+  if (!(r > 0)) return;
   ctx.globalAlpha = a;
   ctx.fillStyle = c;
   ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill();
@@ -239,11 +281,26 @@ function line(ax, color, w, dash, seg) {
   ctx.beginPath(); ctx.moveTo(px(x1), px(y1)); ctx.lineTo(px(x2), px(y2)); ctx.stroke();
   ctx.restore();
 }
+// 접히는 쪽(종이 날개) 판별과 그 영역 경로. side 쪽 반, 보통 모드면 그은 구간 폭만
+function flapOf(f) {
+  const [ox, oy, dx, dy] = dirOf(f.ax), nx = -dy * f.side, ny = dx * f.side;
+  const u0 = f.seg ? f.seg[0] - .5 : -30, u1 = f.seg ? f.seg[1] + .5 : 30;
+  return {
+    ox, oy, nx, ny,
+    has: (x, y) => { const v = (x - ox) * nx + (y - oy) * ny, u = (x - ox) * dx + (y - oy) * dy; return v > .01 && u >= u0 && u <= u1 },
+    path: () => {
+      const P = (u, v) => [px(ox + u * dx + v * nx), px(oy + u * dy + v * ny)];
+      ctx.beginPath(); [P(u0, 0), P(u1, 0), P(u1, 30), P(u0, 30)].forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)); ctx.closePath();
+    },
+  };
+}
+const boardPath = () => { ctx.beginPath(); ctx.roundRect(0, 0, S * N, S * N, 20) };
 function draw(now) {
   ctx.clearRect(0, 0, S * N, S * N);
-  // 번진 자국: 접었던 자리에 옅게 남는다
-  stains = stains.filter(s => now - s.t0 < 2600);
-  for (const s of stains) blot(px(s.x), px(s.y), S * .42, COLORS[s.c], .13 * (1 - (now - s.t0) / 2600), s.seed);
+  const t = fl ? now - fl.t0 : 0, G = fl && t < T_HIT ? fl.snap : grid, F = fl && flapOf(fl);
+  if (fl && !fl.hit && t >= T_HIT) { fl.hit = true; impact(now) }
+  // 날개가 들린 자리는 바탕이 보인다
+  if (F) { ctx.save(); boardPath(); ctx.clip(); F.path(); ctx.fillStyle = fl.bg; ctx.fill(); ctx.restore() }
   if (playing && left < 10) {
     const f = left % 1;
     ctx.globalAlpha = .07 + .1 * f; ctx.fillStyle = "#d8443c"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
@@ -252,45 +309,58 @@ function draw(now) {
   }
   ctx.fillStyle = "#d9d6cf";
   for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
-    const c = grid[idx(x, y)];
+    if (F && F.has(x, y)) continue;
+    const c = G[idx(x, y)];
     if (c < 0) { ctx.beginPath(); ctx.arc(px(x), px(y), Math.max(1.5, S * .04), 0, 7); ctx.fill(); continue; }
-    const t = Math.min(1, Math.max(0, (now - born[idx(x, y)]) / 260));
-    if (t > 0) dot(px(x), px(y), S * .34 * backOut(t), COLORS[c]);
+    const b = Math.min(1, Math.max(0, (now - born[idx(x, y)]) / 260));
+    if (b > 0) dot(px(x), px(y), S * .34 * backOut(b), COLORS[c]);
     ctx.fillStyle = "#d9d6cf";
   }
+  if (F) {
+    // 날개: s=1 펼침 → -1 완전히 덮음. 뒤집힌 동안엔 종이 뒷면에 물감이 비쳐 보인다
+    const s = t < T_HIT ? 1 - 2 * (t / T_HIT) ** 2 : t < T_HIT + 50 ? -1 : Math.min(1, -1 + 2 * (1 - (1 - (t - T_HIT - 50) / (T_END - T_HIT - 50)) ** 3));
+    const k = 1 - s, on = F.nx * px(F.ox) + F.ny * px(F.oy);
+    ctx.save();
+    ctx.setTransform(D * (1 - k * F.nx * F.nx), -D * k * F.nx * F.ny, -D * k * F.nx * F.ny, D * (1 - k * F.ny * F.ny), D * k * on * F.nx, D * k * on * F.ny);
+    boardPath(); ctx.clip(); F.path(); ctx.clip();
+    ctx.fillStyle = s >= 0 ? "#fbfaf7" : "#f1ede5"; ctx.fillRect(-S, -S, S * (N + 2), S * (N + 2));
+    for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+      const c = G[idx(x, y)];
+      if (F.has(x, y)) { if (c >= 0) dot(px(x), px(y), S * .34, COLORS[c], s >= 0 ? 1 : .16); else if (s >= 0) { ctx.fillStyle = "#d9d6cf"; ctx.beginPath(); ctx.arc(px(x), px(y), Math.max(1.5, S * .04), 0, 7); ctx.fill() } }
+    }
+    ctx.fillStyle = !fl.ok && t > T_HIT ? `rgb(216 68 60 / ${.3 * (1 - Math.abs(s))})` : `rgb(40 30 20 / ${.16 * (1 - Math.abs(s))})`;
+    ctx.fillRect(-S, -S, S * (N + 2), S * (N + 2));
+    ctx.restore();
+    if (t > T_END) { const ok = fl.ok; fl = null; if (ok && playing) refill() }
+  }
+  blots = blots.filter(b => now - b.t0 < 380);
+  for (const b of blots) { const k = (now - b.t0) / 380; blot(px(b.x), px(b.y), S * .34 * (1 + 1.1 * Math.sqrt(k)), COLORS[b.c], 1 - k, b.seed) }
+  if (now - flashT < 260) { ctx.save(); boardPath(); ctx.clip(); ctx.fillStyle = `rgb(255 255 255 / ${.55 * (1 - (now - flashT) / 260)})`; ctx.fillRect(0, 0, S * N, S * N); ctx.restore() }
   // 10초 동안 가만히 있으면 가장 많이 겹치는 선이 반짝인다
-  if (playing && !drag && now - lastAct > HINT) {
+  if (playing && !drag && !fl && now - lastAct > (seen ? HINT : 2500)) {
     hint = hint || findHint();
     if (hint) line(hint.ax, `rgb(28 27 25 / ${.1 + .25 * (.5 + .5 * Math.sin(now / 200))})`, S * .16, null, hint.seg);
+    // 처음 하는 사람에겐 손가락이 그 선을 따라 그어 보인다
+    if (hint && !seen && hint.ax) {
+      const [ox, oy, dx, dy] = dirOf(hint.ax), ts = [];
+      for (let t = -12; t <= 12; t += .1) { const x = ox + t * dx, y = oy + t * dy; if (x > -.4 && y > -.4 && x < N - .6 && y < N - .6 && (!hint.seg || (t >= hint.seg[0] && t <= hint.seg[1]))) ts.push(t) }
+      if (ts.length) {
+      const k = (now / 1400) % 1, e = Math.min(1, k / .7), t = ts[0] + (ts[ts.length - 1] - ts[0]) * (1 - (1 - e) ** 2), [fx, fy] = [ox + t * dx, oy + t * dy];
+      ctx.globalAlpha = k < .8 ? 1 : (1 - k) * 5;
+      ctx.fillStyle = "rgb(28 27 25 / .22)"; ctx.beginPath(); ctx.arc(px(fx), px(fy), S * .32, 0, 7); ctx.fill();
+      ctx.strokeStyle = "#1c1b19"; ctx.lineWidth = 2; ctx.stroke();
+      ctx.globalAlpha = 1;
+      }
+    }
   }
   if (axis) line(axis, "rgb(28 27 25 / .5)", 3, [8, 8], segNow());
   if (now - miss < 320 && missAx) line(missAx, "rgb(216 68 60 / " + (1 - (now - miss) / 320) + ")", 4, null, missSeg);
-  if (now - miss < 600) for (const [x, y, mx, my] of missPairs) for (const [a, b] of [[x, y], [mx, my]]) {
-    ctx.strokeStyle = `rgb(216 68 60 / ${Math.abs(Math.sin((now - miss) / 600 * Math.PI * 3))})`; ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.arc(px(a), px(b), S * .44, 0, 7); ctx.stroke();
-  }
-  anims = anims.filter(a => now - a.t0 < 760);
-  for (const a of anims) {
-    const t = (now - a.t0) / 760;
-    if (t < .3) {
-      // 반을 접듯 한쪽 점이 거울 자리로 날아간다
-      const k = easeIO(t / .3);
-      dot(px(a.mx), px(a.my), S * .34, COLORS[a.c]);
-      dot(px(a.x + (a.mx - a.x) * k), px(a.y + (a.my - a.y) * k), S * .34 * (1 + .25 * Math.sin(k * Math.PI)), COLORS[a.c]);
-    } else {
-      if (!a.st) { a.st = 1; stains.push({ x: a.mx, y: a.my, c: a.c, t0: now, seed: a.seed }, { x: a.x, y: a.y, c: a.c, t0: now, seed: a.seed + 7 }); splash(a.mx, a.my, a.c, 5, now); splash(a.x, a.y, a.c, 5, now) }
-      const k = (t - .3) / .7;
-      for (const [x, y, sd] of [[a.mx, a.my, a.seed], [a.x, a.y, a.seed + 7]])
-        blot(px(x), px(y), S * .34 * (1 + 1.1 * Math.sqrt(k)), COLORS[a.c], 1 - k, sd);
-    }
-  }
   rings = rings.filter(r => now - r.t0 < 600);
   for (const r of rings) {
     const k = (now - r.t0) / 600; if (k < 0) continue;
     ctx.strokeStyle = `rgb(28 27 25 / ${.35 * (1 - k)})`; ctx.lineWidth = S * .08 * (1 - k) + 1;
     ctx.beginPath(); ctx.arc(px(r.x), px(r.y), S * (.4 + (1 + r.n * .8) * Math.sqrt(k)), 0, 7); ctx.stroke();
   }
-  drawParts(now);
   if (now - stageT < 900) {
     const k = (now - stageT) / 900;
     ctx.save(); ctx.beginPath(); ctx.roundRect(0, 0, S * N, S * N, 20); ctx.clip();
@@ -312,25 +382,8 @@ function draw(now) {
     ctx.globalAlpha = 1;
   }
 }
-// 튀는 물감 방울: 칸 단위 좌표, 시간으로 위치를 바로 계산
-let parts = [], rings = [], stageT = -1e4, shown = 0, axKey = "";
-function splash(x, y, c, k, now, v0 = 4, up = 1.5, r) {
-  for (let i = 0; i < k; i++) {
-    const a = Math.random() * 6.28, v = v0 * (.5 + Math.random());
-    parts.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - up, r: r || .05 + Math.random() * .1, c, t0: now, life: 450 + Math.random() * 450 });
-  }
-}
-function drawParts(now) {
-  parts = parts.filter(p => now - p.t0 < p.life);
-  for (const p of parts) {
-    const t = (now - p.t0) / 1000; if (t < 0) continue;
-    const tau = (1 - Math.exp(-3 * t)) / 3, k = (now - p.t0) / p.life;
-    ctx.globalAlpha = 1 - k * k; ctx.fillStyle = COLORS[p.c];
-    ctx.beginPath(); ctx.arc(px(p.x + p.vx * tau), px(p.y + p.vy * tau + 5 * t * t), S * p.r * (1 - .5 * k), 0, 7); ctx.fill();
-  }
-  ctx.globalAlpha = 1;
-}
-let missAx = null, missSeg = null, missPairs = [], lastAx = null, lastSeg = null, lastT = 0;
+let blots = [], rings = [], stageT = -1e4, flashT = -1e4, shown = 0, axKey = "", D = 1;
+let missAx = null, missSeg = null, lastAx = null, lastSeg = null, lastT = 0;
 let cur = null, lastAct = 0, hint = null;
 function segNow() {
   if (mode === "easy" || !axis || !cur) return null;
@@ -352,30 +405,38 @@ function stage(m, fx) {
   document.body.dataset.s = $("time").dataset.s = $("mult").dataset.s = m;
   $("mult").textContent = "×" + m;
   if (!fx) return;
+  FX.music(true, { bpm: [0, 80, 100, 120][m] });
   $("mult").classList.remove("up"); void $("mult").offsetWidth; $("mult").classList.add("up");
   texts.push({ x: (N - 1) / 2, y: 1.2, s: "점수 ×" + m, big: true, t0: stageT = performance.now() });
   FX.shake(.45);
+  const b = $("mult").getBoundingClientRect();
+  FX.burst(b.left + b.width / 2, b.top + b.height / 2, m === 3 ? "#d8443c" : "#f08a24", { n: 18, v: 380, up: 80, size: 5, shape: "s", life: 800 });
   [0, 1, 2, 3].forEach(i => FX.tone(FX.pent(m * 2 + i, 392), { d: .3, type: "triangle", vol: .16, at: i * .07 }));
   FX.noise({ d: .5, vol: .08, f: 4000, type: "highpass", at: .2 });
   try { navigator.vibrate && navigator.vibrate([30, 60, 30]) } catch {}
 }
 function loop(now) {
   if (playing) {
-    if (last) { const dt = (now - last) / 1000; left -= dt; el += dt; }
+    if (last) { const dt = Math.min(.1, (now - last) / 1000); left -= dt; el += dt; }
     const m = el < 40 ? 1 : el < 80 ? 2 : 3;
     if (m !== mult) stage(m, true);
-    if (left < 10 && Math.ceil(left) !== tick) {
-      tick = Math.ceil(left);
-      FX.tone(left < 5 ? 1320 : 990, { d: .07, type: "triangle", vol: left < 5 ? .14 : .07 });
-      if (left < 5) try { navigator.vibrate && navigator.vibrate(12) } catch {}
+    const sec = Math.max(0, Math.ceil(left));
+    if (sec !== tick) {
+      tick = sec; $("sec").textContent = sec + "초";
+      if (left < 10 && sec > 0) {
+        FX.music(true, { bpm: 150 });
+        $("sec").classList.remove("hit"); FX.pop($("sec"));
+        FX.tone(70, { d: .12, vol: .4, to: 48 }); FX.tone(62, { d: .1, vol: .25, to: 45, at: .16 });
+        if (left < 5) { FX.tone(1320, { d: .07, type: "triangle", vol: .12 }); try { navigator.vibrate && navigator.vibrate(12) } catch {} }
+      }
     }
     if (left <= 0) end();
     $("bar").style.transform = `scaleX(${Math.max(0, left) / TIME})`;
-    $("time").classList.toggle("low", left < 10);
+    $("time").classList.toggle("low", left < 10); $("sec").classList.toggle("low", left < 10); document.body.classList.toggle("low", playing && left < 10);
   }
   if (shown < score) { shown += Math.ceil((score - shown) * .2); $("score").textContent = shown }
   last = now;
-  draw(now);
+  if (!FX.stopped()) draw(now);
   requestAnimationFrame(loop);
 }
 
@@ -385,12 +446,12 @@ function size() {
   const d = devicePixelRatio || 1;
   cv.width = side * d; cv.height = side * d;
   cv.style.width = cv.style.height = side + "px";
-  ctx.setTransform(d, 0, 0, d, 0, 0);
+  ctx.setTransform(d, 0, 0, d, 0, 0); D = d;
 }
 addEventListener("resize", size);
 
 const cell = e => { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) / S - .5, (e.clientY - r.top) / S - .5] };
-cv.addEventListener("pointerdown", e => { if (!playing) return; cv.setPointerCapture(e.pointerId); drag = cur = cell(e); axis = null; axKey = ""; lastAct = performance.now(); hint = null });
+cv.addEventListener("pointerdown", e => { if (!playing || fl) return; cv.setPointerCapture(e.pointerId); drag = cur = cell(e); axis = null; axKey = ""; lastAct = performance.now(); hint = null });
 cv.addEventListener("pointermove", e => {
   if (!drag) return;
   cur = cell(e); axis = snap(drag, cur);
@@ -398,11 +459,7 @@ cv.addEventListener("pointermove", e => {
   if (k !== axKey) { axKey = k; if (k) FX.tone(2000, { d: .025, type: "triangle", vol: .05 }) }
 });
 const up = () => {
-  if (drag && axis && playing) {
-    const seg = segNow(), ps = pairsFor(axis, seg).length;
-    if (ps >= MIN) { lastAx = axis; lastSeg = seg; lastT = performance.now() } else { missAx = axis; missSeg = seg }
-    fold(axis, seg);
-  }
+  if (drag && axis && playing) fold(axis, segNow());
   drag = null; axis = null; lastAct = performance.now();
 };
 cv.addEventListener("pointerup", up);
@@ -410,23 +467,26 @@ cv.addEventListener("pointercancel", () => { drag = null; axis = null });
 
 // 쉬움: 선이 판 끝까지 접힘 · 보통: 그은 만큼만 접힘. 최고 점수는 모드마다
 const NAME = { easy: "쉬움", normal: "보통" }, KEY = { easy: "decal-best", normal: "decal-best-normal" };
-const loadBest = () => { best = 0; try { best = +localStorage.getItem(KEY[mode]) || 0 } catch {} $("best").textContent = NAME[mode] + " 최고 " + best };
+const loadBest = () => { best = 0; try { best = +localStorage.getItem(KEY[mode]) || 0 } catch {} $("best").textContent = NAME[mode] + " 최고 " + best; $("best").classList.remove("hot") };
 const modes = () => `<div class="modes">${["easy", "normal"].map(m => `<button data-m="${m}" class="${m === mode ? "on" : ""}">${NAME[m]}<small>${m === "easy" ? "선이 판 끝까지" : "그은 만큼만"}</small></button>`).join("")}</div>`;
 const bind = () => $("ov").querySelectorAll("[data-m]").forEach(b => b.onclick = () => start(b.dataset.m));
 function start(m) {
   mode = m; try { localStorage.setItem("decal-mode", m) } catch {}
   loadBest();
-  newBoard(); score = shown = 0; left = TIME; parts = []; rings = []; last = 0; anims = []; stains = []; texts = []; hint = null; lastAct = performance.now(); el = 0; stage(1);
+  newBoard(); score = shown = 0; left = TIME; blots = []; rings = []; fl = null; streak = 0; tick = 0; last = 0; texts = []; hint = null; lastAct = performance.now(); el = 0; stage(1);
   $("score").textContent = 0;
   $("ov").hidden = true; playing = true;
   [0, 1, 2, 3, 4].forEach(i => FX.tone(FX.pent(i) * 2, { d: .18, vol: .1, at: .05 + i * .05, to: FX.pent(i) }));
+  passed = false; FX.music(true, { bpm: 80, root: 261.63 });
 }
 function end() {
-  playing = false; left = 0; drag = null; axis = null; stage(1);
+  playing = false; left = 0; drag = null; axis = null; stage(1); document.body.classList.remove("low"); $("sec").classList.remove("low");
   const now = performance.now(), nb = score > best;
-  grid.forEach((c, i) => { if (c >= 0) splash(i % N, i / N | 0, c, 1, now + Math.random() * 250, 1.5, 2, .32) });
-  grid.fill(-1); anims = []; texts = [];
-  FX.shake(.5);
+  // 남은 점들이 판 밖으로 흘러 떨어진다
+  const r = cv.getBoundingClientRect();
+  grid.forEach((c, i) => { if (c >= 0) FX.burst(r.left + px(i % N), r.top + px(i / N | 0), COLORS[c], { n: 1, v: 90, up: 40, size: S * .3, life: 1000, g: 1400, delay: Math.random() * 250 }) });
+  grid.fill(-1); fl = null; texts = []; blots = [];
+  FX.shake(.5); FX.music(false);
   [3, 2, 0].forEach((i, j) => FX.tone(FX.pent(i, 392), { d: .35, type: "triangle", vol: .16, at: j * .13 }));
   if (nb) { best = score; try { localStorage.setItem(KEY[mode], best) } catch {} }
   $("best").textContent = NAME[mode] + " 최고 " + best;
@@ -434,6 +494,7 @@ function end() {
     $("ov").innerHTML = `<p>점수</p><div class="big">${score}</div>${nb ? '<p class="nb">최고 기록</p>' : `<p>${NAME[mode]} 최고 ${best}</p>`}${modes()}`;
     bind();
     $("ov").hidden = false;
+    FX.count($("ov").querySelector(".big"), score);
     if (nb) [0, 2, 4, 5, 7].forEach((i, j) => FX.tone(FX.pent(i), { d: j === 4 ? .8 : .2, type: "triangle", vol: .16, at: j * .09 }));
   }, 900);
 }
