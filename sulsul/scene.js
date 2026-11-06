@@ -1,7 +1,7 @@
 // 하루 살기: 영어로 사는 이틀. 장면마다 그림 위에서 엿듣기 → 내 차례 → 수첩.
 // 덩어리(chunk) = [영어, 뜻, 왜 이렇게 말하는지]
 const CAFE = {
-  who: "Leo", whoKo: "바리스타", pos: "62% 50%", voices: { them: "m", guest: "f" },
+  who: "Leo", whoKo: "바리스타", pos: "62% 50%", voices: { them: "m", guest: "f" }, guestKo: "다음 손님",
   // 움직이는 겹: 바리스타를 지운 배경 + 팔 없는 몸(숨 쉬듯) + 팔 한 층(카운터 위 팔꿈치 축으로 인사) + 앞 카운터 선반·메뉴판. 좌표는 원본 2752×1536 기준
   layers: { w: 2752, h: 1536, plate: "img/scenes/cafe/plate.webp", box: [1560, 340, 430, 455], body: "img/scenes/cafe/body.png", hand: "img/scenes/cafe/hand.png", pivot: [1630, 720], front: [["img/scenes/cafe/counter.png", 1560, 716, 90, 54], ["img/scenes/cafe/menu.png", 1800, 652, 172, 144]],
     // 배경도 살짝: 햇살이 밝아졌다 흐려지고, 화분이 흔들리고, 김이 피어오른다 (Gemini로 각각 지운·더한 그림에서 떼어 냄)
@@ -23,24 +23,137 @@ const CAFE = {
     { say: "Here you go! Would you like the receipt?", want: "영수증은 괜찮다고 거절하기", need: [["거절", ["no", "i'm good", "im good", "i'm fine", "im fine", "that's ok", "thats ok", "it's okay", "its okay", "nope"]]], hint: ["I'm ~, thanks.", "No, I'm…", "No, I'm good. Thanks!"], model: "No, I'm good. Thanks!", chunk: ["I'm good", "괜찮아요 (거절)", "No thanks보다 가볍고 자연스러운 거절이에요."] }
   ]
 };
+const AIRPORT = {
+  who: "Officer Reed", whoKo: "입국 심사관", pos: "55% 50%", voices: { them: "m2", guest: "f" }, guestKo: "다음 여행객",
+  turns: [
+    { say: "Good morning. May I see your passport, please?", want: "여권을 건네며 '여기 있어요' 하기", need: [["건네기", ["here you go", "here it is", "here's my passport", "here is my passport", "here you are", "sure"]]], hint: ["Here you ~.", "Sure, here you…", "Sure, here you go."], model: "Sure, here you go.", chunk: ["Here you go", "여기 있어요 (건넬 때)", "물건을 건넬 때 가장 흔한 말이에요."] },
+    { say: "What's the purpose of your visit?", want: "여행 왔다고 말하기", need: [["여행", ["trip", "travel", "traveling", "travelling", "vacation", "holiday", "sightseeing", "tourism", "tourist"]]], hint: ["I'm here for a ~.", "I'm here for a…", "I'm here for a one-week trip."], model: "I'm here for a one-week trip." },
+    { say: "How long will you be staying?", want: "일주일 있을 거라고 말하기", need: [["일주일", ["week", "seven days", "7 days"]]], hint: ["For a ~.", "For a…", "For a week."], model: "For a week." },
+    { say: "And where will you be staying?", want: "시내 호텔에 묵는다고 말하기", need: [["호텔", ["hotel"]]], hint: ["At a ~.", "At a hotel…", "At a hotel downtown."], model: "At a hotel downtown." },
+    { say: "Alright, you're all set. Enjoy your stay!", want: "고맙다고 인사하기", need: [["고마움", ["thank", "thanks"]]], hint: ["Thank ~!", "Thank you…", "Thank you so much!"], model: "Thank you so much!" }
+  ],
+  overhear: [
+    ["them", "Next, please. Passport?"],
+    ["guest", "Here you go."],
+    ["them", "What brings you here?", [["What brings you here?", "여긴 무슨 일로 오셨어요?", "Why are you here?보다 부드러운 질문이에요."]]],
+    ["guest", "I'm here on business.", [["on business", "출장으로", "여행이면 on vacation, 일이면 on business라고 해요."]]],
+    ["them", "How long are you staying?"],
+    ["guest", "Just three days."],
+    ["them", "Enjoy your stay.", [["Enjoy your stay", "좋은 시간 보내세요", "공항과 호텔에서 자주 듣는 인사예요."]]]
+  ]
+};
+const WAY = {
+  who: "Tom", whoKo: "지나가던 사람", pos: "50% 50%", voices: { them: "m", guest: "f2" }, guestKo: "다른 여행객",
+  turns: [
+    { say: "Hi! You look a little lost. Need some help?", want: "역에 어떻게 가는지 묻기", need: [["역", ["station"]], ["가는 법", ["how", "where", "way", "get to"]]], hint: ["How do I get to ~?", "How do I get to the…", "How do I get to the station?"], model: "Yes! How do I get to the station?", chunk: ["How do I get to ~?", "~에 어떻게 가요?", "길 물을 때 가장 기본이 되는 말이에요."] },
+    { say: "Sure. Go straight and turn left at the bank.", want: "여기서 먼지 묻기", need: [["먼지", ["far"]]], hint: ["Is it ~ from here?", "Is it far…", "Is it far from here?"], model: "Is it far from here?" },
+    { say: "Not really. About ten minutes on foot.", want: "그럼 걸어가겠다고 말하기", need: [["걷기", ["walk", "walking", "on foot"]]], hint: ["I'll ~ then.", "Great, I'll walk…", "Great, I'll walk then."], model: "Great, I'll walk then." },
+    { say: "It's on your right, next to a café. You can't miss it.", want: "정말 도움이 됐다고 고마워하기", need: [["고마움", ["thank", "thanks", "appreciate"]]], hint: ["Thanks, that really ~.", "Thanks, that really…", "Thanks, that really helps."], model: "Thanks, that really helps." }
+  ],
+  overhear: [
+    ["guest", "Excuse me, is there a pharmacy near here?", [["Excuse me", "실례합니다", "모르는 사람에게 말을 걸 때 첫마디예요."], ["near here", "이 근처에", "around here라고 해도 돼요."]]],
+    ["them", "Yes, just around the corner.", [["around the corner", "모퉁이만 돌면", "아주 가깝다는 뜻이에요."]]],
+    ["guest", "Around the corner? Great, thanks!"],
+    ["them", "No problem."]
+  ]
+};
+const HOTEL = {
+  who: "Emma", whoKo: "호텔 직원", pos: "50% 50%", voices: { them: "f", guest: "m2" }, guestKo: "다른 손님",
+  turns: [
+    { say: "Hi, welcome! Are you checking in?", want: "네, 김으로 예약했다고 말하기", need: [["예약", ["reservation", "booked", "booking"]]], hint: ["I have a reservation under ~.", "I have a reservation…", "Yes, I have a reservation under Kim."], model: "Yes, I have a reservation under Kim.", chunk: ["under Kim", "김이라는 이름으로", "예약한 이름을 말할 때 under를 써요."] },
+    { say: "Great. Could I see your ID, please?", want: "여권을 건네기", need: [["건네기", ["here", "passport", "sure"]]], hint: ["Sure, here's my ~.", "Sure, here's my…", "Sure, here's my passport."], model: "Sure, here's my passport." },
+    { say: "Thank you. You're in room 512. Breakfast is from seven to ten.", want: "와이파이 비밀번호 묻기", need: [["와이파이", ["wifi", "wi fi", "wi-fi", "internet"]]], hint: ["What's the ~ password?", "What's the Wi-Fi…", "What's the Wi-Fi password?"], model: "What's the Wi-Fi password?" },
+    { say: "It's on your key card. Anything else?", want: "조금 늦게 체크아웃해도 되는지 묻기", need: [["늦게", ["late", "later"]], ["체크아웃", ["check out", "checkout"]]], hint: ["Could I ~ a little late?", "Could I check out…", "Could I check out a little late?"], model: "Could I check out a little late?" },
+    { say: "Sure, one o'clock is fine.", want: "좋다고 고마워하기", need: [["고마움", ["thank", "thanks", "perfect", "great"]]], hint: ["~, thank you!", "Perfect, thank…", "Perfect, thank you!"], model: "Perfect, thank you!" }
+  ],
+  overhear: [
+    ["guest", "Hi, I'd like to check in, please.", [["I'd like to", "~하고 싶어요", "I want to보다 공손해요."]]],
+    ["them", "Sure. May I have your name?"],
+    ["guest", "It's Lee. L-E-E.", [["L-E-E", "철자 불러 주기", "이름은 철자를 불러 주면 실수가 없어요."]]],
+    ["them", "Here's your key card. Enjoy your stay!", [["key card", "카드 열쇠", "호텔 방 열쇠를 이렇게 불러요."]]]
+  ]
+};
+const DINNER = {
+  who: "Sam", whoKo: "식당 직원", pos: "50% 50%", voices: { them: "m2", guest: "f" }, guestKo: "옆 테이블 손님",
+  turns: [
+    { say: "Good evening! Table for one?", want: "네, 혼자라고 말하기", need: [["혼자", ["one", "just me", "myself", "yes", "yeah", "yep"]]], hint: ["Yes, just ~.", "Yes, just…", "Yes, just me."], model: "Yes, just me." },
+    { say: "Here's the menu. Are you ready to order?", want: "뭘 추천하는지 묻기", need: [["추천", ["recommend", "recommendation", "popular", "best", "good here"]]], hint: ["What do you ~?", "What do you…", "What do you recommend?"], model: "What do you recommend?", chunk: ["What do you recommend?", "뭘 추천하세요?", "메뉴를 모를 때 가장 쓸모 있는 말이에요."] },
+    { say: "The spicy chicken pasta is really popular.", want: "그걸로 하되 덜 맵게 해 달라고 하기", need: [["덜 맵게", ["less spicy", "not too spicy", "not spicy", "mild", "less hot"]]], hint: ["Could I get that, but ~?", "Could I get that, but less…", "Could I get that, but less spicy?"], model: "Could I get that, but less spicy?" },
+    { say: "Sure! Anything to drink?", want: "물만 달라고 하기", need: [["물", ["water"]]], hint: ["Just ~, please.", "Just water…", "Just water, please."], model: "Just water, please." },
+    { say: "How was everything?", want: "맛있었다고, 남은 걸 싸 달라고 하기", need: [["포장", ["box", "to go", "take", "wrap", "pack"]]], hint: ["Could I get a ~ for this?", "It was great! Could I get a…", "It was great! Could I get a box for this?"], model: "It was great! Could I get a box for this?", chunk: ["a box", "포장 용기", "남은 음식을 싸 달라고 할 때 box라고 해요."] }
+  ],
+  overhear: [
+    ["guest", "Excuse me, could we get the check, please?", [["the check", "계산서", "식당에서 계산서는 bill보다 check를 더 많이 써요."]]],
+    ["them", "Of course. Together or separate?", [["separate", "따로따로", "각자 계산할 때 Separate, please."]]],
+    ["guest", "Separate, please."],
+    ["them", "No problem. I'll be right back.", [["I'll be right back", "금방 올게요", "잠깐 자리를 비울 때 쓰는 말이에요."]]]
+  ]
+};
+const MEETUP = {
+  who: "Sara", whoKo: "모임에서 처음 만난 사람", pos: "50% 50%", voices: { them: "f2", guest: "m" }, guestKo: "옆 사람",
+  turns: [
+    { say: "Hi! I don't think we've met. I'm Sara.", want: "반갑다고 하고 내 이름 말하기", need: [["내 소개", ["i'm", "i am", "my name"]]], hint: ["Hi Sara, I'm ~. Nice to meet you.", "Hi Sara, I'm…", "Hi Sara, I'm {name}. Nice to meet you."], model: "Hi Sara, I'm {name}. Nice to meet you." },
+    { say: "Nice to meet you too! So, what do you do?", want: "대학생이고 컴퓨터를 공부한다고 말하기", need: [["학생·공부", ["student", "study", "studying", "college", "university", "major"]]], hint: ["I'm a ~. I study ~.", "I'm a college student…", "I'm a college student. I study computer science."], model: "I'm a college student. I study computer science." },
+    { say: "Oh, cool! What do you do for fun?", want: "요즘 게임에 푹 빠져 있다고 말하기", need: [["빠져 있다", ["into", "love", "like", "enjoy", "obsessed"]]], hint: ["I'm really ~ games these days.", "I'm really into…", "I'm really into games these days."], model: "I'm really into games these days.", chunk: ["be into ~", "~에 빠져 있다", "like보다 '요즘 푹 빠졌다'는 느낌이에요."] },
+    { say: "No way, me too! We should play sometime.", want: "좋다고, 연락처 물어보기", need: [["연락처", ["number", "contact", "instagram", "insta", "kakao", "discord"]]], hint: ["Sounds good! Can I get your ~?", "Sounds good! Can I get your…", "Sounds good! Can I get your number?"], model: "Sounds good! Can I get your number?" }
+  ],
+  overhear: [
+    ["them", "So, where are you from?"],
+    ["guest", "I'm from Toronto. How about you?", [["How about you?", "너는?", "질문을 상대에게 돌려줄 때 써요."]]],
+    ["them", "I grew up in Busan.", [["grew up in", "~에서 자랐어요", "고향을 말할 때 자연스러운 말이에요."]]],
+    ["guest", "Oh, I've always wanted to go there!", [["I've always wanted to", "늘 ~하고 싶었어요", "관심을 보일 때 좋은 말이에요."]]]
+  ]
+};
+const PHARMACY = {
+  who: "Grace", whoKo: "약사", pos: "50% 50%", voices: { them: "f", guest: "m2" }, guestKo: "다른 손님",
+  turns: [
+    { say: "Hi there. What can I help you with?", want: "머리가 많이 아프다고 말하기", need: [["두통", ["headache", "head hurts", "head is killing", "my head"]]], hint: ["I have a bad ~.", "I have a bad…", "I have a bad headache."], model: "I have a bad headache." },
+    { say: "Oh no. How long have you had it?", want: "어제부터라고 말하기", need: [["어제부터", ["yesterday"]]], hint: ["Since ~.", "Since…", "Since yesterday."], model: "Since yesterday.", chunk: ["since yesterday", "어제부터", "언제부터 계속됐는지는 since로 말해요."] },
+    { say: "Are you allergic to anything?", want: "알레르기는 없다고 말하기", need: [["없다", ["no", "not", "none", "don't", "nothing"]]], hint: ["No, I'm not allergic to ~.", "No, I'm not…", "No, I'm not allergic to anything."], model: "No, I'm not allergic to anything.", chunk: ["allergic", "알레르기가 있는", "'알레르기'가 아니라 '얼러직'에 가깝게 읽어요."] },
+    { say: "Okay. Take two of these every six hours.", want: "밥 먹고 먹어야 하는지 묻기", need: [["식후", ["after", "meal", "meals", "food", "eat", "eating"]]], hint: ["Should I take them ~ meals?", "Should I take them…", "Should I take them after meals?"], model: "Should I take them after meals?" }
+  ],
+  overhear: [
+    ["guest", "Do you have something for a sore throat?", [["something for ~", "~에 먹는 약", "약 이름을 몰라도 이렇게 물으면 돼요."], ["sore throat", "목 아픔", "목이 따끔따끔 아플 때 써요."]]],
+    ["them", "Sure. Try these lozenges.", [["lozenges", "목캔디", "목이 아플 때 녹여 먹는 약이에요."]]],
+    ["guest", "Great. How many a day?"],
+    ["them", "No more than six a day."]
+  ]
+};
+const HELPWAY = {
+  who: "Ben", whoKo: "길 잃은 여행자", pos: "50% 50%", voices: { them: "m", guest: "f2" }, guestKo: "길을 아는 사람",
+  turns: [
+    { say: "Excuse me, do you know where the museum is?", want: "네, 이 길로 쭉 가라고 말하기", need: [["쭉", ["straight"]]], hint: ["Sure, go ~ down this street.", "Sure, go straight…", "Sure, go straight down this street."], model: "Sure, go straight down this street." },
+    { say: "Straight down this street. Okay!", want: "두 번째 신호등에서 왼쪽으로 돌라고 말하기", need: [["왼쪽", ["left"]]], hint: ["Then turn ~ at the second light.", "Then turn left…", "Then turn left at the second light."], model: "Then turn left at the second light.", chunk: ["at the second light", "두 번째 신호등에서", "길 안내는 '어디에서(at) 어느 쪽으로'를 한 쌍으로 말해요."] },
+    { say: "Is it far from here?", want: "아니, 5분쯤이라고 말하기", need: [["5분", ["five", "5"]]], hint: ["No, it's about ~ minutes.", "No, it's about…", "No, it's about five minutes."], model: "No, it's about five minutes." },
+    { say: "Thank you so much!", want: "천만에, 박물관 잘 보라고 인사하기", need: [["인사", ["welcome", "no problem", "enjoy", "have a good", "have fun", "no worries"]]], hint: ["No problem. ~ the museum!", "No problem. Enjoy…", "No problem. Enjoy the museum!"], model: "No problem. Enjoy the museum!" }
+  ],
+  overhear: [
+    ["them", "Excuse me, where's the nearest subway station?"],
+    ["guest", "It's on your right, next to the bank.", [["on your right", "오른쪽에", "on your left는 왼쪽에예요."], ["next to", "~ 바로 옆에", "위치를 말할 때 가장 많이 써요."]]],
+    ["them", "Next to the bank. Got it!", [["Got it", "알겠어요", "이해했다고 짧게 말할 때 써요."]]],
+    ["guest", "You can't miss it.", [["You can't miss it", "금방 찾을 거예요", "아주 찾기 쉽다는 뜻이에요."]]]
+  ]
+};
+
 const DAYS = [
   { title: "1일째 · 도착한 날", scenes: [
-    { id: "airport", time: "11:00", title: "공항 입국" },
-    { id: "way", time: "13:00", title: "숙소 가는 길 묻기" },
-    { id: "hotel", time: "15:00", title: "호텔 체크인" },
-    { id: "dinner", time: "19:00", title: "저녁 식당 주문" },
+    { id: "airport", time: "11:00", title: "공항 입국", img: "img/scenes/airport.webp", ...AIRPORT },
+    { id: "way", time: "13:00", title: "숙소 가는 길 묻기", img: "img/scenes/way.webp", ...WAY },
+    { id: "hotel", time: "15:00", title: "호텔 체크인", img: "img/scenes/hotel.webp", ...HOTEL },
+    { id: "dinner", time: "19:00", title: "저녁 식당 주문", img: "img/scenes/dinner.webp", ...DINNER },
     { id: "night1", time: "22:00", title: "친구에게 오늘 이야기", me: true }
   ] },
   { title: "2일째 · 평범한 하루", scenes: [
     { id: "cafe", time: "08:00", title: "아침 카페", img: "img/scenes/cafe-gemini.webp", ...CAFE },
-    { id: "meetup", time: "10:00", title: "모임에서 자기소개" },
-    { id: "pharmacy", time: "13:00", title: "약국" },
-    { id: "helpway", time: "17:00", title: "길에서 도와주기" },
+    { id: "meetup", time: "10:00", title: "모임에서 자기소개", img: "img/scenes/meetup.webp", ...MEETUP },
+    { id: "pharmacy", time: "13:00", title: "약국", img: "img/scenes/pharmacy.webp", ...PHARMACY },
+    { id: "helpway", time: "17:00", title: "길에서 도와주기", ...HELPWAY, img: null },
     { id: "night2", time: "22:00", title: "친구에게 오늘 이야기", me: true }
   ] }
 ];
 const SCENE_LIST = DAYS.flatMap(d => d.scenes);
-const ready = sc => !!sc.turns || sc.me;
+const nm = s => String(s).replace(/\{name\}/g, S.profile.name || "Chang");
+const ready = sc => (!!sc.turns && !!sc.img) || sc.me;
 // 시간에 따라 하늘색이 바뀐다 (그림이 아직 없는 장면의 바탕)
 const skyOf = t => { const h = +t.slice(0, 2); return h < 10 ? "#f3ead2" : h < 15 ? "#dfe9e2" : h < 19 ? "#f2d6a8" : "#1f3a35" };
 
@@ -78,7 +191,7 @@ function openScene(sc) {
 // 장면 그림: 겹이 있으면 사람만 살짝 움직이고, 없으면 그림 한 장
 function buildStage(sc) {
   const L2 = sc.layers, el = $("scimg");
-  if (!L2) { el.innerHTML = `<img src="${sc.img}" alt="">`; el.dataset.w = 16; el.dataset.h = 10; return fitStage() }
+  if (!L2) { el.innerHTML = `<img src="${sc.img}" alt="">`; el.dataset.w = 16; el.dataset.h = 9; return fitStage() }
   const pc = (v, t) => (100 * v / t) + "%", [bx, by, bw, bh] = L2.box;
   el.dataset.w = L2.w; el.dataset.h = L2.h;
   el.innerHTML = `<img src="${L2.plate}" alt="">
@@ -108,13 +221,13 @@ function phase(n) {
 const chunked = (en, chunks = []) => chunks.reduce((h, [c], i) => h.replace(new RegExp(c.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"), m => `<span class="chunk" role="button" tabindex="0" data-c="${i}">${m}</span>`), esc(en));
 function bubble(who, en, ko) {
   const b = $("scbubble"); b.hidden = false; b.className = "bubble2 " + who;
-  b.innerHTML = `<small>${who === "them" ? `${SC.sc.who} · ${SC.sc.whoKo}` : who === "guest" ? "다음 손님" : "나"}</small><span lang="en">${esc(en)}</span>${ko ? `<em>${esc(ko)}</em>` : ""}`;
+  b.innerHTML = `<small>${who === "them" ? `${SC.sc.who} · ${SC.sc.whoKo}` : who === "guest" ? (SC.sc.guestKo || "다른 사람") : "나"}</small><span lang="en">${esc(en)}</span>${ko ? `<em>${esc(ko)}</em>` : ""}`;
   b.style.animation = "none"; void b.offsetWidth; b.style.animation = "";
 }
-// 2. 듣기: 내가 먼저 말해 본 뒤, 다른 손님이 같은 주문을 하는 걸 듣는다. 밑줄 덩어리를 누르면 뜻과 이유
+// 2. 듣기: 내가 먼저 말해 본 뒤, 같은 자리에서 다른 사람이 하는 말을 듣는다. 밑줄 덩어리를 누르면 뜻과 이유
 async function overhear() {
   const lines = SC.sc.overhear;
-  $("scpanel").innerHTML = `<p class="lead2">이번엔 다른 손님이 주문하는 걸 들어요. 내가 막혔던 말이 어떻게 나오는지 들어 보세요. 밑줄 친 말을 누르면 뜻이 나와요.</p><ol class="script" id="script"></ol>
+  $("scpanel").innerHTML = `<p class="lead2">이번엔 같은 자리에서 다른 사람이 하는 말을 들어요. 밑줄 친 말을 누르면 뜻이 나와요.</p><ol class="script" id="script"></ol>
     <div class="scfoot"><button class="btn ghost" id="replay"><i class="ph-fill ph-speaker-high"></i>다시 듣기</button><button class="btn" id="tome" disabled>수첩 보기 <i class="ph-bold ph-arrow-right"></i></button></div>`;
   $("replay").onclick = () => playScript();
   $("tome").onclick = () => phase(2);
@@ -129,7 +242,7 @@ async function playScript() {
   for (let i = 0; i < lines.length; i++) {
     if (run !== playing || SC?.phase !== 1) return;
     const [who, en, ch] = lines[i];
-    $("script").insertAdjacentHTML("beforeend", `<li class="${who}" data-i="${i}"><small>${who === "them" ? SC.sc.who : "다음 손님"}</small><span lang="en">${chunked(en, ch)}</span></li>`);
+    $("script").insertAdjacentHTML("beforeend", `<li class="${who}" data-i="${i}"><small>${who === "them" ? SC.sc.who : (SC.sc.guestKo || "다른 사람")}</small><span lang="en">${chunked(en, ch)}</span></li>`);
     $("script").lastElementChild.scrollIntoView({ block: "nearest", behavior: "smooth" });
     bubble(who, en);
     if (listenOn()) await speak(en, S.prefs.rate, SC.sc.voices[who]); else await new Promise(r => setTimeout(r, 900 + en.length * 25));
@@ -173,8 +286,8 @@ async function listenFirst(text) {
 }
 function giveHint() {
   const t = SC.sc.turns[SC.turn]; SC.hint = Math.min(3, SC.hint + 1);
-  const h = $("hintline"); h.hidden = false; h.innerHTML = `<i class="ph-fill ph-lightbulb"></i><span lang="en">${esc(t.hint[SC.hint - 1])}</span>`;
-  if (SC.hint === 3) speak(t.hint[2]);
+  const h = $("hintline"); h.hidden = false; h.innerHTML = `<i class="ph-fill ph-lightbulb"></i><span lang="en">${esc(nm(t.hint[SC.hint - 1]))}</span>`;
+  if (SC.hint === 3) speak(nm(t.hint[2]));
 }
 let recS = null;
 function hearMe() {
@@ -212,11 +325,11 @@ function judgeTurn(input, spoken) {
     return;
   }
   fx("good");
-  SC.log.push({ want: t.want, mine: said, model: t.model, hint: SC.hint, tries: SC.tries, chunk: t.chunk });
-  const same = normS(said) === normS(t.model);
-  $("scpanel").innerHTML = `<div class="okcard"><b><i class="ph-fill ph-check-circle"></i>통했어요</b><p class="mine" lang="en">${esc(said)}</p>${same ? "" : `<p class="better"><small>이렇게 말하면 더 자연스러워요</small><span lang="en">${esc(t.model)}</span><button class="say-mini" id="playmodel" aria-label="듣기"><i class="ph-fill ph-speaker-high"></i></button></p>`}</div>
+  SC.log.push({ want: t.want, mine: said, model: nm(t.model), hint: SC.hint, tries: SC.tries, chunk: t.chunk });
+  const same = normS(said) === normS(nm(t.model));
+  $("scpanel").innerHTML = `<div class="okcard"><b><i class="ph-fill ph-check-circle"></i>통했어요</b><p class="mine" lang="en">${esc(said)}</p>${same ? "" : `<p class="better"><small>이렇게 말하면 더 자연스러워요</small><span lang="en">${esc(nm(t.model))}</span><button class="say-mini" id="playmodel" aria-label="듣기"><i class="ph-fill ph-speaker-high"></i></button></p>`}</div>
     <div class="scfoot"><button class="btn" id="nextturn">${SC.turn + 1 < SC.sc.turns.length ? "다음" : "이제 듣기"} <i class="ph-bold ph-arrow-right"></i></button></div>`;
-  if (!same) { $("playmodel").onclick = () => speak(t.model); speak(t.model) }
+  if (!same) { $("playmodel").onclick = () => speak(nm(t.model)); speak(nm(t.model)) }
   $("nextturn").onclick = () => { SC.turn++; myTurn() };
   void spoken;
 }
