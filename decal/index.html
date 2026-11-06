@@ -38,6 +38,11 @@ canvas { display: block; background: var(--paper); border-radius: 20px; box-shad
 .ov button { margin-top: 10px; min-width: 160px; min-height: 52px; border: 0; border-radius: 26px; background: var(--ink); color: #fff; font: 700 17px Pretendard, system-ui, sans-serif; cursor: pointer; transition: transform .15s }
 .ov button:active { transform: scale(.96) }
 .ov button:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px }
+.ov .pts { color: var(--ink); font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums }
+.modes { display: flex; gap: 10px }
+.modes button { min-width: 0; width: 128px; display: grid; gap: 3px; place-content: center; padding: 10px 0 }
+.modes small { font-size: 12px; font-weight: 500; opacity: .7 }
+.modes button:not(.on) { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--ink) }
 </style>
 </head>
 <body>
@@ -51,21 +56,20 @@ canvas { display: block; background: var(--paper); border-radius: 20px; box-shad
     <canvas id="cv" aria-label="데칼코마니 판"></canvas>
     <div class="ov" id="ov">
       <h1>데칼<b>코마니</b></h1>
-      <p id="msg">선을 그어 반으로 접으면 똑같이 겹치는 색이 터져요. 한 번에 많이 겹칠수록 점수가 커져요</p>
-      <button id="go">시작</button>
+      <p id="msg">선을 그어 반으로 접으면 똑같이 겹치는 색이 터져요</p>
+      <p class="pts">1쌍 10 · 2쌍 40 · 3쌍 120 · 4쌍 320</p>
     </div>
   </div></div>
 </main>
 <script>
-const N = 8, TIME = 120, DENSITY = 0.4, MIN = 1, PENALTY = 3;
+const N = 8, TIME = 120, DENSITY = 0.4, MIN = 1, PENALTY = 3, HINT = 10000;
 const COLORS = ["#2f6be0", "#e4473f", "#21985f", "#8a55e8", "#f08a24", "#33312d"];
 const $ = id => document.getElementById(id);
 const cv = $("cv"), ctx = cv.getContext("2d");
 let grid, born, S = 40, playing = false, score = 0, left = TIME, last = 0;
 let drag = null, axis = null, miss = 0, anims = [], stains = [], texts = [];
-let best = 0;
-try { best = +localStorage.getItem("decal-best") || 0 } catch {}
-$("best").textContent = "최고 " + best;
+let best = 0, mode = "easy";
+try { mode = localStorage.getItem("decal-mode") === "normal" ? "normal" : "easy" } catch {}
 
 const idx = (x, y) => y * N + x;
 const inB = (x, y) => x >= 0 && y >= 0 && x < N && y < N;
@@ -77,13 +81,18 @@ function reflect(ax, x, y) {
   if (ax.t === "D1") return [y + ax.a, x - ax.a];
   return [ax.a - y, ax.a - x];
 }
-function pairsFor(ax) {
+// 선 위의 위치: 선 위 한 점 + 방향. seg = [lo, hi]면 그 구간에 걸친 쌍만 (보통 모드)
+const dirOf = ax => ax.t === "V" ? [ax.a, 0, 0, 1] : ax.t === "H" ? [0, ax.a, 1, 0] : [ax.a, 0, Math.SQRT1_2, ax.t === "D1" ? Math.SQRT1_2 : -Math.SQRT1_2];
+const along = (ax, x, y) => { const [ox, oy, dx, dy] = dirOf(ax); return (x - ox) * dx + (y - oy) * dy };
+const at = (ax, t) => { const [ox, oy, dx, dy] = dirOf(ax); return [ox + t * dx, oy + t * dy] };
+function pairsFor(ax, seg) {
   const out = [];
   for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
     const c = grid[idx(x, y)];
     if (c < 0) continue;
     const [mx, my] = reflect(ax, x, y);
     if (!inB(mx, my) || idx(mx, my) <= idx(x, y)) continue;
+    if (seg) { const t = along(ax, (x + mx) / 2, (y + my) / 2); if (t < seg[0] - .4 || t > seg[1] + .4) continue; }
     if (grid[idx(mx, my)] === c) out.push([x, y, mx, my, c]);
   }
   return out;
@@ -149,11 +158,11 @@ function axisEnds(ax) {
   return [L, ax.a - L, R, ax.a - R];
 }
 
-function fold(ax) {
-  const ps = pairsFor(ax), now = performance.now();
+function fold(ax, seg) {
+  const ps = pairsFor(ax, seg), now = performance.now();
   if (ps.length < MIN) {
     miss = now; missPairs = ps; left = Math.max(0, left - PENALTY);
-    const [x1, y1, x2, y2] = axisEnds(ax), cx = Math.min(N - 1.5, Math.max(.5, (x1 + x2) / 2)), cy = Math.min(N - 1, Math.max(.5, (y1 + y2) / 2));
+    const [x1, y1, x2, y2] = seg ? [...at(ax, seg[0]), ...at(ax, seg[1])] : axisEnds(ax), cx = Math.min(N - 1.5, Math.max(.5, (x1 + x2) / 2)), cy = Math.min(N - 1, Math.max(.5, (y1 + y2) / 2));
     texts.push({ x: cx, y: cy, s: "-" + PENALTY + "초", red: true, t0: now });
     cv.classList.remove("shake"); void cv.offsetWidth; cv.classList.add("shake");
     return;
@@ -162,7 +171,7 @@ function fold(ax) {
     grid[idx(x, y)] = grid[idx(mx, my)] = -1;
     anims.push({ x, y, mx, my, c, t0: now, seed: Math.random() * 1e4 });
   }
-  const n = ps.length, pts = 10 * n * n;
+  const n = ps.length, pts = 10 * n * 2 ** (n - 1);
   score += pts; $("score").textContent = score;
   let cx = 0, cy = 0;
   ps.forEach(p => { cx += p[2]; cy += p[3] });
@@ -194,8 +203,8 @@ function blot(x, y, r, c, a, seed) {
   }
   ctx.globalAlpha = 1;
 }
-function line(ax, color, w, dash) {
-  const [x1, y1, x2, y2] = axisEnds(ax);
+function line(ax, color, w, dash, seg) {
+  const [x1, y1, x2, y2] = seg ? [...at(ax, seg[0]), ...at(ax, seg[1])] : axisEnds(ax);
   ctx.save();
   ctx.beginPath(); ctx.roundRect(0, 0, S * N, S * N, 20); ctx.clip();
   ctx.strokeStyle = color; ctx.lineWidth = w; ctx.lineCap = "round";
@@ -216,8 +225,13 @@ function draw(now) {
     if (t > 0) dot(px(x), px(y), S * .34 * backOut(t), COLORS[c]);
     ctx.fillStyle = "#d9d6cf";
   }
-  if (axis) line(axis, "rgb(28 27 25 / .5)", 3, [8, 8]);
-  if (now - miss < 320 && missAx) line(missAx, "rgb(216 68 60 / " + (1 - (now - miss) / 320) + ")", 4);
+  // 10초 동안 가만히 있으면 가장 많이 겹치는 선이 반짝인다
+  if (playing && !drag && now - lastAct > HINT) {
+    hint = hint || findHint();
+    if (hint) line(hint.ax, `rgb(28 27 25 / ${.1 + .25 * (.5 + .5 * Math.sin(now / 200))})`, S * .16, null, hint.seg);
+  }
+  if (axis) line(axis, "rgb(28 27 25 / .5)", 3, [8, 8], segNow());
+  if (now - miss < 320 && missAx) line(missAx, "rgb(216 68 60 / " + (1 - (now - miss) / 320) + ")", 4, null, missSeg);
   if (now - miss < 600) for (const [x, y, mx, my] of missPairs) for (const [a, b] of [[x, y], [mx, my]]) {
     ctx.strokeStyle = `rgb(216 68 60 / ${Math.abs(Math.sin((now - miss) / 600 * Math.PI * 3))})`; ctx.lineWidth = 3;
     ctx.beginPath(); ctx.arc(px(a), px(b), S * .44, 0, 7); ctx.stroke();
@@ -237,7 +251,7 @@ function draw(now) {
         blot(px(x), px(y), S * .34 * (1 + 1.1 * Math.sqrt(k)), COLORS[a.c], 1 - k, sd);
     }
   }
-  if (lastAx && now - lastT < 520) line(lastAx, "rgb(28 27 25 / " + .8 * (1 - (now - lastT) / 520) + ")", 3);
+  if (lastAx && now - lastT < 520) line(lastAx, "rgb(28 27 25 / " + .8 * (1 - (now - lastT) / 520) + ")", 3, null, lastSeg);
   texts = texts.filter(t => now - t.t0 < 900);
   for (const t of texts) {
     const k = (now - t.t0) / 900;
@@ -252,7 +266,21 @@ function draw(now) {
     ctx.globalAlpha = 1;
   }
 }
-let missAx = null, missPairs = [], lastAx = null, lastT = 0;
+let missAx = null, missSeg = null, missPairs = [], lastAx = null, lastSeg = null, lastT = 0;
+let cur = null, lastAct = 0, hint = null;
+function segNow() {
+  if (mode === "easy" || !axis || !cur) return null;
+  const a = along(axis, ...drag), b = along(axis, ...cur);
+  return [Math.min(a, b), Math.max(a, b)];
+}
+function findHint() {
+  const all = AXES.map(ax => [ax, pairsFor(ax)]), m = Math.max(...all.map(v => v[1].length));
+  if (!m) return null;
+  const top = all.filter(v => v[1].length === m), [ax, ps] = top[Math.random() * top.length | 0];
+  if (mode === "easy") return { ax };
+  const ts = ps.map(([x, y, mx, my]) => along(ax, (x + mx) / 2, (y + my) / 2));
+  return { ax, seg: [Math.min(...ts) - .3, Math.max(...ts) + .3] };
+}
 
 function loop(now) {
   if (playing) {
@@ -277,33 +305,40 @@ function size() {
 addEventListener("resize", size);
 
 const cell = e => { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) / S - .5, (e.clientY - r.top) / S - .5] };
-cv.addEventListener("pointerdown", e => { if (!playing) return; cv.setPointerCapture(e.pointerId); drag = cell(e); axis = null });
-cv.addEventListener("pointermove", e => { if (drag) axis = snap(drag, cell(e)) });
+cv.addEventListener("pointerdown", e => { if (!playing) return; cv.setPointerCapture(e.pointerId); drag = cur = cell(e); axis = null; lastAct = performance.now(); hint = null });
+cv.addEventListener("pointermove", e => { if (drag) { cur = cell(e); axis = snap(drag, cur) } });
 const up = () => {
   if (drag && axis && playing) {
-    const ps = pairsFor(axis).length;
-    if (ps >= MIN) { lastAx = axis; lastT = performance.now() } else missAx = axis;
-    fold(axis);
+    const seg = segNow(), ps = pairsFor(axis, seg).length;
+    if (ps >= MIN) { lastAx = axis; lastSeg = seg; lastT = performance.now() } else { missAx = axis; missSeg = seg }
+    fold(axis, seg);
   }
-  drag = null; axis = null;
+  drag = null; axis = null; lastAct = performance.now();
 };
 cv.addEventListener("pointerup", up);
 cv.addEventListener("pointercancel", () => { drag = null; axis = null });
 
-function start() {
-  newBoard(); score = 0; left = TIME; last = 0; anims = []; stains = []; texts = [];
+// 쉬움: 선이 판 끝까지 접힘 · 보통: 그은 만큼만 접힘. 최고 점수는 모드마다
+const NAME = { easy: "쉬움", normal: "보통" }, KEY = { easy: "decal-best", normal: "decal-best-normal" };
+const loadBest = () => { best = 0; try { best = +localStorage.getItem(KEY[mode]) || 0 } catch {} $("best").textContent = NAME[mode] + " 최고 " + best };
+const modes = () => `<div class="modes">${["easy", "normal"].map(m => `<button data-m="${m}" class="${m === mode ? "on" : ""}">${NAME[m]}<small>${m === "easy" ? "선이 판 끝까지" : "그은 만큼만"}</small></button>`).join("")}</div>`;
+const bind = () => $("ov").querySelectorAll("[data-m]").forEach(b => b.onclick = () => start(b.dataset.m));
+function start(m) {
+  mode = m; try { localStorage.setItem("decal-mode", m) } catch {}
+  loadBest();
+  newBoard(); score = 0; left = TIME; last = 0; anims = []; stains = []; texts = []; hint = null; lastAct = performance.now();
   $("score").textContent = 0;
   $("ov").hidden = true; playing = true;
 }
 function end() {
   playing = false; left = 0; drag = null; axis = null;
-  if (score > best) { best = score; try { localStorage.setItem("decal-best", best) } catch {} }
-  $("best").textContent = "최고 " + best;
-  $("ov").innerHTML = `<p>점수</p><div class="big">${score}</div><p>최고 ${best}</p><button id="go">다시</button>`;
-  $("go").onclick = start;
+  if (score > best) { best = score; try { localStorage.setItem(KEY[mode], best) } catch {} }
+  $("best").textContent = NAME[mode] + " 최고 " + best;
+  $("ov").innerHTML = `<p>점수</p><div class="big">${score}</div><p>${NAME[mode]} 최고 ${best}</p>${modes()}`;
+  bind();
   $("ov").hidden = false;
 }
-$("go").onclick = start;
+$("ov").insertAdjacentHTML("beforeend", modes()); bind(); loadBest();
 newBoard(); size(); requestAnimationFrame(loop);
 </script>
 </body>
