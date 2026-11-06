@@ -16,16 +16,16 @@ const save = () => { if (!DEMO) try { localStorage.setItem("sulsul", JSON.string
 
 // ───── 상대와 장면 ─────
 const SCENES = {
-  me: { ko: "내 이야기", name: "Jamie", role: "a friendly peer around the learner's age who loves hearing about their day and what they are making", desc: "A casual catch-up about the learner's real day, plans and projects. Follow up on things you remember." },
-  cafe: { ko: "카페 주문", name: "Mina", role: "a barista at a busy café", desc: "The learner orders a drink and maybe something to eat. Ask about size, hot or iced, for here or to go, then small talk." },
-  street: { ko: "길 묻기", name: "Tom", role: "a local person on a busy street", desc: "The learner asks you how to get somewhere (a station, a museum, a restaurant). Give simple directions and check they understood." },
-  intro: { ko: "자기소개", name: "Sara", role: "someone the learner just met at a meetup", desc: "Getting to know each other: study or work, hobbies, recent news." },
-  clinic: { ko: "병원 접수", name: "Grace", role: "a receptionist at a clinic", desc: "The learner checks in and explains what is wrong, since when, and books a time." },
-  airport: { ko: "공항 체크인", name: "Alex", role: "a check-in agent at an airport counter", desc: "Check-in: passport, destination, bags, seat preference, boarding time." }
+  me: { ko: "내 이야기", name: "Jamie", v: "m", role: "a friendly peer around the learner's age who loves hearing about their day and what they are making", desc: "A casual catch-up about the learner's real day, plans and projects. Follow up on things you remember." },
+  cafe: { ko: "카페 주문", name: "Mina", v: "f", role: "a barista at a busy café", desc: "The learner orders a drink and maybe something to eat. Ask about size, hot or iced, for here or to go, then small talk." },
+  street: { ko: "길 묻기", name: "Tom", v: "m2", role: "a local person on a busy street", desc: "The learner asks you how to get somewhere (a station, a museum, a restaurant). Give simple directions and check they understood." },
+  intro: { ko: "자기소개", name: "Sara", v: "f2", role: "someone the learner just met at a meetup", desc: "Getting to know each other: study or work, hobbies, recent news." },
+  clinic: { ko: "병원 접수", name: "Grace", v: "f", role: "a receptionist at a clinic", desc: "The learner checks in and explains what is wrong, since when, and books a time." },
+  airport: { ko: "공항 체크인", name: "Alex", v: "m", role: "a check-in agent at an airport counter", desc: "Check-in: passport, destination, bags, seat preference, boarding time." }
 };
 const DAILY = ["cafe", "street", "intro", "clinic", "airport"];
 const sceneId = () => S.scene === "custom" && S.custom ? "custom" : S.scene !== "auto" && SCENES[S.scene] ? S.scene : S.mode === "me" ? "me" : DAILY[(new Date().getDate()) % DAILY.length];
-const sceneOf = sc => sc === "custom" ? { ko: "직접 만든 상황", name: "Alex", role: "a friendly person who fits this situation", desc: S.custom } : SCENES[sc];
+const sceneOf = sc => sc === "custom" ? { ko: "직접 만든 상황", name: "Alex", v: "m", role: "a friendly person who fits this situation", desc: S.custom } : SCENES[sc];
 const targets = () => S.stuck.filter(x => !x.done).slice(0, 3);
 
 // ───── 화면 전환 ─────
@@ -156,18 +156,34 @@ $("tr").onclick = async () => {
   else { $("tr").disabled = true; try { $("ko").textContent = await ask("Translate the English line into natural, casual Korean. Reply with the Korean only.", [{ role: "user", parts: [{ text: line }] }]) } catch (e) { $("convErr").textContent = e.message } $("tr").disabled = false }
   $("tr").textContent = "영어만 보기";
 };
-$("again").onclick = () => speak($("line").textContent);
+$("again").onclick = () => speak($("line").textContent, undefined, sceneOf(conv?.scene || sceneId()).v);
 
 // ───── 소리 ─────
 const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
-function speak(text, rate = S.prefs.rate) {
+// 인물마다 다른 목소리. 브라우저에 있는 영어 목소리 중 남자·여자를 골라 쓰고, 하나뿐이면 높낮이로 나눈다
+// 종류: m(남자) m2(다른 남자) f(여자) f2(다른 여자) n(안내)
+const MALE = /\b(male|david|mark|guy|daniel|george|ryan|james|fred|aaron|arthur|thomas|eric|christopher|roger|steffan|brian|andrew)\b/i;
+const FEMALE = /\b(female|zira|aria|jenny|samantha|susan|hazel|libby|karen|moira|tessa|victoria|ava|emma|michelle|sonia|natasha|google us english)\b/i;
+function voiceFor(kind) {
+  const vs = speechSynthesis.getVoices().filter(v => /^en[-_]/i.test(v.lang));
+  const us = v => /en[-_]US/i.test(v.lang) ? 0 : 1, natural = v => /natural|online|google/i.test(v.name) ? 0 : 1;
+  const sort = a => a.sort((x, y) => natural(x) - natural(y) || us(x) - us(y));
+  const men = sort(vs.filter(v => MALE.test(v.name))), women = sort(vs.filter(v => FEMALE.test(v.name) && !MALE.test(v.name)));
+  const pick = { m: men[0], m2: men[1] || men[0], f: women[0], f2: women[1] || women[0], n: women[1] || women[0] }[kind] || vs.find(v => /en[-_]US/i.test(v.lang)) || vs[0];
+  // 같은 목소리를 두 인물이 나눠 쓰면 높낮이로 구분한다
+  const shared = (kind === "m2" && men.length < 2) || (kind === "f2" && women.length < 2);
+  const fits = pick && (kind[0] === "m" ? MALE : FEMALE).test(pick.name);
+  const pitch = shared ? (kind === "m2" ? .75 : 1.25) : fits ? 1 : ({ m: .8, m2: .7, f: 1.15, f2: 1.3 }[kind] ?? 1);
+  return { voice: pick, pitch };
+}
+function speak(text, rate = S.prefs.rate, kind = "n") {
   return new Promise(res => {
     if (!window.speechSynthesis) return res();
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text); u.lang = "en-US"; u.rate = rate;
-    const v = speechSynthesis.getVoices().find(v => v.lang === "en-US"); if (v) u.voice = v;
+    const { voice, pitch } = voiceFor(kind); if (voice) { u.voice = voice; u.lang = voice.lang } u.pitch = pitch;
     let done = false; const fin = () => { if (!done) { done = true; res() } };
-    u.onend = fin; u.onerror = fin; setTimeout(fin, 1500 + text.length * 90);
+    u.onend = fin; u.onerror = fin; setTimeout(fin, 2000 + text.length * 95 / rate);
     speechSynthesis.speak(u);
   });
 }
@@ -274,7 +290,7 @@ async function aiTurn() {
     const reply = await ask(persona(conv.scene), contents);
     conv.turns.push({ who: "ai", text: reply });
     $("line").className = "say"; $("line").textContent = reply; $("ko").textContent = ""; $("tr").textContent = "한국어로 보기"; $("lsub").hidden = false;
-    setState("말하는 중"); await speak(reply);
+    setState("말하는 중"); await speak(reply, undefined, sceneOf(conv.scene).v);
     busy = false; $("mic").disabled = false;
     if (timeLeft() <= 0) return finish();
     startTurn();

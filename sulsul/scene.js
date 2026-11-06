@@ -1,7 +1,7 @@
 // 하루 살기: 영어로 사는 이틀. 장면마다 그림 위에서 엿듣기 → 내 차례 → 수첩.
 // 덩어리(chunk) = [영어, 뜻, 왜 이렇게 말하는지]
 const CAFE = {
-  who: "Mina", whoKo: "바리스타", pos: "62% 50%",
+  who: "Leo", whoKo: "바리스타", pos: "62% 50%", voices: { them: "m", guest: "f" },
   overhear: [
     ["them", "Good morning! What can I get for you?"],
     ["guest", "Hi, can I get a hot latte, please?", [["can I get", "~ 주세요", "주문할 때 가장 흔한 말이에요. Give me보다 부드러워요."]]],
@@ -79,7 +79,7 @@ function phase(n) {
   if (n === 1) myTurn();
   if (n === 2) notebook();
 }
-const chunked = (en, chunks = []) => chunks.reduce((h, [c], i) => h.replace(new RegExp(c.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"), m => `<button class="chunk" data-c="${i}">${m}</button>`), esc(en));
+const chunked = (en, chunks = []) => chunks.reduce((h, [c], i) => h.replace(new RegExp(c.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"), m => `<span class="chunk" role="button" tabindex="0" data-c="${i}">${m}</span>`), esc(en));
 function bubble(who, en, ko) {
   const b = $("scbubble"); b.hidden = false; b.className = "bubble2 " + who;
   b.innerHTML = `<small>${who === "them" ? `${SC.sc.who} · ${SC.sc.whoKo}` : who === "guest" ? "앞 손님" : "나"}</small><span lang="en">${esc(en)}</span>${ko ? `<em>${esc(ko)}</em>` : ""}`;
@@ -93,6 +93,7 @@ async function overhear() {
   $("replay").onclick = () => playScript();
   $("tome").onclick = () => phase(1);
   $("script").onclick = e => { const c = e.target.closest(".chunk"); if (!c) return; const li = c.closest("li"), ch = lines[+li.dataset.i][2][+c.dataset.c]; showChunk(ch) };
+  $("script").onkeydown = e => { if ((e.key === "Enter" || e.key === " ") && e.target.closest(".chunk")) { e.preventDefault(); e.target.click() } };
   playScript();
 }
 let playing = 0;
@@ -105,7 +106,7 @@ async function playScript() {
     $("script").insertAdjacentHTML("beforeend", `<li class="${who}" data-i="${i}"><small>${who === "them" ? SC.sc.who : "앞 손님"}</small><span lang="en">${chunked(en, ch)}</span></li>`);
     $("script").lastElementChild.scrollIntoView({ block: "nearest", behavior: "smooth" });
     bubble(who, en);
-    if (listenOn()) await speak(en, S.prefs.rate); else await new Promise(r => setTimeout(r, 900 + en.length * 25));
+    if (listenOn()) await speak(en, S.prefs.rate, SC.sc.voices[who]); else await new Promise(r => setTimeout(r, 900 + en.length * 25));
     await new Promise(r => setTimeout(r, 250));
   }
   if (run === playing) { $("tome").disabled = false; $("scbubble").hidden = true }
@@ -122,7 +123,6 @@ function myTurn() {
   if (!t) return phase(2);
   SC.hint = 0; SC.tries = 0;
   bubble("them", t.say);
-  if (listenOn()) speak(t.say);
   const typing = !speakOn();
   $("scpanel").innerHTML = `<div class="turnhead"><span>${SC.turn + 1} / ${SC.sc.turns.length}</span><button class="link" id="sayagain"><i class="ph-fill ph-speaker-high"></i> 다시 듣기</button></div>
     <p class="want"><small>하고 싶은 말</small>${esc(t.want)}</p>
@@ -131,24 +131,45 @@ function myTurn() {
     <form class="type" id="sctype" ${typing ? "" : "hidden"}><input id="scin" lang="en" autocomplete="off" placeholder="영어로 쓰기"><button class="btn" style="min-height:46px;padding:0 16px">말하기</button></form>
     <p class="heardw" id="scheard" aria-live="polite"></p>
     <div class="scfoot"><button class="btn ghost" id="schint"><i class="ph-fill ph-lightbulb"></i>힌트</button>${typing ? "" : `<button class="btn ghost" id="sctyping"><i class="ph-bold ph-keyboard"></i>글로</button>`}</div>`;
-  $("sayagain").onclick = () => speak(t.say);
+  $("sayagain").onclick = () => { if (!recS) listenFirst(t.say) };
   $("schint").onclick = () => giveHint();
   if (!typing) { $("scmic").onclick = () => hearMe(); $("sctyping").onclick = () => { $("sctype").hidden = false; $("scin").focus() } }
-  $("sctype").onsubmit = e => { e.preventDefault(); const v = $("scin").value.trim(); if (v) judgeTurn(v) };
-  if (typing) setTimeout(() => $("scin").focus(), 300);
+  $("sctype").onsubmit = e => { e.preventDefault(); const v = $("scin").value.trim(); if (v && !SC.listening) judgeTurn(v) };
+  listenFirst(t.say);
+}
+// 듣는 것도 공부: 상대 말이 다 나올 때까지 말하기·보내기를 잠근다
+async function listenFirst(text) {
+  const lock = on => { SC.listening = on; ["scmic", "sayagain"].forEach(id => { const b = $(id); if (b) b.disabled = on }); const s = $("sctype")?.querySelector("button"); if (s) s.disabled = on; $("scheard").textContent = on ? "끝까지 들어 보세요…" : "" };
+  if (!listenOn()) return lock(false);
+  lock(true);
+  await speak(text, undefined, SC.sc.voices.them);
+  if (SC) { lock(false); if (!speakOn()) $("scin")?.focus() }
 }
 function giveHint() {
   const t = SC.sc.turns[SC.turn]; SC.hint = Math.min(3, SC.hint + 1);
   const h = $("hintline"); h.hidden = false; h.innerHTML = `<i class="ph-fill ph-lightbulb"></i><span lang="en">${esc(t.hint[SC.hint - 1])}</span>`;
   if (SC.hint === 3) speak(t.hint[2]);
 }
+let recS = null;
 function hearMe() {
-  const b = $("scmic"), r = new Rec(); r.lang = "en-US"; r.maxAlternatives = 3;
-  b.classList.add("on"); $("scheard").textContent = "듣는 중…";
-  r.onresult = e => judgeTurn([...e.results[0]].map(a => a.transcript), true);
-  r.onerror = e => { $("scheard").textContent = e.error === "not-allowed" ? "마이크를 허용해 주세요. 글로 써도 돼요." : "잘 안 들렸어요. 다시 눌러 말해요." };
-  r.onend = () => b.classList.remove("on");
-  r.start();
+  const b = $("scmic");
+  if (SC.listening) return;
+  if (recS) { const r = recS; recS = null; b.classList.remove("on"); b.setAttribute("aria-label", "말하기"); $("sayagain").disabled = false; try { r.stop() } catch { r.onend() } return }
+  const got = []; let interim = "";
+  const show = () => { $("scheard").textContent = [...got.map(a => a[0]), interim].join(" ").trim() || "듣는 중… 다 말하면 다시 눌러요" };
+  const r = new Rec(); r.lang = "en-US"; r.continuous = true; r.interimResults = true; r.maxAlternatives = 3;
+  r.onresult = e => { interim = ""; for (let i = e.resultIndex; i < e.results.length; i++) { const res = e.results[i]; if (res.isFinal) got.push([...res].map(a => a.transcript.trim())); else interim += res[0].transcript } show() };
+  r.onerror = e => { if (e.error === "not-allowed") { recS = null; b.classList.remove("on"); $("scheard").textContent = "마이크를 허용해 주세요. 글로 써도 돼요." } };
+  // 브라우저가 조용하다고 멋대로 끝내도, 내가 다시 누르기 전까지는 이어서 듣는다
+  r.onend = () => {
+    if (recS === r) { try { r.start() } catch {} return }
+    const base = got.map(a => a[0]).join(" "), tail = interim.trim();
+    const said = [base, tail].filter(Boolean).join(" ").trim();
+    if (!said) { $("scheard").textContent = "아무 말도 안 들렸어요. 다시 눌러 말해요."; return }
+    const last = got.at(-1) || [], head = got.slice(0, -1).map(a => a[0]).join(" ");
+    judgeTurn([said, ...last.slice(1).map(a => [head, a].filter(Boolean).join(" "))], true);
+  };
+  recS = r; r.start(); b.classList.add("on"); b.setAttribute("aria-label", "다 말했어요"); $("sayagain").disabled = true; show();
 }
 // 뜻이 통하는지: 필요한 덩어리가 들어 있으면 통과 (문장이 똑같을 필요 없음)
 const normS = s => " " + s.toLowerCase().replace(/[’]/g, "'").replace(/[^a-z0-9' ]/g, " ").replace(/\s+/g, " ").trim() + " ";
@@ -190,7 +211,7 @@ function notebook() {
     save(); SC = null; fx("done"); nav("learn");
   };
 }
-$("scclose").onclick = () => { playing++; speechSynthesis.cancel(); SC = null; nav("learn") };
+$("scclose").onclick = () => { playing++; speechSynthesis.cancel(); if (recS) { const r = recS; recS = null; r.onend = null; try { r.stop() } catch {} } SC = null; nav("learn") };
 
 // ───── 수첩 탭 ─────
 function renderNote() {

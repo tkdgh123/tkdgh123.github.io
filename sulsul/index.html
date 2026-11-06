@@ -130,7 +130,9 @@ label.f { display: grid; gap: 4px; margin-top: 12px; font-size: 15px; font-weigh
 .script li.guest { margin-left: auto; background: var(--accent-soft) }
 .script small { display: block; font-size: 12px; font-weight: 700; color: var(--muted) }
 .script span { font-size: 16px; line-height: 1.4 }
-.chunk { font: inherit; color: inherit; text-decoration: underline; text-decoration-color: var(--warm); text-decoration-thickness: 3px; text-underline-offset: 3px; padding: 0 }
+.chunk { cursor: pointer; text-decoration: underline; text-decoration-color: var(--warm); text-decoration-thickness: 2px; text-underline-offset: 4px; text-decoration-skip-ink: none; border-radius: 3px; transition: background .15s }
+.chunk:hover, .chunk:focus-visible { background: var(--warm-soft) }
+.mic-big:disabled, .say-btn:disabled { opacity: .35; box-shadow: none }
 .scfoot { display: flex; gap: 10px; margin-top: auto; padding-top: 16px }
 .scfoot .btn { flex: 1 }
 .turnhead { display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: 700; color: var(--muted) }
