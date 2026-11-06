@@ -23,7 +23,18 @@ body { margin: 0; background: var(--bg); color: var(--ink); font: 500 16px/1.4 "
 .score span { font-size: 13px; color: var(--muted) }
 .time { height: 6px; border-radius: 3px; background: #d6d4ce; overflow: hidden }
 .time i { display: block; height: 100%; width: 100%; background: var(--ink); transform-origin: left; border-radius: 3px }
-.time.low i { background: var(--red) }
+.time[data-s="2"] i { background: #f08a24 }
+.time[data-s="3"] i, .time.low i { background: var(--red) }
+.time.low i { animation: beat .5s infinite alternate }
+@keyframes beat { to { opacity: .35 } }
+body { transition: background 1.2s }
+body[data-s="2"] { background: #ece4da }
+body[data-s="3"] { background: #efdcd6 }
+.mult { align-self: center; margin: 0 auto 0 14px; font: 700 26px/1 Hahmlet, serif; font-style: normal; color: var(--muted) }
+.mult[data-s="2"] { color: #f08a24 }
+.mult[data-s="3"] { color: var(--red) }
+.mult.up { animation: up .6s }
+@keyframes up { 30% { transform: scale(1.7) } }
 .stage { flex: 1; min-height: 0; display: grid; place-items: center }
 .board { position: relative }
 canvas { display: block; background: var(--paper); border-radius: 20px; box-shadow: 0 1px 0 rgb(0 0 0 / .04), 0 18px 40px -18px rgb(40 30 20 / .28); touch-action: none; cursor: crosshair }
@@ -49,6 +60,7 @@ canvas { display: block; background: var(--paper); border-radius: 20px; box-shad
 <main class="app">
   <header class="top">
     <a class="back" href="../">← 창업실</a>
+    <i class="mult" id="mult">×1</i>
     <div class="score"><b id="score">0</b><span id="best">최고 0</span></div>
   </header>
   <div class="time" id="time"><i id="bar"></i></div>
@@ -57,7 +69,7 @@ canvas { display: block; background: var(--paper); border-radius: 20px; box-shad
     <div class="ov" id="ov">
       <h1>데칼<b>코마니</b></h1>
       <p id="msg">선을 그어 반으로 접으면 똑같이 겹치는 색이 터져요</p>
-      <p class="pts">1쌍 10 · 2쌍 40 · 3쌍 120 · 4쌍 320</p>
+      <p class="pts">1쌍 10 · 2쌍 40 · 3쌍 120 · 4쌍 320<br>40초마다 점수 ×2, ×3</p>
     </div>
   </div></div>
 </main>
@@ -171,11 +183,11 @@ function fold(ax, seg) {
     grid[idx(x, y)] = grid[idx(mx, my)] = -1;
     anims.push({ x, y, mx, my, c, t0: now, seed: Math.random() * 1e4 });
   }
-  const n = ps.length, pts = 10 * n * 2 ** (n - 1);
+  const n = ps.length, pts = 10 * n * 2 ** (n - 1) * mult;
   score += pts; $("score").textContent = score;
   let cx = 0, cy = 0;
   ps.forEach(p => { cx += p[2]; cy += p[3] });
-  texts.push({ x: cx / n, y: cy / n, s: "+" + pts, sub: n + "쌍", big: n >= 3, t0: now + 220 });
+  texts.push({ x: cx / n, y: cy / n, s: "+" + pts, sub: n + "쌍" + (mult > 1 ? " ×" + mult : ""), big: n >= 3, t0: now + 220 });
   try { navigator.vibrate && navigator.vibrate(n >= 3 ? [20, 40, 30] : 15) } catch {}
   setTimeout(() => playing && refill(), 520);
 }
@@ -217,6 +229,12 @@ function draw(now) {
   // 번진 자국: 접었던 자리에 옅게 남는다
   stains = stains.filter(s => now - s.t0 < 2600);
   for (const s of stains) blot(px(s.x), px(s.y), S * .42, COLORS[s.c], .13 * (1 - (now - s.t0) / 2600), s.seed);
+  if (playing && left < 10) {
+    const f = left % 1;
+    ctx.globalAlpha = .07 + .1 * f; ctx.fillStyle = "#d8443c"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.font = `700 ${S * (4 + .6 * f)}px Hahmlet, serif`; ctx.fillText(Math.ceil(left), S * N / 2, S * N / 2 + S * .3);
+    ctx.globalAlpha = 1;
+  }
   ctx.fillStyle = "#d9d6cf";
   for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
     const c = grid[idx(x, y)];
@@ -282,9 +300,22 @@ function findHint() {
   return { ax, seg: [Math.min(...ts) - .3, Math.max(...ts) + .3] };
 }
 
+let el = 0, mult = 1, tick = 0;
+function stage(m, fx) {
+  mult = m;
+  document.body.dataset.s = $("time").dataset.s = $("mult").dataset.s = m;
+  $("mult").textContent = "×" + m;
+  if (!fx) return;
+  $("mult").classList.remove("up"); void $("mult").offsetWidth; $("mult").classList.add("up");
+  texts.push({ x: (N - 1) / 2, y: 1.2, s: "점수 ×" + m, big: true, t0: performance.now() });
+  try { navigator.vibrate && navigator.vibrate([30, 60, 30]) } catch {}
+}
 function loop(now) {
   if (playing) {
-    if (last) left -= (now - last) / 1000;
+    if (last) { const dt = (now - last) / 1000; left -= dt; el += dt; }
+    const m = el < 40 ? 1 : el < 80 ? 2 : 3;
+    if (m !== mult) stage(m, true);
+    if (left < 5 && Math.ceil(left) !== tick) { tick = Math.ceil(left); try { navigator.vibrate && navigator.vibrate(12) } catch {} }
     if (left <= 0) end();
     $("bar").style.transform = `scaleX(${Math.max(0, left) / TIME})`;
     $("time").classList.toggle("low", left < 10);
@@ -326,12 +357,12 @@ const bind = () => $("ov").querySelectorAll("[data-m]").forEach(b => b.onclick =
 function start(m) {
   mode = m; try { localStorage.setItem("decal-mode", m) } catch {}
   loadBest();
-  newBoard(); score = 0; left = TIME; last = 0; anims = []; stains = []; texts = []; hint = null; lastAct = performance.now();
+  newBoard(); score = 0; left = TIME; last = 0; anims = []; stains = []; texts = []; hint = null; lastAct = performance.now(); el = 0; stage(1);
   $("score").textContent = 0;
   $("ov").hidden = true; playing = true;
 }
 function end() {
-  playing = false; left = 0; drag = null; axis = null;
+  playing = false; left = 0; drag = null; axis = null; stage(1);
   if (score > best) { best = score; try { localStorage.setItem(KEY[mode], best) } catch {} }
   $("best").textContent = NAME[mode] + " 최고 " + best;
   $("ov").innerHTML = `<p>점수</p><div class="big">${score}</div><p>${NAME[mode]} 최고 ${best}</p>${modes()}`;
