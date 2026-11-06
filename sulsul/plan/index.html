@@ -128,32 +128,37 @@ h2.st { color: var(--ink); text-transform: none; letter-spacing: -.04em; font-st
 .gap b.h { background: var(--red) }
 .gap span { font-size: 13px; font-weight: 700 }
 
-/* 누가 어떤 장면에서 */
-.who { padding: 180px var(--m) 200px }
-.who h2 { font-size: var(--head); font-weight: 800; letter-spacing: -.03em; line-height: 1.05; margin-bottom: 24px }
-.who > p { font-size: var(--lead); max-width: 34ch; margin-bottom: 40px }
-.who h3 { color: var(--blue); font-size: clamp(20px, 2.1vw, 30px); font-weight: 600; padding: 72px 0 20px; line-height: 1.5 }
-.who table { width: 100%; border-collapse: collapse; font-size: clamp(20px, 2.1vw, 30px); font-weight: 400 }
-.who td { padding: 0; line-height: 1.5; vertical-align: top }
-.who td:nth-child(1) { width: 33% } .who td:nth-child(2) { width: 33% }
-.who td:nth-child(4) { text-align: right; font-variant-numeric: tabular-nums; color: var(--muted) }
-.who tr.soft td { color: var(--muted) }
+/* 하루 시간표 */
+.who { padding: 180px var(--m) 200px; background: var(--navy); color: #fff }
+.who .top { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: end }
+.who h2 { font-size: clamp(48px, 6.4vw, 104px); font-weight: 800; letter-spacing: -.03em; line-height: 1 }
+.who .top p { font-size: var(--lead); max-width: 30ch; color: #dfe9e5 }
+.days { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 72px }
+.days section { background: rgba(255,255,255,.05); padding: 32px 32px 40px }
+.days h3 { font-size: 22px; font-weight: 800; color: var(--red); margin-bottom: 18px }
+.slot { display: grid; grid-template-columns: auto 1fr; gap: 0 22px; padding: 16px 0; align-items: baseline }
+.slot time { grid-row: span 2; white-space: nowrap; min-width: 3.1em; font-size: clamp(30px, 2.8vw, 44px); font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.02em; line-height: 1; color: #fff }
+.slot b { font-size: 22px; font-weight: 700 }
+.slot span { font-size: 17px; color: #b9cfc8 }
+.slot.me time, .slot.me b { color: var(--red) }
+.fields { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 48px; font-size: 17px; color: #dfe9e5 }
+.fields em { font-style: normal; padding: 8px 14px; border-radius: 999px; background: rgba(255,255,255,.1); color: #fff; font-weight: 600 }
 
 /* 정한 것 */
+.faq { padding: 0 0 120px; background: var(--bg) }
 .faq .head { min-height: 32svh; background: var(--blue); color: #fff; display: flex; align-items: flex-end; padding: 56px var(--m) }
 .faq .head h2 { font-size: clamp(48px, 7vw, 120px); font-weight: 800; letter-spacing: -.03em; line-height: 1 }
-.q { display: grid; grid-template-columns: repeat(12, 1fr); gap: 0 24px; padding: 56px var(--m) }
-.q:nth-of-type(even) { background: var(--surface) }
-.q h3 { grid-column: 1 / 6; font-size: clamp(24px, 2.2vw, 32px); font-weight: 800; letter-spacing: -.02em; line-height: 1.2 }
-.q .a { grid-column: 7 / 13; font-size: 18px; line-height: 1.6; display: grid; gap: 14px; max-width: 60ch }
-.q ol { margin: 0; padding-left: 1.3em; display: grid; gap: 6px }
+.q { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); gap: 0 48px; max-width: 1180px; margin: 0 auto; padding: 64px var(--m) 0 }
+.q h3 { font-size: clamp(26px, 2.4vw, 36px); font-weight: 800; letter-spacing: -.02em; line-height: 1.2 }
+.q .a { font-size: 19px; line-height: 1.65; display: grid; gap: 14px; max-width: 62ch }
+.q ol { margin: 0; padding-left: 1.3em; display: grid; gap: 8px }
 .q .a a { font-weight: 700; color: var(--blue) }
+.q .a b { font-weight: 700 }
 .ph { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px }
 .ph span { min-width: 54px; padding: 10px 12px 8px; background: var(--ink); color: #fff; text-align: center; font-size: 22px; font-weight: 700 }
 .ph span small { display: block; font-size: 13px; font-weight: 600; margin-top: 2px }
 .ph span.ghost { background: transparent; color: var(--muted); text-decoration: line-through }
 .ph span.bad { background: var(--red); color: var(--ink) }
-
 /* 끝 */
 .end { min-height: 68svh; background: var(--blue); color: #fff; padding: 40px var(--m) 32px; display: flex; flex-direction: column }
 .end .top { display: flex; justify-content: space-between; gap: 24px; font-size: 15px }
@@ -209,16 +214,16 @@ h2.st { color: var(--ink); text-transform: none; letter-spacing: -.04em; font-st
   .card { min-height: 0 }
   .card:nth-child(odd) { margin-right: 8vw; rotate: -1.5deg }
   .card:nth-child(even) { margin-left: 8vw; rotate: 1.5deg }
-  .who { padding: 120px var(--m) }
-  .who table, .who tbody, .who tr, .who td { display: block; width: auto !important }
-  .who tr { display: grid; grid-template-columns: 1fr auto; padding-bottom: 18px }
-  .who td:nth-child(1) { grid-column: 1 / -1; font-size: 22px }
-  .who td:nth-child(2), .who td:nth-child(3), .who td:nth-child(4) { font-size: 14px; color: var(--muted) }
-  .who td:nth-child(2) { grid-column: 1 } .who td:nth-child(3) { grid-column: 1 } .who td:nth-child(4) { grid-column: 2; grid-row: 2 }
-  .who h3 { font-size: 20px; padding-top: 48px }
+  .who { padding: 110px var(--m) }
+  .who .top, .days { grid-template-columns: 1fr }
+  .who h2 { font-size: 13vw }
+  .days { margin-top: 40px }
+  .days section { padding: 24px 20px 28px }
+  .slot { gap: 0 14px }
+  .slot b { font-size: 19px }
   .faq .head { min-height: 30svh }
   .faq .head h2 { font-size: 13vw }
-  .q { display: block; padding: 32px 20px }
+  .q { display: block; padding: 40px 20px 0 }
   .q .a { margin-top: 14px; font-size: 17px }
   .end .meta { grid-template-columns: 1fr }
   .end .meta > :last-child { text-align: left }
@@ -327,90 +332,66 @@ h2.st { color: var(--ink); text-transform: none; letter-spacing: -.04em; font-st
 </section>
 
 <section class="who" aria-labelledby="h-who">
-  <h2 id="h-who" class="rise">누가, 어떤 장면에서</h2>
-  <p class="rise" style="--i:1">나는 내 대화로, 다른 사람은 일상 상황으로 해요. 정보를 넣으면 장면이 맞춰지고, 비워 두면 상황만 골라 바로 시작해요.</p>
-  <h3>나 · 내 대화로</h3>
-  <table>
-    <tr><td>오늘 한 일</td><td>Jamie, 친구</td><td lang="en">I ended up …</td><td>3분</td></tr>
-    <tr><td>만들고 있는 것</td><td>Jamie, 친구</td><td lang="en">It took me about …</td><td>3분</td></tr>
-    <tr><td>4주 시합: 프로젝트 발표</td><td>진짜 사람</td><td lang="en">Let me walk you through …</td><td>3분</td></tr>
-  </table>
-  <h3>다른 사람 · 일상 상황으로</h3>
-  <table>
-    <tr><td>카페 주문</td><td>바리스타</td><td lang="en">Can I get … to go?</td><td>3분</td></tr>
-    <tr><td>길 묻기</td><td>지나가는 사람</td><td lang="en">How do I get to …?</td><td>3분</td></tr>
-    <tr><td>자기소개</td><td>새로 만난 사람</td><td lang="en">I'm really into … these days.</td><td>3분</td></tr>
-    <tr><td>병원 접수</td><td>접수처</td><td lang="en">I've had a … since …</td><td>3분</td></tr>
-    <tr><td>공항 체크인</td><td>카운터 직원</td><td lang="en">Could I get an aisle seat?</td><td>3분</td></tr>
-    <tr class="soft"><td>아무것도 안 고르면</td><td>오늘의 상대</td><td>하루 한 장면</td><td>3분</td></tr>
-  </table>
-  <h3>넣으면 맞춰지는 칸 · 모두 비워도 돼요</h3>
-  <table>
-    <tr><td>부를 이름</td><td>선택</td><td>상대가 이름을 불러요</td><td></td></tr>
-    <tr><td>하는 일</td><td>선택</td><td>학생이면 수업·과제 이야기가 늘어요</td><td></td></tr>
-    <tr><td>관심사</td><td>선택</td><td>상대가 꺼내는 이야깃거리</td><td></td></tr>
-    <tr><td>영어 쓸 곳</td><td>선택</td><td>여행이면 공항·호텔부터</td><td></td></tr>
-    <tr><td>지금 수준</td><td>선택</td><td>상대의 말 빠르기와 단어</td><td></td></tr>
-  </table>
+  <div class="top">
+    <h2 id="h-who" class="rise">하루 시간표</h2>
+    <p class="rise" style="--i:1">영어로 사는 이틀이에요. 장면마다 그 장소 그림 위에서 말해요. '내 이야기로'를 고르면 저녁마다 친구에게 오늘 일을 말하는 장면이 붙어요.</p>
+  </div>
+  <div class="days">
+    <section class="rise" aria-label="1일째"><h3>1일째 · 도착한 날</h3>
+      <div class="slot"><time>11:00</time><b>공항 입국</b><span lang="en">I'm here for a one-week trip.</span></div>
+      <div class="slot"><time>13:00</time><b>숙소 가는 길 묻기</b><span lang="en">How do I get to the station?</span></div>
+      <div class="slot"><time>15:00</time><b>호텔 체크인</b><span lang="en">I have a reservation under Kim.</span></div>
+      <div class="slot"><time>19:00</time><b>저녁 식당 주문</b><span lang="en">Could I get the same, but less spicy?</span></div>
+      <div class="slot me"><time>22:00</time><b>친구에게 오늘 이야기</b><span lang="en">It took longer than I thought.</span></div>
+    </section>
+    <section class="rise" style="--i:1" aria-label="2일째"><h3>2일째 · 평범한 하루</h3>
+      <div class="slot"><time>08:00</time><b>아침 카페</b><span lang="en">Can I get an iced americano to go?</span></div>
+      <div class="slot"><time>10:00</time><b>모임에서 자기소개</b><span lang="en">I'm really into games these days.</span></div>
+      <div class="slot"><time>13:00</time><b>약국</b><span lang="en">I've had a headache since yesterday.</span></div>
+      <div class="slot"><time>17:00</time><b>길에서 도와주기</b><span lang="en">It's on your right, next to the bank.</span></div>
+      <div class="slot me"><time>22:00</time><b>친구에게 오늘 이야기</b><span lang="en">I ended up staying home.</span></div>
+    </section>
+  </div>
+  <p class="fields rise">넣으면 장면이 맞춰지는 칸 <em>부를 이름</em><em>하는 일</em><em>관심사</em><em>영어 쓸 곳</em><em>지금 수준</em> 모두 비워도 돼요.</p>
 </section>
 
 <section class="faq" aria-labelledby="h-faq">
   <div class="head"><h2 id="h-faq" class="rise">정한 것, 남은 것</h2></div>
   <div class="q">
+    <h3 class="rise">왜 하루 살기예요?</h3>
+    <div class="a rise" style="--i:1">
+      <p>보기 고르기와 조각 맞추기는 '알아보기'만 시켜요. 말하기는 내가 스스로 꺼내 말할 때 늘어요. 그래서 장면 속에서 하고 싶은 말만 한국어로 보고, 직접 말하게 했어요.</p>
+      <p>같은 문장을 바로 여러 번 시키지 않아요. 막힌 말만 다음 날 다른 장면에서 한 번 더 나와요.</p>
+    </div>
+  </div>
+  <div class="q">
+    <h3 class="rise">장면 그림은요?</h3>
+    <div class="a rise" style="--i:1"><p>그림은 그림 AI로 만들어요. 장면마다 ChatGPT와 Gemini에 한 장씩 그려 보고 더 맞는 쪽을 써요. 카페는 Gemini의 납작한 그림을 골랐고, 나머지 장면도 이 그림체에 맞춰요.</p></div>
+  </div>
+  <div class="q">
     <h3 class="rise">대화 AI는 뭘 써요?</h3>
     <div class="a rise" style="--i:1">
-      <p>세 칸 모두 0원이에요. 말은 크롬 음성 인식으로 글로 바꾸고, 대답은 Gemini Flash-Lite 무료 등급이 만들고, 소리는 브라우저 음성이 읽어요. 예비는 Groq 무료 등급이에요.</p>
-      <p>지금은 쓰는 사람이 자기 무료 키를 넣어요. 키는 그 기기에만 저장돼요. 사람이 늘면 Cloudflare Worker 무료 중계 뒤에 숨겨요.</p>
-      <p>걸리는 점: Gemini 무료 등급은 대화가 구글 학습에 쓰여서 쓰는 사람에게 알려야 해요. 하루 몇 번까지 무료인지는 AI Studio에서 직접 확인해야 해요.</p>
+      <p>모두 0원이에요. 말은 크롬 음성 인식으로 글로 바꾸고, 대답은 Gemini Flash-Lite 무료 등급, 소리는 브라우저 음성이 맡아요. 쓰는 사람이 자기 무료 키를 넣고, 키는 그 기기에만 저장돼요.</p>
+      <p>걸리는 점: Gemini 무료 등급은 대화가 구글 학습에 쓰여요. 그래서 키 넣는 화면에 알려 둬요.</p>
     </div>
   </div>
   <div class="q">
-    <h3 class="rise">음성 그대로 대화는요?</h3>
-    <div class="a rise" style="--i:1"><p>Gemini Live API가 무료 등급에 있어요. 듣고 바로 소리로 대답해서 3분 대화에 가장 자연스러워요. 아직 미리보기 단계이고 무료 한도를 확인 못 해서, 2단계에서 시험해요.</p></div>
-  </div>
-  <div class="q">
-    <h3 class="rise">왜 실과 매듭이에요?</h3>
+    <h3 class="rise">발음은요?</h3>
     <div class="a rise" style="--i:1">
-      <p>영어가 막히는 걸 우리는 "말이 꼬인다"고 해요. 술술은 "실타래가 술술 풀린다"에서 온 말이고요. 그래서 막힌 곳은 매듭, 배우는 건 매듭 풀기, 문장 만들기는 구슬 꿰기예요.</p>
-      <p>"구슬이 서 말이라도 꿰어야 보배"라는 말처럼, 단어를 알아도 꿰어 말해야 내 것이 돼요. 말해보카를 그만둔 이유(단어만 외우고 못 씀)에 대한 답이에요.</p>
-    </div>
-  </div>
-  <div class="q">
-    <h3 class="rise">다른 앱에서 가져온 것</h3>
-    <div class="a rise" style="--i:1">
-      <ol>
-        <li>듀오링고: 하나씩 풀어 가는 순서, 말하기·듣기 건너뛰기, 틀린 것 복습</li>
-        <li>스픽: 오늘 할 것 목록, 대화 중 글로 쓰기, 내가 만드는 상황극</li>
-        <li>말해보카: 대화에서 막힌 말을 복습 목록으로</li>
-        <li>링글: 대화가 끝나면 돌아보기 한마디</li>
-      </ol>
-      <p>뺀 것: 하트·에너지로 막기, 연속 기록 압박. 2025년에 가장 불만이 컸고, 연속이 끊기면 아예 그만두기 쉽다는 연구가 있어서예요.</p>
-    </div>
-  </div>
-  <div class="q">
-    <h3 class="rise">발음 채점은 직접 만들어요</h3>
-    <div class="a rise" style="--i:1">
-      <p>지금은 '혀 꼬이는 단어' 타래에서 흔히 잘못 읽는 단어(salmon처럼 소리 없는 글자 등)를 풀고, 말해 보면 알아들었는지만 봐요. 다음엔 서버 없이 브라우저 안에서 들린 소리를 음소로 받아 적고, 정답 음소와 맞춰서 빠지거나 바뀐 소리를 짚어요.</p>
+      <p>장면 속 단어 중 헷갈리는 발음(receipt의 p처럼)은 누르면 바로 팁이 나와요. 소리 하나하나를 짚는 채점은 브라우저 안에서 도는 음소 인식 모델로 다음에 붙여요.</p>
       <div class="ph" data-ui lang="en" aria-label="salmon 채점 예시: l은 소리 없음, 다섯 소리 중 하나가 틀림">
         <span>s<small>OK</small></span><span class="bad">æ<small>ɑ로 들림</small></span><span class="ghost">l<small>묵음</small></span><span>m<small>OK</small></span><span>ə<small>OK</small></span><span>n<small>OK</small></span>
       </div>
-      <ol>
-        <li>마이크 소리를 16kHz로 바꿔요.</li>
-        <li>음소 인식 모델(wav2vec2 음소 모델의 ONNX 변환본, transformers.js)이 들린 음소를 적어요.</li>
-        <li>CMUdict로 만든 정답 음소열과 편집 거리로 맞춰요.</li>
-        <li>한국인이 자주 바꾸는 짝(r/l, f/p, 끝소리 '으')은 L2-ARCTIC 한국인 화자 데이터로 보정해요.</li>
-      </ol>
-      <p>한계: 처음 한 번 모델 200~350MB를 받아야 해요. 논문 기준으로 틀린 소리를 짚는 정확도가 열 번에 여섯 번 안팎이라, 점수는 참고용으로 보여 줘요. 노트북에서 몇 초 걸리는지는 직접 재 봐야 해요.</p>
     </div>
   </div>
   <div class="q">
     <h3 class="rise">만드는 순서</h3>
     <div class="a rise" style="--i:1">
       <ol>
-        <li>지금: 일곱 타래(매듭 40개), 12가지 문제, 건너뛰기, 말 걸기 실전, 꼬인 말·틀린 것 복습, 매듭 장식까지 만들었어요.</li>
-        <li>2주 동안 직접 써 보고 고쳐요.</li>
-        <li>발음 채점을 붙이고 노트북 속도를 재요.</li>
-        <li>타래를 늘리고, 바깥 퀘스트·이야기책·중계 서버를 붙여요.</li>
+        <li>카페 장면 하나를 끝까지 만들어 써 봐요.</li>
+        <li>나머지 장면 그림을 같은 그림체로 뽑고 이틀을 채워요.</li>
+        <li>하루 일기와 그림엽서를 붙여요.</li>
+        <li>발음 채점을 붙여요.</li>
       </ol>
     </div>
   </div>
