@@ -2,8 +2,8 @@
 // 덩어리(chunk) = [영어, 뜻, 왜 이렇게 말하는지]
 const CAFE = {
   who: "Leo", whoKo: "바리스타", pos: "62% 50%", voices: { them: "m", guest: "f" },
-  // 움직이는 겹: 바리스타를 지운 배경 + 몸(숨 쉬듯) + 손(팔꿈치 축으로 인사) + 앞 메뉴판. 좌표는 원본 2752×1536 기준
-  layers: { w: 2752, h: 1536, plate: "img/scenes/cafe/plate.webp", box: [1560, 340, 430, 455], body: "img/scenes/cafe/body.png", hand: "img/scenes/cafe/hand.png", pivot: [1650, 705], front: ["img/scenes/cafe/menu.png", 1800, 652, 172, 144] },
+  // 움직이는 겹: 바리스타를 지운 배경 + 팔 없는 몸(숨 쉬듯) + 팔 한 층(카운터 위 팔꿈치 축으로 인사) + 앞 카운터 선반·메뉴판. 좌표는 원본 2752×1536 기준
+  layers: { w: 2752, h: 1536, plate: "img/scenes/cafe/plate.webp", box: [1560, 340, 430, 455], body: "img/scenes/cafe/body.png", hand: "img/scenes/cafe/hand.png", pivot: [1630, 720], front: [["img/scenes/cafe/counter.png", 1560, 716, 90, 54], ["img/scenes/cafe/menu.png", 1800, 652, 172, 144]] },
   overhear: [
     ["them", "Good morning! What can I get for you?"],
     ["guest", "Hi, can I get a hot latte, please?", [["can I get", "~ 주세요", "주문할 때 가장 흔한 말이에요. Give me보다 부드러워요."]]],
@@ -83,7 +83,7 @@ function buildStage(sc) {
     <div class="breath" style="left:${pc(bx, L2.w)};top:${pc(by, L2.h)};width:${pc(bw, L2.w)};height:${pc(bh, L2.h)}">
       <img src="${L2.body}" alt=""><img class="handwave" src="${L2.hand}" alt="" style="transform-origin:${pc(L2.pivot[0] - bx, bw)} ${pc(L2.pivot[1] - by, bh)}">
     </div>
-    ${L2.front ? `<img class="front" src="${L2.front[0]}" alt="" style="left:${pc(L2.front[1], L2.w)};top:${pc(L2.front[2], L2.h)};width:${pc(L2.front[3], L2.w)};height:${pc(L2.front[4], L2.h)}">` : ""}`;
+    ${(L2.front || []).map(([src, x, y, w, h]) => `<img class="front" src="${src}" alt="" style="left:${pc(x, L2.w)};top:${pc(y, L2.h)};width:${pc(w, L2.w)};height:${pc(h, L2.h)}">`).join("")}`;
   fitStage();
 }
 // object-fit: cover 처럼 무대를 꽉 채우되, 사람 쪽(pos)이 보이게
