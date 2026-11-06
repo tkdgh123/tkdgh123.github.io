@@ -3,6 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<script>/* 따로 열면 탭 페이지로, 탭 안에서는 바깥 링크만 창 전체로 */if(window.top===window)location.replace("../3d/?v=pedal"+location.search.replace("?","&")+location.hash);else{document.documentElement.classList.add("framed");addEventListener("click",e=>{const a=e.target.closest("a[href]");if(a&&!a.target&&a.getAttribute("href")[0]!=="#")a.target="_top"})}</script>
+<style>.framed .top .back { display: none }</style>
 <title>액셀 페달 3D</title>
 <meta name="description" content="사용자 3D 시안 구조로 만든 액셀 페달 3D 모델. 모르는 치수는 ?로 두고 직접 입력하면 모델·검사·조각 크기가 바로 바뀜">
 <link rel="preconnect" href="https://fonts.googleapis.com">

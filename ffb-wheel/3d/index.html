@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>레이싱 휠 3D</title>
+<meta name="description" content="창공설 레이싱 휠의 휠 베이스와 액셀 페달 3D 모델 — 한 페이지에서 탭으로, 모델은 따로따로">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
+<style>
+/* 휠 베이스·액셀 페달을 한 주소에서 탭으로. 두 모델은 ../wheel/, ../pedal/ 그대로 */
+:root { --ink: #1C2228; --ink-soft: #56616B; --rule: #C3CBD2; --page: #F4F5F6; --accent: #C8102E; --ui: "IBM Plex Sans KR", "Malgun Gothic", system-ui, sans-serif; color-scheme: light }
+* { box-sizing: border-box }
+html, body { margin: 0; height: 100% }
+body { background: var(--page); color: var(--ink); font: 13px var(--ui); display: flex; flex-direction: column; overflow: hidden }
+nav { flex: none; display: flex; align-items: center; gap: 4px; height: 44px; padding: 0 max(16px, env(safe-area-inset-right)) 0 max(16px, env(safe-area-inset-left)); border-bottom: 1px solid var(--rule) }
+nav a { color: var(--ink-soft); text-decoration: none; white-space: nowrap }
+nav a:hover { color: var(--ink) }
+nav b { font-size: 15px; margin: 0 auto 0 14px; white-space: nowrap }
+nav button { font: inherit; border: 1px solid var(--rule); background: #fff; color: var(--ink-soft); padding: 6px 11px; border-radius: 3px; cursor: pointer; white-space: nowrap }
+nav button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+iframe { flex: 1; width: 100%; border: 0; display: block }
+iframe[hidden] { display: none }
+@media (max-width: 400px) { nav b { display: none } nav a { margin-right: auto } }
+</style>
+</head>
+<body>
+<nav aria-label="레이싱 휠 3D">
+  <a href="../../#make">← 창업실</a>
+  <b>레이싱 휠 3D</b>
+  <button type="button" data-v="wheel" data-src="../wheel/" aria-pressed="true">휠 베이스</button>
+  <button type="button" data-v="pedal" data-src="../pedal/" aria-pressed="false">액셀 페달</button>
+</nav>
+<iframe id="f-wheel" title="휠 베이스 3D" hidden></iframe>
+<iframe id="f-pedal" title="액셀 페달 3D" hidden></iframe>
+<script>
+// 처음 연 탭에만 주소 뒤쪽(#d= 치수, ?cam= 등)을 넘기고, 다른 탭은 처음 누를 때 불러옴
+const tabs = [...document.querySelectorAll("nav button")];
+const q = new URLSearchParams(location.search), first = q.get("v");
+q.delete("v");
+function show(v, rest = "") {
+  for (const t of tabs) {
+    const on = t.dataset.v === v, f = document.getElementById("f-" + t.dataset.v);
+    t.setAttribute("aria-pressed", on);
+    if (on && !f.getAttribute("src")) f.src = t.dataset.src + rest;
+    f.hidden = !on;
+  }
+}
+show(tabs.some(t => t.dataset.v === first) ? first : tabs[0].dataset.v, (q.size ? "?" + q : "") + location.hash);
+for (const t of tabs) t.addEventListener("click", () => {
+  show(t.dataset.v);
+  history.replaceState(null, "", t === tabs[0] ? location.pathname : "?v=" + t.dataset.v);
+});
+</script>
+</body>
+</html>

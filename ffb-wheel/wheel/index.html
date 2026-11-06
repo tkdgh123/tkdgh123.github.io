@@ -3,6 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<script>/* 따로 열면 탭 페이지로, 탭 안에서는 바깥 링크만 창 전체로 */if(window.top===window)location.replace("../3d/?v=wheel"+location.search.replace("?","&")+location.hash);else{document.documentElement.classList.add("framed");addEventListener("click",e=>{const a=e.target.closest("a[href]");if(a&&!a.target&&a.getAttribute("href")[0]!=="#")a.target="_top"})}</script>
+<style>.framed .top .back { display: none }</style>
 <title>휠 베이스 3D</title>
 <meta name="description" content="창공설 레이싱 휠의 핸들 부분을 우리가 산 부품의 실제 치수로 다시 만든 3D 모델">
 <link rel="preconnect" href="https://fonts.googleapis.com">

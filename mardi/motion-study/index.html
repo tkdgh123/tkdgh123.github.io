@@ -3,6 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<script>/* 따로 열면 탭 페이지로, 탭 안에서는 바깥 링크만 창 전체로 */if(window.top===window)location.replace("../?v=study"+location.search.replace("?","&")+location.hash);else{document.documentElement.classList.add("framed");addEventListener("click",e=>{const a=e.target.closest("a[href]");if(a&&!a.target&&a.getAttribute("href")[0]!=="#")a.target="_top"})}</script>
+<style>.framed .top a { display: none }</style>
 <title>마디 움직임 비교</title>
 <meta name="description" content="마디 캐릭터 조정값 15개를 사람 모캡 측정·논문·ARPG·3인칭 액션 게임과 나란히 놓은 비교 — 사람 숫자, 게임 타이밍, 빠진 동작, 2차 전환 동작(출발·멈춤·되돌기·꺾기·착지·발끝), 3차 릴스 3편(MuJoCo 접촉·UE5 되돌기·손가락 리그), 4차 애니메이터 영상(HY-Motion 리뷰·출발 압축), 검사 방법">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
