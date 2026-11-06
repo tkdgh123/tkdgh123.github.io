@@ -503,12 +503,12 @@ function listen(lang = "en-US") {
   };
   rec.start();
 }
+// 막힌 말의 핵심 표현을 내가 실제로 말했는지 직접 본다 (Gemini 판정은 너무 후해서 쓰지 않음)
+const norm = s => " " + s.toLowerCase().replace(/[’]/g, "'").replace(/[^a-z0-9' ]/g, " ").replace(/\s+/g, " ").trim() + " ";
+const keyOf = t => norm(t.key || t.en.split(/\s+/).slice(0, 4).join(" "));
 function hitCheck() {
-  const said = parts.join(" ").toLowerCase();
-  conv.tg.forEach(t => {
-    const key = t.en.toLowerCase().replace(/[^a-z' ]/g, "").split(" ").slice(0, 4).join(" ");
-    if (key && said.includes(key) && !conv.hits[t.id]) { conv.hits[t.id] = 1; chips(t.id) }
-  });
+  const said = norm(parts.join(" "));
+  conv.tg.forEach(t => { if (!conv.hits[t.id] && said.includes(keyOf(t))) { conv.hits[t.id] = 1; chips(t.id) } });
 }
 function startTurn() {
   parts = []; interim = ""; spoke = false; quiet = 0; gapOpen = false; listening = true;
@@ -526,7 +526,8 @@ async function stopTurn() {
 async function aiTurn() {
   busy = true; setState("생각하는 중"); $("mic").disabled = true;
   try {
-    const contents = [{ role: "user", parts: [{ text: "(The learner just arrived. Start the conversation.)" }] }, ...conv.turns.map(t => ({ role: t.who === "ai" ? "model" : "user", parts: [{ text: t.text }] }))];
+    const opener = S.memory ? "(The learner just arrived. Open by following up on one specific thing you remember about them, and ask about it in a way that gives them a reason to use one of today's sentences.)" : "(The learner just arrived. Start the conversation.)";
+    const contents = [{ role: "user", parts: [{ text: opener }] }, ...conv.turns.map(t => ({ role: t.who === "ai" ? "model" : "user", parts: [{ text: t.text }] }))];
     const reply = await ask(persona(conv.scene), contents);
     conv.turns.push({ who: "ai", text: reply });
     $("line").className = "say"; $("line").textContent = reply; $("ko").textContent = ""; $("tr").textContent = "한국어로 보기"; $("lsub").hidden = false;
@@ -581,23 +582,23 @@ async function finish() {
   const c = conv; $("end").hidden = true; $("kobtn").hidden = true;
   setState("돌아보는 중"); $("mic").disabled = true; busy = true;
   const mine = c.turns.filter(t => t.who === "me");
-  let out = { stuck: [], used: [], memory: S.memory, tip: "" };
+  let out = { stuck: [], memory: S.memory, tip: "" };
   if (mine.length) {
     const transcript = c.turns.map(t => `${t.who === "ai" ? SCENES[c.scene].name : "Learner"}: ${t.text}`).join("\n");
     const sys = `You review a short English conversation with a Korean learner. In learner lines, [pause Ns] is silence and [KO: ...] is Korean they used because they could not say it in English.
-Target sentences (id: text): ${c.tg.map(t => `${t.id}: ${t.en}`).join(" | ") || "none"}.
-Return JSON only: {"stuck":[{"en":"short natural English sentence the learner was trying to say","ko":"자연스러운 한국어 뜻"}],"used":["ids of target sentences the learner said correctly (small wording changes are fine)"],"memory":"updated English notes about the learner's life and plans, max 600 characters, keep older facts that still matter","tip":"한국어 한 문장: 오늘 잘한 점이나 다음에 해 볼 것"}
-Rules for stuck: up to 4 items, only where the learner paused, switched to Korean, broke off, or said something clearly wrong. Each en is a complete sentence of at most 12 words they can reuse. Empty list if they spoke smoothly.`;
+Return JSON only: {"stuck":[{"en":"short natural English sentence the learner was trying to say","ko":"자연스러운 한국어 뜻","key":"the 2-5 word core expression inside en that is worth learning, copied exactly from en"}],"memory":"updated English notes about the learner's life and plans, max 600 characters, keep older facts that still matter; refer to the learner by name or as the learner, never with he/she/his/her","tip":"친구처럼 편한 해요체 한국어 한 문장(예: ~했어요, ~해 봐요): 오늘 잘한 점이나 다음에 해 볼 것"}
+Rules for stuck: up to 4 items, only where the learner paused, switched to Korean, broke off, or said something clearly wrong. Each en is a complete sentence of at most 12 words they can reuse. Skip anything already saved or a close variant of it. Empty list if they spoke smoothly.
+Already saved: ${S.stuck.filter(x => !x.done).map(x => x.en).join(" | ") || "none"}`;
     try {
       const raw = await ask(sys + `\nPrevious notes: ${S.memory || "none"}`, [{ role: "user", parts: [{ text: transcript }] }], true);
       const j = JSON.parse(raw.replace(/^```(json)?|```$/g, ""));
-      out = { stuck: Array.isArray(j.stuck) ? j.stuck.filter(x => x?.en && x?.ko).slice(0, 4) : [], used: Array.isArray(j.used) ? j.used : [], memory: typeof j.memory === "string" && j.memory ? j.memory : S.memory, tip: j.tip || "" };
+      out = { stuck: Array.isArray(j.stuck) ? j.stuck.filter(x => x?.en && x?.ko).slice(0, 4) : [], memory: typeof j.memory === "string" && j.memory ? j.memory : S.memory, tip: j.tip || "" };
     } catch (e) { $("convErr").textContent = e instanceof AIError ? e.message : "돌아보기를 읽지 못했어요. 대화 기록은 남겨 둘게요." }
   }
-  const used = new Set([...out.used, ...Object.keys(c.hits)]);
+  const used = new Set(Object.keys(c.hits));
   S.stuck.forEach(x => { if (used.has(x.id)) { x.uses++; if (x.uses >= 2) { x.done = true; x.doneAt = today() } } });
   const have = new Set(S.stuck.map(x => x.en.toLowerCase()));
-  const added = out.stuck.filter(x => !have.has(x.en.toLowerCase())).map((x, i) => ({ id: Date.now().toString(36) + i, en: x.en.trim(), ko: x.ko.trim(), uses: 0, made: today() }));
+  const added = out.stuck.filter(x => !have.has(x.en.toLowerCase())).map((x, i) => ({ id: Date.now().toString(36) + i, en: x.en.trim(), ko: x.ko.trim(), key: typeof x.key === "string" && norm(x.en).includes(norm(x.key)) ? x.key.trim() : "", uses: 0, made: today() }));
   S.stuck.push(...added); S.memory = out.memory;
   const min = c.ms / 60000;
   if (mine.length) S.sessions.push({ date: today(), scene: c.scene, turns: c.turns, pauses: c.pauses, min: +min.toFixed(2), typed: !!c.typed, added: added.length, used: [...used].length, tip: out.tip });
