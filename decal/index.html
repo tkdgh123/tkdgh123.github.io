@@ -195,18 +195,16 @@ function fold(ax, seg) {
   const [ox, oy, dx, dy] = dirOf(ax);
   let pos = 0, neg = 0;
   for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { const v = (x - ox) * -dy + (y - oy) * dx; if (v > .01) pos++; else if (v < -.01) neg++ }
-  // 접히는 넓이: 쉬움은 선이 판을 가르니 그쪽 전체. 보통은 그은 만큼, 맞은 짝이 있는 칸까지만(헛접기는 선 바로 옆 줄).
-  // 띠의 끝은 늘 칸과 칸 사이에 오게 칸 중심에서 잰다(점이 반으로 잘리지 않게)
-  const U = (x, y) => (x - ox) * dx + (y - oy) * dy, V = (x, y) => Math.abs((x - ox) * -dy + (y - oy) * dx);
-  let cells = ps.map(([x, y]) => [x, y]);
-  if (!ok) {
-    const near = ax.t[0] === "D" ? Math.SQRT1_2 : ax.a % 1 ? .5 : 1;
-    for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) if (Math.abs(V(x, y) - near) < .01 && (!seg || (U(x, y) >= seg[0] - .4 && U(x, y) <= seg[1] + .4))) cells.push([x, y]);
+  // 접히는 넓이. 띠의 끝은 늘 칸과 칸 사이에 오게 칸 중심에서 잰다(점이 반으로 잘리지 않게)
+  const V = (x, y) => Math.abs((x - ox) * -dy + (y - oy) * dx);
+  // 길이: 쉬움은 판 끝까지, 보통은 그은 선만큼(칸 위치에 맞춰 반올림). 깊이: 맞은 짝 중 가장 먼 칸까지, 헛접기는 선 바로 옆 줄
+  const step = ax.t[0] === "D" ? Math.SQRT1_2 : 1;
+  let u0 = -30, u1 = 30, vm = 30;
+  if (seg) {
+    u0 = Math.ceil((seg[0] - .4) / step - 1e-6) * step; u1 = Math.floor((seg[1] + .4) / step + 1e-6) * step;
+    if (u0 > u1) u0 = u1 = Math.round((seg[0] + seg[1]) / 2 / step) * step;
+    vm = ok ? Math.max(...ps.map(([x, y]) => V(x, y))) : ax.t[0] === "D" ? Math.SQRT1_2 : ax.a % 1 ? .5 : 1;
   }
-  let u0 = Infinity, u1 = -Infinity, vm = 0;
-  for (const [x, y] of cells) { u0 = Math.min(u0, U(x, y)); u1 = Math.max(u1, U(x, y)); vm = Math.max(vm, V(x, y)) }
-  if (!cells.length) { u0 = u1 = 0; vm = 1 }
-  if (!seg) { u0 = -30; u1 = 30; vm = 30 }
   const m = ax.t[0] === "D" ? .36 : .5;
   fl = { ax, seg, ok, ps, t0: now, side: pos <= neg ? 1 : -1, u0: u0 - m, u1: u1 + m, vm: vm + m, snap: grid.slice(), bg: getComputedStyle(document.body).backgroundColor };
   FX.noise({ d: .19, vol: .22, f: 500, to: 2600, q: .8 });
