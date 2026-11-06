@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>데칼코마니</title>
-<meta name="description" content="선을 그어 판을 반으로 접으면, 똑같이 겹치는 색 점이 짝으로 터지는 60초 퍼즐">
+<meta name="description" content="선을 그어 판을 반으로 접으면, 똑같이 겹치는 색 점이 짝으로 터지는 2분 퍼즐">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -57,7 +57,7 @@ canvas { display: block; background: var(--paper); border-radius: 20px; box-shad
   </div></div>
 </main>
 <script>
-const N = 8, TIME = 60, DENSITY = 0.4, MIN = 1, PENALTY = 3;
+const N = 8, TIME = 120, DENSITY = 0.4, MIN = 1, PENALTY = 3;
 const COLORS = ["#2f6be0", "#e4473f", "#21985f", "#8a55e8", "#f08a24", "#33312d"];
 const $ = id => document.getElementById(id);
 const cv = $("cv"), ctx = cv.getContext("2d");
