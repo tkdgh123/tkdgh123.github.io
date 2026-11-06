@@ -46,6 +46,9 @@
 <details class="t toc" open><summary>이 페이지 차례</summary><nav aria-label="차례"><ol><li><a href="#what"><i>01</i>덜미가 하는 일</a></li><li><a href="#modes"><i>02</i>켜는 방식 두 가지</a></li><li><a href="#connect"><i>03</i>접속</a></li><li><a href="#hello"><i>04</i>접속 절차</a></li><li><a href="#packet"><i>05</i>메시지 한 통의 모양</a></li><li><a href="#path"><i>06</i>한 통이 가는 길</a></li><li><a href="#bytes"><i>07</i>조각 모으기</a></li><li><a href="#rules"><i>08</i>중계 규칙</a></li><li><a href="#poll"><i>09</i>치기와 받기를 동시에</a></li><li><a href="#screen"><i>10</i>화면</a></li><li><a href="#addr"><i>11</i>주소 표시</a></li><li><a href="#code"><i>12</i>코드는 이렇게 놓여 있다</a></li><li><a href="#steps"><i>13</i>만든 순서와 확인</a></li><li><a href="#limits"><i>14</i>아직 못 하는 것</a></li><li><a href="#next"><i>15</i>다음 단계</a></li><li><a href="#s16"><i>16</i>팀 역할</a></li></ol></nav></details>
 <main class="secs">
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" class="ahp"/></marker><marker id="ahg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" class="ahg"/></marker></defs></svg>
+<section class="t sec rise">
+<div class="tip"><b>11-06부터 프로그램이 최종 버전으로 바뀌었다.</b> 모든 글이 암호화되고(헤더 65바이트), 새로 온 사람은 <b>입장 심사</b>(<code>/ok</code>)를 거치며, 모두가 같은 대화를 받았는지 <b>장부 대조</b>로 맞춰 본다. 아래 설명서는 그 바탕인 <b>통신 뼈대(중간 제출 평문 버전)</b> 기준이다 — 접속·조각 모으기·중계·입력 스레드는 그대로이고, 패킷 모양·HELLO·한 통이 가는 길은 바뀌었다. 바뀐 부분은 <a href="../plan/#hello">계획 05~11</a>, 함수 지도는 <a href="../log/">작업 기록 03</a>.</div>
+</section>
 <section class="t sec rise" id="what">
 <h2 id="what"><span class="n">01</span>덜미가 하는 일</h2>
 <ul>
@@ -53,7 +56,7 @@
 <li>프로그램은 <code>deolmi.c</code> <b>한 파일</b>이고 <b>윈도우 전용</b>이다. Visual Studio에서 열어 F5를 누르거나 exe를 더블클릭하면 이름과 방장/참가자를 묻는다. 받는 법과 켜는 법은 <a href="../run/">시작하기</a>에 있다.</li>
 <li>인원 제한 없이 여러 명이 한 방에 들어올 수 있다.</li>
 <li>메시지는 <b>어디에도 저장하지 않는다.</b> 중계하는 방장은 받자마자 전해 주고 잊는다. 꺼져 있던 사람에게는 가지 않는다.</li>
-<li><b>지금은 암호화 전 단계(평문)</b>라 방장과, 같은 네트워크에서 엿보는 사람은 내용을 볼 수 있다. 사람끼리 통신이 확실히 되는 것부터 만들고, 암호화는 그다음에 얹는다 — <a href="../plan/">암호화 계획</a>.</li>
+<li><b>평문 단계(이 설명서 기준)</b>에서는 방장과 같은 네트워크에서 엿보는 사람이 내용을 볼 수 있었다. 11-06 최종 버전은 모든 글을 암호화한다 — <a href="../plan/">계획</a>.</li>
 </ul>
 </section>
 <section class="t sec rise" id="modes">

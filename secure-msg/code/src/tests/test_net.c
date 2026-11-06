@@ -1,4 +1,4 @@
-/* 패킷 송수신 확인 (설명서 '만든 순서와 확인'의 S3). 방장(deolmi H --host)이 켜져 있어야 한다 — tests\run.bat 이 알아서 켠다
+/* 패킷 송수신 확인 (헤더 65바이트: 번호 8 + nonce 24 포함). 방장(deolmi H --host)이 켜져 있어야 한다 — tests\run.bat 이 알아서 켠다
    ① 1바이트씩 쪼개 보내기  ② 두 통을 한 번에  ③ 길이 0xFFFFFFFF */
 #define NET_ONLY   /* deolmi.c 에서 ① 통신 부분만 가져온다 */
 #include "../deolmi.c"
@@ -22,21 +22,28 @@ static void make(const char *text)
     out.type = TYPE_MESSAGE;
     strcpy(out.from, "A");
     strcpy(out.to, "B");
+    out.seq = 7;
+    memset(out.nonce, 0xAB, NONCE_LEN);
     out.body_len = (uint32_t)strlen(text);
     memcpy(out.body, text, out.body_len);
 }
 
-/* 방장에게 이름 등록 (HELLO, 본문 없음) */
+/* 방장에게 이름 등록 (서명한 HELLO) */
 static void hello(int fd, const char *name)
 {
     struct packet *h = &in;
+    uint8_t id_pk[KEY_LEN], id_sk[ID_SK_LEN], kx_pk[KEY_LEN], kx_sk[KEY_LEN];
+    crypto_sign_keypair(id_pk, id_sk);
+    crypto_kx_keypair(kx_pk, kx_sk);
     memset(h, 0, sizeof(*h));
     h->type = TYPE_HELLO;
     strcpy(h->from, name);
+    hello_make(h->body, name, id_pk, id_sk, kx_pk);
+    h->body_len = HELLO_BODY;
     send_packet(fd, h);
 }
 
-/* B에서 MSG 하나를 받아 from·to·body가 맞는지. 방장이 보낸 HELLO, SYS는 건너뜀 */
+/* B에서 MSG 하나를 받아 from·to·seq·nonce·body가 맞는지. 방장이 보낸 HELLO, SYS는 건너뜀 */
 static int got(const char *text)
 {
     int r;
@@ -46,6 +53,7 @@ static int got(const char *text)
                 return 0;   /* 1초 안에 안 오면 실패 */
     } while (r == 1 && in.type != TYPE_MESSAGE);
     return r == 1 && strcmp(in.from, "A") == 0 && strcmp(in.to, "B") == 0
+        && in.seq == 7 && in.nonce[0] == 0xAB && in.nonce[NONCE_LEN - 1] == 0xAB
         && in.body_len == strlen(text) && memcmp(in.body, text, in.body_len) == 0;
 }
 
@@ -53,6 +61,8 @@ int main(void)
 {
     WSADATA wsa;
     WSAStartup(MAKEWORD(2, 2), &wsa);
+    if (sodium_init() < 0)
+        return 1;
     int a = connect_to_host("127.0.0.1", 9000);
     int b = connect_to_host("127.0.0.1", 9000);
     if (a < 0 || b < 0) {

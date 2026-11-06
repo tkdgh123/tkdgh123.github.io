@@ -1,4 +1,4 @@
-/* 방장 중계 확인 (설명서 '만든 순서와 확인'의 S4). 방장(deolmi H --host)이 켜져 있어야 한다 — tests\run.bat 이 알아서 켠다
+/* 방장 중계 확인 . 방장(deolmi H --host)이 켜져 있어야 한다 — tests\run.bat 이 알아서 켠다
    HELLO 등록·전달, to로 중계, 입장·퇴장 SYS, 처리 규칙, 인원 제한 없음 */
 #define NET_ONLY   /* deolmi.c 에서 ① 통신 부분만 가져온다 */
 #include "../deolmi.c"
@@ -10,6 +10,7 @@ struct got {             /* 받은 패킷을 간단히 적어 둔 것 */
     int     type;
     char    from[NAME_LEN], to[NAME_LEN];
     char    text[256];   /* MSG, SYS body */
+    uint64_t seq;
 };
 
 struct user {
@@ -48,11 +49,23 @@ static void open_user(struct user *u)
     setsockopt(u->c.sock, SOL_SOCKET, SO_RCVTIMEO, (const char *)&tv, sizeof(tv));
 }
 
-static void join(struct user *u, const char *name)
+/* 서명한 HELLO. bad면 서명을 1바이트 망가뜨린다 */
+static void join_with(struct user *u, const char *name, int bad)
 {
+    uint8_t id_pk[KEY_LEN], id_sk[ID_SK_LEN], kx_pk[KEY_LEN], kx_sk[KEY_LEN];
+    crypto_sign_keypair(id_pk, id_sk);
+    crypto_kx_keypair(kx_pk, kx_sk);
     open_user(u);
     make(TYPE_HELLO, name, "", "");
+    hello_make(pkt.body, name, id_pk, id_sk, kx_pk);
+    pkt.body_len = HELLO_BODY;
+    pkt.body[HELLO_BODY - 1] ^= (uint8_t)bad;
     send_packet(u->c.sock, &pkt);
+}
+
+static void join(struct user *u, const char *name)
+{
+    join_with(u, name, 0);
 }
 
 /* 지금까지 온 패킷을 전부 받아 적는다 */
@@ -65,6 +78,7 @@ static void collect(struct user *u)
             g->type = pkt.type;
             memcpy(g->from, pkt.from, NAME_LEN);
             memcpy(g->to, pkt.to, NAME_LEN);
+            g->seq = pkt.seq;
             size_t n = pkt.body_len < sizeof(g->text) - 1 ? pkt.body_len : sizeof(g->text) - 1;
             memcpy(g->text, pkt.body, n);
             g->text[n] = '\0';
@@ -116,6 +130,8 @@ int main(void)
 {
     WSADATA wsa;
     WSAStartup(MAKEWORD(2, 2), &wsa);
+    if (sodium_init() < 0)
+        return 1;
     join(&A, "A");
     if (A.c.sock < 0) {
         printf("방장을 먼저 켜세요: deolmi H --host\n");
@@ -126,13 +142,21 @@ int main(void)
     usleep(50000);
     join(&C, "C");
     collect_all();
-    /* 새로 들어온 사람은 이미 있던 사람들(방장 H 포함)의 HELLO를, 있던 사람은 "입장" 알림을 받는다 */
+    /* 새로 들어온 사람은 이미 있던 사람들(방장 H 포함)의 HELLO를, 있던 사람은 새로 온 사람의 HELLO를 받는다 */
     check(has_hello(&C, "A") && has_hello(&C, "B") && has_hello(&C, "H") && count(&C, TYPE_HELLO, NULL) == 3,
           "C가 이미 있던 A, B와 방장 H의 HELLO를 받음");
-    check(has_hello(&B, "A") && has_hello(&B, "H") && count(&B, TYPE_HELLO, NULL) == 2 && has_sys(&B, "C 입장"),
-          "B는 A, H의 HELLO를 받고, 뒤에 온 C는 입장 알림으로 앎");
-    check(has_hello(&A, "H") && count(&A, TYPE_HELLO, NULL) == 1 && has_sys(&A, "B 입장") && has_sys(&A, "C 입장"),
-          "A는 H의 HELLO를 받고, 뒤에 온 B, C는 입장 알림으로 앎");
+    int seq_ok = 1, last_hello = -1;
+    for (int i = 0; i < C.ng; i++)
+        if (C.g[i].type == TYPE_HELLO) {
+            seq_ok &= C.g[i].seq == (strcmp(C.g[i].from, "H") == 0 ? 2u : 1u);
+            last_hello = i;
+        }
+    check(seq_ok && last_hello >= 0 && strcmp(C.g[last_hello].from, "H") == 0,
+          "이미 있던 사람 HELLO는 seq 1, 방장 HELLO는 마지막에 seq 2");
+    check(has_hello(&B, "A") && has_hello(&B, "H") && has_hello(&B, "C") && count(&B, TYPE_HELLO, NULL) == 3 && has_sys(&B, "C 입장"),
+          "B는 A, H의 HELLO와 뒤에 온 C의 HELLO(입장 심사용)를 받음");
+    check(has_hello(&A, "H") && has_hello(&A, "B") && has_hello(&A, "C") && count(&A, TYPE_HELLO, NULL) == 3,
+          "A는 H와 뒤에 온 B, C의 HELLO를 받음");
     check(has_sys(&A, "C 입장") && has_sys(&B, "C 입장") && has_sys(&C, "C 입장"), "전원에게 SYS \"C 입장\"");
 
     join(&D, "B");
@@ -159,9 +183,20 @@ int main(void)
     make(TYPE_MESSAGE, "A", "", "모두에게");
     send_packet(A.c.sock, &pkt);
     collect_all();
-    check(count(&B, TYPE_MESSAGE, "A") == 1 && count(&C, TYPE_MESSAGE, "A") == 1 && B.g[0].to[0] == '\0'
-          && strcmp(C.g[0].text, "모두에게") == 0, "to가 빈 MSG 한 통이 B, C 모두에게 감");
-    check(count(&A, TYPE_MESSAGE, NULL) == 0, "보낸 A 자신에게는 안 돌아옴");
+    check(count(&B, TYPE_MESSAGE, NULL) == 0 && count(&C, TYPE_MESSAGE, NULL) == 0,
+          "받을 사람이 빈 MSG는 아무에게도 안 감 (암호화 뒤엔 사람마다 한 통)");
+
+    make(TYPE_APPROVE, "A", "B", "승인");
+    send_packet(A.c.sock, &pkt);
+    make(TYPE_LEDGER, "A", "C", "장부");
+    send_packet(A.c.sock, &pkt);
+    collect_all();
+    check(count(&B, TYPE_APPROVE, "A") == 1 && count(&C, TYPE_LEDGER, "A") == 1, "APPROVE, LEDGER도 받을 사람에게 그대로");
+
+    make(TYPE_HELLO, "A", "", "");
+    send_packet(A.c.sock, &pkt);
+    collect_all();
+    check(has_sys(&A, "HELLO는 한 번만") && !A.closed && count(&B, TYPE_HELLO, NULL) == 0, "HELLO를 또 보내면 무시하고 알림");
 
     make(TYPE_MESSAGE, "A", "Z", "없는 사람");
     send_packet(A.c.sock, &pkt);
@@ -191,6 +226,10 @@ int main(void)
     join(&F, "");
     collect_all();
     check(has_sys(&F, "이름 사용 중") && F.closed, "빈 이름은 거절");
+
+    join_with(&F, "F", 1);
+    collect_all();
+    check(has_sys(&F, "서명이 맞지 않습니다") && F.closed && count(&A, TYPE_HELLO, NULL) == 0, "서명이 틀린 HELLO는 거절, 남에게 안 알림");
 
     closesocket(C.c.sock);
     C.closed = 1;
