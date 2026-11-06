@@ -3,6 +3,7 @@ import {
   initializeFirestore, persistentLocalCache, persistentMultipleTabManager,
   doc, getDoc, setDoc, updateDoc, deleteDoc, collection, onSnapshot, deleteField, arrayUnion
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { VAPID, unb64u, sendPush } from "./push.js";
 
 const CONFIG = {
   apiKey: "AIzaSyA4VJvIM9DwMB4D2KzhDwcekCIGMRSrmwI",
@@ -65,7 +66,7 @@ function armed(btn) {
 /* ---------- 상태 ---------- */
 const now = new Date();
 const S = { room: null, me: "a", info: null, events: [], wishes: [], annivs: [], days: {},
-            y: now.getFullYear(), m: now.getMonth(), sel: today(), unsub: [], kind: "place", photos: [] };
+            y: now.getFullYear(), m: now.getMonth(), sel: today(), unsub: [], kind: "place", photos: [], subs: [] };
 const name = w => S.info?.[w]?.name || (w === "a" ? "A" : "B");
 const col = (...p) => collection(db, "rooms", S.room, ...p);
 const ref = (...p) => doc(db, "rooms", S.room, ...p);
@@ -263,6 +264,9 @@ function openEvent(id) {
                    days: rep === "w" ? days : deleteField(), mday: rep === "m" ? +$("fDay").value : deleteField() };
     if (!data.title) return false;
     if (rep === "w" && !days.length) { toast("요일을 골라 주세요"); return false; }
+    const keys = ["title", "date", "end", "time", "memo", "who", "rep", "until"];
+    if (!id || keys.some(k => (e[k] || "") !== (data[k] || "")) || (rep === "w" && String(days) !== String(wdays(e))) || (rep === "m" && data.mday !== e.mday))
+      tell(id ? "일정 수정" : "일정 추가", evText({ ...data, days, mday: +$("fDay").value }));
     if (id) {
       updateDoc(ref("events", id), data).catch(fail);
       if (e.wishId) updateDoc(ref("wishes", e.wishId), { date }).catch(() => {});
@@ -289,11 +293,13 @@ function openEvent(id) {
     $("fSkip")?.addEventListener("click", ev => {
       if (!armed(ev.currentTarget)) return;
       updateDoc(ref("events", id), { skip: arrayUnion(startOf(e, S.sel)) }).catch(fail);
+      tell("일정 삭제", `${md(S.sel)} · ${e.title} (이 날만)`);
       closeSheet();
     });
     $("fDel")?.addEventListener("click", ev => {
       if (!armed(ev.currentTarget)) return;
       deleteDoc(ref("events", id)).catch(fail);
+      tell("일정 삭제", evText(e));
       if (e.wishId) updateDoc(ref("wishes", e.wishId), { status: "want", date: deleteField(), eventId: deleteField() }).catch(() => {});
       closeSheet();
     });
@@ -311,6 +317,7 @@ function openMood() {
     const mood = $("fF").dataset.v || "", memo = $("fN").value.trim();
     if (!mood && !memo) return false;
     setDoc(ref("days", S.sel), { [S.me]: { mood, memo } }, { merge: true }).catch(fail);
+    if (mood !== (cur.mood || "") || memo !== (cur.memo || "")) tell("기분·한 줄", `${md(S.sel)} ${[mood, memo].filter(Boolean).join(" ")}`);
   }, () => {
     seg($("fF"), "f");
     if (cur.mood) $("fF").querySelector(`[data-f="${cur.mood}"]`)?.click();
@@ -333,6 +340,7 @@ function openPlan(wid) {
     setDoc(ev, { title: w.title, date, end: "", time: $("pH").value, memo: "", who: "both", by: S.me, at: Date.now(), wishId: wid }).catch(fail);
     updateDoc(ref("wishes", wid), { status: "planned", date, eventId: ev.id }).catch(fail);
     toast(`${md(date)}에 넣었어요`);
+    tell("날짜 잡음", `${md(date)}${$("pH").value ? " " + $("pH").value : ""} · ${w.title}`);
   }, () => { $("pD").value = S.sel >= today() ? S.sel : today(); });
 }
 
@@ -346,14 +354,53 @@ function openAnniv(id) {
     const data = { title: $("aT").value.trim(), md: $("aD").value.slice(5) };
     if (!data.title) return false;
     (a ? updateDoc(ref("annivs", id), data) : setDoc(doc(col("annivs")), data)).catch(fail);
+    if (!a || a.title !== data.title || a.md !== data.md) tell(a ? "기념일 수정" : "기념일 추가", `${data.title} · ${md("2000-" + data.md)}`);
   }, () => {
     $("aT").value = a?.title || "";
     $("aD").value = a ? `${new Date().getFullYear()}-${a.md}` : today();
     $("aDel")?.addEventListener("click", ev => {
       if (!armed(ev.currentTarget)) return;
       deleteDoc(ref("annivs", id)).catch(fail); closeSheet();
+      tell("기념일 삭제", a.title);
     });
   });
+}
+
+/* ---------- 알림: 내가 바꾸면 상대 휴대폰에 뜬다 ---------- */
+const evText = e => [e.rep ? repLabel(e) : md(e.date) + (e.end ? ` ~ ${md(e.end)}` : ""), e.time, "· " + e.title].filter(Boolean).join(" ");
+function tell(what, body) {
+  const title = `${name(S.me)} · ${what}`;
+  for (const s of S.subs) if (s.who !== S.me)
+    sendPush(s.sub, { title, body }).then(st => { if (st === 404 || st === 410) deleteDoc(ref("subs", s.id)); }).catch(() => {});
+}
+const canPush = "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
+const mySub = async () => (await navigator.serviceWorker.getRegistration())?.pushManager.getSubscription() ?? null;
+const subId = async s => [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s.endpoint)))]
+  .slice(0, 12).map(b => pad(b.toString(16))).join("");
+const saveSub = async s => setDoc(ref("subs", await subId(s)), { who: S.me, sub: s.toJSON(), at: Date.now() });
+const ASK_KEY = "uridal-pushask";
+async function renderPush() {
+  const on = canPush && Notification.permission === "granted" && !!(await mySub().catch(() => null));
+  let dismissed = false; try { dismissed = !!localStorage.getItem(ASK_KEY); } catch {}
+  $("pushAsk").hidden = !canPush || Notification.permission !== "default" || dismissed;
+  $("pushBtn").hidden = !canPush || Notification.permission === "denied";
+  $("pushBtn").textContent = on ? "끄기" : "켜기";
+  $("pushState").textContent = !canPush ? (/iphone|ipad|ipod/i.test(navigator.userAgent) ? "홈 화면에 추가한 앱에서 켤 수 있어요" : "이 브라우저는 알림이 안 돼요")
+    : Notification.permission === "denied" ? "막혀 있어요 (브라우저 설정에서 허용)" : on ? "켜짐" : "꺼짐";
+}
+async function pushToggle() {
+  try {
+    const cur = await mySub();
+    if (cur) { await deleteDoc(ref("subs", await subId(cur))).catch(() => {}); await cur.unsubscribe(); toast("알림을 껐어요"); }
+    else {
+      if (await Notification.requestPermission() !== "granted") return;
+      toast("알림 켜는 중…"); $("pushBtn").disabled = $("pushAskOn").disabled = true;
+      const r = await navigator.serviceWorker.ready;
+      await saveSub(await r.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: unb64u(VAPID) }));
+      toast("알림을 켰어요");
+    }
+  } catch { toast("알림을 켜지 못했어요"); }
+  finally { $("pushBtn").disabled = $("pushAskOn").disabled = false; renderPush(); }
 }
 
 /* ---------- 연결 ---------- */
@@ -440,8 +487,13 @@ function enter(room, me) {
     S.unsub.push(onSnapshot(col(c), s => { S[c] = s.docs.map(d => ({ id: d.id, ...d.data() })); render(); }));
   }
   S.unsub.push(onSnapshot(col("days"), s => { S.days = Object.fromEntries(s.docs.map(d => [d.id, d.data()])); render(); }));
+  S.unsub.push(onSnapshot(col("subs"), s => { S.subs = s.docs.map(d => ({ id: d.id, ...d.data() })); }));
+  if (canPush && Notification.permission === "granted") mySub().then(s => s && saveSub(s)).catch(() => {});
+  renderPush();
 }
-function leave() {
+/* 나가면 이 방에서 이 기기로 오던 알림도 끊는다 */
+async function leave() {
+  try { const s = canPush && await mySub(); if (s) await deleteDoc(ref("subs", await subId(s))); } catch {}
   S.unsub.forEach(u => u()); saveLocal(null); location.reload();
 }
 
@@ -564,14 +616,16 @@ $("wishForm").addEventListener("submit", e => {
   e.preventDefault();
   const title = $("wishIn").value.trim(); if (!title) return;
   setDoc(doc(col("wishes")), { title, kind: S.kind, by: S.me, status: "want", at: Date.now() }).catch(fail);
+  tell("하고 싶은 것", `${KIND[S.kind]} · ${title}`);
   $("wishIn").value = "";
 });
 $("wishList").addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b) return;
   const { plan, wdel, wdone, wgo, wback } = b.dataset;
+  const wt = S.wishes.find(x => x.id === (wdel || wdone))?.title;
   if (plan) openPlan(plan);
-  else if (wdel) { if (armed(b)) deleteDoc(ref("wishes", wdel)).catch(fail); }
-  else if (wdone) updateDoc(ref("wishes", wdone), { status: "done" }).catch(fail);
+  else if (wdel) { if (armed(b)) { deleteDoc(ref("wishes", wdel)).catch(fail); tell("하고 싶은 것 삭제", wt); } }
+  else if (wdone) { updateDoc(ref("wishes", wdone), { status: "done" }).catch(fail); tell("다녀옴", wt); }
   else if (wback) updateDoc(ref("wishes", wback), { status: "want", date: deleteField(), eventId: deleteField() }).catch(fail);
   else if (wgo) {
     const w = S.wishes.find(x => x.id === wgo); if (!w?.date) return;
@@ -585,6 +639,7 @@ $("annivList").addEventListener("click", e => { const b = e.target.closest("[dat
 $("saveSet").onclick = () => {
   const a = $("sA").value.trim(), b = $("sB").value.trim(), start = $("sStart").value;
   if (!a || !b || !start) return toast("이름과 날짜를 모두 적어 주세요");
+  if (a !== name("a") || b !== name("b") || start !== S.info.start) tell("설정", `${a} ♥ ${b} · 사귄 날 ${full(start)}`);
   updateDoc(doc(db, "rooms", S.room), { "a.name": a, "b.name": b, start }).catch(fail);
   toast("저장했어요");
 };
@@ -593,6 +648,8 @@ $("leave").onclick = e => { if (armed(e.currentTarget)) leave(); };
 $("skinBtn").onclick = openSkins;
 $("codeBtn").onclick = openRoom;
 $("bootReset").onclick = leave;
+$("pushBtn").onclick = $("pushAskOn").onclick = pushToggle;
+$("pushAskX").onclick = () => { try { localStorage.setItem(ASK_KEY, "1"); } catch {} renderPush(); };
 $("skinBtn2").onclick = openSkins;
 $("hPic").onclick = () => {
   if (!S.photos.length) { showTab("us"); return $("album").scrollIntoView({ behavior: "smooth" }); }
@@ -612,6 +669,7 @@ $("picIn").addEventListener("change", async e => {
   }
   showPhoto(last.id);
   toast("사진을 넣었어요");
+  tell("사진", `사진 ${files.length}장을 넣었어요`);
 });
 $("picList").addEventListener("click", e => {
   const b = e.target.closest("[data-pic], [data-pdel]"); if (!b) return;

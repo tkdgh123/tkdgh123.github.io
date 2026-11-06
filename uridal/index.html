@@ -80,6 +80,7 @@
 
   <main>
     <section id="tab-cal" class="tab">
+      <div class="pushask" id="pushAsk" hidden><span>상대가 일정·기분을 남기면 알림 받기</span><button class="pill" id="pushAskOn" type="button">켜기</button><button class="x" id="pushAskX" type="button" aria-label="닫기">×</button></div>
       <div class="mhead">
         <button class="icon" id="prevM" type="button" aria-label="이전 달">‹</button>
         <h2 id="mTitle"></h2>
@@ -131,6 +132,7 @@
         <label>사귄 날 <input id="sStart" type="date"></label>
         <button class="pill" id="saveSet" type="button">저장</button>
         <button class="pill" id="skinBtn2" type="button">화면 고르기</button>
+        <div class="coderow"><span>알림</span><span class="pstate" id="pushState"></span><button class="pill" id="pushBtn" type="button" hidden>켜기</button></div>
         <div class="coderow"><span>커플 코드</span><output class="code small" id="sCode"></output><button class="pill" id="sCopy" type="button">링크 보내기</button></div>
         <button class="pill" id="installBtn" type="button" hidden>홈 화면에 앱 설치</button>
         <p class="hint" id="iosHint" hidden>Safari 아래 공유 버튼 → 홈 화면에 추가하면 앱처럼 열려요.</p>

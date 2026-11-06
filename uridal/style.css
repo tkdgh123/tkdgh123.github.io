@@ -190,6 +190,11 @@ main { max-width: 640px; margin: 0 auto; padding: 14px max(14px, env(safe-area-i
 .settings .pill { margin: 0; align-self: flex-start; background: var(--hero); box-shadow: none; }
 .coderow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--soft); }
 .hint { margin: 0; font-size: 13px; color: var(--soft); }
+.coderow .pstate { color: var(--ink); }
+.pushask { display: flex; align-items: center; gap: 8px; padding: 8px 8px 8px 16px; border-radius: 999px; background: var(--hero); font-size: 14px; font-weight: 700; color: var(--acc-ink); }
+.pushask span { flex: 1; min-width: 0; }
+.pushask .pill { flex: none; background: var(--acc); color: #fff; box-shadow: none; }
+.pushask .x { flex: none; width: 32px; height: 32px; border: 0; border-radius: 50%; background: none; font-size: 20px; color: var(--soft); }
 
 /* 떠 있는 탭 */
 .tabbar { position: fixed; z-index: 5; left: max(14px, env(safe-area-inset-left, 0px)); right: max(14px, env(safe-area-inset-right, 0px));
