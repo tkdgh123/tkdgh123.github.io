@@ -52,7 +52,7 @@
 <h2 id="s02"><span class="n">02</span>코드 받기</h2>
 <p>프로젝트째 받는다. 암호 라이브러리 설정까지 들어 있어서 새 빈 프로젝트에 <code>deolmi.c</code>만 넣으면 빌드되지 않는다.</p>
 <div class="step">
-<p><a class="dl" href="../code/src/deolmi_vs.zip" download style="padding:4px 10px;font-size:14px">deolmi_vs.zip 받기</a> 를 받아 압축을 푼다. 안에 <code>deolmi.c</code>, <code>deolmi.sln</code>, <code>deolmi.vcxproj</code>와 암호 라이브러리 <code>libsodium</code> 폴더가 있다. <b><code>deolmi.sln</code>을 더블클릭</b>하면 Visual Studio로 열린다.</p>
+<p><a class="dl" href="../code/src/deolmi_vs.zip" download style="padding:4px 10px;font-size:14px">deolmi_vs.zip 받기</a> 를 받아 압축을 푼다. 안에 <code>deolmi.c</code>, <code>deolmi.sln</code>, <code>deolmi.vcxproj</code>, 암호 라이브러리 <code>libsodium</code> 폴더, 카메라 지킴이 <code>eye</code> 폴더와 <code>카메라 준비.bat</code>이 있다. <b><code>deolmi.sln</code>을 더블클릭</b>하면 Visual Studio로 열린다.</p>
 </div>
 <p class="sub">따로 설치·설정할 것은 없다. libsodium(1.0.22 공식 빌드)과 그 경로, 한글 설정이 묶음에 다 들어 있다.</p>
 </section>
@@ -134,7 +134,7 @@
 <p class="sub">장부 대조는 <b>셋 이상</b>일 때 의미가 있다. 시연은 노트북 한 대에서 창 넷(방장 + 셋)으로 해도 된다.</p>
 <h3 id="screen">화면 지키기 — 찍으면 가려지고, 새면 잡힌다</h3>
 <div class="step">
-<p><b>카메라 지킴이 준비 — 처음 한 번만</b>: python을 깔고, 명령 프롬프트에서 <code>pip install mediapipe opencv-python</code>. 덜미의 다른 기능은 이게 없어도 된다.</p>
+<p><b>카메라 지킴이 준비 — 처음 한 번만</b>: 받은 deolmi 폴더의 <b><code>카메라 준비.bat</code>을 더블클릭</b>한다. python이 없으면 알아서 깔고(관리자 권한 필요 없음), 휴대폰 인식에 쓰는 mediapipe를 받는다. 인터넷이 필요하고 처음엔 몇 분 걸린다. <code>[카메라 준비] 끝</code>이 뜨면 아무 키나 눌러 닫는다. 덜미의 다른 기능은 이게 없어도 된다.</p>
 </div>
 <ol>
 <li>한 창에서 <code>/eye</code> → 몇 초 뒤 <code>[카메라] 켜졌습니다</code>. 다른 창들에는 <code>… 카메라 지킴이를 켰습니다</code>.</li>
@@ -153,7 +153,7 @@
 <li><code>9000번 포트로 방을 열 수 없습니다</code> → 이미 켜 둔 덜미 방장이 있다. 그 창을 닫는다 (안 보이면 명령 프롬프트에서 <code>taskkill /im deolmi.exe</code>).</li>
 <li><b>내 글이 상대에게 안 감</b> → 아직 승인 전이다. 방장과 기존 멤버가 모두 <code>/ok 이름</code> 해야 한다. <code>/who</code>로 "승인 대기"인지 본다.</li>
 <li><code>[!] ○○의 키가 전과 다릅니다</code> → 그 사람이 다른 노트북으로 왔거나 신원 키 폴더를 지웠으면 정상이다. 단어를 다시 물어보고 맞으면 <code>/ok</code>. 아니면 다른 사람이다.</li>
-<li><code>[카메라] 카메라 프로그램이 멈췄습니다</code> → python이나 <code>mediapipe</code>·<code>opencv-python</code>이 안 깔렸다 (06 "화면 지키기" 준비).</li>
+<li><code>[카메라] 카메라 프로그램이 멈췄습니다</code> → 아직 <code>카메라 준비.bat</code>을 안 돌렸다 (06 "화면 지키기"). 돌렸는데 <code>[실패]</code>가 떴으면 인터넷을 확인하고 다시 돌린다.</li>
 <li><code>[카메라] 카메라를 열지 못했습니다</code> → 줌·팀즈 같은 다른 프로그램이 카메라를 쓰고 있거나, 윈도우 설정 → 개인 정보 및 보안 → 카메라에서 "데스크톱 앱이 카메라에 액세스하도록 허용"이 꺼져 있다.</li>
 <li><code>[추적] 띄어쓰기가 꼭 맞는 사람이 없습니다</code> → 내가 보낸 글이 아니거나, 누가 다시 타이핑해서 띄어쓰기가 바뀌었다. 나온 줄들과 눈으로 비교해 본다.</li>
 <li>이름을 다시 물음 → 이름은 한글 5글자(15바이트)까지, 띄어쓰기와 <code>/</code> <code>|</code> 없이. 이미 들어와 있는 이름이나 방장 이름도 안 된다.</li>

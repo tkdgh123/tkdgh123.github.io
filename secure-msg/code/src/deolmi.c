@@ -1399,7 +1399,7 @@ static void tick(void)
 enum { EYE_OFF, EYE_ON, EYE_PHONE, EYE_DARK };
 
 static int eye_sock = -1, eye_state = EYE_OFF;
-static HANDLE eye_job, hidden_screen;
+static HANDLE eye_job, eye_proc, hidden_screen;
 static ULONGLONG eye_heard;           // 카메라 프로그램한테서 마지막으로 들은 때
 
 
@@ -1471,6 +1471,10 @@ static void stop_eye(void)
         CloseHandle(eye_job);
         eye_job = NULL;
     }
+    if (eye_proc) {
+        CloseHandle(eye_proc);
+        eye_proc = NULL;
+    }
     if (eye_sock >= 0) {
         closesocket(eye_sock);
         eye_sock = -1;
@@ -1505,13 +1509,35 @@ static int find_eye(wchar_t path[MAX_PATH])
 
 
 
+// "카메라 준비.bat"이 eye\python.txt에 적어 둔 python 위치. 없으면 그냥 python
+static void find_python(const wchar_t *script, wchar_t python[MAX_PATH])
+{
+    wchar_t path[MAX_PATH];
+    char line[3 * MAX_PATH] = "";
+    FILE *f;
+    wcscpy(python, L"python");
+    wcscpy(path, script);
+    wcscpy(wcsrchr(path, L'\\') + 1, L"python.txt");
+    if (!(f = _wfopen(path, L"r")))
+        return;
+    if (fgets(line, sizeof(line), f)) {
+        line[strcspn(line, "\r\n")] = '\0';
+        if (line[0])
+            MultiByteToWideChar(CP_UTF8, 0, line, -1, python, MAX_PATH);
+    }
+    fclose(f);
+}
+
+
+
+
 // 카메라 프로그램 켜기. 받을 UDP 포트를 127.0.0.1에 열고 그 번호를 넘긴다
 // 테스트할 때는 DEOLMI_EYE로 가짜 카메라 프로그램을 쓸 수 있다
 static void start_eye(void)
 {
     struct sockaddr_in addr = {0};
     int len = sizeof(addr);
-    wchar_t cmd[2 * MAX_PATH], script[MAX_PATH];
+    wchar_t cmd[3 * MAX_PATH], script[MAX_PATH], python[MAX_PATH];
     const wchar_t *helper = _wgetenv(L"DEOLMI_EYE");
     STARTUPINFOW si = { sizeof(si) };
     PROCESS_INFORMATION pi;
@@ -1530,21 +1556,23 @@ static void start_eye(void)
         return;
     }
     if (helper)
-        swprintf(cmd, 2 * MAX_PATH, L"%ls %u", helper, ntohs(addr.sin_port));
-    else
-        swprintf(cmd, 2 * MAX_PATH, L"python \"%ls\" %u", script, ntohs(addr.sin_port));
+        swprintf(cmd, 3 * MAX_PATH, L"%ls %u", helper, ntohs(addr.sin_port));
+    else {
+        find_python(script, python);
+        swprintf(cmd, 3 * MAX_PATH, L"\"%ls\" \"%ls\" %u", python, script, ntohs(addr.sin_port));
+    }
     eye_job = CreateJobObjectW(NULL, NULL);   // 덜미가 꺼지면 카메라 프로그램도 같이 꺼지게
     limit.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
     SetInformationJobObject(eye_job, JobObjectExtendedLimitInformation, &limit, sizeof(limit));
     if (!CreateProcessW(NULL, cmd, NULL, NULL, FALSE, CREATE_NO_WINDOW | CREATE_SUSPENDED, NULL, NULL, &si, &pi)) {
-        print_line("[카메라] 카메라 프로그램을 켜지 못했습니다 (python이 깔려 있는지 확인)");
+        print_line("[카메라] 카메라 프로그램을 켜지 못했습니다 (deolmi 폴더의 '카메라 준비.bat'을 한 번 실행하세요)");
         stop_eye();
         return;
     }
     AssignProcessToJobObject(eye_job, pi.hProcess);
     ResumeThread(pi.hThread);
     CloseHandle(pi.hThread);
-    CloseHandle(pi.hProcess);
+    eye_proc = pi.hProcess;
     eye_heard = GetTickCount64();
     print_line("[카메라] 켜는 중입니다 (몇 초 걸립니다)");
 }
@@ -1577,11 +1605,12 @@ static void read_eye(void)
 
 
 
-// 카메라 프로그램이 조용하면 멈춘 것 (켜는 중엔 모델을 읽느라 오래 걸려서 20초까지 기다림)
+// 카메라 프로그램이 꺼졌거나 조용하면 멈춘 것 (켜는 중엔 모델을 읽느라 오래 걸려서 20초까지 기다림)
 static void check_eye(void)
 {
-    if (eye_sock >= 0 && GetTickCount64() - eye_heard > (eye_state == EYE_OFF ? 20000u : 3000u)) {
-        print_line("[카메라] 카메라 프로그램이 멈췄습니다 (python에 mediapipe, opencv-python이 깔려 있는지 확인)");
+    if (eye_sock >= 0 && (WaitForSingleObject(eye_proc, 0) == WAIT_OBJECT_0
+                          || GetTickCount64() - eye_heard > (eye_state == EYE_OFF ? 20000u : 3000u))) {
+        print_line("[카메라] 카메라 프로그램이 멈췄습니다 (deolmi 폴더의 '카메라 준비.bat'을 한 번 실행하세요)");
         stop_eye();
     }
 }
