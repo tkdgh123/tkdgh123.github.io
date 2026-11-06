@@ -48,13 +48,23 @@ body.locked::after { content: ""; position: fixed; z-index: 5; left: 50%; top: 5
 .shots .tips { margin: 0; padding: 0 0 10px 18px; font-size: 13px; line-height: 1.5; color: #3a3a38; border-bottom: 1.5px solid var(--rule) }
 .shots .list { overflow-y: auto; overscroll-behavior: contain; padding: 0 16px 14px }
 .shots h3 { font: 700 12px var(--mono); color: var(--muted); margin: 14px 0 2px }
-.shot { display: grid; grid-template-columns: 22px 1fr; gap: 2px 8px; padding: 8px 0 }
-.shot input { width: 18px; height: 18px; margin: 2px 0 0; accent-color: var(--ink) }
-.shot .sname { padding: 0; border: 0; background: none; font: 700 15px var(--sans); color: var(--ink); text-align: left; cursor: pointer } .shot button.sname:hover, .shot.on .sname { color: #2b44a6 }
-.shot .tag { margin-left: 6px; font: 700 11px var(--sans); color: #d23b2f }
-.shot ul { grid-column: 2; margin: 2px 0 0; padding-left: 16px; font-size: 13px; line-height: 1.5; color: #3a3a38 } .shot li.base { color: var(--muted) }
-.shot.done .sname, .shot.done ul { opacity: .45 }
-@media (max-width: 700px) { .shots { left: 12px; right: 12px; top: auto; bottom: 12px; width: auto; max-height: 56svh } }
+.place { padding: 10px 0 4px } .pname { padding: 0; border: 0; background: none; font: 700 15px var(--sans); color: var(--ink); cursor: pointer } .pname:hover { color: #2b44a6 }
+.place ol { margin: 4px 0 0; padding: 0; list-style: none; counter-reset: s }
+.shot { display: flex; align-items: center; gap: 8px; padding: 3px 0; counter-increment: s }
+.shot input { flex: none; width: 16px; height: 16px; margin: 0; accent-color: var(--ink) }
+.sname { padding: 0; border: 0; background: none; font: 500 14px/1.35 var(--sans); color: #3a3a38; text-align: left; cursor: pointer } .sname::before { content: counter(s) ". "; color: var(--muted) }
+.sname:hover, .shot.on .sname { color: #2b44a6 } .shot.on .sname { font-weight: 700 } .shot.done .sname { opacity: .45; text-decoration: line-through }
+.tag { margin-left: 6px; font: 700 11px var(--sans); color: #d23b2f; white-space: nowrap }
+.sc { position: fixed; z-index: 7; left: var(--m); top: 50%; transform: translateY(-50%); width: 340px; padding: 18px; display: none; background: rgb(242 241 236 / .95); backdrop-filter: blur(8px); box-shadow: 0 8px 28px rgb(0 0 0 / .14) } body.shoot .sc { display: block }
+.sc .meta { color: var(--muted); font-size: 12px } .sc h2 { font: 700 22px/1.25 var(--sans); letter-spacing: -.02em; margin: 6px 0 12px }
+.sc dl { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; margin: 0; font-size: 14px; line-height: 1.45 } .sc dt { color: var(--muted) } .sc dd { margin: 0 }
+.sc .gps { margin-top: 10px; font-size: 12px; color: #1e7e4a } .sc .gps:empty { display: none }
+.sc .row { display: flex; gap: 6px; margin-top: 12px } .sc .row + .row { margin-top: 6px } .sc .row .b { flex: 1; justify-content: center } .sc .b:disabled { opacity: .35; cursor: default }
+.sf { position: fixed; z-index: 4; left: 50%; top: 50%; transform: translate(-50%, -50%); display: none; border: 2px solid #fff; box-shadow: 0 0 0 200vmax rgb(12 12 12 / .4); pointer-events: none;
+  background: linear-gradient(90deg, transparent calc(33.3% - .5px), rgb(255 255 255 / .4) 0 calc(33.3% + .5px), transparent 0 calc(66.6% - .5px), rgb(255 255 255 / .4) 0 calc(66.6% + .5px), transparent 0),
+  linear-gradient(transparent calc(33.3% - .5px), rgb(255 255 255 / .4) 0 calc(33.3% + .5px), transparent 0 calc(66.6% - .5px), rgb(255 255 255 / .4) 0 calc(66.6% + .5px), transparent 0) } /* 휴대폰 화면 틀 + 3등분 선 */
+body.shoot:not(.noframe) .sf { display: block } body.shoot .walk { display: none }
+@media (max-width: 700px) { .shots { left: 12px; right: 12px; top: auto; bottom: 12px; width: auto; max-height: 56svh; z-index: 8 } .sc { left: 12px; right: 12px; top: auto; bottom: 12px; width: auto; transform: none; padding: 14px } .sc h2 { font-size: 19px; margin: 4px 0 8px } .sc dl { font-size: 13px } body.shoot .map { display: none } }
 @media (max-width: 700px) { .panel { top: auto; bottom: 72px; transform: translateY(24px) } .panel.on { transform: none } .panel h2 { margin: 6px 0 8px }
   .map { right: 12px; top: 52px; bottom: auto; width: 176px; padding: 8px } .walk { max-width: calc(100vw - 32px) } #mapC { height: 128px } .mapName { font-size: 13px; margin: 4px 2px 6px } }
 </style>
@@ -70,7 +80,11 @@ body.locked::after { content: ""; position: fixed; z-index: 5; left: 50%; top: 5
   <div class="mapRow"><button class="b sm" id="allB" type="button">전체 보기</button><button class="b sm" id="skB" type="button" aria-pressed="false">스케치</button><button class="b sm" id="shotB" type="button" aria-pressed="false">촬영 목록</button></div>
   <div class="skRow"><button class="b sm" id="skUndo" type="button">되돌리기</button><button class="b sm main" id="skFile" type="button">파일로 저장</button><button class="b sm" id="skClear" type="button">모두 지우기</button></div></section>
 <section class="shots" id="shots" aria-label="촬영 목록"><header><h2>촬영 목록</h2><span class="cnt mono" id="shotCnt"></span></header>
-  <div class="list"><ol class="tips"><li>카메라 위치 태그 켜기 — 갤럭시: 카메라 설정 → 위치 태그 / 아이폰: 설정 → 개인정보 보호 및 보안 → 위치 서비스 → 카메라</li><li>맑은 낮, 1배 줌, 가로로</li><li>모서리에 서면 두 면이 같이 나와요. 같은 곳 여러 장·짧은 영상도 좋아요</li><li><b style="color:#d23b2f">짐작</b> = 지금 추측으로 만든 곳이라 꼭</li><li>카톡으로 보내면 위치가 지워져요 → 구글 드라이브나 케이블로</li></ol><div id="shotList"></div></div></section>
+  <div class="list"><ol class="tips"><li>카메라 위치 태그 켜기 — 갤럭시: 카메라 설정 → 위치 태그 / 아이폰: 설정 → 개인정보 보호 및 보안 → 위치 서비스 → 카메라</li><li>사진 이름을 누르면 그 자리 눈높이 화면이 나와요. 하얀 틀 안처럼 찍으면 돼요</li><li>맑은 낮에, 카드에 적힌 배율(1배·0.5배)과 가로·세로로</li><li>'내 위치'를 켜면 서는 곳까지 방향·거리가 나와요</li><li><b style="color:#d23b2f">짐작</b> = 지금 추측으로 만든 곳이라 꼭</li><li>카톡으로 보내면 위치가 지워져요 → 구글 드라이브나 케이블로</li></ol><div id="shotList"></div></div></section>
+<section class="sc" id="sc" aria-label="촬영 안내"><p class="meta mono" id="scMeta"></p><h2 id="scT"></h2><dl id="scDl"></dl><p class="gps mono" id="scGps"></p>
+  <div class="row"><button class="b sm" id="scPrev" type="button" aria-label="이전 사진">←</button><button class="b sm main" id="scDone" type="button">찍었어요</button><button class="b sm" id="scNext" type="button" aria-label="다음 사진">→</button></div>
+  <div class="row"><button class="b sm" id="scGeo" type="button" aria-pressed="false">내 위치</button><button class="b sm" id="scList" type="button">목록</button><button class="b sm" id="scClose" type="button">닫기</button></div></section>
+<div class="sf" id="sf"></div>
 <div class="note" id="note"><input id="noteIn" type="text" maxlength="200" placeholder="여기에 뭐가 있나요?" aria-label="메모"><button class="b sm main" id="noteOk" type="button">저장</button></div>
 <p class="toast" id="toast" role="status"></p>
 <p class="walk" id="walkHint"></p>
@@ -356,7 +370,7 @@ const MAT = { white: new THREE.MeshStandardMaterial({ color: 0xf4f4f2, roughness
   black: new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: .5 }), steel: new THREE.MeshStandardMaterial({ color: 0x8a9096, roughness: .4, metalness: .6 }), blue: new THREE.MeshStandardMaterial({ color: 0x1f3c74, roughness: .5 }),
   glassY: new THREE.MeshStandardMaterial({ color: 0xe6e2c4, roughness: .15, metalness: .1, transparent: true, opacity: .78 }), glassB: new THREE.MeshStandardMaterial({ color: 0x5f9a9c, roughness: .15, metalness: .2 }) };
 const textTex = (w, h, draw) => { const c = document.createElement("canvas"); c.width = w; c.height = h; draw(c.getContext("2d")); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t; };
-const byName = n => named.find(b => b.n === n);
+const byName = n => named.find(b => b.n === n), SPOT = {}; // SPOT = 촬영 안내가 쓰는 자리 [x, y, z, 바깥 nx, nz]
 const boxWalls = (st, w, h, d, top) => { const mk = W => { const t = facade(st); t.repeat.set(W / (st.bw || 3.6), h / FH); t.offset.set(0, 0); return new THREE.MeshStandardMaterial({ map: t, roughness: .5 }); }, a = mk(d), b = mk(w);
   return [a, a, top, top, b, b]; }; // 순서: +x, -x, +y, -y, +z, -z
 // 형남공학관: 서쪽 끝 15층 탑 (정문 사진·위성 그림자) — 둥근 모서리, 회색 세로줄 벽, 정문 쪽 면 꼭대기 '숭실대학교' + 청록 띠, 남서 모서리 청록 유리 기둥
@@ -377,7 +391,7 @@ for (const b of named) if (b.st?.hiTower) { const o = obb(b.pts), s = o.ux > 0 ?
   const cr = facade(RIB); cr.repeat.set(Math.PI * rr * 2 / RIB.bw, H / FH); cr.offset.set(0, 0); const crM = [new THREE.MeshStandardMaterial({ map: cr, roughness: .8 }), roofM, roofM];
   for (const a of [-1, 1]) for (const c of [-1, 1]) add(new THREE.CylinderGeometry(rr, rr, H, 16), crM, a * (TX / 2 - rr), c * (TZ / 2 - rr));
   const south = -Math.sin(ry) > 0 ? 1 : -1; add(new THREE.CylinderGeometry(4.2, 4.2, H - 4, 24), MAT.glassB, south * (TX / 2 - 2), s * (TZ / 2 - 3)); grp.children.at(-1).position.y = (H - 4) / 2;
-  b.top = Math.max(b.top, b.base + H); b.lv = b.st.hiTower; b.h = H; }
+  b.top = Math.max(b.top, b.base + H); b.lv = b.st.hiTower; b.h = H; SPOT.hnTower = { x, z, y0: b.base - 1, H, TX, TZ, ry }; }
 const edgeFacing = (b, nx, nz) => { let best = null; b.pts.forEach((p, i) => { const q = b.pts[(i + 1) % b.pts.length], dx = q[0] - p[0], dz = q[1] - p[1], L = Math.hypot(dx, dz); if (L < 4) return;
     let ox = dz / L, oz = -dx / L; const mx = (p[0] + q[0]) / 2, mz = (p[1] + q[1]) / 2; if (inPoly(mx + ox, mz + oz, b.pts)) { ox = -ox; oz = -oz; }
     const s = (ox * nx + oz * nz) * Math.min(L, 40); if (!best || s > best.s) best = { s, p, q, L, ox, oz, mx, mz, ang: Math.atan2(dx, dz) }; }); return best; };
@@ -388,7 +402,7 @@ const edgeFacing = (b, nx, nz) => { let best = null; b.pts.forEach((p, i) => { c
   g2.fillStyle = "#e6e2da"; g2.textAlign = "center"; g2.font = "700 40px Pretendard, sans-serif"; g2.fillText("안익태기념관", 128, 62, 236); g2.font = "500 15px Pretendard, sans-serif"; g2.fillText("Ahn Eak Tai Memorial Hall", 128, 88, 236);
   const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace; const stone = new THREE.MeshStandardMaterial({ color: 0x2a2b2d, roughness: .7 }), mats = [stone, stone, stone, stone, stone, stone];
   mats[(-uz * e.ox + ux * e.oz) > 0 ? 4 : 5] = new THREE.MeshStandardMaterial({ map: tex, roughness: .7 });
-  const m = new THREE.Mesh(new THREE.BoxGeometry(9, 13, 1.6), mats); m.rotation.y = Math.atan2(-uz, ux); m.position.set(end[0] + k * ux * 5.5 + e.ox * .9, Y(end[0], end[1]) + 6, end[1] + k * uz * 5.5 + e.oz * .9);
+  const m = new THREE.Mesh(new THREE.BoxGeometry(9, 13, 1.6), mats); m.rotation.y = Math.atan2(-uz, ux); m.position.set(end[0] + k * ux * 5.5 + e.ox * .9, Y(end[0], end[1]) + 6, end[1] + k * uz * 5.5 + e.oz * .9); SPOT.ahnSign = [m.position.x, m.position.y, m.position.z, e.ox, e.oz];
   m.castShadow = m.receiveShadow = true; scene.add(m); } }
 // 신양관: 옥상 유리 피라미드
 { const b = byName("신양관"); if (b) { const s = Math.min(16, b.size * .8), py = new THREE.Mesh(new THREE.ConeGeometry(s * .72, s * .55, 4, 1), MAT.glassY); py.rotation.y = Math.PI / 4 + (edgeFacing(b, 0, 1)?.ang || 0);
@@ -436,10 +450,10 @@ const glassRail = new THREE.MeshStandardMaterial({ color: 0xdfeaee, transparent:
     else for (let y = g + 4.4; y < R - 3; y += 4.4) { box(L, .4, 2.6, MAT.white, mx + ox * 1.3, y, mz + oz * 1.3, ry); box(L, 1.1, .06, glassRail, mx + ox * 2.55, y + .75, mz + oz * 2.55, ry); } }); // 운동장 쪽 층층 테라스
   const f = plaza.sort((a, c) => c.L * c.oz - a.L * a.oz)[0]; if (f) { // 남쪽 광장을 보는 가장 긴 면: 전광판 + 지붕 끝 '학생회관' 글자
     const led = new THREE.Mesh(new THREE.BoxGeometry(8.5, 4.8, .3), new THREE.MeshStandardMaterial({ color: 0x111111, emissive: 0xffffff, emissiveIntensity: .9, emissiveMap: textTex(512, 288, x => { const gr = x.createLinearGradient(0, 0, 512, 288); gr.addColorStop(0, "#3b2c8f"); gr.addColorStop(1, "#d0487c"); x.fillStyle = gr; x.fillRect(0, 0, 512, 288); x.fillStyle = "#fff"; x.font = "700 70px Pretendard, sans-serif"; x.textAlign = "center"; x.fillText("SOONGSIL", 256, 168); }) }));
-    const east = f.ux > 0 ? 1 : -1; led.position.set(f.mx - f.ux * east * f.L * .32 + f.ox * 2.6, R - .6 - 2.6, f.mz - f.uz * east * f.L * .32 + f.oz * 2.6); led.rotation.y = Math.atan2(f.ox, f.oz); scene.add(led); // 캐노피 서쪽 끝 아래에 걸린 전광판
+    const east = f.ux > 0 ? 1 : -1; led.position.set(f.mx - f.ux * east * f.L * .32 + f.ox * 2.6, R - .6 - 2.6, f.mz - f.uz * east * f.L * .32 + f.oz * 2.6); led.rotation.y = Math.atan2(f.ox, f.oz); scene.add(led); SPOT.suLed = [led.position.x, led.position.y, led.position.z, f.ox, f.oz]; SPOT.suFace = f; // 캐노피 서쪽 끝 아래에 걸린 전광판
     const nm = new THREE.Mesh(new THREE.PlaneGeometry(7.5, 1.3), new THREE.MeshStandardMaterial({ map: textTex(512, 88, x => { x.fillStyle = "#8d9196"; x.font = "700 70px Pretendard, sans-serif"; x.textAlign = "center"; x.fillText("학생회관", 256, 70); }), transparent: true, roughness: .4, metalness: .6 }));
-    nm.position.set(f.mx + f.ux * east * f.L * .36 + f.ox * 3.25, R + .6, f.mz + f.uz * east * f.L * .36 + f.oz * 3.25); nm.rotation.y = Math.atan2(f.ox, f.oz); scene.add(nm); }
-  const e = edgeFacing(b, 0, -1); if (e) { const ux = (e.q[0] - e.p[0]) / e.L, uz = (e.q[1] - e.p[1]) / e.L; // 스카이데크: 운동장 쪽 지붕 위 나무 계단 좌석
+    nm.position.set(f.mx + f.ux * east * f.L * .36 + f.ox * 3.25, R + .6, f.mz + f.uz * east * f.L * .36 + f.oz * 3.25); nm.rotation.y = Math.atan2(f.ox, f.oz); scene.add(nm); SPOT.suName = [nm.position.x, nm.position.y, nm.position.z, f.ox, f.oz]; }
+  const e = edgeFacing(b, 0, -1); if (e) { SPOT.suField = e; const ux = (e.q[0] - e.p[0]) / e.L, uz = (e.q[1] - e.p[1]) / e.L; // 스카이데크: 운동장 쪽 지붕 위 나무 계단 좌석
     for (let s = -1; s <= 1; s += 2) { const cx = e.mx + ux * s * e.L * .2 - e.ox * 1, cz = e.mz + uz * s * e.L * .2 - e.oz * 1; steps(cx, cz, cx - e.ox * 10, cz - e.oz * 10, R + .1, 5, .42, 1.6, MAT.wood, e.L * .33); } }
   { const lo = [-35.5, -121], hi = [-35.5, -82], dh = Math.max(1, Y(...hi) - Y(...lo)), n = Math.round(dh / .17); steps(lo[0], lo[1], hi[0], hi[1], Y(...lo) - .1, n, dh / n, 39 / n, MAT.granite, 8); } } } // 중앙계단 (트인 곳)
 
@@ -480,14 +494,14 @@ const SPORT = SSU.areas.filter(a => a.k.includes(":")).map(a => ({ k: a.k, pts: 
   for (let k = 0; k <= 48; k++) { const u = k / 48, p = base.getPointAt(u); p.y = Y(p.x, p.z) + 4.2 + 5.4 * Math.sin(u * Math.PI); arc.push(p); }
   const curve = new THREE.CatmullRomCurve3(arc), shape = new THREE.Shape([new THREE.Vector2(0, -2.6), new THREE.Vector2(.55, -2.6), new THREE.Vector2(.55, 2.6), new THREE.Vector2(0, 2.6)]); // 곡선의 법선=위아래라 두께는 x, 폭은 y
   const rm = new THREE.Mesh(new THREE.ExtrudeGeometry(shape, { steps: 96, extrudePath: curve }), new THREE.MeshStandardMaterial({ color: 0x8a9096, roughness: .55, metalness: .25 })); rm.castShadow = rm.receiveShadow = true; scene.add(rm);
-  const side = u => { const t = base.getTangentAt(u); let nx = -t.z, nz = t.x; if (nx * -.6 + nz * .8 < 0) { nx = -nx; nz = -nz; } return [nx, nz, t]; }; // 상도로 쪽 (남서)
+  const side = u => { const t = base.getTangentAt(u); let nx = -t.z, nz = t.x; if (nx * -.6 + nz * .8 < 0) { nx = -nx; nz = -nz; } return [nx, nz, t]; }; SPOT.gate = { base, side }; // 상도로 쪽 (남서)
   for (const u of [.14, .38, .62, .86]) { const sg = u < .5 ? -1 : 1, [nx, nz, t] = side(u), r = curve.getPointAt(u), b0 = base.getPointAt(cl(u - sg * (Math.abs(u - .5) > .25 ? 3.4 : 2.4) / GL, 0, 1)); // 위로 갈수록 바깥으로 기울고 지붕 위로 조금 솟음
     const top = new THREE.Vector3(r.x + t.x * sg * 1.2 + nx * 2.4, r.y + 1.6, r.z + t.z * sg * 1.2 + nz * 2.4), bx = b0.x + nx * 3, bz = b0.z + nz * 3, bot = new THREE.Vector3(bx, Y(bx, bz) - .3, bz);
     const d = new THREE.Vector3().subVectors(top, bot), geo = new THREE.CylinderGeometry(.32, .78, d.length(), 4, 1, false, Math.PI / 4); geo.scale(1.7, 1, .75); geo.rotateY(Math.atan2(-t.z, t.x)); // 지붕 방향으로 넓은 날
-    const leg = new THREE.Mesh(geo, MAT.concrete); leg.position.copy(bot).add(top).multiplyScalar(.5); leg.quaternion.setFromUnitVectors(up, d.normalize()); leg.castShadow = leg.receiveShadow = true; scene.add(leg); }
+    const leg = new THREE.Mesh(geo, MAT.concrete); leg.position.copy(bot).add(top).multiplyScalar(.5); leg.quaternion.setFromUnitVectors(up, d.normalize()); leg.castShadow = leg.receiveShadow = true; scene.add(leg); (SPOT.legs ||= []).push([bot, top]); }
   { const [nx, nz, t] = side(.72), p = base.getPointAt(.72); box(5, 3, 3.5, MAT.glassB, p.x - nx * 1.5, Y(p.x, p.z) + 1.5, p.z - nz * 1.5, Math.atan2(t.x, t.z)); } // 수위실
   { const [nx, nz, t] = side(.95), p = base.getPointAt(.95), x = p.x + nx * 6, z = p.z + nz * 6, y = Y(x, z); box(6.5, 1.8, 1.2, MAT.granite, x, y + .9, z, Math.atan2(-t.z, t.x)); // 정문 표석
-    const m = signMesh(["숭실대학교", "SOONGSIL UNIVERSITY · SINCE 1897"], 6, "#3a3a3a"); m.position.set(x + nx * .62, y + 1, z + nz * .62); m.rotation.y = Math.atan2(nx, nz); }
+    const m = signMesh(["숭실대학교", "SOONGSIL UNIVERSITY · SINCE 1897"], 6, "#3a3a3a"); m.position.set(x + nx * .62, y + 1, z + nz * .62); m.rotation.y = Math.atan2(nx, nz); SPOT.stone = [m.position.x, m.position.y, m.position.z, nx, nz]; }
   for (const u of [.3, .5, .7]) { const [nx, nz] = side(u), p = base.getPointAt(u), lo = [p.x + nx * 14, p.z + nz * 14], hi = [p.x + nx * 3.5, p.z + nz * 3.5], dh = Y(...hi) - Y(...lo); // 상도로에서 올라오는 계단
     if (dh > .3) { const n = Math.round(dh / .16); steps(lo[0], lo[1], hi[0], hi[1], Y(...lo) - .1, n, dh / n, 10.5 / n, MAT.granite, 15); } } }
 /* ───────── 숭실대입구역(7호선) 출구 1~4 (OSM 위치): 유리 벽·짙은 지붕 출입구 + 아래로 내려가는 계단 + 번호 표지. 방향은 가까운 큰길과 나란히 ───────── */
@@ -495,7 +509,7 @@ const SPORT = SSU.areas.filter(a => a.k.includes(":")).map(a => ({ k: a.k, pts: 
   const along = (x, z) => { let best = null, bd = 1e9; for (const [a, b] of segs) { const d = segD(x, z, a, b); if (d < bd) { bd = d; best = [b[0] - a[0], b[1] - a[1]]; } } return Math.atan2(best[0], best[1]); };
   const roofM = new THREE.MeshStandardMaterial({ color: 0x3a3f45, roughness: .6 }), dark = new THREE.MeshStandardMaterial({ color: 0x1c1d1f, roughness: .9 });
   for (const [x, z, no, ry] of [[-258.7, 108.1, 1, Math.atan2(7.6, 12.1)], [-299.6, 50.9, 2], [-284.5, 16.9, 3], [-236.4, 89.7, 4]]) {
-    clearings.push([x, z, 8]); const g = new THREE.Group(); g.position.set(x, Y(x, z), z); g.rotation.y = ry ?? along(x, z); scene.add(g);
+    clearings.push([x, z, 8]); const g = new THREE.Group(); g.position.set(x, Y(x, z), z); g.rotation.y = ry ?? along(x, z); scene.add(g); (SPOT.exits ||= []).push([x, z, g.rotation.y, no]);
     const add = (w, h, d, mat, px, py, pz) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat); m.position.set(px, py, pz); m.castShadow = m.receiveShadow = true; g.add(m); return m; };
     add(3.6, .3, 9, MAT.granite, 0, .15, 0); add(2.7, .05, 6.5, dark, 0, .31, .6); // 바닥 + 내려가는 계단 구멍
     for (const sx of [-1, 1]) add(.08, 2.4, 8.4, glassRail, sx * 1.75, 1.5, 0); add(3.5, 2.4, .08, glassRail, 0, 1.5, -4.2); add(4, .28, 9.6, roofM, 0, 2.85, 0);
@@ -540,24 +554,24 @@ function entrance(b, o = {}) { // o.at = 대략 위치(가장 가까운 벽), o.
   clearings.push([x + e.ox * 4, z + e.oz * 4, 5]); b.door = [x + e.ox * 7, z + e.oz * 7, x, z]; box(4.4, 3, .3, doorGlass, x + e.ox * .12, y + 1.5, z + e.oz * .12, ry); // 유리문
   if (!o.bare) box(6.6, .32, 2.8, MAT.white, x + e.ox * 1.4, y + 3.7, z + e.oz * 1.4, ry); // 캐노피
   if (o.cols) for (const s2 of [-2.6, 2.6]) { const c = new THREE.Mesh(new THREE.CylinderGeometry(.35, .35, 3.7, 14), MAT.white); c.position.set(x + e.ux * s2 + e.ox * 2.4, y + 1.85, z + e.uz * s2 + e.oz * 2.4); c.castShadow = true; scene.add(c); }
-  if (o.sign) { const m = signMesh(o.sign, 6.4); m.position.set(x + e.ox * .2, y + 4.9, z + e.oz * .2); m.rotation.y = Math.atan2(e.ox, e.oz); } }
+  if (o.sign) { const m = signMesh(o.sign, 6.4); m.position.set(x + e.ox * .2, y + 4.9, z + e.oz * .2); m.rotation.y = Math.atan2(e.ox, e.oz); b.signAt = [m.position.x, m.position.y, m.position.z, e.ox, e.oz]; } }
 const ENTR = { 숭덕경상관: { dir: [0, 1] }, 형남공학관: { at: [-160, 27] }, 조만식기념관: { at: [74, -114], sign: ["조만식기념관", "Jo Man Sik Memorial Hall"] },
   중앙도서관: { at: [97, -19.5], bare: true, sign: ["중앙도서관", "Central Library"] }, 레지던스홀: { cols: true, sign: ["Residence Hall"] },
   진리관: { dir: [-1, 0], cols: true }, 한경직기념관: { dir: [0, -1], bare: true }, 백마관: { dir: [0, 1] } }; // 진리관: 서쪽 면 넓은 돌계단 위 기둥 둘 + 큰 캔틸레버 캐노피 (카카오 로드뷰 2026-06)
 for (const b of named) if (b.n !== "학생회관") entrance(b, ENTR[b.n]);
 // 진리관: 학생회관 쪽 서쪽 면 남쪽 모서리 위층에 '진리관 Veritas Hall' 금속 글자 (카카오 로드뷰 2026-06)
 { const b = byName("진리관"), e = b && edgesOf(b).sort((a, c) => -c.ox * Math.min(c.L, 50) + a.ox * Math.min(a.L, 50))[0]; if (e) { const k = e.p[1] > e.q[1] ? 1 : -1, end = k > 0 ? e.p : e.q, m = signMesh(["진리관", "Veritas Hall"], 7, "#b9bcc0");
-  m.position.set(end[0] + k * e.ux * 5 + e.ox * .2, b.top - 3, end[1] + k * e.uz * 5 + e.oz * .2); m.rotation.y = Math.atan2(e.ox, e.oz); } }
+  m.position.set(end[0] + k * e.ux * 5 + e.ox * .2, b.top - 3, end[1] + k * e.uz * 5 + e.oz * .2); m.rotation.y = Math.atan2(e.ox, e.oz); SPOT.jinri = [m.position.x, m.position.y, m.position.z, e.ox, e.oz]; } }
 // 숭덕경상관: 돌계단 쪽(남쪽) 면 오른쪽(동쪽) 끝, 지붕선 바로 아래 흰 글자 (드론·투어)
 { const b = byName("숭덕경상관"), e = b && edgesOf(b).sort((a, c) => c.oz * Math.min(c.L, 60) - a.oz * Math.min(a.L, 60))[0]; if (e) { const t = e.ux > 0 ? e.L * .84 : e.L * .16, m = signMesh(["숭덕경상관"], 9, "#ffffff");
-  m.position.set(e.p[0] + e.ux * t + e.ox * .2, b.top - 2.2, e.p[1] + e.uz * t + e.oz * .2); m.rotation.y = Math.atan2(e.ox, e.oz); } }
+  m.position.set(e.p[0] + e.ux * t + e.ox * .2, b.top - 2.2, e.p[1] + e.uz * t + e.oz * .2); m.rotation.y = Math.atan2(e.ox, e.oz); SPOT.sdSign = [m.position.x, m.position.y, m.position.z, e.ox, e.oz]; } }
 // 형남공학관: 서쪽 입구 램프 옆 붉은 벽돌 담에 금색 글자 (투어)
 { const b = byName("형남공학관"), e = b && edgesOf(b).map(e => ({ e, d: segD(-160, 27, e.p, e.q) })).sort((a, c) => a.d - c.d)[0]?.e; if (e) { const x = -160 + e.ox * 8, z = 27 + e.oz * 8, y = Y(x, z), ry = Math.atan2(-e.uz, e.ux);
-  box(11, 1.7, .5, MAT.brickStep, x, y + .85, z, ry); const m = signMesh(["형남공학관", "Hyungnam Memorial Engineering Building"], 9, "#d4b06a"); m.position.set(x + e.ox * .27, y + .95, z + e.oz * .27); m.rotation.y = Math.atan2(e.ox, e.oz); } }
+  box(11, 1.7, .5, MAT.brickStep, x, y + .85, z, ry); const m = signMesh(["형남공학관", "Hyungnam Memorial Engineering Building"], 9, "#d4b06a"); m.position.set(x + e.ox * .27, y + .95, z + e.oz * .27); m.rotation.y = Math.atan2(e.ox, e.oz); SPOT.hnSign = [m.position.x, m.position.y, m.position.z, e.ox, e.oz]; } }
 // 안익태기념관: 정문 쪽 나무 벽 남쪽 끝의 큰 전광판 (2023 영상)
 { const b = byName("안익태기념관"), e = b && edgeFacing(b, -1, 0); if (e) { const ux = (e.q[0] - e.p[0]) / e.L, uz = (e.q[1] - e.p[1]) / e.L, k = e.p[1] > e.q[1] ? 1 : -1, end = k > 0 ? e.p : e.q;
   const led = new THREE.Mesh(new THREE.BoxGeometry(7, 4, .3), new THREE.MeshStandardMaterial({ color: 0x111111, emissive: 0xffffff, emissiveIntensity: .9, emissiveMap: textTex(512, 292, x => { const gr = x.createLinearGradient(0, 0, 512, 292); gr.addColorStop(0, "#1f6f8b"); gr.addColorStop(1, "#7ad1a8"); x.fillStyle = gr; x.fillRect(0, 0, 512, 292); x.fillStyle = "#fff"; x.font = "700 64px Pretendard, sans-serif"; x.textAlign = "center"; x.fillText("SOONGSIL", 256, 168); }) }));
-  led.position.set(end[0] + k * ux * 5.5 + e.ox * .35, Y(...end) + 8, end[1] + k * uz * 5.5 + e.oz * .35); led.rotation.y = Math.atan2(e.ox, e.oz); scene.add(led); } }
+  led.position.set(end[0] + k * ux * 5.5 + e.ox * .35, Y(...end) + 8, end[1] + k * uz * 5.5 + e.oz * .35); led.rotation.y = Math.atan2(e.ox, e.oz); scene.add(led); SPOT.ahnLed = [led.position.x, led.position.y, led.position.z, e.ox, e.oz]; } }
 /* 나무계단: 조만식기념관 정면 출입구 옆에서 위층 데크 광장(웨스트민스터홀 쪽)으로 오르는 넓은 나무 계단 + 네모 화분 (2026 투어 영상; 정확한 방향은 추정) */
 { const a = [76, -101], c = [101, -101], dh = Y(...c) - Y(...a); if (dh > .5) { const n = Math.round(dh / .18); steps(a[0], a[1], c[0], c[1], Y(...a) - .1, n, dh / n, 25 / n, MAT.wood, 12);
   const pm = new THREE.MeshStandardMaterial({ color: 0x3b3d40 }), leaf = new THREE.MeshStandardMaterial({ color: 0x5d7a3e, roughness: 1 });
@@ -594,7 +608,7 @@ function free(x, z) { if (SPORT_P.some(a => inPoly(x, z, a.pts)) || Math.hypot(x
   if (FIELD && Math.abs((x - FIELD.cx) * FIELD.ux + (z - FIELD.cz) * FIELD.uz) < FIELD.len / 2 + 6 && Math.abs((x - FIELD.cx) * FIELD.vx + (z - FIELD.cz) * FIELD.vz) < FIELD.wid / 2 + 13) return false; for (const v of V) if (Math.abs(v[0] - x) < v[2] / 2 + 1.5 && Math.abs(v[1] - z) < v[3] / 2 + 1.5) return false;
   for (const b of BLD) { if (Math.abs(b.cx - x) > b.size + 4 || Math.abs(b.cz - z) > b.size + 4) continue; if (inPoly(x, z, b.pts)) return false; }
   for (const [[ax, az], [bx, bz], w] of roadSegs) { const dx = bx - ax, dz = bz - az, L = dx * dx + dz * dz || 1, t = cl(((x - ax) * dx + (z - az) * dz) / L, 0, 1); if (Math.hypot(ax + dx * t - x, az + dz * t - z) < w) return false; } return true; }
-const trees = [];
+const trees = [], CROWNS = []; // CROWNS = 나무 잎 덩어리 [x, z, 아래, 위, 반지름] (촬영 안내 가림 검사용)
 for (const p of green) { const xs = p.map(q => q[0]), zs = p.map(q => q[1]), [a, b2, c, d] = [Math.min(...xs), Math.max(...xs), Math.min(...zs), Math.max(...zs)], wood = forestP.has(p), n = Math.min(wood ? 2500 : 260, ((b2 - a) * (d - c)) / (wood ? 30 : 90) | 0);
   for (let k = 0; k < n; k++) { const x = lerp(a, b2, rnd()), z = lerp(c, d, rnd()); if (inPoly(x, z, p) && free(x, z) && !inFan(x, z) && !cleared(x, z)) trees.push([x, z]); } }
 for (let k = 0; k < 3500 && trees.length < 2600; k++) { const x = lerp(-330, 330, rnd()), z = lerp(-260, 260, rnd()); if (inPoly(x, z, CAMPUS) && rnd() < .55 && free(x, z) && !inFan(x, z) && !cleared(x, z)) trees.push([x, z]); }
@@ -606,8 +620,8 @@ for (let k = 0; k < 30000 && trees.length < 9000; k++) { const x = lerp(X0, X1, 
   const nP = list.filter(t => t.pine).length, F = new THREE.InstancedMesh(blob, leafM, list.length - nP), P = new THREE.InstancedMesh(pine, leafM, nP), Tk = new THREE.InstancedMesh(new THREE.CylinderGeometry(.1, .16, 1, 6), new THREE.MeshStandardMaterial({ color: 0x5a4636 }), list.length);
   const mm = new THREE.Matrix4(), q = new THREE.Quaternion(), col = new THREE.Color(), GREENS = ["#6a8f45", "#5b8040", "#7a9a4c", "#4f7a3a", "#86a356", "#62883f"], PINES = ["#3f5f3a", "#4a6b40", "#38553a"];
   let fi = 0, pi = 0; list.forEach((t, i) => { const y = Y(t.x, t.z); q.setFromEuler(new THREE.Euler(0, rnd() * 6, 0));
-    if (t.pine) { const h = 6 + rnd() * 4, r = h * .28; mm.compose(new THREE.Vector3(t.x, y + 1.6 + h * .3, t.z), q, new THREE.Vector3(r, h * .55, r)); P.setMatrixAt(pi, mm); P.setColorAt(pi++, col.set(PINES[i % 3])); mm.compose(new THREE.Vector3(t.x, y + 1, t.z), q, new THREE.Vector3(1.1, 2, 1.1)); }
-    else { const th = 2.4 + rnd() * 1.8, r = 1.7 + rnd() * 1.5; mm.compose(new THREE.Vector3(t.x, y + th + r * .55, t.z), q, new THREE.Vector3(r, r * .85, r)); F.setMatrixAt(fi, mm); F.setColorAt(fi++, col.set(GREENS[i % 6])); mm.compose(new THREE.Vector3(t.x, y + th / 2 + .3, t.z), q, new THREE.Vector3(1.4, th + .6, 1.4)); }
+    if (t.pine) { const h = 6 + rnd() * 4, r = h * .28; mm.compose(new THREE.Vector3(t.x, y + 1.6 + h * .3, t.z), q, new THREE.Vector3(r, h * .55, r)); P.setMatrixAt(pi, mm); CROWNS.push([t.x, t.z, y + 1.2, y + 1.6 + h, r * .8]); P.setColorAt(pi++, col.set(PINES[i % 3])); mm.compose(new THREE.Vector3(t.x, y + 1, t.z), q, new THREE.Vector3(1.1, 2, 1.1)); }
+    else { const th = 2.4 + rnd() * 1.8, r = 1.7 + rnd() * 1.5; mm.compose(new THREE.Vector3(t.x, y + th + r * .55, t.z), q, new THREE.Vector3(r, r * .85, r)); F.setMatrixAt(fi, mm); CROWNS.push([t.x, t.z, y + th, y + th + r * 1.6, r * 1.05]); F.setColorAt(fi++, col.set(GREENS[i % 6])); mm.compose(new THREE.Vector3(t.x, y + th / 2 + .3, t.z), q, new THREE.Vector3(1.4, th + .6, 1.4)); }
     Tk.setMatrixAt(i, mm); });
   for (const m of [F, P]) { m.castShadow = m.receiveShadow = true; scene.add(m); } Tk.castShadow = true; scene.add(Tk); }
 
@@ -677,7 +691,7 @@ function showPanel() {
 }
 $("next").onclick = () => select(sel + 1); $("prev").onclick = () => select(sel - 1);
 // 걸어서: 건물 앞 땅에 내려앉아 눈높이로. WASD로 걷고 Esc로 하늘
-function walkIn() { if (sel < 0) return; const b = named[sel]; let x, z, d; // 입구 앞에 내려앉음. 입구가 없으면 지금 보는 쪽 벽 바로 바깥
+function walkIn() { shotEnd(); walk.hop = 70; if (sel < 0) return; const b = named[sel]; let x, z, d; // 입구 앞에 내려앉음. 입구가 없으면 지금 보는 쪽 벽 바로 바깥
   if (b.door && free(b.door[0], b.door[1])) { [x, z] = b.door; d = Math.hypot(b.door[2] - x, b.door[3] - z); }
   else { const dir = new V3(fly.pos.x - b.cx, 0, fly.pos.z - b.cz).normalize(); d = 0; while (d < 300 && inPoly(b.cx + dir.x * d, b.cz + dir.z * d, b.pts)) d += 1;
     d += 8; x = b.cx + dir.x * d; z = b.cz + dir.z * d; for (let k = 0; k < 15 && !free(x, z); k++) { d += 2; x = b.cx + dir.x * d; z = b.cz + dir.z * d; } }
@@ -686,7 +700,7 @@ function walkIn() { if (sel < 0) return; const b = named[sel]; let x, z, d; // �
   walk.from = camera.position.clone(); walk.aim = new V3(b.cx, b.base + b.h * .5, b.cz); walk.back = { pos: fly.pos.clone(), yaw: fly.yaw, pitch: fly.pitch };
   view.mode = "walk"; view.t = performance.now(); $("panel").classList.remove("on"); hint(); }
 $("walkB").onclick = walkIn;
-function walkOut() { if (view.mode !== "walk") return; fly.pos.copy(camera.position); fly.yaw = walk.yaw; fly.pitch = walk.pitch; view.mode = "fly";
+function walkOut() { shotEnd(); if (view.mode !== "walk") return; fly.pos.copy(camera.position); fly.yaw = walk.yaw; fly.pitch = walk.pitch; view.mode = "fly";
   flyTo(walk.back.pos, new V3().copy(walk.back.pos).add(dirOf(walk.back.yaw, walk.back.pitch)), 1600); showPanel(); hint(); }
 // 안내 한 줄 (처음 조작하면 옅어짐)
 const touch = matchMedia("(pointer: coarse)").matches;
@@ -747,8 +761,9 @@ function drawMap() { if ($("map").classList.contains("off")) return; const d = m
   for (const a of SPORT_P) { mapPath(a.pts); mg.fillStyle = a.k.includes("basketball") ? "#8fb0dc" : "#a9c896"; mg.fill(); }
   named.forEach((b, i) => { mapPath(b.pts); mg.fillStyle = i === sel ? "#151514" : i === mapHover ? "#2b44a6" : "#a39d90"; mg.fill(); });
   mg.strokeStyle = "#d23b2f"; mg.lineWidth = 2 * d; mg.lineJoin = mg.lineCap = "round"; for (const s of strokes) { mapPath(s.pts, false); mg.stroke(); } if (skCur?.pts.length > 1) { mapPath(skCur.pts, false); mg.stroke(); }
-  if ($("shots").classList.contains("on") || shotOn >= 0) SHOT_ALL.forEach((it, i) => { const p = shotPos(it); if (!p) return; const [x, y] = mp(...p); mg.beginPath(); mg.arc(x, y, (i === shotOn ? 5 : 3) * d, 0, 7); // 찍을 곳 (다 찍은 곳은 회색)
-    mg.fillStyle = shotDone.has(it.n) ? "#9a968c" : "#d23b2f"; mg.fill(); if (i === shotOn) { mg.lineWidth = 1.5 * d; mg.strokeStyle = "#fff"; mg.stroke(); } });
+  if ($("shots").classList.contains("on") && !SC) PLACES.forEach(p => { if (!p.at) return; const [x, y] = mp(...p.at); mg.beginPath(); mg.arc(x, y, 3 * d, 0, 7); mg.fillStyle = p.shots.every(s => shotDone.has(key(p, s))) ? "#9a968c" : "#d23b2f"; mg.fill(); }); // 찍을 곳 (다 찍은 곳은 회색)
+  if (SC) PLACES[SC.pi].shots.forEach((s, i) => { if (!s.r) return; const [x, y] = mp(s.r.e.x, s.r.e.z), on = i === SC.si; mg.beginPath(); mg.arc(x, y, (on ? 5 : 2.5) * d, 0, 7); mg.fillStyle = shotDone.has(key(PLACES[SC.pi], s)) ? "#9a968c" : "#d23b2f"; mg.fill(); if (on) { mg.lineWidth = 1.5 * d; mg.strokeStyle = "#fff"; mg.stroke(); } }); // 이 장소에서 서는 곳들
+  if (me) { const [x, y] = mp(me[0], me[1]); mg.beginPath(); mg.arc(x, y, Math.max(4 * d, me[2] * mapS), 0, 7); mg.fillStyle = "rgb(30 158 90 / .18)"; mg.fill(); mg.beginPath(); mg.arc(x, y, 4 * d, 0, 7); mg.fillStyle = "#1e9e5a"; mg.fill(); mg.lineWidth = 1.5 * d; mg.strokeStyle = "#fff"; mg.stroke(); } // 내 위치 (GPS)
   const o = view.mode === "walk" ? walk : fly, [cx, cy] = mp(camera.position.x, camera.position.z), a = Math.atan2(Math.cos(o.yaw), Math.sin(o.yaw)); // 지금 보는 방향 부채꼴
   mg.beginPath(); mg.moveTo(cx, cy); mg.arc(cx, cy, 30 * d, a - .45, a + .45); mg.closePath(); mg.fillStyle = "rgb(43 68 166 / .22)"; mg.fill();
   mg.beginPath(); mg.arc(cx, cy, 4 * d, 0, 7); mg.fillStyle = "#2b44a6"; mg.fill(); mg.lineWidth = 1.5 * d; mg.strokeStyle = "#fff"; mg.stroke(); }
@@ -793,61 +808,203 @@ $("skFile").onclick = () => { noteDone(true); if (!strokes.length) return toast(
   const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(data)], { type: "application/json" })); a.download = `숭실대-스케치-${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}.json`; a.click();
   setTimeout(() => URL.revokeObjectURL(a.href), 4000); toast("다운로드 폴더에 저장했어요"); };
 
-/* ───────── 촬영 목록: 사용자가 캠퍼스에서 찍어 올 사진. q = 지금 짐작으로 만든 곳, b = 같은 이름 건물, at = [x, z]. 누르면 그곳으로 날아감, 체크는 이 브라우저에만 ───────── */
-const BASIC = "건물 기본: 네 모서리에서 1장씩 + 입구 정면 + 이름판 가까이(있으면)";
-const SHOTS = [
-  ["정문·역 쪽", [
-    { n: "정문", at: [-255, 18], d: 80, s: ["상도로 건너편에서 정문 전체", "정문 안에서 바깥 보고", "아치 지붕 아래 올려다보기", "날개 기둥 하나 가까이", "표석 가까이"] },
-    { n: "7호선 출구 1~4", at: [-270, 60], d: 140, q: 1, s: ["출구마다 1장 — 번호판·계단 방향이 보이게", "출구 앞에서 학교 쪽 보고 1장씩"] },
-    { n: "문화관", b: 1, q: 1, s: ["옥상 철탑이 보이게 멀리서"] },
-    { n: "안익태기념관", b: 1, q: 1, s: ["정문 쪽 나무 벽과 전광판", "'안익태기념관' 검은 돌 간판벽"] },
-    { n: "형남공학관", b: 1, s: ["15층 탑 전체 — 꼭대기 '숭실대학교' 글자 보이게 (정문에서)", "서쪽 입구 램프와 금색 글자 담", "은색 곡면 벽 가까이"] },
-    { n: "숭덕경상관", b: 1, s: ["돌계단 쪽 면의 건물 이름 글자", "짙은 유리·세로 핀 가까이"] },
-    { n: "돌계단 (슈파크)", at: [-214, -40], d: 70, q: 1, s: ["서쪽 평지에서 계단 정면", "계단 맨 위에서 내려다보기", "남쪽 끝·북쪽 끝에서 옆모습 — 단 높이가 보이게", "흰 반원 기념벽", "둘레 붉은 자전거길"] }]],
-  ["운동장 둘레", [
-    { n: "베어드홀", b: 1, q: 1, s: ["학생회관 사이 붉은 벽돌 계단 — 아래에서·위에서"] },
-    { n: "학생회관", b: 1, q: 1, s: ["광장 쪽 긴 면 전체", "전광판(서쪽 끝)과 '학생회관' 글자(동쪽 끝)", "운동장에서 층층 테라스 전체", "가운데 중앙계단 — 위에서·아래에서", "지붕 풀밭·나무 데크 (올라갈 수 있으면)"] },
-    { n: "운동장·북쪽 스탠드", at: "field", d: 170, q: 1, s: ["운동장 가운데에서 북쪽(스탠드·백마관)·남쪽·동쪽·서쪽 1장씩", "스탠드 정면 가까이 — 좌석·태양광 지붕", "스탠드 위 보행로에서 왼쪽·오른쪽", "조명탑 하나"] },
-    { n: "백마관", b: 1, s: ["스탠드 위 보행로에서 입구"] },
-    { n: "교육관", b: 1, q: 1 },
-    { n: "벤처중소기업센터", b: 1, q: 1 }]],
-  ["가운데", [
-    { n: "진리관", b: 1 },
-    { n: "조만식기념관", b: 1 },
-    { n: "나무계단", at: [88, -101], d: 70, q: 1, s: ["아래 끝에서 위 보고", "위 끝에서 아래 보고", "옆에서 전체 — 폭·단 수·화분이 보이게", "위 데크 광장 둘러보기 2장"] },
-    { n: "웨스트민스터홀", b: 1, q: 1, s: ["나무계단 위 데크 광장 쪽 면"] },
-    { n: "신양관", b: 1, q: 1, s: ["옥상 유리 피라미드가 보이게 멀리서"] },
-    { n: "중앙도서관", b: 1, s: ["앞 나무 차양 — 밖에서·아래에서"] },
-    { n: "분수 광장", at: [8, -25], d: 60, s: ["분수와 둘레 화단", "분수에서 네 방향 1장씩"] },
-    { n: "한경직기념관", b: 1, s: ["십자가와 파란 기둥"] },
-    { n: "한국기독교박물관", b: 1, q: 1 }]],
-  ["동쪽", [
-    { n: "미래관", b: 1, q: 1 },
-    { n: "농구장", at: [104, 80], d: 60, s: ["바닥 색과 철망", "골대"] },
-    { n: "연구관", b: 1, q: 1 },
-    { n: "창신관", b: 1, q: 1 },
-    { n: "전산관", b: 1, q: 1, s: ["파란 지붕 — 높은 곳에서 보이면"] },
-    { n: "글로벌브레인홀", b: 1, q: 1 },
-    { n: "레지던스홀", b: 1, s: ["V자 지붕이 보이게 멀리서", "기둥 입구와 'Residence Hall'"] },
-    { n: "정보과학관", b: 1, q: 1, s: ["옥상 채광창 — 높은 곳에서 보이면"] },
-    { n: "창의관", b: 1, q: 1, s: ["쐐기 모양이 보이게 멀리서"] }]],
-  ["어디서든", [
-    { n: "바닥·나무·길", s: ["보도블록·아스팔트·잔디 가까이 1장씩", "가로등", "큰 활엽수·소나무 1장씩", "캠퍼스 길 주차 모습", "언덕 숲 가장자리"] }]]];
-const SHOT_ALL = SHOTS.flatMap(([, items]) => items), SHOTK = "ssu-shots";
+/* ───────── 촬영 안내: 사진 한 장마다 서는 자리·휴대폰 방향·배율을 정하고, 누르면 그 자리 눈높이에서 휴대폰 화면(틀)처럼 보여 줌. 체크는 이 브라우저에만 ───────── */
+const LENS = [{ z: 1, port: 0, h: 67, v: 53 }, { z: 1, port: 1, h: 53, v: 67 }, { z: .5, port: 0, h: 106, v: 90 }, { z: .5, port: 1, h: 90, v: 106 }]; // 휴대폰 기본(26mm)·광각(13mm) 카메라, 4:3
+const RAD = Math.PI / 180, EYE = 1.5, BASE_FOV = camera.fov, CMP = ["북", "북동", "동", "남동", "남", "남서", "서", "북서"];
+const compass = (dx, dz) => CMP[(Math.round(Math.atan2(dx, -dz) / (Math.PI / 4)) + 8) % 8]; // x = 동, z = 남
+const standOK = (x, z) => !inFan(x, z) && !BLD.some(b => Math.abs(b.cx - x) < b.size + 2 && Math.abs(b.cz - z) < b.size + 2 && inPoly(x, z, b.pts)) && !V.some(v => Math.abs(v[0] - x) < v[2] / 2 + 1 && Math.abs(v[1] - z) < v[3] / 2 + 1);
+// 가림 검사: 땅·건물·빌라·나무는 10m 칸 격자로 직접 계산(빠름), 나머지 작은 물체(스탠드·차양·계단·정문)만 광선으로
+const CELL = 10, GRID = new Map(), gk = (i, j) => i * 4096 + j;
+const gadd = (x0, z0, x1, z1, it) => { for (let i = Math.floor(x0 / CELL); i <= Math.floor(x1 / CELL); i++) for (let j = Math.floor(z0 / CELL); j <= Math.floor(z1 / CELL); j++) { const k = gk(i, j); if (!GRID.has(k)) GRID.set(k, []); GRID.get(k).push(it); } };
+for (const c of CROWNS) gadd(c[0] - c[4], c[1] - c[4], c[0] + c[4], c[1] + c[4], { t: c });
+for (const v of V) gadd(v[0] - v[2] / 2, v[1] - v[3] / 2, v[0] + v[2] / 2, v[1] + v[3] / 2, { v });
+for (const b of BLD) if (b.top !== undefined) { const xs = b.pts.map(p => p[0]), zs = b.pts.map(p => p[1]); gadd(Math.min(...xs), Math.min(...zs), Math.max(...xs), Math.max(...zs), { b }); }
+function blocked(x, y, z, own) { if (y < Y(x, z) - .2) return true; for (const it of GRID.get(gk(Math.floor(x / CELL), Math.floor(z / CELL))) || []) {
+  if (it.t) { const [cx, cz, lo, hi, r] = it.t; if (y > lo && y < hi && (x - cx) ** 2 + (z - cz) ** 2 < r * r) return true; }
+  else if (it.v) { const [vx, vz, w, d, , top] = it.v; if (y < top && Math.abs(x - vx) < w / 2 && Math.abs(z - vz) < d / 2) return true; }
+  else if (it.b !== own && y < it.b.top && inPoly(x, z, it.b.pts)) return true; } return false; }
+const seeR = new THREE.Raycaster(), UP = new V3(0, 1, 0); let seeObj = null;
+const seeList = () => seeObj ||= (() => { const l = [], big = new Set([terrain, ...pickables, ...blockers, ...clouds, ...skGroup.children]);
+  scene.traverse(o => { if (o.isMesh && !o.isInstancedMesh && o.visible && !big.has(o) && (o.geometry.index ? o.geometry.index.count : o.geometry.attributes.position.count) < 30000) l.push(o); }); return l; })();
+function sees(e, t, own) { const d = new V3().subVectors(t, e), L = d.length(); d.divideScalar(L);
+  for (let s = .8; s < L - 2; s += 1) if (blocked(e.x + d.x * s, e.y + d.y * s, e.z + d.z * s, own)) return false;
+  seeR.set(e, d); seeR.far = L - 2; return !seeR.intersectObjects(seeList(), false).length; }
+const openSky = e => { for (let s = .5; s < 12; s += 1) if (blocked(e.x, e.y + s, e.z)) return false; seeR.set(e, UP); seeR.far = 12; return !seeR.intersectObjects(seeList(), false).length; };
+function fit(e, pts, L) { // 점들이 다 틀 안에 들어오면 그 가운데를 겨누는 방향
+  let y0 = null; const ys = [], ps = [];
+  for (const p of pts) { const dx = p[0] - e.x, dz = p[2] - e.z, h = Math.hypot(dx, dz); if (h < 1) return null; let a = Math.atan2(dx, dz); y0 ??= a; ys.push(y0 + Math.atan2(Math.sin(a - y0), Math.cos(a - y0))); ps.push(Math.atan2(p[1] - e.y, h)); }
+  const [y1, y2, p1, p2] = [Math.min(...ys), Math.max(...ys), Math.min(...ps), Math.max(...ps)];
+  return y2 - y1 > L.h * RAD * .88 || p2 - p1 > L.v * RAD * .88 ? null : { yaw: (y1 + y2) / 2, pitch: (p1 + p2) / 2 }; }
+function search(pts, T, dirs, d0, d1, o = {}) { // 기준점에서 dirs 쪽으로 d0~d1m 물러나며, 들어가고(fit) 가리지 않는(sees) 첫 자리
+  const at = (bx, bz, ux, uz, d, L) => { const x = bx + ux * d, z = bz + uz * d; if (!standOK(x, z)) return null; const e = new V3(x, Y(x, z) + EYE, z), a = fit(e, pts, L); return a && openSky(e) && sees(e, T, o.own) && (!o.chk || o.chk.filter(c => sees(e, new V3(...c), o.own)).length >= o.chk.length * .75) ? { e, ...a, L, d } : null; };
+  const lenses = o.lens || LENS; let r = null;
+  if (o.near) { for (let d = d0; d <= d1; d += 3) for (const [bx, bz, ux, uz] of dirs) for (const L of lenses) if ((r = at(bx, bz, ux, uz, d, L))) return r; return null; }
+  for (const L of lenses) for (const [bx, bz, ux, uz] of dirs) for (let d = d0; d <= d1; d += 2) if ((r = at(bx, bz, ux, uz, d, L))) return r; return null; }
+const spread = (x, z, dx, dz, rs = [0, .25, -.25, .5, -.5]) => rs.map(r => [x, z, dx * Math.cos(r) - dz * Math.sin(r), dx * Math.sin(r) + dz * Math.cos(r)]);
+const ring = (x, z) => Array.from({ length: 16 }, (_, k) => [x, z, Math.sin(k * Math.PI / 8), Math.cos(k * Math.PI / 8)]);
+const fixed = (x, z, t, L = 0, ground) => { const e = new V3(x, (ground ?? Y(x, z)) + EYE, z); return { e, ...aim(e, new V3(...t)), L: LENS[L], d: 0 }; };
+const face = (S, d0, d1, pts, lens, own) => search(pts || [S.slice(0, 3)], new V3(S[0], S[1], S[2]), spread(S[0], S[2], S[3], S[4]), d0, d1, { lens, own });
+const bverts = b => b.pts.flatMap(p => [[p[0], Y(p[0], p[1]), p[1]], [p[0], b.top, p[1]]]);
+const edgePts = (e, b) => [[e.p[0], Y(...e.p), e.p[1]], [e.p[0], b.top, e.p[1]], [e.q[0], Y(...e.q), e.q[1]], [e.q[0], b.top, e.q[1]]];
+const far = (b, T, own, lens = [LENS[0], LENS[1], LENS[2]]) => search([...bverts(b), T], new V3(...T), ring(T[0], T[2]), 20, 170, { near: 1, lens, own: own && b });
+const SIGNS = { 진리관: "jinri", 숭덕경상관: "sdSign", 형남공학관: "hnSign", 안익태기념관: "ahnSign", 학생회관: "suName" };
+function corners(b) { const o = obb(b.pts); return [[1, 1], [1, -1], [-1, -1], [-1, 1]].map(([su, sv]) => {
+  const cx = o.cx + o.ux * su * o.len / 2 + o.vx * sv * o.wid / 2, cz = o.cz + o.uz * su * o.len / 2 + o.vz * sv * o.wid / 2, P = b.pts.reduce((a, p) => Math.hypot(p[0] - cx, p[1] - cz) < Math.hypot(a[0] - cx, a[1] - cz) ? p : a);
+  const dx = o.ux * su + o.vx * sv, dz = o.uz * su + o.vz * sv, n = Math.hypot(dx, dz); return { P, dx: dx / n, dz: dz / n }; }); }
+function basic(b) { // 건물마다: 네 모서리 + 입구 + 벽 가까이 + 이름판
+  const out = corners(b).map(c => { const dir = compass(c.dx, c.dz); return { t: `${dir}쪽 모서리`,
+    w: r => r.part ? `${dir}쪽 모서리에서 대각선으로 물러날 수 있는 만큼` : `${dir}쪽 모서리에서 대각선으로 약 ${Math.round(r.d)}m`,
+    f: r => r.part ? "건물이 다 안 들어가요 — 모서리와 아래층 위주로" : "모서리가 화면 가운데 · 옥상 끝과 바닥이 다 들어오게",
+    cam: () => { const T = new V3(c.P[0], (b.base + b.top) / 2, c.P[1]), dirs = spread(c.P[0], c.P[1], c.dx, c.dz), i = b.pts.indexOf(c.P), nb = [b.pts.at(i - 1), b.pts[(i + 1) % b.pts.length]];
+      const chk = [[c.P[0], Y(...c.P) + 2, c.P[1]], [c.P[0], b.top - 1, c.P[1]], ...nb.map(q => [q[0], (b.base + b.top) / 2, q[1]])], r = search(bverts(b), T, dirs, 8, 110, { own: b, chk }); if (r) return r;
+      const p = search([[T.x, T.y, T.z]], T, [...dirs, ...ring(c.P[0], c.P[1])], 6, 50, { lens: [LENS[2]], own: b }); return p && { ...p, part: 1 }; } }; });
+  if (b.door) { const [sx, sz, x, z] = b.door, nx = (sx - x) / 7, nz = (sz - z) / 7, y = Y(sx, sz) + 1.6, g = !ENTR[b.n];
+    out.push({ t: g ? "입구 (자리 짐작)" : "입구", q: g, w: r => g ? `실제 주 출입구를 찾아 그 정면 약 ${Math.round(r.d)}m — 미리보기 자리는 짐작이에요` : `입구 정면 약 ${Math.round(r.d)}m`, f: "문이 화면 가운데 · 문 위 지붕과 앞 계단까지",
+      cam: () => face([x, y, z, nx, nz], 8, 30, [[x - nz * 4, y - 1.6, z + nx * 4], [x + nz * 4, y + 2.4, z - nx * 4]], null, b) || { ...fixed(sx, sz, [x, y, z]), d: 7 } }); }
+  const walls = edgesOf(b).sort((a, c) => c.L - a.L), wallAt = e => { const wx = e.p[0] + e.ux * e.L * .3, wz = e.p[1] + e.uz * e.L * .3; return face([wx, Y(wx + e.ox * 5, wz + e.oz * 5) + 4, wz, e.ox, e.oz], 5, 14, null, [LENS[0]], b); };
+  if (walls.length) out.push({ t: "벽 가까이", w: r => `${compass(r.ex, r.ez)}쪽 벽에서 약 ${Math.round(r.d)}m`, f: "벽을 정면으로 · 창 2~3줄과 벽 재질이 화면을 채우게", cam: () => { for (const e of walls.slice(0, 4)) { const r = wallAt(e); if (r) return { ...r, ex: e.ox, ez: e.oz }; } return null; } });
+  const S = b.signAt || SPOT[SIGNS[b.n]];
+  out.push(S ? { t: "이름판", w: r => `이름 글자 정면 약 ${Math.round(r.d)}m`, f: "글자가 화면 가로 2/3 · 정면에서 반듯하게", cam: () => face(S, Math.max(5, (S[1] - Y(S[0], S[2])) * 1.1), 60, null, null, b) || (b.door && { ...fixed(b.door[0], b.door[1], S.slice(0, 3), 2), d: 7 }) }
+    : { t: "이름판 (찾으면)", w: "건물 이름 글자·표지판을 찾으면 그 정면 5m", f: "글자가 화면 가로 2/3 · 어디 붙어 있는지 알게 멀리서 한 장 더" });
+  return out; }
+const by = n => byName(n);
+const PLACES = (() => { const G = SPOT.gate, mid = G.base.getPointAt(.5), [gnx, gnz, gt] = G.side(.5), gy = Y(mid.x, mid.z), F = FIELD, FY = FAN_Y;
+  const gatePts = [0, .5, 1].flatMap(u => { const p = G.base.getPointAt(u), y = Y(p.x, p.z); return [[p.x, y, p.z], [p.x, y + 9.6, p.z]]; });
+  const [n0x, n0z] = F.vz < 0 ? [F.vx, F.vz] : [-F.vx, -F.vz], [ex, ez] = F.ux > 0 ? [F.ux, F.uz] : [-F.ux, -F.uz], FL = FIELD_Y;
+  const fieldAt = (s, t) => [F.cx + n0x * s + ex * t, F.cz + n0z * s + ez * t];
+  const brick = (() => { const r = SSU.roads.find(r => r.k === "steps" && Math.hypot(r.p[0] + 108, r.p[1] + 72) < 15); if (!r) return null; const p = pairs(r.p), a = p[0], c = p.at(-1); return Y(...a) < Y(...c) ? [a, c] : [c, a]; })();
+  const [wa, wc] = [[76, -101], [101, -101]], ya = Y(...wa), yc = Y(...wc), deck = Math.max(Y(108, -101), yc);
+  const cp = canopies[0], cc = cp && [cp.reduce((s, p) => s + p[0], 0) / cp.length, cp.reduce((s, p) => s + p[1], 0) / cp.length], lib = by("중앙도서관");
+  const cn = cc && (() => { const dx = cc[0] - lib.cx, dz = cc[1] - lib.cz, n = Math.hypot(dx, dz); return [dx / n, dz / n]; })(), cy = cp && Math.max(...cp.map(p => Y(...p))) + 4;
+  const fx = 8, fz = -25.4, fy = Y(fx, fz), bc = SPORT.find(a => a.k === "pitch:basketball"), co = bc && obb(bc.pts), coy = co && Y(co.cx, co.cz);
+  const tw = SPOT.hnTower, twPts = tw && [[-1, -1], [1, -1], [1, 1], [-1, 1]].flatMap(([a, c]) => { const lx = a * tw.TX / 2, lz = c * tw.TZ / 2, x = tw.x + lx * Math.cos(tw.ry) + lz * Math.sin(tw.ry), z = tw.z - lx * Math.sin(tw.ry) + lz * Math.cos(tw.ry); return [[x, tw.y0, z], [x, tw.y0 + tw.H, z]]; });
+  const P = [
+    ["정문·역 쪽", [
+      { n: "정문", at: [mid.x, mid.z], d: 80, shots: [
+        { t: "길 건너에서 정문 전체", w: "상도로 건너편 인도, 정문 한가운데 맞은편", f: "아치 지붕 양 끝과 날개 기둥 4개가 다 들어오게 · 지붕이 화면 위쪽 1/3", cam: () => search(gatePts, new V3(mid.x, gy + 6, mid.z), spread(mid.x, mid.z, gnx, gnz, [0, .15, -.15]), 30, 75) },
+        { t: "정문 안에서 바깥 보고", w: "정문 안쪽(캠퍼스 쪽) 약 18m, 정문 한가운데", f: "아치 지붕 아래로 상도로와 건너편이 보이게 · 수평으로", cam: () => fixed(mid.x - gnx * 18, mid.z - gnz * 18, [mid.x + gnx * 10, gy + 4, mid.z + gnz * 10]) },
+        { t: "지붕 아래 올려다보기", w: "정문 지붕 한가운데 바로 아래", f: "지붕 곡선이 화면을 가로지르게 · 위로 올려", cam: () => fixed(mid.x, mid.z, [mid.x + gt.x * 6, gy + 9.6, mid.z + gt.z * 6], 2) },
+        { t: "날개 기둥 하나", w: "3번 출구 쪽 끝 기둥, 바깥(상도로 쪽)에서", f: "기둥 바닥부터 지붕 위로 솟은 끝까지", cam: () => { const [bt, tp] = SPOT.legs[0]; return face([(bt.x + tp.x) / 2, (bt.y + tp.y) / 2, (bt.z + tp.z) / 2, gnx, gnz], 6, 30, [[bt.x, bt.y, bt.z], [tp.x, tp.y, tp.z]], [LENS[1], LENS[0], LENS[3]]); } },
+        { t: "표석", w: r => `정문 동쪽 끝(안익태기념관 쪽) 표석 정면 약 ${Math.round(r.d)}m`, f: "표석 전체 · 글자가 화면 가로 2/3", cam: () => face(SPOT.stone, 6, 20) }] },
+      { n: "7호선 출구 1~4", q: 1, at: [-270, 60], d: 140, shots: SPOT.exits.sort((a, c) => a[3] - c[3]).flatMap(([x, z, ry, no]) => { const sx = Math.sin(ry), sz = Math.cos(ry), dx = CC.x - x, dz = CC.z - z, n = Math.hypot(dx, dz); return [
+        { t: `${no}번 출구 정면`, w: `${no}번 출구 입구 쪽 약 10m 앞`, f: "번호판과 내려가는 계단이 가운데 · 출구가 어느 쪽을 보는지 알게", cam: () => fixed(x + sx * 10, z + sz * 10, [x, Y(x, z) + 1.8, z]) },
+        { t: `${no}번 출구에서 학교 쪽`, w: `${no}번 출구 바로 앞`, f: "학교 쪽으로 수평으로 · 정문이나 건물이 보이게", cam: () => fixed(x + sx * 5, z + sz * 5, [x + dx / n * 80, Y(x, z) + 10, z + dz / n * 80]) }]; }) },
+      { n: "문화관", b: 1, q: 1, x: b => [{ t: "옥상 철탑", w: "철탑 꼭대기가 보이는 곳까지 물러나서", f: "건물 전체와 옥상 철탑 꼭대기까지", cam: () => far(b, [b.cx, b.top + 14, b.cz]) }] },
+      { n: "안익태기념관", b: 1, q: 1, x: () => [{ t: "전광판·나무 벽", w: "정문 쪽 길에서 전광판 정면", f: "전광판과 아래 나무 세로살 벽이 다 들어오게", cam: () => face(SPOT.ahnLed, 15, 45, [[SPOT.ahnLed[0], SPOT.ahnLed[1] - 8, SPOT.ahnLed[2]], [SPOT.ahnLed[0], SPOT.ahnLed[1] + 3, SPOT.ahnLed[2]]]) }] },
+      { n: "형남공학관", b: 1, x: () => tw ? [{ t: "15층 탑 전체", w: r => `탑에서 ${compass(r.e.x - tw.x, r.e.z - tw.z)}쪽으로 약 ${Math.round(r.d)}m`, f: "꼭대기 '숭실대학교' 글자부터 바닥까지 · 세로로",
+        cam: () => search(twPts, new V3(tw.x, tw.y0 + tw.H + 16, tw.z), ring(tw.x, tw.z), 30, 170, { near: 1, lens: [LENS[1], LENS[0], LENS[3]] }) }] : [] }, // 탑 꼭대기 위 하늘 점이 보이면 탑 끝까지 보임
+      { n: "숭덕경상관", b: 1 },
+      { n: "돌계단 (슈파크)", q: 1, at: [-214, -40], d: 70, shots: [
+        { t: "평지에서 계단 정면", w: "돌계단 서쪽 연회색 평지 한가운데", f: "15단이 아래부터 맨 위까지 다 들어오게 · 계단 가운데가 화면 가운데", cam: () => fixed(-234, -40, [-200, FY + 2.5, -40]) },
+        { t: "맨 위에서 내려다보기", w: "돌계단 맨 윗단 가운데", f: "아래 평지와 기념벽 쪽까지 · 살짝 내려다보며", cam: () => fixed(-189, -40, [-228, FY, -40], 0, FY + 5.1) },
+        { t: "남쪽 끝 옆모습", w: "돌계단 남쪽 끝 바깥, 계단 옆", f: "단이 층층이 올라가는 옆모습 · 단 높이가 보이게", cam: () => fixed(-205, -12, [-205, FY + 2.5, -45]) },
+        { t: "북쪽 끝 옆모습", w: "돌계단 북쪽 끝 바깥, 계단 옆", f: "단이 층층이 올라가는 옆모습 · 단 높이가 보이게", cam: () => fixed(-205, -70, [-205, FY + 2.5, -35]) },
+        { t: "흰 반원 기념벽", w: "기념벽 동쪽(평지 쪽) 약 10m", f: "반원 벽 전체 · 글자가 있으면 읽히게", cam: () => fixed(-233, -17, [-243, Y(-243, -17) + 1.2, -17]) },
+        { t: "붉은 자전거길", w: "돌계단 서쪽 붉은 길 위", f: "길이 휘어 가는 모습 · 길 방향으로", cam: () => fixed(-251, -14, [-236, Y(-236, -48) + 1, -48]) }] }]],
+    ["운동장 둘레", [
+      { n: "베어드홀", b: 1, q: 1, x: () => brick ? [
+        { t: "붉은 벽돌 계단 — 아래에서", w: "학생회관과 베어드홀 사이 계단 맨 아래", f: "계단 맨 위까지 · 양옆 벽이 보이게", cam: () => { const [a, c] = brick, dx = a[0] - c[0], dz = a[1] - c[1], n = Math.hypot(dx, dz); return fixed(a[0] + dx / n * 4, a[1] + dz / n * 4, [c[0], Y(...c) + 1.5, c[1]]); } },
+        { t: "붉은 벽돌 계단 — 위에서", w: "같은 계단 맨 위", f: "계단 아래 끝까지 내려다보며", cam: () => { const [a, c] = brick, dx = c[0] - a[0], dz = c[1] - a[1], n = Math.hypot(dx, dz); return fixed(c[0] + dx / n * 3, c[1] + dz / n * 3, [a[0], Y(...a), a[1]]); } }] : [] },
+      { n: "학생회관", b: 1, q: 1, x: b => { const f = SPOT.suFace, e = SPOT.suField, R = b.top; return [
+        { t: "광장 쪽 긴 면 전체", w: "남쪽 광장에서 긴 면 정면", f: "지붕 양 끝까지 다 들어오게 · 지붕 끝 선이 수평으로", cam: () => face([f.mx, (b.base + R) / 2, f.mz, f.ox, f.oz], 12, 90, edgePts({ p: [f.mx - f.ux * f.L / 2, f.mz - f.uz * f.L / 2], q: [f.mx + f.ux * f.L / 2, f.mz + f.uz * f.L / 2] }, b)) },
+        { t: "전광판", w: r => `광장에서 전광판 정면 약 ${Math.round(r.d)}m`, f: "전광판이 화면 가운데 · 위 지붕 끝까지", cam: () => face(SPOT.suLed, 10, 30) },
+        { t: "운동장에서 층층 테라스", w: "운동장 쪽에서 테라스 정면", f: "테라스 층과 유리 난간이 맨 위 지붕까지 다 보이게", cam: () => face([e.mx, (Y(e.mx + e.ox * 20, e.mz + e.oz * 20) + R) / 2, e.mz, e.ox, e.oz], 15, 90, edgePts(e, b)) },
+        { t: "중앙계단 — 아래에서", w: "중앙계단 맨 아래 (운동장 쪽)", f: "계단 끝 광장까지 올려다보며", cam: () => fixed(-35.5, -125, [-35.5, Y(-35.5, -82) + 2, -82]) },
+        { t: "중앙계단 — 위에서", w: "중앙계단 맨 위 (광장 쪽)", f: "운동장까지 내려다보며", cam: () => fixed(-35.5, -78, [-35.5, Y(-35.5, -121) + 1, -121]) },
+        { t: "지붕 풀밭·나무 데크", w: "학생회관 지붕 위 (올라갈 수 있으면)", f: "데크와 풀 지붕이 같이 · 운동장 쪽으로", cam: () => fixed(b.cx, b.cz, [b.cx + e.ox * 40, R, b.cz + e.oz * 40], 2, R) }]; } },
+      { n: "운동장·북쪽 스탠드", q: 1, at: "field", d: 170, shots: [
+        ...[["북", n0x, n0z, "스탠드 전체와 뒤 백마관이 같이"], ["남", -n0x, -n0z, "학생회관 테라스가 보이게"], ["동", ex, ez, "트랙 끝과 뒤 건물이 같이"], ["서", -ex, -ez, "트랙 끝과 뒤 건물이 같이"]].map(([nm, dx, dz, f]) =>
+          ({ t: `가운데에서 ${nm}쪽`, w: "운동장 한가운데 (센터 서클)", f: `${f} · 수평으로`, cam: () => fixed(F.cx, F.cz, [F.cx + dx * 60, FL + 4, F.cz + dz * 60]) })),
+        { t: "스탠드 정면 가까이", w: "트랙 북쪽 가장자리, 스탠드 앞 약 10m", f: "좌석 줄과 태양광 지붕 끝이 보이게", cam: () => { const [x, z] = fieldAt(F.wid / 2 - 8, 0), [tx, tz] = fieldAt(F.wid / 2 + 2.5, 0); return fixed(x, z, [tx, FL + 2.5, tz]); } },
+        ...[["동", 1], ["서", -1]].map(([nm, s]) => ({ t: `스탠드 위 보행로 — ${nm}쪽 보고`, w: "스탠드 뒤 높은 보행로 가운데", f: "보행로와 스탠드 지붕·옆 건물이 같이 · 길 방향으로", cam: () => { const [x, z] = fieldAt(F.wid / 2 + 12, 0), [tx, tz] = fieldAt(F.wid / 2 + 12, s * 45); return fixed(x, z, [tx, Y(tx, tz) + 1.5, tz]); } }))] },
+      { n: "백마관", b: 1 },
+      { n: "교육관", b: 1, q: 1 },
+      { n: "벤처중소기업센터", b: 1, q: 1 }]],
+    ["가운데", [
+      { n: "진리관", b: 1 },
+      { n: "조만식기념관", b: 1 },
+      { n: "나무계단", q: 1, at: [88, -101], d: 70, shots: [
+        { t: "아래 끝에서 위 보고", w: "나무계단 맨 아래 (조만식기념관 입구 옆)", f: "계단이 맨 위까지 · 양옆 화분이 보이게", cam: () => fixed(70, -101, [101, yc + 1.5, -101]) },
+        { t: "위 끝에서 아래 보고", w: "나무계단 맨 위 데크", f: "계단 아래 끝까지 내려다보며", cam: () => fixed(106, -101, [76, ya, -101], 0, deck) },
+        { t: "옆에서 전체", w: r => `계단 가운데 옆쪽 약 ${Math.round(r.d)}m`, f: "계단 폭과 단 수가 보이게 · 계단 전체가 들어오게", cam: () => search([[wa[0], ya, -107], [wa[0], ya, -95], [wc[0], yc + 1, -107], [wc[0], yc + 1, -95]], new V3(88.5, (ya + yc) / 2, -101), [[88.5, -101, 0, 1], [88.5, -101, 0, -1], ...spread(88.5, -101, 0, 1, [.5, -.5]), ...spread(88.5, -101, 0, -1, [.5, -.5])], 7, 45, { near: 1 }) || { ...fixed(88.5, -93, [88.5, (ya + yc) / 2, -101], 2), d: 8 } },
+        { t: "위 데크 광장 — 동쪽", w: "계단 맨 위 데크", f: "데크 광장과 둘레 건물 · 수평으로", cam: () => fixed(106, -101, [150, deck + 3, -101], 0, deck) },
+        { t: "위 데크 광장 — 남쪽", w: "계단 맨 위 데크", f: "데크 광장과 둘레 건물 · 수평으로", cam: () => fixed(108, -101, [108, deck + 3, -60], 0, deck) }] },
+      { n: "웨스트민스터홀", b: 1, q: 1, x: b => [{ t: "데크 광장 쪽 면", w: "나무계단 위 데크에서 건물 정면", f: "이 면 전체 · 입구가 있으면 같이", cam: () => { const e = edgesOf(b).sort((a, c) => Math.hypot(a.mx - 101, a.mz + 101) - Math.hypot(c.mx - 101, c.mz + 101))[0]; return face([e.mx, (b.base + b.top) / 2, e.mz, e.ox, e.oz], 8, 60, edgePts(e, b)); } }] },
+      { n: "신양관", b: 1, q: 1, x: b => [{ t: "옥상 유리 피라미드 (멀리서)", w: "피라미드가 보이는 곳 — 건물에서 멀리 떨어진 길이나 옆 건물 위층 창가", f: "건물과 옥상 피라미드가 같이" }] },
+      { n: "중앙도서관", b: 1, x: () => cp ? [
+        { t: "앞 나무 차양 — 밖에서", w: "차양 앞 길에서", f: "차양 전체와 가는 기둥들 · 뒤 입구까지", cam: () => face([cc[0], cy - 1.5, cc[1], cn[0], cn[1]], 8, 50, cp.flatMap(p => [[p[0], Y(...p), p[1]], [p[0], cy, p[1]]]), null, lib) || { ...fixed(cc[0] + cn[0] * 12, cc[1] + cn[1] * 12, [cc[0], cy - 1.5, cc[1]], 2), d: 12 } },
+        { t: "나무 차양 — 아래에서", w: "차양 한가운데 아래", f: "차양 밑면 나무 결이 보이게 · 위로 올려", cam: () => fixed(cc[0], cc[1], [cc[0] + cn[0] * 4, cy, cc[1] + cn[1] * 4], 2) }] : [] },
+      { n: "분수 광장", at: [fx, fz], d: 60, shots: [
+        { t: "분수와 둘레 화단", w: r => `분수에서 약 ${Math.round(r.d)}m (화단 바깥)`, f: "분수·물줄기·둥근 화단이 다 들어오게 · 살짝 내려다보며", cam: () => search([[fx - 10, fy, fz - 10], [fx + 10, fy, fz + 10], [fx, fy + 5, fz]], new V3(fx, fy + 1, fz), ring(fx, fz), 12, 35, { near: 1 }) },
+        ...[["북", 0, -1], ["동", 1, 0], ["남", 0, 1], ["서", -1, 0]].map(([nm, dx, dz]) => ({ t: `분수에서 ${nm}쪽`, w: `분수 화단 ${nm}쪽 가장자리`, f: `${nm}쪽 건물·길이 보이게 수평으로 (방향 맞추기용)`, cam: () => fixed(fx + dx * 11, fz + dz * 11, [fx + dx * 80, fy + 6, fz + dz * 80]) }))] },
+      { n: "한경직기념관", b: 1, x: b => [{ t: "십자가와 파란 기둥", w: "북쪽 정면 (분수 광장 쪽)", f: "정면 전체 · 십자가 꼭대기까지", cam: () => { const e = edgeFacing(b, 0, -1); return face([e.mx, (b.base + b.top) / 2 + 3, e.mz, e.ox, e.oz], 10, 80, [...edgePts(e, b), [e.mx, b.top + 6, e.mz]]); } }] },
+      { n: "한국기독교박물관", b: 1, q: 1 }]],
+    ["동쪽", [
+      { n: "미래관", b: 1, q: 1 },
+      { n: "농구장", at: co && [co.cx, co.cz], d: 60, shots: co ? [
+        { t: "바닥 색과 철망", w: "농구장 모서리 철망 밖", f: "파란 바닥 전체와 철망 · 대각선으로", cam: () => search([[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([a, c]) => [co.cx + co.ux * a * co.len / 2 + co.vx * c * co.wid / 2, coy, co.cz + co.uz * a * co.len / 2 + co.vz * c * co.wid / 2]), new V3(co.cx, coy + 1, co.cz),
+          [[1, 1], [1, -1], [-1, 1], [-1, -1]].map(([a, c]) => { const dx = co.ux * a + co.vx * c, dz = co.uz * a + co.vz * c, n = Math.hypot(dx, dz); return [co.cx, co.cz, dx / n, dz / n]; }), Math.hypot(co.len, co.wid) / 2 + 2, 50, { near: 1 }) || search([[co.cx, coy, co.cz]], new V3(co.cx, coy + 1, co.cz), ring(co.cx, co.cz), co.wid / 2 + 3, 40, { near: 1 }) },
+        { t: "골대", w: "농구장 한가운데", f: "한쪽 골대와 백보드 · 수평으로", cam: () => fixed(co.cx, co.cz, [co.cx + co.ux * (co.len / 2 - 1), coy + 3, co.cz + co.uz * (co.len / 2 - 1)]) }] : [] },
+      { n: "연구관", b: 1, q: 1 },
+      { n: "창신관", b: 1, q: 1 },
+      { n: "전산관", b: 1, q: 1, x: b => [{ t: "파란 지붕 (높은 곳에서)", w: "지붕이 내려다보이는 옆 건물 위층 창가나 언덕 위", f: "지붕 전체와 색이 보이게 · 내려다보며" }] },
+      { n: "글로벌브레인홀", b: 1, q: 1 },
+      { n: "레지던스홀", b: 1, x: b => [{ t: "V자 지붕", w: "지붕 모양이 보이는 곳까지 물러나서", f: "건물 전체와 V자 지붕선", cam: () => far(b, [b.cx, b.top + 3, b.cz], 1) }] },
+      { n: "정보과학관", b: 1, q: 1, x: b => [{ t: "옥상 채광창 (높은 곳에서)", w: "지붕이 내려다보이는 옆 건물 위층 창가나 언덕 위", f: "옥상 채광창이 보이게 · 내려다보며" }] },
+      { n: "창의관", b: 1, q: 1, x: b => [{ t: "멀리서 전체", w: "건물 모양이 다 보이는 곳까지 물러나서", f: "쐐기 모양 전체", cam: () => far(b, [b.cx, (b.base + b.top) / 2, b.cz], 1) }] }]],
+    ["어디서든", [
+      { n: "바닥·나무·길", shots: [
+        { t: "보도블록", w: "캠퍼스 안 인도 아무 데나", f: "발 아래 1m를 위에서 똑바로 내려다보며 · 블록 무늬와 색이 화면을 채우게" },
+        { t: "아스팔트 길", w: "캠퍼스 안 차도 가장자리", f: "발 아래 1m를 똑바로 내려다보며 · 선이 있으면 같이" },
+        { t: "잔디", w: "캠퍼스 안 잔디밭 가장자리", f: "발 아래 1m를 똑바로 내려다보며" },
+        { t: "가로등", w: "캠퍼스 안 인도 가로등 앞 5m", f: "가로등 하나 바닥부터 끝까지 · 세로로" },
+        { t: "큰 활엽수", w: "캠퍼스 길가 큰 나무 앞", f: "나무 한 그루 바닥부터 꼭대기까지 · 세로로" },
+        { t: "소나무", w: "캠퍼스 안 소나무 앞", f: "나무 한 그루 바닥부터 꼭대기까지 · 세로로" },
+        { t: "캠퍼스 길 주차", w: "차가 서 있는 캠퍼스 길 위", f: "길과 주차된 차가 같이 · 길 방향으로" },
+        { t: "언덕 숲 가장자리", w: "캠퍼스 뒤 언덕 숲이 시작되는 곳", f: "숲 가장자리와 나무가 얼마나 빽빽한지 보이게" }] }]]];
+  return P.flatMap(([h, list]) => list.map(p => { if (p.b) { const b = by(p.n); p.at = b && [b.cx, b.cz]; p.shots = b ? [...basic(b), ...(p.x?.(b) || [])] : []; } else if (p.at === "field") p.at = [F.cx, F.cz]; p.h = h; return p; }).filter(p => p.shots.length)); })();
+const SHOTK = "ssu-shots2", key = (p, s) => `${p.n}|${s.t}`;
 const shotDone = (() => { try { return new Set(JSON.parse(localStorage.getItem(SHOTK)) || []); } catch { return new Set(); } })();
-let shotOn = -1; const narrow = () => matchMedia("(max-width: 700px)").matches;
-const shotPos = it => { if (it.b) { const b = byName(it.n); return b && [b.cx, b.cz]; } return it.at === "field" ? FIELD && [FIELD.cx, FIELD.cz] : it.at; };
-const shotCount = () => $("shotCnt").textContent = `${SHOT_ALL.filter(it => shotDone.has(it.n)).length} / ${SHOT_ALL.length}`;
-$("shotList").innerHTML = SHOTS.map(([h, items]) => `<h3>${h}</h3>` + items.map(it => { const i = SHOT_ALL.indexOf(it);
-  return `<div class="shot${shotDone.has(it.n) ? " done" : ""}" data-i="${i}"><input type="checkbox" aria-label="${it.n} 다 찍음"${shotDone.has(it.n) ? " checked" : ""}><div>${it.b || it.at ? `<button class="sname" type="button">${it.n}</button>` : `<span class="sname">${it.n}</span>`}${it.q ? '<span class="tag">짐작</span>' : ""}</div>`
-    + `<ul>${it.b ? `<li class="base">${BASIC}</li>` : ""}${(it.s || []).map(s => `<li>${s}</li>`).join("")}</ul></div>`; }).join("")).join(""); shotCount();
-$("shotList").addEventListener("change", e => { const row = e.target.closest(".shot"), it = SHOT_ALL[row.dataset.i]; e.target.checked ? shotDone.add(it.n) : shotDone.delete(it.n); row.classList.toggle("done", e.target.checked);
-  try { localStorage.setItem(SHOTK, JSON.stringify([...shotDone])); } catch {} shotCount(); });
-$("shotList").addEventListener("click", e => { if (!e.target.matches("button.sname")) return; const i = +e.target.closest(".shot").dataset.i, it = SHOT_ALL[i];
-  if (view.mode === "walk") walkOut(); if (view.mode !== "fly") return; shotOn = i; document.querySelectorAll(".shot").forEach(r => r.classList.toggle("on", +r.dataset.i === i));
-  if (it.b) { const k = named.findIndex(b => b.n === it.n); if (k >= 0) select(k); }
-  else { const p = shotPos(it), d = it.d, g = Y(...p); sel = -1; showPanel(); flyTo(new V3(p[0] - Math.sin(fly.yaw) * d, g + d * .8, p[1] - Math.cos(fly.yaw) * d), new V3(p[0], g, p[1])); }
-  if (narrow()) shotsShow(false); });
+const shotSave = () => { try { localStorage.setItem(SHOTK, JSON.stringify([...shotDone])); } catch {} };
+const ALL = PLACES.flatMap((p, pi) => p.shots.map((s, si) => [pi, si]));
+let SC = null, me = null, geoId = null; const narrow = () => matchMedia("(max-width: 700px)").matches;
+const shotCount = () => $("shotCnt").textContent = `${ALL.filter(([pi, si]) => shotDone.has(key(PLACES[pi], PLACES[pi].shots[si]))).length} / ${ALL.length}장`;
+$("shotList").innerHTML = PLACES.map((p, pi) => `${pi === 0 || PLACES[pi - 1].h !== p.h ? `<h3>${p.h}</h3>` : ""}<div class="place" data-p="${pi}"><button class="pname" type="button">${p.n}</button>${p.q ? '<span class="tag">짐작</span>' : ""}<ol>`
+  + p.shots.map((s, si) => `<li class="shot${shotDone.has(key(p, s)) ? " done" : ""}" data-s="${si}"><input type="checkbox" aria-label="${p.n} ${s.t} 찍음"${shotDone.has(key(p, s)) ? " checked" : ""}><button class="sname" type="button">${s.t}</button>${s.q ? '<span class="tag">짐작</span>' : ""}</li>`).join("") + "</ol></div>").join(""); shotCount();
+const markDone = (pi, si, on) => { const k = key(PLACES[pi], PLACES[pi].shots[si]); on ? shotDone.add(k) : shotDone.delete(k); shotSave(); shotCount();
+  const li = document.querySelector(`.place[data-p="${pi}"] .shot[data-s="${si}"]`); li.classList.toggle("done", on); li.querySelector("input").checked = on; if (SC?.pi === pi && SC.si === si) scFill(); };
+$("shotList").addEventListener("change", e => { const li = e.target.closest(".shot"); markDone(+li.closest(".place").dataset.p, +li.dataset.s, e.target.checked); });
+$("shotList").addEventListener("click", e => { const pl = e.target.closest(".place"); if (!pl) return; const pi = +pl.dataset.p;
+  if (e.target.matches(".sname")) return shotOpen(pi, +e.target.closest(".shot").dataset.s);
+  if (!e.target.matches(".pname")) return; const p = PLACES[pi]; if (view.mode === "walk") walkOut(); if (view.mode !== "fly" || !p.at) return;
+  const k = p.b ? named.findIndex(b => b.n === p.n) : -1; if (k >= 0) return select(k); const g = Y(...p.at); sel = -1; showPanel(); flyTo(new V3(p.at[0] - Math.sin(fly.yaw) * p.d, g + p.d * .8, p.at[1] - Math.cos(fly.yaw) * p.d), new V3(p.at[0], g, p.at[1])); });
+function shotOpen(pi, si) { if (view.mode === "intro" || view.mode === "dive") return; const s = PLACES[pi].shots[si]; SC = { pi, si }; if (s.cam && s.r === undefined) s.r = s.cam() || null;
+  const r = s.r; document.querySelectorAll(".shot.on").forEach(li => li.classList.remove("on")); document.querySelector(`.place[data-p="${pi}"] .shot[data-s="${si}"]`).classList.add("on");
+  if (r) { if (view.mode !== "walk") walk.back = { pos: fly.pos.clone(), yaw: fly.yaw, pitch: fly.pitch }; walk.hop = view.mode === "walk" ? 20 : 70; walk.from = camera.position.clone();
+    walk.pos.copy(r.e); walk.yaw = r.yaw; walk.pitch = r.pitch; walk.aim = dirOf(r.yaw, r.pitch).multiplyScalar(50).add(r.e); view.mode = "walk"; view.t = performance.now(); fly.tw = null; }
+  if (locked()) document.exitPointerLock(); $("panel").classList.remove("on"); document.body.classList.add("shoot"); document.body.classList.toggle("noframe", !r); if (narrow()) shotsShow(false); scFill(); frameFit(); hint(); }
+function shotEnd() { if (!SC) return; SC = null; document.body.classList.remove("shoot", "noframe"); document.querySelectorAll(".shot.on").forEach(li => li.classList.remove("on")); camera.fov = BASE_FOV; camera.updateProjectionMatrix(); }
+const txt = (v, r) => typeof v === "function" ? (r ? v(r) : "") : v;
+function scFill() { const p = PLACES[SC.pi], s = p.shots[SC.si], r = s.r, n = ALL.findIndex(([a, b]) => a === SC.pi && b === SC.si), done = shotDone.has(key(p, s));
+  $("scMeta").textContent = `${p.n} · ${SC.si + 1} / ${p.shots.length}`; $("scT").innerHTML = `${s.t}${s.q || p.q ? ' <span class="tag">짐작</span>' : ""}`;
+  const L = r?.L, ph = L ? `${L.z === 1 ? "1배" : "0.5배"} · ${L.port ? "세로" : "가로"} · ${compass(Math.sin(r.yaw), Math.cos(r.yaw))}쪽을 보고${r.pitch > .25 ? ", 위로 올려" : r.pitch < -.2 ? ", 아래로 내려" : ""}` : "1배";
+  $("scDl").innerHTML = `<dt>서는 곳</dt><dd>${txt(s.w, r) || "설명대로"}</dd><dt>휴대폰</dt><dd>${ph}</dd><dt>구도</dt><dd>${txt(s.f, r)}</dd>${s.cam && !r ? "<dt></dt><dd>미리보기 자리를 못 찾았어요 — 설명대로 찍어 주세요</dd>" : ""}`;
+  $("scDone").textContent = done ? "찍었어요 ✓" : "찍었어요"; $("scDone").classList.toggle("main", !done); $("scPrev").disabled = n <= 0; $("scNext").disabled = n >= ALL.length - 1; scGps(); }
+function frameFit() { const L = SC && PLACES[SC.pi].shots[SC.si].r?.L; if (!L) return; const a = L.port ? .75 : 4 / 3, W = innerWidth, H = innerHeight, c = $("sc").getBoundingClientRect();
+  const mw = narrow() ? W - 32 : W - 2 * (c.right + 24), mh = narrow() ? 2 * Math.min(H / 2 - 60, c.top - 14 - H / 2) : H - 150, h = Math.max(80, Math.min(mh, mw / a)), f = $("sf").style;
+  f.width = `${h * a}px`; f.height = `${h}px`; camera.fov = 2 * Math.atan(Math.tan(L.v * RAD / 2) * H / h) / RAD; camera.updateProjectionMatrix(); }
+addEventListener("resize", frameFit);
+const step = k => { const n = ALL.findIndex(([a, b]) => a === SC.pi && b === SC.si) + k; if (ALL[n]) shotOpen(...ALL[n]); };
+$("scPrev").onclick = () => step(-1); $("scNext").onclick = () => step(1);
+$("scDone").onclick = () => { const p = PLACES[SC.pi]; markDone(SC.pi, SC.si, !shotDone.has(key(p, p.shots[SC.si]))); };
+$("scList").onclick = () => shotsShow(!$("shots").classList.contains("on"));
+$("scClose").onclick = () => { shotEnd(); walkOut(); };
+function scGps() { const el = $("scGps"), r = SC && PLACES[SC.pi].shots[SC.si].r; if (!me || !r) { el.textContent = ""; return; } const dx = r.e.x - me[0], dz = r.e.z - me[1], d = Math.hypot(dx, dz), acc = Math.round(me[2]);
+  el.textContent = d < Math.max(6, acc) ? `거의 다 왔어요 (위치 오차 ±${acc}m)` : `내 위치에서 ${compass(dx, dz)}쪽으로 약 ${Math.round(d)}m (오차 ±${acc}m)`; }
+$("scGeo").onclick = () => { if (geoId !== null) return; if (!navigator.geolocation) return toast("이 브라우저는 위치를 못 써요");
+  geoId = navigator.geolocation.watchPosition(p => { const { latitude: la, longitude: lo, accuracy } = p.coords; me = [(lo - SSU.origin[1]) * 111320 * Math.cos(SSU.origin[0] * RAD), -(la - SSU.origin[0]) * 110574, accuracy]; scGps(); }, // ssu-data 좌표와 같은 방식 (OSM 출구 위치로 확인)
+    () => { navigator.geolocation.clearWatch(geoId); geoId = null; $("scGeo").setAttribute("aria-pressed", false); toast("위치를 못 받았어요 — 브라우저 위치 권한을 켜 주세요"); }, { enableHighAccuracy: true });
+  $("scGeo").setAttribute("aria-pressed", true); };
 function shotFit() { $("shots").style.maxHeight = narrow() ? "" : `${$("map").getBoundingClientRect().top - 72}px`; } // PC: 오른쪽 위 ~ 작은 지도 위까지
 new ResizeObserver(shotFit).observe($("map")); addEventListener("resize", shotFit);
 function shotsShow(on) { $("shots").classList.toggle("on", on); $("shotB").setAttribute("aria-pressed", on); shotFit(); }
@@ -872,7 +1029,7 @@ function frame(now) {
       const k = n => keys.has(n) ? 1 : 0; fly.pos.addScaledVector(f, (k("w") + k("arrowup") - k("s") - k("arrowdown")) * v).addScaledVector(r, (k("d") + k("arrowright") - k("a") - k("arrowleft")) * v); fly.pos.y += (k("e") - k("q")) * v * .8; }
     keep(); camera.position.copy(fly.pos); camera.lookAt(tmp.copy(fly.pos).add(dirOf(fly.yaw, fly.pitch)));
   } else if (view.mode === "walk") {
-    const k = sm(cl((now - view.t) / (calm ? 300 : 2200), 0, 1)), u = 1 - k, top = Math.max(walk.from.y, walk.pos.y + 70); // 떠올랐다가 그 자리로 곧게 내려앉음 (건물을 뚫지 않게)
+    const k = sm(cl((now - view.t) / (calm ? 300 : 2200), 0, 1)), u = 1 - k, top = Math.max(walk.from.y, walk.pos.y + (walk.hop ?? 70)); // 떠올랐다가 그 자리로 곧게 내려앉음 (건물을 뚫지 않게)
     if (k >= 1 && keys.size) { const v = (keys.has("shift") ? 9 : 4.5) * dt, f = n => keys.has(n) ? 1 : 0, a = (f("w") + f("arrowup") - f("s") - f("arrowdown")) * v, b = (f("d") + f("arrowright") - f("a") - f("arrowleft")) * v;
       stepWalk(Math.sin(walk.yaw) * a - Math.cos(walk.yaw) * b, Math.cos(walk.yaw) * a + Math.sin(walk.yaw) * b); }
     camera.position.set(walk.from.x * u * u + walk.pos.x * (1 - u * u), walk.from.y * u * u + top * 2 * u * k + walk.pos.y * k * k, walk.from.z * u * u + walk.pos.z * (1 - u * u));
