@@ -186,8 +186,8 @@ function axisEnds(ax) {
   return [L, ax.a - L, R, ax.a - R];
 }
 
-// 접기: 판의 작은 쪽 반이 실제로 넘어가 덮였다가(T_HIT) 펼쳐진다(T_END). 점수·판 계산은 바로, 보이는 건 덮이는 순간에
-const T_HIT = 190, T_END = 450;
+// 접기: 짝이 있는 칸까지만 띠로 넘어가 덮고(T_HIT, 철썩) 잠깐 눌러 뒷면 물감이 짝과 겹쳐 보인 뒤(HOLD) 터지며 펼쳐진다(T_END). 점수·판 계산은 바로
+const T_HIT = 220, HOLD = 130, T_END = 600;
 let fl = null, streak = 0, passed = false, seen = false;
 try { seen = !!localStorage.getItem("decal-seen") } catch {}
 function fold(ax, seg) {
@@ -195,7 +195,19 @@ function fold(ax, seg) {
   const [ox, oy, dx, dy] = dirOf(ax);
   let pos = 0, neg = 0;
   for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { const v = (x - ox) * -dy + (y - oy) * dx; if (v > .01) pos++; else if (v < -.01) neg++ }
-  fl = { ax, seg, ok, ps, t0: now, side: pos <= neg ? 1 : -1, snap: grid.slice(), bg: getComputedStyle(document.body).backgroundColor };
+  // 접히는 넓이: 맞은 짝이 있는 칸까지만(선을 따라 짝들 사이, 선에서 가장 먼 짝까지). 헛접기는 선 바로 옆 줄.
+  // 띠의 끝은 늘 칸과 칸 사이에 오게 칸 중심에서 잰다(점이 반으로 잘리지 않게)
+  const U = (x, y) => (x - ox) * dx + (y - oy) * dy, V = (x, y) => Math.abs((x - ox) * -dy + (y - oy) * dx);
+  let cells = ps.map(([x, y]) => [x, y]);
+  if (!ok) {
+    const near = ax.t[0] === "D" ? Math.SQRT1_2 : ax.a % 1 ? .5 : 1;
+    for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) if (Math.abs(V(x, y) - near) < .01 && (!seg || (U(x, y) >= seg[0] - .4 && U(x, y) <= seg[1] + .4))) cells.push([x, y]);
+  }
+  let u0 = Infinity, u1 = -Infinity, vm = 0;
+  for (const [x, y] of cells) { u0 = Math.min(u0, U(x, y)); u1 = Math.max(u1, U(x, y)); vm = Math.max(vm, V(x, y)) }
+  if (!cells.length) { u0 = u1 = 0; vm = 1 }
+  const m = ax.t[0] === "D" ? .36 : .5;
+  fl = { ax, seg, ok, ps, t0: now, side: pos <= neg ? 1 : -1, u0: u0 - m, u1: u1 + m, vm: vm + m, snap: grid.slice(), bg: getComputedStyle(document.body).backgroundColor };
   FX.noise({ d: .19, vol: .22, f: 500, to: 2600, q: .8 });
   if (!ok) { left = Math.max(0, left - PENALTY); streak = 0; return }
   for (const [x, y, mx, my] of ps) grid[idx(x, y)] = grid[idx(mx, my)] = -1;
@@ -207,7 +219,6 @@ function fold(ax, seg) {
 function impact(now) {
   const f = fl, [x1, y1, x2, y2] = f.seg ? [...at(f.ax, f.seg[0]), ...at(f.ax, f.seg[1])] : axisEnds(f.ax);
   const lx = Math.min(N - 1.5, Math.max(.5, (x1 + x2) / 2)), ly = Math.min(N - 1, Math.max(.5, (y1 + y2) / 2));
-  FX.noise({ d: .12, vol: .35, f: 700, type: "lowpass" }); FX.tone(120, { d: .14, vol: .3, to: 55 });
   if (!f.ok) {
     miss = now; missAx = f.ax; missSeg = f.seg;
     texts.push({ x: lx, y: ly, s: "-" + PENALTY + "초", red: true, t0: now });
@@ -284,23 +295,26 @@ function line(ax, color, w, dash, seg) {
 // 접히는 쪽(종이 날개) 판별과 그 영역 경로. side 쪽 반, 보통 모드면 그은 구간 폭만
 function flapOf(f) {
   const [ox, oy, dx, dy] = dirOf(f.ax), nx = -dy * f.side, ny = dx * f.side;
-  const u0 = f.seg ? f.seg[0] - .5 : -30, u1 = f.seg ? f.seg[1] + .5 : 30;
+  const { u0, u1, vm } = f;
   return {
     ox, oy, nx, ny,
-    has: (x, y) => { const v = (x - ox) * nx + (y - oy) * ny, u = (x - ox) * dx + (y - oy) * dy; return v > .01 && u >= u0 && u <= u1 },
+    has: (x, y) => { const v = (x - ox) * nx + (y - oy) * ny, u = (x - ox) * dx + (y - oy) * dy; return v > .01 && v <= vm && u >= u0 && u <= u1 },
+    onCrease: (x, y) => { const v = (x - ox) * nx + (y - oy) * ny, u = (x - ox) * dx + (y - oy) * dy; return Math.abs(v) < .01 && u >= u0 && u <= u1 },
+    crease: () => { const a = [px(ox + u0 * dx), px(oy + u0 * dy)], b = [px(ox + u1 * dx), px(oy + u1 * dy)]; ctx.beginPath(); ctx.moveTo(...a); ctx.lineTo(...b) },
     path: () => {
       const P = (u, v) => [px(ox + u * dx + v * nx), px(oy + u * dy + v * ny)];
-      ctx.beginPath(); [P(u0, 0), P(u1, 0), P(u1, 30), P(u0, 30)].forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)); ctx.closePath();
+      ctx.beginPath(); [P(u0, 0), P(u1, 0), P(u1, vm), P(u0, vm)].forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)); ctx.closePath();
     },
   };
 }
 const boardPath = () => { ctx.beginPath(); ctx.roundRect(0, 0, S * N, S * N, 20) };
 function draw(now) {
   ctx.clearRect(0, 0, S * N, S * N);
-  const t = fl ? now - fl.t0 : 0, G = fl && t < T_HIT ? fl.snap : grid, F = fl && flapOf(fl);
-  if (fl && !fl.hit && t >= T_HIT) { fl.hit = true; impact(now) }
-  // 날개가 들린 자리는 바탕이 보인다
-  if (F) { ctx.save(); boardPath(); ctx.clip(); F.path(); ctx.fillStyle = fl.bg; ctx.fill(); ctx.restore() }
+  const t = fl ? now - fl.t0 : 0, G = fl && t < T_HIT + HOLD ? fl.snap : grid, F = fl && flapOf(fl);
+  if (fl && !fl.touch && t >= T_HIT) { fl.touch = true; FX.noise({ d: .12, vol: .35, f: 700, type: "lowpass" }); FX.tone(120, { d: .14, vol: .3, to: 55 }); FX.shake(.15); FX.punch(-.01) }
+  if (fl && !fl.hit && t >= T_HIT + HOLD) { fl.hit = true; impact(now) }
+  // 들린 종이 밑자리: 점이 없는 살짝 그늘진 종이
+  if (F) { ctx.save(); boardPath(); ctx.clip(); F.path(); ctx.fillStyle = "#efebe4"; ctx.fill(); ctx.restore() }
   if (playing && left < 10) {
     const f = left % 1;
     ctx.globalAlpha = .07 + .1 * f; ctx.fillStyle = "#d8443c"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
@@ -317,20 +331,31 @@ function draw(now) {
     ctx.fillStyle = "#d9d6cf";
   }
   if (F) {
-    // 날개: s=1 펼침 → -1 완전히 덮음. 뒤집힌 동안엔 종이 뒷면에 물감이 비쳐 보인다
-    const s = t < T_HIT ? 1 - 2 * (t / T_HIT) ** 2 : t < T_HIT + 50 ? -1 : Math.min(1, -1 + 2 * (1 - (1 - (t - T_HIT - 50) / (T_END - T_HIT - 50)) ** 3));
-    const k = 1 - s, on = F.nx * px(F.ox) + F.ny * px(F.oy);
+    // 접히는 띠: s=1 펼침 → 0 세워짐 → -1 반대편을 덮음. 그림자·테두리로 따로 든 종이처럼 보이고,
+    // 덮인 동안엔 뒷면에 물감이 비쳐 짝과 겹치는 게 보인다
+    const s = t < T_HIT ? 1 - 2 * (t / T_HIT) ** 2 : t < T_HIT + HOLD ? -1 : Math.min(1, -1 + 2 * (1 - (1 - (t - T_HIT - HOLD) / (T_END - T_HIT - HOLD)) ** 3));
+    const k = 1 - s, on = F.nx * px(F.ox) + F.ny * px(F.oy), lift = 1 - Math.abs(s);
     ctx.save();
     ctx.setTransform(D * (1 - k * F.nx * F.nx), -D * k * F.nx * F.ny, -D * k * F.nx * F.ny, D * (1 - k * F.ny * F.ny), D * k * on * F.nx, D * k * on * F.ny);
-    boardPath(); ctx.clip(); F.path(); ctx.clip();
-    ctx.fillStyle = s >= 0 ? "#fbfaf7" : "#f1ede5"; ctx.fillRect(-S, -S, S * (N + 2), S * (N + 2));
+    boardPath(); ctx.clip();
+    ctx.shadowColor = `rgb(40 30 20 / ${.14 + .22 * lift})`; ctx.shadowBlur = D * (5 + 16 * lift); ctx.shadowOffsetY = D * (2 + 7 * lift);
+    F.path(); ctx.fillStyle = s >= 0 ? "#fbfaf7" : "rgb(245 241 233 / .72)"; ctx.fill();
+    ctx.shadowColor = "transparent";
+    ctx.save(); F.path(); ctx.clip();
     for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+      if (!F.has(x, y)) continue;
       const c = G[idx(x, y)];
-      if (F.has(x, y)) { if (c >= 0) dot(px(x), px(y), S * .34, COLORS[c], s >= 0 ? 1 : .16); else if (s >= 0) { ctx.fillStyle = "#d9d6cf"; ctx.beginPath(); ctx.arc(px(x), px(y), Math.max(1.5, S * .04), 0, 7); ctx.fill() } }
+      if (c >= 0) dot(px(x), px(y), S * .34, COLORS[c], s >= 0 ? 1 : .45);
+      else if (s >= 0) { ctx.fillStyle = "#d9d6cf"; ctx.beginPath(); ctx.arc(px(x), px(y), Math.max(1.5, S * .04), 0, 7); ctx.fill() }
     }
-    ctx.fillStyle = !fl.ok && t > T_HIT ? `rgb(216 68 60 / ${.3 * (1 - Math.abs(s))})` : `rgb(40 30 20 / ${.16 * (1 - Math.abs(s))})`;
-    ctx.fillRect(-S, -S, S * (N + 2), S * (N + 2));
+    ctx.fillStyle = !fl.ok && t > T_HIT ? `rgb(216 68 60 / ${.12 + .25 * lift})` : `rgb(40 30 20 / ${.1 * lift})`;
+    ctx.fillRect(-S * 3, -S * 3, S * (N + 6), S * (N + 6));
     ctx.restore();
+    F.path(); ctx.strokeStyle = !fl.ok && t > T_HIT ? "rgb(216 68 60 / .6)" : "rgb(28 27 25 / .2)"; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.restore();
+    // 접는 선(주름)과 그 위의 점은 접혀도 그대로
+    ctx.save(); boardPath(); ctx.clip(); F.crease(); ctx.strokeStyle = "rgb(28 27 25 / .35)"; ctx.lineWidth = 2; ctx.stroke(); ctx.restore();
+    for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { const c = G[idx(x, y)]; if (c >= 0 && F.onCrease(x, y)) dot(px(x), px(y), S * .34, COLORS[c]) }
     if (t > T_END) { const ok = fl.ok; fl = null; if (ok && playing) refill() }
   }
   blots = blots.filter(b => now - b.t0 < 380);
