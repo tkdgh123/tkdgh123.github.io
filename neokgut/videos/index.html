@@ -40,16 +40,16 @@ article p { margin: 0; max-width: 40rem }
   </header>
 
   <article id="ink-transition">
-    <div class="meta"><b>2026-11-07</b><span>방 이동 전환</span><span>12초 · 실제 속도 한 번, 0.4배 느리게 한 번</span></div>
+    <div class="meta"><b>2026-11-07</b><span>방 이동 전환</span><span>18초 · 실제 속도 한 번(5초), 0.4배 느리게 한 번</span></div>
     <h2>붓 세 획 화면 전환</h2>
-    <video src="ink_transition.mp4" poster="ink_transition.webp" controls muted loop playsinline preload="metadata" width="1280" height="800"></video>
+    <video src="ink_transition_v2.mp4" poster="ink_transition_v2.webp" controls muted loop playsinline preload="metadata" width="1280" height="800"></video>
     <p>족자로 다음 방에 들어갈 때 먹빛 원 대신 붓 세 획이 화면을 덮습니다.</p>
     <ol>
       <li>위 띠: 왼쪽에서 오른쪽으로, 끝이 갈라져 붓털 결이 남는 빠른 획</li>
       <li>가운데 띠: 첫 획이 끝난 오른쪽에서 왼쪽으로, 먹을 듬뿍 묻혀 끝에서 먹이 흘러내리는 획</li>
       <li>아래 띠: 다시 오른쪽으로, 굵기가 물결치고 둘레에 먹점이 튀는 획</li>
     </ol>
-    <p>세 획 사이로 화면이 비치다가 마지막에 먹이 번져 다 덮고, 그 뒤에서 방이 바뀝니다. 새 방은 옅은 먹부터 마르듯 걷히며 드러납니다.</p>
+    <p>세 획은 1.7초에 걸쳐 천천히 긋습니다. 획 사이로 화면이 비치다가 마지막에 먹이 번져 다 덮고, 그 뒤에서 방이 바뀝니다. 새 방은 1.6초에 걸쳐 드러나는데, 그은 순서대로 획마다 처음 그은 자리부터 붓이 지나간 길을 따라 지워집니다.</p>
     <p class="note">획 그림은 ChatGPT와 Gemini에 같은 요청을 보내 세 획 모양이 더 확실히 갈린 ChatGPT 쪽을 골랐습니다. 영상은 자동 걷기 검사가 1280×800 창에서 매 프레임 찍은 것이라 소리는 없습니다.</p>
   </article>
 </main>
