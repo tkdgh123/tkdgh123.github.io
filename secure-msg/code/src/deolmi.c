@@ -1,5 +1,5 @@
 ﻿#define _CRT_SECURE_NO_WARNINGS
-#pragma execution_character_set("utf-8")   /* 한글 글자를 UTF-8로 넣는다 (VS에서 /utf-8 옵션 없이도 안 깨지게) */
+#pragma execution_character_set("utf-8")   // 한글 안 깨지게
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <windows.h>
@@ -12,18 +12,26 @@
 #include <stdint.h>
 #include <string.h>
 
-/* ================= ① 통신: 길이 붙인 패킷 =================
-   TCP는 메시지가 쪼개지거나 붙어서 오기 때문에, 앞에 길이 4바이트를 붙여 보내고
-   받는 쪽은 그 길이만큼 모이면 한 통으로 꺼낸다.
-   한 통 = 길이 4 + 종류 1 + 보낸 사람 16 + 받을 사람 16 + 본문 */
 
-#define NAME_LEN    16                /* 이름은 한글 5글자(15바이트)까지 */
+
+
+// 통신 부분
+// TCP는 메시지가 쪼개지거나 붙어서 올 수 있어서 맨 앞에 길이(4바이트)를 붙여서 보낸다
+// 패킷 구조: 길이 4 + 종류 1 + 보낸 사람 16 + 받을 사람 16 + 본문
+
+#define NAME_LEN    16                // 이름 최대 15바이트 + '\0'
 #define HEADER_LEN  (1 + NAME_LEN + NAME_LEN)
 #define MAX_BODY    65536
 #define MAX_PACKET  (4 + HEADER_LEN + MAX_BODY)
 
-/* HELLO: 접속하면서 이름 밝히기 / MESSAGE: 대화 (받을 사람이 비면 모두에게) / NOTICE: 방장이 보내는 알림 */
+
+
+
+// 패킷 종류 (HELLO: 접속할 때 이름 보내기, MESSAGE: 채팅, NOTICE: 방장이 보내는 알림)
 enum { TYPE_HELLO = 1, TYPE_MESSAGE, TYPE_NOTICE };
+
+
+
 
 struct packet {
     uint8_t  type;
@@ -32,13 +40,19 @@ struct packet {
     uint8_t  body[MAX_BODY];
 };
 
-struct connection {                 /* 한 연결에서 받는 중인 바이트를 모아 두는 곳 */
+
+
+
+struct connection {                 // 받은 바이트를 모아두는 버퍼
     int     sock;
     uint8_t buf[MAX_PACKET];
     size_t  len;
 };
 
-/* 방장: 접속을 기다리는 소켓을 연다 */
+
+
+
+// 방장이 방 열기
 int open_room(int port)
 {
     int sock = (int)socket(AF_INET, SOCK_STREAM, 0);
@@ -51,7 +65,10 @@ int open_room(int port)
     return sock;
 }
 
-/* 참가자: 방장에게 접속한다 */
+
+
+
+// 참가자가 방장한테 접속
 int connect_to_host(const char *host, int port)
 {
     struct addrinfo hints = {0}, *addr_list;
@@ -70,7 +87,10 @@ int connect_to_host(const char *host, int port)
     return sock;
 }
 
-/* 패킷을 보낼 바이트로 늘어놓는다 */
+
+
+
+// 패킷을 바이트 배열로 바꾸기
 size_t packet_to_bytes(const struct packet *p, uint8_t *bytes)
 {
     uint32_t len = HEADER_LEN + p->body_len, net_len = htonl(len);
@@ -82,7 +102,9 @@ size_t packet_to_bytes(const struct packet *p, uint8_t *bytes)
     return 4 + len;
 }
 
-/* 패킷 한 통을 보낸다 */
+
+
+
 int send_packet(int sock, const struct packet *p)
 {
     static uint8_t bytes[MAX_PACKET];
@@ -96,7 +118,10 @@ int send_packet(int sock, const struct packet *p)
     return 0;
 }
 
-/* 받은 바이트를 모은다. 0이면 상대가 연결을 끊은 것 */
+
+
+
+// 0이면 연결 끊김
 int receive_bytes(struct connection *conn)
 {
     int n = recv(conn->sock, (char *)conn->buf + conn->len, (int)(sizeof(conn->buf) - conn->len), 0);
@@ -105,7 +130,11 @@ int receive_bytes(struct connection *conn)
     return n;
 }
 
-/* 모인 바이트에서 패킷 한 통을 꺼낸다. 1 꺼냄, 0 아직 덜 옴, -1 잘못된 길이 */
+
+
+
+// 버퍼에서 패킷 하나 꺼내기
+// 리턴값 1: 꺼냄, 0: 아직 다 안 옴, -1: 길이가 이상함
 int take_packet(struct connection *conn, struct packet *p)
 {
     uint32_t len;
@@ -128,20 +157,28 @@ int take_packet(struct connection *conn, struct packet *p)
     return 1;
 }
 
-#ifndef NET_ONLY   /* 자동 테스트(tests/)는 위의 ① 통신만 가져다 쓴다 */
+
+
+
+#ifndef NET_ONLY   // 통신 부분만 따로 테스트할 때는 여기까지만 씀
 
 #define PORT       9000
-#define MAX_PEOPLE 60                 /* 배열 크기 (윈도우 select가 한 번에 64개까지 본다) */
-#define MAX_INPUT  1000               /* 한 번에 보낼 수 있는 글 길이 */
+#define MAX_PEOPLE 60                 // 윈도우 select가 64개까지라서
+#define MAX_INPUT  1000
+
+
+
 
 static int  is_host;
 static char my_name[NAME_LEN];
-static char dm_target[NAME_LEN];      /* 1:1 대화 상대. 비어 있으면 전체 대화 */
+static char dm_target[NAME_LEN];      // 1:1 대화 상대 (비어 있으면 전체)
 static struct packet recv_pkt, send_pkt;
-static CRITICAL_SECTION lock;         /* 입력 스레드와 받기 반복이 동시에 건드리지 않게 */
+static CRITICAL_SECTION lock;         // 두 스레드가 동시에 건드리지 않게
 
-/* ================= ② 화면 =================
-   글 찍기, 이름 검사, 방에 있는 사람 목록 */
+
+
+
+// 화면 출력, 이름 검사, 접속자 목록
 
 static void print_line(const char *fmt, ...)
 {
@@ -153,7 +190,10 @@ static void print_line(const char *fmt, ...)
     fflush(stdout);
 }
 
-/* 받은 글의 제어 문자를 ? 로 바꾼다 (남이 내 화면을 조작하지 못하게) */
+
+
+
+// 받은 글에 제어 문자가 있으면 ?로 바꿈
 static void remove_control_chars(char *s)
 {
     for (; *s; s++)
@@ -161,7 +201,10 @@ static void remove_control_chars(char *s)
             *s = '?';
 }
 
-/* 이름 검사: 1~15바이트, 띄어쓰기·/ 없이 */
+
+
+
+// 이름은 1~15바이트, 공백이랑 /는 안 됨
 static int is_valid_name(const char *s)
 {
     for (const char *c = s; *c; c++)
@@ -170,9 +213,15 @@ static int is_valid_name(const char *s)
     return s[0] && strlen(s) < NAME_LEN;
 }
 
-/* 방에 있는 사람 목록 (나 빼고) — /who 와 /dm 에 쓴다 */
+
+
+
+// 지금 방에 있는 사람들 (나는 빼고)
 static char members[MAX_PEOPLE][NAME_LEN];
 static int  member_count;
+
+
+
 
 static int find_member(const char *name)
 {
@@ -182,13 +231,19 @@ static int find_member(const char *name)
     return -1;
 }
 
+
+
+
 static void add_member(const char *name)
 {
     if (name[0] && strcmp(name, my_name) != 0 && find_member(name) < 0 && member_count < MAX_PEOPLE)
         strcpy(members[member_count++], name);
 }
 
-/* 1:1로 대화하던 상대가 나가면 전체 대화로 돌아간다 */
+
+
+
+// 1:1 하던 사람이 나가면 다시 전체 대화로
 static void remove_member(const char *name)
 {
     int i = find_member(name);
@@ -199,17 +254,23 @@ static void remove_member(const char *name)
     strcpy(members[i], members[--member_count]);
 }
 
-/* ================= ③ 중계: 방장 =================
-   방장이 서버 역할을 한다. 받은 메시지를 받을 사람에게만 전하고,
-   받을 사람이 비어 있으면 보낸 사람을 뺀 모두에게 전한다. */
 
-struct client {                       /* 방장에게 접속한 참가자 */
+
+
+// 중계 부분 (방장)
+// 방장이 서버 역할을 한다. 받는 사람이 정해져 있으면 그 사람한테만 보내고
+// 비어 있으면 보낸 사람 빼고 전부한테 보낸다
+
+struct client {                       // 방장한테 접속한 참가자
     struct connection conn;
     char name[NAME_LEN];
-    int  joined;                      /* HELLO로 이름을 밝혔나 */
+    int  joined;                      // HELLO 받았는지
 };
 static struct client clients[MAX_PEOPLE];
 static int client_count;
+
+
+
 
 static int find_client(const char *name)
 {
@@ -219,6 +280,9 @@ static int find_client(const char *name)
     return -1;
 }
 
+
+
+
 static void make_packet(struct packet *p, int type, const char *from, const char *to)
 {
     memset(p, 0, sizeof(*p));
@@ -227,7 +291,10 @@ static void make_packet(struct packet *p, int type, const char *from, const char
     strncpy(p->to, to, NAME_LEN - 1);
 }
 
-/* i번 참가자에게 알림을 보낸다 */
+
+
+
+// i번 참가자한테 알림 보내기
 static void send_notice(int i, const char *fmt, ...)
 {
     va_list ap;
@@ -238,7 +305,10 @@ static void send_notice(int i, const char *fmt, ...)
     send_packet(clients[i].conn.sock, &send_pkt);
 }
 
-/* 입장·퇴장 알림을 모두에게 */
+
+
+
+// 입장, 퇴장 알림
 static void notice_all(const char *name, const char *what)
 {
     print_line("[알림] %s %s", name, what);
@@ -247,7 +317,10 @@ static void notice_all(const char *name, const char *what)
             send_notice(k, "%s %s", name, what);
 }
 
-/* 참가자를 내보낸다 (연결이 끊겼거나 규칙을 어겼을 때) */
+
+
+
+// 연결이 끊기거나 규칙을 어기면 내보냄
 static void remove_client(int i)
 {
     char name[NAME_LEN];
@@ -261,8 +334,11 @@ static void remove_client(int i)
     }
 }
 
-/* 입장: 이름을 검사해서 같은 이름·이상한 이름이면 거절하고,
-   통과하면 새 사람에게 방에 있는 사람들을 알려 준 뒤 모두에게 입장을 알린다 */
+
+
+
+// 입장 처리
+// 이름이 겹치거나 쓸 수 없는 이름이면 거절하고, 괜찮으면 새로 온 사람한테 지금 있는 사람들을 알려준다
 static int handle_join(int i, const struct packet *p)
 {
     if (!is_valid_name(p->from) || find_client(p->from) >= 0 || strcmp(p->from, my_name) == 0) {
@@ -284,10 +360,16 @@ static int handle_join(int i, const struct packet *p)
     return 0;
 }
 
+
+
+
 static void print_message(const struct packet *p);
 
-/* 중계 규칙: 이름을 밝히기 전에는 아무것도 못 보내고, 남의 이름으로 보내면 막는다.
-   모두에게 온 글은 방장 화면에 띄우고 나머지 모두에게, 1:1은 그 사람에게만 전한다 */
+
+
+
+// 받은 패킷 처리
+// HELLO 전에 다른 걸 보내면 끊고, 보낸 사람 이름이 다르면 막는다
 static int handle_packet(int i, struct packet *p)
 {
     if (!clients[i].joined && p->type != TYPE_HELLO) {
@@ -318,7 +400,9 @@ static int handle_packet(int i, struct packet *p)
     return 0;
 }
 
-/* 참가자에게서 온 것을 받아 처리한다 */
+
+
+
 static void read_from_client(int i)
 {
     int result;
@@ -333,13 +417,18 @@ static void read_from_client(int i)
         remove_client(i);
 }
 
-/* ================= ④ 대화: 방장·참가자 =================
-   받은 글 보여 주기, 글 보내기, 명령 처리, 키보드 입력 */
 
-static struct connection host_conn;   /* 참가자: 방장과의 연결 */
+
+
+// 대화 부분 (방장, 참가자 둘 다 씀)
+
+static struct connection host_conn;   // 참가자일 때 방장과의 연결
 static char recv_text[MAX_BODY + 1];
 
-/* 받은 글을 보여 준다: [알림] …, [보낸 사람] …, 나에게만 온 1:1은 [보낸 사람 → 나] … */
+
+
+
+// 받은 메시지 출력
 static void print_message(const struct packet *p)
 {
     char from[NAME_LEN];
@@ -351,10 +440,13 @@ static void print_message(const struct packet *p)
     if (p->type == TYPE_NOTICE)
         print_line("[알림] %s", recv_text);
     else
-        print_line(p->to[0] ? "[%s → 나] %s" : "[%s] %s", from, recv_text);
+        print_line(p->to[0] ? "[%s -> 나] %s" : "[%s] %s", from, recv_text);
 }
 
-/* 참가자: 방장에게서 온 것을 받는다. 입장·퇴장 알림을 보고 사람 목록도 고친다 */
+
+
+
+// 참가자: 방장한테 온 걸 받음. 입장/퇴장 알림이면 목록도 고친다
 static void read_from_host(void)
 {
     int result;
@@ -382,15 +474,17 @@ static void read_from_host(void)
         exit(1);
 }
 
-/* 글 보내기: 1:1 중이면 그 사람에게, 아니면 모두에게.
-   참가자는 방장에게 보내고, 방장은 직접 받을 사람에게 보낸다 */
+
+
+
+// 메시지 보내기 (참가자는 방장한테 보내고, 방장은 바로 받는 사람한테 보냄)
 static void send_message(const char *msg)
 {
     size_t len = strlen(msg);
     if (len > MAX_INPUT) {
         len = MAX_INPUT;
         while (len > 0 && ((unsigned char)msg[len] & 0xC0) == 0x80)
-            len--;                    /* 한글 글자 중간에서 자르지 않게 */
+            len--;                    // 한글 중간에서 잘리지 않게
     }
     make_packet(&send_pkt, TYPE_MESSAGE, my_name, dm_target);
     memcpy(send_pkt.body, msg, len);
@@ -403,20 +497,23 @@ static void send_message(const char *msg)
                 send_packet(clients[k].conn.sock, &send_pkt);
 }
 
-/* 명령 처리: /quit 나가기, /all 전체 대화, /dm 이름 1:1 대화, /who 접속한 사람. 나머지는 글로 보낸다 */
+
+
+
+// 명령어: /quit, /all, /dm 이름, /who (명령어가 아니면 메시지로 보냄)
 static void handle_input(const char *line)
 {
     if (strcmp(line, "/quit") == 0) {
         exit(0);
     } else if (strcmp(line, "/all") == 0) {
         dm_target[0] = '\0';
-        print_line("[전체 대화] 모두에게 갑니다");
+        print_line("[전체 대화] 모두에게 보냅니다");
     } else if (strncmp(line, "/dm ", 4) == 0) {
         if (find_member(line + 4) < 0) {
-            print_line("[1:1 대화] %s는 접속해 있지 않습니다 (/who 로 확인)", line + 4);
+            print_line("[1:1 대화] %s는 접속해 있지 않습니다 (/who로 확인)", line + 4);
         } else {
             strcpy(dm_target, line + 4);
-            print_line("[1:1 대화] %s에게만 갑니다 · /all 로 돌아오기", dm_target);
+            print_line("[1:1 대화] %s에게만 보냅니다 (/all 입력하면 전체 대화로)", dm_target);
         }
     } else if (strcmp(line, "/who") == 0) {
         printf("[접속 중] %s(나)", my_name);
@@ -424,7 +521,7 @@ static void handle_input(const char *line)
             printf(", %s", members[i]);
         print_line("");
     } else if (line[0] == '/') {
-        print_line("[알림] 명령: /dm 이름 · /all · /who · /quit");
+        print_line("[알림] 명령어: /dm 이름, /all, /who, /quit");
     } else if (member_count == 0) {
         print_line("[알림] 아직 아무도 없습니다");
     } else {
@@ -432,7 +529,11 @@ static void handle_input(const char *line)
     }
 }
 
-/* 키보드에서 한 줄을 읽는다. 한글이 깨지지 않게 UTF-16으로 받아 UTF-8로 바꾼다. 끝이면 0 */
+
+
+
+// 한 줄 입력받기
+// 그냥 받으면 한글이 깨져서 ReadConsoleW로 받고 UTF-8로 바꾼다
 static int read_line(char *line, int size)
 {
     static wchar_t wide[MAX_INPUT + 2];
@@ -442,7 +543,7 @@ static int read_line(char *line, int size)
         if (!ReadConsoleW(input, wide, MAX_INPUT, &read_count, NULL) || read_count == 0)
             return 0;
         line[WideCharToMultiByte(CP_UTF8, 0, wide, (int)read_count, line, size - 1, NULL, NULL)] = '\0';
-    } else if (!fgets(line, size, stdin)) {   /* 파이프 입력 (자동 테스트용) */
+    } else if (!fgets(line, size, stdin)) {   // 파이프로 입력할 때
         return 0;
     }
     size_t n = strcspn(line, "\r\n");
@@ -452,7 +553,10 @@ static int read_line(char *line, int size)
     return 1;
 }
 
-/* 키보드 입력 스레드: 받기와 따로 돌아서, 글을 치는 중에도 받은 글이 뜬다 */
+
+
+
+// 입력 스레드 (입력을 따로 받아야 치는 중에도 메시지가 뜸)
 static DWORD WINAPI keyboard_thread(LPVOID unused)
 {
     static char line[4 * MAX_INPUT];
@@ -467,7 +571,9 @@ static DWORD WINAPI keyboard_thread(LPVOID unused)
     exit(0);
 }
 
-/* 질문을 띄우고 답을 한 줄 받는다 */
+
+
+
 static void ask_line(const char *question, char *answer, int size)
 {
     printf("%s", question);
@@ -476,7 +582,10 @@ static void ask_line(const char *question, char *answer, int size)
         exit(1);
 }
 
-/* 방장 화면에 내 주소를 띄워서, 다른 컴퓨터가 무엇을 치고 들어오면 되는지 알려 준다 */
+
+
+
+// 내 IP 주소 출력 (다른 사람이 이 주소로 접속)
 static void print_my_address(void)
 {
     struct sockaddr_in to = {0}, me;
@@ -489,12 +598,14 @@ static void print_my_address(void)
     if (connect(sock, (struct sockaddr *)&to, sizeof(to)) == 0 && getsockname(sock, (struct sockaddr *)&me, &len) == 0)
         inet_ntop(AF_INET, &me.sin_addr, ip, sizeof(ip));
     closesocket(sock);
-    print_line("[주소] %s — 다른 사람은 이 주소로 들어와요 (같은 와이파이)", ip);
+    print_line("[주소] %s (같은 와이파이에서 이 주소로 접속)", ip);
 }
 
-/* ================= ⑤ 실행 =================
-   방장이면 방을 열고, 참가자면 방장에게 접속해서 이름을 밝힌다.
-   그다음 키보드 입력 스레드를 띄우고, main은 select로 여러 연결을 같이 지켜보며 받는다. */
+
+
+
+// main
+// 방장이면 방을 열고 참가자면 접속해서 HELLO를 보낸다. 그다음 select로 계속 받음
 
 int main(void)
 {
@@ -504,23 +615,22 @@ int main(void)
     WSAStartup(MAKEWORD(2, 2), &wsa);
     InitializeCriticalSection(&lock);
     SetConsoleOutputCP(CP_UTF8);
-    /* 창을 클릭해도 프로그램이 멈추지 않게 빠른 편집(선택) 모드를 끈다 */
+    // 빠른 편집 모드 끄기 (켜져 있으면 창 클릭했을 때 멈춤)
     HANDLE console_in = GetStdHandle(STD_INPUT_HANDLE);
     DWORD console_mode;
     if (GetConsoleMode(console_in, &console_mode))
         SetConsoleMode(console_in, (console_mode & ~ENABLE_QUICK_EDIT_MODE) | ENABLE_EXTENDED_FLAGS);
-    /* 한글 이름이 깨지지 않게 명령줄을 UTF-8로 바꿔 받는다 */
+    // 명령줄 인자도 한글 때문에 UTF-8로 변환
     wchar_t **wide_args = CommandLineToArgvW(GetCommandLineW(), &arg_count);
     for (int i = 0; i < arg_count && i < 3; i++)
         WideCharToMultiByte(CP_UTF8, 0, wide_args[i], -1, args[i], sizeof(args[i]), NULL, NULL);
 
-    /* 명령줄로 켜면(deolmi 이름 --host / deolmi 이름 주소) 그대로 쓰고,
-       그냥 켜면(Visual Studio에서 실행, exe 더블클릭) 화면에서 물어본다. 잘못되면 다시 묻는다 */
+    // 인자 없이 실행하면 이름이랑 방장/참가자를 물어봄, 잘못 입력하면 다시 물어봄
     char answer[256], host[256] = "127.0.0.1";
     for (;;) {
         if (arg_count < 2) {
             ask_line("이름 (한글 5글자까지): ", args[1], sizeof(args[1]));
-            ask_line("1 = 방 열기(방장), 2 = 방에 들어가기: ", answer, sizeof(answer));
+            ask_line("1. 방장  2. 참가자 : ", answer, sizeof(answer));
             is_host = answer[0] == '1';
             if (!is_host) {
                 ask_line("방장 주소 (같은 컴퓨터면 그냥 엔터): ", answer, sizeof(answer));
@@ -532,11 +642,11 @@ int main(void)
                 strcpy(host, args[2]);
         }
         if (!is_valid_name(args[1]))
-            printf("이름은 한글 5글자까지, 띄어쓰기와 / 없이 써 주세요\n");
+            printf("이름은 한글 5글자까지, 공백이나 / 없이 입력하세요\n");
         else if (is_host && (listen_sock = open_room(PORT)) < 0)
-            printf("%d번 포트로 방을 열 수 없어요 (이미 켜 둔 방장이 있나요?)\n", PORT);
+            printf("%d번 포트로 방을 열 수 없습니다 (이미 방이 열려 있는지 확인)\n", PORT);
         else if (!is_host && (host_conn.sock = connect_to_host(host, PORT)) < 0)
-            printf("%s 에 접속하지 못했어요. 방장이 방을 열었는지, 주소와 와이파이가 맞는지 보세요\n", host);
+            printf("%s에 접속하지 못했습니다 (주소, 와이파이 확인)\n", host);
         else
             break;
         if (arg_count >= 2)
@@ -544,14 +654,14 @@ int main(void)
     }
     strcpy(my_name, args[1]);
     if (is_host) {
-        print_line("덜미 · %s · 방장", my_name);
+        print_line("덜미 - %s (방장)", my_name);
         print_my_address();
     } else {
         make_packet(&send_pkt, TYPE_HELLO, my_name, "");
         send_packet(host_conn.sock, &send_pkt);
-        print_line("덜미 · %s · %s 에 접속", my_name, host);
+        print_line("덜미 - %s (%s에 접속)", my_name, host);
     }
-    print_line("그냥 치면 모두에게 · /dm 이름 = 1:1 · /all · /who · /quit");
+    print_line("명령어: /dm 이름(1:1 대화), /all(전체 대화), /who(접속자 보기), /quit(나가기)");
     CloseHandle(CreateThread(NULL, 0, keyboard_thread, NULL, 0, NULL));
 
     for (;;) {
@@ -567,12 +677,12 @@ int main(void)
         if (select(0, &fds, NULL, NULL, NULL) < 0)
             continue;
         EnterCriticalSection(&lock);
-        for (int i = n - 1; i >= 0; i--)   /* 뒤에서부터: 중간에 누가 나가도 건너뛰는 사람이 없게 */
+        for (int i = n - 1; i >= 0; i--)   // 뒤에서부터 돌아야 중간에 누가 나가도 안 꼬임
             if (FD_ISSET(clients[i].conn.sock, &fds))
                 read_from_client(i);
         if (FD_ISSET(main_sock, &fds) && !is_host)
             read_from_host();
-        else if (FD_ISSET(main_sock, &fds)) {   /* 방장: 새 사람 접속 */
+        else if (FD_ISSET(main_sock, &fds)) {   // 새로 접속한 사람
             int sock = (int)accept(listen_sock, NULL, NULL);
             if (sock >= 0 && client_count < MAX_PEOPLE) {
                 memset(&clients[client_count], 0, sizeof(clients[0]));
@@ -583,4 +693,4 @@ int main(void)
         LeaveCriticalSection(&lock);
     }
 }
-#endif   /* NET_ONLY */
+#endif

@@ -58,10 +58,10 @@
 <h2 id="s03"><span class="n">03</span>켜기 — F5</h2>
 <p>Visual Studio에서 <b>F5</b>(또는 <b>Ctrl+F5</b>)를 누르면 빌드되고 창이 뜬다. 창에서 세 가지를 묻는다.</p>
 <div class="term" data-ui><span class="o">이름 (한글 5글자까지): </span><span class="p">창식</span>
-<span class="o">1 = 방 열기(방장), 2 = 방에 들어가기: </span><span class="p">1</span>
-<span class="o">덜미 · 창식 · 방장</span>
-<span class="o">[주소] 192.168.0.5 — 다른 사람은 이 주소로 들어와요 (같은 와이파이)</span>
-<span class="o">그냥 치면 모두에게 · /dm 이름 = 1:1 · /all · /who · /quit</span></div>
+<span class="o">1. 방장  2. 참가자 : </span><span class="p">1</span>
+<span class="o">덜미 - 창식 (방장)</span>
+<span class="o">[주소] 192.168.0.5 (같은 와이파이에서 이 주소로 접속)</span>
+<span class="o">명령어: /dm 이름(1:1 대화), /all(전체 대화), /who(접속자 보기), /quit(나가기)</span></div>
 <p class="sub">2를 고르면 "방장 주소"를 하나 더 묻는다. 이름이 잘못됐거나 접속이 안 되면 처음부터 다시 묻는다.</p>
 </section>
 <section class="t sec rise" id="s04">
@@ -81,28 +81,28 @@
 <div class="pair">
 <div class="term" data-ui><span class="c"># 창식 (방장, Visual Studio에서 F5)</span>
 <span class="o">이름 (한글 5글자까지): </span><span class="p">창식</span>
-<span class="o">1 = 방 열기(방장), 2 = 방에 들어가기: </span><span class="p">1</span>
-<span class="o">덜미 · 창식 · 방장</span>
-<span class="o">[주소] 192.168.0.5 — 다른 사람은 이 주소로 들어와요 (같은 와이파이)</span>
-<span class="o">그냥 치면 모두에게 · /dm 이름 = 1:1 · /all · /who · /quit</span>
+<span class="o">1. 방장  2. 참가자 : </span><span class="p">1</span>
+<span class="o">덜미 - 창식 (방장)</span>
+<span class="o">[주소] 192.168.0.5 (같은 와이파이에서 이 주소로 접속)</span>
+<span class="o">명령어: /dm 이름(1:1 대화), /all(전체 대화), /who(접속자 보기), /quit(나가기)</span>
 <span class="o">[알림] 민지 입장</span>
 <span class="o">[알림] 철수 입장</span>
 <span class="p">VS에서 켠 방장이에요. 다들 안녕!</span>
 <span class="o">[민지] 더블클릭으로 들어왔어요</span></div>
 <div class="term" data-ui><span class="c"># 철수 (참가자, exe 더블클릭)</span>
 <span class="o">이름 (한글 5글자까지): </span><span class="p">철 수</span>
-<span class="o">1 = 방 열기(방장), 2 = 방에 들어가기: </span><span class="p">2</span>
+<span class="o">1. 방장  2. 참가자 : </span><span class="p">2</span>
 <span class="o">방장 주소 (같은 컴퓨터면 그냥 엔터): </span>
-<span class="o">이름은 한글 5글자까지, 띄어쓰기와 / 없이 써 주세요</span>
+<span class="o">이름은 한글 5글자까지, 공백이나 / 없이 입력하세요</span>
 <span class="o">이름 (한글 5글자까지): </span><span class="p">철수</span>
-<span class="o">1 = 방 열기(방장), 2 = 방에 들어가기: </span><span class="p">2</span>
+<span class="o">1. 방장  2. 참가자 : </span><span class="p">2</span>
 <span class="o">방장 주소 (같은 컴퓨터면 그냥 엔터): </span>
-<span class="o">덜미 · 철수 · 127.0.0.1 에 접속</span>
+<span class="o">덜미 - 철수 (127.0.0.1에 접속)</span>
 <span class="o">[알림] 철수 입장</span>
 <span class="o">[창식] VS에서 켠 방장이에요. 다들 안녕!</span>
 <span class="o">[민지] 더블클릭으로 들어왔어요</span>
 <span class="p">/dm 민지</span>
-<span class="o">[1:1 대화] 민지에게만 갑니다 · /all 로 돌아오기</span>
+<span class="o">[1:1 대화] 민지에게만 보냅니다 (/all 입력하면 전체 대화로)</span>
 <span class="p">민지한테만 보내는 1:1</span>
 <span class="p">/who</span>
 <span class="o">[접속 중] 철수(나), 민지, 창식</span></div>
@@ -124,9 +124,9 @@
 <h2 id="s07"><span class="n">07</span>막히면</h2>
 <ul>
 <li><b>F5를 눌렀는데 빌드가 안 됨</b> → 01의 "C++를 사용한 데스크톱 개발"을 안 깐 것이다 (Visual Studio Installer → 수정).</li>
-<li><code>… 에 접속하지 못했어요</code> → 방장이 아직 방을 안 열었거나 주소가 틀렸다. 방장을 먼저 켠다. 방장 노트북의 방화벽도 확인한다 (05). 친구 노트북 PowerShell에서 <code>Test-NetConnection 192.168.0.5 -Port 9000</code> 의 <code>TcpTestSucceeded</code> 가 <code>True</code> 여야 한다.</li>
+<li><code>…에 접속하지 못했습니다</code> → 방장이 아직 방을 안 열었거나 주소가 틀렸다. 방장을 먼저 켠다. 방장 노트북의 방화벽도 확인한다 (05). 친구 노트북 PowerShell에서 <code>Test-NetConnection 192.168.0.5 -Port 9000</code> 의 <code>TcpTestSucceeded</code> 가 <code>True</code> 여야 한다.</li>
 <li>그래도 안 됨 → <b>학교·카페 와이파이는 기기끼리 연결을 막는 경우가 많다.</b> 한 사람 휴대폰 핫스팟에 둘 다 연결하고 방을 다시 연다. 바뀐 주소가 <code>[주소]</code> 줄에 뜬다.</li>
-<li><code>9000번 포트로 방을 열 수 없어요</code> → 이미 켜 둔 덜미 방장이 있다. 그 창을 닫는다 (안 보이면 명령 프롬프트에서 <code>taskkill /im deolmi.exe</code>).</li>
+<li><code>9000번 포트로 방을 열 수 없습니다</code> → 이미 켜 둔 덜미 방장이 있다. 그 창을 닫는다 (안 보이면 명령 프롬프트에서 <code>taskkill /im deolmi.exe</code>).</li>
 <li>이름을 다시 물음 → 이름은 한글 5글자(15바이트)까지, 띄어쓰기와 <code>/</code> 없이. 이미 들어와 있는 이름이나 방장 이름도 안 된다.</li>
 </ul>
 </section>
