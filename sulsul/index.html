@@ -2,68 +2,221 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#fafbfa">
 <title>술술 — 영어 말하기</title>
 <meta name="description" content="어… 하고 막힌 그 말이 다음 날 내 교재가 되는 영어 말하기.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=TikTok+Sans:wdth,wght@75..150,300..900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/bold/style.css">
 <style>
-:root { --bg: #fafbfa; --page: #e9ebe9; --surface: #eff1ef; --line: #dcdfdc; --ink: #17191c; --muted: #62656b; --accent: #0b6e5b; --accent-soft: #dcefe9; --warm: #f0a23b; --warm-ink: #8f5300; --alert: #b4441b; --deep: #0f2a26 }
+:root {
+  --bg: #fafbfa; --page: #e9ebe9; --surface: #eff1ef; --line: #dcdfdc; --ink: #17191c; --muted: #62656b;
+  --accent: #0b6e5b; --accent-2: #085546; --accent-soft: #dcefe9; --warm: #f0a23b; --warm-2: #c97f16; --warm-soft: #fbe9cc; --warm-ink: #8f5300; --alert: #b4441b; --deep: #0f2a26;
+  --ease: cubic-bezier(.2, .8, .2, 1); --spring: cubic-bezier(.34, 1.56, .64, 1);
+}
 * { box-sizing: border-box }
 html, body { margin: 0; min-height: 100% }
-body { background: var(--page); color: var(--ink); font: 400 17px/1.45 "TikTok Sans", "Pretendard Variable", Pretendard, sans-serif; word-break: keep-all; overflow-wrap: anywhere; -webkit-font-smoothing: antialiased }
-button, input, select, textarea { font: inherit; color: inherit }
+body { background: var(--page); color: var(--ink); font: 400 17px/1.45 "TikTok Sans", "Pretendard Variable", Pretendard, sans-serif; word-break: keep-all; overflow-wrap: anywhere; -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent }
+button, input, select { font: inherit; color: inherit }
 button { border: 0; background: none; cursor: pointer; padding: 0 }
 button:disabled { opacity: .4; cursor: default }
 :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px }
 [hidden] { display: none !important }
-.app { max-width: 460px; min-height: 100vh; margin: 0 auto; background: var(--bg); display: flex; flex-direction: column }
-.top { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px 0 }
+i.ph-fill, i.ph-bold { line-height: 1 }
+.app { position: relative; max-width: 460px; min-height: 100vh; min-height: 100dvh; margin: 0 auto; background: var(--bg); display: flex; flex-direction: column; overflow-x: clip }
+.top { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px 0; gap: 12px }
 .mark { font-weight: 800; font-size: 24px; letter-spacing: -.03em; text-decoration: none; color: var(--ink) }
 .mark::after { content: ""; display: inline-block; width: 7px; height: 7px; margin-left: 3px; border-radius: 50%; background: var(--warm) }
-.day { font-weight: 600; font-size: 15px; color: var(--muted) }
-.view { flex: 1; padding: 14px 20px 24px; display: flex; flex-direction: column }
+.stats { display: flex; gap: 14px; font-weight: 700; font-size: 15px; font-variant-numeric: tabular-nums }
+.stats span { display: inline-flex; align-items: center; gap: 4px }
+.stats .ph-flame { color: var(--warm-2); font-size: 19px }
+.stats .ph-star { color: var(--accent); font-size: 18px }
+.view { flex: 1; padding: 14px 20px 28px; display: flex; flex-direction: column }
+.enter { animation: viewIn .35s var(--ease) both }
+@keyframes viewIn { from { opacity: 0; transform: translateY(10px) } }
+::view-transition-old(root) { animation: vtOut .18s ease both }
+::view-transition-new(root) { animation: vtIn .32s var(--ease) both }
+@keyframes vtOut { to { opacity: 0; transform: translateY(-6px) } }
+@keyframes vtIn { from { opacity: 0; transform: translateY(10px) } }
 h2 { margin: 22px 0 10px; font-size: 15px; font-weight: 700 }
 h2:first-child { margin-top: 6px }
 .big { margin: 10px 0 0; font-size: 28px; line-height: 1.2; font-weight: 800; letter-spacing: -.02em }
 .soft { color: var(--muted); font-size: 15px }
-.btn { display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 0 22px; background: var(--accent); color: #fff; font-weight: 700; transition: transform .12s, background .2s; text-decoration: none }
-.btn:hover { background: var(--ink) }
-.btn:active { transform: scale(.97) }
-.btn.ghost { background: var(--surface); color: var(--ink) }
-.btn.ghost:hover { background: var(--line) }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; padding: 0 22px; background: var(--accent); color: #fff; font-weight: 700; border-radius: 14px; box-shadow: 0 4px 0 var(--accent-2); transition: transform .1s, box-shadow .1s, background .2s; text-decoration: none }
+.btn:active { transform: translateY(4px); box-shadow: 0 0 0 var(--accent-2) }
+.btn.ghost { background: var(--surface); color: var(--ink); box-shadow: 0 4px 0 var(--line) }
+.btn.ghost:active { box-shadow: 0 0 0 var(--line) }
 .btn.wide { width: 100% }
 .link { color: var(--accent); font-weight: 700; font-size: 15px }
 .err { color: var(--alert); font-weight: 600; font-size: 15px; margin: 8px 0 0 }
 .err:empty { display: none }
+.none { padding: 14px; background: var(--surface); border-radius: 12px; font-size: 15px; color: var(--muted) }
+.toast { position: fixed; left: 50%; bottom: 96px; transform: translate(-50%, 20px); opacity: 0; z-index: 30; max-width: 380px; width: calc(100% - 40px); padding: 12px 16px; background: var(--deep); color: #fff; border-radius: 12px; font-size: 15px; font-weight: 600; transition: opacity .25s, transform .25s var(--ease); pointer-events: none }
+.toast.on { opacity: 1; transform: translate(-50%, 0) }
 
 /* 탭 */
-.tabs { position: sticky; bottom: 0; display: grid; grid-template-columns: repeat(5, 1fr); background: var(--bg); border-top: 1px solid var(--line) }
-.tabs button { padding: 12px 0 14px; font-size: 14px; font-weight: 700; color: var(--muted) }
-.tabs button[aria-current=page] { color: var(--ink); box-shadow: inset 0 3px var(--accent) }
-.tabs button i { display: block; font-style: normal; font-size: 12px; font-weight: 600; color: var(--accent); min-height: 1em }
+.tabs { position: sticky; bottom: 0; z-index: 5; display: grid; grid-template-columns: repeat(5, 1fr); background: var(--bg); box-shadow: 0 -1px 0 var(--line); padding-bottom: env(safe-area-inset-bottom) }
+.tabs button { padding: 8px 0 10px; display: grid; justify-items: center; gap: 2px; font-size: 12px; font-weight: 700; color: var(--muted); position: relative }
+.tabs button i { font-size: 25px; transition: transform .25s var(--spring) }
+.tabs button[aria-current=page] { color: var(--accent) }
+.tabs button[aria-current=page] i { transform: translateY(-2px) scale(1.08) }
+.tabs button b { position: absolute; top: 4px; left: calc(50% + 8px); min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--warm); color: var(--ink); font-size: 11px; line-height: 18px }
+.tabs button b:empty { display: none }
 
-/* 시작 */
+/* 처음 */
 .pick { display: grid; gap: 10px; margin-top: 18px }
-.pick button { text-align: left; padding: 18px; background: var(--surface); transition: background .2s }
-.pick button:hover { background: var(--line) }
+.pick button { text-align: left; padding: 18px; background: var(--surface); border-radius: 14px; display: flex; gap: 14px; align-items: center; transition: background .2s, transform .1s }
+.pick button:active { transform: scale(.98) }
+.pick button i { font-size: 30px; color: var(--accent) }
 .pick button[aria-pressed=true] { background: var(--accent); color: #fff }
-.pick b { display: block; font-size: 20px; font-weight: 800 }
+.pick button[aria-pressed=true] i { color: #fff }
+.pick b { display: block; font-size: 19px; font-weight: 800 }
 .pick span { font-size: 15px; opacity: .85 }
 label.f { display: grid; gap: 4px; margin-top: 12px; font-size: 15px; font-weight: 600 }
-.f input, .f select { padding: 12px; border: 0; background: var(--surface); font-size: 17px; font-weight: 400; border-radius: 0 }
+.f input, .f select { padding: 12px; border: 0; background: var(--surface); font-size: 17px; font-weight: 400; border-radius: 10px }
 .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 18px }
 
-/* 오늘 */
+/* 배우기: 오늘 할 것 + 길 */
+.plan { margin-top: 6px; padding: 16px; background: var(--deep); color: #fff; border-radius: 18px }
+.plan h2 { margin: 0 0 10px; color: #cfe7df }
+.plan ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px }
+.plan li button, .plan li a { width: 100%; display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px; background: rgba(255,255,255,.07); color: #fff; text-decoration: none; text-align: left; font-weight: 600; transition: background .2s }
+.plan li button:hover, .plan li a:hover { background: rgba(255,255,255,.13) }
+.plan li i { font-size: 22px; color: var(--warm) }
+.plan li.ok i { color: #7fd1b9 }
+.plan li span { flex: 1 }
+.plan li small { color: #b9cfc8; font-size: 13px; font-weight: 500 }
+.unit { margin-top: 26px }
+.uhead { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 16px; background: var(--uc, var(--accent)); color: #fff }
+.uhead div { flex: 1 }
+.uhead small { display: block; font-size: 13px; opacity: .8; font-weight: 600 }
+.uhead b { font-size: 19px; font-weight: 800 }
+.uhead .jump { padding: 8px 10px; border-radius: 10px; background: rgba(255,255,255,.16); color: #fff; font-size: 13px; font-weight: 700 }
+.nodes { position: relative; display: grid; justify-items: center; gap: 34px; padding: 40px 0 6px }
+.node { position: relative; transform: translateX(var(--x, 0)); display: grid; justify-items: center; gap: 4px }
+.node button { width: 70px; height: 64px; border-radius: 50%; background: var(--line); color: #fff; font-size: 30px; display: grid; place-items: center; box-shadow: 0 6px 0 #c6cac6; transition: transform .1s, box-shadow .1s }
+.node button:active { transform: translateY(5px); box-shadow: 0 1px 0 #c6cac6 }
+.node.open button, .node.done button { background: var(--uc, var(--accent)); box-shadow: 0 6px 0 rgba(0,0,0,.22) }
+.node.lock button { color: #fff; font-size: 24px }
+.node.boss button { width: 86px; height: 78px; font-size: 36px }
+.node.done.boss button { background: var(--warm); color: var(--ink); box-shadow: 0 6px 0 var(--warm-2) }
+.node .stars { display: flex; gap: 1px; font-size: 14px; color: var(--line); height: 16px }
+.node .stars .on { color: var(--warm-2) }
+.node.open::before { content: ""; position: absolute; top: -4px; left: 50%; width: 82px; height: 76px; margin-left: -41px; border-radius: 50%; border: 4px solid var(--uc, var(--accent)); opacity: .35; animation: halo 1.8s ease-out infinite; pointer-events: none }
+.node.boss.open::before { width: 98px; height: 90px; margin-left: -49px }
+@keyframes halo { from { transform: scale(.9); opacity: .5 } to { transform: scale(1.25); opacity: 0 } }
+.node .go-tip { position: absolute; bottom: calc(100% + 2px); white-space: nowrap; padding: 6px 12px; border-radius: 10px; background: var(--bg); color: var(--uc, var(--accent)); font-weight: 800; font-size: 14px; box-shadow: 0 0 0 2px var(--line); animation: bob 1.4s ease-in-out infinite; pointer-events: none }
+.node .go-tip::after { content: ""; position: absolute; left: 50%; top: 100%; margin-left: -6px; border: 6px solid transparent; border-top-color: var(--bg) }
+@keyframes bob { 50% { transform: translateY(-4px) } }
+.node.pop button { animation: pop .6s var(--spring) }
+@keyframes pop { 30% { transform: scale(1.25) } }
+.node label { font-size: 13px; color: var(--muted); font-weight: 600 }
+.sheet { position: fixed; inset: 0; z-index: 20; display: grid; align-items: end; background: rgba(15, 42, 38, .35); animation: fade .2s both }
+.sheet > div { max-width: 460px; width: 100%; margin: 0 auto; padding: 22px 20px calc(22px + env(safe-area-inset-bottom)); background: var(--bg); border-radius: 22px 22px 0 0; animation: up .3s var(--ease) both; display: grid; gap: 10px }
+.sheet h3 { margin: 0; font-size: 22px }
+.sheet p { margin: 0 }
+@keyframes fade { from { opacity: 0 } }
+@keyframes up { from { transform: translateY(40px); opacity: 0 } }
+
+/* 레슨 */
+.lesson { padding-bottom: 0 }
+.lbar { display: flex; align-items: center; gap: 14px }
+.lbar button { font-size: 26px; color: var(--muted) }
+.prog { flex: 1; height: 16px; border-radius: 8px; background: var(--line); overflow: hidden }
+.prog i { display: block; height: 100%; width: 0; border-radius: 8px; background: var(--accent); transition: width .45s var(--ease); position: relative }
+.prog i::after { content: ""; position: absolute; left: 8px; right: 8px; top: 4px; height: 4px; border-radius: 2px; background: rgba(255,255,255,.3) }
+.ex { flex: 1; display: flex; flex-direction: column; padding-top: 22px; animation: exIn .4s var(--ease) both }
+.ex.out { animation: exOut .2s ease both }
+@keyframes exIn { from { opacity: 0; transform: translateX(28px) } }
+@keyframes exOut { to { opacity: 0; transform: translateX(-28px) } }
+.qt { margin: 0 0 18px; font-size: 22px; font-weight: 800; letter-spacing: -.01em }
+.new { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 10px; padding: 4px 10px; border-radius: 8px; background: var(--warm-soft); color: var(--warm-ink); font-weight: 800; font-size: 14px; align-self: flex-start }
+.prompt { display: flex; align-items: center; gap: 12px; margin-bottom: 18px }
+.say-btn { flex: none; width: 56px; height: 56px; border-radius: 16px; background: var(--accent); color: #fff; font-size: 28px; display: grid; place-items: center; box-shadow: 0 4px 0 var(--accent-2); transition: transform .1s, box-shadow .1s }
+.say-btn:active { transform: translateY(4px); box-shadow: none }
+.say-btn.big { width: 96px; height: 96px; font-size: 46px; border-radius: 26px }
+.say-btn.slow { width: 48px; height: 48px; font-size: 13px; font-weight: 800; background: var(--accent-soft); color: var(--accent); box-shadow: 0 3px 0 #b8ddd2 }
+.say-btn.playing { animation: pulse .6s ease-in-out infinite alternate }
+@keyframes pulse { to { transform: scale(1.06) } }
+.center { display: flex; justify-content: center; align-items: flex-end; gap: 12px; margin: 10px 0 22px }
+.bubble { position: relative; padding: 14px 16px; border-radius: 16px; background: var(--surface); font-size: 20px; font-weight: 600; line-height: 1.3 }
+.bubble small { display: block; margin-top: 6px; font-size: 15px; font-weight: 500; color: var(--muted) }
+.learn-en { font-size: 28px; font-weight: 800; line-height: 1.2; letter-spacing: -.02em }
+.learn-ko { margin-top: 8px; font-size: 18px; color: var(--muted) }
+.opts { display: grid; gap: 10px; margin-top: 4px }
+.opt { display: flex; gap: 12px; align-items: center; text-align: left; padding: 14px 16px; border-radius: 14px; background: var(--bg); box-shadow: inset 0 0 0 2px var(--line), 0 3px 0 var(--line); font-size: 17px; font-weight: 600; transition: background .15s, box-shadow .15s, transform .1s }
+.opt kbd { flex: none; width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center; font: 700 13px "TikTok Sans", sans-serif; color: var(--muted); box-shadow: inset 0 0 0 2px var(--line) }
+.opt:active { transform: translateY(2px) }
+.opt.sel { background: var(--accent-soft); box-shadow: inset 0 0 0 2px var(--accent), 0 3px 0 var(--accent) }
+.opt.right { background: var(--accent-soft); box-shadow: inset 0 0 0 2px var(--accent) }
+.opt.wrong { background: var(--warm-soft); box-shadow: inset 0 0 0 2px var(--warm-2); animation: shake .35s }
+@keyframes shake { 25% { transform: translateX(-6px) } 75% { transform: translateX(6px) } }
+.answer { min-height: 112px; display: flex; flex-wrap: wrap; align-content: flex-start; gap: 8px; padding: 8px 0; border-bottom: 2px solid var(--line) }
+.bank { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 20px }
+.tile { padding: 9px 13px; border-radius: 12px; background: var(--bg); box-shadow: inset 0 0 0 2px var(--line), 0 3px 0 var(--line); font-size: 17px; font-weight: 600; transition: transform .15s var(--spring), opacity .15s }
+.tile:active { transform: translateY(2px) }
+.tile.used { opacity: .25; pointer-events: none; box-shadow: inset 0 0 0 2px var(--line) }
+.answer .tile { animation: tileIn .25s var(--spring) }
+@keyframes tileIn { from { transform: scale(.7); opacity: 0 } }
+.pairs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px }
+.pairs .opt { font-size: 15px; min-height: 66px }
+.pairs .opt.gone { opacity: .25; pointer-events: none; box-shadow: inset 0 0 0 2px var(--line) }
+.mic-big { width: 104px; height: 104px; margin: 18px auto 6px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 46px; display: grid; place-items: center; box-shadow: 0 6px 0 var(--accent-2); transition: transform .1s, box-shadow .1s }
+.mic-big:active { transform: translateY(5px); box-shadow: none }
+.mic-big.on { background: var(--warm); color: var(--ink); box-shadow: 0 6px 0 var(--warm-2); animation: ring2 1.4s ease-out infinite }
+@keyframes ring2 { 0% { outline: 0 solid rgba(240,162,59,.5) } 100% { outline: 22px solid rgba(240,162,59,0) } }
+.heardw { text-align: center; min-height: 1.5em; font-size: 18px; font-weight: 600 }
+.heardw .ok { color: var(--accent) }
+.heardw .no { color: var(--alert); text-decoration: line-through }
+.word { margin: 6px 0 4px; font-size: 52px; font-weight: 800; letter-spacing: -.03em; line-height: 1.05 }
+.word s { text-decoration: none; color: var(--warm-2) }
+.skips { display: flex; justify-content: center; gap: 18px; margin-top: auto; padding-top: 16px }
+.skips button { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-weight: 700; font-size: 14px }
+.skips i { font-size: 18px }
+.lfoot { position: sticky; bottom: 0; margin: 16px -20px 0; padding: 14px 20px calc(16px + env(safe-area-inset-bottom)); background: var(--bg); box-shadow: 0 -2px 0 var(--line); display: flex; flex-wrap: wrap; gap: 10px; transition: background .25s }
+.lfoot .btn { flex: 1 }
+.lfoot .skip { flex: 0 0 auto; padding: 0 16px }
+.lfoot.good { background: var(--accent-soft); box-shadow: none }
+.lfoot.bad { background: var(--warm-soft); box-shadow: none }
+.verdict { display: none; flex-basis: 100%; margin-bottom: 4px }
+.lfoot.good .verdict, .lfoot.bad .verdict { display: block; animation: up .3s var(--ease) both }
+.verdict b { display: flex; align-items: center; gap: 8px; font-size: 21px; font-weight: 800 }
+.lfoot.good .verdict b { color: var(--accent) }
+.lfoot.bad .verdict b { color: var(--warm-ink) }
+.verdict p { margin: 4px 0 0; font-size: 16px }
+.lfoot.bad .btn { background: var(--warm); color: var(--ink); box-shadow: 0 4px 0 var(--warm-2) }
+.lfoot.good .skip, .lfoot.bad .skip { display: none }
+
+/* 끝 화면 */
+.done { align-items: center; text-align: center; justify-content: center; gap: 10px; position: relative }
+.done canvas { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 40 }
+.trophy { font-size: 92px; color: var(--warm); animation: pop .8s var(--spring) both }
+.done h1 { margin: 0; font-size: 30px; font-weight: 800; letter-spacing: -.02em }
+.bigstars { display: flex; gap: 6px; font-size: 40px; color: var(--line) }
+.bigstars i { animation: starIn .5s var(--spring) both }
+.bigstars i.on { color: var(--warm-2) }
+.bigstars i:nth-child(2) { animation-delay: .15s } .bigstars i:nth-child(3) { animation-delay: .3s }
+@keyframes starIn { from { transform: scale(0) rotate(-40deg) } }
+.dstats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: 100%; margin: 12px 0 }
+.dstats div { padding: 12px 6px; border-radius: 14px; box-shadow: inset 0 0 0 2px var(--line) }
+.dstats b { display: block; font-size: 24px; font-variant-numeric: tabular-nums }
+.dstats span { font-size: 13px; color: var(--muted); font-weight: 600 }
+.done .btn { width: 100%; margin-top: 8px }
+
+/* 대화 */
 .who { display: flex; align-items: center; gap: 12px }
 .face { width: 44px; height: 44px; border-radius: 50%; background: var(--accent); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 20px; flex: none }
 .who b { display: block; font-size: 18px }
 .who span { font-size: 14px; color: var(--muted) }
 .scenes { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin: 14px -20px 0; padding: 0 20px }
-.scenes button { flex: none; padding: 8px 12px; background: var(--surface); font-size: 15px; font-weight: 600 }
+.scenes button { flex: none; padding: 8px 12px; border-radius: 10px; background: var(--surface); font-size: 15px; font-weight: 600 }
 .scenes button[aria-pressed=true] { background: var(--accent); color: #fff }
+.custom { display: flex; gap: 8px; margin-top: 10px }
+.custom input { flex: 1; min-width: 0; padding: 10px 12px; border: 0; border-radius: 10px; background: var(--surface); font-size: 15px }
 .say { margin: 14px 0 0; font-size: 23px; line-height: 1.25; font-weight: 600; letter-spacing: -.01em; min-height: 2.5em }
 .say.wait { color: var(--muted) }
 .ko { margin: 6px 0 0; font-size: 16px; color: var(--muted) }
@@ -71,7 +224,7 @@ label.f { display: grid; gap: 4px; margin-top: 12px; font-size: 15px; font-weigh
 .sub { display: flex; gap: 14px; margin-top: 8px }
 .sub button { font-size: 15px; font-weight: 700; color: var(--accent) }
 .chips { display: grid; gap: 8px }
-.chip { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 11px 14px; background: var(--surface); transition: background .3s, color .3s }
+.chip { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 11px 14px; border-radius: 12px; background: var(--surface); transition: background .3s, color .3s }
 .chip > div { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px }
 .chip b { font-size: 17px; font-weight: 650 }
 .chip span { font-size: 14px; color: var(--muted) }
@@ -83,95 +236,72 @@ label.f { display: grid; gap: 4px; margin-top: 12px; font-size: 15px; font-weigh
 .chip[data-n="2"] .dots::before, .chip[data-n="2"] .dots::after { background: #fff }
 .chip.hit { animation: hit .5s }
 @keyframes hit { 40% { transform: scale(1.03) } }
-.none { padding: 12px 14px; background: var(--surface); font-size: 15px; color: var(--muted) }
-.wave { margin-top: 16px; height: 64px; background: var(--surface) }
+.wave { margin-top: 16px; height: 64px; border-radius: 12px; overflow: hidden; background: var(--surface) }
 canvas { display: block; width: 100%; height: 100% }
 .heard { margin: 8px 0 0; min-height: 2.9em; font-size: 16px; line-height: 1.45 }
-.heard em { font-style: normal; color: var(--warm-ink); background: #fbe7c4; padding: 0 3px; font-weight: 700 }
+.heard em { font-style: normal; color: var(--warm-ink); background: var(--warm-soft); padding: 0 3px; font-weight: 700 }
 .heard i { font-style: normal; color: var(--muted) }
 .go { margin-top: auto; padding-top: 10px; display: flex; align-items: center; gap: 14px }
-.mic { width: 76px; height: 76px; border-radius: 50%; background: var(--accent); color: #fff; display: grid; place-items: center; flex: none; transition: transform .15s, background .2s }
-.mic:hover { transform: scale(1.05) }
-.mic:active { transform: scale(.96) }
-.mic svg { width: 30px; height: 30px }
-.mic .cut { transition: opacity .2s }
-.live .mic { background: var(--accent); animation: ring 1.6s ease-out infinite }
-@keyframes ring { from { box-shadow: 0 0 0 0 rgba(11, 110, 91, .45) } to { box-shadow: 0 0 0 18px rgba(11, 110, 91, 0) } }
-.live .mic .cut { opacity: 0 }
+.mic { width: 76px; height: 76px; border-radius: 50%; background: var(--accent); color: #fff; display: grid; place-items: center; flex: none; font-size: 34px; box-shadow: 0 5px 0 var(--accent-2); transition: transform .1s, box-shadow .1s, background .2s }
+.mic:active { transform: translateY(4px); box-shadow: none }
+.live .mic { background: var(--warm); color: var(--ink); box-shadow: 0 5px 0 var(--warm-2); animation: ring2 1.4s ease-out infinite }
 .go .st b { display: block; font-size: 20px; font-weight: 800 }
 .go .st span { font-size: 15px; color: var(--muted); font-variant-numeric: tabular-nums }
 .go .side { margin-left: auto; display: grid; gap: 8px; justify-items: end }
-.go .side button { font-size: 15px; font-weight: 700; color: var(--accent) }
+.go .side button { display: inline-flex; align-items: center; gap: 5px; font-size: 15px; font-weight: 700; color: var(--accent) }
 .type { display: flex; gap: 8px; margin-top: 10px }
-.type input { flex: 1; min-width: 0; padding: 12px; border: 0; background: var(--surface); font-size: 16px }
-.result { margin-top: 14px; padding: 16px; background: var(--deep); color: #fff; display: grid; gap: 8px }
+.type input { flex: 1; min-width: 0; padding: 12px; border: 0; border-radius: 10px; background: var(--surface); font-size: 16px }
+.result { margin-top: 14px; padding: 16px; border-radius: 16px; background: var(--deep); color: #fff; display: grid; gap: 8px; animation: up .35s var(--ease) both }
 .result b { font-size: 20px }
-.result .btn { background: #fff; color: var(--ink) }
+.result .btn { background: #fff; color: var(--ink); box-shadow: 0 4px 0 #b9cfc8 }
 
-/* 연습 */
-.card { padding: 18px; background: var(--surface); margin-top: 10px }
-.card .k { font-size: 20px; font-weight: 700 }
-.card .e { margin-top: 8px; font-size: 22px; font-weight: 700; color: var(--accent) }
-.card .e[hidden] { display: none }
-.card .meta { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; font-size: 14px; color: var(--muted) }
-.tools { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px }
-.tools button { padding: 10px 14px; background: var(--bg); color: var(--accent); font-weight: 700; font-size: 15px }
-.tools button.on { background: var(--warm); color: var(--ink) }
-.score { margin: 10px 0 0; font-weight: 600 }
-.score:empty { display: none }
-.score.ok { color: var(--accent) }
-.score.no { color: var(--alert) }
-.score s { color: var(--alert) }
-.grad { margin-top: 26px; font-size: 15px; color: var(--muted) }
-
-/* 발음 */
-.pchips { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin: 0 -20px 12px; padding: 0 20px }
-.pchips button { flex: none; padding: 8px 12px; background: var(--surface); font-weight: 600; font-size: 15px; color: var(--muted) }
-.pchips button[aria-pressed=true] { background: var(--accent); color: #fff }
-.pbar { height: 6px; background: var(--line); margin-bottom: 12px }
-.pbar i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .3s }
-.pcard { background: var(--surface); padding: 24px 20px 20px }
-.tag { display: inline-block; padding: 3px 10px; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 14px }
-.word { margin: 16px 0 2px; font-size: clamp(40px, 12vw, 58px); font-weight: 800; letter-spacing: -.03em; line-height: 1.05 }
-.word s { text-decoration: none; color: var(--warm) }
-.ask { display: block; width: 100%; margin-top: 22px; padding: 16px; background: var(--accent); color: #fff; font-weight: 700; font-size: 18px }
-.ans { margin-top: 18px; display: grid; gap: 12px }
-.wrong { color: var(--alert); font-size: 19px; font-weight: 600 }
-.right { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 14px }
-.right strong { font-size: 34px; font-weight: 500; letter-spacing: -.02em }
-.right strong b { font-weight: 850; color: var(--accent) }
-.ipa { font-size: 16px; color: var(--muted) }
-.tip { margin: 0; padding: 12px 14px; background: var(--bg); font-weight: 500 }
-.next { display: grid; grid-template-columns: 1fr 1fr; gap: 8px }
-.next button { padding: 15px; font-weight: 700; font-size: 17px; background: var(--bg) }
-.next button + button { background: var(--accent); color: #fff }
-.pcount { margin-top: 10px; font-size: 14px; color: var(--muted) }
+/* 복습 */
+.card { padding: 16px; border-radius: 14px; background: var(--surface); margin-top: 10px }
+.card .k { font-size: 18px; font-weight: 700 }
+.card .e { margin-top: 6px; font-size: 17px; font-weight: 600; color: var(--accent) }
+.card .meta { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 14px; color: var(--muted) }
 
 /* 기록 */
 .chart { display: flex; align-items: flex-end; gap: 6px; height: 140px; padding-top: 10px }
 .chart div { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; font-size: 12px; color: var(--muted) }
-.chart i { width: 100%; background: var(--warm); min-height: 3px }
-.sess { margin-top: 8px; background: var(--surface) }
+.chart i { width: 100%; background: var(--warm); min-height: 3px; border-radius: 4px 4px 0 0; transform-origin: bottom; animation: grow .6s var(--ease) both }
+@keyframes grow { from { transform: scaleY(0) } }
+.tiles3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px }
+.tiles3 div { padding: 14px 8px; border-radius: 14px; background: var(--surface); text-align: center }
+.tiles3 b { display: block; font-size: 26px }
+.tiles3 span { font-size: 13px; color: var(--muted); font-weight: 600 }
+.sess { margin-top: 8px; border-radius: 12px; background: var(--surface) }
 .sess summary { padding: 12px 14px; cursor: pointer; display: flex; justify-content: space-between; gap: 10px; font-weight: 600 }
 .sess summary span { color: var(--muted); font-weight: 400; font-size: 15px }
 .sess ol { margin: 0; padding: 0 14px 14px 32px; display: grid; gap: 6px; font-size: 15px }
 .sess li.me { color: var(--accent) }
 
-@media (min-width: 700px) { .app { margin-top: 24px; margin-bottom: 24px; min-height: calc(100vh - 48px) } }
-@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important } }
+/* 설정 */
+.toggle { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; font-weight: 600 }
+.toggle small { display: block; font-size: 13px; color: var(--muted); font-weight: 500 }
+.sw { flex: none; width: 52px; height: 32px; border-radius: 16px; background: var(--line); position: relative; transition: background .2s }
+.sw::after { content: ""; position: absolute; top: 4px; left: 4px; width: 24px; height: 24px; border-radius: 50%; background: #fff; transition: transform .25s var(--spring) }
+.sw[aria-checked=true] { background: var(--accent) }
+.sw[aria-checked=true]::after { transform: translateX(20px) }
+.seg2 { display: flex; border-radius: 10px; background: var(--surface); padding: 3px }
+.seg2 button { padding: 6px 12px; border-radius: 8px; font-size: 14px; font-weight: 700; color: var(--muted) }
+.seg2 button[aria-pressed=true] { background: var(--bg); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.1) }
+
+@media (min-width: 700px) { .app { margin-top: 24px; margin-bottom: 24px; min-height: calc(100vh - 48px); border-radius: 24px; overflow: hidden } }
+@media (prefers-reduced-motion: reduce) { *, ::view-transition-old(root), ::view-transition-new(root) { animation: none !important; transition: none !important } }
 </style>
 </head>
 <body>
 <main class="app" id="app">
-  <div class="top"><a class="mark" href="#today">술술</a><span class="day" id="day"></span></div>
+  <div class="top" id="topbar"><a class="mark" href="#learn">술술</a><div class="stats" id="stats"></div></div>
 
   <!-- 처음 -->
   <section class="view" id="v-start" hidden>
     <div id="s1">
       <p class="big">누구와 이야기할까요?</p>
       <div class="pick" id="modes">
-        <button data-mode="me"><b>내 이야기로</b><span>상대가 내 하루와 하는 일을 물어요</span></button>
-        <button data-mode="daily"><b>일상 상황으로</b><span>카페·길·공항 같은 장면에서 말해요</span></button>
+        <button data-mode="me"><i class="ph-fill ph-user-sound"></i><div><b>내 이야기로</b><span>상대가 내 하루와 하는 일을 물어요</span></div></button>
+        <button data-mode="daily"><i class="ph-fill ph-storefront"></i><div><b>일상 상황으로</b><span>카페·길·공항 같은 장면에서 말해요</span></div></button>
       </div>
     </div>
     <div id="s2" hidden>
@@ -187,20 +317,26 @@ canvas { display: block; width: 100%; height: 100% }
       </form>
     </div>
     <div id="s3" hidden>
-      <p class="big">대화 상대를 깨울 열쇠</p>
-      <p class="soft" style="margin-top:8px">대화는 Google Gemini가 해요. 무료 키를 받아 붙여 넣으면 돼요. 키는 이 기기에만 저장되고, 무료 키로 보낸 대화는 Google이 학습에 쓸 수 있어요.</p>
+      <p class="big">AI 대화 상대를 깨울 열쇠</p>
+      <p class="soft" style="margin-top:8px">스테이지는 키 없이도 다 할 수 있어요. 자유 대화와 AI 실전 대화만 Google Gemini 무료 키가 필요해요. 키는 이 기기에만 저장되고, 무료 키로 보낸 대화는 Google이 학습에 쓸 수 있어요.</p>
       <p style="margin:14px 0 0"><a class="link" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">무료 키 받기 (Google AI Studio) →</a></p>
-      <label class="f">Gemini API 키<input id="key1" autocomplete="off" spellcheck="false" placeholder="AIza…"></label>
+      <label class="f">Gemini API 키<input id="key1" autocomplete="off" spellcheck="false" placeholder="붙여 넣기"></label>
       <p class="err" id="keyerr1"></p>
       <div class="row"><button class="btn" id="keyok1">확인</button><button class="btn ghost" id="keylater">나중에</button></div>
-      <p class="soft" style="margin-top:16px">키 없이도 연습과 발음 칸은 쓸 수 있어요.</p>
     </div>
   </section>
 
-  <!-- 오늘 -->
-  <section class="view" id="v-today" hidden>
+  <!-- 배우기 -->
+  <section class="view" id="v-learn" hidden>
+    <div class="plan" id="plan"></div>
+    <div id="path"></div>
+  </section>
+
+  <!-- 대화 -->
+  <section class="view" id="v-talk" hidden>
     <div class="who"><div class="face" id="face" aria-hidden="true">J</div><div><b id="pname">Jamie</b><span id="psub"></span></div></div>
     <div class="scenes" id="scenes" role="group" aria-label="장면"></div>
+    <form class="custom" id="customf" hidden><input id="customin" placeholder="원하는 상황 (예: 교환학생 첫날 기숙사에서)" maxlength="120"><button class="btn" style="min-height:42px;padding:0 14px">정하기</button></form>
     <p class="say wait" lang="en" id="line"></p>
     <p class="ko" id="ko"></p>
     <div class="sub" id="lsub" hidden><button id="again">다시 듣기</button><button id="tr">한국어로 보기</button></div>
@@ -212,35 +348,28 @@ canvas { display: block; width: 100%; height: 100% }
     <div class="result" id="result" hidden></div>
     <p class="err" id="convErr"></p>
     <div class="go">
-      <button class="mic" id="mic" aria-label="대화 시작">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor" stroke="none"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/><path class="cut" d="M4 4l16 16"/></svg>
-      </button>
+      <button class="mic" id="mic" aria-label="대화 시작"><i class="ph-fill ph-microphone"></i></button>
       <div class="st"><b id="state">대화 시작</b><span id="time">3:00</span></div>
-      <div class="side"><button id="kobtn" hidden>한국어로 말하기</button><button id="end" hidden>끝내기</button><button id="demo" hidden>예시 보기</button></div>
+      <div class="side"><button id="kobtn" hidden><i class="ph-bold ph-translate"></i>한국어로 말하기</button><button id="totype" hidden><i class="ph-bold ph-keyboard"></i>글로 쓰기</button><button id="end" hidden><i class="ph-bold ph-stop"></i>끝내기</button><button id="demo" hidden>예시 보기</button></div>
     </div>
   </section>
 
-  <!-- 연습 -->
-  <section class="view" id="v-practice" hidden>
-    <h2>막혔던 말</h2>
-    <p class="soft">대화에서 두 번 자연스럽게 쓰면 목록에서 빠져요.</p>
-    <div id="plist"></div>
-    <p class="grad" id="grad"></p>
-  </section>
-
-  <!-- 발음 -->
-  <section class="view" id="v-pron" hidden>
-    <h2>잘못 아는 발음</h2>
-    <div class="pbar"><i id="pbar"></i></div>
-    <div class="pchips" id="pchips" role="group" aria-label="함정 종류"></div>
-    <div class="pcard" id="pcard" aria-live="polite"></div>
-    <p class="pcount" id="pcount"></p>
+  <!-- 복습 -->
+  <section class="view" id="v-review" hidden>
+    <h2>내가 막혔던 말</h2>
+    <p class="soft">대화하다 막힌 말이에요. 대화에서 핵심 표현을 두 번 쓰면 빠져요.</p>
+    <div class="row" style="margin-top:12px"><button class="btn wide" id="revStuck"><i class="ph-fill ph-play"></i>막힌 말 연습</button></div>
+    <div id="stucklist"></div>
+    <h2>틀렸던 문제</h2>
+    <p class="soft" id="mistinfo"></p>
+    <div class="row" style="margin-top:12px"><button class="btn ghost wide" id="revMist"><i class="ph-bold ph-arrow-counter-clockwise"></i>틀린 것 다시</button></div>
   </section>
 
   <!-- 기록 -->
   <section class="view" id="v-log" hidden>
+    <div class="tiles3" id="lognums"></div>
     <h2>메워지는 구멍</h2>
-    <p class="soft">1분에 몇 번 멈췄는지예요. 막대가 낮아질수록 술술 나와요.</p>
+    <p class="soft">자유 대화에서 1분에 몇 번 멈췄는지예요. 막대가 낮아질수록 술술 나와요.</p>
     <div class="chart" id="chart"></div>
     <h2>지난 대화</h2>
     <div id="slist"></div>
@@ -248,10 +377,17 @@ canvas { display: block; width: 100%; height: 100% }
 
   <!-- 설정 -->
   <section class="view" id="v-set" hidden>
+    <h2>문제 고르기</h2>
+    <div class="toggle"><div>말하기 문제<small>끄면 말하기 대신 문장 만들기가 나와요</small></div><button class="sw" role="switch" data-p="speak" aria-label="말하기 문제"></button></div>
+    <div class="toggle"><div>듣기 문제<small>끄면 듣기 대신 읽기 문제가 나와요</small></div><button class="sw" role="switch" data-p="listen" aria-label="듣기 문제"></button></div>
+    <div class="toggle"><div>문장 자동으로 읽어 주기</div><button class="sw" role="switch" data-p="auto" aria-label="자동 읽기"></button></div>
+    <div class="toggle"><div>효과음</div><button class="sw" role="switch" data-p="sound" aria-label="효과음"></button></div>
+    <div class="toggle"><div>읽어 주는 빠르기</div><div class="seg2" id="rate"><button data-r=".7">느리게</button><button data-r=".9">보통</button><button data-r="1.05">빠르게</button></div></div>
+    <p class="soft" id="offinfo"></p>
     <h2>대화 방식</h2>
     <div class="pick" id="modes2">
-      <button data-mode="me"><b>내 이야기로</b></button>
-      <button data-mode="daily"><b>일상 상황으로</b></button>
+      <button data-mode="me"><i class="ph-fill ph-user-sound"></i><div><b>내 이야기로</b></div></button>
+      <button data-mode="daily"><i class="ph-fill ph-storefront"></i><div><b>일상 상황으로</b></div></button>
     </div>
     <h2>나에 대해</h2>
     <form id="prof2">
@@ -264,500 +400,38 @@ canvas { display: block; width: 100%; height: 100% }
     </form>
     <h2>Gemini 키</h2>
     <p class="soft" id="keyinfo"></p>
-    <label class="f">새 키<input id="key2" autocomplete="off" spellcheck="false" placeholder="AIza…"></label>
+    <label class="f">새 키<input id="key2" autocomplete="off" spellcheck="false" placeholder="붙여 넣기"></label>
     <p class="err" id="keyerr2"></p>
     <div class="row"><button class="btn" id="keyok2">확인</button><a class="link" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">무료 키 받기 →</a></div>
     <h2>처음부터</h2>
     <button class="btn ghost" id="reset">모든 기록 지우기</button>
   </section>
 
+  <!-- 레슨 -->
+  <section class="view lesson" id="v-lesson" hidden>
+    <div class="lbar"><button id="lclose" aria-label="레슨 그만하기"><i class="ph-bold ph-x"></i></button><div class="prog"><i id="lprog"></i></div></div>
+    <div class="ex" id="ex"></div>
+    <div class="lfoot" id="lfoot">
+      <div class="verdict" id="verdict" aria-live="assertive"></div>
+      <button class="btn ghost skip" id="lskip">건너뛰기</button>
+      <button class="btn" id="lcheck" disabled>확인</button>
+    </div>
+  </section>
+
+  <!-- 레슨 끝 -->
+  <section class="view done" id="v-done" hidden></section>
+
   <nav class="tabs" id="tabs" aria-label="메뉴" hidden>
-    <button data-v="today">오늘<i></i></button>
-    <button data-v="practice">연습<i id="pn"></i></button>
-    <button data-v="pron">발음<i></i></button>
-    <button data-v="log">기록<i></i></button>
-    <button data-v="set">설정<i></i></button>
+    <button data-v="learn"><i class="ph-fill ph-path"></i>배우기</button>
+    <button data-v="talk"><i class="ph-fill ph-chats-circle"></i>대화</button>
+    <button data-v="review"><i class="ph-fill ph-arrow-counter-clockwise"></i>복습<b id="revn"></b></button>
+    <button data-v="log"><i class="ph-fill ph-chart-bar"></i>기록</button>
+    <button data-v="set"><i class="ph-fill ph-gear-six"></i>설정</button>
   </nav>
+  <div class="toast" id="toast" role="status"></div>
 </main>
 <script src="words.js"></script>
-<script>
-"use strict";
-// ───── 저장 ─────
-const $ = id => document.getElementById(id);
-const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-const DEMO = new URLSearchParams(location.search).has("demo");
-const today = () => new Date().toLocaleDateString("sv");
-const fresh = () => ({ mode: null, profile: {}, scene: "auto", memory: "", stuck: [], sessions: [], pron: [], key: "", model: "" });
-let S;
-try { S = DEMO ? null : JSON.parse(localStorage.getItem("sulsul")) } catch {}
-S = Object.assign(fresh(), S || {});
-if (DEMO) Object.assign(S, { mode: "me", key: "", stuck: [
-  { id: "d1", en: "I ended up redoing the whole thing.", ko: "결국 처음부터 다시 했어", uses: 0 },
-  { id: "d2", en: "It took me about two hours.", ko: "두 시간쯤 걸렸어", uses: 1 },
-  { id: "d3", en: "I was about to give up.", ko: "막 포기하려던 참이었어", uses: 0 }] });
-const save = () => { if (!DEMO) try { localStorage.setItem("sulsul", JSON.stringify(S)) } catch {} };
-
-// ───── 상대와 장면 ─────
-const SCENES = {
-  me: { ko: "내 이야기", name: "Jamie", role: "a friendly peer around the learner's age who loves hearing about their day and what they are making", desc: "A casual catch-up about the learner's real day, plans and projects. Follow up on things you remember." },
-  cafe: { ko: "카페 주문", name: "Mina", role: "a barista at a busy café", desc: "The learner orders a drink and maybe something to eat. Ask about size, hot or iced, for here or to go, then small talk." },
-  street: { ko: "길 묻기", name: "Tom", role: "a local person on a busy street", desc: "The learner asks you how to get somewhere (a station, a museum, a restaurant). Give simple directions and check they understood." },
-  intro: { ko: "자기소개", name: "Sara", role: "someone the learner just met at a meetup", desc: "Getting to know each other: study or work, hobbies, recent news." },
-  clinic: { ko: "병원 접수", name: "Grace", role: "a receptionist at a clinic", desc: "The learner checks in and explains what is wrong, since when, and books a time." },
-  airport: { ko: "공항 체크인", name: "Alex", role: "a check-in agent at an airport counter", desc: "Check-in: passport, destination, bags, seat preference, boarding time." }
-};
-const DAILY = ["cafe", "street", "intro", "clinic", "airport"];
-const sceneId = () => S.mode === "me" ? "me" : S.scene !== "auto" ? S.scene : DAILY[(new Date().getDate()) % DAILY.length];
-const targets = () => S.stuck.filter(x => !x.done).slice(0, 3);
-
-// ───── 화면 전환 ─────
-const VIEWS = ["start", "today", "practice", "pron", "log", "set"];
-function go(v) {
-  if (!VIEWS.includes(v)) v = "today";
-  if (!S.mode && !DEMO) v = "start";
-  VIEWS.forEach(x => $("v-" + x).hidden = x !== v);
-  $("tabs").hidden = v === "start" || DEMO;
-  [...$("tabs").children].forEach(b => b.dataset.v === v ? b.setAttribute("aria-current", "page") : b.removeAttribute("aria-current"));
-  ({ today: renderToday, practice: renderPractice, pron: () => pronStart(), log: renderLog, set: renderSet })[v]?.();
-  if (v === "start") startStep(1);
-}
-$("tabs").onclick = e => { const b = e.target.closest("button"); if (b) location.hash = b.dataset.v };
-addEventListener("hashchange", () => go(location.hash.slice(1)));
-function header() {
-  const days = new Set(S.sessions.map(s => s.date)).size;
-  $("day").textContent = days ? `${days}일째` : "";
-  const n = targets().length; $("pn").textContent = n ? n : "";
-}
-
-// ───── 처음 ─────
-function startStep(n) { [1, 2, 3].forEach(i => $("s" + i).hidden = i !== n) }
-$("modes").onclick = e => { const b = e.target.closest("button"); if (!b) return; S.mode = b.dataset.mode; save(); startStep(2) };
-const fillProf = f => ["name", "job", "likes", "use", "level"].forEach(k => f.elements[k].value = S.profile[k] || "");
-const readProf = f => { ["name", "job", "likes", "use", "level"].forEach(k => S.profile[k] = f.elements[k].value.trim()); save() };
-$("prof").onsubmit = e => { e.preventDefault(); readProf($("prof")); startStep(3) };
-$("skip").onclick = () => startStep(3);
-$("keylater").onclick = () => { location.hash = "today"; go("today") };
-$("keyok1").onclick = () => setKey($("key1"), $("keyerr1"), $("keyok1"), () => { location.hash = "today"; go("today") });
-
-// ───── Gemini ─────
-const API = "https://generativelanguage.googleapis.com/v1beta/";
-class AIError extends Error {}
-async function call(path, body) {
-  let r;
-  try { r = await fetch(API + path, { method: body ? "POST" : "GET", headers: { "x-goog-api-key": S.key, ...(body ? { "Content-Type": "application/json" } : {}) }, body: body && JSON.stringify(body) }) }
-  catch { throw new AIError("인터넷 연결을 확인해 주세요.") }
-  if (r.ok) return r.json();
-  if (r.status === 429) throw new AIError("오늘 무료 한도를 다 썼어요. 내일 다시 하거나 연습·발음 칸을 써요.");
-  if (r.status === 400 || r.status === 403) throw new AIError("키가 맞지 않아요. 설정에서 키를 다시 넣어 주세요.");
-  throw new AIError(`Gemini가 응답하지 않아요 (${r.status}). 잠시 뒤 다시 해 주세요.`);
-}
-// 무료로 쓸 수 있는 가장 새 Flash-Lite(없으면 Flash)를 고른다
-async function pickModel() {
-  const { models = [] } = await call("models?pageSize=200");
-  const ok = models.filter(m => (m.supportedGenerationMethods || []).includes("generateContent") && !/preview|exp|tts|image|live|audio|thinking|embedding/i.test(m.name));
-  const ver = m => (m.name.match(/(\d+(?:\.\d+)?)/) || [0, 0])[1] * 1;
-  const best = re => ok.filter(m => re.test(m.name)).sort((a, b) => ver(b) - ver(a))[0];
-  const any = models.filter(m => (m.supportedGenerationMethods || []).includes("generateContent") && /flash/.test(m.name) && !/tts|image|live|audio|embedding/i.test(m.name)).sort((a, b) => ver(b) - ver(a))[0];
-  const m = best(/flash-lite/) || best(/flash/) || any;
-  if (!m) throw new AIError("이 키로 쓸 수 있는 대화 모델을 못 찾았어요.");
-  return m.name.replace(/^models\//, "");
-}
-async function setKey(input, err, btn, done) {
-  const k = input.value.trim(); err.textContent = "";
-  if (!k) { err.textContent = "키를 붙여 넣어 주세요."; return }
-  btn.disabled = true; const old = S.key; S.key = k;
-  try { S.model = await pickModel(); save(); input.value = ""; done() }
-  catch (e) { S.key = old; err.textContent = e.message }
-  btn.disabled = false;
-}
-async function ask(system, contents, json) {
-  const d = await call(`models/${S.model}:generateContent`, {
-    systemInstruction: { parts: [{ text: system }] }, contents,
-    generationConfig: { temperature: json ? .3 : .9, maxOutputTokens: json ? 1500 : 220, ...(json ? { responseMimeType: "application/json" } : {}) }
-  });
-  const t = (d.candidates?.[0]?.content?.parts || []).map(p => p.text || "").join("").trim();
-  if (!t) throw new AIError("대답이 비어 있어요. 다시 해 주세요.");
-  return t;
-}
-function persona(sc) {
-  const p = S.profile, s = SCENES[sc], tg = targets();
-  return `You are ${s.name}, ${s.role}. You are having a short spoken English conversation with a Korean learner${p.name ? ` called ${p.name}` : ""}.
-Scene: ${s.desc}
-Learner: ${[p.job && `does ${p.job}`, p.likes && `likes ${p.likes}`, p.use && `needs English for ${p.use}`, p.level && `level (Korean description): ${p.level}`].filter(Boolean).join("; ") || "no profile given"}.
-What you remember from earlier conversations: ${S.memory || "nothing yet, this is your first talk"}.
-${tg.length ? `The learner got stuck on these before and is trying to use them today: ${tg.map(t => `"${t.en}"`).join(", ")}. Ask questions that give them a natural reason to say these. Never say these sentences yourself and never mention practice or targets.` : ""}
-Rules: speak like a real person in this scene. Reply with one or two short sentences at the learner's level, then ask exactly one question. No lists, no emojis, no corrections. "[KO: ...]" means the learner said that part in Korean; understand it and keep going in English. "[pause Ns]" marks silence.`;
-}
-
-// ───── 오늘: 화면 ─────
-let conv = null, busy = false;
-function renderToday() {
-  header();
-  const sc = conv?.scene || sceneId(), s = SCENES[sc];
-  $("face").textContent = s.name[0]; $("pname").textContent = s.name;
-  $("psub").textContent = sc === "me" ? (S.memory ? "지난 대화를 기억해요" : "오늘 처음 만나요") : s.ko;
-  $("scenes").hidden = S.mode !== "daily";
-  if (S.mode === "daily") $("scenes").innerHTML = [["auto", "오늘의 상대"], ...DAILY.map(k => [k, SCENES[k].ko])].map(([k, t]) => `<button data-s="${k}" aria-pressed="${S.scene === k}" ${conv ? "disabled" : ""}>${t}</button>`).join("");
-  if (!conv) {
-    $("line").className = "say wait";
-    $("line").textContent = DEMO ? "Hey! Yesterday you said the pedal for your racing wheel was almost done. Did you finish it?" : S.key ? `마이크를 누르면 ${s.name}이 먼저 말을 걸어요.` : "대화하려면 설정에서 Gemini 키를 넣어 주세요.";
-    if (DEMO) $("line").className = "say";
-    $("lsub").hidden = !DEMO; $("ko").textContent = "";
-  }
-  chips();
-  $("demo").hidden = !DEMO;
-  $("typed").hidden = !conv || !!Rec;
-  size();
-}
-function chips(fresh) {
-  const tg = conv ? conv.tg : targets();
-  $("chips").innerHTML = tg.length ? tg.map(t => `<div class="chip" data-id="${t.id}" data-n="${Math.min(2, t.uses + (conv?.hits[t.id] || 0))}"><div><b lang="en">${esc(t.en)}</b><span>${esc(t.ko)}</span></div><i class="dots" aria-label="두 번 중 ${Math.min(2, t.uses)}번 씀"></i></div>`).join("")
-    : `<p class="none">${S.sessions.length ? "막혔던 말을 다 썼어요. 오늘 대화에서 새로 모아요." : "첫 대화가 끝나면 막혔던 말이 여기 올라와요."}</p>`;
-  if (fresh) $(`chips`).querySelector(`[data-id="${fresh}"]`)?.classList.add("hit");
-}
-$("scenes").onclick = e => { const b = e.target.closest("button"); if (!b || conv) return; S.scene = b.dataset.s; save(); renderToday() };
-$("tr").onclick = async () => {
-  if ($("ko").textContent) { $("ko").textContent = ""; $("tr").textContent = "한국어로 보기"; return }
-  const line = $("line").textContent;
-  if (DEMO) { $("ko").textContent = "어제 레이싱 휠 페달 거의 다 됐다고 했잖아. 끝냈어?" }
-  else { $("tr").disabled = true; try { $("ko").textContent = await ask("Translate the English line into natural, casual Korean. Reply with the Korean only.", [{ role: "user", parts: [{ text: line }] }]) } catch (e) { $("convErr").textContent = e.message } $("tr").disabled = false }
-  $("tr").textContent = "영어만 보기";
-};
-$("again").onclick = () => speak($("line").textContent);
-
-// ───── 소리 ─────
-const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
-function speak(text, rate = .95) {
-  return new Promise(res => {
-    if (!window.speechSynthesis) return res();
-    speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text); u.lang = "en-US"; u.rate = rate;
-    const v = speechSynthesis.getVoices().find(v => v.lang === "en-US"); if (v) u.voice = v;
-    let done = false; const fin = () => { if (!done) { done = true; res() } };
-    u.onend = fin; u.onerror = fin; setTimeout(fin, 1500 + text.length * 90);
-    speechSynthesis.speak(u);
-  });
-}
-// 파형: 막대 하나 = 1/30초. 말한 뒤 1.2초 넘게 조용하면 주황 칸(멈춤)
-const cv = $("cv"), g = cv.getContext("2d");
-let bars = [], listening = false, stream, actx, meter;
-function size() { const r = cv.getBoundingClientRect(); if (!r.width) return; const d = devicePixelRatio || 1; cv.width = r.width * d; cv.height = r.height * d; g.setTransform(d, 0, 0, d, 0, 0); draw() }
-addEventListener("resize", size);
-function draw() {
-  const w = cv.clientWidth, h = cv.clientHeight, step = 4, vis = bars.slice(-Math.floor(w / step));
-  g.clearRect(0, 0, w, h);
-  vis.forEach((b, i) => {
-    if (b.gap) { g.fillStyle = "#f0a23b"; g.fillRect(i * step, 0, step, h) }
-    else { const bh = Math.max(3, b.v * h * .9); g.fillStyle = "#17191c"; g.fillRect(i * step + 1, (h - bh) / 2, step - 2, bh) }
-  });
-  g.fillStyle = "#17191c"; g.font = "700 14px 'TikTok Sans', sans-serif"; g.textBaseline = "middle";
-  vis.forEach((b, i) => { if (b.gap && !vis[i - 1]?.gap) { let j = i; while (vis[j]?.gap) j++; if ((j - i) * step > 34) g.fillText("uhm", i * step + 6, h / 2) } });
-}
-let quiet = 0, spoke = false, gapOpen = false;
-function push(v) {
-  bars.push({ v, gap: false });
-  if (listening && conv) conv.ms += 1000 / 30;
-  if (v > .12) {
-    if (gapOpen) { gapOpen = false; turnPause(quiet / 30) }
-    spoke = true; quiet = 0;
-  } else if (listening && spoke) {
-    quiet++;
-    if (quiet >= 36) {
-      if (!gapOpen) { gapOpen = true; if (conv) conv.pauses++ }
-      for (let i = Math.max(0, bars.length - quiet); i < bars.length; i++) bars[i].gap = true;
-    }
-  }
-  if (bars.length > 3000) bars = bars.slice(-1500);
-  draw();
-}
-async function micOn() {
-  if (stream) return;
-  stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-  actx = new AudioContext(); const an = actx.createAnalyser(); an.fftSize = 1024;
-  actx.createMediaStreamSource(stream).connect(an);
-  const buf = new Float32Array(an.fftSize);
-  meter = setInterval(() => { an.getFloatTimeDomainData(buf); let r = 0; for (const x of buf) r += x * x; push(listening ? Math.min(1, Math.sqrt(r / buf.length) * 7) : 0) }, 1000 / 30);
-}
-function micOff() { clearInterval(meter); stream?.getTracks().forEach(t => t.stop()); actx?.close(); stream = actx = null }
-
-// ───── 오늘: 대화 ─────
-let rec, parts = [], interim = "", koMode = false, timer;
-const timeLeft = () => Math.max(0, 180 - (Date.now() - conv.t0) / 1000);
-function tick() { const l = timeLeft(); $("time").textContent = `${Math.floor(l / 60)}:${String(Math.floor(l % 60)).padStart(2, "0")}` }
-function setState(t, live) { $("state").textContent = t; $("app").classList.toggle("live", !!live) }
-function showHeard() { $("heard").innerHTML = esc([...parts, interim].join(" ")).replace(/\[KO: (.*?)\]/g, "<em>$1</em>").replace(/\[pause ([\d.]+)s\]/g, "<i>…</i>") }
-function turnPause(sec) { if (listening && sec >= 1.2) { parts.push(`[pause ${sec.toFixed(1)}s]`); showHeard() } }
-function listen(lang = "en-US") {
-  if (!Rec) return;
-  rec = new Rec(); rec.lang = lang; rec.continuous = lang === "en-US"; rec.interimResults = true;
-  rec.onresult = e => {
-    interim = "";
-    for (let i = e.resultIndex; i < e.results.length; i++) {
-      const t = e.results[i][0].transcript.trim();
-      if (e.results[i].isFinal) { if (t) parts.push(lang === "en-US" ? t : `[KO: ${t}]`); hitCheck() } else interim += t + " ";
-    }
-    showHeard();
-  };
-  rec.onerror = e => { if (e.error === "not-allowed") $("convErr").textContent = "마이크를 허용해 주세요." };
-  rec.onend = () => {
-    if (rec?.lang === "ko-KR" && koMode) { koMode = false; $("kobtn").textContent = "한국어로 말하기"; if (listening) listen() }
-    else if (listening && !koMode) try { rec.start() } catch {}
-  };
-  rec.start();
-}
-// 막힌 말의 핵심 표현을 내가 실제로 말했는지 직접 본다 (Gemini 판정은 너무 후해서 쓰지 않음)
-const norm = s => " " + s.toLowerCase().replace(/[’]/g, "'").replace(/[^a-z0-9' ]/g, " ").replace(/\s+/g, " ").trim() + " ";
-const keyOf = t => norm(t.key || t.en.split(/\s+/).slice(0, 4).join(" "));
-function hitCheck() {
-  const said = norm(parts.join(" "));
-  conv.tg.forEach(t => { if (!conv.hits[t.id] && said.includes(keyOf(t))) { conv.hits[t.id] = 1; chips(t.id) } });
-}
-function startTurn() {
-  parts = []; interim = ""; spoke = false; quiet = 0; gapOpen = false; listening = true;
-  setState(conv?.typed ? "글로 대화 중" : "듣는 중 · 다 말하면 누르기", true); $("mic").setAttribute("aria-label", "다 말했어요, 보내기");
-  const voice = Rec && !conv?.typed;
-  $("kobtn").hidden = !voice; $("end").hidden = false;
-  if (voice) listen(); else $("tin").focus();
-}
-async function stopTurn() {
-  listening = false; koMode = false;
-  if (rec) { const r = rec; rec = null; await new Promise(res => { r.onend = res; try { r.stop() } catch { res() } setTimeout(res, 1500) }) }
-  const text = [...parts, interim.trim()].filter(Boolean).join(" ").trim(); interim = "";
-  return text;
-}
-async function aiTurn() {
-  busy = true; setState("생각하는 중"); $("mic").disabled = true;
-  try {
-    const opener = S.memory ? "(The learner just arrived. Open by following up on one specific thing you remember about them, and ask about it in a way that gives them a reason to use one of today's sentences.)" : "(The learner just arrived. Start the conversation.)";
-    const contents = [{ role: "user", parts: [{ text: opener }] }, ...conv.turns.map(t => ({ role: t.who === "ai" ? "model" : "user", parts: [{ text: t.text }] }))];
-    const reply = await ask(persona(conv.scene), contents);
-    conv.turns.push({ who: "ai", text: reply });
-    $("line").className = "say"; $("line").textContent = reply; $("ko").textContent = ""; $("tr").textContent = "한국어로 보기"; $("lsub").hidden = false;
-    setState("말하는 중"); await speak(reply);
-    busy = false; $("mic").disabled = false;
-    if (timeLeft() <= 0) return finish();
-    startTurn();
-  } catch (e) { busy = false; $("mic").disabled = false; $("convErr").textContent = e.message; setState("다시 누르면 이어서", false); conv.failed = true }
-}
-async function begin() {
-  $("convErr").textContent = ""; $("result").hidden = true;
-  if (!S.key) { location.hash = "set"; return }
-  const sc = sceneId();
-  conv = { scene: sc, turns: [], t0: Date.now(), pauses: 0, ms: 0, tg: targets().map(t => ({ ...t })), hits: {} };
-  bars = []; draw(); renderToday();
-  try { if (Rec || navigator.mediaDevices) await micOn() } catch { $("convErr").textContent = "마이크를 쓸 수 없어서 글로 대화해요." }
-  conv.typed = !stream; $("wave").hidden = conv.typed; if (conv.typed) $("typed").hidden = false;
-  timer = setInterval(() => { tick(); if (timeLeft() <= 0 && listening && !busy) send() }, 250);
-  await aiTurn();
-}
-const wrapKo = t => t.replace(/[가-힣][가-힣\s,.!?~]*/g, m => ` [KO: ${m.trim()}] `).replace(/\s+/g, " ").trim();
-async function send(typed) {
-  if (busy || !conv) return;
-  let text = typed != null ? wrapKo(typed) : await stopTurn();
-  if (typed != null) { listening = false; if (rec) await stopTurn() }
-  $("heard").textContent = "";
-  if (!text.replace(/\[pause [\d.]+s\]/g, "").trim()) { if (timeLeft() <= 0) return finish(); startTurn(); return }
-  conv.turns.push({ who: "me", text }); hitCheck2(text);
-  if (timeLeft() <= 0) return finish();
-  await aiTurn();
-}
-function hitCheck2(text) { parts = [text]; hitCheck() }
-$("typed").onsubmit = e => { e.preventDefault(); const v = $("tin").value.trim(); if (!v) return; $("tin").value = ""; send(v) };
-$("mic").onclick = async () => {
-  if (DEMO) return demoMic();
-  if (!conv) return begin();
-  if (busy) return;
-  if (conv.failed) { conv.failed = false; $("convErr").textContent = ""; return conv.turns.at(-1)?.who === "me" ? aiTurn() : startTurn() }
-  if (listening) return send();
-  startTurn();
-};
-$("kobtn").onclick = () => {
-  if (!listening || !Rec) return;
-  koMode = true; $("kobtn").textContent = "한국어 듣는 중…";
-  const r = rec; rec = null; if (r) { r.onend = () => listen("ko-KR"); r.stop() } else listen("ko-KR");
-};
-$("end").onclick = async () => { if (!conv || busy) return; if (listening) { const t = await stopTurn(); if (t.replace(/\[pause [\d.]+s\]/g, "").trim()) conv.turns.push({ who: "me", text: t }) } finish() };
-
-// 대화를 돌아보며 막힌 말을 뽑고, 써 본 말을 세고, 기억을 갱신한다
-async function finish() {
-  clearInterval(timer); listening = false; speechSynthesis.cancel();
-  const c = conv; $("end").hidden = true; $("kobtn").hidden = true;
-  setState("돌아보는 중"); $("mic").disabled = true; busy = true;
-  const mine = c.turns.filter(t => t.who === "me");
-  let out = { stuck: [], memory: S.memory, tip: "" };
-  if (mine.length) {
-    const transcript = c.turns.map(t => `${t.who === "ai" ? SCENES[c.scene].name : "Learner"}: ${t.text}`).join("\n");
-    const sys = `You review a short English conversation with a Korean learner. In learner lines, [pause Ns] is silence and [KO: ...] is Korean they used because they could not say it in English.
-Return JSON only: {"stuck":[{"en":"short natural English sentence the learner was trying to say","ko":"자연스러운 한국어 뜻","key":"the 2-5 word core expression inside en that is worth learning, copied exactly from en"}],"memory":"updated English notes about the learner's life and plans, max 600 characters, keep older facts that still matter; refer to the learner by name or as the learner, never with he/she/his/her","tip":"친구처럼 편한 해요체 한국어 한 문장(예: ~했어요, ~해 봐요): 오늘 잘한 점이나 다음에 해 볼 것"}
-Rules for stuck: up to 4 items, only where the learner paused, switched to Korean, broke off, or said something clearly wrong. Each en is a complete sentence of at most 12 words they can reuse. Skip anything already saved or a close variant of it. Empty list if they spoke smoothly.
-Already saved: ${S.stuck.filter(x => !x.done).map(x => x.en).join(" | ") || "none"}`;
-    try {
-      const raw = await ask(sys + `\nPrevious notes: ${S.memory || "none"}`, [{ role: "user", parts: [{ text: transcript }] }], true);
-      const j = JSON.parse(raw.replace(/^```(json)?|```$/g, ""));
-      out = { stuck: Array.isArray(j.stuck) ? j.stuck.filter(x => x?.en && x?.ko).slice(0, 4) : [], memory: typeof j.memory === "string" && j.memory ? j.memory : S.memory, tip: j.tip || "" };
-    } catch (e) { $("convErr").textContent = e instanceof AIError ? e.message : "돌아보기를 읽지 못했어요. 대화 기록은 남겨 둘게요." }
-  }
-  const used = new Set(Object.keys(c.hits));
-  S.stuck.forEach(x => { if (used.has(x.id)) { x.uses++; if (x.uses >= 2) { x.done = true; x.doneAt = today() } } });
-  const have = new Set(S.stuck.map(x => x.en.toLowerCase()));
-  const added = out.stuck.filter(x => !have.has(x.en.toLowerCase())).map((x, i) => ({ id: Date.now().toString(36) + i, en: x.en.trim(), ko: x.ko.trim(), key: typeof x.key === "string" && norm(x.en).includes(norm(x.key)) ? x.key.trim() : "", uses: 0, made: today() }));
-  S.stuck.push(...added); S.memory = out.memory;
-  const min = c.ms / 60000;
-  if (mine.length) S.sessions.push({ date: today(), scene: c.scene, turns: c.turns, pauses: c.pauses, min: +min.toFixed(2), typed: !!c.typed, added: added.length, used: [...used].length, tip: out.tip });
-  save(); conv = null; busy = false; micOff(); $("mic").disabled = false; $("wave").hidden = false;
-  if (!/돌아보기|한도|키|인터넷|응답/.test($("convErr").textContent)) $("convErr").textContent = "";
-  setState("대화 시작"); $("mic").setAttribute("aria-label", "대화 시작"); $("time").textContent = "3:00"; $("typed").hidden = true;
-  $("result").hidden = false;
-  $("result").innerHTML = mine.length
-    ? `<b>${c.typed ? "글로 대화했어요" : `${c.pauses}번 멈췄어요${min > .2 ? ` · 1분에 ${(c.pauses / min).toFixed(1)}번` : ""}`}</b><span>${added.length ? `막혔던 말 ${added.length}개를 연습 칸에 넣었어요.` : "막힌 말이 없었어요."}${used.size ? ` 지난번 막힌 말을 ${used.size}번 썼어요.` : ""}</span>${out.tip ? `<span>${esc(out.tip)}</span>` : ""}${added.length ? `<a class="btn" href="#practice">연습하러 가기</a>` : ""}`
-    : `<span>말한 게 없어서 기록하지 않았어요.</span>`;
-  renderToday();
-}
-
-// 예시(기획서 안 미리보기): 진짜 마이크로 파형·멈춤·써 볼 말만 보여 준다
-let demoRun = null;
-async function demoMic() {
-  if (demoRun) return demoRun();
-  conv = { scene: "me", turns: [], t0: Date.now(), pauses: 0, ms: 0, tg: targets().map(t => ({ ...t })), hits: {} };
-  bars = []; parts = []; renderToday(); $("line").className = "say";
-  try { await micOn() } catch { return demoPlay() }
-  startTurn(); timer = setInterval(tick, 250);
-  demoRun = async () => { clearInterval(timer); await stopTurn(); micOff(); conv = null; demoRun = null; setState("대화 시작"); $("time").textContent = "3:00"; $("end").hidden = $("kobtn").hidden = true };
-}
-function demoPlay() {
-  conv = { scene: "me", turns: [], t0: Date.now(), pauses: 0, ms: 0, tg: targets().map(t => ({ ...t })), hits: {} };
-  bars = []; parts = []; listening = true; spoke = false; quiet = 0; gapOpen = false; renderToday(); $("line").className = "say";
-  setState("예시", true);
-  const script = [["Yeah, so…", 1.4], [null, 1.6], ["[KO: 결국…]", .9], [null, 1.5], ["I ended up redoing the whole thing.", 2.4], ["It took me about two hours.", 2.3]];
-  let i = 0, until = 0, f = 0, talking = false;
-  const iv = setInterval(() => {
-    f++; tick();
-    if (f >= until) {
-      if (i >= script.length) { clearInterval(iv); listening = false; setState("대화 시작"); $("time").textContent = "3:00"; conv = null; return }
-      const [t, sec] = script[i++]; until = f + sec * 30; talking = !!t;
-      if (t) { parts.push(t); showHeard(); hitCheck() }
-    }
-    push(talking ? .25 + Math.abs(Math.sin(f / 2.3)) * .5 * Math.random() + .1 : Math.random() * .03);
-  }, 1000 / 30);
-}
-$("demo").onclick = () => { if (!conv) demoPlay() };
-
-// ───── 연습 ─────
-const words = s => s.toLowerCase().replace(/[^a-z0-9' ]/g, " ").split(/\s+/).filter(Boolean);
-function renderPractice() {
-  header();
-  const list = S.stuck.filter(x => !x.done);
-  $("plist").innerHTML = list.length ? list.map(x => `<article class="card" data-id="${x.id}">
-    <div class="k">${esc(x.ko)}</div>
-    <div class="e" lang="en" hidden>${esc(x.en)}</div>
-    <div class="tools"><button data-a="show">영어로?</button><button data-a="say">듣기</button><button data-a="slow">천천히</button>${Rec ? '<button data-a="try">말해 보기</button>' : ""}</div>
-    <p class="score"></p>
-    <div class="meta"><span>대화에서 ${x.uses}/2번</span><button data-a="del" class="link" style="color:var(--muted)">빼기</button></div></article>`).join("")
-    : `<p class="none" style="margin-top:12px">${S.sessions.length ? "지금은 막힌 말이 없어요." : "대화를 한 번 하면 막혔던 말이 여기 모여요."}</p>`;
-  const done = S.stuck.filter(x => x.done).length;
-  $("grad").textContent = done ? `대화에서 두 번 써서 빠진 말 ${done}개` : "";
-}
-$("plist").onclick = e => {
-  const b = e.target.closest("button[data-a]"); if (!b) return;
-  const card = b.closest(".card"), x = S.stuck.find(s => s.id === card.dataset.id); if (!x) return;
-  const a = b.dataset.a, out = card.querySelector(".score");
-  if (a === "show") { const en = card.querySelector(".e"); en.hidden = !en.hidden; b.textContent = en.hidden ? "영어로?" : "가리기" }
-  if (a === "say" || a === "slow") speak(x.en, a === "slow" ? .6 : .95);
-  if (a === "del") { if (b.dataset.sure) { S.stuck = S.stuck.filter(s => s !== x); save(); renderPractice() } else { b.dataset.sure = 1; b.textContent = "정말 빼기" } }
-  if (a === "try") {
-    const r = new Rec(); r.lang = "en-US"; r.maxAlternatives = 3; b.classList.add("on"); b.textContent = "듣는 중"; out.className = "score"; out.textContent = "";
-    r.onresult = ev => {
-      const heard = words(ev.results[0][0].transcript), want = words(x.en), left = [...heard];
-      const marks = want.map(w => { const i = left.indexOf(w); if (i >= 0) { left.splice(i, 1); return esc(w) } return `<s>${esc(w)}</s>` });
-      const ok = marks.filter(m => !m.startsWith("<s>")).length / want.length;
-      out.className = "score " + (ok >= .8 ? "ok" : "no");
-      out.innerHTML = (ok >= .8 ? "좋아요. " : "빠진 말이 있어요: ") + marks.join(" ");
-      card.querySelector(".e").hidden = false;
-    };
-    r.onerror = ev => { out.className = "score no"; out.textContent = ev.error === "not-allowed" ? "마이크를 허용해 주세요." : "다시 말해 주세요." };
-    r.onend = () => { b.classList.remove("on"); b.textContent = "말해 보기" };
-    r.start();
-  }
-};
-
-// ───── 발음 ─────
-const TYPES = ["전체", "묵음", "외래어", "강세", "음절"];
-const TNAME = { 묵음: "소리 없는 글자", 외래어: "외래어와 달라요", 강세: "세게 읽는 곳", 음절: "박자 수" };
-const plain = w => w.replace(/[()]/g, "");
-let ptype = "전체", pq = [], ptotal = 0;
-$("pchips").innerHTML = TYPES.map(t => `<button aria-pressed="${t === ptype}">${t === "전체" ? t : TNAME[t]}</button>`).join("");
-$("pchips").onclick = e => { const b = e.target.closest("button"); if (!b) return; ptype = TYPES[[...$("pchips").children].indexOf(b)]; [...$("pchips").children].forEach(x => x.setAttribute("aria-pressed", x === b)); pronStart(true) };
-function pronStart(force) {
-  header();
-  if (pq.length && !force) return pshow();
-  const pool = W.filter(w => (ptype === "전체" || w[5] === ptype) && !S.pron.includes(plain(w[0])));
-  pq = pool.sort(() => Math.random() - .5); ptotal = pool.length; pshow();
-}
-function pshow() {
-  $("pbar").style.width = ptotal ? (100 * (ptotal - pq.length) / ptotal) + "%" : "100%";
-  $("pcount").textContent = ptotal ? `${ptotal - pq.length} / ${ptotal}` : "";
-  const c = $("pcard");
-  if (!pq.length) {
-    const n = W.filter(w => ptype === "전체" || w[5] === ptype).length;
-    c.innerHTML = `<p class="big" style="margin:0">${n}개 다 외웠어요</p><button class="ask" id="preset">처음부터 다시</button>`;
-    $("preset").onclick = () => { S.pron = S.pron.filter(p => !W.some(w => plain(w[0]) === p && (ptype === "전체" || w[5] === ptype))); save(); pronStart(true) };
-    return;
-  }
-  const [w, mean, wrong, right, ipa, t, tip] = pq[0];
-  c.innerHTML = `<span class="tag">${TNAME[t]}</span>
-    <div class="word" lang="en">${w.replace(/\((.+?)\)/g, "<span class=q>$1</span>")}</div>
-    ${mean === wrong ? "" : `<div class="soft">${mean}</div>`}
-    <button class="ask" id="pask">어떻게 읽을까요?</button>
-    <div class="ans" id="pans" hidden>
-      <div class="wrong"><del>${wrong}</del> 아니고</div>
-      <div class="right"><strong>${right.replace(/\[(.+?)\]/g, "<b>$1</b>")}</strong><span class="ipa">/${ipa}/</span></div>
-      <p class="tip">${tip}</p>
-      <div class="tools"><button id="psay">듣기</button><button id="pslow">천천히</button>${Rec ? '<button id="pmic">말해 보기</button>' : ""}</div>
-      <p class="score" id="pheard"></p>
-      <div class="next"><button id="pagain">다시 볼래요</button><button id="pgot">외웠어요</button></div>
-    </div>`;
-  $("pask").onclick = () => { $("pask").hidden = true; $("pans").hidden = false; c.querySelectorAll(".q").forEach(q => q.outerHTML = `<s>${q.textContent}</s>`); speak(plain(w)) };
-  $("psay").onclick = () => speak(plain(w));
-  $("pslow").onclick = () => speak(plain(w), .6);
-  if (Rec) $("pmic").onclick = () => {
-    const r = new Rec(), b = $("pmic"), out = $("pheard"), target = plain(w).toLowerCase(); r.lang = "en-US"; r.maxAlternatives = 5;
-    b.classList.add("on"); b.textContent = "듣는 중"; out.className = "score"; out.textContent = "";
-    r.onresult = e => { const alts = [...e.results[0]].map(a => a.transcript.trim()); const ok = alts.some(a => a.toLowerCase().split(/\W+/).includes(target)); out.className = "score " + (ok ? "ok" : "no"); out.textContent = ok ? "잘 알아들었어요" : `'${alts[0]}'(으)로 들렸어요` };
-    r.onerror = e => { out.className = "score no"; out.textContent = e.error === "not-allowed" ? "마이크를 허용해 주세요" : "다시 말해 주세요" };
-    r.onend = () => { b.classList.remove("on"); b.textContent = "말해 보기" };
-    r.start();
-  };
-  $("pagain").onclick = () => { pq.splice(Math.min(3, pq.length), 0, pq.shift()); pshow() };
-  $("pgot").onclick = () => { S.pron.push(plain(w)); save(); pq.shift(); pshow() };
-}
-
-// ───── 기록 ─────
-function renderLog() {
-  header();
-  const ss = S.sessions.filter(s => !s.typed).slice(-14), rate = s => s.min > .2 ? s.pauses / s.min : s.pauses, max = Math.max(1, ...ss.map(rate));
-  $("chart").innerHTML = ss.length ? ss.map(s => `<div title="${s.date}"><span>${rate(s).toFixed(1)}</span><i style="height:${Math.max(3, 100 * rate(s) / max)}%"></i>${s.date.slice(5).replace("-", ".")}</div>`).join("") : `<p class="none" style="align-self:center;flex:1">대화를 하면 막대가 생겨요.</p>`;
-  $("slist").innerHTML = S.sessions.slice().reverse().map(s => `<details class="sess"><summary>${s.date.slice(5).replace("-", ".")} ${SCENES[s.scene]?.ko || ""}<span>${s.typed ? "글로" : `멈춤 ${s.pauses}`} · 새로 막힌 말 ${s.added}</span></summary><ol>${s.turns.map(t => `<li class="${t.who}" lang="en">${esc(t.text)}</li>`).join("")}</ol></details>`).join("") || `<p class="none">아직 대화가 없어요.</p>`;
-}
-
-// ───── 설정 ─────
-function renderSet() {
-  header();
-  [...$("modes2").children].forEach(b => b.setAttribute("aria-pressed", b.dataset.mode === S.mode));
-  fillProf($("prof2")); $("saved").textContent = "";
-  $("keyinfo").textContent = S.key ? `넣어 둔 키: …${S.key.slice(-4)} · 모델 ${S.model}` : "아직 키가 없어요.";
-}
-$("modes2").onclick = e => { const b = e.target.closest("button"); if (!b) return; S.mode = b.dataset.mode; save(); renderSet() };
-$("prof2").onsubmit = e => { e.preventDefault(); readProf($("prof2")); $("saved").textContent = "저장했어요" };
-$("keyok2").onclick = () => setKey($("key2"), $("keyerr2"), $("keyok2"), renderSet);
-$("reset").onclick = () => {
-  const b = $("reset");
-  if (!b.dataset.sure) { b.dataset.sure = 1; b.textContent = "한 번 더 누르면 다 지워요"; return }
-  try { localStorage.removeItem("sulsul") } catch {}
-  S = fresh(); delete b.dataset.sure; b.textContent = "모든 기록 지우기"; location.hash = ""; go("start");
-};
-
-speechSynthesis?.getVoices();
-go(location.hash.slice(1) || "today");
-</script>
+<script src="course.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
