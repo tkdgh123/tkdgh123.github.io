@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unmute 기획서 · 창업실</title>
+<meta name="description" content="어… 하고 막힌 그 말이 다음 날 내 교재가 되는 영어 말하기 프로그램 기획서.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=TikTok+Sans:wdth,wght@75..150,300..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+:root {
+  --bg: #fff; --surface: #f3f3f3; --ink: #0a0a0a; --muted: #5e5e5e;
+  --blue: #2436ff; --red: #ff3b1f; --black: #0a0a0a; --navy: #050a5c;
+  --m: clamp(16px, 2.2vw, 32px);
+  --small: clamp(.8125rem, .79rem + .1vw, .875rem);
+  --body: clamp(1.0625rem, 1rem + .25vw, 1.1875rem);
+  --lead: clamp(1.25rem, 1.1rem + .7vw, 1.625rem);
+  --head: clamp(2rem, 1.3rem + 3.2vw, 4rem);
+  --ease: cubic-bezier(.2, .7, .2, 1);
+  --sans: "TikTok Sans", "Pretendard Variable", Pretendard, sans-serif;
+}
+* { box-sizing: border-box }
+html { scroll-behavior: smooth }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 var(--body)/1.5 var(--sans); word-break: keep-all; overflow-wrap: anywhere; -webkit-font-smoothing: antialiased; overflow-x: clip }
+a { color: inherit }
+img { display: block; max-width: 100% }
+h1, h2, h3, p { margin: 0 }
+:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px }
+.wide { font-weight: 800; font-stretch: 150%; text-transform: uppercase; letter-spacing: -.01em; line-height: 1 }
+.btn { display: inline-flex; align-items: center; min-height: 56px; padding: 0 26px; background: var(--blue); color: #fff; font-weight: 700; text-decoration: none; transition: transform .15s var(--ease), background .2s }
+.btn:hover { background: var(--ink) }
+.btn:active { transform: scale(.97) }
+.rise { opacity: 0; transform: translateY(24px); transition: opacity .7s var(--ease), transform .7s var(--ease); transition-delay: calc(var(--i, 0) * 80ms) }
+.rise.in, .no-js .rise { opacity: 1; transform: none }
+
+/* 첫 화면 */
+.hero { position: relative; height: 100svh; min-height: 640px; overflow: hidden }
+.bar { position: absolute; inset: 0 var(--m) auto; top: 28px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; font-weight: 600; z-index: 3 }
+.bar a { text-decoration: none; transition: color .2s }
+.bar a:hover { color: var(--blue) }
+.bar .mark { font-weight: 850; font-stretch: 150%; font-size: 22px }
+.bar a:last-child { justify-self: end }
+.band { position: absolute; left: 0; right: 0; top: calc(360px - .5 * var(--fs)); --fs: clamp(150px, 15vw, 230px); height: var(--fs); }
+.band .shot { position: absolute; left: 50%; top: 50%; width: max(272px, 19vw); aspect-ratio: 1; transform: translate(-50%, -50%) }
+.band .shot img { width: 100%; height: 100%; object-fit: cover }
+.line { position: absolute; inset: 0; z-index: 2; margin: 0; display: flex; white-space: nowrap; font-size: var(--fs); font-weight: 500; font-stretch: 150%; letter-spacing: -.02em; line-height: 1; align-items: center; color: #fff; mix-blend-mode: difference }
+.line span { display: flex; align-items: center; animation: run 38s linear infinite; padding-right: .3em }
+.line span::after { content: ""; width: .3em; height: .3em; border-radius: 50%; background: currentColor; margin-left: .3em; flex: none }
+@keyframes run { to { transform: translateX(-100%) } }
+.under { position: absolute; left: 50%; top: calc(360px + max(136px, 9.5vw) + 64px); transform: translateX(-50%); width: min(36ch, 100% - 2 * var(--m)); text-align: center }
+.under p:first-child { font-size: 22px; line-height: 1.4; font-weight: 500 }
+.under p + p { margin-top: 20px; font-size: 17px; color: var(--muted) }
+.foot { position: absolute; left: var(--m); right: var(--m); bottom: 40px; display: flex; justify-content: space-between; align-items: center; gap: 16px }
+
+/* 내 이야기: 계단 문장 */
+.stairs { position: relative; min-height: 100svh; background: var(--red); color: #fff; padding: 14svh 4vw 12svh; display: grid; grid-template-columns: 1fr 20vw; gap: 4vw; align-items: start }
+.s p { font-size: clamp(36px, 4.4vw, 64px); font-weight: 800; line-height: 1.02; letter-spacing: -.02em; padding-left: calc(var(--k) * 6vw) }
+.s p:nth-child(odd) { color: var(--black) }
+.kept { display: grid; gap: 16px }
+.kept figure { min-width: 0; margin: 0; aspect-ratio: 3 / 2; background: #fff; color: var(--ink); padding: 14px; display: flex; flex-direction: column; justify-content: space-between }
+.kept figcaption { font-size: var(--small); font-weight: 600 }
+.call { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; flex: 1; margin-bottom: 8px }
+.call i { background: var(--blue); display: grid; place-items: end start; padding: 6px; color: #fff; font-style: normal; font-size: 12px; font-weight: 600 }
+.call i + i { background: var(--surface); color: var(--ink) }
+.pron { font-size: clamp(26px, 2.6vw, 40px); font-weight: 800; letter-spacing: -.02em }
+.pron s { color: var(--red); text-decoration-thickness: .08em }
+.note { grid-column: 1 / -1; align-self: end; color: var(--ink); font-size: 16px; font-weight: 500; max-width: 36ch; margin-top: 8svh }
+
+/* 하루 10분 */
+.loop { padding: 180px var(--m) 200px }
+.loop h2 { font-size: clamp(48px, 6.4vw, 104px); font-weight: 800; letter-spacing: -.03em; line-height: 1; margin-bottom: 64px }
+.stages { display: flex; gap: 6px; height: 22vh; min-height: 170px }
+.stages > div { display: flex; flex-direction: column; min-width: 12% }
+.seg { flex: 1; padding: 20px; color: #fff; font-size: clamp(20px, 2vw, 30px); font-weight: 800; transform-origin: left; transition: transform 1s var(--ease) }
+.loop:not(.in) .seg { transform: scaleX(.02) }
+.stages > div:nth-child(2) .seg { transition-delay: .15s } .stages > div:nth-child(3) .seg { transition-delay: .3s } .stages > div:nth-child(4) .seg { transition-delay: .45s }
+.stages p { margin-top: 14px; font-size: 17px; max-width: 22ch; padding-right: 8px }
+
+/* 첫 화면 시안 */
+.first { position: relative; overflow: hidden; background: var(--surface); padding: 160px var(--m) 180px }
+.first { display: grid; grid-template-columns: 1fr 390px; column-gap: 5vw; align-items: start }
+.first > .left { min-width: 0 }
+.st { font-size: clamp(64px, 8vw, 140px); font-weight: 800; font-stretch: 150%; line-height: 1; letter-spacing: -.02em; white-space: nowrap; text-transform: uppercase; color: var(--muted) }
+h2.st { color: var(--ink); text-transform: none; letter-spacing: -.04em; font-stretch: 100% }
+.phone { position: relative; width: 390px; height: 800px; transform: rotate(2deg); background: #fff; margin-top: 20px }
+.phone iframe { width: 100%; height: 100%; border: 0; display: block }
+.facts { margin: 64px 0 0; max-width: 34em; display: grid; gap: 18px; font-size: 20px; line-height: 1.5 }
+.facts .open { font-size: 17px; font-weight: 700; color: var(--blue); text-decoration: none }
+.facts .open:hover { text-decoration: underline }
+
+/* 동기 네 가지: 부채 */
+.fan { position: relative; height: 240svh; background: var(--navy); color: #fff }
+.fan .stage { position: sticky; top: 0; height: 100svh; overflow: hidden; padding: 36px var(--m) }
+.fan h2 { font-size: clamp(40px, 4vw, 60px); font-weight: 800; letter-spacing: -.03em; line-height: 1.05 }
+.fan .sub { margin-top: 12px; font-size: 17px; max-width: 40ch }
+.cards { position: absolute; left: 50%; top: 54%; width: 1090px; height: 400px; transform: translate(-50%, -50%) }
+.card { position: absolute; top: 0; width: 340px; height: 400px; padding: 28px; border-radius: 28px; color: var(--ink); display: flex; flex-direction: column; justify-content: space-between; transition: transform .8s var(--ease), opacity .5s }
+.card > * { max-width: 196px }
+.card h3 { font-size: 30px; font-weight: 800; line-height: 1.08; letter-spacing: -.02em }
+.card img, .card .gap { width: 204px; height: auto; aspect-ratio: 3 / 2; object-fit: cover }
+.card p { font-size: 16px; line-height: 1.45 }
+.card:nth-child(1) { left: 0; background: var(--red); --r: -3deg }
+.card:nth-child(2) { left: 250px; background: #fff; --r: 2deg }
+.card:nth-child(3) { left: 500px; background: var(--blue); color: #fff; --r: -2deg }
+.card:nth-child(4) { left: 750px; background: var(--black); color: #fff; --r: 3deg }
+.card { transform: translateY(var(--y, 0)) rotate(var(--r)) }
+.js .card:not(.on) { --y: 120svh }
+.gap { display: flex; flex-direction: column; justify-content: center; gap: 10px }
+.gap div { height: 26px; display: flex; gap: 3px }
+.gap b { flex: var(--w); background: var(--ink) }
+.gap b.h { background: var(--red) }
+.gap span { font-size: 13px; font-weight: 700 }
+
+/* 누가 어떤 장면에서 */
+.who { padding: 180px var(--m) 200px }
+.who h2 { font-size: var(--head); font-weight: 800; letter-spacing: -.03em; line-height: 1.05; margin-bottom: 24px }
+.who > p { font-size: var(--lead); max-width: 34ch; margin-bottom: 40px }
+.who h3 { color: var(--blue); font-size: clamp(20px, 2.1vw, 30px); font-weight: 600; padding: 72px 0 20px; line-height: 1.5 }
+.who table { width: 100%; border-collapse: collapse; font-size: clamp(20px, 2.1vw, 30px); font-weight: 400 }
+.who td { padding: 0; line-height: 1.5; vertical-align: top }
+.who td:nth-child(1) { width: 33% } .who td:nth-child(2) { width: 33% }
+.who td:nth-child(4) { text-align: right; font-variant-numeric: tabular-nums; color: var(--muted) }
+.who tr.soft td { color: var(--muted) }
+
+/* 정한 것 */
+.faq .head { min-height: 40svh; background: var(--blue); color: #fff; display: flex; align-items: flex-end; padding: 56px var(--m) }
+.faq .head h2 { font-size: clamp(48px, 7vw, 120px); font-weight: 800; letter-spacing: -.03em; line-height: 1 }
+.q { display: grid; grid-template-columns: repeat(12, 1fr); gap: 0 24px; padding: 56px var(--m) }
+.q:nth-of-type(even) { background: var(--surface) }
+.q h3 { grid-column: 1 / 6; font-size: clamp(24px, 2.2vw, 32px); font-weight: 800; letter-spacing: -.02em; line-height: 1.2 }
+.q .a { grid-column: 7 / 13; font-size: 18px; line-height: 1.6; display: grid; gap: 14px; max-width: 60ch }
+.q ol { margin: 0; padding-left: 1.3em; display: grid; gap: 6px }
+.q .a a { font-weight: 700; color: var(--blue) }
+.ph { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px }
+.ph span { min-width: 54px; padding: 10px 12px 8px; background: var(--ink); color: #fff; text-align: center; font-size: 22px; font-weight: 700 }
+.ph span small { display: block; font-size: 13px; font-weight: 600; margin-top: 2px }
+.ph span.ghost { background: transparent; color: var(--muted); text-decoration: line-through }
+.ph span.bad { background: var(--red); color: var(--ink) }
+
+/* 끝 */
+.end { min-height: 92svh; background: var(--blue); color: #fff; padding: 40px var(--m) 32px; display: flex; flex-direction: column }
+.end .top { display: flex; justify-content: space-between; gap: 24px; font-size: 15px }
+.end .top a { font-weight: 700 }
+.end .big { margin-top: auto; font-size: clamp(64px, 12.4vw, 220px); font-weight: 850; font-stretch: 150%; letter-spacing: -.03em; line-height: .95; text-decoration: none; display: inline-block; transition: color .2s }
+.end .big:hover { color: var(--red) }
+.end .meta p { max-width: 60ch }
+.end .meta { margin-top: 40px; display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 24px; font-size: 14px; line-height: 1.5 }
+.end .meta > :last-child { text-align: right }
+.end .meta a { margin-right: 14px; font-weight: 700 }
+
+@media (max-width: 1100px) {
+  .first { grid-template-columns: 1fr }
+  .phone { margin: 48px auto 0; transform: rotate(1.5deg) }
+  .stairs { grid-template-columns: 1fr }
+  .kept { grid-template-columns: 1fr 1fr; max-width: 640px }
+}
+@media (max-width: 1180px) {
+  .fan { height: auto }
+  .fan .stage { position: static; height: auto; padding: 120px var(--m) }
+  .cards { position: static; transform: none; width: auto; height: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: 16px; margin-top: 48px }
+  .card { position: static; width: auto; height: auto; min-height: 400px; gap: 20px; transform: none !important }
+  .card > * { max-width: none }
+  .card img, .card .gap { width: 100% }
+  .js .card:not(.on) { --y: 0 }
+}
+@media (max-width: 760px) {
+  .band { --fs: 34vw; top: calc(26svh - .5 * var(--fs)) }
+  .band .shot { width: 46vw }
+  .under { top: calc(26svh + 23vw + 64px) }
+  .under p:first-child { font-size: 18px }
+  .under p + p { font-size: 16px }
+  .foot { flex-direction: column; align-items: stretch; bottom: 20px }
+  .foot .btn { justify-content: center }
+  .bar .nav-l { display: none }
+  .bar { grid-template-columns: 1fr auto }
+  .stairs { grid-template-columns: 1fr; padding: 96px var(--m) 72px; min-height: 0 }
+  .s p { font-size: 7.2vw; padding-left: calc(var(--k) * 3.5vw) }
+  .pron { font-size: 24px }
+  .kept { grid-template-columns: 1fr 1fr; gap: 10px }
+  .kept figure { padding: 10px }
+  .note { margin-top: 0 }
+  .loop { padding: 120px var(--m) }
+  .stages { flex-direction: column; height: 70svh; min-height: 520px }
+  .stages > div { min-height: 72px; flex-grow: var(--g) !important; flex-direction: row }
+  .seg { flex: none; width: 40%; font-size: 22px }
+  .loop:not(.in) .seg { transform: scaleY(.04) }
+  .stages p { margin: 0; padding: 8px 0 0 14px; font-size: 16px; max-width: none }
+  .first { padding: 110px var(--m) 120px }
+  .st { font-size: 15vw }
+  .phone { width: 100%; max-width: 390px; height: 840px; margin: 40px auto 0; transform: rotate(1deg) }
+  .facts { font-size: 17px; margin-top: 40px }
+  .card { min-height: 0 }
+  .card:nth-child(odd) { margin-right: 8vw; rotate: -1.5deg }
+  .card:nth-child(even) { margin-left: 8vw; rotate: 1.5deg }
+  .who { padding: 120px var(--m) }
+  .who table, .who tbody, .who tr, .who td { display: block; width: auto !important }
+  .who tr { display: grid; grid-template-columns: 1fr auto; padding-bottom: 18px }
+  .who td:nth-child(1) { grid-column: 1 / -1; font-size: 22px }
+  .who td:nth-child(2), .who td:nth-child(3), .who td:nth-child(4) { font-size: 14px; color: var(--muted) }
+  .who td:nth-child(2) { grid-column: 1 } .who td:nth-child(3) { grid-column: 1 } .who td:nth-child(4) { grid-column: 2; grid-row: 2 }
+  .who h3 { font-size: 20px; padding-top: 48px }
+  .faq .head { min-height: 30svh }
+  .faq .head h2 { font-size: 13vw }
+  .q { display: block; padding: 32px 20px }
+  .q .a { margin-top: 14px; font-size: 17px }
+  .end .meta { grid-template-columns: 1fr }
+  .end .meta > :last-child { text-align: left }
+  .end .big { font-size: 17vw }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto }
+  .line span { animation: none; transform: translateX(-30%) }
+  .rise, .seg, .card { transition: none !important; opacity: 1 !important }
+  .loop:not(.in) .seg { transform: none }
+  .js .card:not(.on) { --y: 0 }
+}
+</style>
+</head>
+<body class="no-js">
+
+<header class="hero">
+  <nav class="bar" aria-label="위쪽">
+    <a class="nav-l" href="../../">← 창업실</a>
+    <a class="mark" href="#top" aria-label="Unmute 처음으로">Unmute</a>
+    <a href="#app">첫 화면</a>
+  </nav>
+  <div class="band">
+    <div class="shot"><img src="../img/mic-dark.webp" alt="오래된 은색 마이크" width="900" height="900"></div>
+    <h1 class="line" id="top" aria-label="Unmute"><span aria-hidden="true">Unmute</span><span aria-hidden="true">Unmute</span><span aria-hidden="true">Unmute</span><span aria-hidden="true">Unmute</span></h1>
+  </div>
+  <div class="under">
+    <p>어… 하고 막힌 그 말이 다음 날 내 교재가 되는 영어 말하기 프로그램이에요.</p>
+    <p>하루 10분 · 0원 · 내 대화 또는 일상 상황</p>
+  </div>
+  <div class="foot">
+    <span>기획서 · 2026년 11월</span>
+    <a class="btn" href="#app">첫 화면 써 보기</a>
+  </div>
+</header>
+
+<main>
+<section class="stairs" aria-labelledby="why">
+  <h2 id="why" class="sr" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">왜 새로 만드나</h2>
+  <div class="s">
+    <p class="rise" style="--k:0;--i:0">듀오링고는 반복만 시켰고</p>
+    <p class="rise" style="--k:1;--i:1">말해보카는 왜 하는지 몰랐다.</p>
+    <p class="rise" style="--k:2;--i:2">그래서 둘 다 끊었다.</p>
+    <p class="rise" style="--k:3;--i:3">남긴 건 영상통화와</p>
+    <p class="rise" style="--k:4;--i:4">정확한 발음, 이 둘.</p>
+  </div>
+  <div class="kept">
+    <figure class="rise" style="--i:2" data-ui><div class="call"><i>Lily</i><i>나</i></div><figcaption>듀오링고에서 남긴 것 · 실력이 그대로 드러나는 대화</figcaption></figure>
+    <figure class="rise" style="--i:3" data-ui><div class="pron" lang="en">sa<s>l</s>mon</div><figcaption>말해보카에서 남긴 것 · 소리를 정확히 짚어 주기</figcaption></figure>
+  </div>
+  <p class="note rise">둘 다 결제해서 써 봤어요. 반복은 진전이 안 느껴졌고, 발음은 좋았지만 계속할 이유가 없었어요.</p>
+</section>
+
+<section class="loop" id="loop" aria-labelledby="h-loop">
+  <h2 id="h-loop" class="rise">하루 10분, 한 바퀴</h2>
+  <div class="stages" data-ui>
+    <div style="flex-grow:3;--g:3"><div class="seg" style="background:var(--blue)">3분</div><p><b>먼저</b> 말해요. 레슨 고르기 없이 상대가 바로 말을 걸어요.</p></div>
+    <div style="flex-grow:.6;--g:1"><div class="seg" style="background:var(--red);color:var(--ink)">몇 초</div><p><b>그다음</b> 멈춘 곳, 한국어로 바꾼 곳, 끊긴 문장을 찾아요.</p></div>
+    <div style="flex-grow:5;--g:5"><div class="seg" style="background:var(--black)">5분</div><p><b>그 말만</b> 연습해요. 하려던 말의 영어 문장과 발음을 잡아요.</p></div>
+    <div style="flex-grow:2;--g:2"><div class="seg" style="background:var(--navy)">다음 날 2분</div><p><b>다음 날</b> 상대가 그 말을 쓸 수밖에 없는 질문을 해요. 두 번 쓰면 끝.</p></div>
+  </div>
+</section>
+
+<section class="first" id="app" aria-labelledby="h-app">
+  <div class="left">
+  <p class="st rise" aria-hidden="true">Hey,</p>
+  <h2 class="st rise" style="--i:1" id="h-app">첫 화면</h2>
+  <p class="st rise" style="--i:2" aria-hidden="true">say it</p>
+  <p class="st rise" style="--i:3" aria-hidden="true">again.</p>
+  <div class="facts">
+    <p class="rise">앱을 열면 레슨 목록이 아니라 상대의 말이 먼저 나와요. 어제 내가 한 얘기를 기억해서 이어 물어요. 그 아래엔 어제 막혔던 말 세 개가 오늘 써 볼 말로 올라와 있어요.</p>
+    <p class="rise" style="--i:1">마이크를 켜면 진짜로 들어요. 1.2초 넘게 멈추면 파형에 빨간 칸이 생기고, 'ended up', 'took me', 'about to'를 말하면 위 칸이 채워져요. 마이크가 없으면 '예시 보기'로 막히는 대답 하나를 볼 수 있어요.</p>
+    <a class="open rise" style="--i:2" href="../app/">첫 화면만 크게 열기 →</a>
+  </div>
+  </div>
+  <div class="phone"><iframe src="../app/" title="Unmute 첫 화면 시안" allow="microphone" loading="lazy"></iframe></div>
+</section>
+
+<section class="fan" aria-labelledby="h-fan">
+  <div class="stage">
+    <h2 id="h-fan" class="rise">장부 대신 네 가지</h2>
+    <p class="sub rise" style="--i:1">숫자를 모으는 걸로는 계속 오지 않았어요. 사람, 소리, 바깥, 내 이야기로 붙잡아요.</p>
+    <div class="cards">
+      <article class="card on"><h3>나를 기억하는 상대</h3><img src="../img/cafe.webp" alt="카페 카운터에서 커피를 내주는 바리스타" width="1400" height="934" loading="lazy"><p>어제 한 말을 기억하고 오늘 이어서 물어요. 단골 카페 점원처럼요.</p></article>
+      <article class="card"><h3>메워지는 구멍</h3>
+        <div class="gap" aria-label="첫날은 빨간 구멍이 많고 4주 뒤엔 거의 없는 파형"><span>첫날</span><div><b style="--w:3"></b><b class="h" style="--w:2"></b><b style="--w:2"></b><b class="h" style="--w:3"></b><b style="--w:1"></b><b class="h" style="--w:2"></b><b style="--w:2"></b></div><span>4주 뒤</span><div><b style="--w:6"></b><b class="h" style="--w:.6"></b><b style="--w:7"></b><b class="h" style="--w:.4"></b><b style="--w:4"></b></div></div>
+        <p>매주 같은 질문에 다시 답해요. 빨간 구멍이 줄어드는 게 보이고 들려요.</p></article>
+      <article class="card"><h3>바깥 퀘스트</h3><img src="../img/airport.webp" alt="공항 출발 안내판" width="1400" height="933" loading="lazy"><p>4주마다 진짜 사람 앞에서. 영어로 주문, 길 안내, 3분 발표 녹화.</p></article>
+      <article class="card"><h3>내 영어 이야기책</h3><img src="../img/diary.webp" alt="손글씨로 채운 오래된 일기장" width="1400" height="933" loading="lazy"><p>한 달 동안 말한 문장이 내 이야기 한 권이 돼요. 내 목소리로 다시 들어요.</p></article>
+    </div>
+  </div>
+</section>
+
+<section class="who" aria-labelledby="h-who">
+  <h2 id="h-who" class="rise">누가, 어떤 장면에서</h2>
+  <p class="rise" style="--i:1">나는 내 대화로, 다른 사람은 일상 상황으로 해요. 정보를 넣으면 장면이 맞춰지고, 비워 두면 상황만 골라 바로 시작해요.</p>
+  <h3>나 · 내 대화로</h3>
+  <table>
+    <tr><td>오늘 한 일</td><td>Jamie, 친구</td><td lang="en">I ended up …</td><td>3분</td></tr>
+    <tr><td>만들고 있는 것</td><td>Jamie, 친구</td><td lang="en">It took me about …</td><td>3분</td></tr>
+    <tr><td>4주 시합: 프로젝트 발표</td><td>진짜 사람</td><td lang="en">Let me walk you through …</td><td>3분</td></tr>
+  </table>
+  <h3>다른 사람 · 일상 상황으로</h3>
+  <table>
+    <tr><td>카페 주문</td><td>바리스타</td><td lang="en">Can I get … to go?</td><td>3분</td></tr>
+    <tr><td>길 묻기</td><td>지나가는 사람</td><td lang="en">How do I get to …?</td><td>3분</td></tr>
+    <tr><td>자기소개</td><td>새로 만난 사람</td><td lang="en">I'm really into … these days.</td><td>3분</td></tr>
+    <tr><td>병원 접수</td><td>접수처</td><td lang="en">I've had a … since …</td><td>3분</td></tr>
+    <tr><td>공항 체크인</td><td>카운터 직원</td><td lang="en">Could I get an aisle seat?</td><td>3분</td></tr>
+    <tr class="soft"><td>아무것도 안 고르면</td><td>오늘의 상대</td><td>하루 한 장면</td><td>3분</td></tr>
+  </table>
+  <h3>넣으면 맞춰지는 칸 · 모두 비워도 돼요</h3>
+  <table>
+    <tr><td>하는 일</td><td>선택</td><td>학생이면 수업·과제 장면이 늘어요</td><td></td></tr>
+    <tr><td>관심사</td><td>선택</td><td>상대가 꺼내는 이야깃거리</td><td></td></tr>
+    <tr><td>영어 쓸 곳</td><td>선택</td><td>여행이면 공항·호텔부터</td><td></td></tr>
+    <tr><td>지금 수준</td><td>선택</td><td>상대의 말 빠르기와 단어</td><td></td></tr>
+  </table>
+</section>
+
+<section class="faq" aria-labelledby="h-faq">
+  <div class="head"><h2 id="h-faq" class="rise">정한 것, 남은 것</h2></div>
+  <div class="q">
+    <h3 class="rise">대화 AI는 뭘 써요?</h3>
+    <div class="a rise" style="--i:1">
+      <p>세 칸 모두 0원이에요. 말은 크롬 음성 인식으로 글로 바꾸고, 대답은 Gemini Flash-Lite 무료 등급이 만들고, 소리는 브라우저 음성이 읽어요. 예비는 Groq 무료 등급이에요.</p>
+      <p>키는 처음엔 내가 직접 넣어요. 다른 사람이 쓰기 시작하면 Cloudflare Worker 무료 중계 뒤에 숨겨요.</p>
+      <p>걸리는 점: Gemini 무료 등급은 대화가 구글 학습에 쓰여서 쓰는 사람에게 알려야 해요. 하루 몇 번까지 무료인지는 AI Studio에서 직접 확인해야 해요.</p>
+    </div>
+  </div>
+  <div class="q">
+    <h3 class="rise">음성 그대로 대화는요?</h3>
+    <div class="a rise" style="--i:1"><p>Gemini Live API가 무료 등급에 있어요. 듣고 바로 소리로 대답해서 3분 대화에 가장 자연스러워요. 아직 미리보기 단계이고 무료 한도를 확인 못 해서, 2단계에서 시험해요.</p></div>
+  </div>
+  <div class="q">
+    <h3 class="rise">발음 채점은 직접 만들어요</h3>
+    <div class="a rise" style="--i:1">
+      <p>서버 없이 브라우저 안에서 돌아가요. 들린 소리를 음소로 받아 적고, 정답 음소와 나란히 맞춰서 빠지거나 바뀐 소리를 짚어요.</p>
+      <div class="ph" data-ui lang="en" aria-label="salmon 채점 예시: l은 소리 없음, 다섯 소리 중 하나가 틀림">
+        <span>s<small>OK</small></span><span class="bad">æ<small>ɑ로 들림</small></span><span class="ghost">l<small>묵음</small></span><span>m<small>OK</small></span><span>ə<small>OK</small></span><span>n<small>OK</small></span>
+      </div>
+      <ol>
+        <li>마이크 소리를 16kHz로 바꿔요.</li>
+        <li>음소 인식 모델(wav2vec2 음소 모델의 ONNX 변환본, transformers.js)이 들린 음소를 적어요.</li>
+        <li>CMUdict로 만든 정답 음소열과 편집 거리로 맞춰요.</li>
+        <li>한국인이 자주 바꾸는 짝(r/l, f/p, 끝소리 '으')은 L2-ARCTIC 한국인 화자 데이터로 보정해요.</li>
+      </ol>
+      <p>한계: 처음 한 번 모델 200~350MB를 받아야 해요. 논문 기준으로 틀린 소리를 짚는 정확도가 열 번에 여섯 번 안팎이라, 점수는 참고용으로 보여 줘요. 노트북에서 몇 초 걸리는지는 직접 재 봐야 해요.</p>
+    </div>
+  </div>
+  <div class="q">
+    <h3 class="rise">잘못 아는 발음 35개</h3>
+    <div class="a rise" style="--i:1">
+      <p>먼저 만들어 뒀어요. 소리 없는 글자, 외래어와 다른 발음, 세게 읽는 곳, 박자 수 네 가지예요. 지금은 '알아들었는지'만 보고, 채점이 붙으면 소리 하나하나를 짚어요.</p>
+      <p><a href="../pron/">35단어 외워 보기 →</a></p>
+    </div>
+  </div>
+  <div class="q">
+    <h3 class="rise">만드는 순서</h3>
+    <div class="a rise" style="--i:1">
+      <ol>
+        <li>2주 동안 지금 첫 화면과 무료 도구로 직접 써 봐요.</li>
+        <li>대화 AI를 붙여요. 키는 직접 넣는 방식으로요.</li>
+        <li>발음 채점을 붙이고 노트북 속도를 재요.</li>
+        <li>다른 사람용 상황·정보 칸과 중계 서버를 붙여요.</li>
+      </ol>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="end">
+  <div class="top"><span>Unmute 기획서 · 창업실 · 이름은 마이크를 켜는 순간에서 따왔어요.</span><a href="#top">맨 위로</a></div>
+  <a class="big" href="../pron/" lang="en">Say salmon.</a>
+  <div class="meta">
+    <div><a href="../../">창업실</a><a href="../app/">첫 화면</a><a href="../pron/">발음 35단어</a></div>
+    <p>사진: "Unidyne Shure 55S Microphone" Ethan Long, CC BY-SA 2.0 · "Baristas serve espresso and cappuccino at a busy cafe" Shixart1985, CC BY 2.0 · "Melbourne Airport departures board" Marek Ślusarczyk (Tupungato), CC BY 3.0 · "G-C-Woolley page of diary No2" CEphoto, Uwe Aranas, CC BY-SA 3.0 — 모두 Wikimedia Commons</p>
+    <p>서울 · 2026</p>
+  </div>
+</footer>
+
+<script>
+document.body.classList.replace("no-js", "js");
+const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target) } }), { threshold: .2 });
+document.querySelectorAll(".rise, .loop").forEach(el => io.observe(el));
+// 부채: 스크롤 4분의 1마다 카드 한 장씩
+const fan = document.querySelector(".fan"), cards = [...document.querySelectorAll(".card")];
+const deal = () => {
+  if (matchMedia("(max-width: 1180px)").matches) return cards.forEach(c => c.classList.add("on"));
+  const r = fan.getBoundingClientRect(), p = -r.top / (r.height - innerHeight);
+  cards.forEach((c, i) => c.classList.toggle("on", i === 0 || p > i / 4));
+};
+addEventListener("scroll", deal, { passive: true }); addEventListener("resize", deal); deal();
+</script>
+</body>
+</html>

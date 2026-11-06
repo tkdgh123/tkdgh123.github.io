@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unmute — 오늘의 3분</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=TikTok+Sans:wdth,wght@75..150,300..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+:root { --bg: #fff; --surface: #f3f3f3; --ink: #0a0a0a; --muted: #5e5e5e; --blue: #2436ff; --red: #ff3b1f; --navy: #050a5c }
+* { box-sizing: border-box }
+html, body { margin: 0; height: 100% }
+body { background: var(--surface); color: var(--ink); font: 400 17px/1.45 "TikTok Sans", "Pretendard Variable", Pretendard, sans-serif; word-break: keep-all; -webkit-font-smoothing: antialiased }
+button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; padding: 0 }
+button:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px }
+.app { max-width: 430px; min-height: 100%; margin: 0 auto; background: var(--bg); display: flex; flex-direction: column; padding: 18px 20px 22px }
+.top { display: flex; justify-content: space-between; align-items: center }
+.mark { font-weight: 850; font-stretch: 150%; font-size: 22px; letter-spacing: -.01em }
+.day { font-weight: 600; font-size: 15px; color: var(--muted) }
+.who { display: flex; align-items: center; gap: 12px; margin-top: 18px }
+.face { width: 44px; height: 44px; border-radius: 50%; background: var(--blue); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 20px }
+.who b { display: block; font-size: 18px }
+.who span { font-size: 14px; color: var(--muted) }
+.say { margin: 12px 0 0; font-size: 23px; line-height: 1.22; font-weight: 600; letter-spacing: -.01em }
+.ko { margin: 6px 0 0; font-size: 16px; color: var(--muted) }
+.ko:empty { display: none }
+.row { display: flex; gap: 14px; margin-top: 10px }
+.row button { font-size: 15px; font-weight: 700; color: var(--blue) }
+h2 { margin: 20px 0 8px; font-size: 15px; font-weight: 700 }
+.chips { display: grid; gap: 8px }
+.chip { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 11px 14px; background: var(--surface); transition: background .3s, color .3s }
+.chip > div { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px }
+.chip b { font-size: 17px; font-weight: 650 }
+.chip span { font-size: 14px; color: var(--muted) }
+.chip i { display: flex; gap: 5px; flex: none }
+.chip i::before, .chip i::after { content: ""; width: 10px; height: 10px; border-radius: 50%; background: #cfcfcf }
+.chip[data-n="1"] i::before, .chip[data-n="2"] i::before, .chip[data-n="2"] i::after { background: var(--blue) }
+.chip[data-n="2"] { background: var(--blue); color: #fff }
+.chip[data-n="2"] span { color: #dfe2ff }
+.chip[data-n="2"] i::before, .chip[data-n="2"] i::after { background: #fff }
+.chip.hit { animation: hit .5s }
+@keyframes hit { 40% { transform: scale(1.03) } }
+.wave { position: relative; margin-top: 16px; height: 64px; background: var(--surface) }
+canvas { display: block; width: 100%; height: 100% }
+.heard { margin: 8px 0 0; min-height: 2.9em; font-size: 16px; line-height: 1.45 }
+.heard em { font-style: normal; color: var(--red); font-weight: 700 }
+.go { margin-top: auto; padding-top: 8px; display: flex; align-items: center; gap: 16px }
+.mic { width: 76px; height: 76px; border-radius: 50%; background: var(--ink); color: #fff; display: grid; place-items: center; flex: none; transition: transform .15s, background .2s }
+.mic:hover { transform: scale(1.05) }
+.mic:active { transform: scale(.96) }
+.mic svg { width: 30px; height: 30px }
+.mic .cut { transition: opacity .2s }
+.live .mic { background: var(--red) }
+.live .mic .cut { opacity: 0 }
+.go b { display: block; font-size: 20px; font-weight: 800; font-stretch: 125% }
+.go span { font-size: 15px; color: var(--muted) }
+.demo { margin-left: auto; font-size: 15px; font-weight: 700; color: var(--blue) }
+.stat { display: flex; justify-content: space-between; margin-top: 12px; padding-top: 10px; font-size: 15px; border-top: 2px solid var(--surface) }
+.stat b { font-variant-numeric: tabular-nums }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important } }
+</style>
+</head>
+<body>
+<main class="app" data-ui id="app">
+  <div class="top"><span class="mark">Unmute</span><span class="day">12일째</span></div>
+
+  <div class="who"><div class="face" aria-hidden="true">J</div><div><b>Jamie</b><span>어제 대화에서 이어서</span></div></div>
+  <p class="say" lang="en" id="line">Hey! Yesterday you said the pedal for your racing wheel was almost done. Did you finish it?</p>
+  <p class="ko" id="ko"></p>
+  <div class="row"><button id="listen">다시 듣기</button><button id="tr">한국어로 보기</button></div>
+
+  <h2>오늘 다시 써 볼 말</h2>
+  <div class="chips" id="chips">
+    <div class="chip" data-n="0" data-re="ended up"><div><b lang="en">I ended up …</b><span>결국 ~하게 됐어</span></div><i aria-label="두 번 중 0번 씀"></i></div>
+    <div class="chip" data-n="1" data-re="took me"><div><b lang="en">It took me about …</b><span>~쯤 걸렸어</span></div><i aria-label="두 번 중 1번 씀"></i></div>
+    <div class="chip" data-n="0" data-re="about to"><div><b lang="en">I was about to …</b><span>막 ~하려던 참이었어</span></div><i aria-label="두 번 중 0번 씀"></i></div>
+  </div>
+
+  <div class="wave"><canvas id="cv" aria-label="내 목소리 파형, 멈춘 곳은 빨간 칸"></canvas></div>
+  <p class="heard" id="heard" lang="en" aria-live="polite"></p>
+
+  <div class="go">
+    <button class="mic" id="mic" aria-label="말하기 시작">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor" stroke="none"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/><path class="cut" d="M4 4l16 16"/></svg>
+    </button>
+    <div><b id="state">Unmute</b><span id="time">3:00</span></div>
+    <button class="demo" id="demo">예시 보기</button>
+  </div>
+  <div class="stat"><span>이번 주 멈춘 횟수</span><b>14 → 9</b></div>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+const KO = "어제 레이싱 휠 페달 거의 다 됐다고 했잖아. 끝냈어?";
+const cv = $("cv"), g = cv.getContext("2d");
+let bars = [], gaps = 0, live = false, t0 = 0, timer, stopFn;
+
+function size() { const r = cv.getBoundingClientRect(), d = devicePixelRatio || 1; cv.width = r.width * d; cv.height = r.height * d; g.setTransform(d, 0, 0, d, 0, 0); draw() }
+// 막대 하나 = 1/30초. 소리가 작으면(조용) 빨간 칸으로 칠하고, 1.2초 넘게 이어지면 'uhm'으로 센다
+function draw() {
+  const w = cv.clientWidth, h = cv.clientHeight, step = 4, n = Math.floor(w / step);
+  g.clearRect(0, 0, w, h);
+  const vis = bars.slice(-n);
+  let run = 0;
+  vis.forEach((b, i) => {
+    const x = i * step;
+    if (b.gap) { g.fillStyle = "#ff3b1f"; g.fillRect(x, 0, step, h) }
+    else { const bh = Math.max(3, b.v * h * .9); g.fillStyle = "#0a0a0a"; g.fillRect(x + 1, (h - bh) / 2, step - 2, bh) }
+  });
+  // 빨간 칸 위에 uhm
+  g.fillStyle = "#fff"; g.font = "700 14px 'TikTok Sans', sans-serif"; g.textBaseline = "middle";
+  vis.forEach((b, i) => { if (b.gap && (i === 0 || !vis[i - 1].gap)) { run = 0; let j = i; while (j < vis.length && vis[j].gap) j++; if ((j - i) * step > 34) g.fillText("uhm", i * step + 6, h / 2) } });
+}
+function push(v) {
+  bars.push({ v, gap: false });
+  // 말을 한 번이라도 한 뒤 조용함이 36칸(1.2초) 이어지면 그 칸들을 빨갛게
+  const k = bars.length; let q = 0;
+  while (q < k && bars[k - 1 - q].v < .06) q++;
+  if (q >= 36 && bars.slice(0, k - q).some(b => b.v > .12)) {
+    if (!bars[k - 2]?.gap) gaps++;
+    for (let i = k - q; i < k; i++) bars[i].gap = true;
+  }
+  if (bars.length > 2000) bars = bars.slice(-1000);
+  draw();
+}
+function tick() {
+  const left = Math.max(0, 180 - (Date.now() - t0) / 1000);
+  $("time").textContent = `${Math.floor(left / 60)}:${String(Math.floor(left % 60)).padStart(2, "0")}`;
+  if (!left) stop();
+}
+function check(text) {
+  document.querySelectorAll(".chip").forEach(c => {
+    const hits = (text.toLowerCase().match(new RegExp(c.dataset.re, "g")) || []).length;
+    const n = Math.min(2, +c.dataset.base + hits);
+    if (n > +c.dataset.n) { c.dataset.n = n; c.classList.remove("hit"); void c.offsetWidth; c.classList.add("hit"); c.querySelector("i").setAttribute("aria-label", `두 번 중 ${n}번 씀`) }
+  });
+}
+function begin() {
+  live = true; bars = []; gaps = 0; t0 = Date.now(); $("app").classList.add("live");
+  $("state").textContent = "듣는 중"; $("mic").setAttribute("aria-label", "말하기 멈추기"); $("heard").textContent = "";
+  document.querySelectorAll(".chip").forEach(c => c.dataset.base = c.dataset.n);
+  timer = setInterval(tick, 250);
+}
+function stop() {
+  if (!live) return; live = false; clearInterval(timer); stopFn?.(); stopFn = null;
+  $("app").classList.remove("live"); $("state").textContent = "Unmute"; $("mic").setAttribute("aria-label", "말하기 시작");
+  if (bars.length) $("time").textContent = `멈춤 ${gaps}번`;
+}
+async function micOn() {
+  const s = await navigator.mediaDevices.getUserMedia({ audio: true });
+  const ac = new AudioContext(), an = ac.createAnalyser(); an.fftSize = 1024;
+  ac.createMediaStreamSource(s).connect(an);
+  const buf = new Float32Array(an.fftSize);
+  const iv = setInterval(() => { an.getFloatTimeDomainData(buf); let r = 0; for (const x of buf) r += x * x; push(Math.min(1, Math.sqrt(r / buf.length) * 7)) }, 1000 / 30);
+  const R = window.SpeechRecognition || window.webkitSpeechRecognition; let rec;
+  if (R) {
+    rec = new R(); rec.lang = "en-US"; rec.continuous = true; rec.interimResults = true;
+    rec.onresult = e => { const t = [...e.results].map(r => r[0].transcript).join(" "); $("heard").textContent = t; check(t) };
+    rec.onend = () => live && rec.start();
+    rec.start();
+  }
+  begin();
+  stopFn = () => { clearInterval(iv); s.getTracks().forEach(t => t.stop()); ac.close(); if (rec) { rec.onend = null; rec.stop() } };
+}
+// 예시: 실제로 막히는 대답 하나를 그대로 흘려 보낸다
+function demo() {
+  if (live) stop();
+  begin(); $("state").textContent = "예시";
+  const script = [["Yeah, so…", 1.4], [null, 1.6], ["I… 결국…", .9], [null, 1.5], ["I ended up redoing the pedal.", 2.2], ["It took me about two hours.", 2.3]];
+  let said = "", i = 0, until = 0, f = 0, speaking = false;
+  const iv = setInterval(() => {
+    f++;
+    if (f >= until) {
+      if (i >= script.length) { stop(); return }
+      const [txt, sec] = script[i++]; until = f + sec * 30;
+      if (txt) { said += (said ? " " : "") + txt; $("heard").innerHTML = said.replace(/결국…/, "<em>결국…</em>"); check(said) }
+      speaking = !!txt;
+    }
+    push(speaking ? .25 + Math.abs(Math.sin(f / 2.3)) * .5 * Math.random() + .1 : Math.random() * .03);
+  }, 1000 / 30);
+  stopFn = () => clearInterval(iv);
+}
+$("mic").onclick = async () => {
+  if (live) return stop();
+  try { await micOn() } catch { $("heard").textContent = "마이크를 쓸 수 없어서 예시로 보여 줄게요."; setTimeout(demo, 900) }
+};
+$("demo").onclick = demo;
+$("tr").onclick = () => { const on = !$("ko").textContent; $("ko").textContent = on ? KO : ""; $("tr").textContent = on ? "영어만 보기" : "한국어로 보기" };
+$("listen").onclick = () => { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance($("line").textContent); u.lang = "en-US"; u.rate = .95; speechSynthesis.speak(u) };
+addEventListener("resize", size); size();
+if (location.hash === "#demo") demo();
+</script>
+</body>
+</html>
