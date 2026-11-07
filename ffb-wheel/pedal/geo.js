@@ -24,8 +24,10 @@ export const SPEC = [
   ["gap",        "발판 옆 틈 (U 옆벽·O 받이, 한쪽)", 1, "?"],
   ["H",          "O·B 높이 (받침판 윗면 위)", 25,    "?"],
   ["oPostW",     "O 받이 앞뒤 길이",          30,    "?"],
+  ["pairGap",    "액셀·브레이크 받침판 사이", 60,    "?"],
 ].map(([key, label, def, src]) => ({ key, label, def, src }));
 export const NUT = 6.5, WASH = 1, NUT_R = 7.2;   // M8 너트 높이·와셔 1T·너트 꼭짓점 반지름
+export const AS = { board: 23, mag: 6, magT: 2.5, gap: 1.5, chip: 1.4, pcb: 1.6 };   // AS5600 보드·자석 Ø6×2.5·틈 (휠 베이스와 같은 값)
 
 const rad = d => d * Math.PI / 180;
 // 문서 식 일반형: r²+b²−2rb·cos a = (s+L)², 두 자세 (a1, L1), (a2, L2), OA<OB
@@ -57,6 +59,8 @@ export function build(vals = {}) {
   // O 받이: 위쪽 = O 중심 반원(R = 앞뒤/2)
   const OPOST = { w: V.oPostW, r: V.oPostW / 2, z0: PEDAL.t / 2 + V.gap }; OPOST.h = H + OPOST.r;
   const OPIN_HALF = OPOST.z0 + T + WASH + NUT + 2, APIN_HALF = BOX.zOut + WASH + NUT + 2;
+  // 센서 (11주차): O핀이 발판과 같이 돌고, 바깥 끝면에 자석 → 틈 → AS5600 → 센서 받침(15T, 받침판 위에 세움)
+  const SENS = { mag0: OPIN_HALF, pcb0: OPIN_HALF + AS.magT + AS.gap + AS.chip, w: 40, h: H + AS.board / 2 + 10 }; SENS.z0 = SENS.pcb0 + AS.pcb; SENS.z1 = SENS.z0 + T;
   // 전산볼트: C 뒤(U 안쪽)로 앞벽 + 와셔 + 너트, C 앞으로 스프링 최대 길이 + B 판 + 와셔 + 너트
   const ROD = { inB: T + WASH + NUT + 2, out: V.springFree + T + WASH + NUT + 2 }; ROD.len = Math.ceil((ROD.inB + ROD.out) / 5) * 5; ROD.out = ROD.len - ROD.inB;
 
@@ -117,5 +121,5 @@ export function build(vals = {}) {
     }
     return { res };
   }
-  return { V, T, S, H, OA, OB, PEDAL, BOX, BPLATE, BASE, SLOT, OPOST, ROD, NUT_AT, OPIN_HALF, APIN_HALF, pose, parts, clearanceP, check };
+  return { V, T, S, H, OA, OB, PEDAL, BOX, BPLATE, BASE, SLOT, OPOST, ROD, NUT_AT, OPIN_HALF, APIN_HALF, SENS, pose, parts, clearanceP, check };
 }

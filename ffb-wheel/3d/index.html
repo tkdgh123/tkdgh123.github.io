@@ -4,55 +4,137 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>레이싱 휠 3D</title>
-<meta name="description" content="창공설 레이싱 휠의 휠 베이스와 액셀 페달 3D 모델 — 한 페이지에서 탭으로, 모델은 따로따로">
+<meta name="description" content="창공설 레이싱 휠 3D — 주차(10~14주차)를 고르면 그 주에 만들 부품이 보이는 휠 베이스·페달 모델">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
 <style>
-/* 휠 베이스·액셀 페달을 한 주소에서 탭으로. 두 모델은 ../wheel/, ../pedal/ 그대로 */
-:root { --ink: #1C2228; --ink-soft: #56616B; --rule: #C3CBD2; --page: #F4F5F6; --accent: #C8102E; --ui: "IBM Plex Sans KR", "Malgun Gothic", system-ui, sans-serif; color-scheme: light }
+/* 휠 베이스·페달을 한 주소에서 탭으로 + 주차 고르기. 두 모델은 ../wheel/, ../pedal/ 그대로, ?w=주차만 넘김 */
+:root { --ink: #1C2228; --ink-soft: #56616B; --rule: #C3CBD2; --page: #F4F5F6; --accent: #C8102E; --ok: #0E7A3E; --ui: "IBM Plex Sans KR", "Malgun Gothic", system-ui, sans-serif; color-scheme: light }
 * { box-sizing: border-box }
 html, body { margin: 0; height: 100% }
 body { background: var(--page); color: var(--ink); font: 13px var(--ui); display: flex; flex-direction: column; overflow: hidden }
-nav { flex: none; display: flex; align-items: center; gap: 4px; height: 44px; padding: 0 max(16px, env(safe-area-inset-right)) 0 max(16px, env(safe-area-inset-left)); border-bottom: 1px solid var(--rule) }
+.pad { padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)) }
+nav { flex: none; display: flex; align-items: center; gap: 4px; height: 44px; border-bottom: 1px solid var(--rule) }
 nav a { color: var(--ink-soft); text-decoration: none; white-space: nowrap }
 nav a:hover { color: var(--ink) }
 nav b { font-size: 15px; margin: 0 auto 0 14px; white-space: nowrap }
-nav button { font: inherit; border: 1px solid var(--rule); background: #fff; color: var(--ink-soft); padding: 6px 11px; border-radius: 3px; cursor: pointer; white-space: nowrap }
+button { font: inherit; cursor: pointer }
+nav button { border: 1px solid var(--rule); background: #fff; color: var(--ink-soft); padding: 6px 11px; border-radius: 3px; white-space: nowrap }
 nav button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
-iframe { flex: 1; width: 100%; border: 0; display: block }
+
+/* 주차 줄: 달력 칸처럼 날짜를 나눠서 */
+.weeks { flex: none; display: flex; gap: 0; overflow-x: auto; border-bottom: 1px solid var(--rule); background: #fff; scrollbar-width: none }
+.weeks::-webkit-scrollbar { display: none }
+.weeks button { flex: 1 0 auto; min-width: 104px; border: 0; border-right: 1px solid var(--rule); background: none; color: var(--ink-soft); padding: 7px 12px 8px; text-align: left; line-height: 1.35; position: relative }
+.weeks button:last-child { border-right: 0 }
+.weeks button b { display: block; font-size: 14px; color: var(--ink) }
+.weeks button span { font-size: 11.5px; font-variant-numeric: tabular-nums }
+.weeks button i { font-style: normal; font-size: 10.5px; margin-left: 6px; color: var(--ok) }
+.weeks button[aria-pressed="true"] { background: var(--page) }
+.weeks button[aria-pressed="true"]::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 3px; background: var(--accent) }
+.weeks button:hover b { color: var(--accent) }
+
+.goal { flex: none; display: flex; align-items: center; gap: 10px; min-height: 40px; padding-top: 6px; padding-bottom: 6px; border-bottom: 1px solid var(--rule) }
+.goal p { margin: 0; flex: 1; min-width: 0; line-height: 1.45 }
+.goal p b { margin-right: 8px }
+.goal p span { color: var(--ink-soft) }
+.goal button { flex: none; border: 1px solid var(--ink); background: #fff; color: var(--ink); padding: 5px 11px; border-radius: 3px }
+.goal button[aria-expanded="true"] { background: var(--ink); color: #fff }
+
+.wrap { flex: 1; position: relative; min-height: 0 }
+iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block }
 iframe[hidden] { display: none }
-@media (max-width: 400px) { nav b { display: none } nav a { margin-right: auto } }
+.todo { position: absolute; top: 0; right: 0; z-index: 2; width: min(420px, 100%); max-height: 100%; overflow-y: auto; background: #fff; border-left: 1px solid var(--rule); border-bottom: 1px solid var(--rule); box-shadow: 0 10px 30px rgba(28,34,40,.12); padding: 14px 18px 16px }
+.todo[hidden] { display: none }
+.todo h3 { margin: 0 0 6px; font-size: 12px; font-weight: 500; color: var(--ink-soft) }
+.todo ul { list-style: none; margin: 0 0 14px; padding: 0 }
+.todo li { display: grid; grid-template-columns: 74px 1fr; gap: 8px; padding: 6px 0; border-top: 1px solid #E3E7EA; line-height: 1.5 }
+.todo li em { font-style: normal; color: var(--ink-soft); font-size: 12px }
+.todo li em b { display: block; color: var(--ink); font-size: 13px; font-weight: 500 }
+.todo .new li { grid-template-columns: 1fr }
+.todo .new li::before { content: none }
+.todo a { color: var(--accent); text-decoration: none; font-weight: 500 }
+.todo a:hover { text-decoration: underline }
+@media (max-width: 520px) { nav b { display: none } nav a { margin-right: auto } .goal p span { display: none } .weeks button { min-width: 92px; padding: 6px 10px } }
 </style>
 </head>
 <body>
-<nav aria-label="레이싱 휠 3D">
+<nav class="pad" aria-label="레이싱 휠 3D">
   <a href="../../#make">← 창업실</a>
   <b>레이싱 휠 3D</b>
   <button type="button" data-v="wheel" data-src="../wheel/" aria-pressed="true">휠 베이스</button>
-  <button type="button" data-v="pedal" data-src="../pedal/" aria-pressed="false">액셀 페달</button>
+  <button type="button" data-v="pedal" data-src="../pedal/" aria-pressed="false">페달</button>
 </nav>
-<iframe id="f-wheel" title="휠 베이스 3D" hidden></iframe>
-<iframe id="f-pedal" title="액셀 페달 3D" hidden></iframe>
+<div class="weeks pad" id="weeks" role="group" aria-label="주차"></div>
+<div class="goal pad"><p id="goal"></p><button type="button" id="tTodo" aria-expanded="false" aria-controls="todo">할 일</button></div>
+<div class="wrap">
+  <iframe id="f-wheel" title="휠 베이스 3D" hidden></iframe>
+  <iframe id="f-pedal" title="페달 3D" hidden></iframe>
+  <div class="todo" id="todo" hidden></div>
+</div>
 <script>
-// 처음 연 탭에만 주소 뒤쪽(#d= 치수, ?cam= 등)을 넘기고, 다른 탭은 처음 누를 때 불러옴
+// 주차 = 파트 분배(../parts/)와 같은 내용. model = 그 주에 먼저 보여 줄 모델, done = 이미 한 주
+const WEEKS = [
+  { w: 10, d: "11.3 – 11.9", s: "2026-11-03", done: true, model: "pedal", title: "페달 수치와 나무 자르기", goal: "액셀·브레이크 페달의 수치를 정하고 나무를 잘랐어요.",
+    shows: ["페달: 자른 나무 조각 6가지 (붙이기 전)"],
+    jobs: [["기구", "김도영", "페달 수치 확정 · 나무 자르기"], ["HW", "최민호", "센서 자리 수치 · 나무 자르기 함께"], ["SW", "황찬웅", "밟는 각도 수치 · 나무 자르기 함께"], ["기획/테스트", "김창식", "수치 표 정리 · 조각 치수 확인 · 진행 동영상"]] },
+  { w: 11, d: "11.10 – 11.16", s: "2026-11-10", model: "pedal", title: "페달 완성", goal: "두 페달을 밟으면 시리얼 모니터의 값이 바뀐다.",
+    shows: ["페달: 조립 (O핀·A핀·전산볼트·스프링)", "브레이크 페달 한 벌 더 (액셀 왼쪽)", "AS5600 + 자석 (O핀 끝) · 센서 받침", "선: A0(액셀) · A1(브레이크) · 5V · GND", "휠 베이스: 아직 수치만 — 전부 흐리게"],
+    jobs: [["기구", "김도영", "페달 조립 · 복귀 스프링 · 휠 베이스 수치"], ["HW", "최민호", "센서 장착 · 페달 배선 A0·A1 · 페달 회로도"], ["SW", "황찬웅", "센서 범위 방식 · 페달 값 읽기 코드"], ["기획/테스트", "김창식", "페달 시험 표 · 1차 시험 · 결과보고서 틀 · 진행 동영상"]] },
+  { w: 12, d: "11.17 – 11.23", s: "2026-11-17", model: "wheel", title: "휠 베이스와 조향 센서", goal: "핸들 축을 돌리면 각도가 나오고, 페달 보정이 저장된다.",
+    shows: ["바닥판 · 베어링 블록 2개 · 608ZZ · 세로 볼트 · 조향축", "조향 AS5600 + 자석 · 센서 받침 → A4·A5", "아두이노 우노 · BTS7960 신호선 D8·D9·D10 (24V는 아직)"],
+    jobs: [["기구", "김도영", "휠 베이스 자르기·조립 · 핸들 축 고정"], ["HW", "최민호", "조향 센서 배선 A4·A5 · 모터 드라이버 신호선"], ["SW", "황찬웅", "조향 각도 읽기 · 페달 보정·저장 · 텍스트 명령"], ["기획/테스트", "김창식", "페달 예외 시험 · 조향 시험 · 오류 기록 · 진행 동영상"]] },
+  { w: 13, d: "11.24 – 11.30", s: "2026-11-24", model: "wheel", title: "모터와 힘", goal: "보낸 힘만큼 핸들이 움직이고, 문제가 생기면 모터가 꺼진다.",
+    shows: ["MY1016 · 모터 받침쇠 · 20T·60T 풀리 · GT2 벨트", "핸들 · 나무판 · 띄움 조각 · M5 볼트", "LRS-350-24 · 24V 스위치 · 전원선·모터선", "12주차에 단 것은 흐리게"],
+    jobs: [["기구", "김도영", "모터·벨트 장착 · 핸들·패들 장착 · 바닥 고정"], ["HW", "최민호", "24V 전원 연결 · 패들 스위치 D4·D7 · 선 정리"], ["SW", "황찬웅", "시리얼 프레임 · 힘 출력 · 통신 두절 처리"], ["기획/테스트", "김창식", "안전 시험 · 모터 관찰 · 시연 시나리오 초안 · 진행 동영상"]] },
+  { w: 14, d: "12.1 – 12.7", s: "2026-12-01", model: "wheel", title: "합치기와 전시 준비", goal: "처음부터 끝까지 시연이 되고, 최종 작품 검토를 받는다.",
+    shows: ["새로 다는 부품 없음 — 다 된 모습 그대로"],
+    jobs: [["기구", "김도영", "보강 · 전시 배치 · 시연 연습 · 결과보고서"], ["HW", "최민호", "최종 회로도 · 배선 점검 · 결과보고서"], ["SW", "황찬웅", "버그 고치기 · 코드 정리 · 게임 연결 시험 · 결과보고서"], ["기획/테스트", "김창식", "전체 시나리오 시험 · 오류 목록 · 전시회 요약 템플릿 · 결과보고서 · 진행 동영상"]] },
+];
+const $ = id => document.getElementById(id);
 const tabs = [...document.querySelectorAll("nav button")];
-const q = new URLSearchParams(location.search), first = q.get("v");
-q.delete("v");
-function show(v, rest = "") {
+const q = new URLSearchParams(location.search);
+// 오늘이 든 주 (이미 한 주면 다음 주)
+function today() {
+  const t = new Date(); let i = WEEKS.findLastIndex(k => new Date(k.s + "T00:00") <= t);
+  if (i < 0) i = 0; if (WEEKS[i].done && i < WEEKS.length - 1) i++;
+  return WEEKS[i].w;
+}
+let W = WEEKS.some(k => k.w === +q.get("w")) ? +q.get("w") : today();
+let V = tabs.some(t => t.dataset.v === q.get("v")) ? q.get("v") : null;
+q.delete("v"); q.delete("w");
+let rest = (q.size ? "&" + q : "") + location.hash;   // 처음 연 모델에만 넘기는 나머지(#d= 치수, ?cam= 등)
+
+$("weeks").innerHTML = WEEKS.map(k => `<button type="button" data-w="${k.w}"><b>${k.w}주차${k.done ? "<i>한 일</i>" : ""}</b><span>${k.d}</span></button>`).join("");
+const wkBtns = [...$("weeks").children];
+
+function show(v) {
+  V = v;
   for (const t of tabs) {
-    const on = t.dataset.v === v, f = document.getElementById("f-" + t.dataset.v);
+    const on = t.dataset.v === v, f = $("f-" + t.dataset.v);
     t.setAttribute("aria-pressed", on);
-    if (on && !f.getAttribute("src")) f.src = t.dataset.src + rest;
+    if (on && f.dataset.w !== String(W)) { f.src = t.dataset.src + "?w=" + W + rest; f.dataset.w = W; rest = ""; }
     f.hidden = !on;
   }
+  history.replaceState(null, "", "?w=" + W + (v === week().model ? "" : "&v=" + v));
 }
-show(tabs.some(t => t.dataset.v === first) ? first : tabs[0].dataset.v, (q.size ? "?" + q : "") + location.hash);
-for (const t of tabs) t.addEventListener("click", () => {
-  show(t.dataset.v);
-  history.replaceState(null, "", t === tabs[0] ? location.pathname : "?v=" + t.dataset.v);
-});
+const week = () => WEEKS.find(k => k.w === W);
+function pick(w, v) {
+  W = w; const k = week();
+  wkBtns.forEach(b => b.setAttribute("aria-pressed", +b.dataset.w === W));
+  $("goal").innerHTML = `<b>${k.title}</b><span>${k.goal}</span>`;
+  $("todo").innerHTML = `<h3>${k.w}주차 · ${k.d} · 할 일</h3><ul>${k.jobs.map(([r, n, j]) => `<li><em><b>${n}</b>${r}</em><span>${j}</span></li>`).join("")}</ul>` +
+    `<h3>3D에 새로 보이는 것</h3><ul class="new">${k.shows.map(s => `<li>${s}</li>`).join("")}</ul><a href="../parts/#w${k.w}" target="_top">자세한 순서·준비물 → 주차별 파트 분배</a>`;
+  show(v || k.model);
+}
+wkBtns.forEach(b => b.addEventListener("click", () => { pick(+b.dataset.w); b.scrollIntoView({ inline: "nearest", block: "nearest" }); }));
+for (const t of tabs) t.addEventListener("click", () => show(t.dataset.v));
+$("tTodo").addEventListener("click", e => { const open = $("todo").hidden; $("todo").hidden = !open; e.currentTarget.setAttribute("aria-expanded", open); });
+addEventListener("keydown", e => { if (e.key === "Escape" && !$("todo").hidden) $("tTodo").click(); });
+pick(W, V);
+wkBtns.find(b => +b.dataset.w === W).scrollIntoView({ inline: "nearest", block: "nearest" });
 </script>
 </body>
 </html>
