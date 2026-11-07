@@ -3,6 +3,10 @@
 const ART = {
   // ART:BEGIN
   checkout: { img: "img/scenes/hotel.webp", layers: { w: 2752, h: 1536, box: [1271, 488, 227, 280], body: "img/scenes/hotel/body.png" } },
+  subway: { img: "img/scenes/subway.webp", layers: { w: 2752, h: 1536, box: [1212, 532, 311, 316], body: "img/scenes/subway/body.png" } },
+  shop: { img: "img/scenes/shop.webp", layers: { w: 2752, h: 1536, box: [1349, 282, 469, 618], body: "img/scenes/shop/body.png" } },
+  salon: { img: "img/scenes/salon.webp", layers: { w: 2752, h: 1536, box: [1672, 279, 505, 1026], body: "img/scenes/salon/body.png", breath: 1.008 } },
+  photo: { img: "img/scenes/photo.webp", layers: { w: 2752, h: 1536, box: [1107, 298, 525, 1238], body: "img/scenes/photo/body.png", breath: 1.008 } },
   // ART:END
 };
 const THANKS = [["고마움", ["thank", "thanks", "appreciate"]]];
@@ -24,7 +28,7 @@ const SUBWAY = {
   ]
 };
 const SHOP = {
-  who: "Mia", whoKo: "옷 가게 점원", voices: { them: "f2", guest: "m" }, guestKo: "다른 손님",
+  who: "Mia", whoKo: "옷 가게 점원", pos: "58% 50%", voices: { them: "f2", guest: "m" }, guestKo: "다른 손님",
   turns: [
     { say: "Hi there! How can I help?", want: "어제 산 셔츠를 바꾸고 싶다고 하기", need: [["바꾸기", ["exchange", "change", "swap"]]], hint: ["I'd like to ~ this shirt.", "I'd like to exchange…", "I'd like to exchange this shirt."], model: "I'd like to exchange this shirt.", chunk: ["exchange", "교환하다", "돈으로 돌려받는 건 refund예요."] },
     { say: "Sure. What's wrong with it?", want: "조금 작다고 말하기", need: [["작다", ["small", "tight"]]], hint: ["It's a little too ~.", "It's a little too…", "It's a little too small."], model: "It's a little too small." },
@@ -39,7 +43,7 @@ const SHOP = {
   ]
 };
 const SALON = {
-  who: "Jess", whoKo: "미용사", voices: { them: "f", guest: "m2" }, guestKo: "다른 손님",
+  who: "Jess", whoKo: "미용사", pos: "72% 50%", voices: { them: "f", guest: "m2" }, guestKo: "다른 손님",
   turns: [
     { say: "Hi! Have a seat. What are we doing today?", want: "머리를 자르고 싶다고 하기", need: [["자르기", ["haircut", "cut", "trim"]]], hint: ["I'd like a ~, please.", "I'd like a hair…", "I'd like a haircut, please."], model: "I'd like a haircut, please." },
     { say: "Sure. How short do you want it?", want: "윗부분만 조금 다듬어 달라고 하기", need: [["조금만", ["a little", "a bit", "trim"]]], hint: ["Just a little off the ~.", "Just a little off…", "Just a little off the top, please."], model: "Just a little off the top, please.", chunk: ["a little off the top", "윗부분 조금만", "많이 자르지 말라는 뜻으로 굳어진 말이에요."] },
