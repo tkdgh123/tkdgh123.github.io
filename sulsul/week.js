@@ -21,6 +21,8 @@ const ART = {
   gym: { img: "img/scenes/gym.webp", layers: { w: 2752, h: 1536, box: [1204, 319, 344, 508], body: "img/scenes/gym/body.png" } },
   souvenir: { img: "img/scenes/souvenir.webp", layers: { w: 2752, h: 1536, box: [1190, 362, 374, 514], body: "img/scenes/souvenir/body.png" } },
   goodbye: { img: "img/scenes/goodbye.webp", layers: { w: 2752, h: 1536, box: [1206, 239, 718, 1297], body: "img/scenes/goodbye/body.png", breath: 1.008 } },
+  checkin: { img: "img/scenes/checkin.webp", layers: { w: 2752, h: 1536, box: [1460, 343, 373, 423], body: "img/scenes/checkin/body.png" } },
+  plane: { img: "img/scenes/plane.webp", layers: { w: 2752, h: 1536, box: [1217, 403, 632, 798], body: "img/scenes/plane/body.png" } },
   // ART:END
 };
 const THANKS = [["고마움", ["thank", "thanks", "appreciate"]]];
@@ -315,7 +317,7 @@ const GOODBYE = {
   ]
 };
 const CHECKIN = {
-  who: "Victor", whoKo: "항공사 직원", voices: { them: "m", guest: "f2" }, guestKo: "다른 승객",
+  who: "Victor", whoKo: "항공사 직원", pos: "60% 50%", voices: { them: "m", guest: "f2" }, guestKo: "다른 승객",
   turns: [
     { say: "Hi! Where are you flying today?", want: "서울 간다며 여권 건네기", need: [["서울", ["seoul", "korea", "incheon"]]], hint: ["To ~. Here's my passport.", "To Seoul…", "To Seoul. Here's my passport."], model: "To Seoul. Here's my passport." },
     { say: "Thank you. Are you checking any bags?", want: "가방 하나만 부친다고 하기", need: [["하나", ["one", "a bag", "this"]]], hint: ["Just ~ bag.", "Just one…", "Just one bag."], model: "Just one bag.", chunk: ["checking any bags", "부칠 짐", "비행기에 짐을 맡기는 걸 check라고 해요."] },
@@ -330,7 +332,7 @@ const CHECKIN = {
   ]
 };
 const PLANE = {
-  who: "Ruth", whoKo: "옆자리 승객", voices: { them: "f", guest: "m2" }, guestKo: "승무원",
+  who: "Ruth", whoKo: "옆자리 승객", pos: "56% 50%", voices: { them: "f", guest: "m2" }, guestKo: "승무원",
   turns: [
     { say: "Hi! Is this your bag? I think it's on my seat.", want: "죄송하다며 치우겠다고 하기", need: [["사과", ["sorry", "my bad"]]], hint: ["Oh, ~! Let me move it.", "Oh, sorry…", "Oh, sorry! Let me move it."], model: "Oh, sorry! Let me move it." },
     { say: "Thanks. Are you going home or traveling?", want: "집에 가는 길이라고, 일주일 있었다고 하기", need: [["집", ["home"]]], hint: ["I'm going ~. I was here for a week.", "I'm going home…", "I'm going home. I was here for a week."], model: "I'm going home. I was here for a week." },
