@@ -1,0 +1,609 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>창업실 · 편집 저널 (11.07까지 첫 화면)</title>
+<meta name="robots" content="noindex">
+<meta name="description" content="숭실대 AI소프트웨어학부 1학년이 노트북 한 대로 만든 게임 도록, 복습 도구, 생활 자동화를 모은 창업실">
+<script>
+if (/^#(notes|prog|quiz|wrong|code)$/.test(location.hash)) location.replace("../study.html" + location.hash);
+document.documentElement.classList.add("js");
+</script>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@200..800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<script src="../icons.js" defer></script>
+<style>
+/* 종이, 한 단계 어두운 종이, 먹, 잉크 블루 */
+:root {
+  --paper: #f2f1ec; --tone: #e4e2da; --ink: #151514; --muted: #5a5954; --rule: #c9c6bc;
+  --dark: #151618; --on-dark: #eeece6; --on-dark-soft: #9e9d97; --blue: #2b44a6;
+  --m: clamp(16px, 3.2vw, 52px); --g: clamp(12px, 1.6vw, 24px);
+  --serif: "Hahmlet", "Noto Serif KR", serif;
+  --sans: "Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif;
+  --mono: "IBM Plex Mono", "Pretendard Variable", Pretendard, ui-monospace, monospace;
+  --ease: cubic-bezier(.7, 0, .2, 1);
+  /* 종이 결: 밝은 바탕엔 먹 알갱이, 어두운 바탕엔 흰 알갱이 */
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --grain-on-dark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .045 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  color-scheme: light;
+}
+* { box-sizing: border-box }
+html { scroll-behavior: smooth }
+body { margin: 0; background: var(--grain), var(--paper); color: var(--ink); font: 400 17px/1.7 var(--sans); word-break: keep-all; overflow-wrap: anywhere; -webkit-font-smoothing: antialiased; overflow-x: clip }
+a { color: inherit }
+img { display: block; max-width: 100%; height: auto }
+h1, h2, h3 { margin: 0; font-family: var(--serif); font-weight: 400; letter-spacing: -.012em; line-height: 1.1 }
+p, figure, ul, ol { margin: 0 }
+ul, ol { padding: 0; list-style: none }
+.ic { display: inline-flex; width: 18px; height: 18px; flex: none }
+.mono { font-family: var(--mono); font-size: 12.5px; letter-spacing: .02em; line-height: 1.5; word-spacing: -.3em }
+.grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--g) }
+a:focus-visible, button:focus-visible { outline: 2px solid currentColor; outline-offset: 4px }
+figcaption { margin-top: 10px; color: var(--muted) }
+.dark figcaption { color: var(--on-dark-soft) }
+
+/* 머리 */
+.bar { position: absolute; inset: 0 0 auto; z-index: 5; display: flex; justify-content: space-between; align-items: baseline; padding: 26px var(--m) }
+.bar .mark { font: 600 22px/1 var(--serif); text-decoration: none }
+.bar nav { display: flex; gap: clamp(14px, 2.4vw, 36px); font-weight: 600; font-size: 15px }
+.bar nav a { text-decoration: none; padding: 6px 0; display: inline-flex; gap: 6px; align-items: baseline }
+.bar nav i { font: normal 11px var(--mono); color: var(--muted) }
+.bar nav a:hover span { text-decoration: underline 1px; text-underline-offset: 5px }
+
+/* 첫 화면: 큰 제목 아래 큰 그림 하나, 왼쪽에 작은 그림 하나 */
+.hero { --h1: clamp(46px, 7.4vw, 124px); padding: 128px var(--m) 120px; align-items: start }
+.hero .kick { grid-column: 1 / 10; color: var(--muted); margin-bottom: 22px }
+.hero h1 { grid-column: 1 / 13; grid-row: 2; position: relative; z-index: 2; font-size: var(--h1); font-weight: 250; line-height: 1.1; letter-spacing: -.02em }
+.hero h1 b { font-weight: 700 }
+.cover { grid-column: 6 / 13; grid-row: 3; margin-top: 40px }
+.cover a { display: block; overflow: hidden }
+.cover img { width: 100%; transform: scale(1.08); will-change: transform }
+.cover figcaption { display: flex; justify-content: space-between; gap: 16px }
+.hero .side { grid-column: 1 / 6; grid-row: 3; align-self: stretch; display: flex; flex-direction: column; justify-content: space-between; gap: 40px; padding-top: 40px }
+.lede { font-size: clamp(17px, 1rem + .3vw, 21px); line-height: 1.6; max-width: 25em }
+.act { margin-top: 30px; display: grid; gap: 14px; justify-items: start }
+.btn { display: inline-flex; align-items: center; gap: 12px; min-height: 54px; padding: 0 22px; background: var(--blue); color: #fff; font-weight: 700; font-size: 16px; text-decoration: none; transition: background-color .2s, transform .15s }
+.btn:hover { background: #1f3486 } .btn:active { transform: scale(.98) }
+.btn:focus-visible { outline: 2px solid var(--ink) }
+.note { font-size: 15px; color: var(--muted); max-width: 22em }
+.note b { color: var(--ink); font-weight: 700 }
+.small { width: min(100%, 300px) }
+.small a { display: block; overflow: hidden }
+
+/* 칸 머리 공통 부품 */
+.num { font: 200 clamp(84px, 13vw, 220px)/.78 var(--serif); letter-spacing: -.03em }
+.sec { padding-inline: var(--m) }
+.intro { font-size: 17px; max-width: 26em }
+.dark { background: var(--grain-on-dark), radial-gradient(70% 50% at 18% 0, rgb(255 255 255 / .05), transparent 70%), var(--dark); color: var(--on-dark) }
+.dark .intro, .dark .meta { color: var(--on-dark-soft) }
+.more { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; text-underline-offset: 6px; text-decoration-thickness: 1px }
+
+/* 01 게임·03 프로젝트: 먹색 반전, 큰 그림 위로 제목이 겹친다 */
+.show { padding-top: 140px; padding-bottom: 160px }
+.show .head { align-items: end }
+.show .num { grid-column: 1 / 4 }
+.show h2 { grid-column: 4 / 8; font-size: clamp(44px, 5vw, 84px); font-weight: 500 }
+.show .intro { grid-column: 9 / 13; color: var(--on-dark-soft) }
+.g1 { margin-top: 96px; align-items: end }
+.g1 .art { grid-column: 1 / 8; grid-row: 1 }
+.g1 .txt { grid-column: 8 / 13; grid-row: 1; position: relative; z-index: 2 }
+.g1 h3 { font-size: clamp(56px, 7.6vw, 128px); font-weight: 300; line-height: .95; margin: 0 0 38px }
+.g2 { margin-top: 140px; align-items: center }
+.g2 .art { grid-column: 6 / 12; grid-row: 1 }
+.g2 .txt { grid-column: 2 / 6; grid-row: 1 }
+.g2 h3 { font-size: clamp(36px, 3.8vw, 64px); font-weight: 600 }
+.g2.flip .art { grid-column: 2 / 8 }
+.g2.flip .txt { grid-column: 8 / 12 }
+/* 밝은 스크린샷 위에선 흰 제목이 묻히니 겹치지 않는다 */
+.make .g1 h3 { font-size: clamp(48px, 5.6vw, 96px); margin-left: 0; text-shadow: none }
+.make .g2 h3 { font-size: clamp(36px, 3.6vw, 60px) }
+.show .txt p a { color: var(--on-dark); font-weight: 600; text-underline-offset: 4px }
+.show .art { display: block; overflow: hidden }
+.show .art img { width: 100%; transition: transform .9s cubic-bezier(.2, .7, .2, 1) }
+.show .art:hover img { transform: scale(1.03) }
+.g1 .art[data-par] img, .g1 .art[data-par]:hover img { transform: scale(1.1); transition: none }
+.show .txt p { margin-top: 16px; max-width: 30em }
+.show .meta { margin-top: 18px }
+.show .more { margin-top: 22px }
+
+/* 02 공부: 왼쪽 목차는 붙어 있고, 오른쪽 판이 바뀐다 */
+.study { background: var(--grain), var(--tone); padding-top: 120px; padding-bottom: 120px; align-items: start }
+.study .aside { grid-column: 1 / 5; position: sticky; top: 40px }
+.study .num { font-size: clamp(64px, 7vw, 116px) }
+.study h2 { margin-top: 20px; font-size: clamp(36px, 3.6vw, 60px); font-weight: 500 }
+.study .intro { margin-top: 16px; color: var(--muted); max-width: 20em }
+.tabs { margin-top: 44px; display: grid; justify-items: start }
+.tabs button { display: flex; gap: 14px; align-items: baseline; border: 0; background: none; padding: 9px 0; font: 500 18px/1.3 var(--serif); color: var(--muted); cursor: pointer; text-align: left; transition: color .2s }
+.tabs button i { font: normal 11.5px var(--mono); width: 2.4em }
+.tabs button[aria-selected="true"] { color: var(--ink) }
+.tabs button[aria-selected="true"] span { text-decoration: underline 1px; text-underline-offset: 6px }
+.tabs button:hover { color: var(--ink) }
+.count { margin-top: 28px; color: var(--muted) }
+.count b { color: var(--ink); font-weight: 500 }
+.plates { grid-column: 6 / 13 }
+.js .plate[hidden] { display: none }
+.plate + .plate { margin-top: 96px }
+.plate .pic { display: block; overflow: hidden }
+.plate .pic img { width: 100%; transition: transform .7s cubic-bezier(.2, .7, .2, 1) }
+.plate .pic:hover img { transform: scale(1.02) }
+.plate .body { margin-top: 34px; display: grid; grid-template-columns: 7fr 4fr; gap: 24px var(--g) }
+.plate h3 { font-size: clamp(26px, 2.2vw, 36px); font-weight: 600 }
+.plate .body p { margin-top: 14px; max-width: 30em }
+.plate .sub { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 4px 20px; font-size: 15px }
+.plate .sub a { text-underline-offset: 4px; text-decoration-thickness: 1px }
+.go-list a { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 0; border-top: 1px solid var(--rule); font-weight: 600; text-decoration: none; transition: padding .25s, color .2s }
+.go-list li:last-child a { border-bottom: 1px solid var(--rule) }
+.go-list a:hover { padding-left: 8px; color: var(--blue) }
+
+
+/* 04 기타: 큰 그림 하나 + 작은 목록 */
+.etc { background: var(--grain), var(--tone); padding-top: 120px; padding-bottom: 140px; align-items: end }
+.etc h2 { grid-column: 1 / 6; font-size: clamp(48px, 6vw, 100px); font-weight: 500; display: flex; align-items: flex-start; gap: .25em }
+.etc h2 .mono { font-size: 14px; padding-top: .8em; color: var(--muted) }
+.etc .intro { grid-column: 8 / 12; color: var(--muted) }
+.feat { grid-column: 1 / 7; margin-top: 64px; text-decoration: none; align-self: start }
+.feat .pic { overflow: hidden }
+.feat img { width: 100%; transition: transform .7s cubic-bezier(.2, .7, .2, 1) }
+.feat:hover img { transform: scale(1.02) }
+.feat .label { margin-top: 18px; display: grid; gap: 4px }
+.feat b { font: 500 clamp(24px, 2.2vw, 34px)/1.25 var(--serif) }
+.feat:hover b { text-decoration: underline 1px; text-underline-offset: 6px }
+.rest { grid-column: 8 / 13; margin-top: 64px; align-self: start }
+.rest a { display: grid; grid-template-columns: 42% 1fr; gap: 16px; align-items: center; padding: 18px 0; border-top: 1px solid var(--rule); text-decoration: none }
+.rest li:last-child a { border-bottom: 1px solid var(--rule) }
+.rest img { width: 100%; transition: opacity .2s }
+.rest a:hover img { opacity: .82 }
+.rest b { font: 600 17px/1.35 var(--serif); display: block }
+.rest a:hover b { text-decoration: underline 1px; text-underline-offset: 4px }
+.rest .mono, .feat .mono { color: var(--muted) }
+
+/* 끝 */
+.end { padding: 110px var(--m) 0; overflow: hidden }
+.end ol { grid-column: 1 / 8; font: 400 clamp(24px, 2.4vw, 38px)/1.5 var(--serif) }
+.end ol a { text-decoration: none; display: inline-flex; align-items: baseline; gap: 18px }
+.end ol i { font: normal 12px var(--mono); color: var(--on-dark-soft) }
+.end ol a:hover span { text-decoration: underline 1px; text-underline-offset: 8px }
+.end .side { grid-column: 9 / 13; align-self: end; display: grid; gap: 14px; color: var(--on-dark-soft) }
+.end .side a { color: var(--on-dark); text-underline-offset: 4px }
+.end .word { margin-top: 80px; font: 200 27vw/1 var(--serif); letter-spacing: -.04em; white-space: nowrap; margin-left: -.04em; padding-bottom: clamp(32px, 5vw, 72px) }
+
+/* 움직임: 그림은 위에서 아래로 펼쳐지고, 글은 차례로 오른다. 스크립트가 없으면 그대로 보인다 */
+.js .mask { clip-path: inset(0 0 100% 0); transition: clip-path 1.25s var(--ease) }
+.js .mask.in { clip-path: inset(0 0 0 0) }
+.js .rise { opacity: 0; transform: translateY(18px); transition: opacity .8s ease, transform .8s cubic-bezier(.2, .7, .2, 1); transition-delay: calc(var(--i, 0) * 90ms) }
+.js .rise.in { opacity: 1; transform: none }
+
+@media (max-width: 900px) {
+  .hero .side { grid-column: 1 / 13; grid-row: 4; flex-direction: row; align-items: flex-end; padding-top: 40px }
+  .cover { grid-column: 1 / 13; margin-top: 32px }
+  .hero h1 { font-size: var(--h1) }
+  .show .head { row-gap: 18px }
+  .show .num { grid-column: 1 / 6 } .show h2 { grid-column: 6 / 13 } .show .intro { grid-column: 1 / 13 }
+  .g1 .art, .g2 .art, .g2.flip .art { grid-column: 1 / 13 }
+  .g2.flip .txt { grid-column: 1 / 13 }
+  .g1 .txt, .g2 .txt { grid-column: 1 / 13; grid-row: 2; padding: 0 }
+  .g1 h3 { margin: 28px 0 20px }
+  .make .g1 h3 { margin: 24px 0 0; font-size: clamp(40px, 11vw, 76px) }
+  .g2 h3 { margin-top: 24px }
+  .study .aside { grid-column: 1 / 13; position: static }
+  .plates { grid-column: 1 / 13; margin-top: 40px }
+  .feat, .rest { grid-column: 1 / 13 } .rest { margin-top: 48px }
+  .etc .intro { grid-column: 1 / 13; margin-top: 18px }
+  .etc h2 { grid-column: 1 / 13 }
+  .end ol, .end .side { grid-column: 1 / 13 } .end .side { margin-top: 40px }
+}
+@media (max-width: 640px) {
+  body { font-size: 16px }
+  .bar { padding-top: 20px }
+  .bar nav { gap: 14px; font-size: 14px }
+  .bar nav i { display: none }
+  .hero { --h1: 11.6vw; padding-top: 92px; padding-bottom: 72px }
+  .hero .kick { grid-column: 1 / 13 }
+  .cover { margin-inline: calc(-1 * var(--m)); margin-top: 28px }
+  .cover figcaption { padding-inline: var(--m) }
+  .hero .side { display: block }
+  .hero .side .small { margin-top: 40px; width: 62% ; margin-left: auto }
+  .show { padding-top: 96px; padding-bottom: 110px }
+  .g1 { margin-top: 56px } .g2 { margin-top: 88px }
+  .g1 .art, .g2 .art { margin-inline: calc(-1 * var(--m)) }
+  .g1 h3 { font-size: 18vw }
+  .study { padding-top: 88px; padding-bottom: 88px }
+  .tabs { margin-top: 28px; grid-auto-flow: column; overflow-x: auto; gap: 22px; padding-bottom: 6px; margin-inline: calc(-1 * var(--m)); padding-inline: var(--m); scrollbar-width: none }
+  .tabs button { white-space: nowrap; font-size: 16px }
+  .tabs button i { width: auto }
+  .count { display: none }
+  .plate .body { grid-template-columns: 1fr }
+  .etc { padding-top: 88px; padding-bottom: 96px }
+  .feat { margin-top: 40px; margin-inline: calc(-1 * var(--m)) }
+  .feat .label { padding-inline: var(--m) }
+  .rest a { grid-template-columns: 38% 1fr }
+  .end { padding-top: 80px }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto }
+  .js .mask, .js .rise { clip-path: none; opacity: 1; transform: none; transition: none }
+  .cover img { transform: none }
+  .btn, .go-list a, .show .art img, .plate .pic img, .feat img { transition: none }
+}
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <a class="mark" href="../">창업실</a>
+  <nav aria-label="분류">
+    <a href="#game"><i>01</i><span>게임</span></a><a href="#study"><i>02</i><span>공부</span></a><a href="#make"><i>03</i><span>프로젝트</span></a><a href="#etc"><i>04</i><span>기타</span></a>
+  </nav>
+</header>
+
+<main>
+<section class="hero grid">
+  <p class="kick mono rise">숭실대 AI소프트웨어학부 1학년 — 게임 2 · 공부 5 · 프로젝트 5 · 기타 6</p>
+  <h1 class="rise" style="--i:1">만들면서 <b>배우는</b><br>1학년의 창업실</h1>
+  <figure class="cover">
+    <a class="mask" href="../neokgut/" data-par><img src="../neokgut/img/bg_siwang.webp" alt="넋굿의 구름 위 시왕 관문" width="1200" height="675"></a>
+    <figcaption class="mono"><span>넋굿 — 시왕 관문</span><span>01 게임</span></figcaption>
+  </figure>
+  <div class="side">
+    <div>
+      <p class="lede rise" style="--i:2">노트북 한 대로 만든 게임 도록, 복습 도구, 생활 자동화를 한곳에 모았습니다.</p>
+      <div class="act rise" style="--i:3">
+        <a class="btn" id="today" href="../daily/">오늘 AI 공부 열기 <span class="ic" data-icon="arrow-right" data-size="18">→</span></a>
+        <p class="note" id="todayNote">아침 8시마다 한 주제씩 카톡으로 와요.</p>
+      </div>
+    </div>
+    <figure class="small">
+      <a class="mask" href="../ai-motion/index.html"><img src="../hub/shots/aimotion.webp" alt="AI 3장 탐색 영상 강의 제목 화면" width="1600" height="900"></a>
+      <figcaption class="mono">AI 3장 영상 강의</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="sec show game dark" id="game" aria-labelledby="h-game">
+  <div class="head grid">
+    <span class="num rise" aria-hidden="true">01</span>
+    <h2 id="h-game" class="rise" style="--i:1">게임</h2>
+    <p class="intro rise" style="--i:2">혼자 기획하고 있는 세 편과, 바로 해 볼 수 있는 한 판짜리 퍼즐 데모 둘.</p>
+  </div>
+
+  <article class="g1 grid">
+    <a class="art mask" href="../neokgut/" data-par><img src="../neokgut/img/bg_gate.webp" alt="넋굿의 저승 입구 풍경" width="1600" height="900" loading="lazy"></a>
+    <div class="txt">
+      <h3 class="rise">넋굿</h3>
+      <p class="rise" style="--i:1">부서진 저승길 위에서 구미호 아이가 오행 술법으로 원귀를 풀어 주는 쿼터뷰 액션 로그라이트. 이야기부터 신당까지 열두 거리로 정리했습니다.</p>
+      <p class="meta mono rise" style="--i:2">Unity 6 · 액션 로그라이트 · 1인 개발</p>
+      <a class="more rise" style="--i:3" href="../neokgut/">도록 보기 <span class="ic" data-icon="arrow-right" data-size="18">→</span></a>
+    </div>
+  </article>
+
+  <article class="g2 grid">
+    <a class="art mask" href="../brown-rogue/"><img src="../brown-rogue/img/s_title.webp" alt="브라운 로그 타이틀 화면" width="1280" height="720" loading="lazy"></a>
+    <div class="txt">
+      <h3 class="rise">브라운 로그</h3>
+      <p class="rise" style="--i:1">한·중·일의 영웅 열다섯 중 다섯을 골라 3×4 진형에 세우고, 라운드마다 자리를 옮기며 찢긴 저승 명부를 돌려주러 가는 배치 턴제 RPG. 영웅부터 원정 모드까지 열한 절.</p>
+      <p class="meta mono rise" style="--i:2">Python · pygame-ce · 배치 턴제 RPG · 1인 개발</p>
+      <a class="more rise" style="--i:3" href="../brown-rogue/">도록 보기 <span class="ic" data-icon="arrow-right" data-size="18">→</span></a>
+    </div>
+  </article>
+
+  <article class="g2 flip grid">
+    <a class="art mask" href="../mardi/"><img src="../mardi/img/cover.webp" alt="마디 기획서 첫 화면, 걷는 마네킹의 관절 각도" width="1600" height="688" loading="lazy"></a>
+    <div class="txt">
+      <h3 class="rise">마디</h3>
+      <p class="rise" style="--i:1">관절이 다 보이는 마네킹 하나를 사람처럼 자연스럽게 움직이게 만드는 3D 액션 실험. 도구, 마네킹 설계, 어색함을 재는 법, 단계별 계획과 공부 교재, 사람·게임과 나란히 놓은 움직임 비교표까지.</p>
+      <p class="meta mono rise" style="--i:2">Unity 6 · Blender · Mixamo · 기획 중</p>
+      <a class="more rise" style="--i:3" href="../mardi/">기획서 보기 <span class="ic" data-icon="arrow-right" data-size="18">→</span></a>
+      <a class="more rise" style="--i:4" href="../mardi/?v=study">움직임 비교 <span class="ic" data-icon="arrow-right" data-size="18">→</span></a>
+    </div>
+  </article>
+
+  <article class="g2 grid">
+    <a class="art mask" href="../decal/"><img src="../hub/shots/decal.webp" alt="데칼코마니 판, 가로선으로 접힌 자리에서 보라색 점 짝이 물감처럼 터지는 순간" width="1600" height="900" loading="lazy"></a>
+    <div class="txt">
+      <h3 class="rise">데칼코마니</h3>
+      <p class="rise" style="--i:1">선을 하나 그어 판을 반으로 접으면, 똑같이 겹치는 색 점이 짝으로 터지는 2분 퍼즐. 빗나가면 3초가 깎이고, 한 번에 많이 겹칠수록 점수가 크게 뜁니다. 40초마다 점수가 ×2, ×3으로 뛰고, 쉬움은 판 끝까지, 보통은 그은 만큼만 접힙니다.</p>
+      <p class="meta mono rise" style="--i:2">HTML 캔버스 · 2분 퍼즐 · 데모</p>
+      <a class="more rise" style="--i:3" href="../decal/">바로 하기 <span class="ic" data-icon="arrow-right" data-size="18">→</span></a>
+    </div>
+  </article>
+
+  <article class="g2 flip grid">
+    <a class="art mask" href="../stamp/"><img src="../hub/shots/stamp.webp" alt="뒤집기 도장 판, 파란 도장을 대자 빨간 칸 하나가 물들며 한 줄이 지워질 자리로 밝게 표시된 모습" width="1600" height="900" loading="lazy"></a>
+    <div class="txt">
+      <h3 class="rise">뒤집기 도장</h3>
+      <p class="rise" style="--i:1">파랑·빨강 도장을 다른 색 위에 덧찍으면 내 색으로 뒤집히는 퍼즐. 한 줄을 한 색으로 채우면 지워지고, 같은 색 위엔 못 찍어서 판이 막히면 끝납니다.</p>
+      <p class="meta mono rise" style="--i:2">HTML 캔버스 · 배치 퍼즐 · 데모</p>
+      <a class="more rise" style="--i:3" href="../stamp/">바로 하기 <span class="ic" data-icon="arrow-right" data-size="18">→</span></a>
+    </div>
+  </article>
+</section>
+
+<section class="sec study grid" id="study" aria-labelledby="h-study">
+  <div class="aside">
+    <span class="num rise" aria-hidden="true">02</span>
+    <h2 id="h-study" class="rise" style="--i:1">공부</h2>
+    <p class="intro rise" style="--i:2">1학년 2학기 수업을 복습하려고 만든 도구들.</p>
+    <div class="tabs" role="tablist" aria-label="공부 도구" aria-orientation="vertical" hidden></div>
+    <p class="count mono" aria-hidden="true" hidden></p>
+  </div>
+
+  <div class="plates">
+    <article class="plate" data-tab="토론 보충질의">
+      <a class="pic mask" href="../debate/"><img src="../hub/shots/debate.webp" alt="AI 시대 대학 토론 보충질의 첫 화면" width="1280" height="800" loading="lazy"></a>
+      <div class="body">
+        <div><h3>AI 시대의 대학, 토론 보충질의 <span class="mono" style="color:var(--muted);vertical-align:middle">잠금</span></h3>
+          <p>긍정측 보충질의 준비. 부정측 입론 시나리오 8개와 우리 입론을 공격하는 반박 4개. 상대가 어떤 연구를 들고 와도 쓸 수 있는 예/아니오 질문과, 답이 갈릴 때 이어 쓸 말.</p></div>
+        <ul class="go-list"><li><a href="../debate/">전체 보기 <span class="ic" data-icon="arrow-right">→</span></a></li><li><a href="../debate/f.html">가장 센 질문 <span class="ic" data-icon="arrow-right">→</span></a></li></ul>
+      </div>
+    </article>
+    <article class="plate" data-tab="C언어 노트">
+      <a class="pic mask" href="../study.html#notes"><img src="../hub/shots/study.webp" alt="C언어 복습 노트 첫 화면" width="1280" height="800" loading="lazy"></a>
+      <div class="body">
+        <div><h3>프로그래밍기초 복습 노트</h3>
+          <p>C언어 2~9장. 자료형부터 재귀까지 강의 정리, 객관식 퀴즈, 한 줄 코드 작성, 틀린 문제만 다시 푸는 오답노트를 한 화면에.</p></div>
+        <ul class="go-list"><li><a href="../study.html#notes">강의 정리 <span class="ic" data-icon="arrow-right">→</span></a></li><li><a href="../study.html#quiz">퀴즈 풀기 <span class="ic" data-icon="arrow-right">→</span></a></li></ul>
+      </div>
+    </article>
+    <article class="plate" data-tab="인공지능 입문">
+      <a class="pic mask" href="../ai.html"><img src="../hub/shots/ai.webp" alt="인공지능 입문 복습 노트 첫 화면" width="1280" height="800" loading="lazy"></a>
+      <div class="body">
+        <div><h3>인공지능 입문 복습 노트 <span class="mono" style="color:var(--muted);vertical-align:middle">잠금</span></h3>
+          <p>1~6장. AI의 역사, 지능형 에이전트, 탐색, 복잡한 환경의 탐색, 제약 충족 문제, 게임 트리. 원본 강의안과 수업 녹음 정리, 중간고사 정리까지.</p></div>
+        <ul class="go-list"><li><a href="../ai.html">노트 열기 <span class="ic" data-icon="arrow-right">→</span></a></li><li><a href="../ai-motion/index.html">3장 영상 강의 <span class="ic" data-icon="arrow-right">→</span></a></li></ul>
+      </div>
+    </article>
+    <article class="plate" data-tab="매일 AI 공부">
+      <a class="pic mask" href="../daily/"><img src="../hub/shots/daily.webp" alt="매일 AI 공부 레슨 화면" width="1280" height="800" loading="lazy"></a>
+      <div class="body">
+        <div><h3>매일 AI 공부</h3>
+          <p>아침 8시 카톡으로 오는 하루 한 주제. 컴퓨터 기초부터 AI학과 전공 기초까지 차례대로, 어제 배운 걸 묻는 퀴즈와 용어 사전이 붙어 있어요.</p></div>
+        <ul class="go-list"><li><a href="../daily/">레슨 목록 <span class="ic" data-icon="arrow-right">→</span></a></li><li><a href="../daily/?t">용어 사전 <span class="ic" data-icon="arrow-right">→</span></a></li></ul>
+      </div>
+    </article>
+    <article class="plate" data-tab="영상 강의">
+      <a class="pic mask" href="../motion/index.html"><img src="../hub/shots/motion.webp" alt="C 프로그래밍 기초 모션 강의 제목 화면" width="1600" height="900" loading="lazy"></a>
+      <div class="body">
+        <div><h3>움직이는 그림으로 보는 강의</h3>
+          <p>글로만 보면 헷갈리는 장을 움직이는 그림과 목소리로 다시 설명한 영상들.</p>
+          <p class="sub"><a href="../ai-motion5/index.html">AI 5장 제약 충족 문제</a><a href="../hanoi/index.html">하노이의 탑 실행 추적</a></p></div>
+        <ul class="go-list"><li><a href="../motion/index.html">C언어 2~9장 <span class="ic" data-icon="arrow-right">→</span></a></li><li><a href="../ai-motion/index.html">AI 3장 탐색 <span class="ic" data-icon="arrow-right">→</span></a></li></ul>
+      </div>
+    </article>
+    <article class="plate" data-tab="성서 답안">
+      <a class="pic mask" href="../human-bible/"><img src="../hub/shots/bible.webp" alt="인간과 성서 서술형 답안 첫 화면" width="1280" height="800" loading="lazy"></a>
+      <div class="body">
+        <div><h3>인간과 성서 서술형 답안 <span class="mono" style="color:var(--muted);vertical-align:middle">잠금</span></h3>
+          <p>그리스와 기독교의 인간관, 구한말 기독교와 근대화, 혐오와 그 해결. 교재 쪽수를 근거로 쓴 글을 내 말투, 교재 정리본, 외우기용으로 나눠 봅니다.</p></div>
+        <ul class="go-list"><li><a href="../human-bible/">답안 보기 <span class="ic" data-icon="arrow-right">→</span></a></li></ul>
+      </div>
+    </article>
+    <article class="plate" data-tab="박물관 감상문">
+      <a class="pic mask" href="../museum/"><img src="../hub/shots/museum.webp" alt="한국기독교박물관 감상문 첫 화면" width="1280" height="800" loading="lazy"></a>
+      <div class="body">
+        <div><h3>한국기독교박물관 감상문 <span class="mono" style="color:var(--muted);vertical-align:middle">잠금</span></h3>
+          <p>숭실대 한국기독교박물관 1층 한국기독교역사실을 중심으로, 통일신라 경교부터 일제강점기 교회까지 우리 역사 속 기독교를 따라간 감상문.</p></div>
+        <ul class="go-list"><li><a href="../museum/">감상문 보기 <span class="ic" data-icon="arrow-right">→</span></a></li></ul>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section class="sec show make dark" id="make" aria-labelledby="h-make">
+  <div class="head grid">
+    <span class="num rise" aria-hidden="true">03</span>
+    <h2 id="h-make" class="rise" style="--i:1">프로젝트</h2>
+    <p class="intro rise" style="--i:2">수업 팀 과제와, 생활에서 불편했던 걸 직접 고친 것들.</p>
+  </div>
+
+  <article class="g2 grid">
+    <a class="art mask" href="../urigil/"><img src="../hub/shots/urigil.webp" alt="우리길 데이트 코스와 지도 화면" width="1280" height="800" loading="lazy"></a>
+    <div class="txt">
+      <h3 class="rise">우리길</h3>
+      <p class="rise" style="--i:1">날짜와 몇 시부터 몇 시까지만 고르면 서울 데이트 코스를 알아서 짜 주는 앱. 카카오맵 별점·네이버 블로그 최근 후기·유튜브·인스타를 같이 보고 광고 의심은 걸러 고른 동네 맛집·카페·놀거리를, 날씨와 해 지는 시각에 맞춰 실제 지도 위 동선으로 이어 줘요. 만나는 역부터 한눈에.</p>
+      <p class="meta mono rise" style="--i:2">PWA · 카카오맵 · Firebase · 후기 데이터로 코스 짜기</p>
+      <a class="more rise" style="--i:3" href="../urigil/">열어 보기 <span class="ic" data-icon="arrow-right" data-size="18">→</span></a>
+    </div>
+  </article>
+
+  <article class="g1 grid">
+    <a class="art mask" href="../uridal/"><img src="../hub/shots/uridal.webp" alt="우리달 달력·하고 싶은 것·기념일 화면" width="1280" height="800" loading="lazy"></a>
+    <div class="txt">
+      <h3 class="rise">우리달</h3>
+      <p class="rise" style="--i:1">여자친구랑 같이 쓰는 달력 앱. 둘의 일정이 색으로 나뉘고, 날마다 기분 한 줄, 가고 싶은 곳 목록, 100일·주년 D-day까지. 휴대폰 홈 화면에 앱처럼 설치해요.</p>
+      <p class="meta mono rise" style="--i:2">PWA · Firebase · 함께 쓰는 달력</p>
+      <a class="more rise" style="--i:3" href="../uridal/">열어 보기 <span class="ic" data-icon="arrow-right" data-size="18">→</span></a>
+    </div>
+  </article>
+
+  <article class="g2 grid">
+    <a class="art mask" href="../lms/"><img src="../hub/shots/lmsalert.webp" alt="LMS 할 일·마감 알림" width="1280" height="800" loading="lazy"></a>
+    <div class="txt">
+      <h3 class="rise">LMS 할 일·알림</h3>
+      <p class="rise" style="--i:1">숭실대 LMS에서 아직 안 한 과제·영상·공지만 마감 순으로 모아 체크하며 지우고, 아침 8시엔 휴대폰으로, 노트북을 켜면 화면으로 알려 줘요. 신청할 수 있는 비교과도 함께. <a href="../lms-alert/">알림 설명</a></p>
+      <p class="meta mono rise" style="--i:2">Python · Canvas API · 생활 자동화 · 잠금</p>
+      <a class="more rise" style="--i:3" href="../lms/">할 일 목록 <span class="ic" data-icon="arrow-right" data-size="18">→</span></a>
+    </div>
+  </article>
+
+  <article class="g1 grid">
+    <a class="art mask" href="../secure-msg/guide/"><img src="../hub/shots/dulmi.webp" alt="덜미 설명서 첫 화면" width="1280" height="800" loading="lazy"></a>
+    <div class="txt">
+      <h3 class="rise">덜미</h3>
+      <p class="rise" style="--i:1">프밍기2 팀 과제. 방장도 못 믿는 C 메신저 — 몰래 들어온 사람, 사람마다 다른 대화, 화면 앞 휴대폰, 새어 나간 캡처까지 덜미를 잡는다.</p>
+      <p class="meta mono rise" style="--i:2">C · 암호화 메신저 · 팀 과제</p>
+      <a class="more rise" style="--i:3" href="../secure-msg/guide/">설명서 보기 <span class="ic" data-icon="arrow-right" data-size="18">→</span></a>
+      <a class="more rise" style="--i:4" href="../secure-msg/plan/">계획 <span class="ic" data-icon="arrow-right" data-size="18">→</span></a>
+      <a class="more rise" style="--i:5" href="../secure-msg/code/">전체 코드 <span class="ic" data-icon="arrow-right" data-size="18">→</span></a>
+      <a class="more rise" style="--i:6" href="../secure-msg/run/">시작하기 <span class="ic" data-icon="arrow-right" data-size="18">→</span></a>
+      <a class="more rise" style="--i:7" href="../secure-msg/log/">작업 기록 <span class="ic" data-icon="arrow-right" data-size="18">→</span></a>
+    </div>
+  </article>
+
+  <article class="g2 grid">
+    <a class="art mask" href="../sulsul/"><img src="../hub/shots/sulsul.webp" alt="술술 기획서 첫 화면, 마이크 사진 위로 술술 글자가 흘러가는 모습" width="1200" height="630" loading="lazy"></a>
+    <div class="txt">
+      <h3 class="rise">술술</h3>
+      <p class="rise" style="--i:1">듀오링고처럼 스테이지를 깨며 배우는 영어 말하기. AI 상대와 3분 대화하면 막힌 말을 모아 다음 날 복습시켜요.</p>
+      <p class="meta mono rise" style="--i:2">영어 말하기 · Gemini 무료 키</p>
+      <a class="more rise" style="--i:3" href="../sulsul/">써 보기 <span class="ic" data-icon="arrow-right" data-size="18">→</span></a>
+      <a class="more rise" style="--i:4" href="../sulsul/plan/">기획서 <span class="ic" data-icon="arrow-right" data-size="18">→</span></a>
+    </div>
+  </article>
+
+  <article class="g2 flip grid">
+    <a class="art mask" href="../jobmap/"><img src="../hub/shots/jobmap-cover.webp" alt="학과 진로 지도 첫 장" width="1200" height="630" loading="lazy"></a>
+    <div class="txt">
+      <h3 class="rise">학과 진로 지도</h3>
+      <p class="rise" style="--i:1">한 문항씩 넘기는 101문항 진로 검사로 흥미가 겹치는 직무, 준비 상태, 이번 학기 할 일을 보여 줘요.</p>
+      <p class="meta mono rise" style="--i:2">101문항 · 진로 검사</p>
+      <a class="more rise" style="--i:3" href="../jobmap/">검사 해 보기 <span class="ic" data-icon="arrow-right" data-size="18">→</span></a>
+    </div>
+  </article>
+
+  <article class="g2 grid">
+    <a class="art mask" href="../ffb-wheel/"><img src="../hub/shots/ffb-cover.webp" alt="포스 피드백 레이싱 휠 발표 첫 장" width="1280" height="721" loading="lazy"></a>
+    <div class="txt">
+      <h3 class="rise">레이싱 휠</h3>
+      <p class="rise" style="--i:1">창공설 팀, 아두이노로 만드는 포스 피드백 레이싱 휠. 발표 자료와 <a href="../ffb-wheel/sim/">3D 설계도</a>, <a href="../ffb-wheel/srs-review/">SRS 첨삭</a>.</p>
+      <p class="meta mono rise" style="--i:2">Arduino · 팀 과제</p>
+      <a class="more rise" style="--i:3" href="../ffb-wheel/">발표 보기 <span class="ic" data-icon="arrow-right" data-size="18">→</span></a>
+    </div>
+  </article>
+
+  <article class="g2 flip grid">
+    <a class="art mask" href="../ffb-wheel/parts/"><img src="../hub/shots/ffb-parts.webp" alt="레이싱 휠 주차별 파트 분배 첫 화면" width="1280" height="800" loading="lazy"></a>
+    <div class="txt">
+      <h3 class="rise">주차별 파트 분배</h3>
+      <p class="rise" style="--i:1">레이싱 휠 팀의 10~14주차 계획. 주차마다 기구·HW·SW·<span style="white-space:nowrap">기획/테스트</span>가 맡을 일을 카드로, 15주차 전시회까지.</p>
+      <p class="meta mono rise" style="--i:2">창공설 · 팀 과제 · 역할 분담</p>
+      <a class="more rise" style="--i:3" href="../ffb-wheel/parts/">분배 보기 <span class="ic" data-icon="arrow-right" data-size="18">→</span></a>
+    </div>
+  </article>
+
+  <article class="g2 grid">
+    <a class="art mask" href="../ffb-wheel/3d/"><img src="../hub/shots/ffb-pedal.webp" alt="집성목으로 만든 액셀 페달 3D 모델과 부품 이름표" width="1280" height="800" loading="lazy"></a>
+    <div class="txt">
+      <h3 class="rise">레이싱 휠 3D</h3>
+      <p class="rise" style="--i:1">휠 베이스와 액셀 페달을 한 페이지에서 탭으로 바꿔 봐요. 휠 베이스는 우리가 산 부품 실제 치수로, 페달은 모르는 치수를 ?로 두고 직접 넣으면 모델과 검사가 바로 바뀌어요.</p>
+      <p class="meta mono rise" style="--i:2">창공설 · 3D · 자르기 도면</p>
+      <a class="more rise" style="--i:3" href="../ffb-wheel/3d/">휠 베이스 <span class="ic" data-icon="arrow-right" data-size="18">→</span></a>
+      <a class="more rise" style="--i:4" href="../ffb-wheel/3d/?v=pedal">액셀 페달 <span class="ic" data-icon="arrow-right" data-size="18">→</span></a>
+    </div>
+  </article>
+
+  <article class="g2 flip grid">
+    <a class="art mask" href="../ffb-report/"><img src="../hub/shots/ffb-report.webp" alt="창공설 주차 보고서 첫 화면(흐리게)" width="1280" height="800" loading="lazy"></a>
+    <div class="txt">
+      <h3 class="rise">주차 보고서</h3>
+      <p class="rise" style="--i:1">10주차부터 매주 내는 개별 보고서 초안. 수정 버튼으로 직접 고치고, 고친 글로 PDF를 내보내요.</p>
+      <p class="meta mono rise" style="--i:2">창공설 · 개별 과제 · 잠금</p>
+      <a class="more rise" style="--i:3" href="../ffb-report/">보고서 보기 <span class="ic" data-icon="arrow-right" data-size="18">→</span></a>
+    </div>
+  </article>
+</section>
+
+<section class="sec etc grid" id="etc" aria-labelledby="h-etc">
+  <h2 id="h-etc" class="rise"><span class="mono" aria-hidden="true">04</span>기타</h2>
+  <p class="intro rise" style="--i:1">진로 고민, 학교 제도 조사, 노트북 관리처럼 그때그때 정리한 것들.</p>
+  <a class="feat" href="../free-claude-code/">
+    <span class="pic mask" style="display:block"><img src="../hub/shots/fcc.webp" alt="무료 모델 Claude Code 안내 첫 화면" width="1280" height="800" loading="lazy"></span>
+    <span class="label"><span class="mono">10.31 · 도구 설정</span><b>무료 모델 Claude Code</b></span>
+  </a>
+  <ul class="rest">
+    <li class="rise"><a href="../board/"><img src="../hub/shots/board.webp" alt="자유게시판 첫 화면" width="1280" height="800" loading="lazy"><span><span class="mono">11.05 · 누구나 글쓰기</span><b>자유게시판</b></span></a></li>
+    <li class="rise"><a href="../web-motion/"><img src="../hub/shots/webmotion.webp" alt="움직이는 웹사이트 정리의 3D 캔 데모" width="1280" height="800" loading="lazy"><span><span class="mono">11.04 · 조사 + 데모</span><b>움직이는 웹사이트</b></span></a></li>
+    <li class="rise"><a href="../drafts/"><img src="../drafts/shots/a.webp" alt="첫 화면 시안 모음" width="1440" height="900" loading="lazy"><span><span class="mono">11.01 · 디자인</span><b>첫 화면 시안</b></span></a></li>
+    <li class="rise" style="--i:1"><a href="../storage/"><img src="../hub/shots/storage.webp" alt="노트북 저장공간 정리 첫 화면" width="1280" height="800" loading="lazy"><span><span class="mono">11.03 · 정리 제안 · 잠금</span><b>노트북 저장공간 정리</b></span></a></li>
+    <li class="rise" style="--i:1"><a href="../career/"><img src="../hub/shots/career.webp" alt="나의 적성과 취업 방향 첫 화면" width="1280" height="800" loading="lazy"><span><span class="mono">10.29 · 진로 · 잠금</span><b>나의 적성과 취업 방향</b></span></a></li>
+    <li class="rise" style="--i:2"><a href="../career/portfolio.html"><img src="../hub/shots/portfolio.webp" alt="포트폴리오 설계 첫 화면" width="1280" height="800" loading="lazy"><span><span class="mono">10.29 · 진로 · 잠금</span><b>포트폴리오 설계</b></span></a></li>
+    <li class="rise" style="--i:3"><a href="../internship/"><img src="../hub/shots/intern.webp" alt="표준 현장실습학기제 정리 첫 화면" width="1280" height="800" loading="lazy"><span><span class="mono">10.29 · 조사 정리</span><b>표준 현장실습학기제 한눈에</b></span></a></li>
+  </ul>
+</section>
+</main>
+
+<footer class="end dark">
+  <div class="grid">
+    <ol>
+      <li><a href="#game"><i>01</i><span>게임 도록 두 편</span></a></li>
+      <li><a href="#study"><i>02</i><span>공부 도구 다섯 가지</span></a></li>
+      <li><a href="#make"><i>03</i><span>프로젝트 여덟</span></a></li>
+      <li><a href="#etc"><i>04</i><span>그때그때 정리 여덟</span></a></li>
+    </ol>
+    <div class="side">
+      <p>새 작업이 생기면 칸에 하나씩 더합니다.</p>
+      <p><a href="#top" onclick="window.scrollTo({top:0,behavior:'smooth'});return false">맨 위로</a></p>
+    </div>
+  </div>
+  <p class="word" aria-hidden="true">창업실</p>
+</footer>
+
+<script>
+const $ = s => document.querySelector(s);
+const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const unfold = el => calm || el.animate([{ clipPath: "inset(0 0 100% 0)" }, { clipPath: "inset(0 0 0 0)" }], { duration: 750, easing: "cubic-bezier(.7,0,.2,1)" });
+
+// 오늘 공부할 차례: 매일 AI 공부의 완료 기록에서 아직 안 끝낸 첫 레슨
+Promise.all([
+  fetch("../daily/lessons.json").then(r => r.json()),
+  fetch("https://script.google.com/macros/s/AKfycbxhsQA5ijXl4AtQ4kECjZCs0ZXeBAfJqVousGYJ6lEV7aZ7Saqxi8WFoAqleaTsxaTM/exec").then(r => r.json()).catch(() => ({ done: [] }))
+]).then(([data, j]) => {
+  const done = new Set(j.done || []), L = data.lessons, x = L.find(l => !done.has(l.id));
+  const btn = $("#today"), note = $("#todayNote");
+  if (!x) { note.innerHTML = `준비된 <b>${L.length}개</b>를 모두 끝냈어요.`; return; }
+  btn.href = "../daily/?d=" + x.id;
+  btn.firstChild.textContent = `D${x.id} 공부하기 `;
+  note.innerHTML = `오늘 차례: <b>${x.title}</b><br>${L.length}개 중 ${done.size}개 끝냄`;
+}).catch(() => {});
+
+// 공부 칸: 왼쪽 목차로 판을 한 장씩
+const plates = [...document.querySelectorAll(".plate")], tabs = $(".tabs"), count = $(".count");
+const two = n => String(n).padStart(2, "0");
+plates.forEach((p, i) => {
+  const b = document.createElement("button");
+  b.type = "button"; b.role = "tab"; b.id = "t" + i;
+  b.innerHTML = `<i>${two(i + 1)}</i><span>${p.dataset.tab}</span>`;
+  p.id = "p" + i; p.setAttribute("role", "tabpanel"); p.setAttribute("aria-labelledby", b.id); b.setAttribute("aria-controls", p.id);
+  b.onclick = () => show(i, true);
+  tabs.append(b);
+});
+tabs.hidden = count.hidden = false;
+tabs.addEventListener("keydown", e => {
+  const k = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key]; if (!k) return;
+  e.preventDefault();
+  const i = (plates.findIndex(p => !p.hidden) + k + plates.length) % plates.length; show(i, true); tabs.children[i].focus();
+});
+function show(i, anim) {
+  plates.forEach((p, j) => { p.hidden = i !== j; tabs.children[j].setAttribute("aria-selected", i === j); tabs.children[j].tabIndex = i === j ? 0 : -1; });
+  count.innerHTML = `<b>${two(i + 1)}</b> / ${two(plates.length)}`;
+  if (anim) { const pic = plates[i].querySelector(".pic"); pic.classList.add("in"); unfold(pic); }
+}
+show(0);
+
+// 화면에 들어오면: 그림은 펼쳐지고 글은 차례로 오른다
+const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { rootMargin: "0px 0px -8% 0px" });
+document.querySelectorAll(".rise, .mask").forEach(el => io.observe(el));
+
+// 큰 그림 두 장만 은은하게 늦게 따라온다
+const par = [...document.querySelectorAll("[data-par] img")];
+if (!calm && par.length) {
+  let ticking = false;
+  const move = () => {
+    ticking = false;
+    const h = innerHeight;
+    par.forEach(img => {
+      const r = img.parentNode.getBoundingClientRect();
+      if (r.bottom < 0 || r.top > h) return;
+      const t = (r.top + r.height / 2 - h / 2) / h;
+      img.style.transform = `translateY(${(t * -5).toFixed(2)}%) scale(1.1)`;
+    });
+  };
+  addEventListener("scroll", () => { if (!ticking) { ticking = true; requestAnimationFrame(move); } }, { passive: true });
+  move();
+}
+</script>
+</body>
+</html>
