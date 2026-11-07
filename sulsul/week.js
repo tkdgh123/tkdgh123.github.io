@@ -15,6 +15,10 @@ const ART = {
   movie: { img: "img/scenes/movie.webp", layers: { w: 2752, h: 1536, box: [1263, 335, 344, 498], body: "img/scenes/movie/body.png" } },
   park: { img: "img/scenes/park.webp", layers: { w: 2752, h: 1536, box: [1199, 215, 398, 972], body: "img/scenes/park/body.png", breath: 1.008 } },
   home: { img: "img/scenes/home.webp", layers: { w: 2752, h: 1536, box: [1010, 215, 734, 1321], body: "img/scenes/home/body.png", breath: 1.008 } },
+  class: { img: "img/scenes/class.webp", layers: { w: 2752, h: 1536, box: [1419, 360, 339, 733], body: "img/scenes/class/body.png" } },
+  foodtruck: { img: "img/scenes/foodtruck.webp", layers: { w: 2752, h: 1536, box: [1199, 376, 372, 371], body: "img/scenes/foodtruck/body.png" } },
+  team: { img: "img/scenes/team.webp", layers: { w: 2752, h: 1536, box: [1128, 432, 472, 425], body: "img/scenes/team/body.png" } },
+  gym: { img: "img/scenes/gym.webp", layers: { w: 2752, h: 1536, box: [1204, 319, 344, 508], body: "img/scenes/gym/body.png" } },
   // ART:END
 };
 const THANKS = [["고마움", ["thank", "thanks", "appreciate"]]];
@@ -204,7 +208,7 @@ const HOME = {
   ]
 };
 const CLASS = {
-  who: "Mr. Brown", whoKo: "어학원 선생님", voices: { them: "m", guest: "f2" }, guestKo: "다른 학생",
+  who: "Mr. Brown", whoKo: "어학원 선생님", pos: "58% 50%", voices: { them: "m", guest: "f2" }, guestKo: "다른 학생",
   turns: [
     { say: "Good morning! Are you new here?", want: "네, 오늘이 첫날이라고 하기", need: [["첫날", ["first day", "first class", "new"]]], hint: ["Yes, it's my ~ day.", "Yes, it's my first…", "Yes, it's my first day."], model: "Yes, it's my first day." },
     { say: "Welcome! We'll start with page twelve. Am I talking too fast?", want: "조금만 더 천천히 말해 달라고 하기", need: [["천천히", ["slowly", "slow", "slower"]]], hint: ["Could you speak a little more ~?", "Could you speak…", "Could you speak a little more slowly?"], model: "Could you speak a little more slowly?", chunk: ["a little more slowly", "조금 더 천천히", "못 알아들었을 때 부탁하는 말이에요."] },
