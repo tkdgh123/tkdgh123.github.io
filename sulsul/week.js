@@ -7,6 +7,10 @@ const ART = {
   shop: { img: "img/scenes/shop.webp", layers: { w: 2752, h: 1536, box: [1349, 282, 469, 618], body: "img/scenes/shop/body.png" } },
   salon: { img: "img/scenes/salon.webp", layers: { w: 2752, h: 1536, box: [1672, 279, 505, 1026], body: "img/scenes/salon/body.png", breath: 1.008 } },
   photo: { img: "img/scenes/photo.webp", layers: { w: 2752, h: 1536, box: [1107, 298, 525, 1238], body: "img/scenes/photo/body.png", breath: 1.008 } },
+  lost: { img: "img/scenes/lost.webp", layers: { w: 2752, h: 1536, box: [1421, 309, 331, 548], body: "img/scenes/lost/body.png" } },
+  wrong: { img: "img/scenes/wrong.webp", layers: { w: 2752, h: 1536, box: [1513, 96, 605, 1091], body: "img/scenes/wrong/body.png", breath: 1.008 } },
+  room: { img: "img/scenes/room.webp", layers: { w: 2752, h: 1536, box: [1387, 266, 430, 953], body: "img/scenes/room/body.png", breath: 1.008 } },
+  clinic: { img: "img/scenes/clinic.webp", layers: { w: 2752, h: 1536, box: [1438, 282, 387, 596], body: "img/scenes/clinic/body.png" } },
   // ART:END
 };
 const THANKS = [["고마움", ["thank", "thanks", "appreciate"]]];
@@ -74,7 +78,7 @@ const PHOTO = {
   ]
 };
 const LOST = {
-  who: "Rosa", whoKo: "분실물 센터 직원", voices: { them: "f2", guest: "m2" }, guestKo: "다른 사람",
+  who: "Rosa", whoKo: "분실물 센터 직원", pos: "58% 50%", voices: { them: "f2", guest: "m2" }, guestKo: "다른 사람",
   turns: [
     { say: "Good morning. What can I do for you?", want: "어제 지하철에서 가방을 잃어버렸다고 하기", need: [["잃어버림", ["lost", "left", "lose"]], ["가방", ["bag", "backpack"]]], hint: ["I lost my ~ on the subway.", "I lost my bag…", "I lost my bag on the subway yesterday."], model: "I lost my bag on the subway yesterday." },
     { say: "I'm sorry to hear that. What does it look like?", want: "작은 검은 배낭이라고 말하기", need: [["검은색", ["black"]]], hint: ["It's a small ~ backpack.", "It's a small black…", "It's a small black backpack."], model: "It's a small black backpack.", chunk: ["What does it look like?", "어떻게 생겼어요?", "모양·색을 물을 때 쓰는 질문이에요."] },
@@ -89,7 +93,7 @@ const LOST = {
   ]
 };
 const WRONG = {
-  who: "Kevin", whoKo: "식당 직원", voices: { them: "m", guest: "f" }, guestKo: "옆 테이블 손님",
+  who: "Kevin", whoKo: "식당 직원", pos: "66% 50%", voices: { them: "m", guest: "f" }, guestKo: "옆 테이블 손님",
   turns: [
     { say: "Here's your burger. Enjoy!", want: "이거 안 시켰다고 말하기", need: [["안 시킴", ["didn't order", "didnt order", "did not order", "not what i ordered", "wrong", "not mine"]]], hint: ["Sorry, I didn't ~ this.", "Sorry, I didn't order…", "Sorry, I didn't order this."], model: "Sorry, I didn't order this.", chunk: ["I didn't order this", "이거 안 시켰어요", "화내지 않고 실수를 알려 주는 말이에요."] },
     { say: "Oh, I'm so sorry! What did you order?", want: "치킨 샐러드 시켰다고 하기", need: [["샐러드", ["salad"]]], hint: ["I ordered the ~.", "I ordered the chicken…", "I ordered the chicken salad."], model: "I ordered the chicken salad." },
@@ -104,7 +108,7 @@ const WRONG = {
   ]
 };
 const ROOM = {
-  who: "Mike", whoKo: "호텔 직원", voices: { them: "m2", guest: "f" }, guestKo: "옆방 손님",
+  who: "Mike", whoKo: "호텔 직원", pos: "58% 50%", voices: { them: "m2", guest: "f" }, guestKo: "옆방 손님",
   turns: [
     { say: "Hi, you called the front desk?", want: "에어컨이 안 된다고 말하기", need: [["에어컨", ["air conditioner", "air conditioning", "ac", "a c", "aircon"]], ["안 됨", ["not working", "doesn't work", "doesnt work", "isn't working", "isnt working", "broken", "won't", "wont"]]], hint: ["The air conditioner isn't ~.", "The air conditioner isn't…", "The air conditioner isn't working."], model: "The air conditioner isn't working.", chunk: ["isn't working", "작동이 안 돼요", "고장 났다고 할 때 broken보다 자주 써요."] },
     { say: "Let me take a look. Hmm, it might take an hour to fix.", want: "다른 방으로 옮길 수 있냐고 묻기", need: [["방 옮기기", ["another room", "different room", "change rooms", "change my room", "move", "switch rooms", "new room"]]], hint: ["Could I ~ to another room?", "Could I move to…", "Could I move to another room?"], model: "Could I move to another room?" },
@@ -119,7 +123,7 @@ const ROOM = {
   ]
 };
 const CLINIC = {
-  who: "Nora", whoKo: "병원 접수 직원", voices: { them: "f", guest: "m" }, guestKo: "다른 환자",
+  who: "Nora", whoKo: "병원 접수 직원", pos: "59% 50%", voices: { them: "f", guest: "m" }, guestKo: "다른 환자",
   turns: [
     { say: "Hi, do you have an appointment?", want: "예약은 없는데 오늘 진료 볼 수 있냐고 묻기", need: [["진료", ["see a doctor", "see the doctor", "doctor"]]], hint: ["No. Can I see a ~ today?", "No. Can I see a doctor…", "No. Can I see a doctor today?"], model: "No. Can I see a doctor today?", chunk: ["see a doctor", "진료를 받다", "병원에 간다는 말을 이렇게 해요."] },
     { say: "Let me check. What seems to be the problem?", want: "열이 나고 기침을 한다고 말하기", need: [["열·기침", ["fever", "cough", "coughing"]]], hint: ["I have a ~ and a cough.", "I have a fever…", "I have a fever and a cough."], model: "I have a fever and a cough.", chunk: ["What seems to be the problem?", "어디가 불편하세요?", "병원에서 가장 먼저 듣는 질문이에요."] },
