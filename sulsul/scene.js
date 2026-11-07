@@ -119,7 +119,7 @@ const PHARMACY = {
     { say: "Okay. Take two of these every six hours.", want: "밥 먹고 먹어야 하는지 묻기", need: [["식후", ["after", "meal", "meals", "food", "eat", "eating"]]], hint: ["Should I take them ~ meals?", "Should I take them…", "Should I take them after meals?"], model: "Should I take them after meals?" }
   ],
   overhear: [
-    ["guest", "Do you have something for a sore throat?", [["something for ~", "~에 먹는 약", "약 이름을 몰라도 이렇게 물으면 돼요."], ["sore throat", "목 아픔", "목이 따끔따끔 아플 때 써요."]]],
+    ["guest", "Do you have something for a sore throat?", [["something for", "~에 먹는 약", "약 이름을 몰라도 이렇게 물으면 돼요."], ["sore throat", "목 아픔", "목이 따끔따끔 아플 때 써요."]]],
     ["them", "Sure. Try these lozenges.", [["lozenges", "목캔디", "목이 아플 때 녹여 먹는 약이에요."]]],
     ["guest", "Great. How many a day?"],
     ["them", "No more than six a day."]
@@ -156,7 +156,8 @@ const DAYS = [
     { id: "pharmacy", time: "13:00", title: "약국", img: "img/scenes/pharmacy.webp", ...PHARMACY },
     { id: "helpway", time: "17:00", title: "길에서 도와주기", img: "img/scenes/helpway.webp", ...HELPWAY },
     { id: "night2", time: "22:00", title: "친구에게 오늘 이야기", me: true, img: "img/scenes/night.webp" }
-  ] }
+  ] },
+  ...MORE_DAYS
 ];
 const SCENE_LIST = DAYS.flatMap(d => d.scenes);
 const nm = s => String(s).replace(/\{name\}/g, S.profile.name || "Chang");
