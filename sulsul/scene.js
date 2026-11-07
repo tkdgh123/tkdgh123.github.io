@@ -25,6 +25,7 @@ const CAFE = {
 };
 const AIRPORT = {
   who: "Officer Reed", whoKo: "입국 심사관", pos: "55% 50%", voices: { them: "m2", guest: "f" }, guestKo: "다음 여행객",
+  layers: { w: 2752, h: 1536, box: [1263, 501, 264, 302], body: "img/scenes/airport/body.png" },
   turns: [
     { say: "Good morning. May I see your passport, please?", want: "여권을 건네며 '여기 있어요' 하기", need: [["건네기", ["here you go", "here it is", "here's my passport", "here is my passport", "here you are", "sure"]]], hint: ["Here you ~.", "Sure, here you…", "Sure, here you go."], model: "Sure, here you go.", chunk: ["Here you go", "여기 있어요 (건넬 때)", "물건을 건넬 때 가장 흔한 말이에요."] },
     { say: "What's the purpose of your visit?", want: "여행 왔다고 말하기", need: [["여행", ["trip", "travel", "traveling", "travelling", "vacation", "holiday", "sightseeing", "tourism", "tourist"]]], hint: ["I'm here for a ~.", "I'm here for a…", "I'm here for a one-week trip."], model: "I'm here for a one-week trip." },
@@ -44,6 +45,7 @@ const AIRPORT = {
 };
 const WAY = {
   who: "Tom", whoKo: "지나가던 사람", pos: "50% 50%", voices: { them: "m", guest: "f2" }, guestKo: "다른 여행객",
+  layers: { w: 2752, h: 1536, box: [1188, 518, 320, 664], body: "img/scenes/way/body.png" },
   turns: [
     { say: "Hi! You look a little lost. Need some help?", want: "역에 어떻게 가는지 묻기", need: [["역", ["station"]], ["가는 법", ["how", "where", "way", "get to"]]], hint: ["How do I get to ~?", "How do I get to the…", "How do I get to the station?"], model: "Yes! How do I get to the station?", chunk: ["How do I get to ~?", "~에 어떻게 가요?", "길 물을 때 가장 기본이 되는 말이에요."] },
     { say: "Sure. Go straight and turn left at the bank.", want: "여기서 먼지 묻기", need: [["먼지", ["far"]]], hint: ["Is it ~ from here?", "Is it far…", "Is it far from here?"], model: "Is it far from here?" },
@@ -59,6 +61,7 @@ const WAY = {
 };
 const HOTEL = {
   who: "Emma", whoKo: "호텔 직원", pos: "50% 50%", voices: { them: "f", guest: "m2" }, guestKo: "다른 손님",
+  layers: { w: 2752, h: 1536, box: [1271, 488, 227, 280], body: "img/scenes/hotel/body.png" },
   turns: [
     { say: "Hi, welcome! Are you checking in?", want: "네, 김으로 예약했다고 말하기", need: [["예약", ["reservation", "booked", "booking"]]], hint: ["I have a reservation under ~.", "I have a reservation…", "Yes, I have a reservation under Kim."], model: "Yes, I have a reservation under Kim.", chunk: ["under Kim", "김이라는 이름으로", "예약한 이름을 말할 때 under를 써요."] },
     { say: "Great. Could I see your ID, please?", want: "여권을 건네기", need: [["건네기", ["here", "passport", "sure"]]], hint: ["Sure, here's my ~.", "Sure, here's my…", "Sure, here's my passport."], model: "Sure, here's my passport." },
@@ -75,6 +78,7 @@ const HOTEL = {
 };
 const DINNER = {
   who: "Sam", whoKo: "식당 직원", pos: "50% 50%", voices: { them: "m2", guest: "f" }, guestKo: "옆 테이블 손님",
+  layers: { w: 2752, h: 1536, box: [1139, 360, 527, 808], body: "img/scenes/dinner/body.png" },
   turns: [
     { say: "Good evening! Table for one?", want: "네, 혼자라고 말하기", need: [["혼자", ["one", "just me", "myself", "yes", "yeah", "yep"]]], hint: ["Yes, just ~.", "Yes, just…", "Yes, just me."], model: "Yes, just me." },
     { say: "Here's the menu. Are you ready to order?", want: "뭘 추천하는지 묻기", need: [["추천", ["recommend", "recommendation", "popular", "best", "good here"]]], hint: ["What do you ~?", "What do you…", "What do you recommend?"], model: "What do you recommend?", chunk: ["What do you recommend?", "뭘 추천하세요?", "메뉴를 모를 때 가장 쓸모 있는 말이에요."] },
@@ -91,6 +95,7 @@ const DINNER = {
 };
 const MEETUP = {
   who: "Sara", whoKo: "모임에서 처음 만난 사람", pos: "50% 50%", voices: { them: "f2", guest: "m" }, guestKo: "옆 사람",
+  layers: { w: 2752, h: 1536, box: [1265, 511, 295, 644], body: "img/scenes/meetup/body.png" },
   turns: [
     { say: "Hi! I don't think we've met. I'm Sara.", want: "반갑다고 하고 내 이름 말하기", need: [["내 소개", ["i'm", "i am", "my name"]]], hint: ["Hi Sara, I'm ~. Nice to meet you.", "Hi Sara, I'm…", "Hi Sara, I'm {name}. Nice to meet you."], model: "Hi Sara, I'm {name}. Nice to meet you." },
     { say: "Nice to meet you too! So, what do you do?", want: "대학생이고 컴퓨터를 공부한다고 말하기", need: [["학생·공부", ["student", "study", "studying", "college", "university", "major"]]], hint: ["I'm a ~. I study ~.", "I'm a college student…", "I'm a college student. I study computer science."], model: "I'm a college student. I study computer science." },
@@ -106,6 +111,7 @@ const MEETUP = {
 };
 const PHARMACY = {
   who: "Grace", whoKo: "약사", pos: "50% 50%", voices: { them: "f", guest: "m2" }, guestKo: "다른 손님",
+  layers: { w: 2752, h: 1536, box: [1242, 472, 281, 345], body: "img/scenes/pharmacy/body.png" },
   turns: [
     { say: "Hi there. What can I help you with?", want: "머리가 많이 아프다고 말하기", need: [["두통", ["headache", "head hurts", "head is killing", "my head"]]], hint: ["I have a bad ~.", "I have a bad…", "I have a bad headache."], model: "I have a bad headache." },
     { say: "Oh no. How long have you had it?", want: "어제부터라고 말하기", need: [["어제부터", ["yesterday"]]], hint: ["Since ~.", "Since…", "Since yesterday."], model: "Since yesterday.", chunk: ["since yesterday", "어제부터", "언제부터 계속됐는지는 since로 말해요."] },
@@ -121,6 +127,7 @@ const PHARMACY = {
 };
 const HELPWAY = {
   who: "Ben", whoKo: "길 잃은 여행자", pos: "50% 50%", voices: { them: "m", guest: "f2" }, guestKo: "길을 아는 사람",
+  layers: { w: 2752, h: 1536, box: [962, 451, 788, 1085], body: "img/scenes/helpway/body.png", breath: 1.008 },
   turns: [
     { say: "Excuse me, do you know where the museum is?", want: "네, 이 길로 쭉 가라고 말하기", need: [["쭉", ["straight"]]], hint: ["Sure, go ~ down this street.", "Sure, go straight…", "Sure, go straight down this street."], model: "Sure, go straight down this street." },
     { say: "Straight down this street. Okay!", want: "두 번째 신호등에서 왼쪽으로 돌라고 말하기", need: [["왼쪽", ["left"]]], hint: ["Then turn ~ at the second light.", "Then turn left…", "Then turn left at the second light."], model: "Then turn left at the second light.", chunk: ["at the second light", "두 번째 신호등에서", "길 안내는 '어디에서(at) 어느 쪽으로'를 한 쌍으로 말해요."] },
@@ -141,14 +148,14 @@ const DAYS = [
     { id: "way", time: "13:00", title: "숙소 가는 길 묻기", img: "img/scenes/way.webp", ...WAY },
     { id: "hotel", time: "15:00", title: "호텔 체크인", img: "img/scenes/hotel.webp", ...HOTEL },
     { id: "dinner", time: "19:00", title: "저녁 식당 주문", img: "img/scenes/dinner.webp", ...DINNER },
-    { id: "night1", time: "22:00", title: "친구에게 오늘 이야기", me: true }
+    { id: "night1", time: "22:00", title: "친구에게 오늘 이야기", me: true, img: "img/scenes/night.webp" }
   ] },
   { title: "2일째 · 평범한 하루", scenes: [
     { id: "cafe", time: "08:00", title: "아침 카페", img: "img/scenes/cafe-gemini.webp", ...CAFE },
     { id: "meetup", time: "10:00", title: "모임에서 자기소개", img: "img/scenes/meetup.webp", ...MEETUP },
     { id: "pharmacy", time: "13:00", title: "약국", img: "img/scenes/pharmacy.webp", ...PHARMACY },
-    { id: "helpway", time: "17:00", title: "길에서 도와주기", ...HELPWAY, img: null },
-    { id: "night2", time: "22:00", title: "친구에게 오늘 이야기", me: true }
+    { id: "helpway", time: "17:00", title: "길에서 도와주기", img: "img/scenes/helpway.webp", ...HELPWAY },
+    { id: "night2", time: "22:00", title: "친구에게 오늘 이야기", me: true, img: "img/scenes/night.webp" }
   ] }
 ];
 const SCENE_LIST = DAYS.flatMap(d => d.scenes);
@@ -161,17 +168,26 @@ const skyOf = t => { const h = +t.slice(0, 2); return h < 10 ? "#f3ead2" : h < 1
 function renderDay() {
   header();
   const nextId = SCENE_LIST.find(sc => ready(sc) && !S.visited[sc.id] && !sc.me)?.id;
-  $("daystrip").innerHTML = DAYS.map(d => `<section class="dayrow"><h2>${d.title}</h2><div class="strip" tabindex="0" aria-label="${d.title} 장면들">${d.scenes.map(sc => {
+  $("daystrip").innerHTML = DAYS.map(d => `<section class="dayrow"><h2>${d.title}</h2><div class="stripwrap"><button class="snav back" data-dir="-1" aria-label="이전 장면" hidden><i class="ph-bold ph-caret-left"></i></button><div class="strip" tabindex="0" aria-label="${d.title} 장면들">${d.scenes.map(sc => {
     const been = S.visited[sc.id], isNext = sc.id === nextId, night = +sc.time.slice(0, 2) >= 19;
     const state = been ? "다녀왔어요" : sc.me ? (S.key ? "AI와 말하기" : "키를 넣으면 열려요") : ready(sc) ? (isNext ? "지금 갈 곳" : "갈 수 있어요") : "그림 준비 중";
     return `<button class="scard${isNext ? " next" : ""}${ready(sc) ? "" : " soon"}${night ? " night" : ""}" data-sc="${sc.id}" style="--sky:${skyOf(sc.time)}">
       <div class="pic">${sc.img ? `<img src="${sc.img}" alt="" loading="lazy" style="object-position:${sc.pos || "50% 50%"}">` : `<i class="ph-fill ${sc.me ? "ph-chats-circle" : "ph-sun-horizon"}"></i>`}${been ? `<span class="stamp"><i class="ph-fill ph-check-circle"></i></span>` : ""}</div>
       <div class="cap"><time>${sc.time}</time><b>${sc.title}</b><span>${state}</span></div></button>`;
-  }).join("")}</div></section>`).join("");
+  }).join("")}</div><button class="snav fwd" data-dir="1" aria-label="다음 장면"><i class="ph-bold ph-caret-right"></i></button></div></section>`).join("");
   const nx = $("daystrip").querySelector(".scard.next");
   if (nx) nx.parentElement.scrollLeft = nx.offsetLeft - 12;
+  $("daystrip").querySelectorAll(".strip").forEach(s => { s.onscroll = () => snavState(s); snavState(s) });
+}
+// 컴퓨터(마우스)에서는 옆으로 밀 수 없으니 양옆 화살표로 한 장씩 넘긴다
+function snavState(s) {
+  const w = s.parentElement, end = s.scrollWidth - s.clientWidth - 4, pic = s.querySelector(".pic");
+  if (pic) w.style.setProperty("--mid", 4 + pic.offsetHeight / 2 + "px");
+  w.querySelector(".back").hidden = s.scrollLeft <= 4; w.querySelector(".fwd").hidden = s.scrollLeft >= end;
 }
 $("daystrip").onclick = e => {
+  const n = e.target.closest(".snav");
+  if (n) { const s = n.parentElement.querySelector(".strip"), c = s.querySelector(".scard"); return s.scrollBy({ left: n.dataset.dir * (c.offsetWidth + 12) }) }
   const b = e.target.closest("[data-sc]"); if (!b) return;
   const sc = SCENE_LIST.find(x => x.id === b.dataset.sc);
   if (sc.me) { S.scene = "auto"; save(); return nav("talk") }
@@ -194,10 +210,11 @@ function buildStage(sc) {
   if (!L2) { el.innerHTML = `<img src="${sc.img}" alt="">`; el.dataset.w = 16; el.dataset.h = 9; return fitStage() }
   const pc = (v, t) => (100 * v / t) + "%", [bx, by, bw, bh] = L2.box;
   el.dataset.w = L2.w; el.dataset.h = L2.h;
-  el.innerHTML = `<img src="${L2.plate}" alt="">
+  // plate가 없으면 원본 그림 위에 사람 겹만 얹는다(숨 쉴 때 살짝 커지기만 해서 밑그림이 안 비친다)
+  el.innerHTML = `<img src="${L2.plate || sc.img}" alt="">
     ${(L2.amb || []).map(([src, x, y, w, h, c]) => `<img class="amb ${c}" src="${src}" alt="" style="left:${pc(x, L2.w)};top:${pc(y, L2.h)};width:${pc(w, L2.w)};height:${pc(h, L2.h)}">`).join("")}
-    <div class="breath" style="left:${pc(bx, L2.w)};top:${pc(by, L2.h)};width:${pc(bw, L2.w)};height:${pc(bh, L2.h)}">
-      <img src="${L2.body}" alt=""><img class="handwave" src="${L2.hand}" alt="" style="transform-origin:${pc(L2.pivot[0] - bx, bw)} ${pc(L2.pivot[1] - by, bh)}">
+    <div class="breath" style="${L2.breath ? `--s:${L2.breath};` : ""}left:${pc(bx, L2.w)};top:${pc(by, L2.h)};width:${pc(bw, L2.w)};height:${pc(bh, L2.h)}">
+      <img src="${L2.body}" alt="">${L2.hand ? `<img class="handwave" src="${L2.hand}" alt="" style="transform-origin:${pc(L2.pivot[0] - bx, bw)} ${pc(L2.pivot[1] - by, bh)}">` : ""}
     </div>
     ${(L2.front || []).map(([src, x, y, w, h]) => `<img class="front" src="${src}" alt="" style="left:${pc(x, L2.w)};top:${pc(y, L2.h)};width:${pc(w, L2.w)};height:${pc(h, L2.h)}">`).join("")}`;
   fitStage();

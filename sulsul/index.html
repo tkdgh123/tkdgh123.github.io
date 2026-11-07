@@ -85,6 +85,14 @@ label.f { display: grid; gap: 4px; margin-top: 12px; font-size: 15px; font-weigh
 .dayrow { margin-top: 10px }
 .dayrow h2 { margin: 18px 0 10px }
 .strip { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: 12px; margin: 0 -20px; padding: 4px 12px 14px; scrollbar-width: none; scroll-behavior: smooth }
+.stripwrap { position: relative }
+.snav { display: none }
+@media (hover: hover) and (pointer: fine) {
+  .snav { display: grid; place-items: center; position: absolute; top: var(--mid, 30%); transform: translateY(-50%); z-index: 2; width: 44px; height: 44px; border-radius: 50%; background: var(--bg); color: var(--ink); font-size: 20px; box-shadow: 0 2px 10px rgba(23,25,28,.18); transition: transform .15s, opacity .15s }
+  .snav[hidden] { display: none }
+  .snav:hover { transform: translateY(-50%) scale(1.08) }
+  .snav.back { left: -8px } .snav.fwd { right: -8px }
+}
 .scard { flex: none; width: 78%; scroll-snap-align: start; text-align: left; border-radius: 20px; background: var(--bg); box-shadow: inset 0 0 0 2px var(--line); overflow: hidden; transition: transform .2s var(--spring), box-shadow .2s }
 .scard:active { transform: scale(.98) }
 .scard .pic { position: relative; aspect-ratio: 16 / 10; background: var(--sky); display: grid; place-items: center; font-size: 44px; color: rgba(23,25,28,.25) }
@@ -116,7 +124,7 @@ label.f { display: grid; gap: 4px; margin-top: 12px; font-size: 15px; font-weigh
 .scimg .breath img { position: absolute; inset: 0; width: 100%; height: 100% }
 /* 사람만 아주 조금: 숨 쉬듯 커졌다 작아지고, 손은 가끔 인사한다 */
 .breath { transform-origin: 50% 100%; animation: breathe 4.8s ease-in-out infinite }
-@keyframes breathe { 0%, 100% { transform: scale(1) } 50% { transform: scale(1.014) } }
+@keyframes breathe { 0%, 100% { transform: scale(1) } 50% { transform: scale(var(--s, 1.014)) } }
 .handwave { animation: handwave 4s ease-in-out infinite }
 @keyframes handwave { 0%, 48%, 100% { transform: rotate(0) } 10% { transform: rotate(-6deg) } 20% { transform: rotate(4deg) } 30% { transform: rotate(-5deg) } 40% { transform: rotate(2deg) } }
 .sctop { position: absolute; left: 0; right: 0; top: 0; display: flex; align-items: center; gap: 10px; padding: 14px 16px }
