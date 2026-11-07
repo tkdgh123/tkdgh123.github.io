@@ -19,6 +19,8 @@ const ART = {
   foodtruck: { img: "img/scenes/foodtruck.webp", layers: { w: 2752, h: 1536, box: [1199, 376, 372, 371], body: "img/scenes/foodtruck/body.png" } },
   team: { img: "img/scenes/team.webp", layers: { w: 2752, h: 1536, box: [1128, 432, 472, 425], body: "img/scenes/team/body.png" } },
   gym: { img: "img/scenes/gym.webp", layers: { w: 2752, h: 1536, box: [1204, 319, 344, 508], body: "img/scenes/gym/body.png" } },
+  souvenir: { img: "img/scenes/souvenir.webp", layers: { w: 2752, h: 1536, box: [1190, 362, 374, 514], body: "img/scenes/souvenir/body.png" } },
+  goodbye: { img: "img/scenes/goodbye.webp", layers: { w: 2752, h: 1536, box: [1206, 239, 718, 1297], body: "img/scenes/goodbye/body.png", breath: 1.008 } },
   // ART:END
 };
 const THANKS = [["고마움", ["thank", "thanks", "appreciate"]]];
@@ -298,7 +300,7 @@ const SOUVENIR = {
   ]
 };
 const GOODBYE = {
-  who: "Sara", whoKo: "모임에서 만난 친구", voices: { them: "f2", guest: "m" }, guestKo: "다른 친구",
+  who: "Sara", whoKo: "모임에서 만난 친구", pos: "57% 50%", voices: { them: "f2", guest: "m" }, guestKo: "다른 친구",
   turns: [
     { say: "I can't believe you're leaving today!", want: "나도, 시간이 너무 빨리 갔다고 하기", need: [["빨리", ["fast", "quickly", "flew", "quick"]]], hint: ["Me neither. Time went by so ~.", "Me neither. Time went by…", "Me neither. Time went by so fast."], model: "Me neither. Time went by so fast.", chunk: ["Me neither", "나도 (그래)", "부정문에 맞장구칠 땐 Me too 대신 Me neither예요."] },
     { say: "Thanks for hanging out with me.", want: "나야말로 고맙다고, 정말 재밌었다고 하기", need: THANKS, hint: ["No, thank ~! I had so much fun.", "No, thank you…", "No, thank you! I had so much fun."], model: "No, thank you! I had so much fun.", chunk: ["hang out", "같이 놀다", "친구와 시간을 보낸다는 뜻이에요."] },
