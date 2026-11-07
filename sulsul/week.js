@@ -11,6 +11,10 @@ const ART = {
   wrong: { img: "img/scenes/wrong.webp", layers: { w: 2752, h: 1536, box: [1513, 96, 605, 1091], body: "img/scenes/wrong/body.png", breath: 1.008 } },
   room: { img: "img/scenes/room.webp", layers: { w: 2752, h: 1536, box: [1387, 266, 430, 953], body: "img/scenes/room/body.png", breath: 1.008 } },
   clinic: { img: "img/scenes/clinic.webp", layers: { w: 2752, h: 1536, box: [1438, 282, 387, 596], body: "img/scenes/clinic/body.png" } },
+  market: { img: "img/scenes/market.webp", layers: { w: 2752, h: 1536, box: [1169, 354, 414, 511], body: "img/scenes/market/body.png" } },
+  movie: { img: "img/scenes/movie.webp", layers: { w: 2752, h: 1536, box: [1263, 335, 344, 498], body: "img/scenes/movie/body.png" } },
+  park: { img: "img/scenes/park.webp", layers: { w: 2752, h: 1536, box: [1199, 215, 398, 972], body: "img/scenes/park/body.png", breath: 1.008 } },
+  home: { img: "img/scenes/home.webp", layers: { w: 2752, h: 1536, box: [1010, 215, 734, 1321], body: "img/scenes/home/body.png", breath: 1.008 } },
   // ART:END
 };
 const THANKS = [["고마움", ["thank", "thanks", "appreciate"]]];
