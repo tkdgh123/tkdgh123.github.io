@@ -181,7 +181,7 @@ function place(i, gx, gy) {
     if (combo > 1) { $("combo").classList.remove("up"); void $("combo").offsetWidth; $("combo").classList.add("up") }
   } else if (++since >= 3) {
     if (combo > 1) FX.tone(330, { d: .3, type: "triangle", vol: .12, to: 150 });
-    combo = 0;
+    combo = 0; since = 0;
   }
   score += pts;
   showCombo();
