@@ -4,6 +4,15 @@ const ART = {
   // ART:BEGIN
   checkout: { img: "img/scenes/hotel.webp", layers: { w: 2752, h: 1536, box: [1271, 488, 227, 280], body: "img/scenes/hotel/body.png" } },
   subway: { img: "img/scenes/subway.webp", layers: { w: 2752, h: 1536, box: [1212, 532, 311, 316], body: "img/scenes/subway/body.png" } },
+  home: { img: "img/scenes/home.webp", layers: { w: 2752, h: 1536, box: [1010, 215, 734, 1321], body: "img/scenes/home/body.png", breath: 1.008 } },
+  class: { img: "img/scenes/class.webp", layers: { w: 2752, h: 1536, box: [1419, 360, 339, 733], body: "img/scenes/class/body.png" } },
+  foodtruck: { img: "img/scenes/foodtruck.webp", layers: { w: 2752, h: 1536, box: [1199, 376, 372, 371], body: "img/scenes/foodtruck/body.png" } },
+  team: { img: "img/scenes/team.webp", layers: { w: 2752, h: 1536, box: [1128, 432, 472, 425], body: "img/scenes/team/body.png" } },
+  gym: { img: "img/scenes/gym.webp", layers: { w: 2752, h: 1536, box: [1204, 319, 344, 508], body: "img/scenes/gym/body.png" } },
+  souvenir: { img: "img/scenes/souvenir.webp", layers: { w: 2752, h: 1536, box: [1190, 362, 374, 514], body: "img/scenes/souvenir/body.png" } },
+  goodbye: { img: "img/scenes/goodbye.webp", layers: { w: 2752, h: 1536, box: [1206, 239, 718, 1297], body: "img/scenes/goodbye/body.png", breath: 1.008 } },
+  checkin: { img: "img/scenes/checkin.webp", layers: { w: 2752, h: 1536, box: [1460, 343, 373, 423], body: "img/scenes/checkin/body.png" } },
+  plane: { img: "img/scenes/plane.webp", layers: { w: 2752, h: 1536, box: [1217, 403, 632, 798], body: "img/scenes/plane/body.png" } },
   shop: { img: "img/scenes/shop.webp", layers: { w: 2752, h: 1536, box: [1349, 282, 469, 618], body: "img/scenes/shop/body.png" } },
   salon: { img: "img/scenes/salon.webp", layers: { w: 2752, h: 1536, box: [1672, 279, 505, 1026], body: "img/scenes/salon/body.png", breath: 1.008 } },
   photo: { img: "img/scenes/photo.webp", layers: { w: 2752, h: 1536, box: [1107, 298, 525, 1238], body: "img/scenes/photo/body.png", breath: 1.008 } },
@@ -14,15 +23,6 @@ const ART = {
   market: { img: "img/scenes/market.webp", layers: { w: 2752, h: 1536, box: [1169, 354, 414, 511], body: "img/scenes/market/body.png" } },
   movie: { img: "img/scenes/movie.webp", layers: { w: 2752, h: 1536, box: [1263, 335, 344, 498], body: "img/scenes/movie/body.png" } },
   park: { img: "img/scenes/park.webp", layers: { w: 2752, h: 1536, box: [1199, 215, 398, 972], body: "img/scenes/park/body.png", breath: 1.008 } },
-  home: { img: "img/scenes/home.webp", layers: { w: 2752, h: 1536, box: [1010, 215, 734, 1321], body: "img/scenes/home/body.png", breath: 1.008 } },
-  class: { img: "img/scenes/class.webp", layers: { w: 2752, h: 1536, box: [1419, 360, 339, 733], body: "img/scenes/class/body.png" } },
-  foodtruck: { img: "img/scenes/foodtruck.webp", layers: { w: 2752, h: 1536, box: [1199, 376, 372, 371], body: "img/scenes/foodtruck/body.png" } },
-  team: { img: "img/scenes/team.webp", layers: { w: 2752, h: 1536, box: [1128, 432, 472, 425], body: "img/scenes/team/body.png" } },
-  gym: { img: "img/scenes/gym.webp", layers: { w: 2752, h: 1536, box: [1204, 319, 344, 508], body: "img/scenes/gym/body.png" } },
-  souvenir: { img: "img/scenes/souvenir.webp", layers: { w: 2752, h: 1536, box: [1190, 362, 374, 514], body: "img/scenes/souvenir/body.png" } },
-  goodbye: { img: "img/scenes/goodbye.webp", layers: { w: 2752, h: 1536, box: [1206, 239, 718, 1297], body: "img/scenes/goodbye/body.png", breath: 1.008 } },
-  checkin: { img: "img/scenes/checkin.webp", layers: { w: 2752, h: 1536, box: [1460, 343, 373, 423], body: "img/scenes/checkin/body.png" } },
-  plane: { img: "img/scenes/plane.webp", layers: { w: 2752, h: 1536, box: [1217, 403, 632, 798], body: "img/scenes/plane/body.png" } },
   // ART:END
 };
 const THANKS = [["고마움", ["thank", "thanks", "appreciate"]]];
