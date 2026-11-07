@@ -300,9 +300,10 @@ function flapOf(f) {
     has: (x, y) => { const v = (x - ox) * nx + (y - oy) * ny, u = (x - ox) * dx + (y - oy) * dy; return v > .01 && v <= vm && u >= u0 && u <= u1 },
     onCrease: (x, y) => { const v = (x - ox) * nx + (y - oy) * ny, u = (x - ox) * dx + (y - oy) * dy; return Math.abs(v) < .01 && u >= u0 && u <= u1 },
     crease: () => { const a = [px(ox + u0 * dx), px(oy + u0 * dy)], b = [px(ox + u1 * dx), px(oy + u1 * dy)]; ctx.beginPath(); ctx.moveTo(...a); ctx.lineTo(...b) },
-    path: () => {
+    // 기본은 접히는 띠, path(-1, 0)은 접는 선 바로 맞은편(남는 쪽) 한 칸 폭
+    path: (v0 = 0, v1 = vm) => {
       const P = (u, v) => [px(ox + u * dx + v * nx), px(oy + u * dy + v * ny)];
-      ctx.beginPath(); [P(u0, 0), P(u1, 0), P(u1, vm), P(u0, vm)].forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)); ctx.closePath();
+      ctx.beginPath(); [P(u0, v0), P(u1, v0), P(u1, v1), P(u0, v1)].forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)); ctx.closePath();
     },
   };
 }
@@ -326,7 +327,11 @@ function draw(now) {
     const c = G[idx(x, y)];
     if (c < 0) { ctx.beginPath(); ctx.arc(px(x), px(y), Math.max(1.5, S * .04), 0, 7); ctx.fill(); continue; }
     const b = Math.min(1, Math.max(0, (now - born[idx(x, y)]) / 260));
+    // 접는 선 위의 점은 남는 쪽 반만 여기 그리고, 나머지 반은 종이와 같이 접힌다
+    const cut = F && F.onCrease(x, y);
+    if (cut) { ctx.save(); F.path(-1, 0); ctx.clip() }
     if (b > 0) dot(px(x), px(y), S * .34 * backOut(b), COLORS[c]);
+    if (cut) ctx.restore();
     ctx.fillStyle = "#d9d6cf";
   }
   if (F) {
@@ -342,7 +347,7 @@ function draw(now) {
     ctx.shadowColor = "transparent";
     ctx.save(); F.path(); ctx.clip();
     for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
-      if (!F.has(x, y)) continue;
+      if (!F.has(x, y) && !F.onCrease(x, y)) continue;
       const c = G[idx(x, y)];
       if (c >= 0) dot(px(x), px(y), S * .34, COLORS[c], s >= 0 ? 1 : .45);
       else if (s >= 0) { ctx.fillStyle = "#d9d6cf"; ctx.beginPath(); ctx.arc(px(x), px(y), Math.max(1.5, S * .04), 0, 7); ctx.fill() }
@@ -352,9 +357,8 @@ function draw(now) {
     ctx.restore();
     F.path(); ctx.strokeStyle = !fl.ok && t > T_HIT ? "rgb(216 68 60 / .6)" : "rgb(28 27 25 / .2)"; ctx.lineWidth = 1.5; ctx.stroke();
     ctx.restore();
-    // 접는 선(주름)과 그 위의 점은 접혀도 그대로
+    // 접는 선(주름)
     ctx.save(); boardPath(); ctx.clip(); F.crease(); ctx.strokeStyle = "rgb(28 27 25 / .35)"; ctx.lineWidth = 2; ctx.stroke(); ctx.restore();
-    for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { const c = G[idx(x, y)]; if (c >= 0 && F.onCrease(x, y)) dot(px(x), px(y), S * .34, COLORS[c]) }
     if (t > T_END) { const ok = fl.ok; fl = null; if (ok && playing) refill() }
   }
   blots = blots.filter(b => now - b.t0 < 380);
