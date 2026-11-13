@@ -75,12 +75,12 @@ a:focus-visible, button:focus-visible { outline: 2px solid currentColor; outline
 .card { position: absolute; left: calc(var(--w) / -2); top: calc(var(--w) * -.3125); width: var(--w); aspect-ratio: 16 / 10; transform-style: preserve-3d; will-change: transform, opacity }
 .face { position: absolute; inset: 0; display: block; overflow: hidden; background: #0c0c0c; box-shadow: 0 40px 70px -38px rgb(0 0 0 / .7), 0 0 0 1px rgb(255 255 255 / .04) inset; transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transition: transform .5s var(--out); -webkit-user-drag: none }
 .face img, .refl img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none }
-.face img { transform: scale(1.05) translateX(calc(clamp(-1, var(--k, 0), 1) * -2%)) }
-.face::after { content: ""; position: absolute; inset: 0; background: #000; opacity: var(--dim, 0); pointer-events: none }
+.face img { transform: scale(1.05) translateX(calc(clamp(-1, var(--k, 0), 1) * -2%)); will-change: transform }  /* 매 프레임 바뀌는 값은 따로 레이어로: 큰 그림을 다시 칠하지 않게 */
+.face::after { content: ""; position: absolute; inset: 0; background: #000; opacity: var(--dim, 0); pointer-events: none; will-change: opacity }
 .face .lk { position: absolute; left: 12px; top: 12px; z-index: 1; padding: 3px 8px; background: rgb(0 0 0 / .55); color: #fff; backdrop-filter: blur(6px) }
 .glare { position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity .35s; mix-blend-mode: screen; background: radial-gradient(38% 55% at var(--gx, 50%) var(--gy, 30%), rgb(255 255 255 / .22), rgb(255 255 255 / 0) 70%) }
 .card.hot .glare { opacity: 1 }
-.refl { position: absolute; left: 0; right: 0; top: calc(100% + 8px); height: 26%; overflow: hidden; opacity: calc(.24 - var(--dim, 0) * .35); -webkit-mask-image: linear-gradient(#000, transparent 85%); mask-image: linear-gradient(#000, transparent 85%); pointer-events: none }
+.refl { position: absolute; left: 0; right: 0; top: calc(100% + 8px); height: 26%; overflow: hidden; opacity: calc(.24 - var(--dim, 0) * .35); will-change: opacity; -webkit-mask-image: linear-gradient(#000, transparent 85%); mask-image: linear-gradient(#000, transparent 85%); pointer-events: none }
 .refl img { position: absolute; left: 0; top: 0; height: calc(100% / .26); transform: scaleY(-1) }
 
 /* 아래: 작품 글 + 큰 번호 */
@@ -163,7 +163,7 @@ body[data-c="프로젝트"] .go:hover { background: #e3e7f8 }
 .rooms { position: fixed; inset: 0; z-index: 30; display: flex; padding-top: 84px; background: #0e0e0f; transition: opacity .45s var(--ease), visibility 0s }
 body.in .rooms { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .45s var(--ease), visibility 0s .45s }
 body:not(.in) :is(.stage, .cap, .ticks, .hint, .tabs) { visibility: hidden }
-.room { position: relative; flex: 1 1 0; min-width: 0; display: grid; grid-template-rows: auto 1fr auto auto auto; padding: 24px clamp(16px, 1.8vw, 30px) 34px; background: var(--rb); color: var(--rf); text-decoration: none; overflow: hidden; transition: flex-grow .7s var(--ease), padding .7s var(--ease), opacity .4s }
+.room { position: relative; flex: 1 1 0; min-width: 0; display: grid; grid-template-rows: auto 1fr auto auto auto; padding: 24px clamp(16px, 1.8vw, 30px) 34px; background: var(--rb); color: var(--rf); text-decoration: none; overflow: hidden; transition: flex-grow .7s var(--ease), opacity .3s }
 .room:first-child { flex-grow: 1.45 }
 .rooms:not(.going) .room:hover, .rooms:not(.going) .room:focus-visible { flex-grow: 2.1 }
 .room:focus-visible { outline: 2px solid currentColor; outline-offset: -8px }
@@ -180,8 +180,10 @@ body:not(.in) :is(.stage, .cap, .ticks, .hint, .tabs) { visibility: hidden }
 .rgo { margin-top: 16px; font-weight: 700; font-size: 14px; white-space: nowrap }
 .rgo i { font-style: normal; display: inline-block; transition: transform .3s var(--out) }
 .room:hover .rgo i { transform: translateX(5px) }
-.rooms.going .room { flex-grow: 0; padding-inline: 0; opacity: 0 }
-.rooms.going .room.pick { flex-grow: 1; padding-inline: clamp(16px, 1.8vw, 30px); opacity: 1 }
+.rooms.going .room:not(.pick) { opacity: 0 }
+/* 덮개: 누른 방 자리에서 화면 가득 커진 뒤(크기 변환만 써서 매끄럽게) 고리 위에서 걷힌다 */
+.veil { position: fixed; left: 0; top: 0; z-index: 45; width: 100vw; height: 100svh; transform-origin: 0 0; pointer-events: none; will-change: transform, opacity }
+body.snap, body.snap::before, body.snap .rooms { transition: none !important }
 
 @media (max-width: 1300px) { .mark span { display: none } }
 @media (max-width: 1100px) {
@@ -219,10 +221,9 @@ body:not(.in) :is(.stage, .cap, .ticks, .hint, .tabs) { visibility: hidden }
   .rt { font-size: 36px; margin-top: 6px }
   .rs { font-size: 14px; min-height: 0; margin-top: 6px }
   .rgo { display: none }
-  .rooms.going .room { min-height: 0; padding-block: 0 }
 }
 @media (prefers-reduced-motion: reduce) {
-  body, body::before, .txt *, .no *, .face, .list, .chip .dot, .rooms, .room, .fan img { transition: none !important; animation: none !important }
+  body, body::before, .txt *, .no *, .face, .list, .chip .dot, .rooms, .room, .fan img, .veil { transition: none !important; animation: none !important }
 }
 </style>
 </head>
@@ -241,6 +242,7 @@ body:not(.in) :is(.stage, .cap, .ticks, .hint, .tabs) { visibility: hidden }
 
 <main>
   <nav class="rooms" id="rooms" aria-label="분류"></nav>
+  <div class="veil" id="veil" hidden></div>
   <div class="stage" id="stage" aria-label="작품 고리 — 끌거나 화살표 키로 돌려요"><div class="ring" id="ring"></div></div>
   <div class="cap">
     <div class="txt out" id="txt" aria-live="polite">
@@ -588,6 +590,7 @@ secretCards().catch(() => {}).then(() => {
   CATS = ROOMS.map(r => r[0]).filter(c => of(c).length);
   drawTabs(); drawList(); drawRooms();
   if (startCat && CATS.includes(startCat)) enter(startCat, startI, true); else leave();
+  warm();
 });
 
 // 분류 방 ↔ 고리
@@ -598,19 +601,41 @@ function drawRooms() {
     return `<a class="room" href="#${h}" data-c="${c}" style="--rb:${rb};--rf:${rf}"><span class="rn mono">${two(n + 1)} · ${ws.length}개</span><span class="fan" aria-hidden="true">${imgs}</span><span class="rt">${c}</span><span class="rs">${s}</span><span class="rgo">들어가기 <i>→</i></span></a>`;
   }).join("");
 }
+const BG = { 게임: "--dark", 공부: "--tone", 프로젝트: "--blue", 기타: "--olive" };
+const raf2 = f => requestAnimationFrame(() => requestAnimationFrame(f));
 function enter(c, start = 0, now = false) {
+  const i = Math.max(0, Math.min(start, of(c).length - 1));
   const go = () => {
     inside = true; document.body.classList.add("in");
-    build(c, Math.max(0, Math.min(start, of(c).length - 1)));
+    build(c, i);
     if (!running) { running = true; requestAnimationFrame(frame); }
-    $("rooms").classList.remove("going");
-    for (const r of $("rooms").children) r.classList.remove("pick");
   };
-  if (now || calm) return go();
   const r = [...$("rooms").children].find(r => r.dataset.c === c);
-  if (r) r.classList.add("pick");
-  $("rooms").classList.add("going");
-  setTimeout(go, 620);
+  if (now || calm || !r) return go();
+  // 1) 누른 방과 같은 색 판을 그 자리에 놓고, 크기 변환으로 화면 가득 키운다(배치 계산 없이 그래픽 카드만 일함)
+  const veil = $("veil"), b = r.getBoundingClientRect(), bg = getComputedStyle(document.documentElement).getPropertyValue(BG[of(c)[i].cat]);
+  veil.style.transition = "none"; veil.style.opacity = "1";
+  veil.style.background = getComputedStyle(r).backgroundColor;
+  veil.style.transform = `translate(${b.left}px, ${b.top}px) scale(${b.width / innerWidth}, ${b.height / innerHeight})`;
+  veil.hidden = false; r.classList.add("pick"); $("rooms").classList.add("going");
+  raf2(() => { veil.style.transition = "transform .6s var(--ease), background-color .6s var(--ease)"; veil.style.transform = "none"; veil.style.background = bg; });
+  // 2) 화면이 다 덮여 멈춰 있을 때 무거운 일(고리 만들기·배경 바꾸기)을 한다
+  setTimeout(() => {
+    document.body.classList.add("snap"); go();
+    // 3) 그려진 뒤 덮개를 걷고, 카드는 그때부터 솟는다
+    raf2(() => {
+      document.body.classList.remove("snap"); born = performance.now();
+      veil.style.transition = "opacity .45s var(--ease)"; veil.style.opacity = "0";
+      setTimeout(() => { veil.hidden = true; r.classList.remove("pick"); $("rooms").classList.remove("going"); }, 470);
+    });
+  }, 640);
+}
+// 쉬는 틈에 작품 그림을 미리 받아 둔다(고리에 들어갈 때 그림 풀기로 멈추지 않게)
+function warm() {
+  const urls = [...new Set(W.map(w => w.img))], idle = window.requestIdleCallback || (f => setTimeout(() => f({ timeRemaining: () => 8 }), 60));
+  let k = 0;
+  const step = d => { while (k < urls.length && d.timeRemaining() > 4) { const im = new Image(); im.src = urls[k++]; im.decode?.().catch(() => {}); } if (k < urls.length) idle(step); };
+  idle(step);
 }
 function leave() {
   inside = false; document.body.classList.remove("in"); document.body.dataset.c = "게임";
