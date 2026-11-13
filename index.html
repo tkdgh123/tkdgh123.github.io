@@ -159,6 +159,30 @@ body[data-c="프로젝트"] .go:hover { background: #e3e7f8 }
 .peek { position: fixed; left: 0; top: 0; z-index: 90; width: 300px; aspect-ratio: 16 / 10; object-fit: cover; pointer-events: none; opacity: 0; box-shadow: 0 30px 60px -28px rgb(0 0 0 / .5); translate: var(--x, 0) var(--y, 0); rotate: var(--r, 0deg); scale: var(--sc, .92); transition: opacity .2s, scale .3s var(--out) }
 .peek.on { opacity: 1; --sc: 1 }
 
+/* 첫 화면: 분류 방. 하나를 누르면 그 방이 화면을 채우고 고리로 들어간다 */
+.rooms { position: fixed; inset: 0; z-index: 30; display: flex; padding-top: 84px; background: #0e0e0f; transition: opacity .45s var(--ease), visibility 0s }
+body.in .rooms { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .45s var(--ease), visibility 0s .45s }
+body:not(.in) :is(.stage, .cap, .ticks, .hint, .tabs) { visibility: hidden }
+.room { position: relative; flex: 1 1 0; min-width: 0; display: grid; grid-template-rows: auto 1fr auto auto auto; padding: 24px clamp(16px, 1.8vw, 30px) 34px; background: var(--rb); color: var(--rf); text-decoration: none; overflow: hidden; transition: flex-grow .7s var(--ease), padding .7s var(--ease), opacity .4s }
+.room:first-child { flex-grow: 1.45 }
+.rooms:not(.going) .room:hover, .rooms:not(.going) .room:focus-visible { flex-grow: 2.1 }
+.room:focus-visible { outline: 2px solid currentColor; outline-offset: -8px }
+.room .rn { opacity: .66; white-space: nowrap }
+.fan { position: relative; align-self: center; height: min(36svh, 300px) }
+.fan img { position: absolute; left: 50%; top: 50%; width: min(100%, 380px); aspect-ratio: 16 / 10; object-fit: cover; translate: -50% -50%; box-shadow: 0 30px 50px -28px rgb(0 0 0 / .65); transition: rotate .6s var(--out), translate .6s var(--out) }
+.fan img:nth-child(1) { rotate: -7deg; translate: -57% -45% }
+.fan img:nth-child(2) { rotate: 6deg; translate: -43% -53% }
+.fan img:nth-child(3) { rotate: -1deg }
+.room:hover .fan img:nth-child(1) { rotate: -11deg; translate: -72% -42% }
+.room:hover .fan img:nth-child(2) { rotate: 10deg; translate: -28% -56% }
+.rt { font: 300 clamp(38px, 4.4vw, 76px)/1 var(--serif); letter-spacing: -.03em; white-space: nowrap }
+.rs { margin-top: 12px; font-size: 15px; line-height: 1.5; opacity: .72; max-width: 17em; min-height: 3em }
+.rgo { margin-top: 16px; font-weight: 700; font-size: 14px; white-space: nowrap }
+.rgo i { font-style: normal; display: inline-block; transition: transform .3s var(--out) }
+.room:hover .rgo i { transform: translateX(5px) }
+.rooms.going .room { flex-grow: 0; padding-inline: 0; opacity: 0 }
+.rooms.going .room.pick { flex-grow: 1; padding-inline: clamp(16px, 1.8vw, 30px); opacity: 1 }
+
 @media (max-width: 1300px) { .mark span { display: none } }
 @media (max-width: 1100px) {
   .bar { grid-template-columns: auto minmax(0, 1fr); row-gap: 6px }
@@ -187,9 +211,18 @@ body[data-c="프로젝트"] .go:hover { background: #e3e7f8 }
   .arr { padding: 0 } .arr button { width: 46px; height: 46px }
   .list h2 { margin: 44px 0 36px }
   .cols { grid-template-columns: 1fr; gap: 40px }
+  .rooms { flex-direction: column; overflow-y: auto; padding-top: 70px }
+  .room, .room:first-child { flex: none; min-height: 132px; grid-template-columns: minmax(0, 1fr) 118px; grid-template-rows: auto auto auto 1fr; column-gap: 12px; padding: 18px var(--m) 20px }
+  .room > :not(.fan) { grid-column: 1 }
+  .fan { grid-column: 2; grid-row: 1 / -1; height: auto }
+  .fan img { width: 104px }
+  .rt { font-size: 36px; margin-top: 6px }
+  .rs { font-size: 14px; min-height: 0; margin-top: 6px }
+  .rgo { display: none }
+  .rooms.going .room { min-height: 0; padding-block: 0 }
 }
 @media (prefers-reduced-motion: reduce) {
-  body, body::before, .txt *, .no *, .face, .list, .chip .dot { transition: none !important; animation: none !important }
+  body, body::before, .txt *, .no *, .face, .list, .chip .dot, .rooms, .room, .fan img { transition: none !important; animation: none !important }
 }
 </style>
 </head>
@@ -207,6 +240,7 @@ body[data-c="프로젝트"] .go:hover { background: #e3e7f8 }
 </header>
 
 <main>
+  <nav class="rooms" id="rooms" aria-label="분류"></nav>
   <div class="stage" id="stage" aria-label="작품 고리 — 끌거나 화살표 키로 돌려요"><div class="ring" id="ring"></div></div>
   <div class="cap">
     <div class="txt out" id="txt" aria-live="polite">
@@ -285,10 +319,19 @@ const PICK = [
   ["ai-data/", "공부 · 혼자"], ["adam/", "발표 준비 · 혼자"], ["stamp/", "공개 · 혼자"],
 ];
 const STATE = Object.fromEntries(PICK);
-const CATS = ["대표", "전체", "게임", "공부", "프로젝트", "기타"];
-const of = c => c === "대표" ? PICK.map(([h]) => W.find(w => w.href === h)).filter(Boolean) : c === "전체" ? W : W.filter(w => w.cat === c);
-const HASH = { all: "전체", game: "게임", study: "공부", make: "프로젝트", etc: "기타" }, SLUG = Object.fromEntries(Object.entries(HASH).map(([k, v]) => [v, k]));
-const COLOR = { 게임: "var(--dark)", 공부: "var(--rule)", 프로젝트: "var(--blue)", 기타: "var(--olive)" };
+// 분류 방: 이름 · 주소 · 한 줄 · 방 색 · 글자 색. 잠금은 열쇠가 있는 기기에만 생긴다
+const ROOMS = [
+  ["대표", "pick", "처음이라면 여기부터. 직접 해 볼 수 있는 것 위주로.", "var(--paper)", "var(--ink)"],
+  ["게임", "game", "수묵 액션부터 2분 퍼즐까지.", "#1c1d20", "var(--on-dark)"],
+  ["공부", "study", "수업마다 만든 정리와 복습 도구.", "var(--tone)", "var(--ink)"],
+  ["프로젝트", "make", "생활에 쓰는 앱과 팀 과제.", "var(--blue)", "#fff"],
+  ["기타", "etc", "조사 정리, 시안, 도구 설정.", "var(--olive)", "#eeece6"],
+  ["잠금", "lock", "이 기기에서만 보여요.", "#5e1d18", "#f3e7e2"],
+];
+let CATS = [];
+const of = c => c === "대표" ? PICK.map(([h]) => W.find(w => w.href === h)).filter(Boolean) : c === "잠금" ? W.filter(w => w.lock) : W.filter(w => w.cat === c && !w.lock);
+const HASH = Object.fromEntries(ROOMS.map(([c, h]) => [h, c])), SLUG = Object.fromEntries(ROOMS.map(([c, h]) => [c, h]));
+const COLOR = { 게임: "var(--dark)", 공부: "var(--rule)", 프로젝트: "var(--blue)", 기타: "var(--olive)", 잠금: "#5e1d18" };
 const $ = id => document.getElementById(id);
 const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const fine = matchMedia("(hover: hover) and (pointer: fine)").matches;
@@ -306,7 +349,7 @@ const drawTabs = () => $("tabs").innerHTML = CATS.map(c => `<button type="button
 $("tabs").onclick = e => { const b = e.target.closest("button"); if (b && b.dataset.c !== cat) swap(b.dataset.c); };
 
 function swap(c) {
-  history.replaceState(null, "", c === "대표" ? location.pathname : "#" + SLUG[c]);
+  history.replaceState(null, "", "#" + SLUG[c]);
   if (calm) return build(c, 0);
   stage.classList.add("swap");
   setTimeout(() => { build(c, 0); stage.classList.remove("swap"); }, 220);
@@ -451,7 +494,7 @@ if (fine && !calm) {
 // 휠·트랙패드: 한 번 굴리면 한 칸 (트랙패드 관성으로 여러 칸 넘어가지 않게)
 let acc = 0, accT = 0, stepT = 0;
 addEventListener("wheel", e => {
-  if (listOpen) return;
+  if (listOpen || !inside) return;
   e.preventDefault();
   const now = performance.now(), d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
   const fresh = now - accT > 200; accT = now;
@@ -461,6 +504,7 @@ addEventListener("wheel", e => {
 }, { passive: false });
 addEventListener("keydown", e => {
   if (listOpen) { if (e.key === "Escape") toggleList(false); return; }
+  if (!inside) return;
   if (e.key === "ArrowRight") go(1);
   else if (e.key === "ArrowLeft") go(-1);
   else if (e.key === "Enter" && e.target === document.body) location.href = list[cur].href;
@@ -474,8 +518,8 @@ const hideHint = () => $("hint").classList.add("gone");
 let listOpen = false;
 function drawList() {
   $("listN").textContent = W.length;
-  $("cols").innerHTML = CATS.slice(2).map((c, n) => {
-    const ws = W.filter(w => w.cat === c);
+  $("cols").innerHTML = CATS.slice(1).map((c, n) => {
+    const ws = of(c);
     return `<section class="col"><h3><i class="c" style="background:${COLOR[c]}"></i>${c}<span class="mono">${two(n + 1)} · ${ws.length}</span></h3><ul>${ws.map(w => `<li><a href="${w.href}" data-img="${w.img}"><b>${esc(w.t)}</b><span class="mono">${w.d} · ${w.tag}${w.lock ? " · 잠금" : ""}</span></a></li>`).join("")}</ul></section>`;
   }).join("");
 }
@@ -514,7 +558,7 @@ Promise.all([
 }).catch(() => {});
 
 // 시작: 주소의 #분류 → 이 탭에서 마지막으로 보던 작품 → 맨 앞
-let startCat = HASH[location.hash.slice(1)] || "대표", startI = 0;
+let startCat = HASH[location.hash.slice(1)], startI = 0;
 try { const s = JSON.parse(sessionStorage.getItem("hub")); if (s && s.c === startCat) startI = s.i; } catch (e) {}
 // 이 기기에 열쇠가 있을 때만: 잠긴 작품의 진짜 카드(lock/hub.enc)와 금고 카드(vault/data.bin)를 푼다.
 // 열쇠가 없으면 공개 카드("잠긴 작업")만 보이고, 금고 카드는 아예 없다.
@@ -533,17 +577,49 @@ async function secretCards() {
     return JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({ name: "AES-GCM", iv: b.slice(0, 12), ...(aad && { additionalData: new TextEncoder().encode(aad) }) }, k, b.slice(12))));
   };
   const [lk, vk] = await Promise.all([key("lock"), key("vault")]);
-  if (lk) try { const real = await open(lk, "lock/hub.enc"); W.forEach((w, i) => { if (real[w.href]) W[i] = toW(real[w.href], w.id); }); } catch (e) {}
+  if (lk) try { const real = await open(lk, "lock/hub.enc"); W.forEach((w, i) => { if (real[w.href]) W[i] = { ...toW(real[w.href], w.id), lock: 1 }; }); } catch (e) {}
   if (vk) try { const c = (await open(vk, "vault/data.bin", "changupsil-vault-v1")).card; W.push(toW([c.cat, c.t, c.d, "vault/", c.img || "hub/shots/locked.webp", c.s, c.tag, 1, c.label, []], W.length)); } catch (e) {}
 }
 secretCards().catch(() => {}).then(() => {
   // 열쇠가 없는 기기에선 잠긴 작업 칸을 아예 안 보인다(빈 카드는 미완성처럼 보여서)
   for (let i = W.length; i--;) if (W[i].t === "잠긴 작업") W.splice(i, 1);
-  drawTabs(); drawList();
-  build(startCat, Math.min(startI, of(startCat).length - 1));
-  requestAnimationFrame(frame);
+  CATS = ROOMS.map(r => r[0]).filter(c => of(c).length);
+  drawTabs(); drawList(); drawRooms();
+  if (startCat && CATS.includes(startCat)) enter(startCat, startI, true); else leave();
 });
-addEventListener("hashchange", () => { const c = HASH[location.hash.slice(1)]; if (c && c !== cat) swap(c); });
+
+// 분류 방 ↔ 고리
+let inside = false, running = false;
+function drawRooms() {
+  $("rooms").innerHTML = ROOMS.filter(([c]) => CATS.includes(c)).map(([c, h, s, rb, rf], n) => {
+    const ws = of(c), imgs = ws.slice(0, 3).reverse().map(w => `<img src="${w.img}" alt="" loading="lazy">`).join("");
+    return `<a class="room" href="#${h}" data-c="${c}" style="--rb:${rb};--rf:${rf}"><span class="rn mono">${two(n + 1)} · ${ws.length}개</span><span class="fan" aria-hidden="true">${imgs}</span><span class="rt">${c}</span><span class="rs">${s}</span><span class="rgo">들어가기 <i>→</i></span></a>`;
+  }).join("");
+}
+function enter(c, start = 0, now = false) {
+  const go = () => {
+    inside = true; document.body.classList.add("in");
+    build(c, Math.max(0, Math.min(start, of(c).length - 1)));
+    if (!running) { running = true; requestAnimationFrame(frame); }
+    $("rooms").classList.remove("going");
+    for (const r of $("rooms").children) r.classList.remove("pick");
+  };
+  if (now || calm) return go();
+  const r = [...$("rooms").children].find(r => r.dataset.c === c);
+  if (r) r.classList.add("pick");
+  $("rooms").classList.add("going");
+  setTimeout(go, 620);
+}
+function leave() {
+  inside = false; document.body.classList.remove("in"); document.body.dataset.c = "게임";
+  $("txt").classList.add("out"); $("no").classList.add("out");
+}
+addEventListener("hashchange", () => {
+  const c = HASH[location.hash.slice(1)];
+  if (!c || !CATS.includes(c)) return leave();
+  if (!inside) { let i = 0; try { const s = JSON.parse(sessionStorage.getItem("hub")); if (s && s.c === c) i = s.i; } catch (e) {} enter(c, i); }
+  else if (c !== cat) swap(c);
+});
 </script>
 </body>
 </html>
