@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>잠금 설정 · 창업실</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@250;600&family=IBM+Plex+Mono:wght@400&display=swap">
+<style>
+:root { --paper: #f2f1ec; --ink: #151514; --muted: #5a5954; --rule: #d6d3c9; --blue: #2b44a6; --red: #a3261d; --m: clamp(16px, 3.2vw, 52px) }
+* { box-sizing: border-box }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 16px/1.55 "Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif; padding: 0 var(--m) calc(110px + env(safe-area-inset-bottom)) }
+a { color: inherit }
+.mono { font-family: "IBM Plex Mono", ui-monospace, Consolas, monospace }
+header { padding-block: 26px }
+header a { font: 600 22px/1 Hahmlet, serif; text-decoration: none }
+h1 { margin: 9vh 0 10px; font: 250 clamp(48px, 9vw, 104px)/1 Hahmlet, serif; letter-spacing: -.03em }
+h1 b { font-weight: 600 }
+.lead { margin: 0 0 56px; color: var(--muted) }
+
+#setup { max-width: 640px; margin: 0 0 64px; padding: 26px 0 0; border-top: 2px solid var(--ink) }
+#setup h2 { margin: 0 0 18px; font: 600 22px/1.3 Hahmlet, serif }
+#setup ol { margin: 0; padding: 0; list-style: none; counter-reset: s; display: grid; gap: 22px }
+#setup li { counter-increment: s; display: grid; grid-template-columns: 34px 1fr; gap: 0 10px }
+#setup li::before { content: counter(s); font: 600 22px/1.2 Hahmlet, serif; color: var(--blue) }
+#setup li p { margin: 0; grid-column: 2 }
+#setup li p + p { color: var(--muted); font-size: 14.5px; margin-top: 4px }
+#setup code { font: 14px "IBM Plex Mono", monospace; background: #e4e2da; padding: 1px 6px }
+.ext { font-weight: 700; color: var(--blue); text-underline-offset: 3px }
+.tok { grid-column: 2; display: flex; gap: 8px; margin-top: 10px }
+.tok input { flex: 1; min-width: 0; font: 14px "IBM Plex Mono", monospace; padding: 12px 2px; border: 0; border-bottom: 2px solid var(--ink); background: transparent; outline: none }
+.tok input:focus-visible { border-color: var(--blue) }
+button { font: 700 15px/1 inherit; font-family: inherit; min-height: 46px; padding: 0 20px; border: 0; background: var(--blue); color: #fff; cursor: pointer }
+button:disabled { opacity: .45; cursor: default }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px }
+#tokMsg { grid-column: 2; margin: 6px 0 0; min-height: 1.5em; color: var(--red); font-size: 14px }
+
+#groups { columns: 2 440px; column-gap: clamp(32px, 6vw, 96px) }
+section.g { break-inside: avoid; margin-bottom: 52px }
+section.g h2 { display: flex; align-items: baseline; gap: 10px; margin: 0 0 6px; font: 600 26px/1.2 Hahmlet, serif }
+section.g h2 span { font: 13px "IBM Plex Mono", monospace; color: var(--muted) }
+.row { display: flex; align-items: center; gap: 16px; padding: 13px 0; border-bottom: 1px solid var(--rule); cursor: pointer }
+.row:first-of-type { border-top: 1px solid var(--ink) }
+.row .t { flex: 1; min-width: 0 }
+.row b { display: block; font-weight: 600 }
+.row small { display: block; color: var(--muted); font-size: 12.5px; overflow-wrap: anywhere }
+.row.off { cursor: default; color: var(--muted) }
+.row .now { font-size: 12px; color: var(--blue); white-space: nowrap }
+
+/* 스위치: 켜짐 = 잠금 */
+.sw { appearance: none; flex: none; width: 50px; height: 28px; margin: 0; border-radius: 14px; background: #c9c6bc; position: relative; cursor: inherit; transition: background-color .2s }
+.sw::after { content: ""; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgb(0 0 0 / .25); transition: transform .2s }
+.sw:checked { background: var(--ink) }
+.sw:checked::after { transform: translateX(22px) }
+.sw:disabled { opacity: .4 }
+
+.bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px var(--m) calc(14px + env(safe-area-inset-bottom)); background: var(--ink); color: var(--paper) }
+.bar p { margin: 0; font-size: 15px }
+.bar p.err { color: #ffb4a8 }
+.bar button { background: var(--paper); color: var(--ink); min-width: 96px }
+.foot { margin-top: 8px; font-size: 14px; color: var(--muted) }
+.foot button { background: none; color: inherit; padding: 0; min-height: 0; font-weight: 400; text-decoration: underline; text-underline-offset: 3px }
+.auth { position: fixed; left: 0; right: 0; bottom: 74px; z-index: 6; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; padding: 16px var(--m); background: var(--paper); border-top: 2px solid var(--ink) }
+.auth p { flex-basis: 100%; margin: 0; font-size: 14px; color: var(--muted) }
+.auth input { flex: 1 1 160px; min-width: 0; font: 15px inherit; font-family: inherit; padding: 10px 2px; border: 0; border-bottom: 2px solid var(--ink); background: transparent; outline: none }
+.auth .dots { -webkit-text-security: disc }
+.auth #authX { background: none; color: var(--ink); border: 1px solid var(--ink) }
+@media (prefers-reduced-motion: reduce) { .sw, .sw::after { transition: none } }
+</style>
+</head>
+<body>
+<header><a href="/">창업실</a></header>
+<h1>잠금 <b>설정</b></h1>
+<p class="lead">켠 페이지는 들어갈 때 세 단계(비밀번호·질문·점 순서)를 물어요.</p>
+
+<section id="setup" hidden>
+  <h2>처음 한 번만</h2>
+  <ol>
+    <li><p><a class="ext" id="mkTok" target="_blank" rel="noopener">GitHub 열쇠 만들기 ↗</a></p><p>Repository access에서 <b>Only select repositories → tkdgh123.github.io</b>, 권한은 <b>Actions: Read and write 하나만</b>(링크가 미리 골라 둠) → 맨 아래 Generate token. 이 열쇠로는 사이트를 고칠 수 없고, 잠금 작업을 시작하는 것만 돼요.</p></li>
+    <li><p><a class="ext" href="https://github.com/tkdgh123/tkdgh123.github.io/settings/secrets/actions/new" target="_blank" rel="noopener">잠금 비밀번호 등록하기 ↗</a></p><p>Name에 <code>LOCK_PASSWORD</code>, Secret에 세 단계를 한 줄에 하나씩(비밀번호, 질문 답, 점 번호).</p></li>
+    <li><p>만든 열쇠 붙여 넣기</p>
+      <form class="tok" id="tokF"><input id="tok" type="password" autocomplete="off" spellcheck="false" placeholder="github_pat_…" aria-label="GitHub 열쇠" required><button>확인</button></form>
+      <p id="tokMsg" role="alert"></p></li>
+  </ol>
+</section>
+
+<div id="groups"></div>
+<p class="foot" id="foot" hidden><button type="button" id="forget">이 기기에서 GitHub 열쇠 지우기</button></p>
+
+<form class="auth" id="auth" hidden>
+  <p>바꾸려면 세 단계를 다시 입력하세요. 이 기기에 저장되지 않고, 이번 요청에 서명하는 데만 써요.</p>
+  <input id="a1" type="password" autocomplete="off" placeholder="비밀번호" aria-label="비밀번호" required>
+  <input id="a2" class="dots" type="text" autocomplete="off" spellcheck="false" placeholder="질문 답" aria-label="질문 답" required>
+  <input id="a3" class="dots" type="text" inputmode="numeric" autocomplete="off" placeholder="점 순서(번호, 예: 1234)" aria-label="점 순서" pattern="[1-9]{4,9}" required>
+  <button>서명하고 저장</button> <button type="button" id="authX">취소</button>
+</form>
+<div class="bar"><p id="st" role="status">불러오는 중…</p><button id="save" disabled>저장</button></div>
+
+<script>
+const REPO = "tkdgh123/tkdgh123.github.io", API = "https://api.github.com/repos/" + REPO;
+const WITH = { "ai.html": ["slides", "originals"] };   // 같이 잠겨야 하는 그림·원본 폴더
+const APP = ["uridal", "urigil"];                      // 서비스 워커가 따로 있어 잠그면 앱이 깨짐
+const CATS = ["게임", "공부", "프로젝트", "기타"];
+const $ = id => document.getElementById(id);
+const esc = s => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+const unit = h => h.split("#")[0].split("?")[0].split("/")[0];
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const same = (a, b) => JSON.stringify([...a].sort()) === JSON.stringify([...b].sort());
+const store = (k, v) => { try { return v === undefined ? localStorage.getItem(k) : v === null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch { return null; } };
+
+store("lock-token", null);   // 옛 열쇠(저장소 쓰기 권한)는 이 기기에서 지운다
+let token = store("lock-token2"), units = [], want = new Set(), base = new Set(), busy = false;
+
+$("mkTok").href = "https://github.com/settings/personal-access-tokens/new?" + new URLSearchParams({
+  name: "창업실 잠금 작업 시작", description: "창업실 lock/ 잠금 설정 화면이 서명한 요청으로 잠금 작업을 시작해요(사이트 쓰기 권한 없음)", target_name: "tkdgh123", expires_in: "366", actions: "write",
+});
+
+const gh = (path, opt = {}) => fetch(API + path, { ...opt, headers: { Authorization: "Bearer " + token, Accept: "application/vnd.github+json", ...opt.headers } });
+const site = path => fetch(path + "?t=" + Date.now(), { cache: "no-store" }).then(r => r.json());
+
+async function wanted() {   // 지금 원하는 목록은 공개 파일로 충분하다(쓰기는 서명한 요청으로만)
+  return site("/lock/pages.json");
+}
+
+async function realCards() {
+  const key = await new Promise(res => {
+    const o = indexedDB.open("lock", 1);
+    o.onupgradeneeded = () => o.result.createObjectStore("k");
+    o.onsuccess = () => { const r = o.result.transaction("k").objectStore("k").get("key"); r.onsuccess = () => res(r.result); r.onerror = () => res(null); };
+    o.onerror = () => res(null);
+  });
+  if (!key) return {};
+  const b = new Uint8Array(await (await fetch("/lock/hub.enc", { cache: "no-store" })).arrayBuffer());
+  return JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({ name: "AES-GCM", iv: b.slice(0, 12) }, key, b.slice(12))));
+}
+
+async function load() {
+  const html = await fetch("/index.html", { cache: "no-store" }).then(r => r.text());
+  const W = Function("return " + html.match(/const W = (\[[\s\S]*?\n\])\.map/)[1])();
+  // 공개 카드는 "잠긴 작업"으로 가려져 있다 → 이 기기에 열쇠가 있으면 진짜 제목으로
+  const real = await realCards().catch(() => ({}));
+  W.forEach((r, i) => { if (real[r[3]]) W[i] = real[r[3]]; });
+  const [list, pages] = await Promise.all([site("/lock/list.json"), wanted()]);
+  const map = new Map();
+  const add = (u, title, cat) => {
+    if (!u || u === "index.html" || u === "lock" || Object.values(WITH).flat().includes(u)) return;
+    const x = map.get(u) || map.set(u, { u, cat, titles: [] }).get(u);
+    if (!x.titles.includes(title)) x.titles.push(title);
+  };
+  for (const [cat, t, , href, , , , , , more = []] of W) add(unit(href), t, cat);
+  for (const [cat, t, , href, , , , , , more = []] of W) for (const [l, h] of more) if (unit(h) !== unit(href)) add(unit(h), t + " · " + l, cat);
+  for (const u of [...list.pages, ...pages]) if (!map.has(u)) add(u, u, "그 밖");
+  units = [...map.values()];
+  want = new Set(pages); base = new Set(pages);
+  render();
+  if (!same(list.pages, pages)) watchSite(pages);
+  else status();
+}
+
+function render() {
+  const groups = [...CATS, "그 밖"].map(c => [c, units.filter(x => x.cat === c)]).filter(([, xs]) => xs.length);
+  $("groups").innerHTML = groups.map(([c, xs]) => `<section class="g"><h2>${c}<span>${xs.filter(x => want.has(x.u)).length} / ${xs.length} 잠금</span></h2>${xs.map(x => {
+    const app = APP.includes(x.u);
+    return `<label class="row${app ? " off" : ""}"><span class="t"><b>${esc(x.titles[0])}</b><small class="mono">${esc([...(x.titles[0] === x.u ? [] : [x.u + (x.u.includes(".") ? "" : "/")]), ...x.titles.slice(1)].join(" · "))}${app ? " · 앱이라 잠그지 않아요" : ""}</small></span>${want.has(x.u) !== base.has(x.u) ? `<span class="now">${want.has(x.u) ? "잠글 예정" : "풀 예정"}</span>` : ""}<input class="sw" type="checkbox" role="switch" data-u="${x.u}"${want.has(x.u) ? " checked" : ""}${app ? " disabled" : ""}></label>`;
+  }).join("")}</section>`).join("");
+  $("setup").hidden = !!token;
+  $("foot").hidden = !token;
+}
+
+$("groups").onchange = e => {
+  const u = e.target.dataset.u;
+  if (!u || busy) return;
+  for (const v of [u, ...(WITH[u] || [])]) e.target.checked ? want.add(v) : want.delete(v);
+  render(); status();
+};
+
+function changes() {
+  const shown = new Set(units.map(x => x.u));
+  return { on: [...want].filter(u => !base.has(u) && shown.has(u)), off: [...base].filter(u => !want.has(u) && shown.has(u)) };
+}
+function status(text, err) {
+  const { on, off } = changes(), n = on.length + off.length;
+  $("st").textContent = text || (n ? `${n}곳 바뀜` : "지금 잠금 상태 그대로예요");
+  $("st").className = err ? "err" : "";
+  $("save").disabled = busy || !n;
+}
+
+$("save").onclick = () => {
+  if (!token) { $("setup").scrollIntoView({ behavior: "smooth" }); $("tok").focus({ preventScroll: true }); status("GitHub 열쇠를 먼저 넣어 주세요", true); return; }
+  $("auth").hidden = false; $("a1").focus();
+};
+$("authX").onclick = () => { $("auth").reset(); $("auth").hidden = true; };
+
+// 세 단계로 그 자리에서 만든 '설정용 열쇠'로 요청을 암호화한다. 기기에 저장된 열쇠로는 이 열쇠를 만들 수 없다.
+async function sign(parts, body) {
+  const l = await site("/lock/list.json"), enc = new TextEncoder(), b64 = x => Uint8Array.from(atob(x), c => c.charCodeAt(0));
+  const pw = await crypto.subtle.importKey("raw", enc.encode(parts.join("\n")), "PBKDF2", false, ["deriveBits"]);
+  const bits = await crypto.subtle.deriveBits({ name: "PBKDF2", salt: b64(l.salt), iterations: l.iter, hash: "SHA-256" }, pw, 256);
+  const aes = await crypto.subtle.importKey("raw", bits, "AES-GCM", false, ["decrypt"]), chk = b64(l.check);
+  try { await crypto.subtle.decrypt({ name: "AES-GCM", iv: chk.slice(0, 12) }, aes, chk.slice(12)); } catch { throw new Error("세 단계 중 하나가 틀렸어요"); }
+  const hk = await crypto.subtle.importKey("raw", bits, "HKDF", false, ["deriveKey"]);
+  const admin = await crypto.subtle.deriveKey({ name: "HKDF", hash: "SHA-256", salt: new Uint8Array(0), info: enc.encode("changupsil-lock-admin") }, hk, { name: "AES-GCM", length: 256 }, false, ["encrypt"]);
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const ct = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv, additionalData: enc.encode("changupsil-lock-request") }, admin, enc.encode(JSON.stringify(body))));
+  const all = new Uint8Array(12 + ct.length); all.set(iv); all.set(ct, 12);
+  return btoa(String.fromCharCode(...all));
+}
+
+$("auth").onsubmit = async e => {
+  e.preventDefault();
+  const parts = [$("a1").value, $("a2").value.normalize("NFC").toLowerCase().replace(/\s+/g, ""), $("a3").value.replace(/\D/g, "")];
+  $("auth").reset(); $("auth").hidden = true;
+  busy = true; status("서명하는 중…");
+  try {
+    const req = await sign(parts, { pages: [...want].sort(), base: [...base].sort(), ts: Date.now(), nonce: crypto.randomUUID() });
+    const t0 = Date.now();
+    const r = await gh("/actions/workflows/lock.yml/dispatches", { method: "POST", body: JSON.stringify({ ref: "main", inputs: { req } }) });
+    if (r.status === 401) throw new Error("열쇠");
+    if (!r.ok) throw new Error(r.status === 403 || r.status === 404 ? "열쇠에 Actions 쓰기 권한이 없어요(1번 다시)" : "요청 실패 " + r.status);
+    base = new Set(want); render();
+    await watchRun(t0);
+    await watchSite([...want]);
+  } catch (e) {
+    busy = false;
+    if (e.message === "열쇠") { token = null; store("lock-token2", null); render(); status("GitHub 열쇠가 만료됐거나 틀려요. 다시 넣어 주세요", true); }
+    else status(e.message, true);
+  }
+};
+
+// GitHub가 잠그고 푸는 작업(lock.yml)이 끝날 때까지
+async function watchRun(t0) {
+  status("GitHub가 확인하고 잠그는 중… (1분쯤)");
+  for (let i = 0; i < 120; i++) {
+    await sleep(5000);
+    const r = await gh("/actions/workflows/lock.yml/runs?per_page=5&event=workflow_dispatch");
+    if (!r.ok) return;
+    const run = (await r.json()).workflow_runs.find(x => Date.parse(x.created_at) >= t0 - 10e3);
+    if (run?.status === "completed") {
+      if (run.conclusion === "success") return;
+      throw new Error("GitHub가 요청을 거절했어요 — 2번(비밀번호 등록)을 확인해 주세요");
+    }
+  }
+  throw new Error("GitHub 작업이 너무 오래 걸려요. 나중에 새로고침해 주세요");
+}
+// 사이트(GitHub Pages)에 반영될 때까지
+async function watchSite(pages) {
+  busy = true; status("사이트에 반영하는 중…");
+  for (let i = 0; i < 90; i++) {
+    const l = await site("/lock/list.json").catch(() => null);
+    if (l && same(l.pages, pages)) { busy = false; return status("적용됐어요"); }
+    await sleep(6000);
+  }
+  busy = false; status("반영이 늦어요. 조금 뒤 새로고침해 주세요", true);
+}
+
+$("tokF").onsubmit = async e => {
+  e.preventDefault();
+  token = $("tok").value.trim(); $("tokMsg").textContent = "";
+  const r = await gh("/actions/workflows/lock.yml").catch(() => null);
+  if (!r || !r.ok) { token = null; $("tokMsg").textContent = r && r.status === 404 ? "열쇠가 이 저장소를 못 봐요 — 1번에서 tkdgh123.github.io를 골라 주세요" : "열쇠가 맞지 않아요"; return; }
+  store("lock-token2", token); $("tok").value = "";
+  const keep = new Set(want);
+  await load();
+  want = keep; render(); status();
+};
+$("forget").onclick = () => { store("lock-token2", null); token = null; render(); status(); };
+
+load().catch(e => {
+  if (e.message === "열쇠") { token = null; store("lock-token2", null); return load(); }
+  status("불러오지 못했어요 — 새로고침해 주세요", true);
+});
+</script>
+</body>
+</html>

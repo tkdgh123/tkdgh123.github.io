@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>창업실</title>
+<meta name="description" content="숭실대 AI소프트웨어학부 1학년이 노트북 한 대로 만든 게임 도록, 복습 도구, 생활 자동화를 모은 창업실">
+<script>
+if (/^#(notes|prog|quiz|wrong|code)$/.test(location.hash)) location.replace("../study.html" + location.hash);
+document.documentElement.classList.add("js");
+</script>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fonts-archive/Paperlogy/Paperlogy.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sun-typeface/SUIT@2/fonts/variable/woff2/SUIT-Variable.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap">
+<script src="../icons.js" defer></script>
+<style>
+/* 전시장: 회백 벽, 한 단계 어두운 벽, 먹색 방, 깊은 청록 하나 */
+:root {
+  --paper: #eeeeeb; --tone: #dcdcd7; --ink: #141619; --muted: #56585b;
+  --on-dark: #ededea; --on-dark-soft: #a4a7ab; --accent: #1d4f5c; --accent-hi: #163e49;
+  --m: clamp(16px, 3vw, 48px);
+  --s-small: 14px; --s-body: clamp(16px, .95rem + .2vw, 18px); --s-lead: clamp(19px, 1rem + .6vw, 25px);
+  --head: "Paperlogy", "SUIT Variable", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
+  color-scheme: light;
+}
+* { box-sizing: border-box }
+html { scroll-behavior: smooth }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 var(--s-body)/1.6 "SUIT Variable", "SUIT", system-ui, "Malgun Gothic", sans-serif; word-break: keep-all; overflow-wrap: anywhere; -webkit-font-smoothing: antialiased }
+a { color: inherit }
+img { display: block; max-width: 100%; height: auto }
+h1, h2, h3 { margin: 0; font-family: var(--head); font-weight: 800; letter-spacing: -.015em; line-height: 1.1 }
+p { margin: 0 }
+.ic { display: inline-flex; width: 20px; height: 20px; flex: none }
+.n { font-family: var(--mono); font-weight: 500; font-size: 13px; letter-spacing: .04em; font-variant-numeric: tabular-nums }
+a:focus-visible, button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px }
+.dark a:focus-visible { outline-color: var(--on-dark) }
+
+/* 위 막대 */
+.bar { position: absolute; inset: 0 0 auto; z-index: 10; display: flex; justify-content: space-between; align-items: center; padding: 22px var(--m) }
+.bar .mark { font-family: var(--head); font-weight: 800; font-size: 22px; text-decoration: none }
+.bar nav { display: flex; gap: clamp(14px, 2.2vw, 32px); font-weight: 650 }
+.bar nav a { text-decoration: underline 2px transparent; text-underline-offset: 7px; padding: 6px 0; transition: text-decoration-color .2s }
+.bar nav a:hover { text-decoration-color: currentColor }
+
+/* 지금 있는 방 */
+.where.off { opacity: 0 }
+.where { transition: opacity .3s; position: fixed; left: var(--m); bottom: 20px; z-index: 9; color: #fff; mix-blend-mode: difference; display: flex; gap: 10px; align-items: baseline; pointer-events: none; font-weight: 650; font-size: var(--s-small) }
+
+/* 입구: 큰 제목 뒤로 작업 그림이 깊이를 두고 겹친다 */
+.hero { position: relative; min-height: 100svh; overflow: hidden; display: flex; align-items: center; padding: 120px var(--m) 96px }
+.hero .copy { position: relative; z-index: 3; max-width: 44vw }
+.hero h1 { font-size: clamp(44px, 5.9vw, 100px); line-height: 1.08 }
+.hero h1 em { font-style: normal; color: var(--accent) }
+.hero .lede { margin-top: 32px; font-size: var(--s-lead); line-height: 1.5; max-width: 22em; color: #2b2d30 }
+.hero .act { margin-top: 40px; display: flex; flex-wrap: wrap; align-items: center; gap: 14px 22px }
+.btn { display: inline-flex; align-items: center; gap: 10px; min-height: 58px; padding: 0 26px; background: var(--accent); color: #fff; font-weight: 750; text-decoration: none; box-shadow: 0 14px 30px -14px rgba(20, 50, 60, .7); transition: background-color .2s, transform .15s }
+.btn:hover { background: var(--accent-hi) } .btn:active { transform: scale(.97) }
+.note { max-width: 20em; font-size: 15px; color: var(--muted) }
+.note b { color: var(--ink); font-weight: 750 }
+
+.collage { position: absolute; top: 0; right: 0; bottom: 0; width: 60vw; z-index: 1; pointer-events: none; --mx: 0; --my: 0 }
+.collage > * { position: absolute; margin: 0; left: var(--x); top: var(--y); width: var(--w); translate: calc(var(--mx) * var(--d) * -26px) calc(var(--my) * var(--d) * -16px); rotate: var(--r, 0deg); transition: translate .9s cubic-bezier(.2, .7, .2, 1) }
+.collage img { width: 100%; box-shadow: 0 calc(var(--d) * 40px) calc(var(--d) * 70px) calc(var(--d) * -20px) rgba(10, 14, 18, .45) }
+.collage .slab { aspect-ratio: 5 / 4; background: var(--accent) }
+.collage .far img { filter: saturate(.5) contrast(.85); opacity: .55 }
+.js .collage > * { opacity: 0; scale: .93; transition: translate .9s cubic-bezier(.2, .7, .2, 1), opacity .9s ease, scale 1.1s cubic-bezier(.2, .7, .2, 1); transition-delay: 0s, calc(var(--k) * 110ms + .1s), calc(var(--k) * 110ms + .1s) }
+.js .collage.in > * { opacity: 1; scale: 1 }
+
+/* 들어올 때 떠오르기 (스크립트 없으면 처음부터 보임) */
+.js .rise { opacity: 0; transform: translateY(24px); transition: opacity .7s ease, transform .7s cubic-bezier(.2, .7, .2, 1); transition-delay: calc(var(--i, 0) * 80ms) }
+.js .rise.in { opacity: 1; transform: none }
+
+/* 게임: 작품 하나에 방 하나. 작은 액자로 시작해 화면 가득 커진다 */
+.dark { background: var(--ink); color: var(--on-dark) }
+.game-in { padding: 22vh var(--m) 8vh; display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 24px; align-items: end }
+.game-in h2 { grid-column: 1 / 7; font-size: clamp(64px, 11vw, 190px); line-height: .95 }
+.game-in .intro { grid-column: 8 / 12; color: var(--on-dark-soft); font-size: var(--s-lead); line-height: 1.5 }
+.room { position: relative; height: 210vh; --e: 0 }
+.stage { position: sticky; top: 0; height: 100svh; overflow: hidden }
+.stage .art { position: absolute; inset: 0; display: block; clip-path: inset(calc(var(--e) * 24svh) calc(var(--e) * max(0px, (100vw - 92.4svh) / 2))) }
+.stage .art img { width: 100%; height: 100%; object-fit: cover; transform: scale(calc(1 + var(--e) * .22)) }
+.stage .art::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(10, 11, 13, .82) 0%, rgba(10, 11, 13, .5) 34%, rgba(10, 11, 13, 0) 62%); opacity: calc(1 - var(--e) * 1.6) }
+.stage .cap { position: absolute; left: var(--m); bottom: 11vh; width: min(34em, 40vw); opacity: calc(1 - var(--e) * 3.2); transform: translateY(calc(var(--e) * 50px)) }
+.stage .cap:focus-within { opacity: 1; transform: none }
+.cap .n { color: var(--on-dark-soft) }
+.room.plaque .art::after { display: none }
+.room.plaque .cap { left: 0; bottom: 0; width: min(31em, 36vw); padding: 44px var(--m) 76px; background: rgba(16, 17, 20, .92); box-shadow: 30px -30px 80px -40px rgba(0, 0, 0, .6) }
+.room.plaque .cap h3 { font-size: clamp(44px, 4.6vw, 80px) }
+.cap h3 { margin-top: 14px; font-size: clamp(56px, 7.5vw, 128px); line-height: 1 }
+.cap h3 a { text-decoration: none }
+.cap p { margin-top: 20px; line-height: 1.6 }
+.cap .meta { margin-top: 14px; font-family: var(--mono); font-size: 13px; color: var(--on-dark-soft) }
+.more { display: inline-flex; align-items: center; gap: 8px; margin-top: 26px; font-weight: 750; text-underline-offset: 6px }
+
+/* 공부: 판이 위에 고정되고 다음 판이 겹쳐 올라온다 */
+.study { background: var(--tone); padding: 18vh var(--m) 16vh; display: grid; grid-template-columns: 4fr 8fr; column-gap: clamp(24px, 4vw, 64px); align-items: start }
+.study .side { position: sticky; top: 12vh }
+.study h2 { font-size: clamp(56px, 7vw, 120px); line-height: 1 }
+.study .intro { margin-top: 24px; max-width: 20em; color: var(--muted) }
+.idx { margin: 40px 0 0; padding: 0; list-style: none; display: grid; gap: 4px }
+.idx a { display: flex; gap: 14px; align-items: baseline; padding: 6px 0; text-decoration: none; color: var(--muted); font-weight: 650; transition: color .2s, padding-left .25s }
+.idx a .n { color: inherit }
+.idx a:hover, .idx a[aria-current="true"] { color: var(--ink) }
+.idx a[aria-current="true"] { padding-left: 14px; box-shadow: inset 3px 0 var(--accent) }
+.stack { padding-bottom: 6vh }
+.plate { --pb: #f6f6f3; --pf: var(--ink); --ps: var(--muted); position: sticky; top: calc(9vh + var(--i) * 50px); margin-bottom: 30vh; background: var(--pb); color: var(--pf); box-shadow: 0 -16px 40px -18px rgba(0, 0, 0, .28), 0 40px 70px -40px rgba(0, 0, 0, .35); transform: scale(calc(1 - var(--q, 0) * .035)); transform-origin: 50% 0; scroll-margin-top: calc(9vh + var(--i) * 50px) }
+.plate:last-child { margin-bottom: 0 }
+.plate.ink { --pb: var(--ink); --pf: var(--on-dark); --ps: var(--on-dark-soft) }
+.plate.acc { --pb: var(--accent); --pf: #f1f4f4; --ps: #b9cdd1 }
+.plate .tab { height: 50px; display: flex; align-items: center; gap: 16px; padding: 0 28px; font-weight: 700; font-size: 15px }
+.plate .tab .n { color: var(--ps) }
+.plate .body { display: grid; grid-template-columns: 7fr 5fr; gap: 32px; padding: 6px 28px 28px }
+.plate .pic { display: block; overflow: hidden; align-self: start }
+.plate .pic img { width: 100%; transition: transform .6s cubic-bezier(.2, .7, .2, 1) }
+.plate .pic:hover img { transform: scale(1.03) }
+.plate .txt { display: flex; flex-direction: column; justify-content: space-between; gap: 24px }
+.plate h3 { font-size: clamp(22px, 1.1rem + .8vw, 30px); line-height: 1.25 }
+.plate .txt p { margin-top: 14px; font-size: 16px; color: var(--ps) }
+.plate .also { margin: 12px 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 15px }
+.plate .also a { font-weight: 700; text-underline-offset: 4px }
+.cells { display: grid; grid-template-columns: 1fr 1fr; gap: 6px }
+.cells a { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 56px; padding: 0 16px; text-decoration: none; font-weight: 750; font-size: 15px; background: color-mix(in srgb, var(--pf) 9%, transparent); transition: transform .15s, background-color .2s }
+.cells a:first-child { background: var(--pf); color: var(--pb) }
+.cells a:hover { transform: translateY(-2px) } .cells a:active { transform: scale(.98) }
+.cells a:only-child { grid-column: 1 / -1 }
+.plate a:focus-visible { outline-color: var(--pf) }
+
+/* 프로젝트: 크기가 다른 작품을 벽에 건다 */
+.make { padding: 20vh var(--m) 22vh }
+.mhead { display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 24px; align-items: end }
+.mhead h2 { grid-column: 1 / 8; font-size: clamp(56px, 8.5vw, 150px); line-height: 1 }
+.mhead .intro { grid-column: 9 / 13; color: var(--on-dark-soft); font-size: var(--s-lead); line-height: 1.5 }
+.hang { margin-top: 14vh; display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 24px; row-gap: 12vh; align-items: start }
+.w { margin: 0 }
+.w .grow { display: block; overflow: hidden; --e: 0 }
+.w .grow img { width: 100%; transform: scale(calc(1 - var(--e) * .14)); opacity: calc(1 - var(--e) * .8); transform-origin: 50% 100% }
+.w figcaption { margin-top: 20px; display: grid; grid-template-columns: auto 1fr; column-gap: 16px; align-items: baseline }
+.w figcaption .n { color: var(--on-dark-soft) }
+.w .name { font-family: var(--head); font-weight: 750; font-size: clamp(26px, 1.2rem + 1.2vw, 40px); line-height: 1.15; text-decoration: underline 3px transparent; text-underline-offset: 8px; transition: text-decoration-color .2s }
+.w .name:hover { text-decoration-color: currentColor }
+.w .fact { grid-column: 2; margin-top: 10px; max-width: 30em; color: var(--on-dark-soft); font-size: 16px }
+.w .fact a { color: var(--on-dark); font-weight: 700; text-underline-offset: 4px }
+.w1 { grid-column: 1 / 8; grid-row: 1 }
+.w2 { grid-column: 9 / 13; grid-row: 1; margin-top: 26vh }
+.w3 { grid-column: 2 / 6; grid-row: 2 }
+.w4 { grid-column: 7 / 13; grid-row: 2; margin-top: 14vh }
+.w5 { grid-column: 4 / 8; grid-row: 3 }
+
+/* 기타: 촘촘한 띠 */
+.etc { background: var(--tone); padding: 13vh var(--m) 15vh }
+.ehead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px 32px }
+.ehead h2 { font-size: clamp(40px, 4.4vw, 72px) }
+.ehead .intro { color: var(--muted); max-width: 30em }
+.band { margin-top: 40px; display: flex; gap: 14px; align-items: flex-end }
+.t { flex: 1 1 0; min-width: 0; text-decoration: none; display: block }
+.t1 { flex-grow: 1.75 } .t2 { flex-grow: 1.3 }
+.t .pic { display: block; overflow: hidden; box-shadow: 0 18px 30px -22px rgba(0, 0, 0, .5) }
+.t img { width: 100%; transition: transform .5s cubic-bezier(.2, .7, .2, 1) }
+.t:hover img { transform: scale(1.04) }
+.t .lab { display: grid; gap: 2px; padding-top: 12px }
+.t .lab .n { color: var(--muted); font-size: 12px }
+.t b { font-weight: 700; font-size: 15px; line-height: 1.35 }
+.t1 b { font-size: 18px }
+.t:hover b { text-decoration: underline 2px; text-underline-offset: 4px }
+
+/* 끝 */
+.end { padding: 18vh var(--m) 0; overflow: hidden }
+.end .go { display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 24px; row-gap: 32px }
+.end ul { grid-column: 1 / 7; margin: 0; padding: 0; list-style: none; font-size: var(--s-lead); font-weight: 750; line-height: 1.7 }
+.end ul a { text-decoration: none; display: inline-flex; align-items: center; gap: 12px }
+.end ul a:hover { text-decoration: underline 2px; text-underline-offset: 6px }
+.end ul .n { color: var(--on-dark-soft); font-weight: 400 }
+.end .side { grid-column: 8 / 13; align-self: end; display: grid; gap: 14px; color: var(--on-dark-soft) }
+.end .side a { color: var(--on-dark); font-weight: 700; text-underline-offset: 4px }
+.end .word { margin: 72px 0 0; font-family: var(--head); font-weight: 800; font-size: 27vw; line-height: .8; letter-spacing: -.03em; white-space: nowrap; height: .64em; overflow: hidden; color: #24272b }
+
+@media (max-width: 1000px) {
+  .hero { display: block; min-height: 0; padding-top: 104px; padding-bottom: 0 }
+  .hero .copy { max-width: none }
+  .hero h1 { font-size: clamp(40px, 9vw, 76px) }
+  .collage { position: relative; width: auto; height: 74vw; margin: 48px calc(-1 * var(--m)) 0 }
+  .game-in h2, .game-in .intro, .mhead h2, .mhead .intro { grid-column: 1 / -1 }
+  .game-in .intro, .mhead .intro { margin-top: 20px; max-width: 28em }
+  .study { grid-template-columns: 1fr }
+  .study .side { position: static }
+  .idx { display: none }
+  .stack { margin-top: 48px }
+  .w1 { grid-column: 1 / 10 } .w2 { grid-column: 4 / 13; grid-row: 2; margin-top: 0 }
+  .w3 { grid-column: 1 / 8; grid-row: 3 } .w4 { grid-column: 3 / 13; grid-row: 4; margin-top: 0 } .w5 { grid-column: 1 / 8; grid-row: 5 }
+  .hang { row-gap: 72px }
+}
+@media (max-width: 760px) {
+  .bar { padding-top: 18px }
+  .bar .mark { font-size: 19px }
+  .bar nav { gap: 14px; font-size: 15px }
+  .where { display: none }
+  .hero .lede { margin-top: 22px; font-size: 18px }
+  .hero .act { margin-top: 28px }
+  .collage { height: 92vw; margin-top: 36px }
+  .game-in { padding-top: 14vh; padding-bottom: 6vh }
+  .room { height: auto; padding: 0 0 72px }
+  .stage { position: static; height: auto }
+  .stage .art { position: relative; aspect-ratio: 16 / 9; clip-path: inset(calc(var(--e) * 12%)) }
+  .stage .art::after { display: none }
+  .room.plaque .cap { width: auto; padding: 28px var(--m) 0; background: none; box-shadow: none }
+  .room.plaque .cap h3 { font-size: 15vw }
+  .stage .cap { position: static; width: auto; padding: 28px var(--m) 0; opacity: calc(1 - var(--e) * 2) }
+  .cap h3 { font-size: 15vw }
+  .study { padding-top: 12vh; padding-bottom: 10vh }
+  .plate { top: calc(10px + var(--i) * 30px); margin-bottom: 18vh; scroll-margin-top: 10px }
+  .plate .tab { height: 30px; padding: 0 16px; font-size: 13px; gap: 12px }
+  .plate .body { grid-template-columns: 1fr; gap: 16px; padding: 8px 16px 16px }
+  .plate .txt { gap: 16px }
+  .plate .txt p { margin-top: 8px; font-size: 15px; line-height: 1.55 }
+  .plate h3 { font-size: 21px }
+  .cells a { min-height: 50px }
+  .make { padding-top: 14vh; padding-bottom: 14vh }
+  .hang { margin-top: 64px; row-gap: 64px }
+  .w1 { grid-column: 1 / -1 } .w2 { grid-column: 3 / -1 } .w3 { grid-column: 1 / 11 } .w4 { grid-column: 1 / -1 } .w5 { grid-column: 4 / -1 }
+  .w figcaption { column-gap: 12px }
+  .w .fact { grid-column: 1 / -1 }
+  .band { margin: 32px calc(-1 * var(--m)) 0; padding: 0 var(--m) 8px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: var(--m); align-items: flex-end }
+  .t { flex: 0 0 46vw; scroll-snap-align: start }
+  .t1 { flex-basis: 74vw } .t2 { flex-basis: 58vw }
+  .end ul, .end .side { grid-column: 1 / -1 }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto }
+  .js .rise, .js .collage > * { opacity: 1; transform: none; scale: 1; transition: none }
+  .collage > * { translate: none; transition: none }
+  .room { height: auto }
+  .stage { position: relative }
+  .room, .w .grow { --e: 0 !important }
+  .plate { transform: none }
+  .plate .pic img, .t img, .cells a, .btn, .idx a { transition: none }
+}
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <a class="mark" href="../">창업실</a>
+  <nav aria-label="분류">
+    <a href="#game">게임</a><a href="#study">공부</a><a href="#make">프로젝트</a><a href="#etc">기타</a>
+  </nav>
+</header>
+<div class="where" aria-hidden="true"><span class="n" id="whereN">00 / 04</span><span id="whereT">입구</span></div>
+
+<main>
+<section class="hero" data-room="00" data-name="입구">
+  <div class="copy">
+    <h1 class="rise">만들면서 배우는<br><em>1학년</em>의 창업실</h1>
+    <p class="lede rise" style="--i:1">숭실대 AI소프트웨어학부 1학년이 노트북 한 대로 만든 게임 도록, 복습 도구, 생활 자동화를 한곳에 모았습니다.</p>
+    <div class="act rise" style="--i:2">
+      <a class="btn" id="today" href="../daily/">오늘 AI 공부 열기 <span class="ic" data-icon="arrow-right" data-size="20">→</span></a>
+      <p class="note" id="todayNote">아침 8시마다 한 주제씩 카톡으로 와요.</p>
+    </div>
+  </div>
+  <div class="collage" aria-hidden="true">
+    <div class="slab" style="--x:22%;--y:13%;--w:40%;--d:.15;--k:0"></div>
+    <figure class="far" style="--x:66%;--y:9%;--w:28%;--d:.25;--k:1"><img src="../hub/shots/ai.webp" alt="" width="1280" height="800"></figure>
+    <figure style="--x:30%;--y:22%;--w:64%;--d:.5;--k:2"><img src="../neokgut/img/bg_gate.webp" alt="" width="1600" height="900"></figure>
+    <figure style="--x:9%;--y:55%;--w:40%;--d:.85;--k:3;--r:-1.2deg"><img src="../hub/shots/daily.webp" alt="" width="1280" height="800"></figure>
+    <figure style="--x:56%;--y:63%;--w:36%;--d:1;--k:4;--r:1.5deg"><img src="../hub/shots/uridal.webp" alt="" width="1280" height="800"></figure>
+  </div>
+</section>
+
+<section class="game dark" id="game" aria-labelledby="h-game" data-room="01" data-name="게임">
+  <div class="game-in">
+    <h2 id="h-game" class="rise">게임</h2>
+    <p class="intro rise" style="--i:1">혼자 기획하고 있는 두 편. 그림과 규칙, 한 판의 흐름까지 도록으로 묶었습니다.</p>
+  </div>
+
+  <article class="room">
+    <div class="stage">
+      <a class="art" href="../neokgut/" tabindex="-1"><img src="../neokgut/img/bg_gate.webp" alt="넋굿의 저승 입구 풍경" width="1600" height="900" loading="lazy"></a>
+      <div class="cap">
+        <span class="n">01 — 넋굿</span>
+        <h3><a href="../neokgut/">넋굿</a></h3>
+        <p>부서진 저승길 위에서 구미호 아이가 오행 술법으로 원귀를 풀어 주는 쿼터뷰 액션 로그라이트. 이야기, 한 판의 흐름, 전투, 원귀, 술법·보물, 신당까지 열두 거리로 정리했습니다.</p>
+        <p class="meta">Unity 6 · 액션 로그라이트 · 1인 개발</p>
+        <a class="more" href="../neokgut/">도록 보기 <span class="ic" data-icon="arrow-right" data-size="18">→</span></a>
+      </div>
+    </div>
+  </article>
+
+  <article class="room plaque">
+    <div class="stage">
+      <a class="art" href="../brown-rogue/" tabindex="-1"><img src="../brown-rogue/img/s_title.webp" alt="브라운 로그 타이틀 화면" width="1280" height="720" loading="lazy"></a>
+      <div class="cap">
+        <span class="n">02 — 브라운 로그</span>
+        <h3><a href="../brown-rogue/">브라운 로그</a></h3>
+        <p>한·중·일의 영웅 열다섯 중 다섯을 골라 3×4 진형에 세우고, 라운드 사이마다 자리를 옮기며 찢긴 저승 명부를 돌려주러 가는 동양풍 배치 턴제 RPG. 영웅, 전투, 열 장의 보스, 성장, 원정 모드까지 열한 절로 정리했습니다.</p>
+        <p class="meta">Python · pygame-ce · 배치 턴제 RPG · 1인 개발</p>
+        <a class="more" href="../brown-rogue/">도록 보기 <span class="ic" data-icon="arrow-right" data-size="18">→</span></a>
+      </div>
+    </div>
+  </article>
+</section>
+
+<section class="study" id="study" aria-labelledby="h-study" data-room="02" data-name="공부">
+  <div class="side">
+    <h2 id="h-study" class="rise">공부</h2>
+    <p class="intro rise" style="--i:1">1학년 2학기 수업을 복습하려고 만든 도구들. 강의 정리, 퀴즈, 오답노트, 움직이는 강의까지.</p>
+    <ol class="idx">
+      <li><a href="#st1"><span class="n">01</span>C언어 노트</a></li>
+      <li><a href="#st2"><span class="n">02</span>인공지능 입문</a></li>
+      <li><a href="#st3"><span class="n">03</span>매일 AI 공부</a></li>
+      <li><a href="#st4"><span class="n">04</span>영상 강의</a></li>
+      <li><a href="#st5"><span class="n">05</span>성서 답안</a></li>
+    </ol>
+  </div>
+  <div class="stack">
+    <article class="plate" id="st1" style="--i:0">
+      <div class="tab"><span class="n">01</span>C언어 노트</div>
+      <div class="body">
+        <a class="pic" href="../study.html#notes" tabindex="-1"><img src="../hub/shots/study.webp" alt="C언어 복습 노트 첫 화면" width="1280" height="800" loading="lazy"></a>
+        <div class="txt">
+          <div><h3>프로그래밍기초 복습 노트</h3>
+            <p>C언어 2~9장. 자료형부터 재귀까지 강의 정리, 객관식 퀴즈, 한 줄 코드 작성, 틀린 문제만 다시 푸는 오답노트를 한 화면에.</p></div>
+          <div class="cells"><a href="../study.html#notes">강의 정리 <span class="ic" data-icon="arrow-right">→</span></a><a href="../study.html#quiz">퀴즈 풀기 <span class="ic" data-icon="arrow-right">→</span></a></div>
+        </div>
+      </div>
+    </article>
+    <article class="plate ink" id="st2" style="--i:1">
+      <div class="tab"><span class="n">02</span>인공지능 입문</div>
+      <div class="body">
+        <a class="pic" href="../ai.html" tabindex="-1"><img src="../hub/shots/ai.webp" alt="인공지능 입문 복습 노트 첫 화면" width="1280" height="800" loading="lazy"></a>
+        <div class="txt">
+          <div><h3>인공지능 입문 복습 노트</h3>
+            <p>1~5장. AI의 역사, 지능형 에이전트, 탐색, 복잡한 환경의 탐색, 제약 충족 문제. 원본 강의안과 수업 녹음 정리, 중간고사 정리까지.</p></div>
+          <div class="cells"><a href="../ai.html">노트 열기 <span class="ic" data-icon="arrow-right">→</span></a><a href="../ai-motion/index.html">3장 영상 강의 <span class="ic" data-icon="arrow-right">→</span></a></div>
+        </div>
+      </div>
+    </article>
+    <article class="plate" id="st3" style="--i:2">
+      <div class="tab"><span class="n">03</span>매일 AI 공부</div>
+      <div class="body">
+        <a class="pic" href="../daily/" tabindex="-1"><img src="../hub/shots/daily.webp" alt="매일 AI 공부 레슨 화면" width="1280" height="800" loading="lazy"></a>
+        <div class="txt">
+          <div><h3>매일 AI 공부</h3>
+            <p>아침 8시 카톡으로 오는 하루 한 주제. 컴퓨터 기초부터 AI학과 전공 기초까지 차례대로, 어제 배운 걸 묻는 퀴즈와 용어 사전이 붙어 있어요.</p></div>
+          <div class="cells"><a href="../daily/">레슨 목록 <span class="ic" data-icon="arrow-right">→</span></a><a href="../daily/?t">용어 사전 <span class="ic" data-icon="arrow-right">→</span></a></div>
+        </div>
+      </div>
+    </article>
+    <article class="plate acc" id="st4" style="--i:3">
+      <div class="tab"><span class="n">04</span>영상 강의</div>
+      <div class="body">
+        <a class="pic" href="../motion/index.html" tabindex="-1"><img src="../hub/shots/motion.webp" alt="C 프로그래밍 기초 모션 강의 제목 화면" width="1600" height="900" loading="lazy"></a>
+        <div class="txt">
+          <div><h3>움직이는 그림으로 보는 강의</h3>
+            <p>글로만 보면 헷갈리는 장을 움직이는 그림과 목소리로 다시 설명한 영상들.</p>
+            <ul class="also"><li><a href="../ai-motion5/index.html">AI 5장 제약 충족 문제</a></li><li><a href="../hanoi/index.html">하노이의 탑 실행 추적</a></li></ul></div>
+          <div class="cells"><a href="../motion/index.html">C언어 2~9장 <span class="ic" data-icon="arrow-right">→</span></a><a href="../ai-motion/index.html">AI 3장 탐색 <span class="ic" data-icon="arrow-right">→</span></a></div>
+        </div>
+      </div>
+    </article>
+    <article class="plate" id="st5" style="--i:4">
+      <div class="tab"><span class="n">05</span>성서 답안</div>
+      <div class="body">
+        <a class="pic" href="../human-bible/" tabindex="-1"><img src="../hub/shots/bible.webp" alt="인간과 성서 서술형 답안 첫 화면" width="1280" height="800" loading="lazy"></a>
+        <div class="txt">
+          <div><h3>인간과 성서 서술형 답안</h3>
+            <p>그리스와 기독교의 인간관, 구한말 기독교와 근대화, 혐오와 그 해결. 교재 쪽수를 근거로 쓴 글을 내 말투, 교재 정리본, 외우기용으로 나눠 봅니다.</p></div>
+          <div class="cells"><a href="../human-bible/">답안 보기 <span class="ic" data-icon="arrow-right">→</span></a></div>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section class="make dark" id="make" aria-labelledby="h-make" data-room="03" data-name="프로젝트">
+  <div class="mhead">
+    <h2 id="h-make" class="rise">프로젝트</h2>
+    <p class="intro rise" style="--i:1">수업 팀 과제와, 생활에서 불편했던 걸 직접 고친 것들.</p>
+  </div>
+  <div class="hang">
+    <figure class="w w1">
+      <a class="grow" href="../uridal/" tabindex="-1"><img src="../hub/shots/uridal.webp" alt="우리달 달력·하고 싶은 것·기념일 화면" width="1280" height="800" loading="lazy"></a>
+      <figcaption><span class="n">01</span><a class="name" href="../uridal/">우리달</a>
+        <p class="fact">여자친구랑 같이 쓰는 동글동글한 달력 앱. 남자친구·여자친구·함께 일정이 색으로 나뉘고, 날마다 기분 한 줄, 가고 싶은 곳 목록, 100일·주년 D-day까지. 휴대폰 홈 화면에 앱처럼 설치해요.</p></figcaption>
+    </figure>
+    <figure class="w w2">
+      <a class="grow" href="../lms/" tabindex="-1"><img src="../hub/shots/lmsalert.webp" alt="LMS 할 일·마감 알림" width="1280" height="800" loading="lazy"></a>
+      <figcaption><span class="n">02</span><a class="name" href="../lms/">LMS 할 일·알림</a>
+        <p class="fact">숭실대 LMS에서 아직 안 한 과제·영상·공지만 마감 순으로 모아 체크하며 지우고, 아침 8시엔 휴대폰으로, 노트북을 켜면 화면으로 알려 줘요. 신청할 수 있는 비교과 프로그램도 함께. <a href="../lms/">할 일 목록</a> · <a href="../lms-alert/">알림 설명</a></p></figcaption>
+    </figure>
+    <figure class="w w3">
+      <a class="grow" href="../secure-msg/guide/" tabindex="-1"><img src="../hub/shots/dulmi.webp" alt="덜미 설명서" width="1280" height="800" loading="lazy"></a>
+      <figcaption><span class="n">03</span><a class="name" href="../secure-msg/guide/">덜미</a>
+        <p class="fact">프밍기2 팀 과제. C로 만드는 암호화 메신저의 원리, 계획과 발표, 서버 설계와 코드 뼈대를 한 페이지에.</p></figcaption>
+    </figure>
+    <figure class="w w4">
+      <a class="grow" href="../jobmap/" tabindex="-1"><img src="../hub/shots/jobmap-cover.webp" alt="학과 진로 지도" width="1200" height="630" loading="lazy"></a>
+      <figcaption><span class="n">04</span><a class="name" href="../jobmap/">학과 진로 지도</a>
+        <p class="fact">한 문항씩 넘기는 101문항 진로 검사로 흥미가 겹치는 직무, 준비 상태, 이번 학기 할 일을 보여 줘요.</p></figcaption>
+    </figure>
+    <figure class="w w5">
+      <a class="grow" href="../ffb-wheel/" tabindex="-1"><img src="../hub/shots/ffb-cover.webp" alt="포스 피드백 레이싱 휠 발표 첫 장" width="1280" height="721" loading="lazy"></a>
+      <figcaption><span class="n">05</span><a class="name" href="../ffb-wheel/">레이싱 휠</a>
+        <p class="fact">창공설 팀, 아두이노로 만드는 포스 피드백 레이싱 휠. 발표 자료와 <a href="../ffb-wheel/sim/">3D 설계도</a>, <a href="../ffb-wheel/srs-review/">SRS 첨삭</a>.</p></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="etc" id="etc" aria-labelledby="h-etc" data-room="04" data-name="기타">
+  <div class="ehead">
+    <h2 id="h-etc" class="rise">기타</h2>
+    <p class="intro rise" style="--i:1">진로 고민, 학교 제도 조사, 노트북 관리처럼 그때그때 정리한 것들.</p>
+  </div>
+  <div class="band">
+    <a class="t t1" href="../free-claude-code/"><span class="pic"><img src="../hub/shots/fcc.webp" alt="무료 모델 Claude Code 안내 첫 화면" width="1280" height="800" loading="lazy"></span><span class="lab"><span class="n">10.31 · 도구 설정</span><b>무료 모델 Claude Code</b></span></a>
+    <a class="t t2" href="../storage/"><span class="pic"><img src="../hub/shots/storage.webp" alt="노트북 저장공간 정리 첫 화면" width="1280" height="800" loading="lazy"></span><span class="lab"><span class="n">10.31 · 정리 제안</span><b>노트북 저장공간 정리</b></span></a>
+    <a class="t" href="../career/"><span class="pic"><img src="../hub/shots/career.webp" alt="나의 적성과 취업 방향 첫 화면" width="1280" height="800" loading="lazy"></span><span class="lab"><span class="n">10.29 · 진로</span><b>나의 적성과 취업 방향</b></span></a>
+    <a class="t" href="../career/portfolio.html"><span class="pic"><img src="../hub/shots/portfolio.webp" alt="포트폴리오 설계 첫 화면" width="1280" height="800" loading="lazy"></span><span class="lab"><span class="n">10.29 · 진로</span><b>포트폴리오 설계</b></span></a>
+    <a class="t" href="../internship/"><span class="pic"><img src="../hub/shots/intern.webp" alt="표준 현장실습학기제 정리 첫 화면" width="1280" height="800" loading="lazy"></span><span class="lab"><span class="n">10.29 · 조사 정리</span><b>표준 현장실습학기제 한눈에</b></span></a>
+  </div>
+</section>
+</main>
+
+<footer class="end dark">
+  <div class="go">
+    <ul>
+      <li><a href="#game"><span class="n">01</span>게임 도록 두 편 <span class="ic" data-icon="arrow-right">→</span></a></li>
+      <li><a href="#study"><span class="n">02</span>공부 도구 다섯 가지 <span class="ic" data-icon="arrow-right">→</span></a></li>
+      <li><a href="#make"><span class="n">03</span>프로젝트 다섯 <span class="ic" data-icon="arrow-right">→</span></a></li>
+      <li><a href="#etc"><span class="n">04</span>그때그때 정리 다섯 <span class="ic" data-icon="arrow-right">→</span></a></li>
+    </ul>
+    <div class="side">
+      <p>새 작업이 생기면 방에 하나씩 더합니다.</p>
+      <p><a href="#top" onclick="window.scrollTo({top:0,behavior:'smooth'});return false">맨 위로</a></p>
+    </div>
+  </div>
+  <p class="word" aria-hidden="true">창업실</p>
+</footer>
+
+<script>
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const clamp = v => Math.min(1, Math.max(0, v)), ease = t => 1 - Math.pow(1 - t, 3);
+const still = matchMedia("(prefers-reduced-motion: reduce)").matches, narrow = matchMedia("(max-width: 760px)");
+
+// 오늘 공부할 차례: 매일 AI 공부의 완료 기록에서 아직 안 끝낸 첫 레슨
+Promise.all([
+  fetch("../daily/lessons.json").then(r => r.json()),
+  fetch("https://script.google.com/macros/s/AKfycbxhsQA5ijXl4AtQ4kECjZCs0ZXeBAfJqVousGYJ6lEV7aZ7Saqxi8WFoAqleaTsxaTM/exec").then(r => r.json()).catch(() => ({ done: [] }))
+]).then(([data, j]) => {
+  const done = new Set(j.done || []), L = data.lessons, x = L.find(l => !done.has(l.id));
+  const btn = $("#today"), note = $("#todayNote");
+  if (!x) { note.innerHTML = `준비된 <b>${L.length}개</b>를 모두 끝냈어요.`; return; }
+  btn.href = "../daily/?d=" + x.id;
+  btn.firstChild.textContent = `D${x.id} 공부하기 `;
+  note.innerHTML = `오늘 차례: <b>${x.title}</b><br>${L.length}개 중 ${done.size}개 끝냄`;
+}).catch(() => {});
+
+// 입구 그림: 차례로 놓이고, 마우스에 아주 조금 따라 움직인다
+const collage = $(".collage");
+requestAnimationFrame(() => collage.classList.add("in"));
+if (!still && matchMedia("(pointer: fine)").matches) {
+  addEventListener("pointermove", e => {
+    collage.style.setProperty("--mx", (e.clientX / innerWidth - .5) * 2);
+    collage.style.setProperty("--my", (e.clientY / innerHeight - .5) * 2);
+  }, { passive: true });
+}
+
+// 스크롤에 따라: 방 그림이 커지고, 공부 판이 겹쳐 쌓이고, 지금 있는 방을 표시
+const rooms = $$(".room"), grows = $$(".grow"), plates = $$(".plate"), idx = $$(".idx a"), halls = $$("[data-room]");
+const whereN = $("#whereN"), whereT = $("#whereT");
+let ticking = false;
+function frame() {
+  ticking = false;
+  const vh = innerHeight;
+  if (!still) {
+    rooms.forEach(r => r.style.setProperty("--e", (1 - ease(clamp((vh - r.getBoundingClientRect().top) / (vh * (narrow.matches ? .8 : 1.25))))).toFixed(4)));
+    grows.forEach(g => g.style.setProperty("--e", (1 - ease(clamp((vh - g.getBoundingClientRect().top) / (vh * .55)))).toFixed(4)));
+    plates.forEach((p, i) => {
+      const n = plates[i + 1]; if (!n) return;
+      p.style.setProperty("--q", clamp(1 - (n.getBoundingClientRect().top - p.getBoundingClientRect().top) / (vh * .8)).toFixed(4));
+    });
+  }
+  let cur = 0;
+  plates.forEach((p, i) => { if (p.getBoundingClientRect().top < vh * .5) cur = i; });
+  idx.forEach((a, i) => a.setAttribute("aria-current", i === cur));
+  let h = halls[0];
+  halls.forEach(s => { if (s.getBoundingClientRect().top < vh * .5) h = s; });
+  $(".where").classList.toggle("off", $(".end").getBoundingClientRect().top < vh);
+  whereN.textContent = h.dataset.room + " / 04"; whereT.textContent = h.dataset.name;
+}
+const req = () => { if (!ticking) { ticking = true; requestAnimationFrame(frame); } };
+addEventListener("scroll", req, { passive: true });
+addEventListener("resize", req);
+frame();
+
+// 글이 화면에 들어오면 차례로 떠오른다
+const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { rootMargin: "0px 0px -8% 0px" });
+$$(".rise").forEach(el => io.observe(el));
+</script>
+</body>
+</html>

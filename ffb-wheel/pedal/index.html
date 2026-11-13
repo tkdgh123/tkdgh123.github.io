@@ -1,0 +1,753 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<script>/* 따로 열면 탭 페이지로, 탭 안에서는 바깥 링크만 창 전체로 */if(window.top===window)location.replace("../3d/?v=pedal"+location.search.replace("?","&")+location.hash);else{document.documentElement.classList.add("framed");addEventListener("click",e=>{const a=e.target.closest("a[href]");if(a&&!a.target&&a.getAttribute("href")[0]!=="#")a.target="_top"})}</script>
+<style>.framed .top .back { display: none }</style>
+<title>액셀 페달 3D</title>
+<meta name="description" content="사용자 3D 시안 구조로 만든 액셀 페달 3D 모델. 모르는 치수는 ?로 두고 직접 입력하면 모델·검사·조각 크기가 바로 바뀜">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
+<style>
+:root {
+  --sky-top: #E9EDF0; --sky-bottom: #CBD3D9;
+  --ink: #1C2228; --ink-soft: #56616B; --rule: #C3CBD2; --paper: #FFFFFF; --page: #F4F5F6;
+  --accent: #C8102E; --ok: #0E7A3E; --warn: #8A5A00;
+  --ui: "IBM Plex Sans KR", "Malgun Gothic", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--page); color: var(--ink); font: 15px/1.6 var(--ui); -webkit-font-smoothing: antialiased; }
+a { color: inherit; }
+
+.view { position: relative; height: 100vh; min-height: 560px; background: linear-gradient(180deg, var(--sky-top), var(--sky-bottom)); overflow: hidden; }
+#stage, #stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+#labels { position: absolute; inset: 0; pointer-events: none; }
+.pt { position: absolute; transform: translate(8px, -22px); font: 600 15px/1 var(--mono); color: var(--accent); text-shadow: 0 0 3px #fff, 0 0 3px #fff, 0 0 6px #fff; }
+.tag { position: absolute; transform: translate(-50%, -50%); background: rgba(255,255,255,.93); border: 1px solid var(--ink); padding: 1px 6px; font-size: 12px; font-weight: 500; white-space: nowrap; line-height: 1.5; }
+.tag b { font: 500 11px var(--mono); color: var(--accent); margin-right: 4px; }
+.tag.hw { border-color: #7E868D; color: #3A4148; }
+.tag.on { background: var(--ink); color: #fff; border-color: var(--ink); opacity: 1 !important; }
+.tag.on b { color: #FFB3BE; }
+.tag.hid { opacity: .3; }
+.tag.new { background: #C8102E; color: #fff; border-color: #C8102E; opacity: 1 !important; }
+.tag.new b { color: #FFE1E6; }
+.tag.note { background: var(--ink); color: #fff; border-color: var(--ink); }
+.tag.note small { margin-left: 5px; font-size: 10.5px; color: #C3CBD2; }
+.dim { position: absolute; transform: translate(-50%, -50%); font: 500 11.5px var(--mono); color: var(--ink); background: rgba(233,237,240,.9); padding: 0 4px; white-space: nowrap; border-left: 2px solid var(--ink-soft); }
+.dim.q { color: var(--accent); font-weight: 700; background: #FFF0F2; pointer-events: auto; cursor: pointer; border: 1px dashed var(--accent); padding: 0 6px; }
+.dim.q.set { color: var(--ok); border-color: var(--ok); background: #F0FAF4; }
+.dim.q:hover { background: #FFE0E5; }
+.dim input { font: 700 12px var(--mono); width: 62px; padding: 1px 4px; border: 1px solid var(--accent); }
+.ask { position: absolute; right: 18px; bottom: 18px; background: rgba(255,255,255,.9); border: 1px solid var(--rule); padding: 8px 12px; font-size: 13px; color: var(--ink-soft); display: flex; gap: 10px; align-items: center; flex-wrap: wrap; max-width: calc(100% - 36px); }
+.ask b { color: var(--accent); }
+.ask button { font: inherit; font-size: 12.5px; padding: 4px 9px; border: 1px solid var(--ink); background: #fff; cursor: pointer; border-radius: 3px; }
+.ask #copied { font-size: 12px; word-break: break-all; }
+#tip { position: absolute; pointer-events: none; background: var(--ink); color: #fff; font-size: 13px; padding: 4px 9px; transform: translate(12px, 12px); display: none; white-space: nowrap; }
+#tip small { display: block; font: 11px var(--mono); color: #C9D0D6; }
+.top { position: absolute; top: 0; left: 0; right: 0; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 14px 18px; pointer-events: none; }
+.top .back { pointer-events: auto; text-decoration: none; font-size: 13px; color: var(--ink-soft); }
+.top h1 { margin: 0; font-size: 17px; font-weight: 700; }
+.top h1 span { font: 400 12px var(--mono); color: var(--ink-soft); margin-left: 8px; }
+.tools { margin-left: auto; display: flex; gap: 4px; flex-wrap: wrap; pointer-events: auto; }
+.tools button { font: inherit; font-size: 13px; border: 1px solid var(--rule); background: rgba(255,255,255,.78); color: var(--ink-soft); padding: 6px 11px; border-radius: 3px; cursor: pointer; }
+.tools button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
+.tools .sep { width: 10px; }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ctl { position: absolute; left: 18px; bottom: 18px; width: min(380px, calc(100% - 36px)); background: var(--paper); border: 1px solid var(--ink); box-shadow: 6px 6px 0 rgba(28,34,40,.12); }
+.ctl .row { display: flex; align-items: center; gap: 10px; padding: 12px 14px 8px; }
+.ctl .play { width: 38px; height: 34px; border: 1px solid var(--ink); background: var(--ink); color: #fff; cursor: pointer; font-size: 13px; flex: none; }
+.ctl input[type=range] { flex: 1; accent-color: var(--accent); }
+.ctl .deg { font: 500 20px var(--mono); min-width: 58px; text-align: right; }
+.ctl dl { margin: 0; display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--rule); }
+.ctl dl div { padding: 8px 10px 10px 14px; border-right: 1px solid var(--rule); }
+.ctl dl div:last-child { border-right: 0; }
+.ctl dt { font-size: 11.5px; color: var(--ink-soft); }
+.ctl dd { margin: 2px 0 0; font: 500 15px var(--mono); white-space: nowrap; }
+.ok { color: var(--ok); } .bad { color: var(--accent); }
+#loading { position: absolute; inset: 0; display: grid; place-items: center; font: 13px var(--mono); color: var(--ink-soft); }
+
+main { max-width: 1180px; margin: 0 auto; padding: 72px 24px 120px; }
+section { margin-bottom: 88px; }
+.h { display: grid; grid-template-columns: 64px 1fr; align-items: baseline; margin-bottom: 24px; }
+.h .no { font: 500 15px var(--mono); color: var(--accent); }
+.h h2 { margin: 0; font-size: 30px; line-height: 1.2; font-weight: 700; }
+.h p { grid-column: 2; margin: 8px 0 0; color: var(--ink-soft); max-width: 70ch; }
+.body { padding-left: 64px; }
+
+.form { display: grid; grid-template-columns: 1fr 1fr; gap: 0 56px; }
+.form h3 { margin: 0 0 6px; font-size: 13px; font-weight: 500; color: var(--ink-soft); }
+.form h3.q { color: var(--accent); }
+.frow { display: grid; grid-template-columns: 1fr 110px 54px; gap: 10px; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--rule); font-size: 14.5px; }
+.frow input { font: 500 14px var(--mono); width: 100%; padding: 5px 8px; border: 1px solid var(--rule); border-radius: 3px; background: #fff; text-align: right; }
+.frow.q input { border-color: var(--accent); background: #FFF6F7; }
+.frow.q input::placeholder { color: var(--accent); opacity: .8; }
+.frow.set input { border-color: var(--ok); background: #F2FAF5; }
+.frow .src { font-size: 11.5px; color: var(--ink-soft); }
+.frow.q .src { color: var(--accent); font-weight: 700; }
+.frow.set .src { color: var(--ok); font-weight: 500; }
+.fbtn { margin-top: 16px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.fbtn button { font: inherit; font-size: 13.5px; padding: 7px 14px; border: 1px solid var(--ink); background: #fff; cursor: pointer; border-radius: 3px; }
+.fbtn button.pri { background: var(--ink); color: #fff; }
+.fbtn span { font-size: 13px; color: var(--ink-soft); word-break: break-all; }
+
+.chk { list-style: none; margin: 0; padding: 0; max-width: 920px; }
+.chk li { display: grid; grid-template-columns: 22px 1fr auto; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--rule); font-size: 14.5px; align-items: baseline; }
+.chk li i { font-style: normal; font-weight: 700; }
+.chk li span.v { font-family: var(--mono); white-space: nowrap; }
+.chk li small { display: block; color: var(--ink-soft); font-size: 13px; }
+
+.pcs { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 30px 44px; }
+.pc h3 { margin: 0 0 2px; font-size: 17px; }
+.pc h3 .n { font: 500 14px var(--mono); color: var(--accent); margin-right: 6px; }
+.pc h3 .x { font: 500 14px var(--mono); color: var(--accent); margin-left: 6px; }
+.pc p { margin: 0 0 8px; font-size: 13.5px; color: var(--ink-soft); }
+.pc table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.pc td { padding: 5px 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.pc td:last-child { text-align: right; font-family: var(--mono); padding-left: 12px; }
+.qm { color: var(--accent); font-weight: 700; }
+.lists { display: grid; grid-template-columns: 1fr 1fr; gap: 0 56px; margin-top: 36px; }
+.lists h3 { margin: 0 0 6px; font-size: 13px; font-weight: 500; color: var(--ink-soft); }
+.lists ul { margin: 0 0 24px; padding: 0; }
+.lists li { list-style: none; display: grid; grid-template-columns: 110px 1fr; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--rule); font-size: 14px; }
+.lists li span { color: var(--ink-soft); }
+table.hw { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+.hw th, .hw td { text-align: left; padding: 9px 12px 9px 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.hw th { font-size: 12.5px; color: var(--ink-soft); font-weight: 500; }
+.hw td.m { font-family: var(--mono); white-space: nowrap; }
+ol.steps { margin: 0; padding: 0; list-style: none; counter-reset: s; max-width: 880px; }
+ol.steps li { counter-increment: s; display: grid; grid-template-columns: 40px 1fr; padding: 11px 0; border-bottom: 1px solid var(--rule); }
+ol.steps li::before { content: counter(s, decimal-leading-zero); font: 500 14px var(--mono); color: var(--accent); padding-top: 2px; }
+.warn { margin-top: 20px; font-size: 14px; color: var(--warn); max-width: 80ch; }
+.warn p { margin: 4px 0; }
+
+@media (max-width: 760px) {
+  .top h1 span { display: none; }
+  .tools { margin-left: 0; width: 100%; }
+  .tools button { padding: 5px 8px; font-size: 12px; }
+  .tag, .dim { font-size: 10.5px; padding: 0 4px; }
+  .ctl dl { grid-template-columns: repeat(2, 1fr); }
+  .ctl dl div:nth-child(2) { border-right: 0; }
+  .ctl dl div:nth-child(-n+2) { border-bottom: 1px solid var(--rule); }
+  .ask { left: 18px; right: auto; bottom: 212px; }
+  main { padding: 56px 16px 96px; }
+  .h { grid-template-columns: 40px 1fr; }
+  .h h2 { font-size: 24px; }
+  .body { padding-left: 0; }
+  .form, .lists { grid-template-columns: 1fr; }
+  .frow { grid-template-columns: 1fr 92px 46px; font-size: 13.5px; }
+  .pcs { grid-template-columns: 1fr; }
+  .hw th:nth-child(4), .hw td:nth-child(4) { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="view">
+  <div id="stage"></div>
+  <div id="labels" aria-hidden="true"></div>
+  <div id="tip" aria-hidden="true"></div>
+  <div id="loading">3D 모델 불러오는 중…</div>
+  <header class="top">
+    <a class="back" href="../../#make">← 창업실</a>
+    <h1 id="ttl">액셀·브레이크 페달<span>3D 시안 구조 · ? = 아직 모르는 값</span></h1>
+    <div class="tools" role="group" aria-label="보기">
+      <button type="button" data-cam="iso" aria-pressed="true">비스듬히</button>
+      <button type="button" data-cam="side" aria-pressed="false">옆</button>
+      <button type="button" data-cam="front" aria-pressed="false">앞</button>
+      <button type="button" data-cam="back" aria-pressed="false">뒤</button>
+      <span class="sep"></span>
+      <button type="button" id="tNames" aria-pressed="true">이름</button>
+      <button type="button" id="tDims" aria-pressed="true">치수</button>
+      <button type="button" id="tLines" aria-pressed="false">문서 선</button>
+    </div>
+  </header>
+  <div class="ctl">
+    <div class="row">
+      <button class="play" id="play" type="button" aria-label="밟기 재생">▶</button>
+      <input id="ang" type="range" min="15" max="60" step="0.1" value="60" aria-label="∠AOB">
+      <span class="deg" id="deg">60.0°</span>
+    </div>
+    <dl>
+      <div><dt>∠AOB</dt><dd id="vA">60.0°</dd></div>
+      <div><dt>AB</dt><dd id="vAB">—</dd></div>
+      <div><dt>스프링 CB</dt><dd id="vCB">—</dd></div>
+      <div><dt>DE–P 간격</dt><dd id="vGap">—</dd></div>
+    </dl>
+  </div>
+  <div class="ask"><span>빨간 점선 <b>?</b> <b id="qCount"></b> — 눌러서 숫자를 쓰면 바로 반영돼요</span><button type="button" id="copy">값 링크 복사</button><button type="button" id="reset">지우기</button><span id="copied"></span></div>
+</div>
+
+<main>
+  <section id="check">
+    <div class="h"><span class="no">01</span><h2>검사</h2>
+      <p>지금 값으로 ∠AOB 전 구간을 0.5° 간격으로 계산해서, 부품 사이 가장 가까운 거리를 보여 줘요.</p></div>
+    <div class="body"><ul class="chk" id="chk"></ul></div>
+  </section>
+
+  <section id="parts">
+    <div class="h"><span class="no">02</span><h2>부품 이름과 크기</h2>
+      <p>받침판은 액셀·브레이크가 같이 쓰는 한 장, 나머지는 한 페달 몫이에요 — 브레이크도 똑같이 한 벌 더. 3D에서 부품에 마우스를 올려도 이 이름이 떠요. <span class="qm">?</span> = 아직 모르는 값에 따라 바뀌는 치수.</p></div>
+    <div class="body"><div class="pcs" id="pcs"></div><div class="lists" id="lists"></div></div>
+  </section>
+
+  <section id="hw">
+    <div class="h"><span class="no">03</span><h2>철물</h2><p>한 페달 몫이에요. 브레이크도 한 벌 더.</p></div>
+    <div class="body"><table class="hw" id="hwt"></table></div>
+  </section>
+
+  <section id="asm">
+    <div class="h"><span class="no">04</span><h2>조립 순서</h2></div>
+    <div class="body"><ol class="steps" id="steps"></ol><div class="warn" id="warn"></div></div>
+  </section>
+</main>
+
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+<script type="module">
+import { SPEC, NUT, WASH, AS, build } from "./geo.js";
+import { pieces, hardware, FEATURES, POINTS, f } from "./plan.js";
+
+const $ = id => document.getElementById(id);
+const STORE = "ffb-pedal-dims";
+// 주차 (탭 페이지가 ?w=로 넘김): 10 = 자른 나무 조각만, 11부터 = 조립 + 브레이크 + 센서·선
+const W = +new URLSearchParams(location.search).get("w") || 11;
+// 일차 (?d=1|2): 11주차만 나뉨 — 1일차 = 나무 붙이기, 2일차 = 철물·센서·선. 2일차엔 나무 치수를 숨김
+const D = +new URLSearchParams(location.search).get("d") === 1 ? 1 : 2;
+const NODIM = W === 10 && D === 1;
+let LEGO = null;   // 레고 조립서 (10주차 2일차·11주차): ../steps.js
+if (W === 10) $("ttl").innerHTML = D === 1 ? "자른 나무 조각<span>10주차 · 붙이기 전 · 받침판 1장 + 페달 두 벌 몫</span>" : "나무 자르기<span>10주차 2일차 · 조각마다</span>";
+const TTL11 = { 111: "액셀·브레이크 페달 — 나무 붙이기<span>11주차 1일차 · ? = 아직 모르는 값</span>", 112: "액셀·브레이크 페달 — 축·스프링·센서<span>11주차 2일차</span>" };
+if (W === 11) $("ttl").innerHTML = TTL11[W * 10 + D];
+if (W >= 12) $("ttl").innerHTML = "액셀·브레이크 페달<span>11주차에 다 만든 모습</span>";
+if (NODIM) { document.querySelector(".ask").style.display = "none"; $("tDims").style.display = "none"; }
+const spec = k => SPEC.find(s => s.key === k);
+
+/* ---------- 입력값: URL #d=... > 이 브라우저 저장값 ---------- */
+let vals = {};
+(function load() {
+  const m = location.hash.match(/d=([^&]+)/);
+  if (m) decodeURIComponent(m[1]).split(",").forEach(kv => { const [k, v] = kv.split(":"); if (spec(k) && v !== "" && isFinite(+v)) vals[k] = +v; });
+  else try { vals = JSON.parse(localStorage.getItem(STORE) || "{}") || {}; } catch (e) { vals = {}; }
+})();
+const save = () => { try { localStorage.setItem(STORE, JSON.stringify(vals)); } catch (e) {} };
+const isQ = key => spec(key).src === "?" && !Number.isFinite(vals[key]);
+const unknownIn = deps => deps.some(isQ);
+let G = build(vals);
+
+/* ---------- 링크 복사 · 지우기 ---------- */
+$("reset").addEventListener("click", () => { vals = {}; save(); update(); });
+$("copy").addEventListener("click", async () => {
+  const d = Object.entries(vals).map(([k, v]) => `${k}:${v}`).join(",");
+  const url = location.href.split("#")[0].split("?")[0] + (d ? `#d=${encodeURIComponent(d)}` : "");
+  try { await navigator.clipboard.writeText(url); $("copied").textContent = "복사했어요"; } catch (e) { $("copied").textContent = url; }
+});
+function setVal(k, v) { if (v === "" || !isFinite(+v)) delete vals[k]; else vals[k] = +v; save(); update(); }
+function markRows() { const n = SPEC.filter(s => isQ(s.key)).length; $("qCount").textContent = n ? n + "개" : "없음"; }
+
+/* ---------- 02 검사 · 03 부품 · 04 철물 · 05 조립 ---------- */
+function renderDocs() {
+  const C = G.check(), V = G.V, R = C.res;
+  const item = (ok, name, v, sub) => `<li><i class="${ok ? "ok" : "bad"}">${ok ? "✓" : "!"}</i><span>${name}${sub ? `<small>${sub}</small>` : ""}</span><span class="v ${ok ? "" : "bad"}">${v}</span></li>`;
+  const dd = k => { const r = R[k]; return item(r.d > 0, k, r.d < 0 ? "겹침" : f(r.d) + "mm", `가장 가까울 때 ${f(r.deg)}°`); };
+  const holeTop = G.OPOST.h - G.H - 4.25;   // O 구멍 위에 남는 나무
+  $("chk").innerHTML = [
+    item(R["DE–P (문서 조건)"].d > 0, "DE–P (문서 조건)", f(R["DE–P (문서 조건)"].d) + "mm", "막대 몸통 앞벽 안쪽 면 ↔ 페달 막대의 B 쪽 면. 0보다 커야 해요"),
+    item(true, "OA · OB (문서 식)", `${f(G.OA)} · ${f(G.OB)}`, `AC ${f(G.S)}, 스프링 ${f(V.springFree)}→${f(V.springMin)}, ${f(V.degRest)}°→${f(V.degPress)}°로 푼 값`),
+    item(holeTop >= 6, "O 구멍 위 남는 나무", f(holeTop) + "mm", `O 받이 높이 ${f(G.OPOST.h)} − O 높이 ${f(G.H)} − 구멍 반지름 4.25. 얇으면 밟을 때 쪼개져요 (6 이상)`),
+    item(true, "B 구멍 크기 (관통)", `좌우 ${f(G.SLOT.w)} × 위아래 ${G.SLOT.h}`, `좌우 = 볼트 ${f(V.rodD)} + 여유 ${f(V.holeClr)}. 위아래 = 볼트가 ${f(V.degRest)}°→${f(V.degPress)}° 동안 기울며 판을 지나가는 ${f(G.SLOT.need)} + 여유 ${f(V.holePlay)}`),
+    item(G.LNUT > 0, "장너트 길이 (한쪽)", f(G.LNUT) + "mm", `O 받이 안쪽 면 ${f(G.OPOST.z0)} − 와셔 ${WASH} − 페달 막대 반쪽 ${f(G.PEDAL.t / 2)} − 돌 여유 0.5. 한 페달 칸 폭(= B 판 폭)에 따라 바뀌어요`),
+    dd("U 안쪽 너트 ↔ 페달 막대"), dd("페달 막대 ↔ 받침판"), dd("페달 막대 ↔ B 판"), dd("발판 ↔ B 판"), dd("발판 ↔ 받침판"), dd("막대 몸통 ↔ 받침판"), dd("막대 몸통 ↔ O 받이 (옆 틈)"), dd("A핀 끝 와셔·너트 ↔ O 받이"), dd("발판 ↔ O 받이"), dd("막대 몸통 ↔ B 판"), dd("스프링 ↔ 받침판"), dd("전산볼트·뒤 너트 ↔ 받침판"),
+  ].join("");
+  const qv = (v, deps) => (unknownIn(deps) ? `<span class="qm">? </span>` : "") + v;
+  $("pcs").innerHTML = pieces(G).map(p => `<div class="pc"><h3><span class="n">${p.no}</span>${p.name}<span class="x">× ${p.q}</span></h3><p>${p.what}</p><table>` +
+    p.dims.map(([k, v, deps]) => `<tr><td>${k}</td><td>${qv(f(v), deps)}</td></tr>`).join("") +
+    (p.holes || []).map(([k, v, deps]) => `<tr><td>${k}</td><td>${qv(v, deps)}</td></tr>`).join("") + `</table></div>`).join("");
+  $("lists").innerHTML = `<div><h3>파낸 자리</h3><ul>${FEATURES.map(([a, b]) => `<li><b>${a}</b><span>${b}</span></li>`).join("")}</ul></div><div><h3>문서 점 · 선</h3><ul>${POINTS.map(([a, b]) => `<li><b>${a}</b><span>${b}</span></li>`).join("")}</ul></div>`;
+  $("hwt").innerHTML = `<thead><tr><th>이름</th><th>규격</th><th>수량</th><th>쓰는 곳</th></tr></thead><tbody>` +
+    hardware(G).map(h => `<tr><td>${h.name}</td><td class="m">${qv(h.spec, h.deps)}</td><td class="m">${h.q}</td><td>${h.use}</td></tr>`).join("") + `</tbody>`;
+  $("steps").innerHTML = [
+    `페달 막대에 O 구멍(아래 끝에서 ${f(V.oFromEnd)})과 A 구멍(아래 끝에서 ${f(V.oFromEnd + G.OA)})을 Ø8.5로 뚫고, 발판(${isQ("padW") ? "?" : f(V.padW)} × ${isQ("padL") ? "?" : f(V.padL)})을 위 끝 운전자 쪽 면에 피스 2개로 붙여요.`,
+    `막대 몸통 옆벽 2장에 A 구멍(뒤 끝에서 ${f(G.BOX.back)})을 뚫고, 앞벽을 옆벽 앞 끝에 피스로 붙여 U자로 만들어요. 옆벽 사이 안쪽 폭은 ${f(G.BOX.inner)}이에요.`,
+    `B 판에 B 구멍(좌우 ${f(G.SLOT.w)} × 위아래 ${G.SLOT.h}, 중심 높이 ${f(G.SLOT.cy)})을 관통으로 뚫고, 받침판 앞 끝 자기 칸에 세워요.`,
+    `O 받이 2개(길이 ${f(G.OPOST.w)})를 자기 칸 양 끝에 받침판 뒤 끝부터 B 판 뒷면까지 세워 U자로 만들어요. O 구멍은 뒤 끝에서 ${f(V.rear)}. 바깥쪽 O 받이는 받침판 옆면에 맞추고, 바깥 폭이 B 판 폭과 같아요.`,
+    `O핀을 O 받이 한쪽 구멍에 넣고 와셔 → 장너트 → 페달 막대 → 장너트 → 와셔 순서로 돌려 꿰어 반대쪽 O 받이로 빼요. 장너트 두 개로 페달 막대를 조이면 O핀이 막대와 같이 돌아요. 와셔와 O 받이 사이 양쪽 0.5쯤 틈을 남겨요.`,
+    `막대 몸통 U를 페달에 걸기 전에, 전산볼트(${G.ROD.len}mm)를 앞벽 가운데 구멍에 끼워 안쪽(와셔+너트)·바깥쪽(너트)에서 렌치로 조여요. 페달 막대를 U에 넣고 나면 안쪽 너트에 렌치가 안 들어가요. C에서 앞으로 ${f(G.ROD.out)} 나와요.`,
+    `전산볼트에 스프링을 끼우고 볼트 끝을 B 구멍에 꿰어요. 스프링을 누르지 않아도 볼트 끝이 B 판 뒤로 ${f(G.ROD.out - V.springFree - G.T)} 나오니, 뒤 끝에 와셔+너트를 C에서 ${f(G.NUT_AT)}mm(놓았을 때 B 판 뒷면) 자리에 잠가요.`,
+    `페달 막대를 60°로 세워 U 옆벽 사이에 넣고 A 구멍을 맞춰 A핀 → 양 끝 와셔·너트.`,
+    `끝까지 밟아 스프링이 ${f(V.springMin)}mm까지 눌릴 때 ∠AOB가 ${f(V.degPress)}°인지 확인해요.`,
+    `O핀 바깥 끝면(O 받이 밖으로 ${f(G.OPIN_HALF - G.BASE.half)} 나옴) 가운데에 자석을 붙여요.`,
+    `사이 조각을 받침판 옆면에 대고 센서 받침을 바닥에 세워 피스로 셋을 같이 고정해요. AS5600은 자석과 ${AS.gap}mm 떨어져요. OUT → A0(액셀)·A1(브레이크), VCC → 5V, GND → GND.`,
+    `브레이크 페달도 똑같이 한 벌 더 — 같은 받침판 왼쪽 칸에, 액셀 칸과 ${isQ("pairGap") ? "?" : f(V.pairGap)} 띄워 만들어요.`,
+  ].map(s => `<li><span>${s}</span></li>`).join("");
+  $("warn").innerHTML = [
+    `15°는 스프링이 최대로 눌린 ${f(V.springMin)}mm에서 멈추고, 60°는 전산볼트 뒤 끝 너트가 B 판 뒷면에 걸려서 멈춰요.`,
+    `끝까지 밟으면 전산볼트가 B 판 뒤로 ${f(G.ROD.out - G.V.springMin - G.T)}mm 나와요.`,
+  ].map(s => `<p>${s}</p>`).join("");
+}
+
+/* =================== 3D =================== */
+const THREE = await import("three");
+const { OrbitControls } = await import("three/addons/controls/OrbitControls.js");
+const { RoomEnvironment } = await import("three/addons/environments/RoomEnvironment.js");
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const stage = $("stage");
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true }); renderer.setClearColor(0, 0);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = .92;
+stage.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), .04).texture;
+const camera = new THREE.PerspectiveCamera(30, 1, 5, 6000);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; controls.dampingFactor = .08; controls.minDistance = 100; controls.maxDistance = 2200;
+scene.add(new THREE.HemisphereLight(0xffffff, 0xb8c0c6, .9));
+const sun = new THREE.DirectionalLight(0xffffff, 2.2); sun.position.set(260, 520, 340); sun.castShadow = true;
+sun.shadow.mapSize.set(4096, 4096); Object.assign(sun.shadow.camera, { left: -400, right: 400, top: 400, bottom: -400, near: 50, far: 1500 });
+sun.shadow.bias = -.0002; sun.shadow.normalBias = .4; scene.add(sun);
+const fillL = new THREE.DirectionalLight(0xe2eaf2, .7); fillL.position.set(-300, 180, -200); scene.add(fillL);
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(4000, 4000), new THREE.ShadowMaterial({ opacity: .18 }));
+ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
+
+let seed = 11; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+const TEX_MM = 400;
+const woodTex = (() => {
+  const c = document.createElement("canvas"); c.width = c.height = 1024; const g = c.getContext("2d"), px = 1024 / TEX_MM;
+  const tones = ["#DDB98F", "#E6C59D", "#D2A676", "#E9CCA6", "#D8AE80", "#E2BC90", "#CFA06F"];
+  let y = 0;
+  while (y < 1024) {
+    const h = (28 + rnd() * 30) * px; g.fillStyle = tones[Math.floor(rnd() * tones.length)]; g.fillRect(0, y, 1024, h + 1);
+    for (let i = 0; i < 14; i++) { const yy = y + rnd() * h, a = .6 + rnd() * 2.5, fq = .002 + rnd() * .006, ph = rnd() * 6;
+      g.strokeStyle = `rgba(${120 + rnd() * 30},${72 + rnd() * 20},${30 + rnd() * 15},${.10 + rnd() * .16})`; g.lineWidth = .6 + rnd() * 1.6;
+      g.beginPath(); for (let x = 0; x <= 1024; x += 8) g.lineTo(x, Math.min(y + h, Math.max(y, yy + Math.sin(x * fq + ph) * a))); g.stroke(); }
+    if (rnd() < .45) { const x0 = rnd() * 1024, t = 10 * px, k = 4 * px; g.strokeStyle = "rgba(110,70,35,.35)"; g.lineWidth = 1.2; g.beginPath(); for (let yy = y, i = 0; yy <= y + h; yy += k, i++) g.lineTo(x0 + (i % 2 ? t : 0), yy); g.stroke(); }
+    g.fillStyle = "rgba(90,55,25,.30)"; g.fillRect(0, y, 1024, 1.2); y += h;
+  }
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 8; return t;
+})();
+const woodMat = () => new THREE.MeshStandardMaterial({ map: woodTex, roughness: .82, metalness: 0, envMapIntensity: .6 });
+const steelMat = () => new THREE.MeshStandardMaterial({ color: 0xC7CCD0, metalness: .9, roughness: .32 });
+const zincMat = () => new THREE.MeshStandardMaterial({ color: 0xBAC0C4, metalness: .85, roughness: .38, flatShading: true });
+const threadTex = (() => { const c = document.createElement("canvas"); c.width = 8; c.height = 64; const g = c.getContext("2d"); for (let y = 0; y < 64; y += 8) { g.fillStyle = "#e0e3e6"; g.fillRect(0, y, 8, 4); g.fillStyle = "#7d8489"; g.fillRect(0, y + 4, 8, 4); } const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; return t; })();
+const rodMat = len => { const t = threadTex.clone(); t.needsUpdate = true; t.repeat.set(1, len / 1.25 / 8); return new THREE.MeshStandardMaterial({ map: t, metalness: .85, roughness: .38 }); };
+function worldUV(geo, grain = "x", ox = rnd() * TEX_MM, oy = rnd() * TEX_MM) {
+  const pos = geo.attributes.position, nor = geo.attributes.normal, uv = geo.attributes.uv, gi = { x: 0, y: 1, z: 2 }[grain];
+  for (let i = 0; i < pos.count; i++) {
+    const p = [pos.getX(i), pos.getY(i), pos.getZ(i)], n = [Math.abs(nor.getX(i)), Math.abs(nor.getY(i)), Math.abs(nor.getZ(i))];
+    const ax = n[0] > n[1] && n[0] > n[2] ? 0 : n[1] > n[2] ? 1 : 2;
+    let a = gi, b = [0, 1, 2].find(k => k !== ax && k !== gi);
+    if (ax === gi) { a = [0, 1, 2].find(k => k !== ax); b = 3 - ax - a; }
+    uv.setXY(i, (p[a] + ox) / TEX_MM, (p[b] + oy) / TEX_MM);
+  }
+  uv.needsUpdate = true; return geo;
+}
+const circlePath = (x, y, r) => { const p = new THREE.Path(); p.absarc(x, y, r, 0, Math.PI * 2, true); return p; };
+const rectShape = (x0, x1, y0, y1) => { const s = new THREE.Shape(); s.moveTo(x0, y0); s.lineTo(x1, y0); s.lineTo(x1, y1); s.lineTo(x0, y1); s.closePath(); return s; };
+const nutGeo = h => new THREE.CylinderGeometry(7.2, 7.2, h, 6);
+const washerGeo = h => { const s = new THREE.Shape(); s.absarc(0, 0, 8.5, 0, Math.PI * 2); s.holes.push(circlePath(0, 0, 4.3)); return new THREE.ExtrudeGeometry(s, { depth: h, bevelEnabled: false, curveSegments: 24 }); };
+function springGeo(len) {
+  const V = G.V, turns = 11, rr = (V.springOD - 1.2) / 2, wr = .6, endT = 1 / turns, pc = 1.2, open = Math.max(1, len - 2 * pc - 1.2);
+  const curve = new (class extends THREE.Curve { getPoint(t, v = new THREE.Vector3()) {
+    const a = t * turns * Math.PI * 2; let x;
+    if (t < endT) x = t / endT * pc; else if (t > 1 - endT) x = pc + open + (t - (1 - endT)) / endT * pc; else x = pc + (t - endT) / (1 - 2 * endT) * open;
+    return v.set(x + wr, Math.cos(a) * rr, Math.sin(a) * rr); } })();
+  return new THREE.TubeGeometry(curve, turns * 40, wr, 8, false);
+}
+
+/* ---- 모델 (값이 바뀌면 통째로 다시 만듦) ---- */
+let M = null;
+const labelsEl = $("labels");
+const pressed = id => $(id).getAttribute("aria-pressed") === "true";
+function buildModel() {
+  if (M) { scene.remove(M.root); M.root.traverse(o => { if (o.isMesh || o.isLine) { o.geometry.dispose(); o.material.dispose(); } }); labelsEl.innerHTML = ""; }
+  seed = 11;
+  const V = G.V, T = G.T, H = G.H, P = G.PEDAL, BX = G.BOX, BP = G.BPLATE, BS = G.BASE;
+  const root = new THREE.Group(); scene.add(root); ground.position.y = -T - .2;
+  const PARTS = new Map(), TAGS = [], DIMS = []; let Q = false;   // Q: 브레이크 한 벌은 이름표·치수 없이
+  let ST = null, PL = null, DPN = null;   // ST = 조립 단계(주차*100+일차*10+단계), PL = 따로 만든 덩어리를 붙이는 단계, DPN = 치수가 속한 부품
+  const mesh = (geo, mat, parent, pos, rot) => { const m = new THREE.Mesh(geo, mat); m.userData.st = ST; if (PL) m.userData.place = PL; if (pos) m.position.set(...pos); if (rot) m.rotation.set(...rot); m.castShadow = m.receiveShadow = true; parent.add(m); return m; };
+  // 이름: tag 좌표는 obj의 부모 기준
+  const part = (obj, name, opt = {}) => {
+    if (!PARTS.has(name)) PARTS.set(name, { name, no: opt.no, kind: opt.kind || "wood", meshes: [] });
+    const Pp = PARTS.get(name); obj.traverse(o => { if (o.isMesh) { o.userData.part = name; Pp.meshes.push(o); } });
+    if (opt.tag && !Q && !Pp.tagged) { Pp.tagged = true; const d = document.createElement("div"); d.className = "tag" + (Pp.kind === "hw" ? " hw" : ""); d.innerHTML = (opt.no ? `<b>${opt.no}</b>` : "") + name; labelsEl.append(d); TAGS.push({ el: d, frame: obj.parent, local: new THREE.Vector3(...opt.tag), name }); }
+    return obj;
+  };
+  // 치수 표시: 모르는 값이면 ?
+  // 치수선 (수학 문제처럼): 아는 값 = 회색 실선 + 숫자, 모르는 값 = 빨간 점선 + ? (눌러서 입력, 입력하면 초록)
+  const DL = new THREE.LineBasicMaterial({ color: 0x56616B, depthTest: false, transparent: true, opacity: .85 });
+  const DQ = new THREE.LineDashedMaterial({ color: 0xC8102E, dashSize: 2.5, gapSize: 2, depthTest: false, transparent: true });
+  const DS = new THREE.LineDashedMaterial({ color: 0x0E7A3E, dashSize: 2.5, gapSize: 2, depthTest: false, transparent: true });
+  const dim = (frame, a, b, off, label, value, key) => {
+    if (Q || NODIM) return;
+    const ask = !!key && spec(key).src === "?", q = ask && isQ(key), mat = ask ? (q ? DQ : DS) : DL;
+    const A = new THREE.Vector3(...a), B = new THREE.Vector3(...b), o = new THREE.Vector3(...off), A2 = A.clone().add(o), B2 = B.clone().add(o);
+    const dir = B2.clone().sub(A2).normalize(), on = (o.lengthSq() ? o.clone() : new THREE.Vector3(0, 1, 0)).normalize(), tk = on.clone().multiplyScalar(2.5);
+    const ar = dir.clone().multiplyScalar(3);
+    const pts = [A, A2.clone().add(tk), B, B2.clone().add(tk), A2, B2, A2, A2.clone().add(ar).add(tk.clone().multiplyScalar(.5)), A2, A2.clone().add(ar).sub(tk.clone().multiplyScalar(.5)), B2, B2.clone().sub(ar).add(tk.clone().multiplyScalar(.5)), B2, B2.clone().sub(ar).sub(tk.clone().multiplyScalar(.5))];
+    const l = new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(pts), mat); l.computeLineDistances(); l.renderOrder = 9; l.frustumCulled = false; frame.add(l);
+    const d = document.createElement("div"); d.className = "dim" + (ask ? " q" : "") + (ask && !q ? " set" : "");
+    d.textContent = `${label} ${q ? "?" : value}`; labelsEl.append(d);
+    if (ask) { d.title = spec(key).label + " — 눌러서 숫자 입력 (mm)"; d.addEventListener("click", () => {
+      if (d.querySelector("input")) return; d.textContent = label + " "; const i = document.createElement("input"); i.type = "number"; i.step = "0.1"; i.value = Number.isFinite(vals[key]) ? vals[key] : ""; i.placeholder = "?"; d.append(i); i.focus();
+      let gone = false; const done = ok => { if (gone) return; gone = true; if (ok) setVal(key, i.value.trim()); else update(); };
+      i.addEventListener("keydown", e => { if (e.key === "Enter") done(true); if (e.key === "Escape") done(false); }); i.addEventListener("blur", () => done(true)); }); }
+    DIMS.push({ part: DPN, el: d, frame, local: A2.clone().add(B2).multiplyScalar(.5).add(on.clone().multiplyScalar(5)), line: l });
+  };
+  const woodBox = (parent, [x0, x1], [y0, y1], [z0, z1], grain = "x") => { const g = new THREE.BoxGeometry(x1 - x0, y1 - y0, z1 - z0); worldUV(g, grain); return mesh(g, woodMat(), parent, [(x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2]); };
+  const woodShape = (parent, shape, z0, depth, grain = "x") => { const g = new THREE.ExtrudeGeometry(shape, { depth, bevelEnabled: false, curveSegments: 28 }); g.computeVertexNormals(); worldUV(g, grain); const m = mesh(g, woodMat(), parent); m.position.z = z0; return m; };
+  const rodZ = (parent, x, y, z0, z1) => mesh(new THREE.CylinderGeometry(4, 4, z1 - z0, 20), rodMat(z1 - z0), parent, [x, y, (z0 + z1) / 2], [Math.PI / 2, 0, 0]);
+  const stackZ = (parent, x, y, z, dir, list) => { let p = z; list.forEach(k => { const t = k === "w" ? WASH : NUT, q = p + dir * t, lo = Math.min(p, q);
+    if (k === "w") part(mesh(washerGeo(t), steelMat(), parent, [x, y, lo]), "와셔", { kind: "hw" }); else part(mesh(nutGeo(t), zincMat(), parent, [x, y, lo + t / 2], [Math.PI / 2, 0, 0]), "너트", { kind: "hw" }); p = q; }); };
+
+  const note = (frame, local, html, code) => { const d = document.createElement("div"); d.className = "tag note"; d.innerHTML = html; labelsEl.append(d); TAGS.push({ el: d, frame, local: new THREE.Vector3(...local), name: null, code }); };
+  const wire = (parent, pts, color) => mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts.map(p => new THREE.Vector3(...p)), false, "centripetal"), 140, .9, 8, false), new THREE.MeshStandardMaterial({ color, roughness: .6 }), parent);
+  function unit(zOff, quiet, side, name) {
+  const u = new THREE.Group(); u.position.z = zOff; root.add(u); Q = quiet; let endL = null;   // endL = 우노로 가는 선 끝(바닥)
+  /* 받침판 · B 판 · O 받이 · O핀 */
+  const fixed = new THREE.Group(); u.add(fixed);
+  ST = 1111; PL = null;
+  if (!quiet) part(woodBox(fixed, [BS.x0, BS.x1], [-T, 0], [BS.half - BS.w, BS.half]), "받침판", { no: 1, tag: [BS.x0 + 70, 0, BS.half - 12] });   // 액셀·브레이크 같이 쓰는 한 장 (브레이크 칸은 −z 쪽)
+  ST = 1113;
+  const bp = new THREE.Group(); fixed.add(bp);
+  { const sh = rectShape(-BS.half, BS.half, 0, BP.h), hw = G.SLOT.w / 2, hh = G.SLOT.h / 2, r = Math.min(hw, hh), H = G.SLOT.cy;
+    const hole = new THREE.Path(); hole.moveTo(-hw, H - hh + r); hole.absarc(-hw + r, H - hh + r, r, Math.PI, Math.PI * 1.5); hole.lineTo(hw - r, H - hh); hole.absarc(hw - r, H - hh + r, r, Math.PI * 1.5, Math.PI * 2); hole.lineTo(hw, H + hh - r); hole.absarc(hw - r, H + hh - r, r, 0, Math.PI / 2); hole.lineTo(-hw + r, H + hh); hole.absarc(-hw + r, H + hh - r, r, Math.PI / 2, Math.PI); hole.closePath(); sh.holes.push(hole);
+    const g1 = new THREE.ExtrudeGeometry(sh, { depth: T, bevelEnabled: false, curveSegments: 20 }); g1.rotateY(Math.PI / 2); g1.computeVertexNormals(); worldUV(g1, "z");
+    mesh(g1, woodMat(), bp, [BP.face, 0, 0]); }
+  part(bp, "B 판", { no: 5, tag: [BP.face + T, BP.h - 8, BS.half - 16] });
+  ST = 1112;
+  for (const s of [1, -1]) { const sh = rectShape(G.OPOST.x0, G.OPOST.x1, 0, G.OPOST.h); sh.holes.push(circlePath(0, H, 4.25)); part(woodShape(fixed, sh, s > 0 ? G.OPOST.z0 : -G.OPOST.z0 - T, T), "O 받이", { no: 6, tag: s > 0 ? [G.OPOST.x0 + 40, G.OPOST.h - 6, G.OPOST.z0 + T] : null }); }   // 뒤 끝 ~ B 판 뒷면 긴 판
+  ST = 1121;
+  part(rodZ(fixed, 0, H, -G.OPIN_HALF, G.OPIN_HALF), "O핀", { kind: "hw", tag: [0, H, G.OPIN_HALF + 4] });
+  for (const s of [1, -1]) stackZ(fixed, 0, H, s * G.OPOST.z0, -s, ["w"]);   // O 받이 안쪽 와셔 (장너트가 닿는 자리)
+  { const zp = -(G.OPOST.z0 + T), zb = BS.half, sw = G.SLOT.w / 2, sh = G.SLOT.h / 2, cy = G.SLOT.cy;
+    DPN = "받침판";
+    dim(fixed, [BS.x0, -T, zb], [BS.x1, -T, zb], [0, -10, 6], "받침판 길이", f(BS.len));
+    dim(fixed, [BS.x1, -T, -zb], [BS.x1, -T, zb], [12, -4, 0], "칸 폭", f(V.baseW), "baseW");
+    dim(fixed, [BS.x0, -T, zb - BS.w], [BS.x0, -T, zb], [-24, -4, 0], "받침판 폭", isQ("baseW") || isQ("pairGap") ? "?" : f(BS.w));
+    dim(fixed, [BS.x0, -T, zb], [BS.x0, 0, zb], [-10, 0, 0], "두께", f(T));
+    dim(fixed, [BS.x0, 0, zb], [0, 0, zb], [0, 0, 10], "뒤 끝→O", f(V.rear));
+    DPN = "O 받이";
+    dim(fixed, [0, 0, zp], [0, H, zp], [0, 0, -8], "O·B 높이", f(H), "H");
+    dim(fixed, [G.OPOST.x0, G.OPOST.h, zp], [G.OPOST.x1, G.OPOST.h, zp], [0, 8, 0], "O 받이 길이", f(G.OPOST.w));
+    dim(fixed, [G.OPOST.x0, 0, zp], [G.OPOST.x0, G.OPOST.h, zp], [-10, 0, 0], "O 받이 높이", f(G.OPOST.h), "oPostH");
+    DPN = "B 판";
+    dim(fixed, [BP.face + T, 0, zb], [BP.face + T, BP.h, zb], [10, 0, 0], "B 판 높이", f(BP.h));
+    dim(fixed, [BP.face - .5, cy + sh, -sw], [BP.face - .5, cy + sh, sw], [0, 7, 0], "구멍 좌우", f(G.SLOT.w));
+    dim(fixed, [BP.face - .5, cy - sh, sw], [BP.face - .5, cy + sh, sw], [0, 0, 8], "위아래", String(G.SLOT.h));
+    DPN = null;
+    dim(fixed, [0, H, -zb], [G.OB, H, -zb], [0, -H - T - 26, 0], "OB", f(G.OB)); }
+
+  /* 페달 막대 (O에서 돎) */
+  const pedal = new THREE.Group(); pedal.position.set(0, H, 0); u.add(pedal);
+  ST = 1114; PL = 1121; DPN = "페달 막대";
+  { const sh = rectShape(-P.back, P.len - P.back, -P.depth / 2, P.depth / 2); sh.holes.push(circlePath(0, 0, 4.25)); sh.holes.push(circlePath(G.OA, 0, 4.25)); part(woodShape(pedal, sh, -P.t / 2, P.t), "페달 막대", { no: 2, tag: [P.len - P.back - 30, 0, P.t / 2] }); }
+  ST = 1121; PL = null;
+  for (const s of [1, -1]) { const a = s * P.t / 2, b = s * (P.t / 2 + G.LNUT);   // 장너트: 페달 막대를 양쪽에서 조여 O핀과 같이 돎
+    part(mesh(new THREE.CylinderGeometry(7.2, 7.2, Math.abs(b - a), 6), zincMat(), pedal, [0, 0, (a + b) / 2], [Math.PI / 2, 0, 0]), "장너트", { kind: "hw", tag: s > 0 ? [0, -14, (a + b) / 2] : null }); }
+  ST = 1114; PL = 1121; DPN = "발판";
+  { const PD = G.PAD, d = P.depth / 2;   // 발판: 페달 막대 위 끝, 운전자 쪽 면
+    part(woodBox(pedal, [PD.x0, PD.x1], [d, d + PD.t], [-PD.w / 2, PD.w / 2]), "발판", { no: 9, tag: [PD.x0 + 20, d + PD.t, PD.w / 2] });
+    dim(pedal, [PD.x0, d + PD.t, PD.w / 2], [PD.x1, d + PD.t, PD.w / 2], [0, 10, 0], "발판 길이", f(PD.l), "padL");
+    dim(pedal, [PD.x1, d + PD.t, -PD.w / 2], [PD.x1, d + PD.t, PD.w / 2], [12, 0, 0], "발판 좌우", f(PD.w), "padW"); }
+  DPN = "페달 막대";
+  { const L = P.len - P.back, d = P.depth / 2, t2 = P.t / 2;
+    dim(pedal, [-P.back, d, t2], [L, d, t2], [0, 12, 0], "페달 막대 길이", f(P.len));
+    dim(pedal, [L, -d, t2], [L, d, t2], [12, 0, 0], "폭", f(P.depth));
+    dim(pedal, [L, d, -t2], [L, d, t2], [0, 10, 0], "두께", f(P.t));
+    dim(pedal, [-P.back, -d, t2], [0, -d, t2], [0, -10, 0], "끝→O", f(P.back));
+    dim(pedal, [0, -d, t2], [G.OA, -d, t2], [0, -10, 0], "OA", f(G.OA)); }
+
+  /* 막대 몸통 (A에서 돎) + 스프링 */
+  const strut = new THREE.Group(); u.add(strut);
+  const sideG = new THREE.Group(); strut.add(sideG);
+  ST = 1115; PL = 1123; DPN = "막대 몸통 옆벽";
+  for (const s of [1, -1]) { const r = BX.r, sh = new THREE.Shape(); sh.moveTo(0, -r); sh.lineTo(G.S - T, -r); sh.lineTo(G.S - T, r); sh.lineTo(0, r); sh.absarc(0, 0, r, Math.PI / 2, Math.PI * 1.5, false); sh.holes.push(circlePath(0, 0, 4.25)); woodShape(sideG, sh, s > 0 ? BX.zIn : -BX.zOut, T); }
+  part(sideG, "막대 몸통 옆벽", { no: 3, tag: [G.S * .55, BX.h / 2, BX.zOut] });
+  part(woodBox(strut, [G.S - T, G.S], [-BX.h / 2, BX.h / 2], [-BX.zOut, BX.zOut], "z"), "막대 몸통 앞벽", { no: 4, tag: [G.S, -BX.h / 2, BX.zOut] });
+  ST = 1124; PL = null;
+  part(rodZ(strut, 0, 0, -G.APIN_HALF, G.APIN_HALF), "A핀", { kind: "hw", tag: [0, 0, G.APIN_HALF + 4] });
+  for (const s of [1, -1]) stackZ(strut, 0, 0, s * BX.zOut, s, ["w", "n"]);
+  { const hb = BX.h / 2, z = BX.zOut;
+    dim(strut, [0, -hb, z], [G.S, -hb, z], [0, -10, 0], "AC", f(G.S));
+    dim(strut, [G.S, -hb, z], [G.S, hb, z], [10, 0, 0], "높이", f(BX.h));
+    dim(strut, [-BX.back, hb, z], [0, hb, z], [0, 10, 0], "둥근 끝 R", f(BX.r));
+    dim(strut, [-BX.back, -hb, P.t / 2], [-BX.back, -hb, BX.zIn], [0, -9, 0], "틈", f(BX.gap), "gap"); }
+  ST = 1122; PL = 1123; DPN = "전산볼트";
+  { const rl = G.ROD.len, x0 = G.S - G.ROD.inB, rg = new THREE.Group(); strut.add(rg);
+    mesh(new THREE.CylinderGeometry(V.rodD / 2, V.rodD / 2, rl, 20), rodMat(rl), rg, [x0 + rl / 2, 0, 0], [0, 0, Math.PI / 2]);
+    part(rg, "전산볼트", { kind: "hw", tag: [G.S + G.NUT_AT + 18, 0, 0] });
+    const nx = (a, b) => part(mesh(new THREE.CylinderGeometry(7.2, 7.2, b - a, 6), zincMat(), strut, [(a + b) / 2, 0, 0], [0, 0, Math.PI / 2]), "너트", { kind: "hw" });
+    const wx = (a, b) => part(mesh(new THREE.CylinderGeometry(8.5, 8.5, b - a, 24), steelMat(), strut, [(a + b) / 2, 0, 0], [0, 0, Math.PI / 2]), "와셔", { kind: "hw" });
+    const qi = G.S - T; wx(qi - WASH, qi); nx(qi - WASH - NUT, qi - WASH);    // 앞벽 안쪽
+    nx(G.S, G.S + NUT);                                                       // 앞벽 바깥 (스프링 속)
+    ST = 1123; PL = null;
+    const e = G.S + G.NUT_AT; wx(e, e + WASH); nx(e + WASH, e + WASH + NUT); // 뒤 끝: 놓았을 때 B 판 뒷면
+    dim(strut, [G.S, -BX.h / 2, 0], [G.S + G.ROD.out, -BX.h / 2, 0], [0, -14, 0], "C→볼트 끝", f(G.ROD.out)); }
+  const spring = mesh(springGeo(V.springFree), new THREE.MeshStandardMaterial({ color: 0xD3D8DC, metalness: .92, roughness: .25 }), strut, [G.S, 0, 0]);
+  part(spring, "스프링", { kind: "hw", tag: [G.S + 26, V.springOD / 2 + 3, 0] });
+  /* 센서 (11주차): 자석은 O핀 끝 = 페달 막대와 같이 돎, AS5600·센서 받침은 고정 */
+  if (W >= 11) {
+    const SN = G.SENS, s = side, zz = (a, b) => s > 0 ? [a, b] : [-b, -a], mid = (a, b) => { const [p, q] = zz(a, b); return (p + q) / 2; };
+    ST = 1125;   // 자석: 센서 받침을 세우기 전에 O핀 끝에 (세운 뒤엔 칩과 틈 1.5라 손이 안 들어감)
+    const mg = new THREE.Group(); pedal.add(mg);
+    for (const [a0, c] of [[0, 0xC8102E], [Math.PI, 0x2A5DB0]]) { const g = new THREE.CylinderGeometry(AS.mag / 2, AS.mag / 2, AS.magT, 24, 1, false, a0, Math.PI); g.rotateX(Math.PI / 2); g.translate(0, 0, mid(SN.mag0, SN.mag0 + AS.magT)); mesh(g, new THREE.MeshStandardMaterial({ color: c, roughness: .5 }), mg); }
+    part(mg, "자석", { kind: "hw" });
+    ST = 1126;   // AS5600은 센서 받침에 먼저 붙이고, 받침째 세움
+    const sb = new THREE.Group(); fixed.add(sb);
+    mesh(new THREE.BoxGeometry(AS.board, AS.board, AS.pcb), new THREE.MeshStandardMaterial({ color: 0x5B3AA8, roughness: .5 }), sb, [0, H, mid(SN.pcb0, SN.z0)]);
+    mesh(new THREE.BoxGeometry(5, 4, AS.chip), new THREE.MeshStandardMaterial({ color: 0x1B1C1E, roughness: .5 }), sb, [0, H, mid(SN.pcb0 - AS.chip, SN.pcb0)]);
+    const pins = [[-4, 0xC8102E], [0, 0x1B1C1E], [4, 0xF2B807]];   // VCC · GND · OUT
+    pins.forEach(([x]) => mesh(new THREE.BoxGeometry(.8, 6, .8), new THREE.MeshStandardMaterial({ color: 0xC9A24A, metalness: .8, roughness: .3 }), sb, [x, H + AS.board / 2 + 3, mid(SN.pcb0 - 1, SN.pcb0)]));
+    part(sb, "AS5600", { kind: "hw", tag: [0, H + AS.board / 2 + 12, s * SN.pcb0] });
+    part(woodBox(fixed, [-SN.w / 2, SN.w / 2], [-T, SN.top], zz(SN.z0, SN.z1), "y"), "센서 받침", { no: 7, tag: [-SN.w / 2, SN.top - 6, s * SN.z1] });
+    part(woodBox(fixed, [-SN.w / 2, SN.w / 2], [-T, 0], zz(BS.half, SN.z0)), "사이 조각", { no: 8, tag: [SN.w / 2, -T / 2, s * (BS.half + SN.z0) / 2] });
+    ST = 1127;
+    const wg = new THREE.Group(); fixed.add(wg); const zo = s * (SN.z1 + 4); endL = [BS.x0 - 110, -T + 1.2, zo + s * 8];
+    pins.forEach(([x, c], i) => { const zp = mid(SN.pcb0 - 1, SN.pcb0), y0 = H + AS.board / 2 + 6;
+      wire(wg, [[x, y0, zp], [x, SN.top + 7, zp], [x - 6, SN.top + 6, zo + s * i * 2], [-SN.w / 2 - 12, SN.top - 10, zo + s * i * 2], [-SN.w / 2 - 30, -T + 3, zo + s * (2 + i * 2)], [BS.x0 + 10, -T + 1.2, zo + s * (4 + i * 2.5)], [BS.x0 - 110, -T + 1.2, zo + s * (8 + i * 3)]], c); });
+    part(wg, "선", { kind: "hw" });
+  }
+  if (name) note(pedal, [P.len - P.back - 6, P.depth / 2 + G.T + 16, 0], name, quiet ? 1128 : 1121);
+  if (W >= 11) note(fixed, [BS.x0 - 100, -T + 6, side * (G.SENS.z1 + 14)], `${side > 0 ? "A0" : "A1"} · 5V · GND<small>→ 휠 베이스 위 우노</small>`, quiet ? 1128 : 1127);
+  /* 10주차: 철물 없이 나무 조각만, 조금씩 떼어 놓음 */
+  if (W === 10 && D === 1) {
+    bp.position.x += 45;
+    PARTS.get("O 받이").meshes.forEach(m => m.position.z += Math.sign(m.position.z + T / 2) * 32);
+    sideG.children.forEach(m => m.position.z += Math.sign(m.position.z + T / 2) * 32);
+    PARTS.get("막대 몸통 앞벽").meshes.forEach(m => m.position.x += 34);
+  }
+  Q = false;
+  return { u, pedal, strut, spring, fixed, endL, lastCB: -1 };
+  }
+  const units = [unit(0, false, 1, W >= 11 ? "액셀 페달<small>A0</small>" : "")];
+  if (W >= 11) {
+    units.push(unit(-(V.baseW + V.pairGap), true, -1, "브레이크 페달<small>A1</small>"));
+    // 브레이크 한 벌: 나무(받침판·O 받이·B 판 + 따로 만든 페달 막대·U) = 1일차 마지막 단계, 나머지·붙이기 = 2일차 마지막 단계
+    units[1].u.traverse(m => { if (!m.isMesh) return; const s0 = m.userData.st; m.userData.brake = true; m.userData.sub = s0;
+      if (s0 === 1114 || s0 === 1115) { m.userData.st = 1116; m.userData.place = 1128; } else { m.userData.st = s0 <= 1113 ? 1116 : 1128; delete m.userData.place; } });
+    DPN = "@1116";
+    dim(root, [BS.x0 + 20, 0, -BS.half], [BS.x0 + 20, 0, -BS.half - V.pairGap], [0, 6, 0], "칸 사이", f(V.pairGap), "pairGap");
+  }
+  // 그날 만드는 것만: 10주차 = 자른 나무 조각(발판은 11주차에 새로), 11주차 1일차 = 나무 붙이기, 2일차 = 철물·센서·선
+  if (W === 10) { for (const p of PARTS.values()) if (p.kind === "hw" || p.name === "발판") p.meshes.forEach(m => m.visible = false); note(root, [BS.x0 + 40, -T, BS.half + 20], "받침판 1장 · 나머지 두 벌<small>액셀 · 브레이크</small>"); }
+  for (let i = TAGS.length - 1; i >= 0; i--) { const Pp = TAGS[i].name && PARTS.get(TAGS[i].name); if (Pp && !Pp.meshes.some(m => m.visible)) { TAGS[i].el.remove(); TAGS.splice(i, 1); } }
+
+  /* 문서 선 */
+  const lines = new THREE.Group(); root.add(lines); lines.visible = pressed("tLines");
+  const LM = new THREE.LineBasicMaterial({ color: 0xC8102E, depthTest: false, transparent: true });
+  const LD = new THREE.LineDashedMaterial({ color: 0xC8102E, dashSize: 5, gapSize: 4, depthTest: false, transparent: true, opacity: .8 });
+  const lineObj = mat => { const g = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]); const l = new THREE.Line(g, mat); l.renderOrder = 10; l.frustumCulled = false; lines.add(l); return l; };
+  const L = { OA: lineObj(LM), AB: lineObj(LM), P: lineObj(LD), Q: lineObj(LD), DE: lineObj(LM), OB: lineObj(LD) };
+  const DOT = {}, PT = {}, dotGeo = new THREE.SphereGeometry(2.2, 16, 12), dotMat = new THREE.MeshBasicMaterial({ color: 0xC8102E, depthTest: false });
+  ["O", "A", "B", "C", "D", "E"].forEach(k => { DOT[k] = new THREE.Mesh(dotGeo, dotMat); DOT[k].renderOrder = 11; lines.add(DOT[k]); const d = document.createElement("div"); d.className = "pt"; d.textContent = k; d.style.display = lines.visible ? "" : "none"; labelsEl.append(d); PT[k] = d; });
+
+  M = { root, units, PARTS, TAGS, DIMS, pickable: [...PARTS.values()].flatMap(p => p.meshes).filter(m => m.visible), lines, L, DOT, PT };
+  tagVis(); dimVis();
+}
+/* 이름표·치수: 조립 단계일 땐 보이는 부품 이름표만, 치수는 이번 단계 부품 것만 */
+function tagVis() {
+  const on = pressed("tNames"), c = LEGO ? LEGO.cur() : Infinity;
+  M.TAGS.forEach(t => { const P = t.name && M.PARTS.get(t.name), vis = LEGO ? (P ? P.meshes.some(m => m.visible && m.userData.mat0 && !m.userData.brake && !m.userData.benched) : t.code === c) : (P ? P.meshes.some(m => m.visible) : true);   // 조립 단계엔 이번 단계 것만
+    t.el.style.display = on && vis ? "" : "none"; t.el.classList.toggle("new", !!P && P.meshes.some(m => m.visible && m.userData.mat0 && !m.userData.brake && !m.userData.benched)); });
+}
+function dimVis() {
+  const on = pressed("tDims"), c = LEGO?.cur(), fresh = new Set();
+  if (LEGO) M.PARTS.forEach(P => { if (P.meshes.some(m => m.userData.mat0 && !m.userData.brake && !m.userData.benched)) fresh.add(P.name); });   // 옆에 눕혀 둔 건 치수 빼고(치수선은 제자리 기준)
+  let ask = false;
+  M.DIMS.forEach(t => { const vis = on && (!LEGO || (!!t.part && (fresh.has(t.part) || t.part === "@" + c))); t.el.style.display = vis ? "" : "none"; t.line.visible = vis; if (vis && t.el.classList.contains("q")) ask = true; });
+  if (LEGO && !NODIM) document.querySelector(".ask").style.display = ask ? "" : "none";
+}
+
+/* ---- 자세 ---- */
+let curDeg = 60;
+function poseUnit(U, deg) {
+  const p = G.pose(deg);
+  U.pedal.rotation.z = deg * Math.PI / 180;
+  U.strut.position.set(p.A[0], p.A[1], 0); U.strut.rotation.z = Math.atan2(p.w[1], p.w[0]);
+  if (Math.abs(p.CB - U.lastCB) > .05) { U.spring.geometry.dispose(); U.spring.geometry = springGeo(p.CB); U.lastCB = p.CB; }
+}
+function setPose(deg) {
+  curDeg = deg; const q = G.parts(deg), p = q.p;
+  poseUnit(M.units[0], deg);
+  const setL = (l, a, b) => { const g = l.geometry.attributes.position; g.setXYZ(0, a[0], a[1], 0); g.setXYZ(1, b[0], b[1], 0); g.needsUpdate = true; l.computeLineDistances(); };
+  const ext = (a, d, s0, s1) => [[a[0] + d[0] * s0, a[1] + d[1] * s0], [a[0] + d[0] * s1, a[1] + d[1] * s1]];
+  setL(M.L.OA, ...ext(p.O, p.u, -20, 260)); setL(M.L.AB, p.A, p.B); setL(M.L.OB, p.O, p.B);
+  setL(M.L.P, ...ext([p.O[0] - p.n[0] * G.PEDAL.depth / 2, p.O[1] - p.n[1] * G.PEDAL.depth / 2], p.u, -20, 260));
+  setL(M.L.Q, ...ext([p.C[0] - p.w[0] * G.T, p.C[1] - p.w[1] * G.T], p.m, -40, 40)); setL(M.L.DE, q.D, q.E);
+  const pts = { O: p.O, A: p.A, B: p.B, C: p.C, D: q.D, E: q.E }; for (const k in pts) M.DOT[k].position.set(pts[k][0], pts[k][1], 0);
+  $("deg").textContent = deg.toFixed(1) + "°"; $("vA").textContent = deg.toFixed(1) + "°";
+  $("vAB").textContent = p.AB.toFixed(1); $("vCB").textContent = p.CB.toFixed(1);
+  const gap = G.clearanceP(deg); $("vGap").textContent = gap.toFixed(1) + "mm"; $("vGap").className = gap > 0 ? "ok" : "bad";
+  $("ang").value = deg;
+}
+function update() {
+  G = build(vals);
+  const a = $("ang"); a.min = G.V.degPress; a.max = G.V.degRest;
+  buildModel(); if (M.units[1]) poseUnit(M.units[1], G.V.degRest); setPose(Math.min(G.V.degRest, Math.max(G.V.degPress, curDeg))); benches(); renderDocs(); markRows();
+  if (LEGO) LEGO.apply({ fit: false, replay: false });
+}
+
+/* 만들어 놓고 아직 안 붙인 덩어리(페달 막대+발판, 막대 몸통 U): 그 페달 바깥 옆 바닥에 눕혀 둠 — steps.js가 userData.bench로 옮김 */
+function benches() {
+  M.units.forEach((U, k) => { let z = 0;
+    for (const g of [U.pedal, U.strut]) {
+      const ms = []; g.traverse(m => m.isMesh && m.userData.place && ms.push(m)); if (!ms.length) continue;
+      M.root.updateMatrixWorld(true);
+      const piv = new THREE.Vector3().setFromMatrixPosition(g.matrixWorld), R = new THREE.Matrix4().makeTranslation(piv.x, piv.y, piv.z).multiply(new THREE.Matrix4().makeRotationZ(-g.rotation.z)).multiply(new THREE.Matrix4().makeTranslation(-piv.x, -piv.y, -piv.z));
+      const bx = new THREE.Box3(); ms.forEach(m => { m.geometry.computeBoundingBox(); bx.union(m.geometry.boundingBox.clone().applyMatrix4(R.clone().multiply(m.matrixWorld))); });
+      const zu = U.u.position.z, out = k ? -1 : 1, gap = 30;   // 액셀 = +z 쪽, 브레이크 = −z 쪽
+      const dz = out > 0 ? zu + G.BASE.half + gap + z - bx.min.z : zu - G.BASE.half - gap - z - bx.max.z;
+      const B = new THREE.Matrix4().makeTranslation(G.BASE.x0 - bx.min.x, -G.T - bx.min.y, dz).multiply(R);
+      ms.forEach(m => m.userData.bench = B); z += bx.max.z - bx.min.z + 20;
+    }
+  });
+}
+/* ---- 카메라 · 버튼 ---- */
+const ZC = W >= 11 ? -(G.V.baseW + G.V.pairGap) / 2 : 0, KZ = W >= 11 ? 1.25 : 1;   // 두 페달이면 가운데를 보고 조금 멀리
+const CAMS = { iso: { p: [105 + 415 * KZ, 50 + 330 * KZ, ZC + 640 * KZ], t: [105, 50, ZC] }, side: { p: [110, 75, 560], t: [110, 75, 0] }, front: { p: [760 * KZ, 120, ZC + 1], t: [100, 60, ZC] }, back: { p: [-780 * KZ, 210, ZC + 1], t: [30, 75, ZC] } };   // 뒤 = 발 쪽에서 O 받이 U·장너트가 보이게
+let tween = null; const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+function go(k, instant) {
+  const c = CAMS[k], to = { p: new THREE.Vector3(...c.p), t: new THREE.Vector3(...c.t) };
+  if (innerWidth / innerHeight < .9) to.p.sub(to.t).multiplyScalar(1.7).add(to.t);
+  document.querySelectorAll("[data-cam]").forEach(b => b.setAttribute("aria-pressed", b.dataset.cam === k));
+  if (instant || reduce) { camera.position.copy(to.p); controls.target.copy(to.t); tween = null; } else tween = { from: { p: camera.position.clone(), t: controls.target.clone() }, to, s: performance.now() };
+}
+document.querySelectorAll("[data-cam]").forEach(b => b.addEventListener("click", () => go(b.dataset.cam)));
+const toggle = (id, fn) => { const b = $(id); b.addEventListener("click", () => { const v = b.getAttribute("aria-pressed") !== "true"; b.setAttribute("aria-pressed", v); fn(v); }); };
+toggle("tNames", () => tagVis());
+toggle("tDims", () => dimVis());
+toggle("tLines", v => { M.lines.visible = v; Object.values(M.PT).forEach(d => d.style.display = v ? "" : "none"); });
+
+/* ---- 마우스 올리면 이름 ---- */
+const ray = new THREE.Raycaster(), ptr = new THREE.Vector2(), tip = $("tip"); let hot = null;
+function setHot(name) {
+  if (hot === name) return;
+  if (hot && M.PARTS.get(hot)) M.PARTS.get(hot).meshes.forEach(m => m.material.emissive && m.material.emissive.setHex(0));
+  hot = name; if (hot) M.PARTS.get(hot).meshes.forEach(m => m.material.emissive && m.material.emissive.setHex(0x5a0d18));
+  M.TAGS.forEach(t => t.el.classList.toggle("on", t.name === hot));
+}
+function pick(e) {
+  const r = renderer.domElement.getBoundingClientRect(); ptr.set((e.clientX - r.left) / r.width * 2 - 1, -(e.clientY - r.top) / r.height * 2 + 1);
+  ray.setFromCamera(ptr, camera); const hit = ray.intersectObjects(M.pickable, false)[0];
+  const name = hit ? hit.object.userData.part : null; setHot(name);
+  if (name) { const pc = pieces(G).find(q => q.name === name); tip.innerHTML = (pc ? `${pc.no} ` : "") + name + (pc ? `<small>${pc.dims.map(d => (unknownIn(d[2]) ? "?" : f(d[1]))).join(" × ")}</small>` : ""); tip.style.display = "block"; tip.style.left = e.clientX - r.left + "px"; tip.style.top = e.clientY - r.top + "px"; }
+  else tip.style.display = "none";
+}
+renderer.domElement.addEventListener("pointermove", e => { if (e.buttons === 0) pick(e); });
+renderer.domElement.addEventListener("pointerdown", e => { if (e.pointerType !== "mouse") pick(e); });
+renderer.domElement.addEventListener("pointerleave", () => { setHot(null); tip.style.display = "none"; });
+
+let playing = false, playT = 0;
+const midAmp = () => [(G.V.degRest + G.V.degPress) / 2, (G.V.degRest - G.V.degPress) / 2];
+$("ang").addEventListener("input", e => { playing = false; $("play").textContent = "▶"; setPose(+e.target.value); });
+$("play").addEventListener("click", () => { playing = !playing; $("play").textContent = playing ? "❚❚" : "▶"; const [mid, amp] = midAmp(); playT = Math.acos(Math.max(-1, Math.min(1, (curDeg - mid) / amp))); });
+
+function resize() { const w = stage.clientWidth, h = stage.clientHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+addEventListener("resize", resize); resize();
+const params = new URLSearchParams(location.search);
+curDeg = params.has("deg") ? +params.get("deg") : G.V.degRest;
+update();
+go(params.get("cam") || "iso", true);
+if (params.get("lines") === "1") $("tLines").click();
+if (params.get("names") === "0") $("tNames").click();
+if (params.get("dims") === "0") $("tDims").click();
+/* ================= 레고 조립서: 날마다 단계 (ST 번호와 같은 순서) ================= */
+// 브레이크 한 벌을 한 단계로: 액셀 1~7단계와 같은 길로, 같은 순서로 차례로 들어옴 ([x, y, z, 늦게 시작(초)])
+function brakeDir(m) {
+  const u = m.userData, sub = u.sub === 1114 ? 1121 : u.sub === 1115 || u.sub === 1122 ? 1123 : u.sub, r = M.units[1].strut.rotation.z, ax = k => [Math.cos(r) * k, Math.sin(r) * k, 0];
+  const d = sub === 1121 ? (u.part === "O핀" ? [0, 0, -120] : /페달 막대|발판/.test(u.part) ? [0, 130, 0] : [0, 50, 0])
+    : sub === 1123 ? ax(u.p0.x >= G.S + G.NUT_AT - 1 ? 40 : -70)
+    : sub === 1124 ? (u.part === "A핀" ? [0, 0, -90] : [0, 0, Math.sign(u.p0.z || 1) * 40])
+    : sub === 1125 ? [0, 0, -40] : sub === 1126 ? [0, 0, -80] : [0, 60, 0];
+  return [...d, Math.max(0, [1121, 1123, 1124, 1125, 1126, 1127].indexOf(sub)) * .7];
+}
+function legoSteps() {
+  const V = G.V, PC = pieces(G), pc = n => PC.find(q => q.name === n), sz = q => q.dims.map(d => (unknownIn(d[2]) ? "?" : f(d[1]))).join(" × ");
+  const qv = k => (isQ(k) ? "?" : f(G.V[k])), hw = n => hardware(G).find(h => h.name === n);
+  if (W === 10 && D === 2) return { 102: ["받침판", "O 받이", "B 판", "페달 막대", "막대 몸통 옆벽", "막대 몸통 앞벽"].map(n => { const q = pc(n);
+    return { title: `${q.no} ${n} 자르기`, isolate: true, pick: m => m.userData.part === n, parts: [["15T 집성목", sz(q), q.shared ? q.q : q.q * 2]],
+      text: [q.shared ? `${sz(q)}로 ${q.q}장 — 액셀·브레이크가 같이 써요.` : `${sz(q)}로 ${q.q * 2}장 — 액셀·브레이크 두 벌.`, q.what, ...(q.holes || []).map(([k, v]) => `${k} — ${v} (구멍은 11주차 1일차에)`)] }; }) };
+  if (W === 11) return { 111: [   // 11주차는 1일차 → 2일차 완성까지 한 줄로
+    { title: "받침판 놓기", dir: [0, 60, 0], parts: [["1 받침판", sz(pc("받침판")), 1]], text: [`10주차에 자른 받침판 한 장 — 오른쪽 칸 액셀, 왼쪽 칸 브레이크 (칸 ${qv("baseW")}, 사이 ${qv("pairGap")}).`, `뒤 끝에서 ${f(V.rear)}에 O 자리를, 칸 경계를 연필로 표시해요.`] },
+    { title: "O 받이 2개 세우기 — U자", dir: [0, 80, 0], parts: [["6 O 받이", sz(pc("O 받이")), 2], ["피스 6×25", "", 6]],
+      text: [`두 장을 겹쳐 O 구멍 Ø8.5를 뒤 끝에서 ${f(V.rear)}, 밑에서 ${qv("H")}에 한 번에 뚫어요 → 일직선.`, `액셀 칸 양 끝에 뒤 끝을 받침판 뒤 끝에 맞춰 세우고 밑에서 피스 3개씩. 앞 끝은 B 판 자리(${f(G.T)})를 남기고 끝나요. 오른쪽 것은 받침판 옆면에 맞추고, 바깥 폭 = B 판 폭.`] },
+    { title: "B 판 세우기", dir: [80, 0, 0], parts: [["5 B 판", sz(pc("B 판")), 1], ["피스 6×25", "", 3]],
+      text: [`B 구멍 ${f(G.SLOT.w)} × ${G.SLOT.h} (가운데 높이 ${f(G.SLOT.cy)})을 관통으로 뚫어요.`, "받침판 앞 끝 액셀 칸에 세워 밑에서 피스 3개."] },
+    { title: "페달 막대 + 발판", isolate: true, parts: [["2 페달 막대", sz(pc("페달 막대")), 1], ["9 발판", sz(pc("발판")), 1], ["피스 6×25", "", 2]],
+      text: [`페달 막대에 O 구멍(아래 끝에서 ${f(V.oFromEnd)})·A 구멍(아래 끝에서 ${f(V.oFromEnd + G.OA)}) Ø8.5.`, `발판을 ${qv("padW")} × ${qv("padL")}로 잘라 막대 위 끝에 맞춰 운전자 쪽 면에 피스 2개.`, "받침판에 거는 건 2일차 O핀으로."] },
+    { title: "막대 몸통 U 만들기", isolate: true, parts: [["3 막대 몸통 옆벽", sz(pc("막대 몸통 옆벽")), 2], ["4 막대 몸통 앞벽", sz(pc("막대 몸통 앞벽")), 1], ["피스 6×25", "", 4]],
+      text: [`옆벽 A 쪽 끝을 R${f(G.BOX.r)} 반원으로 깎고 반원 중심에 A 구멍 Ø8.5.`, "앞벽 가운데 Ø8.5 (전산볼트 자리).", `앞벽을 옆벽 앞 끝에 피스 4개 → U자. 안쪽 폭 ${f(G.BOX.inner)}.`] },
+    { title: "브레이크도 한 벌 더", dir: [0, 0, -130], parts: [["2~5단계", "똑같이", 1]],
+      text: [`같은 받침판 왼쪽 칸에 O 받이 2개·B 판을 똑같이 세워요 — 액셀 칸과 ${qv("pairGap")} 띄우고, 왼쪽 O 받이는 받침판 옆면에 맞춰요.`, "페달 막대 + 발판, 막대 몸통 U도 하나씩 더 — 2일차에 달아요."] },
+  ], 112: [
+    // dir: 부품마다 실제로 넣는 길 — 핀은 구멍 축을 따라, 사이에 끼는 와셔·너트·막대는 위에서 (벽을 뚫고 들어오지 않게)
+    { title: "O핀으로 페달 막대 걸기", dir: m => m.userData.part === "O핀" ? [0, 0, 120] : /페달 막대|발판/.test(m.userData.part) ? [0, 130, 0] : [0, 50, 0], parts: [["O핀", hw("O핀").spec, 1], ["장너트", hw("장너트").spec, 2], ["와셔 17×1T", "", 2]],
+      text: ["페달 막대를 두 O 받이 사이에 세워 구멍을 맞춰요.", "O핀을 한쪽 O 받이로 넣으며 와셔 → 장너트 → 페달 막대 → 장너트 → 와셔 순서로 꿰어 반대쪽으로 빼요. 장너트는 나사라 O핀을 돌려서 넣어요.",
+        "장너트 두 개를 페달 막대 쪽으로 마주 조여요 → O핀이 막대와 같이 돌아요.", "와셔와 O 받이 사이에 양쪽 0.5쯤 틈이 남아야 해요. 꽉 끼면 페달이 안 돌아요."] },
+    { title: "전산볼트를 U에 — 페달에 걸기 전에", dir: m => m.userData.p0.x < G.S - 1 ? [0, 50, 0] : [90, 0, 0],   // 옆에 눕힌 U: 안쪽 와셔·너트는 위에서, 볼트·바깥 너트는 앞벽 바깥에서
+      parts: [["전산볼트 M8", `${G.ROD.len}mm`, 1], ["너트 M8", "", 2], ["와셔 17×1T", "", 1]],
+      text: ["막대 몸통 U를 책상에 놓고, 앞벽 가운데 구멍에 전산볼트를 바깥(B 판 쪽)에서 꿰어요.", `U 안쪽은 와셔 → 너트, 바깥은 너트로 렌치 두 개로 조여요. U 안쪽으로 ${f(G.ROD.inB - G.T)}, 바깥으로 ${f(G.ROD.out)} 나와요.`,
+        "지금 하는 까닭: 페달 막대를 U에 넣고 나면 안쪽 너트가 막대와 붙어 렌치가 안 들어가요."] },
+    { title: "스프링 끼우고 B 구멍에 꿰기", dir: m => { const r = M.units[0].strut.rotation.z, k = m.userData.p0.x >= G.S + G.NUT_AT - 1 ? 40 : -70; return [Math.cos(r) * k, Math.sin(r) * k, 0]; },   // U는 축을 따라 밀려 B 구멍으로, 뒤 너트는 B 판 뒤에서 parts: [["스프링", "1.2 × 17.85 × 78.4", 1], ["와셔 17×1T", "", 1], ["너트 M8", "", 1]],
+      text: ["전산볼트에 스프링을 끼우고, U를 B 판 쪽으로 밀어 볼트 끝을 B 구멍에 꿰어요.",
+        `스프링을 누르지 않아도(놓은 길이 ${f(V.springFree)}) 볼트 끝이 B 판 뒤로 ${f(G.ROD.out - V.springFree - G.T)} 나와요 — 와셔·너트 걸 자리가 충분해요.`,
+        `B 판 뒤에서 와셔 → 너트를 C에서 ${f(G.NUT_AT)}(볼트에 미리 표시)에 잠가요. 이 너트가 놓았을 때 60°를 정해요.`] },
+    { title: "U를 페달 막대에 A핀으로", dir: m => m.userData.part === "A핀" ? [0, 0, 90] : [0, 0, Math.sign(m.userData.p0.z || 1) * 40], parts: [["A핀", hw("A핀").spec, 1], ["너트 M8", "", 2], ["와셔 17×1T", "", 2]],
+      text: ["페달 막대를 놓은 자리(60°)로 세우고 U 옆벽 사이에 넣어요. U는 볼트가 B 구멍에 걸려 위아래로 기울어서 A 구멍을 맞출 수 있어요.",
+        "옆벽 → 막대 → 옆벽 A 구멍으로 A핀을 꿰고 양 끝 와셔 → 너트.", "손으로 밟아 스프링이 눌리고, 놓으면 돌아오는지 봐요."] },
+    { title: "자석 붙이기 — 센서 받침보다 먼저", dir: [0, 0, 40], parts: [["자석", "Ø6 × 2.5 지름 방향", 1], ["순간접착제", "", 1]],
+      text: [`O핀 바깥 끝면 가운데에 자석을 붙여요 (O 받이 밖으로 ${f(G.OPIN_HALF - G.BASE.half)} 나옴).`, `센서 받침을 세우고 나면 자석과 칩 사이가 ${AS.gap}뿐이라 손이 안 들어가요. 그래서 지금.`] },
+    { title: "AS5600 붙인 센서 받침 세우기", dir: [0, 0, 80], parts: [["7 센서 받침", sz(pc("센서 받침")), 1], ["8 사이 조각", sz(pc("사이 조각")), 1], ["AS5600", "23 × 23", 1], ["피스 6×25", "", 2]],
+      text: [`책상에서 센서 받침 안쪽 면에 AS5600을 먼저 붙여요 — 칩 가운데가 밑에서 ${f(G.T + V.H)}(O 높이), 칩이 바깥(자석 쪽)을 보게.`, "사이 조각을 받침판 옆면에 대고 센서 받침을 바닥에 세워 옆에서 밀어 넣어요. 피스로 셋을 같이.", `칩과 자석 틈 ${AS.gap} — 사이 조각 두께가 이 틈을 정해요.`] },
+    { title: "선 잇기", dir: [0, 60, 0], parts: [["점퍼선", "OUT · VCC · GND", 3]],
+      text: ["11주차 시험은 우노에 바로: OUT → A0, VCC → 5V, GND → GND.", "선은 센서 받침 뒤로 내려 받침판 옆을 따라 묶어요 — 밟을 때 움직이는 페달 막대·U에 안 닿게.", "14주차에 책상 위 휠 베이스 브레드보드로 옮겨요."] },
+    { title: "브레이크도 똑같이", dir: brakeDir, parts: [["1~7단계", "똑같이 — 센서는 왼쪽", 1]], text: ["1~7단계 순서 그대로 (화면도 그 순서로 들어와요).", "브레이크 OUT은 A1."] },
+    { title: "밟아 보기", ctl: true, parts: [], text: ["아래 ▶를 눌러 봐요. 끝까지 밟으면 15° (스프링 39), 놓으면 60°로 돌아와요.", "걸리는 곳이 있으면 구멍을 조금 넓히거나 축을 다듬어요."] },
+  ] };
+  return null;
+}
+if (legoSteps()) {
+  const { stepper } = await import("../steps.js");
+  LEGO = stepper({ view: document.querySelector(".view"), scene, camera, controls, day: W * 10 + D, steps: legoSteps,
+    meshes: () => { const a = []; M.root.traverse(o => o.isMesh && a.push(o)); return a; },
+    onApply: s => { if (W === 11) $("ttl").innerHTML = TTL11[s.day];
+      tagVis(); dimVis(); M.pickable = [...M.PARTS.values()].flatMap(q => q.meshes).filter(m => m.visible); document.querySelector(".ctl").style.display = s.ctl ? "" : "none"; if (!s.ctl && playing) $("play").click(); } });
+  LEGO.apply();
+}
+
+$("loading").remove();
+
+const v3 = new THREE.Vector3(), clock = new THREE.Clock(), occ = new THREE.Raycaster(); let fno = 0;
+function frame() {
+  const dt = clock.getDelta();
+  LEGO?.tick(dt);
+  if (tween) { const k = Math.min(1, (performance.now() - tween.s) / 1200), e = ease(k); camera.position.lerpVectors(tween.from.p, tween.to.p, e); controls.target.lerpVectors(tween.from.t, tween.to.t, e); if (k >= 1) tween = null; }
+  if (playing) { playT += dt * 1.6; const [mid, amp] = midAmp(); setPose(mid + amp * Math.cos(playT)); }
+  controls.update(); renderer.render(scene, camera);
+  const w = stage.clientWidth, h = stage.clientHeight, check = fno++ % 6 === 0;
+  const place = (el, wp) => { v3.copy(wp).project(camera); el.style.left = (v3.x * .5 + .5) * w + "px"; el.style.top = (-v3.y * .5 + .5) * h + "px"; el.style.visibility = v3.z < 1 ? "" : "hidden"; };
+  const world = t => { t.frame.updateWorldMatrix(true, false); return t.local.clone().applyMatrix4(t.frame.matrixWorld); };
+  M.TAGS.forEach(t => { if (t.el.style.display === "none") return; const wp = world(t); place(t.el, wp);
+    if (check) { const dir = wp.clone().sub(camera.position), d = dir.length(); occ.set(camera.position, dir.normalize()); occ.far = d - 3; t.el.classList.toggle("hid", !!occ.intersectObjects(M.pickable, false).find(hh => hh.object.userData.part !== t.name)); } });
+  M.DIMS.forEach(t => { if (t.el.style.display !== "none") place(t.el, world(t)); });
+  if (M.lines.visible) for (const k in M.PT) place(M.PT[k], M.DOT[k].getWorldPosition(new THREE.Vector3()));
+  requestAnimationFrame(frame);
+}
+frame();
+// 휠 베이스 14주차(합치기)가 이 모델을 책상 밑에 놓으려고 가져감: 모양 + 우노로 가는 선 끝(바닥) 위치
+window.__pedal = () => { M.root.updateMatrixWorld(true); const c = M.root.clone(true); c.traverse(o => { if (o.isMesh || o.isLine) o.geometry = new THREE.BufferGeometry().copy(o.geometry); });   // 관 모양·밀어낸 모양도 점 배열로 (불러오는 쪽에서 다시 못 만드는 곡선 대신)
+  return { json: c.toJSON(), ends: M.units.map(U => U.endL && U.fixed.localToWorld(new THREE.Vector3(...U.endL)).toArray()).filter(Boolean) }; };
+window.__ready = true;
+</script>
+</body>
+</html>

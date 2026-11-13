@@ -1,0 +1,166 @@
+<!-- Claude가 만듦 (2026-11-06) — 열두 달 달력이 고리로 돌고 달마다 파스텔 바탕이 바뀜(캔 고리 80), 그 달의 기념일이 쪽지로 떨어져 쌓임(쌓이는 종이 20) -->
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>우리달</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+/* 우리달 앱 색 그대로: 남자친구 하늘, 여자친구 분홍, 둘이 보라 */
+:root { --ink: #3D2F3B; --soft: #A08F9C; --acc: #FF7FA7; --acc-ink: #E5508A;
+  --a: #A9CBFF; --a-ink: #3D7BD9; --b: #FFB5CB; --b-ink: #E0558A; --both: #D5C2FF; --both-ink: #8A5BDB;
+  --bg1: #FFF6F8; --bg2: #FFE6EE;
+  --round: "Jua", "Pretendard Variable", Pretendard, sans-serif; --sans: "Pretendard Variable", Pretendard, system-ui, sans-serif;
+  --m: clamp(16px, 3.2vw, 52px); --cw: clamp(190px, 21vw, 300px); --rt: 46%; color-scheme: light }
+* { box-sizing: border-box }
+html, body { margin: 0; height: 100%; overflow: hidden }
+body { background: var(--bg1); color: var(--ink); font: 400 16px/1.5 var(--sans); word-break: keep-all; -webkit-font-smoothing: antialiased; touch-action: pan-y }
+#sky { position: fixed; inset: 0; background: radial-gradient(ellipse 80% 60% at 50% 38%, var(--bg2), var(--bg1) 72%); transition: background 1s }
+#sky::after { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 18% 82%, rgb(255 255 255 / .7), transparent 30%), radial-gradient(circle at 86% 20%, rgb(255 255 255 / .6), transparent 26%) }
+a { color: inherit }
+.top { position: fixed; z-index: 20; inset: 0 0 auto; display: flex; justify-content: space-between; padding: 18px var(--m); font: 500 12.5px var(--sans); color: var(--soft) }
+.top a { text-decoration: none } .top a:hover { color: var(--ink) }
+h1 { position: fixed; z-index: 5; left: 0; right: 0; top: clamp(54px, 9vh, 90px); margin: 0; text-align: center; font: 400 clamp(34px, 4.4vw, 60px)/1 var(--round); color: var(--acc-ink); pointer-events: none }
+h1 small { display: block; margin-top: 10px; font: 400 15px var(--round); color: var(--soft) }
+/* 고리 */
+.stage { position: fixed; inset: 0; perspective: 1500px; perspective-origin: 50% 40%; cursor: grab }
+.stage.grab { cursor: grabbing }
+.ring { position: absolute; left: 50%; top: var(--rt); width: 0; height: 0; transform-style: preserve-3d }
+.mon { position: absolute; left: calc(var(--cw) / -2); top: calc(var(--cw) * -.62); width: var(--cw); aspect-ratio: 1 / 1.24; padding: 18px 18px 16px; border-radius: 28px; background: #fff; box-shadow: 0 30px 60px -28px rgb(120 60 90 / .35), 0 2px 0 rgb(255 255 255 / .9) inset; backface-visibility: hidden; user-select: none }
+.mon .hd { display: flex; justify-content: space-between; align-items: baseline }
+.mon b { font: 400 clamp(30px, 3vw, 42px)/1 var(--round); color: var(--c) }
+.mon .en { font: 600 11px var(--sans); letter-spacing: .14em; color: var(--soft) }
+.mon .wk { display: grid; grid-template-columns: repeat(7, 1fr); margin-top: 12px; font: 400 11px var(--round); color: var(--soft); text-align: center }
+.mon .wk span:first-child { color: var(--b-ink) } .mon .wk span:last-child { color: var(--a-ink) }
+.mon .days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px 0; margin-top: 4px }
+.mon .days i { position: relative; display: grid; place-items: center; aspect-ratio: 1; font: 400 clamp(10px, .9vw, 12.5px) var(--round); font-style: normal; color: var(--ink) }
+.mon .days i.o { visibility: hidden }
+.mon .days i[data-w]::after { content: ""; position: absolute; bottom: 1px; width: 5px; height: 5px; border-radius: 50% }
+.mon .days i[data-w="a"]::after { background: var(--a-ink) } .mon .days i[data-w="b"]::after { background: var(--b-ink) } .mon .days i[data-w="both"]::after { background: var(--both-ink) }
+.mon .days i.hl { color: #fff } .mon .days i.hl::before { content: ""; position: absolute; inset: 8%; border-radius: 50%; background: var(--c); z-index: -1 }
+.mon .days { isolation: isolate }
+.mon .mood { margin-top: 10px; padding: 8px 12px; border-radius: 14px; background: color-mix(in srgb, var(--c) 14%, #fff); font: 400 13px var(--round); color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+/* 앞 카드 아래 D-day + 쪽지 더미 */
+.dday { position: fixed; z-index: 6; left: 0; right: 0; top: calc(var(--rt) + var(--cw) * .74 + 18px); margin: 0; text-align: center; pointer-events: none; font: 400 clamp(18px, 1.6vw, 22px) var(--round); color: var(--soft) }
+.dday b { font-weight: 400; color: var(--acc-ink) }
+.pile { position: fixed; z-index: 7; left: 50%; top: calc(var(--rt) + var(--cw) * .74 + 70px); width: min(520px, 92vw); height: 130px; translate: -50% 0; pointer-events: none }
+.note { position: absolute; left: 50%; bottom: 0; padding: 9px 16px 8px; border-radius: 12px; background: var(--nc); color: var(--ni); font: 400 clamp(15px, 1.35vw, 20px) var(--round); white-space: nowrap; box-shadow: 0 10px 18px -12px rgb(120 60 90 / .5); translate: calc(-50% + var(--x)) var(--y); rotate: var(--r); transition: translate .75s cubic-bezier(.3, 1.4, .5, 1), rotate .75s cubic-bezier(.3, 1.4, .5, 1), opacity .4s }
+.note.up { translate: calc(-50% + var(--x)) -70vh; rotate: calc(var(--r) * -3); opacity: 0; transition: none }
+.note.gone { translate: calc(-50% + var(--x) * 3) 40vh; rotate: calc(var(--r) * 6); opacity: 0; transition: translate .6s cubic-bezier(.5, 0, .9, .5), rotate .6s, opacity .6s }
+.arrow { position: fixed; z-index: 8; top: var(--rt); translate: 0 -50%; width: 52px; height: 52px; border: 0; border-radius: 50%; background: rgb(255 255 255 / .75); color: var(--acc-ink); font: 400 22px var(--round); cursor: pointer; box-shadow: 0 8px 20px -10px rgb(120 60 90 / .5); transition: transform .15s }
+.arrow:hover { transform: scale(1.08) } .arrow:active { transform: scale(.94) }
+.prev { left: var(--m) } .next { right: var(--m) }
+button:focus-visible, a:focus-visible { outline: 2px solid var(--acc-ink); outline-offset: 4px }
+@media (max-width: 700px) {
+  :root { --rt: 40% }
+  .arrow { top: calc(var(--rt) + var(--cw) * .74 + 4px); width: 44px; height: 44px; translate: none }
+}
+</style>
+</head>
+<body>
+<div id="sky"></div>
+<nav class="top"><a href="./index.html">← 카드별 어울림</a><a href="../../uridal/">작품 보기 →</a></nav>
+<h1>우리달<small>둘이 같이 쓰는 달력</small></h1>
+<div class="stage" id="stage"><div class="ring" id="ring"></div></div>
+<p class="dday" id="dday"></p>
+<div class="pile" id="pile" aria-live="polite"></div>
+<button class="arrow prev" type="button" aria-label="이전 달">‹</button>
+<button class="arrow next" type="button" aria-label="다음 달">›</button>
+
+<script>
+// 예시 달력 (실제 둘의 일정은 앱 안에만 있어요) — w: a 남자친구, b 여자친구, both 둘이
+const Y = 2026;
+const M = [
+  { c: "#7FA8E8", bg: ["#EEF4FF", "#DCE8FF"], mood: "눈 오는 날 산책 ☃", n: [["새해 첫 데이트", "both"], ["스키장", "both"]], dots: { 1: "both", 9: "a", 17: "both", 24: "b" } },
+  { c: "#B48BE6", bg: ["#F6F0FF", "#E9DDFF"], mood: "초콜릿 반쯤 먹음", n: [["발렌타인데이", "b"], ["개강 준비", "a"]], dots: { 7: "a", 14: "b", 21: "both" } },
+  { c: "#6CC4A1", bg: ["#EFFBF5", "#D8F3E7"], mood: "개강! 같은 수업 하나", n: [["개강", "both"], ["화이트데이", "a"]], dots: { 2: "both", 14: "a", 28: "b" } },
+  { c: "#F08BB0", bg: ["#FFF1F6", "#FFDCE9"], mood: "벚꽃 보러 가기", n: [["벚꽃 구경", "both"], ["중간고사", "a"], ["중간고사", "b"]], dots: { 4: "both", 11: "b", 20: "a", 21: "b" } },
+  { c: "#8CC56A", bg: ["#F4FBEE", "#E3F4D6"], mood: "축제 부스 같이 돌기", n: [["대학 축제", "both"], ["어버이날", "b"]], dots: { 8: "b", 15: "both", 16: "both", 27: "a" } },
+  { c: "#62B6E0", bg: ["#EEF8FD", "#D6EEFA"], mood: "기말 끝나면 바다", n: [["기말고사", "both"], ["종강", "both"]], dots: { 10: "a", 18: "both", 26: "b" } },
+  { c: "#4FC0C0", bg: ["#ECFAFA", "#D3F2F2"], mood: "바다 보고 옴 🌊", n: [["첫 여행", "both"], ["생일", "a"], ["백일", "both"]], dots: { 3: "both", 4: "both", 12: "a", 22: "both" } },
+  { c: "#F2A06B", bg: ["#FFF5EE", "#FFE5D3"], mood: "너무 더워서 카페만", n: [["불꽃놀이", "both"], ["계절학기", "b"]], dots: { 6: "b", 15: "both", 29: "a" } },
+  { c: "#A894E0", bg: ["#F4F1FD", "#E6DFFA"], mood: "2학기 시간표 맞추기", n: [["개강", "both"], ["추석", "both"]], dots: { 1: "both", 24: "both", 25: "both" } },
+  { c: "#E89A5A", bg: ["#FFF4EA", "#FFE3CC"], mood: "단풍 든 길 걷기", n: [["중간고사", "a"], ["생일", "b"], ["할로윈", "both"]], dots: { 9: "b", 19: "a", 23: "b", 31: "both" } },
+  { c: "#E07C9C", bg: ["#FFF2F5", "#FFDDE6"], mood: "첫 패딩 꺼냄", n: [["빼빼로데이", "b"], ["수능 응원", "a"]], dots: { 6: "both", 11: "b", 19: "a" } },
+  { c: "#8FA3D8", bg: ["#F1F4FC", "#DFE5F7"], mood: "트리 앞에서 사진", n: [["종강", "both"], ["크리스마스", "both"], ["연말 모임", "a"]], dots: { 12: "a", 24: "both", 25: "both", 31: "both" } },
+];
+const EN = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+const NC = { a: ["var(--a)", "#244E8F"], b: ["var(--b)", "#8F2453"], both: ["var(--both)", "#4F2E8F"] };
+const N = 12, step = 360 / N;
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const ring = document.getElementById("ring"), stage = document.getElementById("stage"), root = document.documentElement;
+const cards = M.map((m, i) => {
+  const first = new Date(Y, i, 1).getDay(), len = new Date(Y, i + 1, 0).getDate();
+  let days = "";
+  for (let k = 0; k < first; k++) days += "<i class=o>.</i>";
+  for (let d = 1; d <= len; d++) days += `<i${m.dots[d] ? ` data-w="${m.dots[d]}"` : ""}${d === Object.keys(m.dots).map(Number).find(x => m.dots[x] === "both") ? " class=hl" : ""}>${d}</i>`;
+  const el = document.createElement("div");
+  el.className = "mon"; el.style.setProperty("--c", m.c);
+  el.innerHTML = `<div class="hd"><b>${i + 1}월</b><span class="en">${EN[i]} ${Y}</span></div>
+    <div class="wk"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div>
+    <div class="days">${days}</div><p class="mood">${m.mood}</p>`;
+  ring.appendChild(el); return el;
+});
+
+let R = 0;
+function layout() {
+  const cw = cards[0].offsetWidth;
+  R = Math.round(cw * 1.1 / (2 * Math.tan(Math.PI / N)));
+  cards.forEach((el, i) => el.dataset.base = `rotateY(${i * step}deg) translateZ(${R}px)`);
+}
+addEventListener("resize", layout); layout();
+
+// 돌리기 (끌기 + 관성 + 가장 가까운 달에 멈춤)
+let angle = 0, target = 0, vel = 0, drag = null, sel = -1;
+const today = new Date();
+const front = () => ((Math.round(-target / step) % N) + N) % N;
+const go = d => { target = Math.round(target / step) * step - d * step; pick(); };
+document.querySelector(".prev").onclick = () => go(-1);
+document.querySelector(".next").onclick = () => go(1);
+addEventListener("keydown", e => { if (e.key === "ArrowRight") go(1); if (e.key === "ArrowLeft") go(-1); });
+stage.addEventListener("pointerdown", e => { drag = { x: e.clientX, t: target, lx: e.clientX, v: 0 }; stage.classList.add("grab"); });
+addEventListener("pointermove", e => { if (!drag) return; target = drag.t + (e.clientX - drag.x) * .22; drag.v = (e.clientX - drag.lx) * .22; drag.lx = e.clientX; });
+const end = () => { if (!drag) return; target += drag.v * 6; target = Math.round(target / step) * step; drag = null; stage.classList.remove("grab"); pick(); };
+addEventListener("pointerup", end); addEventListener("pointercancel", end);
+
+// 앞 달이 바뀌면: 바탕색, D-day, 쪽지 더미
+const pile = document.getElementById("pile"), dday = document.getElementById("dday");
+function pick() {
+  const i = front(); if (i === sel) return; sel = i;
+  const m = M[i];
+  root.style.setProperty("--bg1", m.bg[0]); root.style.setProperty("--bg2", m.bg[1]);
+  const start = new Date(Y, i, 1), diff = Math.round((start - new Date(today.getFullYear(), today.getMonth(), today.getDate())) / 864e5);
+  dday.innerHTML = diff > 0 ? `${i + 1}월까지 <b>D-${diff}</b>` : diff === 0 ? `<b>D-day</b>` : `${i + 1}월은 <b>${-diff}일 전</b>`;
+  [...pile.children].forEach(n => { n.classList.add("gone"); setTimeout(() => n.remove(), 650); });
+  m.n.forEach(([t, w], k) => {
+    const n = document.createElement("span");
+    n.className = "note up"; n.textContent = t;
+    n.style.setProperty("--nc", NC[w][0]); n.style.setProperty("--ni", NC[w][1]);
+    const x = (k - (m.n.length - 1) / 2) * 22 + (k % 2 ? 8 : -8), r = (k % 2 ? 1 : -1) * (3 + k * 2.5);
+    n.style.setProperty("--x", x + "px"); n.style.setProperty("--y", -k * 34 + "px"); n.style.setProperty("--r", r + "deg");
+    pile.appendChild(n);
+    setTimeout(() => n.classList.remove("up"), reduce ? 0 : 260 + k * 170);
+  });
+}
+
+function frame() {
+  angle += (target - angle) * (reduce ? .4 : .09);
+  ring.style.transform = `translateZ(${-R}px) rotateY(${angle}deg)`;
+  const f = front();
+  cards.forEach((el, i) => {
+    // 앞에서 멀수록 작고 흐리게
+    let d = Math.abs(((i * step + angle) % 360 + 540) % 360 - 180); d = 180 - d; // 0 = 앞
+    const k = Math.max(0, 1 - d / 75);
+    el.style.transform = `${el.dataset.base} scale(${.86 + k * .22}) translateY(${(1 - k) * 18}px)`;
+    el.style.zIndex = String(Math.round(k * 10));
+  });
+  requestAnimationFrame(frame);
+}
+target = -today.getMonth() * step; angle = target; pick(); frame();
+</script>
+</body>
+</html>

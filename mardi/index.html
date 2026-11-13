@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>마디</title>
+<meta name="description" content="관절이 다 보이는 마네킹을 사람처럼 자연스럽게 움직이게 만드는 3D 액션 실험 — 기획서와 움직임 비교">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* 기획서·움직임 비교를 한 주소에서 탭으로. 두 문서는 plan/, motion-study/ 그대로 */
+:root { --vp: #1c1e22; --on-vp: #e8eaed; --on-vp-soft: #8d939c; --joint: #f06a1d; --mono: "IBM Plex Mono", "Malgun Gothic", ui-monospace, monospace; color-scheme: dark }
+* { box-sizing: border-box }
+html, body { margin: 0; height: 100% }
+body { background: var(--vp); color: var(--on-vp); font: 500 13px var(--mono); display: flex; flex-direction: column; overflow: hidden }
+nav { flex: none; display: flex; align-items: center; gap: 4px 18px; height: 44px; padding: 0 max(16px, env(safe-area-inset-right)) 0 max(16px, env(safe-area-inset-left)); border-bottom: 1px solid rgb(255 255 255 / .08) }
+nav a { color: var(--on-vp-soft); text-decoration: none; margin-right: auto; white-space: nowrap }
+nav a:hover { color: var(--on-vp) }
+nav button { font: inherit; color: var(--on-vp-soft); background: none; border: 0; height: 100%; padding: 0 4px; cursor: pointer; box-shadow: inset 0 -2px 0 transparent; white-space: nowrap }
+nav button[aria-pressed="true"] { color: var(--on-vp); box-shadow: inset 0 -2px 0 var(--joint) }
+nav button:hover { color: var(--on-vp) }
+:focus-visible { outline: 2px solid var(--joint); outline-offset: -2px }
+iframe { flex: 1; width: 100%; border: 0; display: block; background: #eceef0 }
+iframe[hidden] { display: none }
+</style>
+</head>
+<body>
+<nav aria-label="마디">
+  <a href="../#game">← 창업실</a>
+  <button type="button" data-v="plan" data-src="plan/" aria-pressed="true">기획서</button>
+  <button type="button" data-v="study" data-src="motion-study/" aria-pressed="false">움직임 비교</button>
+</nav>
+<iframe id="f-plan" title="마디 기획서" hidden></iframe>
+<iframe id="f-study" title="마디 움직임 비교" hidden></iframe>
+<script>
+// 처음 연 탭에만 주소 뒤쪽(#절 이름 등)을 넘기고, 다른 탭은 처음 누를 때 불러옴
+const tabs = [...document.querySelectorAll("nav button")];
+const q = new URLSearchParams(location.search), first = q.get("v");
+q.delete("v");
+function show(v, rest = "") {
+  for (const t of tabs) {
+    const on = t.dataset.v === v, f = document.getElementById("f-" + t.dataset.v);
+    t.setAttribute("aria-pressed", on);
+    if (on && !f.getAttribute("src")) f.src = t.dataset.src + rest;
+    f.hidden = !on;
+  }
+}
+show(tabs.some(t => t.dataset.v === first) ? first : tabs[0].dataset.v, (q.size ? "?" + q : "") + location.hash);
+for (const t of tabs) t.addEventListener("click", () => {
+  show(t.dataset.v);
+  history.replaceState(null, "", t === tabs[0] ? location.pathname : "?v=" + t.dataset.v);
+});
+</script>
+</body>
+</html>

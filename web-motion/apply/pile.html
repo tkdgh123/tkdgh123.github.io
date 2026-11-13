@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>한 학기 쌓기 · 창업실 적용 3</title>
+<link rel="stylesheet" href="apply.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<style>
+/* 스크롤 카메라(Quai·데모 C)를 창업실 git 기록으로: 저장 한 번 = 종이 한 장, 날마다 쌓이는 더미 위를 지나감 */
+body { height: 900svh }
+canvas.bg { z-index: 0 }
+.day { position: fixed; z-index: 2; left: var(--m); top: clamp(84px, 13vh, 130px); max-width: min(760px, calc(100vw - 2 * var(--m))); pointer-events: none; transition: top .5s var(--ease), bottom .5s var(--ease) }
+.day .fade { transition: opacity .25s, transform .25s; padding: 14px 20px 14px 0; background: radial-gradient(closest-side, rgb(242 241 236 / .9), rgb(242 241 236 / .75) 70%, rgb(242 241 236 / 0)); background-size: 115% 125%; background-position: 10% 50% }   /* 높은 더미가 뒤에 와도 글이 읽히게 */
+.day .fade.out { opacity: 0; transform: translateY(8px) }
+.day .date { color: var(--muted) }
+.day .row { display: flex; align-items: flex-end; gap: clamp(22px, 3vw, 48px); margin: 4px 0 12px }
+.day .n { display: flex; align-items: baseline; gap: 14px; flex: none }
+.day .n b { font: 200 clamp(96px, 13vw, 210px)/.8 var(--serif); letter-spacing: -.04em; font-variant-numeric: tabular-nums }
+.day .n span { font: 300 clamp(20px, 2vw, 28px) var(--serif) }
+.day .what { font-size: clamp(16px, 1.2vw, 19px) }
+/* 그날 저장 제목: 한 줄씩 차례로 */
+.log { margin: 0; padding: 0; list-style: none; font: 13px/1.65 var(--sans); letter-spacing: -.005em; color: var(--muted); max-width: 46ch; padding-bottom: 4px }
+.log li { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0; transform: translateY(6px); animation: up .45s var(--ease) forwards; animation-delay: calc(var(--i) * 45ms + .15s) }
+.log li.more { color: var(--ink) }
+@keyframes up { to { opacity: 1; transform: none } }
+/* 한눈에 볼 땐 고른 날을 아래에 */
+.day.low { top: auto; bottom: clamp(28px, 7vh, 72px) }
+.hero { position: fixed; z-index: 2; left: var(--m); top: 18vh; transition: opacity .4s; pointer-events: none }
+.hero h1 { font-size: clamp(46px, 7vw, 120px); line-height: 1.08 }
+.hero p { margin-top: 18px; color: var(--muted) }
+.key { position: fixed; z-index: 2; right: var(--m); bottom: clamp(28px, 7vh, 72px); display: grid; gap: 6px; justify-items: start }
+.key span { display: flex; align-items: center; gap: 8px }
+.key i { width: 18px; height: 6px; outline: 1px solid rgb(0 0 0 / .25) }
+.end { position: fixed; z-index: 2; left: 50%; top: 16vh; transform: translateX(-50%); text-align: center; opacity: 0; transition: opacity .5s; pointer-events: none; width: max-content; max-width: calc(100vw - 32px) }
+.end.on { opacity: 1 }
+.end.on .go { pointer-events: auto }
+.end h2 { font-size: clamp(40px, 5.6vw, 92px) }
+.end .go { margin-top: 26px }
+.lbl { position: fixed; z-index: 1; top: 0; left: 0; color: var(--muted); white-space: nowrap; pointer-events: none; transform: translate(-50%, 0); transition: color .2s }
+.lbl.hot { color: var(--ink); font-weight: 500 }
+canvas.bg.pick { cursor: pointer }
+@media (max-width: 700px) {
+  .key { top: 58px; bottom: auto; grid-auto-flow: column; gap: 12px }
+  .hero { top: 22vh }
+  .day { top: 96px }
+  .day .n b { font-size: 88px }
+  .day .row { flex-direction: column; align-items: flex-start; gap: 10px }
+  .day.low { bottom: 20px; left: 12px; right: 12px; max-width: none }
+  .day.low .fade { padding: 14px 16px; background: rgb(242 241 236 / .94); box-shadow: 0 10px 30px -12px rgb(0 0 0 / .25) }
+  .day.low .n b { font-size: 64px }
+}
+@media (prefers-reduced-motion: reduce) { .log li { animation: none; opacity: 1; transform: none } }
+</style>
+</head>
+<body>
+<nav class="top mono"><a href="../#apply">← 움직이는 웹사이트</a><span class="right"><a href="dots.html">← 이전</a><span>창업실 적용 3 / 4 · 한 학기 쌓기</span><a href="stick.html">다음 →</a></span></nav>
+<canvas class="bg" id="cv"></canvas>
+<div id="lbls"></div>
+<div class="hero" id="hero"><h1>한 학기를<br><b>쌓아</b> 보면</h1><p class="mono">창업실에 저장한 기록 한 번 = 종이 한 장 · 내려 보세요</p></div>
+<div class="day" id="dayBox"><div class="fade out" id="day"></div></div>
+<div class="key mono" id="key"></div>
+<div class="end" id="end"><h2 id="endT"></h2><a class="go" href="../../">창업실로 →</a></div>
+
+<script type="module">
+import * as THREE from "three";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+import { DAYS } from "./pile-data.js";
+const KIND = { s: ["공부", 0xfbfaf5], p: ["프로젝트", 0x2b44a6], g: ["게임", 0x1d1e21], e: ["창업실·기타", 0xcfcabb] };
+const $ = id => document.getElementById(id);
+$("key").innerHTML = "spge".split("").map(k => `<span><i style="background:#${KIND[k][1].toString(16).padStart(6, "0")}"></i>${KIND[k][0]}</span>`).join("");
+
+// 날짜 → 가로 자리 (저장 없는 날도 칸을 비워 둠)
+const D0 = Date.parse(DAYS[0][0]);
+const dayNo = s => Math.round((Date.parse(s) - D0) / 864e5);
+const GAP = 2.4, TH = .045;
+const X = DAYS.map(d => dayNo(d[0]) * GAP);
+const SPAN = dayNo(DAYS[DAYS.length - 1][0]) + 1;
+const TOTAL = DAYS.reduce((a, d) => a + d[1].length, 0);
+$("endT").innerHTML = `${SPAN}일 동안<br><b>${TOTAL}</b>장`;
+
+const renderer = new THREE.WebGLRenderer({ canvas: $("cv"), antialias: true });
+renderer.setClearColor(0xf2f1ec);
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
+const scene = new THREE.Scene();
+scene.fog = new THREE.Fog(0xf2f1ec, 14, 46);
+// 방 안의 부드러운 빛(반사·그늘)에 해 하나로 그림자
+scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), .04).texture;
+scene.environmentIntensity = .55;
+const cam = new THREE.PerspectiveCamera(38, 1, .1, 200);
+scene.add(new THREE.HemisphereLight(0xffffff, 0xd9d6cc, .9));
+const sun = new THREE.DirectionalLight(0xfffaf0, 2.1);
+sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); sun.shadow.radius = 6; sun.shadow.bias = -.0004;
+Object.assign(sun.shadow.camera, { left: -26, right: 26, top: 12, bottom: -12, near: 1, far: 50 });
+scene.add(sun, sun.target);
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(220, 60), new THREE.ShadowMaterial({ opacity: .12 }));
+ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
+// 시간 줄과 날짜 눈금
+const ink = new THREE.MeshBasicMaterial({ color: 0x151514 });
+const span = SPAN * GAP;
+const line = new THREE.Mesh(new THREE.BoxGeometry(span + 4, .006, .012), ink); line.position.set(span / 2 - 1.2, .003, 1.05); scene.add(line);
+for (let i = 0; i <= SPAN; i++) { const t = new THREE.Mesh(new THREE.BoxGeometry(.012, .006, i % 5 ? .1 : .22), ink); t.position.set(i * GAP, .003, 1.05 + (i % 5 ? .05 : .11)); scene.add(t); }
+
+// 종이 결: 윗면은 옅은 섬유와 가장자리 그늘, 옆면은 한 톤 어두운 단면
+function paper() {
+  const c = Object.assign(document.createElement("canvas"), { width: 256, height: 256 }), g = c.getContext("2d");
+  g.fillStyle = "#fff"; g.fillRect(0, 0, 256, 256);
+  for (let i = 0; i < 2600; i++) { g.fillStyle = `rgba(90,80,60,${Math.random() * .05})`; g.fillRect(Math.random() * 256, Math.random() * 256, 1, 1); }
+  g.lineWidth = .6;
+  for (let i = 0; i < 140; i++) { const x = Math.random() * 256, y = Math.random() * 256, a = Math.random() * 6.3, l = 4 + Math.random() * 10; g.strokeStyle = `rgba(110,100,80,${.03 + Math.random() * .04})`; g.beginPath(); g.moveTo(x, y); g.lineTo(x + Math.cos(a) * l, y + Math.sin(a) * l); g.stroke(); }
+  for (const [x0, y0, x1, y1] of [[0, 0, 10, 0], [256, 0, 246, 0], [0, 0, 0, 10], [0, 256, 0, 246]]) {
+    const gr = g.createLinearGradient(x0, y0, x1, y1); gr.addColorStop(0, "rgba(70,60,40,.16)"); gr.addColorStop(1, "rgba(70,60,40,0)");
+    g.fillStyle = gr; g.fillRect(0, 0, 256, 256);
+  }
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return t;
+}
+const top = new THREE.MeshStandardMaterial({ map: paper(), roughness: .92, metalness: 0 });
+const side = new THREE.MeshStandardMaterial({ color: 0xcfc9bb, roughness: .95 });
+const sheets = new THREE.InstancedMesh(new THREE.BoxGeometry(1.5, TH * .8, 1.06), [side, side, top, side, side, side], TOTAL);
+sheets.castShadow = sheets.receiveShadow = true; sheets.frustumCulled = false; scene.add(sheets);   // 처음엔 다 숨어 있어 경계가 작게 잡히므로 끔
+const S = []; // [날 j, 그날 몇째, 회전, 어긋남x, 어긋남z]
+const col = new THREE.Color();
+DAYS.forEach((d, j) => [...d[1]].forEach((k, s) => {
+  S.push([j, s, (Math.random() - .5) * .2, (Math.random() - .5) * .07, (Math.random() - .5) * .06]);
+  sheets.setColorAt(S.length - 1, col.setHex(KIND[k][1]));
+}));
+// 고를 때 쓰는 보이지 않는 상자 (더미마다 하나)
+const hitMat = new THREE.MeshBasicMaterial({ colorWrite: false, depthWrite: false });
+const hits = DAYS.map((d, j) => { const h = Math.max(.25, d[1].length * TH + .1), m = new THREE.Mesh(new THREE.BoxGeometry(1.9, h, 1.5), hitMat); m.position.set(X[j], h / 2, 0); m.userData.j = j; scene.add(m); return m; });
+const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), e3 = new THREE.Euler(), v = new THREE.Vector3(), one = new THREE.Vector3(1, 1, 1), zero = new THREE.Vector3();
+
+// 날짜 글씨는 화면 위에 HTML로 (더미 앞 바닥에 붙여서)
+$("lbls").innerHTML = DAYS.map(d => `<span class="lbl mono">${d[0].slice(5).replace("-", ".")}</span>`).join("");
+const L = [...$("lbls").children];
+
+function resize() {
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.setSize(innerWidth, innerHeight, false);
+  cam.aspect = innerWidth / innerHeight; cam.fov = innerWidth < 700 ? 52 : 38; cam.updateProjectionMatrix();
+}
+addEventListener("resize", resize); resize();
+
+const cl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const sm = x => (x = cl(x), x * x * (3 - 2 * x));
+const out = x => 1 - (1 - cl(x)) ** 3;
+const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+let cur = -2, u = 0, tx = 0, ty = 0, sx = 0, sy = 0, hover = -1, sel = -1, wideOn = false;
+const lift = new Float32Array(DAYS.length);
+const camPos = new THREE.Vector3(), look = new THREE.Vector3(), wide = new THREE.Vector3(), wideLook = new THREE.Vector3();
+
+// 마우스: 카메라가 살짝 따라 돌고, 한눈에 볼 땐 더미를 고름
+const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+function pick(x, y) { ndc.set(x / innerWidth * 2 - 1, -(y / innerHeight) * 2 + 1); ray.setFromCamera(ndc, cam); const h = ray.intersectObjects(hits)[0]; return h ? h.object.userData.j : -1; }
+addEventListener("pointermove", e => {
+  tx = e.clientX / innerWidth - .5; ty = e.clientY / innerHeight - .5;
+  if (e.pointerType === "mouse") { hover = wideOn ? pick(e.clientX, e.clientY) : -1; $("cv").classList.toggle("pick", hover >= 0); }
+});
+let down = null;
+addEventListener("pointerdown", e => { down = [e.clientX, e.clientY]; });
+addEventListener("pointerup", e => {
+  if (!down || !wideOn || e.target.closest("a")) return;
+  if (Math.hypot(e.clientX - down[0], e.clientY - down[1]) < 8) { const j = pick(e.clientX, e.clientY); sel = j === sel ? -1 : j; }
+  down = null;
+});
+
+function frame() {
+  const max = document.documentElement.scrollHeight - innerHeight;
+  const goal = cl(scrollY / Math.max(1, max));
+  u += (goal - u) * (calm ? 1 : .09);
+  sx += (tx - sx) * .05; sy += (ty - sy) * .05;
+  // 0~.06 처음 · .06~.86 날을 따라 이동 · .86~1 한눈에
+  const walk = cl((u - .06) / .8), pull = sm((u - .86) / .12);
+  const narrow = innerWidth < 700, last = X[X.length - 1];
+  const cx = -1.5 + walk * (last + 2.3);   // 마지막 날을 조금 지나야 그날 종이가 다 내려앉음
+  // 한눈에: 넓은 화면은 정면에서 전부, 좁은 화면은 끝에서 비스듬히 줄을 따라
+  if (narrow) { wide.set(last + 11, 9, 3.4); wideLook.set(last * .45, -1.2, -1.1); }
+  else { const d = (last / 2 + 3) / Math.tan(THREE.MathUtils.degToRad(cam.fov / 2)) / cam.aspect; wide.set(last / 2, d * .42, d * .95); wideLook.set(last / 2, 2.4, 0); }
+  scene.fog.near = 14 + pull * 30; scene.fog.far = 46 + pull * 80;
+  camPos.set(cx - 2.6, narrow ? 4.6 : 3.4, narrow ? 9.5 : 7.2).lerp(wide, pull);
+  look.set(cx + .6, narrow ? 1.6 : 1.1, 0).lerp(wideLook, pull);
+  if (!calm) camPos.add(v.set(sx * (1.4 - pull * .6), -sy * .7, 0));   // 마우스 쪽으로 살짝 돎
+  cam.position.copy(camPos); cam.lookAt(look);
+  sun.position.set(camPos.x - 6, 14, 9); sun.target.position.set(camPos.x, 0, 0);
+
+  wideOn = pull > .7;
+  if (!wideOn) { hover = -1; sel = -1; }
+  const focus = hover >= 0 ? hover : sel;
+  for (let j = 0; j < lift.length; j++) lift[j] += ((j === focus ? 1 : 0) - lift[j]) * .15;
+
+  // 카메라가 다가가면 그날 종이가 위에서 차례로 떨어짐. 고른 더미는 종이 사이가 살짝 벌어짐
+  for (let i = 0; i < S.length; i++) {
+    const [j, s, r, ox, oz] = S[i], n = DAYS[j][1].length;
+    const arrive = Math.max(pull, cl((cx - X[j] + 1.6) / 2.2));
+    const a = calm ? (arrive > 0 ? 1 : 0) : out((arrive - s / n * .75) / .25);
+    if (a <= 0) { m4.compose(zero, q, zero); sheets.setMatrixAt(i, m4); continue; }
+    v.set(X[j] + ox, (s + .5) * TH * (1 + lift[j] * .6) + lift[j] * .12 + (1 - a) * 3.5, oz);
+    q.setFromEuler(e3.set(0, r * (1 + lift[j] * 1.5) + (1 - a) * 1.2, (1 - a) * .3));
+    sheets.setMatrixAt(i, m4.compose(v, q, one));
+  }
+  sheets.instanceMatrix.needsUpdate = true;
+  renderer.render(scene, cam);
+
+  // 날짜 글씨 자리
+  for (let j = 0; j < L.length; j++) {
+    v.set(X[j], 0, 1.45).project(cam);
+    const vis = v.z < 1 && v.x > -1.1 && v.x < 1.1;
+    L[j].style.transform = `translate(${(v.x + 1) / 2 * innerWidth}px, ${(1 - v.y) / 2 * innerHeight}px) translateX(-50%)`;
+    const crowd = narrow && pull > .3 && j > 0 && j < L.length - 1 && j !== focus;   // 좁은 화면 한눈에 볼 땐 처음·끝·고른 날짜만
+    L[j].style.opacity = vis && !crowd ? 1 - pull * .3 + (j === focus) * .3 : 0;
+    L[j].classList.toggle("hot", j === focus);
+  }
+  $("hero").style.opacity = 1 - sm(u / .05);
+  // 지금 보는 날: 걸어가는 동안은 카메라 앞 날, 한눈에 볼 땐 고른 날
+  let want = -1;
+  if (wideOn) want = focus;
+  else if (u > .045 && pull < .5) { let best = 1e9; X.forEach((x, j) => { const d = Math.abs(x - cx - .2); if (d < best) { best = d; want = j; } }); }
+  $("dayBox").classList.toggle("low", wideOn);
+  if (want !== cur) day(want);
+  $("end").classList.toggle("on", wideOn && !(narrow && focus >= 0));
+  requestAnimationFrame(frame);
+}
+
+let tm, count;
+function day(j) {
+  cur = j; const el = $("day");
+  el.classList.add("out"); clearTimeout(tm); cancelAnimationFrame(count);
+  if (j < 0) return;
+  tm = setTimeout(() => {
+    const [d, s, w, log] = DAYS[j], [, m, dd] = d.split("-"), narrow = innerWidth < 700, maxN = narrow ? 3 : 8;
+    const items = log.slice(0, log.length > maxN ? maxN - 1 : maxN).map((t, i) => `<li style="--i:${i}">${t.replace(/</g, "&lt;")}</li>`);
+    if (log.length > maxN) items.push(`<li class="more" style="--i:${maxN - 1}">+ ${log.length - maxN + 1}개 더</li>`);
+    el.innerHTML = `<p class="date mono">${+m}월 ${+dd}일</p><div class="row"><p class="n"><b id="cnt">0</b><span>장</span></p><ul class="log">${items.join("")}</ul></div><p class="what">${w}</p>`;
+    el.classList.remove("out");
+    // 숫자는 0부터 세어 올라감
+    const n = s.length, t0 = performance.now(), b = $("cnt");
+    const run = now => { const p = calm ? 1 : cl((now - t0) / 700); b.textContent = Math.round(n * out(p)); if (p < 1) count = requestAnimationFrame(run); };
+    count = requestAnimationFrame(run);
+  }, calm ? 0 : 160);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

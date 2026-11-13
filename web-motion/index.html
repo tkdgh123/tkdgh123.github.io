@@ -1,0 +1,705 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>움직이는 웹사이트</title>
+<meta name="description" content="인스타 릴스 속 스크롤하면 움직이는 사이트 세 편을 뜯어보고, 직접 만들 수 있는지 데모로 확인한 정리">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<style>
+/* 수상작 웹사이트 결: 어두운 바탕, 큰 글자, 모노 라벨. 장마다 원본 사이트의 강조색 하나 */
+:root {
+  --bg: #0b0b0d; --bg-2: #141418; --ink: #ecebe6; --soft: #a3a29c; --rule: rgb(236 235 230 / .12);
+  --blue: #0d99ff; --violet: #9b6bff; --red: #ff4433; --ok: #3ddc84; --warn: #ffb020;
+  --m: clamp(16px, 4vw, 64px); --g: clamp(12px, 1.8vw, 28px);
+  --sans: "Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif;
+  --mono: "JetBrains Mono", "Pretendard Variable", ui-monospace, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box }
+html { scroll-behavior: smooth }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 17px/1.75 var(--sans); word-break: keep-all; overflow-wrap: anywhere; -webkit-font-smoothing: antialiased; overflow-x: clip }
+a { color: inherit; text-underline-offset: 3px }
+img, canvas { display: block; max-width: 100% }
+h1, h2, h3 { margin: 0; letter-spacing: -.035em; line-height: 1.08 }
+p, ul, ol, figure { margin: 0 }
+ul, ol { padding: 0; list-style: none }
+b { font-weight: 700 }
+.mono { font-family: var(--mono); font-size: 12.5px; letter-spacing: .02em; line-height: 1.6 }
+.wrap { padding: 0 var(--m) }
+.grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--g) }
+
+/* 맨 위 */
+.top { display: flex; justify-content: space-between; padding: 22px var(--m); color: var(--soft) }
+.top a { text-decoration: none }
+.hero { padding: clamp(60px, 12vw, 170px) var(--m) clamp(48px, 7vw, 100px) }
+.hero h1 { font-size: clamp(46px, 10.5vw, 168px); font-weight: 800; grid-column: 1 / -1 }
+.hero h1 span { color: var(--soft); font-weight: 300 }
+.hero .lead { grid-column: 1 / span 6; margin-top: 36px; font-size: clamp(18px, 1.6vw, 22px); color: var(--soft) }
+.hero .lead b { color: var(--ink) }
+
+/* 결론 세 줄 */
+.verdict { border-top: 1px solid var(--rule) }
+.verdict li { display: grid; grid-template-columns: 120px 1fr minmax(0, 1.2fr); gap: var(--g); padding: 26px var(--m); border-bottom: 1px solid var(--rule); align-items: baseline }
+.verdict .tag { font-family: var(--mono); font-size: 13px; font-weight: 700 }
+.verdict h3 { font-size: clamp(20px, 2vw, 28px); font-weight: 700 }
+.verdict p { color: var(--soft) }
+.t-ok { color: var(--ok) } .t-mid { color: var(--warn) } .t-no { color: var(--red) }
+
+/* 장 */
+.ch { padding: clamp(80px, 11vw, 160px) var(--m) 0; --c: var(--blue) }
+.ch.v { --c: var(--violet) } .ch.r { --c: var(--red) }
+.ch-head { align-items: end; margin-bottom: clamp(28px, 4vw, 56px) }
+.ch-head .no { grid-column: 1 / span 3; font: 800 clamp(90px, 15vw, 230px)/.8 var(--sans); color: var(--c); letter-spacing: -.06em }
+.ch-head .ttl { grid-column: 4 / -1 }
+.ch-head .src { color: var(--c); margin-bottom: 10px }
+.ch-head h2 { font-size: clamp(30px, 4.6vw, 70px); font-weight: 800 }
+.shots { display: grid; grid-template-columns: 1.35fr 1fr; gap: var(--g); align-items: start }
+.shots img { width: 100%; height: auto; background: var(--bg-2) }
+.shots figcaption { margin-top: 10px; color: var(--soft) }
+.rows { margin-top: clamp(36px, 5vw, 64px) }
+.row { padding: 26px 0; border-top: 1px solid var(--rule) }
+.row .k { grid-column: 1 / span 3; color: var(--c); font-family: var(--mono); font-size: 13px; font-weight: 700; padding-top: 4px }
+.row .v { grid-column: 4 / span 8 }
+.row .v p + p, .row .v p + ul, .row .v ul + p, .row .v p + ol { margin-top: 12px }
+.row .v li { padding-left: 1.1em; position: relative }
+.row .v li::before { content: ""; position: absolute; left: 0; top: .78em; width: 6px; height: 1.5px; background: var(--c) }
+.row .v code { font-family: var(--mono); font-size: .84em; padding: 1px 6px; background: rgb(255 255 255 / .07) }
+.row .v .note { color: var(--soft); font-size: 15px }
+.can.t-ok, .can.t-mid, .can.t-no { color: var(--ink) }
+.can.t-ok i { color: var(--ok) } .can.t-mid i { color: var(--warn) } .can.t-no i { color: var(--red) }
+.can i { font-style: normal; font-family: var(--mono); font-size: 13px; padding: 2px 8px; margin-right: 8px; border: 1.5px solid currentColor; vertical-align: 2px }
+
+/* 데모 공통 */
+.demo { margin-top: clamp(40px, 6vw, 80px) }
+.demo-bar { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 14px }
+.demo-bar h3 { font-size: clamp(20px, 2.2vw, 30px); font-weight: 700 }
+.demo-bar h3 small { display: block; margin-bottom: 6px; color: var(--c) }
+.btn { font: 500 14px var(--sans); color: var(--ink); background: none; border: 1.5px solid var(--rule); padding: 9px 16px; cursor: pointer; white-space: nowrap }
+.btn:hover { border-color: var(--ink) }
+.btn:focus-visible { outline: 2px solid var(--c); outline-offset: 3px }
+
+/* 데모 A: 커서가 화면을 짓는다 */
+.stage { position: relative; overflow: hidden; background: #101014; outline: 1px solid var(--rule) }
+.mock { display: grid; grid-template-columns: 1.15fr 1fr; gap: clamp(16px, 3vw, 44px); padding: clamp(22px, 4vw, 56px); align-items: center; min-height: clamp(380px, 42vw, 560px) }
+.mock .nav { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center }
+.mock .logo { font-weight: 800; letter-spacing: -.03em }
+.mock .links { display: flex; gap: 18px; color: var(--soft); font-size: 14px }
+.mock .eyebrow { font-family: var(--mono); font-size: 12px; color: var(--soft); letter-spacing: .12em }
+.mock h4 { margin: 14px 0 16px; font-size: clamp(30px, 4.4vw, 64px); line-height: 1.02; letter-spacing: -.04em; font-weight: 800 }
+.mock h4 span { color: var(--soft) }
+.mock .copy { color: var(--soft); max-width: 34ch; font-size: clamp(14px, 1.2vw, 16px) }
+.mock .cta { display: flex; gap: 10px; margin-top: 22px }
+.mock .cta span { padding: 10px 16px; font-size: 14px; font-weight: 600 }
+.mock .cta span:first-child { background: var(--ink); color: var(--bg) }
+.mock .cta span:last-child { outline: 1.5px solid var(--rule) }
+.mock .art { width: min(100%, 360px); justify-self: center; aspect-ratio: 1; background: radial-gradient(circle at 35% 35%, #3b7bff, #1b2a6b 55%, transparent 72%), radial-gradient(circle at 70% 70%, #ff9a3c 0, transparent 40%); border-radius: 50% }
+.mock .stats { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px }
+.mock .stats div { padding-top: 10px; border-top: 1px solid var(--rule); font-family: var(--mono); font-size: 11px; color: var(--soft) }
+.mock .stats b { display: block; font: 800 clamp(20px, 2.6vw, 34px) var(--sans); color: var(--ink) }
+.ov { position: absolute; inset: 0; pointer-events: none }
+.box { position: absolute; border: 1.5px solid var(--bc); background: color-mix(in srgb, var(--bc) 10%, transparent) }
+.box::before, .box::after { content: ""; position: absolute; width: 7px; height: 7px; background: #fff; border: 1.5px solid var(--bc) }
+.box::before { left: -4.5px; top: -4.5px } .box::after { right: -4.5px; bottom: -4.5px }
+.size { position: absolute; left: 50%; top: calc(100% + 6px); transform: translateX(-50%); background: var(--bc); color: #fff; font: 600 10.5px var(--mono); padding: 1px 5px; white-space: nowrap }
+.cur { position: absolute; left: 0; top: 0; will-change: transform; transition: opacity .3s }
+.cur svg { display: block; filter: drop-shadow(0 1px 2px rgb(0 0 0 / .5)) }
+.cur span { position: absolute; left: 14px; top: 16px; background: var(--cc); color: #fff; font: 600 11px var(--sans); padding: 2px 7px; border-radius: 3px; white-space: nowrap }
+.tc { font-style: normal }
+
+/* 데모 B: 3D 캔 */
+.cans { position: relative; height: clamp(420px, 48vw, 640px); background: var(--tint, #1a1030); transition: background .8s; overflow: hidden; outline: 1px solid var(--rule); touch-action: pan-y; cursor: grab }
+.cans canvas { width: 100%; height: 100% }
+.cans .name { position: absolute; left: 0; right: 0; bottom: clamp(18px, 3vw, 36px); text-align: center; pointer-events: none }
+.cans .name b { display: block; font-size: clamp(26px, 3.6vw, 52px); font-weight: 800; letter-spacing: -.03em; line-height: 1.1 }
+.cans .name span { color: rgb(255 255 255 / .6) }
+.cans .arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 48px; height: 48px; border-radius: 50%; border: 1.5px solid rgb(255 255 255 / .35); background: rgb(0 0 0 / .2); color: #fff; font-size: 20px; cursor: pointer }
+.cans .arrow:hover { border-color: #fff }
+.cans .prev { left: 16px } .cans .next { right: 16px }
+
+/* 데모 C: 프레임 스크롤 */
+.scrub { height: 340vh; position: relative; margin-top: 14px }
+.scrub .pin { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; background: #000 }
+.scrub canvas { width: 100%; height: 100% }
+.scrub .say { position: absolute; left: var(--m); bottom: 12vh; max-width: 15ch; font: 800 clamp(34px, 6vw, 92px)/1 var(--sans); letter-spacing: -.045em; opacity: 0; transition: opacity .5s, transform .5s; transform: translateY(16px); text-shadow: 0 2px 30px rgb(0 0 0 / .5) }
+.scrub .say.on { opacity: 1; transform: none }
+.scrub .meter { position: absolute; right: var(--m); bottom: 5vh; color: rgb(255 255 255 / .75) }
+.scrub .hint { position: absolute; top: 5vh; left: var(--m); color: rgb(255 255 255 / .7) }
+
+/* 흐름도 */
+.flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; margin-top: 14px; counter-reset: s }
+.flow li { background: var(--bg-2); padding: 18px 16px; counter-increment: s; font-size: 15px }
+.flow li::before { content: "0" counter(s); display: block; font: 700 12px var(--mono); color: var(--c); margin-bottom: 8px }
+.flow li b { display: block; font-size: 16px }
+.flow li span { color: var(--soft); font-size: 14px }
+
+/* 도구 표 */
+.tools { margin-top: 14px; width: 100%; border-collapse: collapse; font-size: 15px }
+.tools th, .tools td { text-align: left; padding: 12px 10px 12px 0; border-bottom: 1px solid var(--rule); vertical-align: top }
+.tools th { font: 500 12px var(--mono); color: var(--soft); letter-spacing: .04em }
+.tools td:first-child { font-weight: 700; white-space: nowrap }
+.tools td:last-child { color: var(--soft) }
+
+/* 더 찾아본 사이트 */
+.ch.g { --c: var(--ok) }
+.more-lead { color: var(--soft); max-width: 60ch; margin-bottom: 8px }
+.kind { margin-top: clamp(48px, 6vw, 80px); font: 700 13px var(--mono); color: var(--c); letter-spacing: .04em; padding-bottom: 12px; border-bottom: 1px solid var(--rule) }
+.site { padding: 28px 0; border-bottom: 1px solid var(--rule); align-items: start }
+.site > a { grid-column: 1 / span 6; display: block }
+.site img { width: 100%; height: auto; background: var(--bg-2); transition: opacity .2s }
+.site > a:hover img { opacity: .85 }
+.site .txt { grid-column: 7 / -1 }
+.site h3 { font-size: clamp(24px, 2.6vw, 36px); font-weight: 800 }
+.site h3 a { text-decoration: none } .site h3 a:hover { text-decoration: underline 2px; text-underline-offset: 5px }
+.site .who { margin: 8px 0 14px; color: var(--soft) }
+.site .can { margin-top: 14px }
+.dlink { display: inline-block; margin-top: 18px; padding: 10px 16px; font-weight: 700; font-size: 15px; color: var(--bg); background: var(--ok); text-decoration: none }
+.dlink:hover { filter: brightness(1.1) }
+.dlink:focus-visible { outline: 2px solid var(--ok); outline-offset: 3px }
+/* 창업실에 적용 */
+.ch.f { --c: #8fa6ff } .ch.f .dlink { background: #8fa6ff } .ch.f .dlink:focus-visible { outline-color: #8fa6ff }
+.ch.w { --c: #f2f1ec }
+.ch.w .dlink { background: #f2f1ec }
+.ch.w .dlink:focus-visible { outline-color: #f2f1ec }
+.ch.w .can.t-ok i { color: #f2f1ec }
+
+/* 끝 */
+.end { margin-top: clamp(100px, 12vw, 180px); padding: 56px var(--m) 64px; background: var(--bg-2) }
+.end h2 { font-size: clamp(26px, 3.4vw, 48px); font-weight: 800; grid-column: 1 / span 5 }
+.end .src { grid-column: 7 / -1; color: var(--soft) }
+.end .src li { padding: 6px 0; border-bottom: 1px solid var(--rule) }
+.end .by { grid-column: 1 / -1; margin-top: 40px; color: var(--soft) }
+
+@media (max-width: 860px) {
+  .hero .lead { grid-column: 1 / -1 }
+  .verdict li { grid-template-columns: 1fr; gap: 6px }
+  .ch-head .no { grid-column: 1 / -1; margin-bottom: 14px }
+  .ch-head .ttl { grid-column: 1 / -1 }
+  .shots { grid-template-columns: 1fr }
+  .row .k, .row .v { grid-column: 1 / -1 }
+  .row .k { margin-bottom: 8px }
+  .mock { grid-template-columns: 1fr }
+  .mock .art { display: none }
+  .mock .links { display: none }
+  .mock .stats { grid-template-columns: repeat(2, 1fr) }
+  .flow { grid-template-columns: 1fr 1fr }
+  .end h2, .end .src { grid-column: 1 / -1 }
+  .end .src { margin-top: 28px }
+  .tools { font-size: 14px }
+  .tools td:first-child { white-space: normal }
+  .site > a, .site .txt { grid-column: 1 / -1 }
+  .site .txt { margin-top: 16px }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto } }
+</style>
+</head>
+<body>
+
+<nav class="top mono"><a href="../">← 창업실</a><span>2026.11.04 · 조사 + 데모</span></nav>
+
+<header class="hero grid">
+  <h1>스크롤하면<br>움직이는 <span>사이트</span></h1>
+  <p class="lead">보내 준 릴스 세 편 속 사이트를 실제로 열어 코드까지 확인했어요. 그리고 <b>제가 만들 수 있는지는 말보다 데모로</b> — 아래에 직접 만든 세 개가 들어 있어요. 비슷한 요즘 사이트는 <a href="#more">7곳 더</a> 모아 뒀어요. 그중 창업실에 맞는 기법은 <a href="#apply">창업실 내용으로 4개</a>, 더 역동적인 것은 <a href="#dyn">6개 더</a> 만들어 봤어요. 그리고 창업실 카드마다 어울리는 기법을 <a href="#fit">셋씩 골라</a> 1순위를 데모로 만들었어요.</p>
+</header>
+
+<ol class="verdict">
+  <li><span class="tag t-ok">할 수 있음</span><h3>움직임·3D 화면·스크롤 연결 코드</h3><p>세 사이트의 기술은 전부 무료 도구(GSAP, Lenis, Three.js)예요. 코드는 제가 다 짤 수 있어요.</p></li>
+  <li><span class="tag t-mid">소재가 관건</span><h3>3D 모델과 영상</h3><p>간단한 3D는 노트북에 깔린 Blender로 제가 만들어요. 사진처럼 보이는 영상은 AI 영상 도구(Kling·Veo) 계정이 있어야 해요.</p></li>
+  <li><span class="tag t-no">구조만</span><h3>3번 같은 수상작 품질</h3><p>Quai Network는 3D 아티스트까지 있는 스튜디오 작품이에요. 같은 구조의 단순한 버전부터 시작할 수 있어요.</p></li>
+</ol>
+
+<!-- 01 -->
+<section class="ch" id="c1">
+  <div class="ch-head grid">
+    <span class="no" aria-hidden="true">01</span>
+    <div class="ttl"><p class="src mono">ignitrondev.space · @xiaobima___</p><h2>커서들이 페이지를 짓는다</h2></div>
+  </div>
+  <div class="shots">
+    <figure><img src="img/ign1.webp" alt="여러 색 커서가 상자를 긋고 크기 표시를 붙이는 장면" width="1080" height="760" loading="lazy"><figcaption class="mono">상자마다 크기 표시(1062 × 486)가 붙어요</figcaption></figure>
+    <figure><img src="img/ign2.webp" alt="커서들이 글자 칸을 고르며 문장이 채워지는 장면" width="1080" height="760" loading="lazy"><figcaption class="mono">빨간 상자를 끌어 놓고, 글자는 타이핑</figcaption></figure>
+  </div>
+  <div class="rows">
+    <div class="row grid"><p class="k">보이는 것</p><div class="v"><p>피그마에서 여럿이 같이 작업하는 화면처럼, 색색의 커서가 날아와 상자를 긋고 크기를 달고 글자를 쳐 넣으면서 섹션이 하나씩 지어져요. 스크롤을 내릴 때마다 다음 섹션이 같은 식으로 조립돼요.</p></div></div>
+    <div class="row grid"><p class="k">만든 방법</p><div class="v">
+      <p>사이트 코드를 받아 확인한 재료:</p>
+      <ul><li><code>Astro</code> 페이지 + <code>GSAP</code> ScrollTrigger(스크롤 위치에 맞춰 움직임 실행) + <code>Lenis</code>(부드러운 스크롤)</li><li>오른쪽 3D 로고는 따로 만든 3D 부품(<code>HeroLogo3D</code>)</li></ul>
+      <p>커서 효과의 원리는 단순해요. 화면 요소의 위치·크기를 읽고 → 그 위에 상자·크기 표시·커서를 겹쳐 그리고 → 순서대로 움직인 뒤 → 진짜 요소를 보여 줘요.</p>
+      <p class="note">11월 4일에 열어 본 사이트 첫 화면엔 이 효과 없이 완성 화면만 나왔어요. 영상을 찍은 뒤 바뀌었을 수 있어요.</p>
+    </div></div>
+    <div class="row grid"><p class="k">제가 할 수 있나</p><div class="v"><p class="can t-ok"><i>가능</i>혼자 다 돼요. 아래가 직접 짠 것(라이브러리 없이 브라우저 기능만).</p></div></div>
+  </div>
+
+  <div class="demo">
+    <div class="demo-bar"><h3><small class="mono">데모 A · 직접 만듦</small>커서 네 개가 화면을 짓는 중</h3><button class="btn" id="rebuild" type="button">다시 짓기</button></div>
+    <div class="stage" id="stage">
+      <div class="mock" id="mock">
+        <div class="nav"><span class="logo" data-b>창업실</span><span class="links" data-b><span>게임</span><span>공부</span><span>프로젝트</span><span>기타</span></span></div>
+        <div>
+          <p class="eyebrow" data-b="type">SOONGSIL · AI SOFTWARE</p>
+          <h4 data-b="type">만들면서 <span>배우는 중.</span></h4>
+          <p class="copy" data-b>게임, 공부 도구, 생활 자동화. 한 학기 동안 만든 것들을 한곳에 모았어요.</p>
+          <div class="cta" data-b><span>작품 보기</span><span>연락하기</span></div>
+        </div>
+        <div class="art" data-b></div>
+        <div class="stats" data-b><div>게임<b>02</b></div><div>공부 도구<b>05</b></div><div>프로젝트<b>05</b></div><div>정리<b>07</b></div></div>
+      </div>
+      <div class="ov" id="ov"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 02 -->
+<section class="ch v" id="c2">
+  <div class="ch-head grid">
+    <span class="no" aria-hidden="true">02</span>
+    <div class="ttl"><p class="src mono">"Websites in 2026" · @w.wearebrand</p><h2>3D 캔과 하늘에서 내려오는 분양 사이트</h2></div>
+  </div>
+  <div class="shots">
+    <figure><img src="img/ciro.webp" alt="Ciro Energy 사이트, 캔들이 둥글게 떠 있고 가운데 캔이 강조됨" width="1080" height="700" loading="lazy"><figcaption class="mono">Ciro Energy — 캔이 고리로 돌고, 맛을 바꾸면 배경색이 바뀜</figcaption></figure>
+    <figure><img src="img/repose2.webp" alt="Reposé Residence 사이트, 건물 층을 고르는 화면" width="1080" height="700" loading="lazy"><figcaption class="mono">Reposé Residence — 구름 → 단지 → 건물 → 층 고르기 → 로비</figcaption></figure>
+  </div>
+  <div class="rows">
+    <div class="row grid"><p class="k">보이는 것</p><div class="v"><p>프랑스 에너지 음료 Ciro Energy는 3D 캔 아홉 개가 떠서 돌고, 고른 맛에 따라 색이 바뀌어요. 두바이 분양 단지 Reposé Residence는 구름 위에서 시작해 스크롤할수록 단지·건물·로비·수영장으로 카메라가 내려가요.</p></div></div>
+    <div class="row grid"><p class="k">만든 방법</p><div class="v">
+      <ul><li><b>Ciro</b>: 3D로 만든 캔 모델을 화면에서 실시간으로 돌리는 방식(WebGL)이에요. 사이트가 자동 접속을 막아 코드는 확인 못 했어요.</li>
+      <li><b>Reposé</b>: 2027년 완공 예정이라 아직 지어지지 않은 건물이에요. 실제로 찍을 수 없으니 3D 건축 렌더나 AI 영상이고, 영상을 그림 수백 장으로 쪼개 스크롤 위치마다 한 장씩 보여 줘요.</li></ul>
+      <p>올해 이런 사이트를 만드는 흐름:</p>
+      <ol class="flow"><li><b>장면 두 장</b><span>이미지 AI로 시작·끝 장면</span></li><li><b>잇는 영상</b><span>Kling 3.0·Veo 3.1에 두 장을 넣어 사이 영상 생성</span></li><li><b>그림으로 쪼개기</b><span>ffmpeg로 프레임 → WebP</span></li><li><b>스크롤에 연결</b><span>캔버스에 스크롤 위치마다 한 장</span></li></ol>
+    </div></div>
+    <div class="row grid"><p class="k">제가 할 수 있나</p><div class="v"><p class="can t-ok"><i>코드 가능</i>3D 캔(데모 B), 스크롤 영상(데모 C) 둘 다 직접 만들었어요.</p><p class="can t-mid" style="margin-top:10px"><i>소재</i>사진 같은 영상은 제가 못 만들어요. AI 영상 도구에서 뽑아 주면 연결은 제가 해요.</p></div></div>
+  </div>
+
+  <div class="demo">
+    <div class="demo-bar"><h3><small class="mono">데모 B · 직접 만듦 · Three.js</small>캔 고리 — 끌거나 화살표</h3></div>
+    <div class="cans" id="cans">
+      <canvas id="cansCv" aria-label="3D 캔 일곱 개가 고리 모양으로 도는 화면"></canvas>
+      <button class="arrow prev" type="button" aria-label="이전 맛">←</button>
+      <button class="arrow next" type="button" aria-label="다음 맛">→</button>
+      <p class="name"><b id="flavor">자두</b><span class="mono" id="flavorEn">PLUM · 01 / 07</span></p>
+    </div>
+  </div>
+
+  <div class="demo">
+    <div class="demo-bar"><h3><small class="mono">데모 C · 직접 만듦 · Blender 렌더 100장</small>스크롤하면 하늘에서 탑으로</h3><a class="dlink" href="move/tower.html">이 탑만 남겨 문 26개로 → </a></div>
+  </div>
+</section>
+<div class="scrub" id="scrub">
+  <div class="pin">
+    <canvas id="scrubCv" aria-label="해 질 녘 도시 위에서 가운데 탑으로 내려가는 장면"></canvas>
+    <p class="hint mono">↓ 천천히 내려 보세요</p>
+    <p class="say" data-at="0">하늘 위에서</p>
+    <p class="say" data-at=".4">도시를 지나</p>
+    <p class="say" data-at=".78">탑 앞까지.</p>
+    <p class="meter mono" id="meter">001 / 100</p>
+  </div>
+</div>
+
+<!-- 03 -->
+<section class="ch r" id="c3">
+  <div class="ch-head grid">
+    <span class="no" aria-hidden="true">03</span>
+    <div class="ttl"><p class="src mono">qu.ai · @ngocbuildswebsites</p><h2>"Claude Code로 바꾼 뒤" 만든 사이트가 아님</h2></div>
+  </div>
+  <div class="shots">
+    <figure><img src="img/quai2.webp" alt="Quai Network 사이트, 붉은 3D 건물 사이를 지나는 장면" width="1200" height="833" loading="lazy"><figcaption class="mono">Quai Network 공식 사이트 — 붉은 가상 건물 안을 스크롤로 지나감</figcaption></figure>
+    <figure><img src="img/quai1.webp" alt="Quai Network 첫 화면, REBUILDING CURRENCY 문구와 빛나는 조각들" width="1200" height="833" loading="lazy"><figcaption class="mono">첫 화면 "REBUILDING CURRENCY"</figcaption></figure>
+  </div>
+  <div class="rows">
+    <div class="row grid"><p class="k">사실 확인</p><div class="v"><p>릴스 문구는 "ChatGPT에서 Claude Code로 바꾼 뒤의 웹사이트"지만, 이 사이트는 블록체인 회사 Quai Network의 공식 사이트(qu.ai)이고 <b>Unseen Studio가 2023년 1월에 만든 작품</b>이에요. Awwwards·CSSDA·FWA에서 '오늘의 사이트'를 받았어요.</p><p class="note">릴스 셋 중 둘이 "댓글 달면 보내 줄게요"로 끝나요. 팔로워와 연락처를 모으는 광고라, 문구 속 도구 이름은 실제 제작 도구와 다를 수 있어요.</p></div></div>
+    <div class="row grid"><p class="k">만든 방법</p><div class="v">
+      <p>사이트 코드에서 확인한 재료:</p>
+      <ul><li><code>Next.js</code> 페이지 위에 <code>WebGL</code> 3D 장면</li><li>압축 텍스처(<code>.ktx2</code>)와 라이트맵 — 3D 프로그램에서 빛과 그림자를 미리 그림으로 구워 둔 것. 웹에선 카메라만 실시간으로 움직여서 가볍게 돌아가요.</li></ul>
+      <p>즉 3D 프로그램에서 건물·사람을 모델링하고 → 빛을 굽고 → 웹에서 스크롤에 맞춰 카메라를 옮기는 구조예요.</p>
+    </div></div>
+    <div class="row grid"><p class="k">제가 할 수 있나</p><div class="v"><p class="can t-mid"><i>구조만</i>장면 불러오기·카메라 이동·스크롤 연결은 데모 B·C의 연장이라 가능해요. 이 수준의 건물·조명·연출은 3D 아트 작업이 커서, 단순한 장면부터 쌓아야 해요.</p></div></div>
+  </div>
+</section>
+
+<!-- 더 찾아본 사이트 -->
+<section class="ch g" id="more">
+  <div class="ch-head grid">
+    <span class="no" aria-hidden="true">+7</span>
+    <div class="ttl"><p class="src mono">더 찾아본 사이트</p><h2>요즘 수상작 일곱 곳</h2></div>
+  </div>
+  <p class="more-lead">2025~2026년 수상작과 3D 사이트 모음에서 14곳을 골라 직접 열어 보고, 움직임이 확실한 7곳만 남겼어요. 7곳 모두 브라우저 3D 그리기(캔버스)를 써요. 그림을 누르면 원본이, <b>초록 링크를 누르면 같은 기법으로 제가 만든 데모</b>가 열려요.</p>
+
+  <p class="kind">3D 물건을 스크롤로 돌려 보기</p>
+  <article class="site grid">
+    <a href="https://oryzo.ai/" target="_blank" rel="noopener"><img src="img/more/oryzo.webp" alt="Oryzo 첫 화면, 재단 매트 위 코르크 컵받침" width="960" height="600" loading="lazy"></a>
+    <div class="txt"><h3><a href="https://oryzo.ai/" target="_blank" rel="noopener">Oryzo</a></h3><p class="who mono">Lusion · Awwwards 이달의 사이트 2026.04</p>
+      <p>코르크 컵받침 하나가 스크롤에 따라 돌고, 다가오고, 손에 들리며 장면이 바뀌어요. 팔지 않는 가짜 제품으로 스튜디오 실력을 보여 주는 사이트예요.</p>
+      <p class="can t-ok"><i>가능</i>모양이 단순해서 Blender 모델 + Three.js 스크롤 카메라로 만들 수 있어요.</p><a class="dlink" href="lab/cup.html">제가 만든 데모 · 청자 머그 →</a></div>
+  </article>
+  <article class="site grid">
+    <a href="https://drone.riotters.com/" target="_blank" rel="noopener"><img src="img/more/lidar.webp" alt="Aevion 드론 사이트, 큰 Gear 글자 앞의 흰 드론 3D 모델" width="960" height="600" loading="lazy"></a>
+    <div class="txt"><h3><a href="https://drone.riotters.com/" target="_blank" rel="noopener">Aevion LiDAR 드론</a></h3><p class="who mono">Riotters · Awwwards 오늘의 사이트 2026.10.06</p>
+      <p>3D 드론이 스크롤 따라 기울고 돌며 화면 가운데로 오고, 옆 설명이 부품·성능 순서로 바뀌어요.</p>
+      <p class="can t-mid"><i>소재</i>이만큼 정밀한 드론 모델은 사거나 무료 모델을 받아야 해요. 움직임 연결은 제가 해요.</p><a class="dlink" href="lab/drone.html">제가 만든 데모 · 점검 드론 →</a></div>
+  </article>
+
+  <p class="kind">3D 풍경 속을 날아가기</p>
+  <article class="site grid">
+    <a href="https://explore.ownprimland.com/" target="_blank" rel="noopener"><img src="img/more/primland.webp" alt="Primland 사이트, 구름 사이로 보이는 산과 강" width="960" height="600" loading="lazy"></a>
+    <div class="txt"><h3><a href="https://explore.ownprimland.com/" target="_blank" rel="noopener">Primland</a></h3><p class="who mono">Awwwards 우수작 2025.12</p>
+      <p>미국 블루리지 산맥 리조트 사이트예요. 구름을 뚫고 내려가 산과 강 위를 날아다니고, 소리를 켜고 보는 구성이에요. 영상이 아니라 실시간 3D라 원하는 곳으로 움직여요.</p>
+      <p class="can t-mid"><i>소재</i>실제 지형 높이 데이터와 위성사진이 있으면 Three.js로 가능해요. 구름·나무를 얼마나 그럴듯하게 하느냐가 관건이에요.</p><a class="dlink" href="lab/terrain.html">제가 만든 데모 · 마디 산장 →</a></div>
+  </article>
+
+  <p class="kind">글자·입자가 흩어졌다 모이기</p>
+  <article class="site grid">
+    <a href="https://www.shopify.com/editions/spring2026" target="_blank" rel="noopener"><img src="img/more/shopify.webp" alt="Shopify Editions 첫 화면, 숲 위로 휘어진 Everywhere 글자" width="960" height="600" loading="lazy"></a>
+    <div class="txt"><h3><a href="https://www.shopify.com/editions/spring2026" target="_blank" rel="noopener">Shopify Editions 봄 ’26</a></h3><p class="who mono">Shopify · 2026 봄 신기능 발표</p>
+      <p>숲 장면이 점 수만 개로 흩날리고, 글자가 공중에서 휘어 돌아요. 스크롤하면 장면이 입자로 부서지며 다음 소개로 넘어가요.</p>
+      <p class="can t-ok"><i>가능</i>점 수만 개를 그래픽카드에서 움직이는 Three.js 기본 기법이에요.</p><a class="dlink" href="lab/particles.html">제가 만든 데모 · 흩어지고 모이는 점 →</a></div>
+  </article>
+  <article class="site grid">
+    <a href="https://iventions.com/" target="_blank" rel="noopener"><img src="img/more/iventions.webp" alt="Iventions 첫 화면, 보라색 빛기둥 아래 기울어진 카드" width="960" height="600" loading="lazy"></a>
+    <div class="txt"><h3><a href="https://iventions.com/" target="_blank" rel="noopener">Iventions</a></h3><p class="who mono">행사 기획사 · CSSDA 이달의 사이트 2025.10</p>
+      <p>무대 조명 같은 빛기둥이 3D 카드를 비추고, 카드가 기울며 프로젝트가 하나씩 나와요. 아래로 가면 고객사 이름이 크게 흘러가요.</p>
+      <p class="can t-ok"><i>가능</i>카드 한 장 + 빛 + 스크롤 연결이라 데모 B 수준이에요.</p><a class="dlink" href="lab/spotlight.html">제가 만든 데모 · 무대 위 카드 →</a></div>
+  </article>
+
+  <p class="kind">사이트가 곧 게임</p>
+  <article class="site grid">
+    <a href="https://members-play.lacoste.com/ace-breaker-rg/gb/en/" target="_blank" rel="noopener"><img src="img/more/lacoste.webp" alt="Lacoste Ace Breaker 시작 화면" width="960" height="600" loading="lazy"></a>
+    <div class="txt"><h3><a href="https://members-play.lacoste.com/ace-breaker-rg/gb/en/" target="_blank" rel="noopener">Lacoste Ace Breaker</a></h3><p class="who mono">Lacoste · 롤랑가로스 회원 이벤트</p>
+      <p>테니스공으로 벽돌을 깨는 게임이에요. 점수판과 경품이 걸려 있어서 광고 대신 사람들이 계속 다시 하게 만들어요.</p>
+      <p class="can t-ok"><i>가능</i>마디·넋굿처럼 게임을 만들던 방식 그대로 웹으로 옮기면 돼요.</p><a class="dlink" href="lab/breaker.html">제가 만든 데모 · 마감 깨기 →</a></div>
+  </article>
+  <article class="site grid">
+    <a href="https://www.dontlookup.app/" target="_blank" rel="noopener"><img src="img/more/dontlookup.webp" alt="Don't Look Up 시작 화면, 거대한 다리 아래 작은 사람들" width="960" height="600" loading="lazy"></a>
+    <div class="txt"><h3><a href="https://www.dontlookup.app/" target="_blank" rel="noopener">Don’t Look Up</a></h3><p class="who mono">Marcelo Reis Melo · Awwwards 오늘의 사이트 2026.11.01</p>
+      <p>아주 크고 부자인 '나'가 사람들 위에 서서, 아무도 위를 올려다보지 못하게 하는 손그림 게임이에요. 개인 한 명이 만들어 수상했어요.</p>
+      <p class="can t-mid"><i>소재</i>게임 코드는 가능해요. 이 손그림 느낌은 그림 소재가 있어야 해요.</p><a class="dlink" href="lab/lookup.html">제가 만든 데모 · 올려다봐 →</a></div>
+  </article>
+</section>
+
+<!-- 창업실에 적용 -->
+<section class="ch w" id="apply">
+  <div class="ch-head grid">
+    <span class="no" aria-hidden="true">+4</span>
+    <div class="ttl"><p class="src mono">2026.11.05 · 창업실에 적용</p><h2>창업실 내용으로 다시 만든 넷</h2></div>
+  </div>
+  <p class="more-lead">위 기법 가운데 창업실에 실제로 쓸 만한 셋을 골라 창업실 첫 화면의 작품·그림·저장 기록으로 만들고, 작품마다 옷을 갈아입는 쫄라맨을 하나 더 만들었어요. 색과 글꼴은 창업실 첫 화면 그대로예요.</p>
+
+  <article class="site grid">
+    <a href="apply/ring.html"><img src="img/apply/ring.webp" alt="창업실 작품 썸네일이 3D 고리로 늘어선 화면, 앞에 마디" width="960" height="600" loading="lazy"></a>
+    <div class="txt"><h3><a href="apply/ring.html">작품 고리</a></h3><p class="who mono">데모 B 캔 고리 → 창업실 작품 26개</p>
+      <p>첫 화면의 작품 26개를 고리에 걸었어요. 끌면 관성으로 돌다 가까운 작품에 멈추고, 앞에 온 작품의 분류에 따라 바탕색이 바뀌어요. 카드 아래엔 바닥 반사, 앞 카드엔 마우스를 따라오는 빛. 3D 라이브러리 없이 브라우저 기능(CSS 3D)만 썼어요.</p>
+      <p class="can t-ok"><i>쓸 곳</i>첫 화면 맨 아래 '전체 작품 보기'</p><a class="dlink" href="apply/ring.html">열어 보기 →</a></div>
+  </article>
+  <article class="site grid">
+    <a href="apply/dots.html"><img src="img/apply/dots.webp" alt="마디 기획서 첫 화면이 작은 점 수만 개로 그려진 화면" width="960" height="600" loading="lazy"></a>
+    <div class="txt"><h3><a href="apply/dots.html">점으로 그린 작품</a></h3><p class="who mono">데모 4 흩어지고 모이는 점 → 대표 그림 다섯 장</p>
+      <p>넋굿·마디·우리달·학과 진로 지도·액셀 페달 그림을 점 2만 2천 개로 다시 그렸어요. 내리면 밝은 점은 다음 그림의 밝은 자리로, 왼쪽부터 물결처럼 휘어 날아가 모이고, 마우스 근처 점은 제자리에서 살짝 흩어져요.</p>
+      <p class="can t-ok"><i>쓸 곳</i>첫 화면 큰 그림 자리(지금은 넋굿 그림 한 장)</p><a class="dlink" href="apply/dots.html">열어 보기 →</a></div>
+  </article>
+  <article class="site grid">
+    <a href="apply/pile.html"><img src="img/apply/pile.webp" alt="날짜 줄 위에 파랑·흰색·회색 종이가 쌓이고 위에서 떨어지는 화면, 11월 4일 30장" width="960" height="600" loading="lazy"></a>
+    <div class="txt"><h3><a href="apply/pile.html">한 학기 쌓기</a></h3><p class="who mono">qu.ai·데모 C 스크롤 카메라 → 창업실 저장 기록 235번</p>
+      <p>창업실에 저장(git 커밋)한 235번을 한 번에 종이 한 장씩, 날짜마다 쌓았어요. 내리면 카메라가 10월 20일부터 11월 5일까지 지나가며 그날 종이가 떨어지고 그날 저장한 제목이 옆에 나와요. 마지막엔 17일이 한눈에 보이고, 더미를 누르면 그날을 골라 볼 수 있어요. 종이 색은 저장 제목으로 나눈 분류예요.</p>
+      <p class="can t-ok"><i>쓸 곳</i>첫 화면 맨 끝이나 따로 '작업 기록' 페이지</p><a class="dlink" href="apply/pile.html">열어 보기 →</a></div>
+  </article>
+  <article class="site grid">
+    <a href="apply/stick.html"><img src="img/apply/stick.webp" alt="붉은 머리띠와 갈색 무복을 입은 쫄라맨이 '브라운 로그' 제목 위에서 칼을 휘두르는 장면" width="960" height="600" loading="lazy"></a>
+    <div class="txt"><h3><a href="apply/stick.html">옷 갈아입는 쫄라맨</a></h3><p class="who mono">작품 고리 → 작품 12개를 한 캐릭터가 연기</p>
+      <p>화면엔 쫄라맨과 작품 제목만 있어요. 브라운 로그에선 무사 옷을 입고 칼을 휘두르고, 넋굿에선 여우 귀·꼬리를 달고 부적을 던져 오행 다섯 색으로 터뜨려요. 다른 작품으로 넘기면 공중제비를 돌며 옷과 소품이 날아가고, 제목 글자가 떨어지고, 새 제목 위에 내려앉아 새 옷이 하나씩 떨어져 입혀져요. 그림 파일 없이 전부 코드로 그렸어요.</p>
+      <p class="can t-ok"><i>쓸 곳</i>첫 화면 맨 위 인사, 작품 소개 페이지 첫 장면</p><a class="dlink" href="apply/stick.html">열어 보기 →</a></div>
+  </article>
+</section>
+
+<section class="ch r" id="dyn">
+  <div class="ch-head grid">
+    <span class="no" aria-hidden="true">+6</span>
+    <div class="ttl"><p class="src mono">2026.11.05 · 더 역동적인</p><h2>몸으로 느껴지는 움직임</h2></div>
+  </div>
+  <p class="more-lead">Awwwards 10월~11월 오늘의 사이트 31곳을 훑고 9곳을 직접 열어 봤어요. 위에서 다룬 3D 물건·입자와 겹치지 않고, <b>사람이 밀고 던지고 모는 느낌</b>이 나는 것을 골라 창업실 작품으로 다시 만들고, 작품을 행성으로 탐방하는 아이디어, 숭실대를 실제 지도로 세워 날아다니는 데모도 더했어요.</p>
+
+  <article class="site grid">
+    <a href="move/push.html"><img src="img/dyn/push.webp" alt="종이색 첫 화면을 쫄라맨이 왼쪽으로 밀어내고 넋굿 칸이 드러나는 장면" width="960" height="600" loading="lazy"></a>
+    <div class="txt"><h3><a href="move/push.html">쫄라맨이 넘기는 창업실</a></h3><p class="who mono"><a href="https://huyml.co/" target="_blank" rel="noopener">Huy Phan Vol.2</a> · Awwwards 오늘의 사이트 2026.10.14</p>
+      <p>원본은 손그림 캐릭터가 스크롤에 맞춰 다음 화면을 몸으로 밀어 넣어요. 제 것은 쫄라맨이 작품 칸을 네 가지로 넘겨요 — 첫 화면을 밀어내고, 넋굿 칸을 바닥에서 들어 머리 위로 던지고, 줄을 당겨 레이싱 휠 칸을 끌어내리고, 걷어차서 넘어뜨려 우리달이 나와요. 전부 스크롤 위치에 묶여 있어서 올리면 거꾸로 돌아가요.</p>
+      <p class="can t-ok"><i>쓸 곳</i>창업실 첫 화면 대신 '작품 소개 둘러보기' 한 페이지</p><a class="dlink" href="move/push.html">열어 보기 →</a></div>
+  </article>
+  <article class="site grid">
+    <a href="move/throw.html"><img src="img/dyn/throw.webp" alt="작품 이름표 26개가 게임·공부·프로젝트·기타 통 위에 쌓이고 하나를 집어 든 장면" width="960" height="600" loading="lazy"></a>
+    <div class="txt"><h3><a href="move/throw.html">집어 던지는 창업실</a></h3><p class="who mono"><a href="https://grail-app.com/" target="_blank" rel="noopener">Grail</a> · 오늘의 사이트 2026.11.04 · <a href="https://bruno-simon.com/" target="_blank" rel="noopener">Bruno Simon</a> 2025판</p>
+      <p>원본들은 물리 엔진(Matter.js·Rapier)으로 화면 속 물건이 떨어지고 부딪혀요. 제 것은 작품 이름표 26개가 쏟아져 쌓이고, 마우스로 집어 던져 네 분류 통에 넣어요. 통마다 맞게 넣은 개수가 올라가고, 집으면 한 줄 설명이 뜨고, 그냥 누르면 그 작품이 열리고, 빈 곳을 누르면 그 자리에서 펑 터져요.</p>
+      <p class="can t-ok"><i>쓸 곳</i>첫 화면 맨 아래 '전체 작품'을 노는 칸으로</p><a class="dlink" href="move/throw.html">열어 보기 →</a></div>
+  </article>
+  <article class="site grid">
+    <a href="move/drive.html"><img src="img/dyn/drive.webp" alt="파란 차가 회색 서킷을 달리고 앞에 파란 '프로젝트' 구간 문과 작품 표지판이 보이는 장면" width="960" height="600" loading="lazy"></a>
+    <div class="txt"><h3><a href="move/drive.html">창업실 그랑프리</a></h3><p class="who mono"><a href="https://awards.racing" target="_blank" rel="noopener">Awards Racing</a> · 오늘의 사이트 2026.10.27</p>
+      <p>원본은 Three.js + Bullet 물리로 브라우저에서 드리프트 경주를 해요. 제 것은 한 바퀴 서킷을 분류 넷으로 나눴어요 — 게임은 검은 탑과 빛, 공부는 책 더미, 프로젝트는 파란 연석과 타이어, 기타는 숲. 구간마다 문이 있고, 트랙 옆에 작품마다 피트 차고가 하나씩, 모두 26개 있어요. 차고는 그 작품다운 소품으로 꾸몄어요(넋굿은 저승 문·부적·오행 구슬, 우리달은 초승달·달력, 액셀 페달은 스프링과 모르는 치수 ?). 피트 칸에 천천히 들어가면 차가 칸 가운데 멈추고, 화면이 차고 쪽으로 돌고, 정비원 둘이 달려와 바퀴를 갈아요. W로 다시 출발하면 차 바로 뒤 3인칭 화면으로 돌아와요.</p>
+      <p class="can t-ok"><i>쓸 곳</i>레이싱 휠 프로젝트 소개의 마지막 놀이 칸</p><a class="dlink" href="move/drive.html">열어 보기 →</a></div>
+  </article>
+  <article class="site grid">
+    <a href="move/planet.html"><img src="img/dyn/planet.webp" alt="해왕성을 닮은 파란 행성 위에 우주선이 서 있고 왼쪽에 브라운 로그 정보가 뜬 장면" width="960" height="600" loading="lazy"></a>
+    <div class="txt"><h3><a href="move/planet.html">창업실 은하</a></h3><p class="who mono">사용자 아이디어 · 행성 탐방</p>
+      <p>작품 26개가 행성이에요. 가운데 해를 두고 분류마다 궤도가 하나 — 안쪽부터 게임·공부·프로젝트·기타 — 이고, 같은 분류 행성은 그 궤도 둘레에 고르게 떠서 천천히 돌아요. 행성 겉면은 지구·화성·목성·토성·해왕성·천왕성·달·금성·유로파·이오를 본떠 코드로 그리고 무늬와 색만 조금씩 바꿨어요. '다음 행성'을 누르면 우주선이 천천히 떠올라 곡선을 그리며 날아가고, 내리기 한참 전부터 머리를 들어 다음 행성 위에 꼬리부터 내려앉으면 정보가 떠요. 행성을 바로 눌러도 그리로 날아가요.</p>
+      <p class="can t-ok"><i>쓸 곳</i>창업실 첫 화면 '전체 작품 보기'를 여행으로</p><a class="dlink" href="move/planet.html">열어 보기 →</a></div>
+  </article>
+  <article class="site grid">
+    <a href="move/tower.html"><img src="img/dyn/tower.webp" alt="해 질 녘 불 켜진 창이 가득한 원통 탑, 열린 아치 문에서 빛이 새고 왼쪽에 넋굿 카드" width="960" height="600" loading="lazy"></a>
+    <div class="txt"><h3><a href="move/tower.html">탑의 문 스물여섯</a></h3><p class="who mono">데모 C(하늘에서 탑으로)에서 가운데 탑만</p>
+      <p>데모 C는 미리 그린 그림 100장이라 누를 수가 없어서, 가운데 탑만 남기고 같은 해 질 녘 빛으로 실시간 3D로 다시 만들었어요. 탑을 나선으로 감고 올라가는 아치 문 26개가 작품이에요. 내리면 하늘에서 탑 꼭대기로 내려온 뒤 탑을 돌며 한 층씩 내려가고, 앞에 온 문이 열리며 안에서 빛이 새고 그 작품 카드가 떠요. 오른쪽 눈금이나 문을 눌러 바로 가고, 열린 문을 누르면 작품이 열려요.</p>
+      <p class="can t-ok"><i>쓸 곳</i>창업실 작품 전체를 한 줄로 보는 페이지</p><a class="dlink" href="move/tower.html">열어 보기 →</a></div>
+  </article>
+  <article class="site grid">
+    <a href="move/campus.html"><img src="img/dyn/campus.webp" alt="맑은 낮 숭실대학교 캠퍼스, 초록 운동장과 유리·벽돌 건물들, 둘레 동네는 흰 모형" width="960" height="600" loading="lazy"></a>
+    <div class="txt"><h3><a href="move/campus.html">숭실대 위를 날다</a></h3><p class="who mono">Primland 같은 하늘에서 내려오기 · 지도는 <a href="https://hong-iron.github.io/SMASH-SSU/" target="_blank" rel="noopener">SMASH-SSU</a> 참고</p>
+      <p>실제 지도(OpenStreetMap 건물·길 + 땅 높이)에 사진을 맞춰 세운 숭실대예요. 나무위키·학교 소개 사진과 2022년 드론 영상을 보고 건물 24곳의 외벽 재료·색·창 모양·층수·지붕을 맞췄고(베어드홀 "숭실대학교" 탑, 형남공학관 15층 유리 탑, 신양관 유리 피라미드, 레지던스홀 V자 지붕), 운동장·스탠드, 파란 농구장, 분수 광장, 학생회관 나무 데크 계단, 정문 날개 지붕, 계단을 넣었어요. 캠퍼스 밖은 흰 모형으로 물렸어요. 하늘에선 마음대로 날아요 — 끌기 둘러보기, 오른쪽 끌기 옮기기, 휠 다가가기, WASD·방향키 이동, E/Q 위아래. 건물을 누르면 날아가고, 걸어서 보기에선 WASD로 걸어요.</p>
+      <p class="can t-ok"><i>쓸 곳</i>학교 소개·캠퍼스 길 찾기 같은 페이지의 첫 화면</p><a class="dlink" href="move/campus.html">열어 보기 →</a></div>
+  </article>
+</section>
+
+<!-- 도구 -->
+<section class="ch f" id="fit">
+  <div class="ch-head grid">
+    <span class="no" aria-hidden="true">27</span>
+    <div class="ttl"><p class="src mono">2026.11.06 · 카드마다 셋</p><h2>카드마다 어울리는 움직임</h2></div>
+  </div>
+  <p class="more-lead">창업실 카드 27장에 위 기법 21개를 하나씩 맞춰 보고 카드마다 <b>딱 셋</b>을 골랐어요. 1순위는 그 작품 내용으로 데모를 만들었고, 섞는 게 나을 때만 "지형 비행 70 + 흩어지는 점 30"처럼 비율을 정해 섞었어요. 어느 카드에도 안 맞은 기법은 다른 활동에 쓸 곳을 적어 뒀어요.</p>
+  <article class="site grid">
+    <a href="fit/index.html"><img src="img/fit.webp" alt="카드마다 어울리는 움직임 페이지 첫 화면" width="960" height="600" loading="lazy"></a>
+    <div class="txt"><h3><a href="fit/index.html">카드 27장 × 셋</a></h3><p class="who mono">1순위 데모 27개 · 기법별 뽑힌 횟수 · 남은 기법의 쓸 곳</p>
+      <p>게임은 세계를 보여 주고, 휠·페달 같은 실물은 돌려 보고 뜯어 보고, 코드·설정은 직접 치는 걸 보여 주도록 골랐어요. 매일 여는 도구는 가볍게, 답안·감상문은 차분하게. 이미 있던 데모(마감 깨기·작품 고리·탑)는 그 카드에 맞게 새로 다듬었어요.</p>
+      <a class="dlink" href="fit/index.html">열어 보기 →</a></div>
+  </article>
+</section>
+
+<section class="ch" id="tools">
+  <div class="ch-head grid">
+    <span class="no" aria-hidden="true">→</span>
+    <div class="ttl"><p class="src mono">따라 하려면</p><h2>쓰는 도구</h2></div>
+  </div>
+  <table class="tools">
+    <thead><tr><th>도구</th><th>하는 일</th><th>비용</th></tr></thead>
+    <tbody>
+      <tr><td>GSAP + ScrollTrigger</td><td>스크롤 위치에 맞춰 움직임 실행 (01·03 원본)</td><td>무료</td></tr>
+      <tr><td>Lenis</td><td>스크롤을 미끄러지듯 부드럽게</td><td>무료</td></tr>
+      <tr><td>Three.js</td><td>브라우저에서 3D 그리기 (데모 B)</td><td>무료</td></tr>
+      <tr><td>Matter.js · cannon-es</td><td>물리 엔진 — 떨어지고 부딪히고 무너짐 (던지기 2D · 운전 3D)</td><td>무료</td></tr>
+      <tr><td>Blender</td><td>3D 모델·렌더 (데모 C) — 노트북에 4.5·5.2 설치돼 있음</td><td>무료</td></tr>
+      <tr><td>Kling · Veo</td><td>장면 두 장을 잇는 AI 영상</td><td>무료 체험은 조금, 넉넉히 쓰려면 유료</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<footer class="end grid">
+  <h2>원본 확인한 곳</h2>
+  <ul class="src mono">
+    <li><a href="https://ignitrondev.space">ignitrondev.space</a> — 코드에서 Astro·GSAP·Lenis 확인</li>
+    <li><a href="https://qu.ai">qu.ai</a> — 코드에서 Next.js·WebGL·라이트맵 확인</li>
+    <li><a href="https://unseen.co/projects/quai-network/">Unseen Studio · Quai Network</a> — 제작사·2023년 1월·수상</li>
+    <li><a href="https://gulfnews.com/business/property/saion-properties-offers-affordable-luxury-with-new-repos%C3%A9-residence-1.500311282">Gulf News · Reposé Residence</a> — 2027년 완공 예정</li>
+    <li><a href="https://tympanus.net/codrops/2025/10/16/creating-smooth-scroll-synchronized-animation-for-optikka-from-html5-video-to-frame-sequences/">Codrops · 영상을 프레임으로 스크롤</a></li>
+    <li><a href="https://www.awwwards.com/websites/sites_of_the_day/">Awwwards 오늘의 사이트</a> — Aevion·Don’t Look Up 날짜</li>
+    <li><a href="https://www.awwwards.com/lusion/">Awwwards · Lusion</a> — Oryzo 이달의 사이트 2026.04</li>
+    <li><a href="https://www.awwwards.com/sites/primland-residences">Awwwards · Primland</a> — 우수작 2025.12</li>
+    <li><a href="https://www.utsubo.com/blog/best-threejs-websites-2026">Utsubo · 2026 Three.js 사이트 8곳</a> — Oryzo·Primland·Shopify·Lacoste 후보</li>
+    <li><a href="https://www.hontran.dev/blog/best-award-winning-websites-2026">Hon Tran · 2026 수상 사이트</a> — Iventions 수상</li>
+    <li><a href="https://www.awwwards.com/sites/huy-phan-vol-2">Awwwards · Huy Phan Vol.2</a> · <a href="https://www.awwwards.com/sites/grail">Grail</a> · <a href="https://www.awwwards.com/sites/awards-racing">Awards Racing</a> — 날짜·기술(Matter.js, Bullet 물리)</li>
+    <li><a href="https://github.com/brunosimon/folio-2025">Bruno Simon folio-2025</a> — Three.js WebGPU + Rapier 물리</li>
+  </ul>
+  <p class="by mono">조사·데모 제작: Claude (Blender 렌더, 데모 코드, 창업실 적용 데모 4개·더 역동적인 데모 4개 포함) · 릴스 화면은 설명용으로 잘라 씀</p>
+</footer>
+
+<script>
+const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const ease = t => t < .5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
+const tween = (ms, fn) => new Promise(done => { const t0 = performance.now(); const step = now => { const t = Math.min(1, (now - t0) / ms); fn(ease(t)); t < 1 ? requestAnimationFrame(step) : done(); }; requestAnimationFrame(step); });
+
+/* 데모 A */
+(() => {
+  const stage = document.getElementById("stage"), ov = document.getElementById("ov");
+  const items = [...stage.querySelectorAll("[data-b]")];
+  // 타이핑할 글자를 한 글자씩 감싸 둔다 (자리는 그대로, 보이기만 바꿈)
+  const split = n => [...n.childNodes].forEach(c => c.nodeType === 3 ? c.replaceWith(...[...c.textContent].map(ch => Object.assign(document.createElement("i"), { className: "tc", textContent: ch }))) : split(c));
+  items.forEach(el => el.dataset.b === "type" && split(el));
+  const team = [["#0d99ff", "디자인"], ["#ff5c8a", "기획"], ["#f5a524", "개발"], ["#22c55e", "Claude"]];
+  const arrow = c => `<svg width="18" height="20" viewBox="0 0 18 20"><path d="M1 1l15 7.5-6.5 1.8L6.8 17z" fill="${c}" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/></svg>`;
+  let run = 0;
+
+  async function type(el, id) {
+    const chs = [...el.querySelectorAll(".tc")];
+    chs.forEach(c => c.style.opacity = 0); el.style.opacity = 1;
+    for (const c of chs) { if (id !== run) return; c.style.opacity = 1; await sleep(38); }
+  }
+
+  async function build() {
+    const id = ++run;
+    ov.innerHTML = "";
+    if (calm) { stage.querySelectorAll("[data-b], .tc").forEach(el => el.style.opacity = 1); return; }
+    items.forEach(el => { el.style.opacity = 0; el.style.transition = "opacity .5s"; });
+    const S = stage.getBoundingClientRect();
+    const curs = team.map(([c, n], i) => {
+      const d = document.createElement("div");
+      d.className = "cur"; d.style.setProperty("--cc", c);
+      d.innerHTML = arrow(c) + `<span>${n}</span>`;
+      d.pos = { x: S.width * (i % 2 ? 1.05 : -.05), y: S.height * (i < 2 ? .15 : .85) };
+      d.style.transform = `translate(${d.pos.x}px,${d.pos.y}px)`;
+      ov.append(d); return d;
+    });
+    const move = (cur, x, y, ms) => { const a = { ...cur.pos }; return tween(ms, t => { cur.pos = { x: a.x + (x - a.x) * t, y: a.y + (y - a.y) * t }; cur.style.transform = `translate(${cur.pos.x}px,${cur.pos.y}px)`; }); };
+    const jobs = items.map(async (el, i) => {
+      const cur = curs[i % curs.length];
+      await sleep(i * 420);
+      if (id !== run) return;
+      const r = el.getBoundingClientRect(), x = r.left - S.left, y = r.top - S.top, w = r.width, h = r.height;
+      await move(cur, x, y, 520 + Math.random() * 200);
+      if (id !== run) return;
+      const box = document.createElement("div"), size = document.createElement("span");
+      box.className = "box"; size.className = "size";
+      box.style.cssText = `--bc:${team[i % team.length][0]};left:${x}px;top:${y}px;width:0;height:0`;
+      box.append(size); ov.append(box);
+      const grow = tween(560, t => { box.style.width = w * t + "px"; box.style.height = h * t + "px"; size.textContent = `${Math.round(w * t)} × ${Math.round(h * t)}`; });
+      await Promise.all([grow, move(cur, x + w, y + h, 560)]);
+      if (id !== run) return;
+      el.dataset.b === "type" ? await type(el, id) : (el.style.opacity = 1);
+      await sleep(500);
+      box.style.transition = "opacity .5s"; box.style.opacity = 0;
+    });
+    await Promise.all(jobs);
+    if (id !== run) return;
+    await sleep(400);
+    curs.forEach((c, i) => move(c, i % 2 ? S.width + 40 : -60, c.pos.y, 700));
+  }
+
+  document.getElementById("rebuild").onclick = build;
+  items.forEach(el => el.style.opacity = 0);
+  new IntersectionObserver((es, io) => { if (es[0].isIntersecting) { io.disconnect(); build(); } }, { threshold: .45 }).observe(stage);
+})();
+
+/* 데모 C: 스크롤 위치 → 그림 한 장 */
+(() => {
+  const N = 100, wrap = document.getElementById("scrub"), cv = document.getElementById("scrubCv"), ctx = cv.getContext("2d");
+  const meter = document.getElementById("meter"), says = [...wrap.querySelectorAll(".say")];
+  const imgs = [], src = i => `frames/${String(i).padStart(3, "0")}.webp`;
+  let cur = -1;
+  const load = i => { if (!imgs[i]) { imgs[i] = new Image(); imgs[i].src = src(i); imgs[i].onload = () => i === want() && draw(i, true); } return imgs[i]; };
+  const progress = () => { const r = wrap.getBoundingClientRect(); return Math.min(1, Math.max(0, -r.top / (r.height - innerHeight))); };
+  const want = () => Math.round(progress() * (N - 1));
+  function size() { const d = Math.min(devicePixelRatio, 2); cv.width = cv.clientWidth * d; cv.height = cv.clientHeight * d; draw(want(), true); }
+  function draw(i, force) {
+    if (i === cur && !force) return;
+    let im = load(i);
+    if (!im.complete) { for (let j = i; j >= 0; j--) if (imgs[j]?.complete) { im = imgs[j]; break; } if (!im.complete) return; }
+    cur = i;
+    const s = Math.max(cv.width / im.naturalWidth, cv.height / im.naturalHeight), w = im.naturalWidth * s, h = im.naturalHeight * s;
+    ctx.drawImage(im, (cv.width - w) / 2, (cv.height - h) / 2, w, h);
+    meter.textContent = `${String(i + 1).padStart(3, "0")} / ${N}`;
+  }
+  function onScroll() {
+    const p = progress(); draw(want());
+    let on = null; says.forEach(s => { if (p >= +s.dataset.at) on = s; });
+    says.forEach(s => s.classList.toggle("on", s === on));
+  }
+  load(0);
+  new IntersectionObserver(es => { if (es[0].isIntersecting) for (let i = 0; i < N; i++) load(i); }, { rootMargin: "100% 0px" }).observe(wrap);
+  addEventListener("scroll", () => requestAnimationFrame(onScroll), { passive: true });
+  new ResizeObserver(size).observe(cv);
+})();
+</script>
+
+<script type="module">
+/* 데모 B: 3D 캔 고리 */
+import * as THREE from "three";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+
+await document.fonts.load("italic 900 150px 'Pretendard Variable'").catch(() => {});
+const box = document.getElementById("cans"), cv = document.getElementById("cansCv");
+const flavors = [
+  ["자두", "PLUM", "#7a2fb8", "#1d0f2e"], ["유자", "YUZU", "#e09a00", "#2a1d05"], ["청포도", "GRAPE", "#2f9a5a", "#0b2215"],
+  ["복숭아", "PEACH", "#ff7f5e", "#2e1510"], ["블루베리", "BLUEBERRY", "#3d4fc4", "#0f1330"], ["수박", "WATERMELON", "#e0344f", "#2c0b12"], ["민트", "MINT", "#1fa39a", "#082422"]
+];
+const N = flavors.length, R = 3.1;
+const renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+const scene = new THREE.Scene();
+scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), .04).texture;
+const camera = new THREE.PerspectiveCamera(32, 1, .1, 50);
+camera.position.set(0, .9, 11); camera.lookAt(0, .35, 0);
+scene.add(new THREE.DirectionalLight("#ffffff", 1.4).translateX(3).translateY(4).translateZ(5));
+
+function label([ko, en, c]) {
+  const k = document.createElement("canvas"); k.width = 1024; k.height = 512;
+  const g = k.getContext("2d");
+  const gr = g.createLinearGradient(0, 0, 1024, 0); gr.addColorStop(0, c); gr.addColorStop(.5, c); gr.addColorStop(1, c);
+  g.fillStyle = gr; g.fillRect(0, 0, 1024, 512);
+  for (const x of [256, 768]) { // 둘레 양쪽에 같은 글자 — 어느 쪽이 보여도 읽히게
+    g.save(); g.translate(x, 256); g.rotate(-Math.PI / 2);
+    g.fillStyle = "#fff"; g.font = "italic 900 150px 'Pretendard Variable', sans-serif"; g.textAlign = "center"; g.textBaseline = "middle";
+    g.fillText("MADI", 0, -20);
+    g.font = "700 40px 'Pretendard Variable', sans-serif"; g.fillText(`${ko} · ${en}`, 0, 90);
+    g.restore();
+  }
+  const t = new THREE.CanvasTexture(k); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;
+}
+
+const ring = new THREE.Group(); ring.position.y = .55; scene.add(ring);
+const metal = new THREE.MeshStandardMaterial({ color: "#c9cbd0", metalness: 1, roughness: .28 });
+const bodyG = new THREE.CylinderGeometry(.5, .5, 1.7, 72, 1, true), capG = new THREE.CylinderGeometry(.44, .5, .1, 72);
+const cans = flavors.map((f, i) => {
+  const can = new THREE.Group();
+  can.add(new THREE.Mesh(bodyG, new THREE.MeshStandardMaterial({ map: label(f), metalness: .55, roughness: .32 })));
+  const top = new THREE.Mesh(capG, metal); top.position.y = .9; can.add(top);
+  const bot = new THREE.Mesh(capG, metal); bot.position.y = -.9; bot.rotation.x = Math.PI; can.add(bot);
+  const a = i / N * Math.PI * 2;
+  can.position.set(Math.sin(a) * R, 0, Math.cos(a) * R);
+  can.userData = { a, tilt: (i % 2 ? 1 : -1) * (.18 + (i % 3) * .06), bob: i * 1.3 };
+  ring.add(can); return can;
+});
+
+let sel = 0, angle = 0, target = 0, drag = null, running = false;
+const nameEl = document.getElementById("flavor"), enEl = document.getElementById("flavorEn");
+function pick(i) {
+  sel = (i % N + N) % N;
+  const f = flavors[sel];
+  nameEl.textContent = f[0]; enEl.textContent = `${f[1]} · ${String(sel + 1).padStart(2, "0")} / ${String(N).padStart(2, "0")}`;
+  box.style.setProperty("--tint", `radial-gradient(ellipse at 50% 45%, ${f[2]}55, ${f[3]} 70%)`);
+}
+const step = Math.PI * 2 / N;
+function go(d) { target -= d * step; pick(Math.round(-target / step)); }
+box.querySelector(".prev").onclick = () => go(-1);
+box.querySelector(".next").onclick = () => go(1);
+box.addEventListener("pointerdown", e => { if (e.target.closest("button")) return; drag = { x: e.clientX, t: target }; box.setPointerCapture(e.pointerId); box.style.cursor = "grabbing"; });
+box.addEventListener("pointermove", e => { if (drag) target = drag.t + (e.clientX - drag.x) / box.clientWidth * 3; });
+const end = () => { if (!drag) return; drag = null; box.style.cursor = ""; target = Math.round(target / step) * step; pick(Math.round(-target / step)); };
+box.addEventListener("pointerup", end); box.addEventListener("pointercancel", end);
+box.tabIndex = 0;
+box.addEventListener("keydown", e => { if (e.key === "ArrowRight") go(1); if (e.key === "ArrowLeft") go(-1); });
+
+function resize() { const w = box.clientWidth, h = box.clientHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.fov = w < 600 ? 50 : 30; camera.updateProjectionMatrix(); }
+new ResizeObserver(resize).observe(box);
+
+const clock = new THREE.Clock();
+function frame() {
+  if (!running) return;
+  const t = clock.getElapsedTime();
+  angle += (target - angle) * .08;
+  ring.rotation.y = angle;
+  const front = Math.round(-target / step);
+  cans.forEach((c, i) => {
+    const on = ((front % N) + N) % N === i;
+    const s = c.scale.x + ((on ? 1.18 : .92) - c.scale.x) * .1;
+    c.scale.setScalar(s);
+    c.rotation.z += ((on ? 0 : c.userData.tilt) - c.rotation.z) * .1;
+    c.rotation.y = -angle + (on ? t * .6 : c.userData.a * .3);
+    c.position.y = Math.sin(t * 1.2 + c.userData.bob) * .08;
+  });
+  renderer.render(scene, camera);
+  requestAnimationFrame(frame);
+}
+new IntersectionObserver(es => { running = es[0].isIntersecting; if (running) { clock.getDelta(); frame(); } }).observe(box);
+pick(0);
+</script>
+</body>
+</html>

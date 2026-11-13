@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#fafbfa">
+<title>술술 1판 (보관)</title>
+<meta name="description" content="어… 하고 막힌 그 말이 다음 날 내 교재가 되는 영어 말하기.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=TikTok+Sans:wdth,wght@75..150,300..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/bold/style.css">
+<style>
+:root {
+  --bg: #fafbfa; --page: #e9ebe9; --surface: #eff1ef; --line: #dcdfdc; --ink: #17191c; --muted: #62656b;
+  --accent: #0b6e5b; --accent-2: #085546; --accent-soft: #dcefe9; --warm: #f0a23b; --warm-2: #c97f16; --warm-soft: #fbe9cc; --warm-ink: #8f5300; --alert: #b4441b; --deep: #0f2a26;
+  --ease: cubic-bezier(.2, .8, .2, 1); --spring: cubic-bezier(.34, 1.56, .64, 1);
+}
+* { box-sizing: border-box }
+html, body { margin: 0; min-height: 100% }
+body { background: var(--page); color: var(--ink); font: 400 17px/1.45 "TikTok Sans", "Pretendard Variable", Pretendard, sans-serif; word-break: keep-all; overflow-wrap: anywhere; -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent }
+button, input, select { font: inherit; color: inherit }
+button { border: 0; background: none; cursor: pointer; padding: 0 }
+button:disabled { opacity: .4; cursor: default }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px }
+[hidden] { display: none !important }
+i.ph-fill, i.ph-bold { line-height: 1 }
+.app { position: relative; max-width: 460px; min-height: 100vh; min-height: 100dvh; margin: 0 auto; background: var(--bg); display: flex; flex-direction: column; overflow-x: clip }
+.top { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px 0; gap: 12px }
+.mark { font-weight: 800; font-size: 24px; letter-spacing: -.03em; text-decoration: none; color: var(--ink) }
+.mark::after { content: ""; display: inline-block; width: 7px; height: 7px; margin-left: 3px; border-radius: 50%; background: var(--warm) }
+.stats { display: flex; gap: 14px; font-weight: 700; font-size: 15px; font-variant-numeric: tabular-nums }
+.stats span { display: inline-flex; align-items: center; gap: 4px }
+.stats .ph-flame { color: var(--warm-2); font-size: 19px }
+.stats .ph-star { color: var(--accent); font-size: 18px }
+.view { flex: 1; padding: 14px 20px 28px; display: flex; flex-direction: column }
+.enter { animation: viewIn .35s var(--ease) both }
+@keyframes viewIn { from { opacity: 0; transform: translateY(10px) } }
+::view-transition-old(root) { animation: vtOut .18s ease both }
+::view-transition-new(root) { animation: vtIn .32s var(--ease) both }
+@keyframes vtOut { to { opacity: 0; transform: translateY(-6px) } }
+@keyframes vtIn { from { opacity: 0; transform: translateY(10px) } }
+h2 { margin: 22px 0 10px; font-size: 15px; font-weight: 700 }
+h2:first-child { margin-top: 6px }
+.big { margin: 10px 0 0; font-size: 28px; line-height: 1.2; font-weight: 800; letter-spacing: -.02em }
+.soft { color: var(--muted); font-size: 15px }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; padding: 0 22px; background: var(--accent); color: #fff; font-weight: 700; border-radius: 14px; box-shadow: 0 4px 0 var(--accent-2); transition: transform .1s, box-shadow .1s, background .2s; text-decoration: none }
+.btn:active { transform: translateY(4px); box-shadow: 0 0 0 var(--accent-2) }
+.btn.ghost { background: var(--surface); color: var(--ink); box-shadow: 0 4px 0 var(--line) }
+.btn.ghost:active { box-shadow: 0 0 0 var(--line) }
+.btn.wide { width: 100% }
+.link { color: var(--accent); font-weight: 700; font-size: 15px }
+.err { color: var(--alert); font-weight: 600; font-size: 15px; margin: 8px 0 0 }
+.err:empty { display: none }
+.none { padding: 14px; background: var(--surface); border-radius: 12px; font-size: 15px; color: var(--muted) }
+.toast { position: fixed; left: 50%; bottom: 96px; transform: translate(-50%, 20px); opacity: 0; z-index: 30; max-width: 380px; width: calc(100% - 40px); padding: 12px 16px; background: var(--deep); color: #fff; border-radius: 12px; font-size: 15px; font-weight: 600; transition: opacity .25s, transform .25s var(--ease); pointer-events: none }
+.toast.on { opacity: 1; transform: translate(-50%, 0) }
+
+/* 탭 */
+.tabs { position: sticky; bottom: 0; z-index: 5; display: grid; grid-template-columns: repeat(5, 1fr); background: var(--bg); box-shadow: 0 -1px 0 var(--line); padding-bottom: env(safe-area-inset-bottom) }
+.tabs button { padding: 8px 0 10px; display: grid; justify-items: center; gap: 2px; font-size: 12px; font-weight: 700; color: var(--muted); position: relative }
+.tabs button i { font-size: 25px; transition: transform .25s var(--spring) }
+.tabs button[aria-current=page] { color: var(--accent) }
+.tabs button[aria-current=page] i { transform: translateY(-2px) scale(1.08) }
+.tabs button b { position: absolute; top: 4px; left: calc(50% + 8px); min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--warm); color: var(--ink); font-size: 11px; line-height: 18px }
+.tabs button b:empty { display: none }
+
+/* 처음 */
+.pick { display: grid; gap: 10px; margin-top: 18px }
+.pick button { text-align: left; padding: 18px; background: var(--surface); border-radius: 14px; display: flex; gap: 14px; align-items: center; transition: background .2s, transform .1s }
+.pick button:active { transform: scale(.98) }
+.pick button i { font-size: 30px; color: var(--accent) }
+.pick button[aria-pressed=true] { background: var(--accent); color: #fff }
+.pick button[aria-pressed=true] i { color: #fff }
+.pick b { display: block; font-size: 19px; font-weight: 800 }
+.pick span { font-size: 15px; opacity: .85 }
+label.f { display: grid; gap: 4px; margin-top: 12px; font-size: 15px; font-weight: 600 }
+.f input, .f select { padding: 12px; border: 0; background: var(--surface); font-size: 17px; font-weight: 400; border-radius: 10px }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 18px }
+
+/* 하루 띠: 장면이 오른쪽으로 이어진다 */
+.hello { width: calc(100% + 40px); margin: 0 -20px; aspect-ratio: 16 / 9; object-fit: cover; display: block }
+.trip { display: flex; align-items: center; gap: 10px; margin-top: 6px }
+.tripname { flex: 1; display: grid; text-align: center; gap: 2px }
+.tripname small { font-size: 12px; font-weight: 700; color: var(--muted); letter-spacing: .02em }
+.tripname b { font-size: 22px; letter-spacing: -.02em }
+.tripname span { font-size: 13px; color: var(--muted); font-weight: 600 }
+.tripname small i { font-size: 10px; vertical-align: 1px }
+.yeargrid { display: grid; grid-template-columns: 30px repeat(13, 1fr); gap: 4px; margin-top: 12px; padding: 10px; border-radius: 14px; background: var(--surface) }
+.yeargrid span { font-size: 11px; font-weight: 800; color: var(--muted); align-self: center }
+.wk { aspect-ratio: 1; border-radius: 6px; font-size: 10px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--muted); background: linear-gradient(0deg, color-mix(in srgb, var(--accent) 28%, transparent) calc(var(--p) * 100%), var(--bg) 0) }
+.wk.done { background: var(--accent); color: #fff }
+.wk.now { box-shadow: inset 0 0 0 2px var(--accent); color: var(--accent) }
+.wk.on { background: var(--ink); color: var(--bg) }
+.tnav { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--surface); color: var(--ink); font-size: 18px }
+.tnav:disabled { opacity: .3 }
+.daychips { display: flex; gap: 6px; margin: 16px -20px 0; padding: 0 20px; overflow-x: auto; scrollbar-width: none }
+.dchip { flex: 1 0 40px; max-width: 64px; display: grid; justify-items: center; gap: 6px; padding: 8px 0 9px; border-radius: 12px; background: var(--surface); color: var(--muted); transition: background .2s, color .2s }
+.dchip b { font-size: 17px; font-variant-numeric: tabular-nums }
+.dchip i { width: 60%; height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--accent) calc(var(--p) * 100%), var(--line) 0) }
+.dchip.now { box-shadow: inset 0 0 0 2px var(--accent); color: var(--accent) }
+.dchip.done { color: var(--accent) }
+.dchip.on { background: var(--ink); color: var(--bg) }
+.dchip.on i { background: linear-gradient(90deg, var(--warm) calc(var(--p) * 100%), rgba(255,255,255,.25) 0) }
+.dayname { margin: 18px 0 10px; transition: opacity .2s }
+.daysep { flex: none; width: 34px; display: grid; justify-items: center; align-content: center; gap: 8px; color: var(--muted); font-size: 18px; scroll-snap-align: none }
+.daysep span { writing-mode: vertical-rl; font-size: 13px; font-weight: 800; letter-spacing: .1em }
+.strip { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: 12px; margin: 0 -20px; padding: 4px 12px 14px; scrollbar-width: none; scroll-behavior: smooth }
+.stripwrap { position: relative }
+.snav { display: none }
+@media (hover: hover) and (pointer: fine) {
+  .snav { display: grid; place-items: center; position: absolute; top: var(--mid, 30%); transform: translateY(-50%); z-index: 2; width: 44px; height: 44px; border-radius: 50%; background: var(--bg); color: var(--ink); font-size: 20px; box-shadow: 0 2px 10px rgba(23,25,28,.18); transition: transform .15s, opacity .15s }
+  .snav[hidden] { display: none }
+  .snav:hover { transform: translateY(-50%) scale(1.08) }
+  .snav.back { left: -8px } .snav.fwd { right: -8px }
+}
+.scard { flex: none; width: 78%; scroll-snap-align: start; text-align: left; border-radius: 20px; background: var(--bg); box-shadow: inset 0 0 0 2px var(--line); overflow: hidden; transition: transform .2s var(--spring), box-shadow .2s }
+.scard:active { transform: scale(.98) }
+.scard .pic { position: relative; aspect-ratio: 16 / 10; background: var(--sky); display: grid; place-items: center; font-size: 44px; color: rgba(23,25,28,.25) }
+.scard.night .pic { color: rgba(255,255,255,.3) }
+.scard .pic img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover }
+.scard .stamp { position: absolute; right: 10px; top: 10px; width: 36px; height: 36px; border-radius: 50%; background: var(--bg); color: var(--accent); display: grid; place-items: center; font-size: 26px }
+.scard .cap { display: grid; grid-template-columns: auto 1fr; gap: 0 12px; padding: 14px 16px 16px; align-items: baseline }
+.scard time { grid-row: span 2; font-size: 26px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.02em }
+.scard b { font-size: 18px }
+.scard .cap span { font-size: 14px; color: var(--muted); font-weight: 600 }
+.scard.next { box-shadow: inset 0 0 0 3px var(--accent), 0 8px 24px -14px rgba(11,110,91,.6) }
+.scard.next .cap span { color: var(--accent) }
+.scard.soon .pic { filter: saturate(.6) }
+.scard.soon .cap { opacity: .65 }
+
+/* 장면 */
+.view.scene { padding: 0 }
+.scstage { position: relative; height: 46vh; min-height: 280px; max-height: 420px; overflow: hidden; background: #e8e2d0 }
+.scimg { position: absolute }
+.scimg > img:first-child { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover }
+.scimg .breath, .scimg .front, .scimg .amb { position: absolute }
+/* 배경도 아주 조금: 햇살, 화분, 김 */
+.amb.glow { animation: glow 9s ease-in-out infinite }
+@keyframes glow { 50% { opacity: .5 } }
+.amb.sway { transform-origin: 50% 100%; animation: sway 7s ease-in-out infinite }
+@keyframes sway { 25% { transform: rotate(1.3deg) } 75% { transform: rotate(-1deg) } }
+.amb.steam { transform-origin: 40% 100%; animation: steam 4.5s ease-in-out infinite alternate }
+@keyframes steam { from { opacity: .45; transform: translateY(5px) skewX(1deg) } to { opacity: .95; transform: translateY(-7px) skewX(-3deg) } }
+.scimg .breath img { position: absolute; inset: 0; width: 100%; height: 100% }
+/* 사람만 아주 조금: 숨 쉬듯 커졌다 작아지고, 손은 가끔 인사한다 */
+.breath { transform-origin: 50% 100%; animation: breathe 4.8s ease-in-out infinite }
+@keyframes breathe { 0%, 100% { transform: scale(1) } 50% { transform: scale(var(--s, 1.014)) } }
+.handwave { animation: handwave 4s ease-in-out infinite }
+@keyframes handwave { 0%, 48%, 100% { transform: rotate(0) } 10% { transform: rotate(-6deg) } 20% { transform: rotate(4deg) } 30% { transform: rotate(-5deg) } 40% { transform: rotate(2deg) } }
+.sctop { position: absolute; left: 0; right: 0; top: 0; display: flex; align-items: center; gap: 10px; padding: 14px 16px }
+.sctop button { width: 40px; height: 40px; border-radius: 50%; background: rgba(250,251,250,.9); font-size: 20px; display: grid; place-items: center }
+.sctop p { margin: 0; padding: 6px 12px; border-radius: 12px; background: rgba(250,251,250,.9); font-weight: 700 }
+.sctop time { color: var(--accent); font-weight: 800 }
+.steps { position: absolute; left: 16px; bottom: 12px; display: flex; gap: 6px }
+.steps span { padding: 4px 10px; border-radius: 999px; background: rgba(250,251,250,.75); font-size: 13px; font-weight: 700; color: var(--muted) }
+.steps span.on { background: var(--accent); color: #fff }
+.steps span.done { background: rgba(250,251,250,.95); color: var(--accent) }
+.bubble2 { position: absolute; left: 16px; right: 16px; bottom: 48px; padding: 12px 16px; border-radius: 18px; background: rgba(255,255,255,.96); box-shadow: 0 10px 24px -16px rgba(0,0,0,.5); animation: up .35s var(--spring) both; max-width: 380px }
+.bubble2.guest { margin-left: auto }
+.bubble2 small { display: block; font-size: 12px; font-weight: 700; color: var(--accent) }
+.bubble2.guest small { color: var(--warm-ink) }
+.bubble2 span { font-size: 18px; font-weight: 600; line-height: 1.3 }
+.chunkcard { position: relative; margin: 12px 16px 0; padding: 14px 52px 14px 16px; border-radius: 16px; background: var(--warm-soft); animation: up .3s var(--ease) both }
+.chunkcard b { display: block; font-size: 19px }
+.chunkcard span { font-weight: 700; color: var(--warm-ink) }
+.chunkcard p { margin: 4px 0 0; font-size: 15px }
+.say-mini { position: absolute; right: 12px; top: 12px; width: 36px; height: 36px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 18px; display: grid; place-items: center }
+.scpanel { flex: 1; display: flex; flex-direction: column; padding: 16px 20px 20px }
+.lead2 { margin: 0 0 10px; color: var(--muted); font-size: 15px }
+.script { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; max-height: 32vh; overflow-y: auto }
+.script li { max-width: 88%; padding: 10px 14px; border-radius: 16px; background: var(--surface); animation: up .3s var(--ease) both }
+.script li.guest { margin-left: auto; background: var(--accent-soft) }
+.script small { display: block; font-size: 12px; font-weight: 700; color: var(--muted) }
+.script span { font-size: 16px; line-height: 1.4 }
+.chunk { cursor: pointer; text-decoration: underline; text-decoration-color: var(--warm); text-decoration-thickness: 2px; text-underline-offset: 4px; text-decoration-skip-ink: none; border-radius: 3px; transition: background .15s }
+.chunk:hover, .chunk:focus-visible { background: var(--warm-soft) }
+.mic-big:disabled, .say-btn:disabled { opacity: .35; box-shadow: none }
+.scfoot { display: flex; gap: 10px; margin-top: auto; padding-top: 16px }
+.scfoot .btn { flex: 1 }
+.turnhead { display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: 700; color: var(--muted) }
+.want { margin: 12px 0 0; padding: 14px 16px; border-radius: 16px; background: var(--surface); font-size: 21px; font-weight: 800; line-height: 1.3 }
+.want small { display: block; font-size: 13px; font-weight: 700; color: var(--accent); margin-bottom: 4px }
+.hintline { display: flex; gap: 8px; align-items: center; margin: 10px 0 0; padding: 10px 14px; border-radius: 12px; background: var(--warm-soft); font-weight: 700; animation: up .3s var(--ease) both }
+.hintline i { color: var(--warm-2) }
+.mic-big { width: 92px; height: 92px; margin: 18px auto 6px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 40px; display: grid; place-items: center; box-shadow: 0 6px 0 var(--accent-2); transition: transform .1s, box-shadow .1s }
+.mic-big:active { transform: translateY(5px); box-shadow: none }
+.mic-big.on { background: var(--warm); color: var(--ink); box-shadow: 0 6px 0 var(--warm-2); animation: ring2 1.4s ease-out infinite }
+@keyframes ring2 { 0% { outline: 0 solid rgba(240,162,59,.5) } 100% { outline: 22px solid rgba(240,162,59,0) } }
+.heardw { text-align: center; min-height: 1.5em; margin: 8px 0 0; font-size: 16px; font-weight: 600 }
+.no2 { color: var(--alert) }
+.okcard { padding: 16px; border-radius: 16px; background: var(--accent-soft); animation: up .3s var(--ease) both }
+.okcard b { display: flex; gap: 6px; align-items: center; color: var(--accent); font-size: 18px }
+.okcard .mine { margin: 8px 0 0; font-size: 20px; font-weight: 700 }
+.better { position: relative; margin: 12px 0 0; padding: 12px 52px 12px 14px; border-radius: 12px; background: var(--bg) }
+.better small { display: block; font-size: 13px; color: var(--muted); font-weight: 600 }
+.better span { font-size: 18px; font-weight: 700; color: var(--accent) }
+.notes { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px }
+.notes li { padding: 12px 14px; border-radius: 14px; background: var(--surface) }
+.notes li.hard { box-shadow: inset 4px 0 0 var(--warm) }
+.notes small { display: block; font-size: 13px; color: var(--muted); font-weight: 600 }
+.notes span { display: block; font-size: 17px; font-weight: 700 }
+.notes em { display: block; font-style: normal; color: var(--accent); font-weight: 600 }
+
+/* 수첩·기록 */
+.notes2, .notes3 { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px }
+.notes2 li { position: relative; padding: 14px 56px 14px 16px; border-radius: 14px; background: var(--surface) }
+.notes2 b { display: block; font-size: 18px }
+.notes2 span { font-weight: 700; color: var(--accent); font-size: 15px }
+.notes2 p { margin: 4px 0 0; font-size: 14px; color: var(--muted) }
+.notes3 li { padding: 12px 14px; border-radius: 14px; background: var(--surface) }
+.notes3 small { display: block; font-size: 13px; color: var(--muted); font-weight: 600 }
+.notes3 span { font-weight: 700 }
+.prons summary { padding: 12px 14px; border-radius: 14px; background: var(--surface); font-weight: 700; cursor: pointer }
+.prons ul { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 6px }
+.prons li { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; padding: 10px 14px; border-radius: 12px; box-shadow: inset 0 0 0 2px var(--line); cursor: pointer }
+.prons li b { font-size: 18px }
+.prons li s { text-decoration: none; color: var(--warm-2) }
+.prons li del { color: var(--alert) }
+.prons li strong { color: var(--accent) }
+.prons li small { flex-basis: 100%; color: var(--muted) }
+.cards2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px }
+.cards2 figure { margin: 0; border-radius: 14px; overflow: hidden; background: var(--surface) }
+.cards2 img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; display: block }
+.cards2 figcaption { padding: 8px 10px; font-size: 14px; font-weight: 700 }
+.cards2 small { display: block; color: var(--muted); font-weight: 500 }
+
+/* 대화 */
+.who { display: flex; align-items: center; gap: 12px }
+.face { width: 44px; height: 44px; border-radius: 50%; background: var(--accent); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 20px; flex: none }
+.who b { display: block; font-size: 18px }
+.who span { font-size: 14px; color: var(--muted) }
+.scenes { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin: 14px -20px 0; padding: 0 20px }
+.scenes button { flex: none; padding: 8px 12px; border-radius: 10px; background: var(--surface); font-size: 15px; font-weight: 600 }
+.scenes button[aria-pressed=true] { background: var(--accent); color: #fff }
+.custom { display: flex; gap: 8px; margin-top: 10px }
+.custom input { flex: 1; min-width: 0; padding: 10px 12px; border: 0; border-radius: 10px; background: var(--surface); font-size: 15px }
+.say { margin: 14px 0 0; font-size: 23px; line-height: 1.25; font-weight: 600; letter-spacing: -.01em; min-height: 2.5em }
+.say.wait { color: var(--muted) }
+.ko { margin: 6px 0 0; font-size: 16px; color: var(--muted) }
+.ko:empty { display: none }
+.sub { display: flex; gap: 14px; margin-top: 8px }
+.sub button { font-size: 15px; font-weight: 700; color: var(--accent) }
+.chips { display: grid; gap: 8px }
+.chip { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 11px 14px; border-radius: 12px; background: var(--surface); transition: background .3s, color .3s }
+.chip > div { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px }
+.chip b { font-size: 17px; font-weight: 650 }
+.chip span { font-size: 14px; color: var(--muted) }
+.dots { display: flex; gap: 5px; flex: none }
+.dots::before, .dots::after { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--line) }
+[data-n="1"] .dots::before, [data-n="2"] .dots::before, [data-n="2"] .dots::after { background: var(--accent) }
+.chip[data-n="2"] { background: var(--accent); color: #fff }
+.chip[data-n="2"] span { color: #d2ece5 }
+.chip[data-n="2"] .dots::before, .chip[data-n="2"] .dots::after { background: #fff }
+.chip.hit { animation: hit .5s }
+@keyframes hit { 40% { transform: scale(1.03) } }
+.wave { margin-top: 16px; height: 64px; border-radius: 12px; overflow: hidden; background: var(--surface) }
+canvas { display: block; width: 100%; height: 100% }
+.heard { margin: 8px 0 0; min-height: 2.9em; font-size: 16px; line-height: 1.45 }
+.heard em { font-style: normal; color: var(--warm-ink); background: var(--warm-soft); padding: 0 3px; font-weight: 700 }
+.heard i { font-style: normal; color: var(--muted) }
+.go { margin-top: auto; padding-top: 10px; display: flex; align-items: center; gap: 14px }
+.mic { width: 76px; height: 76px; border-radius: 50%; background: var(--accent); color: #fff; display: grid; place-items: center; flex: none; font-size: 34px; box-shadow: 0 5px 0 var(--accent-2); transition: transform .1s, box-shadow .1s, background .2s }
+.mic:active { transform: translateY(4px); box-shadow: none }
+.live .mic { background: var(--warm); color: var(--ink); box-shadow: 0 5px 0 var(--warm-2); animation: ring2 1.4s ease-out infinite }
+.go .st b { display: block; font-size: 20px; font-weight: 800 }
+.go .st span { font-size: 15px; color: var(--muted); font-variant-numeric: tabular-nums }
+.go .side { margin-left: auto; display: grid; gap: 8px; justify-items: end }
+.go .side button { display: inline-flex; align-items: center; gap: 5px; font-size: 15px; font-weight: 700; color: var(--accent) }
+.type { display: flex; gap: 8px; margin-top: 10px }
+.type input { flex: 1; min-width: 0; padding: 12px; border: 0; border-radius: 10px; background: var(--surface); font-size: 16px }
+.result { margin-top: 14px; padding: 16px; border-radius: 16px; background: var(--deep); color: #fff; display: grid; gap: 8px; animation: up .35s var(--ease) both }
+.result b { font-size: 20px }
+.result .btn { background: #fff; color: var(--ink); box-shadow: 0 4px 0 #b9cfc8 }
+
+/* 기록 */
+.chart { display: flex; align-items: flex-end; gap: 6px; height: 140px; padding-top: 10px }
+.chart div { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; font-size: 12px; color: var(--muted) }
+.chart i { width: 100%; background: var(--warm); min-height: 3px; border-radius: 4px 4px 0 0; transform-origin: bottom; animation: grow .6s var(--ease) both }
+@keyframes grow { from { transform: scaleY(0) } }
+.tiles3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px }
+.tiles3 div { padding: 14px 8px; border-radius: 14px; background: var(--surface); text-align: center }
+.tiles3 b { display: block; font-size: 26px }
+.tiles3 span { font-size: 13px; color: var(--muted); font-weight: 600 }
+.sess { margin-top: 8px; border-radius: 12px; background: var(--surface) }
+.sess summary { padding: 12px 14px; cursor: pointer; display: flex; justify-content: space-between; gap: 10px; font-weight: 600 }
+.sess summary span { color: var(--muted); font-weight: 400; font-size: 15px }
+.sess ol { margin: 0; padding: 0 14px 14px 32px; display: grid; gap: 6px; font-size: 15px }
+.sess li.me { color: var(--accent) }
+
+/* 설정 */
+.toggle { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; font-weight: 600 }
+.toggle small { display: block; font-size: 13px; color: var(--muted); font-weight: 500 }
+.sw { flex: none; width: 52px; height: 32px; border-radius: 16px; background: var(--line); position: relative; transition: background .2s }
+.sw::after { content: ""; position: absolute; top: 4px; left: 4px; width: 24px; height: 24px; border-radius: 50%; background: #fff; transition: transform .25s var(--spring) }
+.sw[aria-checked=true] { background: var(--accent) }
+.sw[aria-checked=true]::after { transform: translateX(20px) }
+.seg2 { display: flex; border-radius: 10px; background: var(--surface); padding: 3px }
+.seg2 button { padding: 6px 12px; border-radius: 8px; font-size: 14px; font-weight: 700; color: var(--muted) }
+.seg2 button[aria-pressed=true] { background: var(--bg); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.1) }
+
+@media (min-width: 700px) { .app { margin-top: 24px; margin-bottom: 24px; min-height: calc(100vh - 48px); border-radius: 24px; overflow: hidden } }
+@media (prefers-reduced-motion: reduce) { *, ::view-transition-old(root), ::view-transition-new(root) { animation: none !important; transition: none !important } }
+</style>
+</head>
+<body>
+<main class="app" id="app">
+  <div class="top" id="topbar"><a class="mark" href="#learn">술술</a><div class="stats" id="stats"></div></div>
+
+  <!-- 처음 -->
+  <section class="view" id="v-start" hidden>
+    <div id="s1">
+      <img class="hello" src="../img/scenes/cafe-gemini.webp" alt="아침 커피숍 그림">
+      <p class="big">영어로 하루를<br>살아 봐요</p>
+      <p class="soft" style="margin:8px 0 0">누구와 이야기할까요?</p>
+      <div class="pick" id="modes">
+        <button data-mode="me"><i class="ph-fill ph-user-sound"></i><div><b>내 이야기로</b><span>상대가 내 하루와 하는 일을 물어요</span></div></button>
+        <button data-mode="daily"><i class="ph-fill ph-storefront"></i><div><b>일상 상황으로</b><span>카페·길·공항 같은 장면에서 말해요</span></div></button>
+      </div>
+    </div>
+    <div id="s2" hidden>
+      <p class="big">나에 대해 알려 주세요</p>
+      <p class="soft">모두 비워 둬도 돼요. 넣으면 대화가 나에게 맞춰져요.</p>
+      <form id="prof">
+        <label class="f">부를 이름<input name="name" autocomplete="given-name" placeholder="예: Chang"></label>
+        <label class="f">하는 일<input name="job" placeholder="예: 대학생, AI 전공"></label>
+        <label class="f">관심사<input name="likes" placeholder="예: 게임 만들기, 레이싱"></label>
+        <label class="f">영어 쓸 곳<input name="use" placeholder="예: 여행, 면접, 외국인 친구"></label>
+        <label class="f">지금 수준<select name="level"><option value="">고르지 않음</option><option>거의 처음</option><option>짧은 문장은 돼요</option><option>일상 대화는 돼요</option><option>꽤 자유로워요</option></select></label>
+        <div class="row"><button class="btn" type="submit">다음</button><button class="btn ghost" type="button" id="skip">건너뛰기</button></div>
+      </form>
+    </div>
+    <div id="s3" hidden>
+      <p class="big">AI 대화 상대를 깨울 열쇠</p>
+      <p class="soft" style="margin-top:8px">장면은 키 없이도 다 할 수 있어요. 밤에 친구와 말하기(AI 말 걸기)만 Google Gemini 무료 키가 필요해요. 키는 이 기기에만 저장되고, 무료 키로 보낸 대화는 Google이 학습에 쓸 수 있어요.</p>
+      <p style="margin:14px 0 0"><a class="link" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">무료 키 받기 (Google AI Studio) →</a></p>
+      <label class="f">Gemini API 키<input id="key1" autocomplete="off" spellcheck="false" placeholder="붙여 넣기"></label>
+      <p class="err" id="keyerr1"></p>
+      <div class="row"><button class="btn" id="keyok1">확인</button><button class="btn ghost" id="keylater">나중에</button></div>
+    </div>
+  </section>
+
+  <!-- 배우기 -->
+  <section class="view" id="v-learn" hidden>
+    <div id="daystrip"></div>
+  </section>
+
+  <!-- 대화 -->
+  <section class="view" id="v-talk" hidden>
+    <div class="who"><div class="face" id="face" aria-hidden="true">J</div><div><b id="pname">Jamie</b><span id="psub"></span></div></div>
+    <div class="scenes" id="scenes" role="group" aria-label="장면"></div>
+    <form class="custom" id="customf" hidden><input id="customin" placeholder="원하는 상황 (예: 교환학생 첫날 기숙사에서)" maxlength="120"><button class="btn" style="min-height:42px;padding:0 14px">정하기</button></form>
+    <p class="say wait" lang="en" id="line"></p>
+    <p class="ko" id="ko"></p>
+    <div class="sub" id="lsub" hidden><button id="again">다시 듣기</button><button id="tr">한국어로 보기</button></div>
+    <h2>오늘 다시 써 볼 말</h2>
+    <div class="chips" id="chips"></div>
+    <div class="wave" id="wave"><canvas id="cv" aria-label="내 목소리 파형, 멈춘 곳은 주황 칸"></canvas></div>
+    <p class="heard" id="heard" aria-live="polite"></p>
+    <form class="type" id="typed" hidden><input id="tin" placeholder="영어로 쓰기 (한국어 섞어도 돼요)" autocomplete="off" lang="en"><button class="btn" style="min-height:44px;padding:0 16px">보내기</button></form>
+    <div class="result" id="result" hidden></div>
+    <p class="err" id="convErr"></p>
+    <div class="go">
+      <button class="mic" id="mic" aria-label="대화 시작"><i class="ph-fill ph-microphone"></i></button>
+      <div class="st"><b id="state">대화 시작</b><span id="time">3:00</span></div>
+      <div class="side"><button id="kobtn" hidden><i class="ph-bold ph-translate"></i>한국어로 말하기</button><button id="totype" hidden><i class="ph-bold ph-keyboard"></i>글로 쓰기</button><button id="end" hidden><i class="ph-bold ph-stop"></i>끝내기</button><button id="demo" hidden>예시 보기</button></div>
+    </div>
+  </section>
+
+  <!-- 수첩 -->
+  <section class="view" id="v-review" hidden>
+    <h2>장면에서 건진 말</h2>
+    <ul class="notes2" id="notelist"></ul>
+    <h2>내일 한 번 더 나올 말</h2>
+    <ul class="notes3" id="nglist"></ul>
+    <h2>말 걸기에서 막힌 말</h2>
+    <ul class="notes3" id="stucklist"></ul>
+    <h2>헷갈리는 발음</h2>
+    <details class="prons"><summary>흔히 잘못 읽는 단어 35개</summary><ul id="pronlist"></ul></details>
+  </section>
+
+  <!-- 기록 -->
+  <section class="view" id="v-log" hidden>
+    <div class="tiles3" id="lognums"></div>
+    <h2>그림엽서</h2>
+    <div class="cards2" id="shelf"></div>
+    <h2>줄어드는 멈춤</h2>
+    <p class="soft">말 걸기에서 1분에 몇 번 멈췄는지예요. 낮아질수록 술술 나와요.</p>
+    <div class="chart" id="chart"></div>
+    <h2>지난 대화</h2>
+    <div id="slist"></div>
+  </section>
+
+  <!-- 설정 -->
+  <section class="view" id="v-set" hidden>
+    <h2>문제 고르기</h2>
+    <div class="toggle"><div>말하기 문제<small>끄면 말하기 대신 문장 만들기가 나와요</small></div><button class="sw" role="switch" data-p="speak" aria-label="말하기 문제"></button></div>
+    <div class="toggle"><div>듣기 문제<small>끄면 듣기 대신 읽기 문제가 나와요</small></div><button class="sw" role="switch" data-p="listen" aria-label="듣기 문제"></button></div>
+    <div class="toggle"><div>문장 자동으로 읽어 주기</div><button class="sw" role="switch" data-p="auto" aria-label="자동 읽기"></button></div>
+    <div class="toggle"><div>효과음</div><button class="sw" role="switch" data-p="sound" aria-label="효과음"></button></div>
+    <div class="toggle"><div>읽어 주는 빠르기</div><div class="seg2" id="rate"><button data-r=".7">느리게</button><button data-r=".9">보통</button><button data-r="1.05">빠르게</button></div></div>
+    <p class="soft" id="offinfo"></p>
+    <h2>대화 방식</h2>
+    <div class="pick" id="modes2">
+      <button data-mode="me"><i class="ph-fill ph-user-sound"></i><div><b>내 이야기로</b></div></button>
+      <button data-mode="daily"><i class="ph-fill ph-storefront"></i><div><b>일상 상황으로</b></div></button>
+    </div>
+    <h2>나에 대해</h2>
+    <form id="prof2">
+      <label class="f">부를 이름<input name="name"></label>
+      <label class="f">하는 일<input name="job"></label>
+      <label class="f">관심사<input name="likes"></label>
+      <label class="f">영어 쓸 곳<input name="use"></label>
+      <label class="f">지금 수준<select name="level"><option value="">고르지 않음</option><option>거의 처음</option><option>짧은 문장은 돼요</option><option>일상 대화는 돼요</option><option>꽤 자유로워요</option></select></label>
+      <div class="row"><button class="btn">저장</button><span class="soft" id="saved"></span></div>
+    </form>
+    <h2>Gemini 키</h2>
+    <p class="soft" id="keyinfo"></p>
+    <label class="f">새 키<input id="key2" autocomplete="off" spellcheck="false" placeholder="붙여 넣기"></label>
+    <p class="err" id="keyerr2"></p>
+    <div class="row"><button class="btn" id="keyok2">확인</button><a class="link" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">무료 키 받기 →</a></div>
+    <h2>처음부터</h2>
+    <button class="btn ghost" id="reset">모든 기록 지우기</button>
+  </section>
+
+  <!-- 장면 -->
+  <section class="view scene" id="v-scene" hidden>
+    <div class="scstage">
+      <div class="scimg" id="scimg" role="img" aria-label="장면 그림"></div>
+      <div class="sctop"><button id="scclose" aria-label="장면 나가기"><i class="ph-bold ph-x"></i></button><p id="sctitle"></p></div>
+      <div class="steps" id="scsteps"></div>
+      <div class="bubble2" id="scbubble" hidden></div>
+    </div>
+    <div class="chunkcard" id="chunkcard" hidden></div>
+    <div class="scpanel" id="scpanel"></div>
+  </section>
+
+  <nav class="tabs" id="tabs" aria-label="메뉴" hidden>
+    <button data-v="learn"><i class="ph-fill ph-sun-horizon"></i>하루</button>
+    <button data-v="talk"><i class="ph-fill ph-chats-circle"></i>말 걸기</button>
+    <button data-v="review"><i class="ph-fill ph-notebook"></i>수첩<b id="revn"></b></button>
+    <button data-v="log"><i class="ph-fill ph-chart-bar"></i>기록</button>
+    <button data-v="set"><i class="ph-fill ph-gear-six"></i>설정</button>
+  </nav>
+  <div class="toast" id="toast" role="status"></div>
+</main>
+<script src="words.js"></script>
+<script src="app.js"></script>
+<script src="week.js"></script>
+<script src="year.js"></script>
+<script src="scene.js"></script>
+</body>
+</html>

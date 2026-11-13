@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>창업실</title>
+<meta name="description" content="숭실대 AI소프트웨어학부 1학년이 노트북 한 대로 만든 게임 도록, 복습 도구, 생활 자동화를 모은 창업실">
+<script>
+if (/^#(notes|prog|quiz|wrong|code)$/.test(location.hash)) location.replace("study.html" + location.hash);
+</script>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@200..800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* 종이·먹·잉크 블루는 그대로. 앞에 온 작품의 분류색으로 방 전체가 바뀐다 */
+:root {
+  --paper: #f2f1ec; --tone: #e4e2da; --ink: #151514; --muted: #5a5954; --rule: #c9c6bc;
+  --dark: #151618; --on-dark: #eeece6; --on-dark-soft: #9e9d97; --blue: #2b44a6; --olive: #34392f;
+  --m: clamp(16px, 3.2vw, 52px);
+  --serif: "Hahmlet", "Noto Serif KR", serif;
+  --sans: "Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif;
+  --mono: "IBM Plex Mono", "Pretendard Variable", Pretendard, ui-monospace, monospace;
+  --ease: cubic-bezier(.7, 0, .2, 1); --out: cubic-bezier(.2, .8, .2, 1);
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --bg: var(--dark); --fg: var(--on-dark); --soft: var(--on-dark-soft); --gl: .06;
+  color-scheme: light;
+}
+body[data-c="공부"] { --bg: var(--tone); --fg: var(--ink); --soft: var(--muted); --gl: .55 }
+body[data-c="프로젝트"] { --bg: var(--blue); --fg: #fff; --soft: #c6cdf0; --gl: .1 }
+body[data-c="기타"] { --bg: var(--olive); --fg: #eeece6; --soft: #b6baab; --gl: .07 }
+* { box-sizing: border-box }
+html, body { margin: 0; height: 100% }
+body { height: 100svh; overflow: hidden; background: var(--bg); color: var(--fg); font: 400 17px/1.6 var(--sans); word-break: keep-all; -webkit-font-smoothing: antialiased; transition: background-color .9s var(--ease), color .9s var(--ease) }
+/* 바닥에 고인 빛과 종이 결 */
+body::before { content: ""; position: fixed; inset: 0; pointer-events: none; background: radial-gradient(55% 40% at 50% 60%, #fff, transparent 72%); opacity: var(--gl); transition: opacity .9s var(--ease) }
+body::after { content: ""; position: fixed; inset: 0; pointer-events: none; background: var(--grain); z-index: 100; mix-blend-mode: overlay }
+a { color: inherit }
+h1, h2, p { margin: 0 }
+button { font: inherit; color: inherit }
+.mono { font-family: var(--mono); font-size: 12.5px; letter-spacing: .02em; line-height: 1.5; word-spacing: -.3em }
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%) }
+a:focus-visible, button:focus-visible { outline: 2px solid currentColor; outline-offset: 4px }
+
+/* 머리: 이름 · 분류 · 오늘 공부와 목록 */
+.bar { position: fixed; z-index: 50; inset: 0 0 auto; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 20px; padding: 20px var(--m) }
+.mark { justify-self: start; display: flex; align-items: baseline; gap: 14px; text-decoration: none; white-space: nowrap }
+.mark b { font: 600 23px/1 var(--serif); letter-spacing: -.01em }
+.mark span { color: var(--soft); transition: color .9s }
+.tabs { display: flex; gap: 2px }
+.tabs button { flex: none; font-weight: 600; font-size: 15px; background: none; border: 0; padding: 10px 13px; cursor: pointer; opacity: .55; transition: opacity .2s }
+.tabs button i { font: normal 11px var(--mono); margin-left: 5px; opacity: .75 }
+.tabs button:hover, .tabs button[aria-pressed="true"] { opacity: 1 }
+.tabs button span { background: linear-gradient(currentColor, currentColor) 0 100% / 0 1.5px no-repeat; padding-bottom: 6px; transition: background-size .45s var(--ease) }
+.tabs button[aria-pressed="true"] span { background-size: 100% 1.5px }
+.side { justify-self: end; display: flex; align-items: center; gap: 8px; min-width: 0 }
+.chip { display: flex; align-items: center; gap: 10px; min-height: 42px; padding: 0 14px; min-width: 0; text-decoration: none; font-size: 14px; background: color-mix(in srgb, currentColor 9%, transparent); transition: background-color .2s }
+.chip:hover { background: color-mix(in srgb, currentColor 16%, transparent) }
+.chip .mono { color: var(--soft); white-space: nowrap; transition: color .9s }
+.chip b { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 15em }
+.chip .dot { width: 7px; height: 7px; flex: none; border-radius: 50%; background: #ff7a45; box-shadow: 0 0 0 0 rgb(255 122 69 / .6); animation: ping 2.4s infinite }
+@keyframes ping { 70%, 100% { box-shadow: 0 0 0 9px rgb(255 122 69 / 0) } }
+.chip.done .dot { background: currentColor; animation: none; opacity: .5 }
+.chip, .listbtn { border: 0; cursor: pointer }
+.listbtn { display: flex; align-items: center; gap: 10px; min-height: 42px; padding: 0 14px; font-weight: 600; font-size: 14px; background: color-mix(in srgb, currentColor 9%, transparent) }
+.listbtn:hover { background: color-mix(in srgb, currentColor 16%, transparent) }
+.listbtn svg { width: 14px; height: 14px }
+
+/* 고리 */
+.stage { position: fixed; inset: 0; z-index: 1; perspective: 1700px; perspective-origin: var(--po, 50% 40%); touch-action: pan-y; user-select: none; -webkit-user-select: none; --w: min(clamp(250px, 32vw, 500px), 58svh); transition: opacity .22s }
+.stage.swap { opacity: 0 }
+.ring { position: absolute; left: 50%; top: 38svh; width: 0; height: 0; transform-style: preserve-3d }
+.card { position: absolute; left: calc(var(--w) / -2); top: calc(var(--w) * -.3125); width: var(--w); aspect-ratio: 16 / 10; transform-style: preserve-3d; will-change: transform, opacity }
+.face { position: absolute; inset: 0; display: block; overflow: hidden; background: #0c0c0c; box-shadow: 0 40px 70px -38px rgb(0 0 0 / .7), 0 0 0 1px rgb(255 255 255 / .04) inset; transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transition: transform .5s var(--out); -webkit-user-drag: none }
+.face img, .refl img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none }
+.face img { transform: scale(1.05) translateX(calc(clamp(-1, var(--k, 0), 1) * -2%)) }
+.face::after { content: ""; position: absolute; inset: 0; background: #000; opacity: var(--dim, 0); pointer-events: none }
+.face .lk { position: absolute; left: 12px; top: 12px; z-index: 1; padding: 3px 8px; background: rgb(0 0 0 / .55); color: #fff; backdrop-filter: blur(6px) }
+.glare { position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity .35s; mix-blend-mode: screen; background: radial-gradient(38% 55% at var(--gx, 50%) var(--gy, 30%), rgb(255 255 255 / .22), rgb(255 255 255 / 0) 70%) }
+.card.hot .glare { opacity: 1 }
+.refl { position: absolute; left: 0; right: 0; top: calc(100% + 8px); height: 26%; overflow: hidden; opacity: calc(.24 - var(--dim, 0) * .35); -webkit-mask-image: linear-gradient(#000, transparent 85%); mask-image: linear-gradient(#000, transparent 85%); pointer-events: none }
+.refl img { position: absolute; left: 0; top: 0; height: calc(100% / .26); transform: scaleY(-1) }
+
+/* 아래: 작품 글 + 큰 번호 */
+.cap { position: fixed; z-index: 40; left: var(--m); right: var(--m); bottom: 72px; display: flex; justify-content: space-between; align-items: flex-end; gap: 32px; pointer-events: none }
+.cap > * { pointer-events: auto }
+.txt { max-width: min(54vw, 760px) }
+.meta { color: var(--soft); margin-bottom: 12px; transition: color .9s }
+.ttl { font: 300 clamp(36px, min(5.4vw, 9svh), 84px)/1.04 var(--serif); letter-spacing: -.025em }
+.ttl.long { font-size: clamp(30px, min(3.9vw, 6.6svh), 62px) }
+.ttl .w { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .1em; margin-bottom: -.1em }
+.ttl .w > span { display: inline-block; transition: transform .7s var(--out); transition-delay: calc(var(--k) * 16ms) }
+.s { margin-top: 12px; max-width: 34em; text-wrap: pretty; color: var(--soft); transition: color .9s }
+.acts { margin-top: 22px; display: flex; align-items: center; gap: 6px 22px; flex-wrap: wrap }
+.go { display: inline-flex; align-items: center; gap: 12px; min-height: 50px; padding: 0 22px; background: var(--blue); color: #fff; font-weight: 700; font-size: 15px; text-decoration: none; transition: background-color .2s, transform .15s }
+.go:hover { background: #1f3486 } .go:active { transform: scale(.98) }
+.go i, .more a i { font-style: normal; display: inline-block; transition: transform .3s var(--out) }
+.go:hover i, .more a:hover i { transform: translateX(4px) }
+body[data-c="프로젝트"] .go { background: #fff; color: var(--blue) }
+body[data-c="프로젝트"] .go:hover { background: #e3e7f8 }
+.more { display: contents }
+.more a { font-weight: 600; font-size: 15px; text-decoration: none; padding: 8px 0; white-space: nowrap; background: linear-gradient(currentColor, currentColor) 0 calc(100% - 4px) / 100% 1px no-repeat }
+.more a:hover { background-size: 0 1px; background-position: 100% calc(100% - 4px); transition: background-size .35s var(--out) }
+.meta, .s, .acts { transition: opacity .4s, transform .5s var(--out), color .9s }
+.out .meta, .out .s, .out .acts { opacity: 0; transform: translateY(10px); transition-duration: .15s }
+.out .ttl .w > span { transform: translateY(112%); transition: transform .17s ease-in; transition-delay: 0s }
+.txt:not(.out) .s { transition-delay: .1s } .txt:not(.out) .acts { transition-delay: .17s }
+
+.ctl { display: flex; align-items: flex-end; gap: 22px; flex: none }
+.arr { display: flex; gap: 8px; padding-bottom: 6px }
+.arr button { width: 50px; height: 50px; border-radius: 50%; border: 1.5px solid currentColor; background: none; font-size: 18px; cursor: pointer; opacity: .6; transition: opacity .2s, transform .15s, background-color .2s }
+.arr button:hover { opacity: 1; background: color-mix(in srgb, currentColor 10%, transparent) } .arr button:active { transform: scale(.93) }
+.no { display: flex; align-items: flex-start; gap: 8px; line-height: .8 }
+.no .big { font: 200 clamp(76px, min(9.5vw, 17svh), 160px)/.8 var(--serif); letter-spacing: -.05em; overflow: hidden; display: block; padding-bottom: .04em; width: 1.2em; text-align: right }  /* 가장 넓은 04가 1.185em: 번호가 바뀌어도 화살표가 안 움직이게 */
+.no .big span { display: inline-block; transition: transform .6s var(--out) }
+.no.out .big span { transform: translateY(-105%); transition: transform .16s ease-in }
+.no .mono { color: var(--soft); padding-top: .3em; transition: color .9s }
+
+/* 맨 아래 눈금: 작품 하나가 선 하나 */
+.ticks { position: fixed; z-index: 40; left: calc(var(--m) - 6px); bottom: 20px; display: flex; align-items: flex-end }
+.ticks button { position: relative; width: 13px; height: 28px; padding: 0; border: 0; background: none; cursor: pointer }
+.ticks button::before { content: ""; position: absolute; left: 6px; bottom: 0; width: 1.5px; height: 9px; background: currentColor; opacity: .32; transition: height .4s var(--out), opacity .3s }
+.ticks button:hover::before { height: 17px; opacity: .8 }
+.ticks button[aria-current="true"]::before { height: 28px; opacity: 1 }
+.ticks button.gap { margin-left: 18px }
+.ticks button::after { content: attr(data-t); position: absolute; left: 6px; bottom: 38px; translate: -50% 4px; white-space: nowrap; font: 600 12.5px/1 var(--sans); padding: 8px 10px; background: var(--fg); color: var(--bg); opacity: 0; pointer-events: none; transition: opacity .18s, translate .25s var(--out) }
+.ticks button:first-child::after { translate: 0 4px; left: 0 }
+.ticks button:hover::after { opacity: 1; translate: -50% 0 }
+.ticks button:first-child:hover::after { translate: 0 0 }
+.hint { position: fixed; z-index: 40; right: var(--m); bottom: 24px; color: var(--soft); transition: color .9s, opacity .6s }
+.hint.gone { opacity: 0 }
+
+/* 커서: 고리 위에서만 동그라미가 된다 */
+.cur { position: fixed; left: 0; top: 0; z-index: 70; width: 78px; height: 78px; margin: -39px 0 0 -39px; border-radius: 50%; background: #fff; color: #000; mix-blend-mode: difference; display: grid; place-items: center; font: 700 12.5px var(--sans); pointer-events: none; opacity: 0; translate: var(--x, -100px) var(--y, -100px); scale: var(--sc, .3); transition: opacity .25s, scale .35s var(--out) }
+.cur.on { opacity: 1 }
+@media (hover: hover) and (pointer: fine) { .stage.fine, .stage.fine a { cursor: none } }
+
+/* 전체 목록 */
+.list { position: fixed; inset: 0; z-index: 80; overflow-y: auto; background: var(--paper); color: var(--ink); padding: 22px var(--m) 80px; clip-path: inset(0 0 100% 0); visibility: hidden; transition: clip-path .7s var(--ease), visibility 0s .7s }
+.list.open { clip-path: inset(0); visibility: visible; transition: clip-path .7s var(--ease) }
+.lhead { display: flex; justify-content: space-between; align-items: center; gap: 20px }
+.lhead .mark b { font-size: 23px }
+.close { display: flex; align-items: center; gap: 10px; min-height: 42px; padding: 0 14px; border: 0; background: var(--tone); font-weight: 600; font-size: 14px; cursor: pointer }
+.close:hover { background: var(--rule) }
+.list h2 { margin: clamp(48px, 9vh, 110px) 0 clamp(40px, 7vh, 80px); font: 250 clamp(44px, 6.6vw, 112px)/1.05 var(--serif); letter-spacing: -.025em }
+.list h2 b { font-weight: 700 }
+.cols { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 48px clamp(20px, 2.4vw, 40px) }
+.col h3 { margin: 0 0 14px; display: flex; align-items: baseline; gap: 10px; font: 500 26px/1.2 var(--serif) }
+.col h3 .mono { color: var(--muted) }
+.col h3 .c { width: 10px; height: 10px; align-self: center; flex: none }
+.col ul { margin: 0; padding: 0; list-style: none }
+.col a { display: grid; gap: 2px; padding: 13px 0; border-top: 1px solid var(--rule); text-decoration: none; transition: padding .3s var(--out), color .2s }
+.col li:last-child a { border-bottom: 1px solid var(--rule) }
+.col a b { font: 500 18px/1.35 var(--serif) }
+.col a .mono { color: var(--muted) }
+.col a:hover { padding-left: 10px; color: var(--blue) }
+.peek { position: fixed; left: 0; top: 0; z-index: 90; width: 300px; aspect-ratio: 16 / 10; object-fit: cover; pointer-events: none; opacity: 0; box-shadow: 0 30px 60px -28px rgb(0 0 0 / .5); translate: var(--x, 0) var(--y, 0); rotate: var(--r, 0deg); scale: var(--sc, .92); transition: opacity .2s, scale .3s var(--out) }
+.peek.on { opacity: 1; --sc: 1 }
+
+@media (max-width: 1100px) {
+  .bar { grid-template-columns: auto minmax(0, 1fr); row-gap: 6px }
+  .tabs { grid-column: 1 / -1; grid-row: 2; margin-inline: calc(-1 * var(--m)); padding-inline: calc(var(--m) - 13px); overflow-x: auto; scrollbar-width: none }
+  .stage { --w: min(34vw, 48svh) }
+  .ring { top: 38svh }
+  .cols { grid-template-columns: repeat(2, minmax(0, 1fr)) }
+}
+@media (max-width: 760px) {
+  .bar { padding-top: 14px; padding-bottom: 0 }
+  .mark span, .chip .mono, .listbtn span, .ticks, .hint { display: none }
+  .chip b { max-width: 9.5em }
+  .tabs button { padding: 10px 11px; font-size: 14.5px }
+  .stage { --w: 76vw; perspective: 900px }
+  .ring { top: 38svh }
+  .refl { height: 18% } .refl img { height: calc(100% / .18) }
+  .cap { bottom: max(16px, env(safe-area-inset-bottom)); flex-direction: column; align-items: stretch; gap: 14px }
+  .txt { max-width: none }
+  .meta { margin-bottom: 8px }
+  .ttl { font-size: clamp(30px, 9.4vw, 44px) } .ttl.long { font-size: clamp(25px, 7.4vw, 34px) }
+  .s { font-size: 15px; line-height: 1.55 }
+  .acts { margin-top: 16px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-right: calc(-1 * var(--m)); padding-right: var(--m) }
+  .go { min-height: 46px; flex: none }
+  .ctl { justify-content: space-between; align-items: center; flex-direction: row-reverse }
+  .no { align-items: baseline } .no .big { font-size: 40px; letter-spacing: -.03em; width: auto }
+  .arr { padding: 0 } .arr button { width: 46px; height: 46px }
+  .list h2 { margin: 44px 0 36px }
+  .cols { grid-template-columns: 1fr; gap: 40px }
+}
+@media (prefers-reduced-motion: reduce) {
+  body, body::before, .txt *, .no *, .face, .list, .chip .dot { transition: none !important; animation: none !important }
+}
+</style>
+</head>
+<body data-c="게임">
+<h1 class="vh">창업실 — 만들면서 배우는 1학년의 작업</h1>
+
+<header class="bar">
+  <a class="mark" href="./"><b>창업실</b><span class="mono">만들면서 배우는 1학년</span></a>
+  <div class="tabs" id="tabs" role="toolbar" aria-label="분류"></div>
+  <div class="side">
+    <a class="chip" id="today" href="daily/"><i class="dot" aria-hidden="true"></i><span class="mono">오늘 AI 공부</span><b id="todayT">열기</b></a>
+    <button class="listbtn" id="openList" type="button" aria-expanded="false" aria-controls="list"><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M0 2.5h14M0 7h14M0 11.5h14" stroke="currentColor" stroke-width="1.6"/></svg><span>전체 목록</span></button>
+  </div>
+</header>
+
+<main>
+  <div class="stage" id="stage" aria-label="작품 고리 — 끌거나 화살표 키로 돌려요"><div class="ring" id="ring"></div></div>
+  <div class="cap">
+    <div class="txt out" id="txt" aria-live="polite">
+      <p class="meta mono" id="meta">&nbsp;</p>
+      <h2 class="ttl" id="ttl">&nbsp;</h2>
+      <p class="s" id="desc">&nbsp;</p>
+      <div class="acts"><a class="go" id="open" href="#"><span id="openT">열어 보기</span><i>→</i></a><span class="more" id="more"></span></div>
+    </div>
+    <div class="ctl">
+      <div class="arr"><button id="prev" type="button" aria-label="이전 작품">←</button><button id="next" type="button" aria-label="다음 작품">→</button></div>
+      <p class="no out" id="no" aria-hidden="true"><span class="big"><span id="noB">01</span></span><span class="mono" id="noT">/ 30</span></p>
+    </div>
+  </div>
+  <div class="ticks" id="ticks" aria-hidden="true"></div>
+  <p class="hint mono" id="hint">끌거나 ← → 로 돌려요</p>
+</main>
+
+<div class="list" id="list" role="dialog" aria-modal="true" aria-labelledby="listH" inert>
+  <div class="lhead"><a class="mark" href="./"><b>창업실</b></a><button class="close" id="closeList" type="button">닫기 <span aria-hidden="true">✕</span></button></div>
+  <h2 id="listH">만들면서 <b>배우는</b><br>1학년의 작업 <span id="listN"></span>개</h2>
+  <div class="cols" id="cols"></div>
+</div>
+<img class="peek" id="peek" alt="" aria-hidden="true">
+<div class="cur" id="cur" aria-hidden="true"></div>
+<noscript><p style="position:fixed;inset:auto 0 0;padding:20px">작품 고리는 스크립트가 켜져 있어야 보여요. <a href="drafts/journal.html">목록으로 보기</a></p></noscript>
+
+<script>
+// 작품: 분류 · 제목 · 처음 올린 날 · 주소 · 그림 · 한 줄 · 쓴 것 · [잠금] · 첫 버튼 · 더 보기 링크
+const W = [
+  ["게임", "넋굿", "10.27", "neokgut/", "neokgut/img/bg_gate.webp", "부서진 저승길 위에서 구미호 아이가 오행 술법으로 원귀를 풀어 주는 쿼터뷰 액션 로그라이트.", "Unity 6 · 액션 로그라이트", 0, "도록 보기", [["개발 영상", "neokgut/videos/"]]],
+  ["게임", "브라운 로그", "10.27", "brown-rogue/", "brown-rogue/img/s_title.webp", "한·중·일 영웅 다섯을 3×4 진형에 세우고, 자리를 옮겨 가며 찢긴 저승 명부를 돌려주러 가는 배치 턴제 RPG.", "Python · pygame-ce", 0, "도록 보기"],
+  ["게임", "마디", "11.01", "mardi/", "mardi/img/cover.webp", "관절이 다 보이는 마네킹 하나를 사람처럼 자연스럽게 움직이게 만드는 3D 액션 실험.", "Unity 6 · Blender · 기획 중", 0, "기획서 보기", [["움직임 비교", "mardi/?v=study"]]],
+  ["게임", "데칼코마니", "11.06", "decal/", "hub/shots/decal.webp", "선을 그어 판을 반으로 접으면, 똑같이 겹치는 색 점이 짝으로 터지는 2분 퍼즐.", "HTML 캔버스 · Firebase 랭킹 · 2분 퍼즐", 0, "바로 하기", [["앱 출시 길잡이", "decal/store/"]]],
+  ["게임", "뒤집기 도장", "11.06", "stamp/", "hub/shots/stamp.webp", "다른 색 위에 덧찍으면 내 색으로 뒤집히고, 한 줄을 한 색으로 채우면 지워지는 퍼즐.", "HTML 캔버스 · 배치 퍼즐", 0, "바로 하기"],
+  ["게임", "일필휘지", "11.10", "lossy-brush/", "lossy-brush/img/cover_pixel.webp", "붓이 되어 길을 긋는 수묵 액션. 대숲을 떠나 본 적 없는 화공 대신, 스무 살의 그가 어머니가 말하던 바다까지 걸어가요.", "Godot 4 · 기획서", 0, "기획서 보기", [["평가 기록", "lossy-brush/review/"]]],
+  ["게임", "교수님 머리 뽑기", "11.12", "prof-hair/", "hub/shots/prof-hair.webp", "교수님이 판서하는 동안 정수리 머리카락을 몰래 뽑아요. 돌아보는 순간 커서가 내 태블릿 위에 없으면 끝.", "HTML 캔버스 · 난이도 3단계", 0, "바로 하기"],
+  ["공부", "봉사 18시간", "11.13", "volunteer/", "hub/shots/volunteer.webp", "섬김의리더십 봉사 18시간을 12/7까지. 숭실대입구역에서 1시간 안팎, 한 번만 가면 되는 1365·VMS 봉사 74개를 날짜별로 모으고, 담으면 하루 6시간 상한까지 계산해 줘요.", "1365 · VMS · 섬김의리더십", 0, "봉사 고르기"],
+  ["공부", "프롬프트 연습", "11.13", "prompt/", "hub/shots/prompt.webp", "Claude에게 일을 맡기는 말을 쓰면, Claude가 만들 결과를 미리 보여 주고 빨간 펜으로 채점해요. 세 번 안에 원하는 결과를 끌어내는 연습.", "Claude 기준 · 5문제", 0, "풀어 보기"],
+  ["공부", "AI와 데이터 기초 시험 정리", "11.13", "ai-data/", "hub/shots/ai-data.webp", "11/26 시험 범위 1~10주차를 교수님이 짚은 것 중심으로. 실습 코드를 진짜로 돌린 결과와, 직접 풀고 채점되는 문제·오답 노트까지.", "판다스 · 시각화 · 시험 정리", 0, "정리 보기", [["concat·merge 구분", "ai-data/#w6"], ["folium 지도", "ai-data/#w10"]]],
+  ["공부", "Adam 논문 발표", "11.11", "adam/", "hub/shots/adam.webp", "인공지능입문 Paper Seminar. 기울기의 평균을 크기로 나눈 만큼 움직인다는 한 가지 개념으로 논문 전체와 15분 발표 순서를 정리했어요.", "논문 발표 · ICLR 2015", 0, "내용 정리", [["발표 순서", "adam/?t=talk"]]],
+  ["공부", "잠긴 작업", "11.07", "debate/", "hub/shots/locked.webp", "열쇠가 있는 기기에서만 보여요.", "잠금", 1, "열기", []],
+  ["공부", "프로그래밍기초 복습 노트", "10.20", "study.html#notes", "hub/shots/study.webp", "C언어 2~9장 강의 정리, 객관식 퀴즈, 한 줄 코드 작성, 틀린 문제만 다시 푸는 오답노트를 한 화면에.", "C언어", 0, "강의 정리", [["퀴즈 풀기", "study.html#quiz"]]],
+  ["공부", "인공지능 입문 복습 노트", "10.20", "ai.html", "hub/shots/ai.webp", "AI의 역사부터 게임 트리까지 1~6장. 원본 강의안과 수업 녹음 정리, 중간고사 정리까지.", "인공지능 입문", 0, "노트 열기", [["3장 영상 강의", "ai-motion/index.html"]]],
+  ["공부", "매일 AI 공부", "10.29", "daily/", "hub/shots/daily.webp", "아침 8시 카톡으로 오는 하루 한 주제. 어제 배운 걸 묻는 퀴즈와 용어 사전이 붙어 있어요.", "카톡 알림 · 퀴즈", 0, "레슨 목록", [["용어 사전", "daily/?t"]]],
+  ["공부", "움직이는 그림으로 보는 강의", "10.20", "motion/index.html", "hub/shots/motion.webp", "글로만 보면 헷갈리는 장을 움직이는 그림과 목소리로 다시 설명한 영상들.", "영상 강의", 0, "C언어 2~9장", [["AI 3장 탐색", "ai-motion/index.html"], ["AI 5장 제약 충족", "ai-motion5/index.html"], ["하노이의 탑", "hanoi/index.html"]]],
+  ["공부", "잠긴 작업", "11.01", "human-bible/", "hub/shots/locked.webp", "열쇠가 있는 기기에서만 보여요.", "잠금", 1, "열기", []],
+  ["공부", "잠긴 작업", "11.02", "museum/", "hub/shots/locked.webp", "열쇠가 있는 기기에서만 보여요.", "잠금", 1, "열기", []],
+  ["프로젝트", "우리길", "11.01", "urigil/", "hub/shots/urigil.webp", "날짜와 시간만 고르면 서울 데이트 코스를 날씨와 해 지는 시각에 맞춰 실제 지도 위 동선으로 짜 줘요.", "PWA · 카카오맵 · Firebase", 0, "열어 보기"],
+  ["프로젝트", "우리달", "11.01", "uridal/", "hub/shots/uridal.webp", "여자친구랑 같이 쓰는 달력 앱. 둘의 일정, 날마다 기분 한 줄, 가고 싶은 곳, D-day까지.", "PWA · Firebase", 0, "열어 보기"],
+  ["프로젝트", "잠긴 작업", "10.29", "lms/", "hub/shots/locked.webp", "열쇠가 있는 기기에서만 보여요.", "잠금", 1, "열기", []],
+  ["프로젝트", "덜미", "10.29", "secure-msg/guide/", "hub/shots/dulmi.webp", "방장도 못 믿는 C 메신저. 몰래 들어온 사람부터 새어 나간 캡처까지 덜미를 잡아요.", "C · 암호화 메신저 · 팀 과제", 0, "설명서 보기", [["계획", "secure-msg/plan/"], ["전체 코드", "secure-msg/code/"], ["시작하기", "secure-msg/run/"], ["작업 기록", "secure-msg/log/"]]],
+  ["프로젝트", "술술", "11.06", "sulsul/", "hub/shots/sulsul.webp", "어… 하고 막힌 그 말이 다음 날 내 교재가 되는 영어 말하기.", "영어 말하기 · Gemini", 0, "써 보기", [["기획서", "sulsul/plan/"]]],
+  ["프로젝트", "학과 진로 지도", "10.29", "jobmap/", "hub/shots/jobmap-cover.webp", "101문항 진로 검사로 흥미가 겹치는 직무, 준비 상태, 이번 학기 할 일을 보여 줘요.", "101문항 · 진로 검사", 0, "검사 해 보기"],
+  ["프로젝트", "창공설 레이싱 휠", "10.27", "ffb-wheel/", "hub/shots/ffb-cover.webp", "창공설 팀이 아두이노로 만드는 포스 피드백 레이싱 휠. 한 페이지에서 발표 · 주차별 계획 · 3D 조립 순서 세 칸으로 봐요.", "Arduino · 팀 과제", 0, "발표", [["주차별 계획", "ffb-wheel/?t=plan"], ["3D 조립 순서", "ffb-wheel/?t=build"]]],
+  ["프로젝트", "주차 보고서", "11.04", "ffb-report/", "hub/shots/ffb-report.webp", "10주차부터 매주 내는 개별 보고서 초안. 직접 고친 글로 PDF까지 내보내요.", "창공설 · 개별 과제", 0, "보고서 보기"],
+  ["기타", "구 한컴타자, 맥에서", "11.10", "taja-mac/", "hub/shots/taja-mac.webp", "공식 Windows용 구 한컴타자연습을 고치지 않고 Wine으로 맥에서 켜는 한 줄 명령.", "Wine · macOS 스크립트", 0, "안내 보기"],
+  ["기타", "잠긴 작업", "11.08", "links/", "hub/shots/locked.webp", "열쇠가 있는 기기에서만 보여요.", "잠금", 1, "열기", []],
+  ["기타", "아이폰 조종 계획", "11.08", "iphone-agent/", "hub/shots/iphone-agent.webp", "아이폰에 말하면 Claude가 그 아이폰을 직접 조작하게 만드는 계획과 준비할 일.", "계획 · 시험 전", 0, "계획 보기"],
+  ["기타", "릴스 속 Claude Code 도구", "11.08", "claude-tools/", "hub/shots/claude-tools.webp", "릴스에 나온 헤드룸·태스크 옵저버·게임 개발 스킬 77개를 저장소에서 직접 확인하고, 이 노트북에 맞는지 따진 정리.", "조사 정리", 0, "열어 보기"],
+  ["기타", "무료 모델 Claude Code", "10.31", "free-claude-code/", "hub/shots/fcc.webp", "무료 NVIDIA 모델로 Claude Code를 쓰는 설정 안내.", "도구 설정", 0, "안내 보기"],
+  ["기타", "자유게시판", "11.05", "board/", "hub/shots/board.webp", "구글로 로그인하고 닉네임으로 누구나 글을 남기는 게시판.", "Firebase · 누구나 글쓰기", 0, "들어가기"],
+  ["기타", "움직이는 웹사이트", "11.04", "web-motion/", "hub/shots/webmotion.webp", "릴스 속 사이트를 뜯어 보고, 같은 기법으로 창업실 내용을 넣어 직접 만든 데모들.", "조사 + 데모", 0, "열어 보기"],
+  ["기타", "첫 화면 시안", "11.01", "drafts/", "drafts/shots/a.webp", "창업실 첫 화면을 고르려고 만든 시안들과, 지난 첫 화면.", "디자인", 0, "시안 보기", [["작품 원통", "drafts/drum.html"], ["편집 저널", "drafts/journal.html"]]],
+  ["기타", "잠긴 작업", "11.03", "storage/", "hub/shots/locked.webp", "열쇠가 있는 기기에서만 보여요.", "잠금", 1, "열기", []],
+  ["기타", "잠긴 작업", "10.29", "career/", "hub/shots/locked.webp", "열쇠가 있는 기기에서만 보여요.", "잠금", 1, "열기", []],
+  ["기타", "잠긴 작업", "10.29", "career/portfolio.html", "hub/shots/locked.webp", "열쇠가 있는 기기에서만 보여요.", "잠금", 1, "열기", []],
+  ["기타", "표준 현장실습학기제 한눈에", "10.29", "internship/", "hub/shots/intern.webp", "현장실습학기제와 공기업·사기업 인턴을 한눈에 비교한 정리.", "조사 정리", 0, "열어 보기"],
+].map(toW);
+function toW([cat, t, d, href, img, s, tag, lock, label, more = []], id) { return { id, cat, t, d, href, img, s, tag, lock, label, more }; }
+
+const CATS = ["전체", "게임", "공부", "프로젝트", "기타"];
+const HASH = { game: "게임", study: "공부", make: "프로젝트", etc: "기타" }, SLUG = Object.fromEntries(Object.entries(HASH).map(([k, v]) => [v, k]));
+const COLOR = { 게임: "var(--dark)", 공부: "var(--rule)", 프로젝트: "var(--blue)", 기타: "var(--olive)" };
+const $ = id => document.getElementById(id);
+const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const fine = matchMedia("(hover: hover) and (pointer: fine)").matches;
+const two = n => String(n).padStart(2, "0");
+const mod = (x, m) => ((x % m) + m) % m;
+const esc = s => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+const STEP = 32;   // 이웃 카드 사이 각도. 분류마다 개수가 달라도 같은 휘어짐으로 끝없이 돈다
+const stage = $("stage"), ring = $("ring");
+let list = [], cards = [], cat = "전체", pos = 0, vel = 0, target = 0, cur = -1, born = 0, cw = 400;
+const measure = () => { cw = cards[0]?.offsetWidth || 400; };
+addEventListener("resize", measure);
+
+// 분류 단추
+const drawTabs = () => $("tabs").innerHTML = CATS.map(c => `<button type="button" data-c="${c}"><span>${c}</span><i>${c === "전체" ? W.length : W.filter(w => w.cat === c).length}</i></button>`).join("");
+$("tabs").onclick = e => { const b = e.target.closest("button"); if (b && b.dataset.c !== cat) swap(b.dataset.c); };
+
+function swap(c) {
+  history.replaceState(null, "", c === "전체" ? location.pathname : "#" + SLUG[c]);
+  if (calm) return build(c, 0);
+  stage.classList.add("swap");
+  setTimeout(() => { build(c, 0); stage.classList.remove("swap"); }, 220);
+}
+function build(c, start) {
+  cat = c;
+  for (const b of $("tabs").children) b.setAttribute("aria-pressed", b.dataset.c === c);
+  list = c === "전체" ? W : W.filter(w => w.cat === c);
+  const n = list.length;
+  ring.innerHTML = list.map((w, i) => {
+    const near = Math.abs(mod(i - start + n / 2, n) - n / 2) <= 3, lz = near ? "" : ' loading="lazy"';
+    return `<div class="card" data-i="${i}"><a class="face" href="${w.href}" draggable="false" tabindex="-1"><img src="${w.img}" alt="${esc(w.t)}" draggable="false"${lz}>${w.lock ? '<span class="lk mono">잠금</span>' : ""}<i class="glare"></i></a><div class="refl" aria-hidden="true"><img src="${w.img}" alt=""${lz}></div></div>`;
+  }).join("");
+  cards = [...ring.children]; measure();
+  $("ticks").innerHTML = list.map((w, i) => `<button type="button" tabindex="-1" data-i="${i}" data-t="${esc(w.t)}"${i && w.cat !== list[i - 1].cat ? ' class="gap"' : ""}></button>`).join("");
+  target = start; pos = calm ? start : start - 1.2; vel = 0; cur = -1; born = performance.now();
+  // 처음엔 가까운 그림만, 조금 뒤에 나머지도 미리 받아 둔다
+  setTimeout(() => ring.querySelectorAll("img[loading]").forEach(im => im.loading = "eager"), 1500);
+}
+
+const rel = i => { const n = list.length; return mod(i - pos + n / 2, n) - n / 2; };   // 앞에서 몇 칸(짧은 쪽으로)
+const go = d => { target = Math.round(target) + d; hideHint(); };
+const goTo = i => { const n = list.length, b = Math.round(target); target = b + mod(i - b + n / 2, n) - n / 2; hideHint(); };
+const ease = x => 1 - (1 - x) ** 3;
+
+let tx = 0, ty = 0, sx = 0, sy = 0;
+addEventListener("pointermove", e => { tx = e.clientX / innerWidth - .5; ty = e.clientY / innerHeight - .5; }, { passive: true });
+
+function frame(now) {
+  if (!drag) {
+    vel += (target - pos) * (calm ? 1 : .055);
+    vel *= calm ? 0 : .76;
+    pos += vel;
+    if (Math.abs(target - pos) < .0005 && Math.abs(vel) < .0005) { pos = target; vel = 0; }
+  }
+  sx += (tx - sx) * .06; sy += (ty - sy) * .06;
+  const w = cw;
+  const r = Math.max(w * 1.15, (w / 2 + 26) / Math.tan(Math.PI * STEP / 360));
+  ring.style.transform = (calm ? "" : `rotateX(${(-sy * 5 - 2).toFixed(2)}deg) rotateY(${(sx * 6).toFixed(2)}deg) `) + `translateZ(${-r}px)`;
+  stage.style.setProperty("--po", `${50 + sx * 6}% ${40 + sy * 6}%`);
+  const n = list.length;
+  for (let i = 0; i < n; i++) {
+    const k = rel(i), a = k * STEP, abs = Math.abs(a), c = cards[i];
+    // 들어올 때: 앞 카드부터 차례로 아래에서 솟는다
+    const order = Math.min(Math.abs(mod(i - target + n / 2, n) - n / 2), 6);
+    const e = calm ? 1 : ease(Math.min(1, Math.max(0, (now - born - order * 70) / 700)));
+    const op = (abs < 48 ? 1 : abs > 80 ? 0 : 1 - (abs - 48) / 32) * e;
+    c.style.transform = `rotateY(${a.toFixed(3)}deg) translateZ(${r.toFixed(1)}px) translate3d(0, ${((1 - e) * 170).toFixed(1)}px, ${(-(1 - e) * 320).toFixed(1)}px) rotateX(${((1 - e) * -25).toFixed(2)}deg)`;
+    c.style.opacity = op.toFixed(3);
+    c.style.visibility = op < .005 ? "hidden" : "";
+    c.style.pointerEvents = op > .2 ? "" : "none";
+    c.style.setProperty("--dim", Math.min(Math.abs(k) * .17, .58).toFixed(3));
+    c.style.setProperty("--k", k.toFixed(3));
+  }
+  const near = mod(Math.round(pos), n);
+  if (near !== cur) show(near);
+  requestAnimationFrame(frame);
+}
+
+let tm;
+function show(i) {
+  const first = cur === -1;
+  cur = i; const w = list[i];
+  document.body.dataset.c = w.cat;
+  cards.forEach((c, j) => c.firstChild.tabIndex = j === i ? 0 : -1);
+  [...$("ticks").children].forEach((b, j) => b.setAttribute("aria-current", j === i));
+  try { sessionStorage.setItem("hub", JSON.stringify({ c: cat, i })); } catch (e) {}
+  $("txt").classList.add("out"); $("no").classList.add("out"); clearTimeout(tm);
+  tm = setTimeout(() => {
+    $("meta").textContent = `${w.d} · ${w.cat} · ${w.tag}${w.lock ? " · 잠금" : ""}`;
+    let k = 0;
+    $("ttl").innerHTML = w.t.split(" ").map(word => `<span class="w">${[...word].map(ch => `<span style="--k:${k++}">${esc(ch)}</span>`).join("")}</span>`).join(" ");
+    $("ttl").classList.toggle("long", w.t.length > 9);
+    $("desc").textContent = w.s;
+    $("open").href = w.href; $("openT").textContent = w.label;
+    $("more").innerHTML = w.more.map(([l, h]) => `<a href="${h}">${l} <i>→</i></a>`).join("");
+    $("noB").textContent = two(i + 1); $("noT").textContent = "/ " + two(list.length);
+    $("txt").classList.remove("out"); $("no").classList.remove("out");
+  }, calm ? 0 : first ? 380 : 190);
+}
+
+// 끌기: 놓을 때의 속도만큼 더 돌다가 가까운 작품에서 멈춘다
+let drag = null, moved = false;
+stage.addEventListener("pointerdown", e => { if (e.button) return; drag = { x: e.clientX, y: e.clientY, p: pos, lx: e.clientX, lt: performance.now(), v: 0 }; moved = false; vel = 0; });
+stage.addEventListener("pointermove", e => {
+  if (!drag) return;
+  const dx = e.clientX - drag.x;
+  if (!moved && Math.abs(dx) > 6 && Math.abs(dx) > Math.abs(e.clientY - drag.y)) { moved = true; stage.setPointerCapture(e.pointerId); hideHint(); }
+  if (!moved) return;
+  const unit = cw * .7, t = performance.now();
+  drag.v = drag.v * .5 + (-(e.clientX - drag.lx) / unit / Math.max(1, t - drag.lt) * 16) * .5;
+  drag.lx = e.clientX; drag.lt = t; pos = drag.p - dx / unit;
+});
+const end = () => {
+  if (!drag) return;
+  const v = performance.now() - drag.lt > 90 ? 0 : drag.v;
+  drag = null;
+  if (moved) { vel = v; target = Math.round(pos + v * 7); }
+};
+stage.addEventListener("pointerup", end); stage.addEventListener("pointercancel", end);
+stage.addEventListener("click", e => {
+  const c = e.target.closest(".card"); if (!c) return;
+  if (moved) { e.preventDefault(); return; }
+  const k = rel(+c.dataset.i);
+  if (Math.abs(k) > .5) { e.preventDefault(); goTo(+c.dataset.i); }
+});
+// 탭 키로 앞 카드에 오면 그 카드로
+stage.addEventListener("focusin", e => { const c = e.target.closest(".card"); if (c && +c.dataset.i !== cur) goTo(+c.dataset.i); });
+
+// 앞 카드는 마우스 쪽으로 살짝 기울고 빛이 따라온다
+let hot = null;
+const cool = () => { if (hot) { hot.classList.remove("hot"); hot.firstChild.style.setProperty("--rx", "0deg"); hot.firstChild.style.setProperty("--ry", "0deg"); hot = null; } };
+stage.addEventListener("pointermove", e => {
+  const c = e.target.closest(".card");
+  const front = c && Math.abs(rel(+c.dataset.i)) < .5 && !moved ? c : null;
+  if (hot !== front) cool();
+  if (!front || calm) return;
+  hot = front;
+  const f = front.firstChild, b = f.getBoundingClientRect(), x = (e.clientX - b.left) / b.width, y = (e.clientY - b.top) / b.height;
+  front.classList.add("hot");
+  f.style.setProperty("--gx", `${x * 100}%`); f.style.setProperty("--gy", `${y * 100}%`);
+  f.style.setProperty("--rx", `${(.5 - y) * 7}deg`); f.style.setProperty("--ry", `${(x - .5) * 9}deg`);
+});
+stage.addEventListener("pointerleave", cool);
+
+// 커서 동그라미: 빈 곳은 끌기, 앞 카드는 열기, 옆 카드는 보기
+if (fine && !calm) {
+  stage.classList.add("fine");
+  const cu = $("cur"); let cx = -100, cy = -100, mx = -100, my = -100, on = false;
+  stage.addEventListener("pointermove", e => {
+    mx = e.clientX; my = e.clientY;
+    if (!on) { cx = mx; cy = my; on = true; cu.classList.add("on"); }
+    const c = e.target.closest(".card"), front = c && Math.abs(rel(+c.dataset.i)) < .5;
+    const label = drag && moved ? "" : front ? "열기" : c ? "보기" : "끌기";
+    if (cu.textContent !== label) cu.textContent = label;
+    cu.style.setProperty("--sc", drag && moved ? .35 : front ? 1 : c ? .82 : .7);
+  });
+  stage.addEventListener("pointerleave", () => { on = false; cu.classList.remove("on"); });
+  (function loop() { cx += (mx - cx) * .22; cy += (my - cy) * .22; cu.style.setProperty("--x", cx + "px"); cu.style.setProperty("--y", cy + "px"); requestAnimationFrame(loop); })();
+}
+
+// 휠·트랙패드: 한 번 굴리면 한 칸 (트랙패드 관성으로 여러 칸 넘어가지 않게)
+let acc = 0, accT = 0, stepT = 0;
+addEventListener("wheel", e => {
+  if (listOpen) return;
+  e.preventDefault();
+  const now = performance.now(), d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+  const fresh = now - accT > 200; accT = now;
+  if (fresh) acc = 0;
+  acc += e.deltaMode ? d * 40 : d;
+  if (Math.abs(acc) >= 40 && (fresh || now - stepT > 420)) { go(Math.sign(acc)); acc = 0; stepT = now; }
+}, { passive: false });
+addEventListener("keydown", e => {
+  if (listOpen) { if (e.key === "Escape") toggleList(false); return; }
+  if (e.key === "ArrowRight") go(1);
+  else if (e.key === "ArrowLeft") go(-1);
+  else if (e.key === "Enter" && e.target === document.body) location.href = list[cur].href;
+});
+$("prev").onclick = () => go(-1);
+$("next").onclick = () => go(1);
+$("ticks").onclick = e => { const b = e.target.closest("button"); if (b) goTo(+b.dataset.i); };
+const hideHint = () => $("hint").classList.add("gone");
+
+// 전체 목록
+let listOpen = false;
+function drawList() {
+  $("listN").textContent = W.length;
+  $("cols").innerHTML = CATS.slice(1).map((c, n) => {
+    const ws = W.filter(w => w.cat === c);
+    return `<section class="col"><h3><i class="c" style="background:${COLOR[c]}"></i>${c}<span class="mono">${two(n + 1)} · ${ws.length}</span></h3><ul>${ws.map(w => `<li><a href="${w.href}" data-img="${w.img}"><b>${esc(w.t)}</b><span class="mono">${w.d} · ${w.tag}${w.lock ? " · 잠금" : ""}</span></a></li>`).join("")}</ul></section>`;
+  }).join("");
+}
+function toggleList(open) {
+  listOpen = open;
+  $("list").classList.toggle("open", open); $("list").inert = !open;
+  $("openList").setAttribute("aria-expanded", open);
+  if (open) $("closeList").focus({ preventScroll: true }); else { $("openList").focus({ preventScroll: true }); peek.classList.remove("on"); }
+}
+$("openList").onclick = () => toggleList(true);
+$("closeList").onclick = () => toggleList(false);
+const peek = $("peek");
+if (fine) {
+  $("cols").addEventListener("pointermove", e => {
+    const a = e.target.closest("a[data-img]");
+    if (!a) return peek.classList.remove("on");
+    if (!peek.src.endsWith(a.dataset.img)) peek.src = a.dataset.img;
+    peek.style.setProperty("--x", Math.min(e.clientX + 28, innerWidth - 320) + "px");
+    peek.style.setProperty("--y", Math.min(e.clientY - 90, innerHeight - 210) + "px");
+    peek.style.setProperty("--r", ((e.clientX / innerWidth - .5) * 4).toFixed(2) + "deg");
+    peek.classList.add("on");
+  });
+  $("cols").addEventListener("pointerleave", () => peek.classList.remove("on"));
+}
+
+// 오늘 공부할 차례: 매일 AI 공부의 완료 기록에서 아직 안 끝낸 첫 레슨
+Promise.all([
+  fetch("daily/lessons.json").then(r => r.json()),
+  fetch("https://script.google.com/macros/s/AKfycbxhsQA5ijXl4AtQ4kECjZCs0ZXeBAfJqVousGYJ6lEV7aZ7Saqxi8WFoAqleaTsxaTM/exec").then(r => r.json()).catch(() => ({ done: [] }))
+]).then(([data, j]) => {
+  const done = new Set(j.done || []), L = data.lessons, x = L.find(l => !done.has(l.id)), chip = $("today");
+  if (!x) { chip.classList.add("done"); $("todayT").textContent = `${L.length}개 모두 끝냄`; return; }
+  chip.href = "daily/?d=" + x.id;
+  $("todayT").textContent = `D${x.id} ${x.title}`;
+  chip.title = `오늘 차례: ${x.title} (${L.length}개 중 ${done.size}개 끝냄)`;
+}).catch(() => {});
+
+// 시작: 주소의 #분류 → 이 탭에서 마지막으로 보던 작품 → 맨 앞
+let startCat = HASH[location.hash.slice(1)] || "전체", startI = 0;
+try { const s = JSON.parse(sessionStorage.getItem("hub")); if (s && s.c === startCat) startI = s.i; } catch (e) {}
+// 이 기기에 열쇠가 있을 때만: 잠긴 작품의 진짜 카드(lock/hub.enc)와 금고 카드(vault/data.bin)를 푼다.
+// 열쇠가 없으면 공개 카드("잠긴 작업")만 보이고, 금고 카드는 아예 없다.
+async function secretCards() {
+  const names = await (indexedDB.databases ? indexedDB.databases() : Promise.resolve([{ name: "lock" }, { name: "vault" }])).then(l => l.map(d => d.name)).catch(() => []);
+  const key = db => names.includes(db) && new Promise(res => {
+    const o = indexedDB.open(db, 1);
+    o.onupgradeneeded = () => o.result.createObjectStore("k");
+    o.onsuccess = () => { const r = o.result.transaction("k").objectStore("k").get("key"); r.onsuccess = () => res(r.result); r.onerror = () => res(null); };
+    o.onerror = () => res(null);
+  });
+  const open = async (k, path, aad) => {
+    const r = await fetch(path, { cache: "no-cache" });
+    let b = new Uint8Array(await r.arrayBuffer());
+    if (aad) b = Uint8Array.from(atob(new TextDecoder().decode(b).trim()), c => c.charCodeAt(0));
+    return JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({ name: "AES-GCM", iv: b.slice(0, 12), ...(aad && { additionalData: new TextEncoder().encode(aad) }) }, k, b.slice(12))));
+  };
+  const [lk, vk] = await Promise.all([key("lock"), key("vault")]);
+  if (lk) try { const real = await open(lk, "lock/hub.enc"); W.forEach((w, i) => { if (real[w.href]) W[i] = toW(real[w.href], w.id); }); } catch (e) {}
+  if (vk) try { const c = (await open(vk, "vault/data.bin", "changupsil-vault-v1")).card; W.push(toW([c.cat, c.t, c.d, "vault/", c.img || "hub/shots/locked.webp", c.s, c.tag, 1, c.label, []], W.length)); } catch (e) {}
+}
+secretCards().catch(() => {}).then(() => {
+  drawTabs(); drawList();
+  build(startCat, Math.min(startI, (startCat === "전체" ? W : W.filter(w => w.cat === startCat)).length - 1));
+  requestAnimationFrame(frame);
+});
+addEventListener("hashchange", () => { const c = HASH[location.hash.slice(1)]; if (c && c !== cat) swap(c); });
+</script>
+</body>
+</html>

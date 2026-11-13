@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>덜미 작업 기록</title>
+<meta name="description" content="덜미 코드가 바뀐 순서, 그렇게 정한 이유, 확인한 방법, deolmi.c 지도.">
+<script>document.documentElement.classList.add("js")</script>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="../site.css">
+</head>
+<body>
+<div class="board">
+<header class="topbar">
+  <a class="logo" href="../guide/" aria-label="덜미 설명서">덜미<i>.</i></a>
+  <nav class="pages" aria-label="덜미 페이지"><a href="../guide/">설명서</a><a href="../run/">시작하기</a><a href="../code/">전체 코드</a><a href="../plan/">암호화 계획</a><a href="../log/" aria-current="page">작업 기록</a><a class="home" href="/">← 창업실</a></nav>
+  <a class="get" href="../code/src/deolmi.c" download>deolmi.c 받기 <span aria-hidden="true">↓</span></a>
+</header>
+<section class="hero" aria-label="작업 기록">
+  <div class="t h-name rise"><h1>작업 기록</h1></div>
+  <div class="h-low">
+    <div class="t h-say rise" style="--i:1"><p>코드가 어떤 순서로 바뀌었고, 누가 무엇을 했고, 왜 그렇게 정했고, 어떻게 확인했는지. 처음 보는 팀원이 여기만 읽어도 지금 코드를 이어서 고칠 수 있게 적는다.</p><div class="by">만든 사람 <b>김창식</b>(기획·결정·확인) · <b>Claude</b>(코드·사이트 작성)</div></div>
+    <a class="t h-next rise" style="--i:2" href="../guide/"><span>다음 페이지</span><b>설명서 <span aria-hidden="true">→</span></b></a>
+  </div>
+  <div class="h-ui rise" data-ui><p class="cap">deolmi 저장소의 최근 커밋 (git log)</p>
+<pre class="term"><span class="k">11-06 22:10</span>  카메라 준비.bat: 더블클릭 한 번으로 python·media…
+<span class="k">11-06 21:32</span>  카메라 도우미를 exe 위쪽 폴더에서도 찾기, 첫 화면에 띄어쓰…
+<span class="k">11-06 21:22</span>  화면 지키기: 카메라 지킴이(/eye)와 유출 추적(/trace…
+<span class="k">11-06 17:54</span>  이름 뒤 조사를 받침에 맞게 (창식이 들어왔습니다, 창식과 같음)
+<span class="k">11-06 17:49</span>  최종 방향: 방장도 못 믿는 메신저 — 암호화 + 입장 심사 +…
+<span class="k">11-06 17:28</span>  중간결과물 제출본: 주석을 짧게, 화면 글을 ~습니다로 통일 (…
+<span class="k">11-05 21:35</span>  .bat·.sln 은 윈도우 줄바꿈(CRLF)으로 받게</pre></div>
+</section>
+<div class="doc">
+<details class="t toc" open><summary>이 페이지 차례</summary><nav aria-label="차례"><ol><li><a href="#who"><i>00</i>누가 무엇을 했나</a></li><li><a href="#s01"><i>01</i>바뀐 순서</a></li><li><a href="#check"><i>02</i>어떻게 확인했나</a></li><li><a href="#s03"><i>03</i>deolmi.c 지도</a></li><li><a href="#s04"><i>04</i>다음에 할 일</a></li></ol></nav></details>
+<main class="secs">
+
+<section class="t sec rise">
+<div class="now">
+  <b>지금 상태 · 11월 6일 저녁</b>
+  <ul>
+    <li><b>최종 방향: 방장도 못 믿는 메신저</b> — 끌 수 없는 종단간 암호화 + <b>입장 심사</b> + <b>장부 대조</b> + 시연 모드, 그리고 <b>화면 지키기</b>(카메라 지킴이 + 유출 추적) (<a href="../plan/">계획</a>). 코드까지 들어갔다.</li>
+    <li>코드는 <code>deolmi.c</code> <b>한 파일</b> (2,070줄쯤) + <code>libsodium</code> 폴더 + 카메라 도우미 <code>eye\deolmi_eye.py</code>, <b>윈도우 전용</b>. <code>deolmi.sln</code>을 열고 F5 (<a href="../run/">시작하기</a>).</li>
+    <li>자동 테스트 <b>105개 통과</b> — 네 명을 실제 프로그램으로 띄워 입장 심사·대화·두 얼굴·몰래 버리기·1바이트 바꾸기·유출 추적·카메라 지킴이(가짜 카메라)·다시 접속·키 바뀜까지 (아래 <a href="#check">확인</a>).</li>
+    <li>11-06 중간결과물(평문)은 git 태그 <code>midterm-submit</code>으로 남겨 두었다 (<a href="../code/#m0">코드 페이지</a>).</li>
+    <li><b>아직</b>: 실제 휴대폰을 카메라 앞에 들어 보기, 노트북 여러 대에서 실제 접속, 실제 콘솔 창에서 손으로 해 보기, <a href="../guide/">설명서</a>를 새 프로그램 기준으로 다시 쓰기.</li>
+  </ul>
+</div>
+</section>
+<section class="t sec rise" id="who">
+<h2 id="who"><span class="n">00</span>누가 무엇을 했나</h2>
+<div class="tbl"><table class="whot">
+<tr><th>누구</th><th>한 일</th></tr>
+<tr><td><span class="u">김창식</span></td><td>기획과 방향 결정 (암호화는 나중에, 한 파일로, 주소 표시, <b>11-06 최종 방향 "방장도 못 믿는 메신저" 확정</b>, 근거는 2026년 자료로, <b>"더 창의적으로" — 카메라로 휴대폰을 잡는 아이디어</b> 등), 직접 실행해 보고 문제 찾기 (<code>/who</code>가 안 됨, 다른 컴퓨터에서 안 붙음, 사이트가 처음 보는 사람에게 불친절함)</td></tr>
+<tr><td><span class="c">Claude</span><br><small>Anthropic의 AI</small></td><td><b>코드 전부 작성</b> (S1~S8, 한 파일로 합치기, 버그 수정), 자동 테스트 작성·실행, 둘이 채팅 시뮬레이션, <b>이 사이트의 모든 페이지 작성</b> (설명서·암호화 계획·코드·시작하기·작업 기록), 암호화·2인 잠금 설계, 이 노트북 방화벽 규칙 넣기, 윈도우판(같은 <code>deolmi.c</code>가 윈도우에서 돌게)과 그 시험, 제출용으로 줄이기(윈도우 전용·이름 정리), Visual Studio 프로젝트, <b>11-06 다른 메신저 빈틈 조사(2026년 자료)·최종 설계·암호화·입장 심사·장부 대조·시연 모드 코드·libsodium 붙이기, 저녁에 띄어쓰기 표식 설계·카메라 지킴이·유출 추적 코드, 테스트 105개</b></td></tr>
+</table></div>
+<p class="sub">git 커밋 기록에는 작성자가 모두 김창식으로 남아 있지만, 위 표처럼 실제 코드는 Claude가 썼다. 아래 각 항목에도 누가 요청하고 누가 만들었는지 적었다.</p>
+</section>
+<section class="t sec rise" id="s01">
+<h2 id="s01"><span class="n">01</span>바뀐 순서</h2>
+
+<div class="tl">
+<div class="ev"><span class="d">11-02 오전</span>
+<h3>통신 기초 — S1~S5</h3>
+<p class="who">구현 <span class="c">Claude</span></p>
+<p>설명서의 <a href="../guide/#steps">만든 순서와 확인</a> 순서대로 한 단계씩 쌓았다. 단계마다 확인을 통과해야 다음으로 넘어갔다.</p>
+<ul>
+<li><b>S1</b> 받은 글을 그대로 돌려주는 에코 서버</li>
+<li><b>S2</b> <code>poll</code>로 여러 명을 한꺼번에 받기</li>
+<li><b>S3</b> 길이 붙인 패킷 — TCP는 메시지 경계를 모르니 앞에 길이 4바이트를 붙인다. 테스트 <code>test_net.c</code></li>
+<li><b>S4</b> 접속하며 이름 밝히기(HELLO), 받을 사람(<code>to</code>)에게만 전하기, 입장·퇴장 알림. 테스트 <code>test_server.c</code></li>
+<li><b>S5</b> 채팅 화면 — 입력하는 중에도 받은 글이 뜨게, 전체/1:1 대화</li>
+</ul></div>
+
+<div class="ev"><span class="d">11-02 낮</span>
+<h3>암호화 — S6~S8</h3>
+<p class="who">구현 <span class="c">Claude</span></p>
+<p>세션 키와 메시지마다 바뀌는 키(래칫), 신원 키와 단어 지문, 키 두 개짜리 금고, 암호화된 대화 기록, 서버 창의 공격 명령(tamper·replay·drop). 코드는 <a href="../code/#e0">암호화 버전</a>에 있다. 이 설계를 설명하던 옛 설명서 내용은 11-03에 지웠다 (지금 프로그램과 달라서).</p></div>
+
+<div class="ev"><span class="d">11-02 21시</span>
+<h3>결정: 암호화를 빼고 통신부터</h3>
+<p class="who">결정 <span class="u">김창식</span> · 분리 작업 <span class="c">Claude</span></p>
+<p><b>암호화를 빼고 평문으로 통신부터 탄탄하게</b> 하기로 했다. 사람끼리 메시지가 확실히 오가는 것을 먼저 보고, 그 위에 암호화를 한 단계씩 다시 얹는다.</p>
+<p>암호화 코드는 지우지 않았다. 코드 페이지의 <a href="../code/#e0">암호화 버전</a>에 그대로 있다. 패킷 모양을 암호화 버전과 똑같이 남겨 둬서, 나중에 다시 얹을 때 서버 쪽은 거의 안 바꿔도 된다.</p></div>
+
+<div class="ev"><span class="d">11-02 23시</span>
+<h3>서버를 따로 안 띄우는 방장 모드</h3>
+<p class="who">질문 <span class="u">김창식</span> · 세 방법 비교와 구현 <span class="c">Claude</span></p>
+<p>"서버와 클라이언트를 한 프로그램에서 할 수 있나?"를 따져 봤다. 길은 세 가지였다.</p>
+<div class="diag">
+  <figure>
+    <svg viewBox="0 0 200 150" role="img" aria-label="별 모양: 가운데 서버, 둘레에 세 사람">
+      <g fill="none" stroke="currentColor" stroke-width="1.4" opacity=".55">
+        <line x1="100" y1="75" x2="38" y2="34"/><line x1="100" y1="75" x2="162" y2="34"/><line x1="100" y1="75" x2="100" y2="128"/>
+      </g>
+      <g font-family="IBM Plex Mono, monospace" font-size="11" text-anchor="middle">
+        <rect x="68" y="62" width="64" height="26" rx="7" fill="#CF3B1C"/><text x="100" y="79" fill="#fff" font-weight="600">서버</text>
+        <circle cx="38" cy="34" r="15" fill="#2A4F86"/><text x="38" y="38" fill="#fff">민지</text>
+        <circle cx="162" cy="34" r="15" fill="#2A4F86"/><text x="162" y="38" fill="#fff">현우</text>
+        <circle cx="100" cy="128" r="15" fill="#2A4F86"/><text x="100" y="132" fill="#fff">수빈</text>
+      </g>
+    </svg>
+    <figcaption>서버 모드 — 가운데 서버가 중계</figcaption>
+  </figure>
+  <figure>
+    <svg viewBox="0 0 200 150" role="img" aria-label="방장 모드: 수빈이 중계하면서 대화, 민지와 현우가 붙음">
+      <g fill="none" stroke="currentColor" stroke-width="1.4" opacity=".55">
+        <line x1="100" y1="88" x2="40" y2="40"/><line x1="100" y1="88" x2="160" y2="40"/>
+      </g>
+      <g font-family="IBM Plex Mono, monospace" font-size="11" text-anchor="middle">
+        <rect x="58" y="74" width="84" height="30" rx="8" fill="#17806A"/><text x="100" y="86" fill="#fff" font-weight="600" font-size="10.5">수빈</text><text x="100" y="98" fill="#fff" font-size="8.5">방장: 중계+대화</text>
+        <circle cx="40" cy="40" r="15" fill="#2A4F86"/><text x="40" y="44" fill="#fff">민지</text>
+        <circle cx="160" cy="40" r="15" fill="#2A4F86"/><text x="160" y="44" fill="#fff">현우</text>
+      </g>
+    </svg>
+    <figcaption>방장 모드 — 방장이 곧 서버</figcaption>
+  </figure>
+</div>
+<div class="tbl"><table>
+<tr><th>방법</th><th>내용</th><th>판단</th></tr>
+<tr><td>1. 켤 때 역할 선택</td><td>한 프로그램이 켤 때 서버나 참가자 중 하나가 된다</td><td>쉽지만 서버 창은 여전히 따로</td></tr>
+<tr><td><b>2. 방장이 중계+대화</b></td><td>한 사람이 방을 열어 중계하면서 자기도 대화한다</td><td><b>골랐다.</b> 창 하나로 끝난다</td></tr>
+<tr><td>3. 완전 P2P</td><td>모두가 서로 직접 연결</td><td>누가 누구에게 잇는지가 복잡해져 과제에 과하다</td></tr>
+</table></div>
+<p>그래서 <code>deolmi.c</code>를 새로 만들었다. 이때는 아직 <code>server.c</code> · <code>client.c</code> · <code>net.c</code> · <code>net.h</code> 와 따로 있었다.</p></div>
+
+<div class="ev"><span class="d">11-03</span>
+<h3>한 파일로 합침</h3>
+<p class="who">요청 <span class="u">김창식</span> — "net.h 랑 net.c 합쳐줘", "실행이 한 파일에서 되게끔" · 구현 <span class="c">Claude</span></p>
+<p><b>왜:</b> 파일이 다섯 개로 나뉘어 있으니 받을 것도, 빌드 명령도, "어느 파일에 뭐가 있지?"도 많았다. 팀원이 받아서 바로 돌리려면 <b>파일 하나, 명령 하나</b>가 제일 쉽다.</p>
+<p><b>어떻게:</b></p>
+<ul>
+<li><code>net.c</code> + <code>net.h</code>(패킷 주고받기)를 먼저 하나로 합치고, 이어서 전부 <code>deolmi.c</code> 안으로 옮겼다.</li>
+<li><code>server.c</code>의 중계 코드를 <b>서버 모드와 방장 모드가 같이 쓰게</b> 했다. 방장은 "자기도 방에 들어와 있는 서버"로 보면 된다. 그래서 방장 모드도 서버와 똑같은 규칙을 따른다 — 남의 이름으로 보내면 막고, 없는 사람에게 보내면 알려 준다. (예전 방장 모드에는 이 두 검사가 없었다.)</li>
+<li><code>client.c</code>의 대화 화면은 <code>deolmi.c</code>의 참가자 모드가 이어받았다. 참가자는 서버에도, 방장에게도 똑같이 붙는다.</li>
+<li>테스트 두 개는 <code>deolmi.c</code>의 통신 부분만 가져다 쓴다. 파일 맨 앞에 <code>#define NET_ONLY</code> 를 두면 ① 통신 부분까지만 읽히고 나머지는 건너뛴다.</li>
+</ul>
+</div>
+
+<div class="ev"><span class="d">11-03</span>
+<h3>그 뒤로 바꾼 것</h3>
+<div class="tbl"><table class="chg">
+<tr><th>바꾼 것</th><th>누가</th></tr>
+<tr><td><b>공격 명령(tamper·replay·drop)을 뺐다.</b> 지금은 통신 구현만 한다. 공격 명령은 <a href="../code/#e1">암호화 버전 server.c</a>에 그대로 있다.</td><td>결정 <span class="u">김창식</span><br>반영 <span class="c">Claude</span></td></tr>
+<tr><td><b>코드 페이지를 버전별로 나눴다.</b> 지금 버전과 암호화 버전 파일이 한 목록에 섞여 있었다. 프로그램에 필요 없는 테스트 파일과 Makefile은 아래 "확인용" 칸으로 따로 뺐다.</td><td>지적·요청 <span class="u">김창식</span><br>수정 <span class="c">Claude</span></td></tr>
+<tr><td><b>복사 버튼이 코드를 한 줄로 붙여 복사하던 문제.</b> 줄 번호를 붙이는 부품이 줄바꿈을 지운 뒤의 글자를 복사하고 있었다. 지금은 화면에 보이는 줄 그대로 복사된다.</td><td>질문 <span class="u">김창식</span><br>확인·수정 <span class="c">Claude</span></td></tr>
+<tr><td><b>시작하기·작업 기록 페이지.</b> 받기부터 친구와 채팅까지 순서대로 따라 하는 안내와, 이 기록을 새로 썼다. 코드 주석의 내부 용어도 풀어 썼다.</td><td>지적 <span class="u">김창식</span> — "너만 아는 내용들이 너무 많아"<br>작성 <span class="c">Claude</span></td></tr>
+<tr><td><b><code>/who</code> 뒤에 공백이 붙으면 "모르는 명령"이 뜨던 버그.</b> 복사해 붙이면 끝에 눈에 안 보이는 공백이 딸려 오기 쉽다. 입력한 줄의 앞뒤 공백을 지우고 처리하게 고쳤다.</td><td>발견 <span class="u">김창식</span> (직접 실행)<br>원인 찾기·수정 <span class="c">Claude</span></td></tr>
+<tr><td><b>방을 열면 주소가 뜬다.</b> 포트 번호 대신 <code>[주소] 10.x.x.x — 다른 컴퓨터는 ./deolmi 이름 10.x.x.x 으로 들어와요</code>. 전에는 <code>ipconfig</code>로 따로 찾아야 했다.</td><td>요청 <span class="u">김창식</span><br>구현 <span class="c">Claude</span></td></tr>
+<tr><td><b>접속이 막히면 5초 뒤 이유를 알려 준다.</b> 전에는 2분 넘게 아무 말 없이 멈췄다. 방이 없으면 "열린 방이 없어요", 중간에서 막히면 방화벽·와이파이를 확인하라고 뜬다.</td><td>발견 <span class="u">김창식</span> — "다른 데스크탑에서 아무것도 안 떠"<br>수정 <span class="c">Claude</span></td></tr>
+<tr><td><b>설명서를 지금 프로그램 기준으로 새로 썼다.</b> 암호화 원리·금고·공격 실험실·지난 일정처럼 지금 프로그램과 다른 내용은 지웠다 (git 기록에는 남아 있다). 팀 역할 표만 기획 때 그대로 옮겼다.</td><td>요청 <span class="u">김창식</span> — "옛날 설명은 다 지워"<br>작성 <span class="c">Claude</span></td></tr>
+<tr><td><b>시작 화면에 자세한 설명.</b> 방장·참가자·서버마다 무엇을 하는 창인지, 친구가 칠 명령, 명령 목록, 만든 사람이 뜬다. <code>/help</code> 로 다시 볼 수 있다.</td><td>요청 <span class="u">김창식</span><br>구현 <span class="c">Claude</span></td></tr>
+</table></div>
+</div>
+<div class="ev"><span class="d">11-04</span>
+<h3>설명서를 자세히, 암호화 계획 페이지를 새로</h3>
+<p class="who">요청 <span class="u">김창식</span> — "지금까지 한 내용이 어떻게 작동되는지 자세하게 … 암호화를 어떻게 할 것이고 2인 잠금 시스템은 어떻게 진행할 것인지" · 작성 <span class="c">Claude</span></p>
+<ul>
+<li><b><a href="../guide/">설명서</a></b>에 안에서 돌아가는 과정을 더했다 — 접속(소켓, 5초 제한, 실패 이유), 접속 절차(HELLO 그림), 실제 패킷 바이트, 한 통이 가는 길(거치는 함수 순서), 조각 모으기, <code>poll</code> 반복, 화면 그리기, 주소 표시. 팀 역할 표는 그대로 뒀다.</li>
+<li><b><a href="../plan/">암호화 계획</a></b>을 새로 만들었다 — 무엇을 지키나, 쓰는 도구(libsodium), 키 두 종류, HELLO 서명, 단어 지문, 래칫, 받을 때 검사, 지금 코드에서 바뀌는 곳, 2인 잠금(키 두 개짜리 금고) 흐름과 바이트 모양, 막은 구멍, 못 막는 것, 만드는 순서 E1~V4. 11-02 암호화 버전 코드를 바탕으로 지금 한 파일·방장 방식에 맞게 다시 짰다. 공격 실험 명령은 계획에 넣지 않았다 (11-03 결정).</li>
+<li><b>코드는 바꾸지 않았다.</b> 확인: 평문 테스트 25개, 11-02 암호화 버전 테스트 80개를 다시 돌려 모두 통과. 페이지의 서버 창 출력과 패킷 바이트는 실제로 돌려서 얻은 것이다.</li>
+</ul></div>
+
+<div class="ev"><span class="d">11-04 오후</span>
+<h3>윈도우에서도 돈다 — WSL 없이</h3>
+<p class="who">요청 <span class="u">김창식</span> — "저번에 줬던 test.c 파일처럼 윈도우에서도 되게끔" · 구현·시험 <span class="c">Claude</span></p>
+<p><b>왜:</b> 지금까지는 우분투(WSL) 창에서만 돌아서, 윈도우 노트북은 WSL 설치·미러링·Hyper-V 방화벽 규칙까지 해야 했다. 김창식이 준 <code>test.c</code>(winsock으로 만든 작은 채팅)처럼 윈도우에서 바로 빌드해 쓰게 했다.</p>
+<p><b>어떻게:</b> 파일을 나누지 않고 <code>deolmi.c</code> 맨 위에 <code>#ifdef _WIN32</code> 부분을 두어 윈도우와 다른 곳만 바꿨다. 리눅스 쪽 동작은 그대로다.</p>
+<ul>
+<li><b>소켓</b> — winsock(<code>WSAStartup</code>·<code>closesocket</code>·<code>ioctlsocket</code>·<code>WSAPoll</code>). 오류는 윈도우가 주는 한국어 설명으로 띄운다. 윈도우에서는 <code>SO_REUSEADDR</code>가 "같은 포트를 둘이 쓰기"라서 뺐다.</li>
+<li><b>키보드</b> — <code>test.c</code>는 입력용 스레드를 따로 두지만, 덜미는 치는 줄을 맨 아래에 다시 그리는 화면이라 스레드 없이 같은 구조를 지켰다. 소켓은 <code>WSAPoll</code>로 0.05초씩 기다리고 그 사이 키보드를 따로 본다. 키는 콘솔 함수로 하나씩 받아 UTF-8로 바꾼다.</li>
+<li><b>한글</b> — 화면을 UTF-8로 바꾸고, 명령줄의 이름도 UTF-8로 다시 받는다 (그대로 두면 윈도우에서 들어온 한글 이름이 리눅스 쪽에서 깨진다). 글자 폭은 윈도우에 <code>wcwidth</code>가 없어서 직접 잰다.</li>
+<li><b>주소 표시</b> — 윈도우는 가상 장치가 많아서, 인터넷 쪽으로 UDP <code>connect</code>만 해 보고 운영체제가 고른 주소 하나를 보여 준다. 방화벽 창에서 '액세스 허용'을 누르라는 안내도 뜬다.</li>
+</ul>
+<p><b>확인:</b> Visual Studio 2026으로 가장 엄격한 경고(<code>/W4</code>)에서도 경고 0 · 리눅스 테스트 그대로 통과 · 윈도우↔윈도우, 윈도우 방장↔리눅스 참가자, 리눅스 방장↔윈도우 참가자 대화(한글 이름, <code>/dm</code>) · Windows Terminal과 같은 방식(의사 콘솔)으로 실제 키를 쳐 넣어 한글·지우기·화살표·긴 줄·이모지·Ctrl+C 확인. 이모지가 사라지던 문제를 이 확인에서 찾아 고쳤다 (윈도우는 자판에 없는 글자를 "Alt 키를 뗐다"는 신호에 실어 보낸다).</p>
+<p class="sub">확인 못 한 것: MinGW(gcc)로 하는 윈도우 빌드, 노트북 두 대 사이 실제 접속.</p></div>
+
+<div class="ev"><span class="d">11-04 오후</span>
+<h3>방향: 방장이 서버 — 중계만 하는 서버 모드(<code>--server</code>)는 뺐다</h3>
+<p class="who">결정 <span class="u">김창식</span> — "1대1이든 다수의 참여자가 있는 채팅이든간에 방장이 서버를 열고 나머지가 참여하는 방식을 사용할것", "없애" · 반영 <span class="c">Claude</span></p>
+<p><b>정한 것:</b> 덜미는 P2P(모두가 서로 직접 연결)가 아니다. 방장만 서버가 되고 나머지는 참가자로 들어온다. 1:1이든 여럿이든 같은 방식이다. 그래서 따로 띄우던 중계 전용 서버 모드를 뺐다.</p>
+<p><b>암호화는 여전히 필요한가:</b> 팀에서 "P2P면 중계자가 없어 운영자가 훔쳐볼 수 없으니 암호화가 필요 없다"는 의견이 나왔다. 김창식의 판단은 "암호화가 막으려는 대상은 중계자만이 아니라 <b>둘 사이 네트워크 경로의 제3자</b>이기도 해서 완전히 필요 없는 건 아니다"였다. Claude가 한 가지를 더했다: 덜미에서는 셋 이상이면 <b>방장이 남들끼리의 글도 중계</b>하므로, 방장 컴퓨터도 참가자끼리 암호화해야 하는 길목이다. <a href="../plan/#goal">암호화 계획 01</a>에 반영했다.</p>
+<ul>
+<li><code>deolmi.c</code> — 서버 모드, 서버 창의 <code>[relay]</code> 줄, 서버 안내 화면을 지우고 ③ 중계 칸을 방장 전용으로 정리했다.</li>
+<li>테스트 — <code>make test</code>가 서버 대신 방장 <code>H</code>를 켜고 돈다. 방장의 HELLO를 받는지, 방장 이름으로 못 들어오는지, 방장에게 보낸 글이 남에게 안 가는지 2개를 더해 27개.</li>
+<li>사이트 — 설명서(켜는 방식 두 가지, 한 통이 가는 길을 방장 기준으로 다시, 윈도우 설명), 시작하기(윈도우를 먼저), 암호화 계획(P2P 질문, 서버 창 예시 바꿈)을 고쳤다. 암호화 계획 페이지에서 <code>crypto.c</code>·<code>vault.c</code> 줄 수가 <code>deolmi.c</code> 줄 수로 잘못 나오던 것도 고쳤다 (273줄·304줄).</li>
+</ul>
+<p><b>확인:</b> 리눅스 <code>make test</code> 27개 통과, 윈도우 경고 0, 윈도우 방장↔참가자 대화와 실제 키 입력 다시 확인. 설명서의 "한 통이 가는 길" 화면은 방장 민지·참가자 수빈·현우를 실제로 띄워 얻은 출력이다.</p></div>
+
+<div class="ev"><span class="d">11-05</span>
+<h3>통신만 남김 — 패킷에서 암호화 자리를 뺐다</h3>
+<p class="who">요청 <span class="u">김창식</span> — "암호화 토대를 빼고 우선 통신이 되는 코드만 넣어줘. 암호화는 아직 안했다는 가정하에" · 구현·시험 <span class="c">Claude</span></p>
+<p><b>왜:</b> 평문 <code>deolmi.c</code>에 암호화를 나중에 얹으려고 미리 맞춰 둔 자리가 남아 있었다. 쓰지 않는 칸을 0으로 채워 보내는 코드라 "통신만 하는 프로그램"으로 읽기에 헷갈렸다.</p>
+<ul>
+<li><b>헤더</b> — <code>seq</code>(8바이트)·<code>nonce</code>(24바이트) 필드를 뺐다. 헤더는 종류·보낸 사람·받을 사람 <b>33바이트</b>(전에는 65). "안녕" 한 통이 76바이트에서 43바이트가 됐다.</li>
+<li><b>HELLO</b> — 키 자리였던 본문 128바이트(늘 0)를 뺐다. 이름만 보낸다. "HELLO 길이가 잘못됨" 검사도 없어졌다.</li>
+<li><b>패킷 종류</b> — 금고용 VAULT·OPEN_REQ·SHARE·PROOF를 뺐다. HELLO(1)·MSG(2)·SYS(3)만 남았다. 참가자가 MSG 말고 다른 걸 보내면 "모르는 type".</li>
+<li><b>전체 대화</b> — 전에는 사람마다 한 통씩 따로 보냈다(사람마다 키가 다를 것을 대비한 방식). 이제는 받을 사람을 비운 <b>한 통</b>을 보내고 방장이 모두에게 나눠 준다. 본문 맨 앞의 "모두에게/1:1" 바이트도 필요 없어져서 뺐다 — 받을 사람 필드로 안다.</li>
+<li><b>입장</b> — 새 사람에게만 기존 사람들의 HELLO를 준다. 기존 사람은 "○○ 입장" 알림으로 새 사람을 안다 (전에는 키를 나누려고 양쪽에 HELLO를 줬다).</li>
+<li>테스트 — seq·nonce 확인을 빼고, "HELLO 길이"·"VAULT도 그대로" 대신 "받을 사람이 빈 한 통이 모두에게 감", "보낸 사람에게는 안 돌아옴"을 넣었다. 그대로 27개.</li>
+<li>사이트 — 설명서 04~08·15와 첫 화면의 "바이트 직접 쳐 보기", 암호화 계획(지금 상태 설명, 바뀌는 곳 표, 만드는 순서 E1·E3·V1, 금고 종류 번호 4~7)을 새 모양에 맞췄다.</li>
+</ul>
+<p><b>확인:</b> 리눅스 <code>make test</code> 27개 통과(경고 0) · 방장 + 참가자 둘을 실제로 띄워 전체 대화·<code>/dm</code>·방장에게 1:1·<code>/who</code>가 각 화면에 맞게 뜨는지(1:1은 받는 사람에게만) · 윈도우 Visual Studio 빌드 경고 0, 윈도우 방장↔참가자 대화. 폴더의 <code>deolmi.exe</code>도 새로 빌드한 것으로 바꿨다 — 패킷 모양이 바뀌어 <b>예전 버전과는 대화가 안 된다</b>(둘 다 새로 빌드해야 한다).</p></div>
+
+<div class="ev"><span class="d">11-05 저녁</span>
+<h3>제출용으로 줄이기 — 윈도우 전용, 1140줄 → 557줄</h3>
+<p class="who">요청 <span class="u">김창식</span> — "코드가 왜 이렇게 커?", "wsl 없이 윈도우에서 하게 하는 코드는 짧았잖아. 뭔가 쓸데없는건 빼줘", "일단 윈도우만 넣어줘", "16명 제한 빼줘", "당연한건 빼고, 기능들을 설명하는 거를", "함수 이름이랑 변수 이름을 … 한눈에 알아보기도 쉽고 쓰기도 쉬운 이름들로", "만든 사람 빼" · 구현·시험 <span class="c">Claude</span></p>
+<p><b>왜:</b> 프밍기2 중간결과물(코드, 개인별)로 낼 코드라서, 팀원이 한눈에 읽을 수 있게 줄였다. 테스트하기 힘든 리눅스·맥 부분은 뺐다.</p>
+<ul>
+<li><b>윈도우 전용</b> — 리눅스·맥 코드(<code>#ifdef _WIN32</code>로 나눠 둔 부분)를 뺐다.</li>
+<li><b>입력 방식</b> — 키를 한 글자씩 받아 입력 줄을 다시 그리던 화면 처리를 빼고, 입력 스레드가 한 줄씩 받는 방식으로 바꿨다. 김창식이 준 <code>test.c</code>와 같은 구조다. 받기는 <code>poll</code> 대신 <code>select</code>. 글을 치는 도중에 남의 글이 오면 치던 줄 사이에 끼어 보이지만, 치던 내용은 그대로 간다.</li>
+<li><b>인원 제한</b> — 16명 제한과 "방이 꽉 찼습니다"를 뺐다. 사람을 담는 배열만 60칸이다(윈도우 <code>select</code>가 한 번에 64개까지 본다).</li>
+<li>그 밖에 뺀 것 — 접속 5초 제한, 여러 주소를 찾아 보여 주기(이제 주소 하나), 긴 시작 안내문과 <code>/help</code>, 같은 사람이 HELLO를 두 번 보내는 경우 검사, 맨 위 설명 주석(만든 사람 포함).</li>
+<li><b>주석과 이름</b> — 주석은 기능 설명만 짧게. 이름은 풀어 썼다: <code>net_listen</code>→<code>open_room</code>, <code>conn_take</code>→<code>take_packet</code>, <code>handle_hello</code>→<code>handle_join</code>, <code>serve</code>→<code>read_from_client</code>, <code>send_sys</code>→<code>send_notice</code>, <code>peers</code>→<code>members</code>, <code>T_SYS</code>→<code>TYPE_NOTICE</code> 등.</li>
+<li><b>창을 클릭하면 멈추던 문제</b> — 실제 콘솔 창으로 시연하다가 찾았다. 윈도우 콘솔은 창을 클릭하면 "선택" 모드가 되어 그 프로그램의 화면 출력이 멈추는데, 방장이면 방 전체 중계가 멈춘다. 켤 때 빠른 편집 모드를 끄게 했다.</li>
+</ul>
+<p><b>확인:</b> Visual Studio 가장 엄격한 경고(<code>/W4</code>)에서 경고 0 · 자동 테스트를 윈도우로 옮김(<code>tests\run.bat</code>, 26개 — 16·17명 검사 2개를 빼고 "20명째도 들어옴"을 넣었다) · 실제 콘솔 창 4개로 시연(입장·전체 대화·1:1·<code>/who</code>·같은 이름 거절·나가기·나간 사람에게 <code>/dm</code>) · 키보드로 친 한글·이모지 · 빠른 편집은 수정 전 켜짐/수정 후 꺼짐을 콘솔 설정값으로 확인하고, 수정 후 방장 창을 실제 마우스로 클릭해도 글이 계속 오는 것을 봤다.</p></div>
+
+<div class="ev"><span class="d">11-05 밤</span>
+<h3>Visual Studio에서 F5로 바로 실행</h3>
+<p class="who">요청 <span class="u">김창식</span> — "VS에서 작동하게 하면 안돼? 빌드말고 그냥 저거 바탕화면에 있는거 들어가서" · 구현·시험 <span class="c">Claude</span></p>
+<p><b>왜:</b> 명령 프롬프트에서 <code>cl /utf-8</code>로 빌드하고 이름을 붙여 켜야 했다. Visual Studio에서 열고 실행 버튼만 누르면 되게 했다.</p>
+<ul>
+<li><b>한글</b> — VS 새 프로젝트는 <code>/utf-8</code> 옵션이 없어서 화면 한글이 깨진다. 코드 파일 앞에 UTF-8 표시(BOM)를 넣고 <code>#pragma execution_character_set("utf-8")</code> 한 줄을 넣어 옵션 없이도 안 깨지게 했다.</li>
+<li><b>그냥 켜면 묻기</b> — 이름 없이 켜지면(F5, exe 더블클릭) 이름 → 1 방장 / 2 참가자 → 주소를 묻는다. 잘못되면 다시 묻는다. 명령줄로 켜는 방식도 그대로 된다.</li>
+<li><b>프로젝트 파일</b> — <code>deolmi.sln</code>·<code>deolmi.vcxproj</code>(VS 기본 설정 그대로). <a href="../code/">코드</a> 페이지와 <a href="../run/">시작하기</a>에서 <code>deolmi_vs.zip</code>으로 받는다.</li>
+</ul>
+<p><b>확인:</b> VS 기본 설정으로 빌드 경고 0 · exe 안의 한글이 UTF-8로 들어간 것을 확인 · 실제 Visual Studio로 <code>deolmi.sln</code>을 열어 실행(방장)하고, exe를 더블클릭한 창 2개(참가자)와 대화 · 띄어쓰기 넣은 이름은 다시 묻는 것까지. 화면은 <a href="../run/#chat">시작하기</a>에 옮겨 두었다.</p></div>
+
+<div class="ev"><span class="d">11-06</span>
+<h3>주석·화면 글 정리, 기능 사이 띄우기</h3>
+<p class="who">요청 <span class="u">김창식</span> — "기능들을 따로 보기 편하게", "실행했을 때 보이는 것도 바꿔야지" · 구현·시험 <span class="c">Claude</span></p>
+<ul>
+<li><b>주석</b> — 구역 머리의 띠와 ①~⑤ 번호를 빼고 <code>//</code> 한 줄 주석으로 줄였다. 함수 이름만 봐도 아는 주석은 지웠다. 이 사이트에서는 ①~⑤ 칸 이름을 그대로 쓴다.</li>
+<li><b>빈 줄</b> — 함수·덩어리 사이를 4줄씩 띄웠다 (586줄 → 696줄). 함수 안은 그대로다.</li>
+<li><b>화면 글</b> — <code>·</code> <code>→</code> <code>—</code> 같은 특수 문자를 빼고 말투를 "~습니다"로 맞췄다. 예: <code>덜미 - 창식 (방장)</code>, <code>[수빈 -&gt; 나] 안녕</code>. 설명서·시작하기의 화면 예시도 같이 바꿨다.</li>
+</ul>
+<p><b>확인:</b> 주석·문자열을 뺀 코드는 이전과 같다 · 자동 테스트 26개 통과 · 방장과 참가자를 띄워 입장·전체 대화·1:1·<code>/who</code>·없는 이름·잘못된 명령·퇴장 화면을 봤다.</p>
+<p class="sub">이 버전이 11-06 중간결과물로 낸 코드다 (git 태그 <code>midterm-submit</code>).</p></div>
+
+<div class="ev"><span class="d">11-06 오후</span>
+<h3>최종 방향: 방장도 못 믿는 메신저 — 암호화 + 입장 심사 + 장부 대조</h3>
+<p class="who">방향 결정 <span class="u">김창식</span> — "교수님이 창의성을 중시하신다, 채팅 + 암호화는 시중에 너무 많다", "다른 플랫폼의 어떤 문제를 어떻게 보완하는지", "2026년 자료로", "그 방향으로 확정, 바로 진행" · 조사·설계·구현·시험 <span class="c">Claude</span></p>
+<ul>
+<li><b>왜</b> — 카카오톡·인스타·디스코드·텔레그램·문자·시그널·WhatsApp의 2026년 빈틈을 조사해 보니, 암호 자체보다 <b>몰래 들어온 사람</b>(2026 시그널 기기 연결 피싱)과 <b>사람마다 다른 대화</b>(USENIX Security 2026 「Send and Pretend」)가 남은 빈틈이었다. 표는 <a href="../plan/#why">계획 00</a>.</li>
+<li><b>암호화</b> — 헤더 33 → 65바이트(번호 8, nonce 24). 신원 키(Ed25519)로 서명한 HELLO, 접속마다 새 세션 키(X25519), 받을 사람마다 따로 XChaCha20-Poly1305, 한 통마다 키를 돌림. 11-02 버전의 "평문 섞기" 대신 <b>표준 대칭 래칫</b> — 한 통이 빠져도 대화가 이어져야 장부 대조가 쓸모 있어서.</li>
+<li><b>입장 심사</b> — 새 사람은 기존 멤버 전원이 단어 8개를 확인하고 <code>/ok</code> 해야 글을 받는다. 승인은 암호화해서 알려 방장이 못 꾸민다. 승인한 키는 <code>known</code> 파일에 기억 → 같은 키는 자동 승인, 같은 이름·다른 키는 경고.</li>
+<li><b>장부 대조</b> — 사람별 전체 글 해시 사슬. 글 안에 번호와 앞 값을 넣고, 2초마다(새 글이 있으면)·<code>/check</code>로 맞춰 본다. 다르면, 빠지면 <code>[덜미]</code>.</li>
+<li><b>시연 모드</b> — <code>/twoface</code>, 방장 <code>/drop</code> <code>/tamper</code>. 11-03엔 공격 명령을 뺐지만, 최종 단계에서 "예전에 뺀 건 상관없다"(김창식)로 다시 넣었다.</li>
+<li><b>libsodium</b> — 1.0.22 공식 Visual Studio 빌드를 받아 minisign 서명을 확인하고 <code>libsodium\</code> 폴더에 넣음. 이 빌드가 C 런타임을 정적으로 써서 프로젝트도 /MT·/MTd. git이 .lib를 글자 파일로 보고 줄바꿈을 바꾸려 해서 <code>.gitattributes</code>에 binary로 지정.</li>
+<li><b>조사 중 고친 것</b> — 시험해 보니 ① 보낸 사람의 첫 글이 빠지면 "원래 0개"와 구분이 안 됨 → 멤버로 받아 줄 때 "여기서부터" 장부를 한 번 보냄 ② 나중에 들어온 사람은 기존 멤버 키를 안 적어 둬서 다시 접속할 때 자동 승인이 안 됨 → 처음 본 키로 적어 둠 ③ 이름 뒤 조사가 "창식가"처럼 어색함 → 받침에 맞게.</li>
+</ul>
+<p><b>확인:</b> 자동 테스트 85개 통과 (그때) · Visual Studio Debug·Release 빌드 경고 0 · 사이트의 <code>deolmi_vs.zip</code>을 빈 폴더에 풀어 처음 받는 사람처럼 빌드됨.</p></div>
+
+<div class="ev"><span class="d">11-06 저녁</span>
+<h3>화면 지키기 — 찍으면 가려지고, 새면 잡힌다</h3>
+<p class="who">요청 <span class="u">김창식</span> — "창의성이 좀 떨어지는 것 같다, 더 창의적이게", "카메라를 켜서 손날 가림막처럼 핸드폰을 인식하면 덜미가 잡히게", "같이 하자" · 설계·구현·시험 <span class="c">Claude</span></p>
+<ul>
+<li><b>왜</b> — 입장 심사는 시그널의 안전 번호 확인과, 장부 대조는 학계 연구와 닮아 "이미 있는 것"으로 보일 수 있었다. 그래서 누구나 겪는 문제인 <b>캡처</b>로 넓혔다. 2026년 9월 치협 선관위 단톡방(19명) 캡처가 소송 증거로 나왔는데 누가 흘렸는지 찾지 못했다 (<a href="../plan/#why">계획 00</a>).</li>
+<li><b>카메라 지킴이</b> (<code>/eye</code>, 김창식 아이디어) — python 도우미가 MediaPipe 물체 인식으로 화면을 향한 휴대폰이나 가려진 렌즈를 찾아 한 단어만 덜미에 보낸다. 덜미는 빈 화면 버퍼로 바꿔 끼워 글을 가리고, 방 사람들에게 <code>EYE</code> 패킷(암호화, 1바이트)으로 알린다. 영상은 저장·전송하지 않는다. 덜미가 꺼지면 도우미도 같이 꺼진다(job 객체).</li>
+<li><b>유출 추적</b> (<code>/trace</code>) — 카메라만으로는 키보드 캡처를 못 봐서 같이 넣었다. 두 사람 신원 키로 만든 표식 키로, 받은 글의 칸을 4칸에 1칸꼴로 두 칸 띄운다. 새어 나간 줄을 넣으면 사람마다의 표식을 다시 만들어 맞춰 본다. 내가 보낸 글만 되고, 덜미 첫 화면에 이 사실을 알린다.</li>
+<li><b>카메라 준비.bat</b> (요청 <span class="u">김창식</span> "덜미 파일을 다운 받으면 저것도 함께 다운받게") — 실행 파일로 묶으면 80MB 안팎이라, zip은 그대로 두고 한 번 더블클릭하는 준비 파일을 넣었다. python이 없으면 winget으로 3.12를 내 계정에만 깔고 <code>mediapipe==1.2.0</code>(opencv가 같이 깔림)을 받는다. winget으로 깐 python은 PATH에 안 들어갈 수 있어서, 찾은 위치를 <code>eye\python.txt</code>에 적고 덜미가 그걸 먼저 쓴다. 카메라 프로그램이 바로 꺼지면 20초를 기다리지 않고 곧장 "카메라 준비.bat을 실행하세요"를 띄운다. <b>확인:</b> python이 PATH에 있을 때와 없을 때(윈도우 스토어 바로 가기만 있을 때) 둘 다 준비가 끝나고 <code>/eye</code>가 켜짐, winget에 python 3.12가 있음. <b>아직:</b> python이 아예 없는 노트북에서 winget으로 새로 까는 과정.</li>
+<li><b>시험하다 고친 것</b> — ① 다시 들어온 사람에게 카메라 상태가 안 갔나 했는데, 그 순간 "가려짐"이라 다른 문구로 간 것이었다 (테스트를 고침) ② 실제 창에서 가림막 화면을 읽어 보려니 다른 프로그램이 못 열게 돼 있었다 (공유 허용으로) ③ <code>x64\Debug\deolmi.exe</code>를 더블클릭하면 도우미를 못 찾았다 → exe 위쪽 폴더에서도 찾게 ④ "추적되는 방이라고 알린다"고 해 놓고 안내 줄이 빠져 있었다 → 첫 화면에 추가.</li>
+</ul>
+<p><b>확인:</b> 자동 테스트 105개 통과 · Debug·Release 빌드 경고 0 · 최소화한 실제 콘솔 창에서 휴대폰 신호 때 가림막으로 바뀌고 돌아오는 것을 화면 내용으로 확인 · 진짜 도우미를 노트북 카메라로 12초 돌려 휴대폰 없이 잘못 잡은 것 0 · 샘플 사진 5장 모두 휴대폰 찾음. <b>실제 휴대폰을 들어 보는 건 아직</b> (김창식 확인 필요).</p></div>
+</div>
+</section>
+<section class="t sec rise" id="check">
+<h2 id="check"><span class="n">02</span>어떻게 확인했나</h2>
+<h3>자동 테스트 — <code>tests\run.bat</code>, 105개 모두 통과 (11-06 저녁)</h3>
+<p>Visual Studio 개발자 명령 프롬프트에서 <code>tests\run.bat</code> 하나로 빌드부터 끝까지 돈다.</p>
+<ul>
+<li><b>키 30개</b> (<code>test_crypto</code>, 방장 없이) — 같은 키면 같은 단어 8개 · HELLO의 이름·세션 키를 바꿔치기하면 서명이 안 맞음 · 방향별 키가 서로 맞물림 · 암호문에 평문 없음 · 1바이트 바뀐 암호문·받을 사람이나 번호를 바꾼 헤더는 안 열리고 키도 안 돌아감 · 한 통 빠져도 다음 통은 열림 · 장부 값은 한 글자·번호만 달라도 다르고, 한 번 달라지면 뒤로도 계속 다름 · 표식 키는 두 사람이 같은 값을 만들고 받는 사람마다 다름 · 같은 글도 받는 사람마다 띄어쓰기가 다르고, 두 칸을 줄이면 원래 글 · 두 칸은 4칸에 1칸꼴</li>
+<li><b>패킷 5개</b> (<code>test_net</code>) — 쪼개져 온 바이트, 붙어 온 두 통, 말도 안 되는 길이, 본문 0바이트, 번호·nonce가 그대로 전달됨</li>
+<li><b>중계 24개</b> (<code>test_server</code>) — 서명한 HELLO만 등록, 서명이 틀리면 거절 · 새 사람은 이미 있던 사람들의 HELLO(번호 1, 방장은 마지막 번호 2)를, 있던 사람들은 새 사람의 HELLO를 받음 · 같은 이름·빈 이름·방장 이름 거절 · 받을 사람에게만 · APPROVE·LEDGER도 그대로 넘김 · 받을 사람이 빈 글은 아무에게도 안 감 · 남의 이름 막기 · 20명째도 들어옴</li>
+<li><b>시나리오 46개</b> (<code>e2e.py</code>) — 방장 H와 참가자 A·B·C를 실제 <code>deolmi.exe</code>로 띄움: 승인 전엔 글이 안 감 → 전원 승인해야 멤버 → 전체·1:1 대화(1:1은 방장 화면에도 없음) → <code>/check</code> 모두 같음, 정상 대화에선 경고 0 → 두 얼굴을 B·C·H가 모두 잡고 보낸 A에게도 보임 → 방장이 버린 글을 장부와 번호로 잡음 → 1바이트 바꾼 글은 버리고 대화는 이어짐 → 같은 글이 H·B·C 화면에서 띄어쓰기가 서로 다르고, B·C 화면의 줄로 <code>/trace</code> 하면 각각 B·C를 찾음, 남의 글은 추적 안 함 → 가짜 카메라로 <code>/eye</code>: 휴대폰·가림을 방 사람 모두가 알고, 나중에 들어온 사람도 앎, 끄면 알림 → 같은 키로 다시 오면 자동 승인 → 같은 이름·다른 키면 경고하고 자동 승인 안 함</li>
+</ul>
+<h3>둘이서 채팅 — 직접 돌림</h3>
+<p>한 컴퓨터에서 프로그램 두 개를 띄우고, 정해 둔 순서대로 글을 넣어 양쪽 화면을 확인했다. 전체 대화, <code>/dm</code> 1:1, <code>/who</code>, 나가기까지 모두 맞게 떴다. 화면은 <a href="../run/#chat">시작하기</a>에 옮겨 두었다.</p>
+<ul>
+<li><b>방장 모드</b> — 민지(<code>--host</code>)와 현우</li>
+<li><b>셋이서</b> — 방장 민지 + 수빈 + 현우. 수빈이 모두에게 보낸 글이 방장 화면과 현우 화면에 뜨는 것까지 확인 (<a href="../guide/#path">설명서 06</a>)</li>
+<li><b>실제 창</b> — 콘솔 창 4개로 시연, Visual Studio로 켠 방장 + exe 더블클릭 참가자 (위 11-05)</li>
+</ul>
+<p>위 자동 테스트와 시뮬레이션은 <span class="c">Claude</span>가 돌렸고, 평문 버전을 실제 노트북에서 띄워 대화해 본 것은 <span class="u">김창식</span>이다. <b>11-06 최종 버전은 아직 사람이 직접 창을 띄워 해 보지 않았다.</b> 카메라 지킴이도 진짜 휴대폰을 들어 본 건 아직이다.</p>
+<div class="tip"><b>아직 확인 못 한 것</b> — 다른 컴퓨터에서 접속: 11-03 다른 데스크탑에서 시도했지만 연결이 이 노트북까지 오지 않았다. 학교 와이파이(SSU_INFO_WI-FI)가 기기끼리 연결을 막는 것으로 보고, 휴대폰 핫스팟으로 다시 해 볼 예정.</div>
+</section>
+<section class="t sec rise" id="s03">
+<h2 id="s03"><span class="n">03</span>deolmi.c 지도</h2>
+<p>위에서부터 이 순서로 놓여 있다. 고치고 싶은 게 있으면 해당 칸부터 보면 된다.</p>
+<div class="tbl"><table class="map">
+<tr><th>칸 (코드 속 제목)</th><th>하는 일</th><th>주요 함수</th></tr>
+<tr><td>① 통신</td><td>패킷 모양(헤더 65), 접속, 길이 붙여 보내기, 한 통씩 꺼내기</td><td><code>open_room</code> <code>connect_to_host</code> <code>send_packet</code> <code>take_packet</code> <code>header_ad</code></td></tr>
+<tr><td>② 키</td><td>단어 지문, 서명한 HELLO, 방향별 시작 키, 래칫 암호화·복호화, 장부 해시, 띄어쓰기 표식 — 네트워크를 모르는 순수 함수라 테스트가 바로 가져다 씀</td><td><code>key_words</code> <code>hello_make</code> <code>hello_ok</code> <code>start_keys</code> <code>seal_packet</code> <code>open_packet</code> <code>ledger_next</code> <code>mark_key</code> <code>mark_text</code></td></tr>
+<tr><td>③ 화면 · 파일 · 사람</td><td>글 찍기, 이름 검사, 신원 키·known 파일, 방에 있는 사람(키·래칫·승인·장부)</td><td><code>print_line</code> <code>trim</code> <code>open_my_file</code> <code>load_identity</code> <code>load_known</code> <code>check_known</code> · <code>struct person</code></td></tr>
+<tr><td>④ 중계</td><td>방장이 하는 일. HELLO 서명 확인·등록·넘기기, 받을 사람에게 넘기기, 시연 <code>/drop</code> <code>/tamper</code></td><td><code>handle_join</code> <code>handle_packet</code> <code>host_send</code> <code>remove_client</code></td></tr>
+<tr><td>⑤ 대화</td><td>한 사람에게 암호화해 보내기, 받은 통 열기(다시 보내기·빠짐·바뀜 검사)</td><td><code>send_to</code> <code>open_from</code></td></tr>
+<tr><td>⑥ 입장 심사</td><td>승인 모으기, 멤버가 되면 "여기서부터" 장부, HELLO 받기</td><td><code>check_admitted</code> <code>approve</code> <code>on_approve</code> <code>on_hello</code></td></tr>
+<tr><td>⑦ 장부 대조</td><td>장부 쌓기·대조, 1초마다 확인</td><td><code>book_add</code> <code>send_stamp</code> <code>on_stamp</code> <code>tick</code></td></tr>
+<tr><td>⑧ 카메라 지킴이 · 유출 추적 · 받기 · 명령어</td><td>도우미 켜고 끄기, 한 단어 받기, 글 가리기, <code>EYE</code> 알림, <code>/trace</code>, 받은 패킷 나누기(표식 넣어 보여 주기), 보내기, 명령어, 입력 스레드</td><td><code>start_eye</code> <code>read_eye</code> <code>set_eye</code> <code>hide_screen</code> <code>on_eye</code> <code>trace</code> <code>on_message</code> <code>handle_incoming</code> <code>send_message</code> <code>handle_input</code></td></tr>
+<tr><td>⑨ main</td><td>이름·방장/참가자 묻기, 신원 키·세션 키, 그다음 <code>select</code>(1초마다 깨어 <code>tick</code>)</td><td><code>main</code></td></tr>
+</table></div>
+</section>
+<section class="t sec rise" id="s04">
+<h2 id="s04"><span class="n">04</span>다음에 할 일</h2>
+<ul>
+<li>실제 창으로 손으로 해 보기 — 한 노트북에서 창 넷(방장 + 셋)으로 입장 심사와 시연 셋, 그리고 <b>진짜 휴대폰을 카메라 앞에 들어 보기</b>와 <code>/trace</code> (<a href="../run/#screen">시작하기 06</a>)</li>
+<li>노트북 두세 대로 실제 접속 (같은 핫스팟)</li>
+<li><a href="../guide/">설명서</a>를 새 프로그램 기준으로 다시 쓰기 — 지금 설명서의 패킷·HELLO 그림은 평문 버전 기준이다</li>
+<li>시간이 남으면 2인 잠금 금고 (<a href="../plan/#vault">계획 15~18</a>)</li>
+<li>최종 제출(12-04: PPT 10장 이상·최종 코드·회의록 8회 이상)과 발표(12-09, 개인 3분) 준비</li>
+</ul>
+</section>
+</main>
+</div>
+<footer class="end">
+  <div class="e-by"><p><b>김창식</b> — 기획 · 결정 · 실제로 돌려 보고 문제 찾기</p><p><b>Claude</b> (Anthropic의 AI) — 코드와 이 사이트 작성</p><p><a href="../log/#who">누가 무엇을 했나 자세히</a></p></div>
+  <nav class="e-nav" aria-label="덜미 페이지"><ul><li><a href="../guide/">설명서</a></li><li><a href="../run/">시작하기</a></li><li><a href="../code/">전체 코드</a></li><li><a href="../plan/">암호화 계획</a></li><li><a href="../log/" aria-current="page">작업 기록</a></li><li><a href="/">창업실로</a></li></ul></nav>
+  <a class="e-next" href="../guide/"><span>다음 페이지</span><b>설명서 <span aria-hidden="true">→</span></b></a>
+  <p class="e-word" aria-hidden="true">덜미<i>.</i></p>
+</footer>
+</div>
+<script src="../site.js" defer></script>
+</body>
+</html>

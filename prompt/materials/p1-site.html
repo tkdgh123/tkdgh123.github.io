@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>책상 하나 · 스터디카페</title>
+<style>
+  :root { --bg:#16332a; --bg2:#1d4034; --ink:#f1f4ef; --mute:#a9bcb2; --line:#3c5e51; --taken:#4d6359; --acc:#ff8a3d; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.6 "Pretendard","Apple SD Gothic Neo","Malgun Gothic",sans-serif; }
+  header { position:sticky; top:0; z-index:5; display:flex; align-items:center; justify-content:space-between; padding:0 32px; height:76px; background:var(--bg); transition:height .25s, box-shadow .25s; }
+  header.small { height:52px; box-shadow:0 6px 18px rgba(0,0,0,.35); }
+  .logo { font-size:22px; font-weight:800; letter-spacing:-.5px; transition:font-size .25s; }
+  header.small .logo { font-size:18px; }
+  .logo i { display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--acc); margin-left:3px; vertical-align:2px; }
+  nav a { color:var(--mute); text-decoration:none; margin-left:24px; font-size:15px; }
+  nav a:hover { color:var(--ink); }
+  .hero { padding:40px 32px 8px; }
+  .hero h1 { font-size:34px; line-height:1.3; margin:0 0 10px; letter-spacing:-1px; }
+  .left { color:var(--mute); font-size:15px; }
+  .left b { color:var(--acc); font-size:20px; }
+  .map { padding:20px 32px 40px; }
+  .window { font-size:12px; color:var(--mute); letter-spacing:4px; margin-bottom:8px; }
+  .grid { display:grid; grid-template-columns:repeat(6, 64px); gap:10px; }
+  .seat { height:52px; border-radius:8px; border:1.5px solid var(--line); background:transparent; color:var(--ink); font:600 14px inherit; font-family:inherit; cursor:pointer; position:relative; }
+  .seat:hover:not(.taken) { border-color:var(--ink); }
+  .seat.taken { background:var(--taken); border-color:var(--taken); color:#8fa59a; cursor:not-allowed; }
+  .seat.pick { background:var(--acc); border-color:var(--acc); color:#1a1a1a; }
+  .tip { position:absolute; left:50%; bottom:calc(100% + 8px); transform:translateX(-50%); white-space:nowrap; background:var(--ink); color:#16332a; font-size:13px; font-weight:600; padding:5px 10px; border-radius:6px; pointer-events:none; }
+  .legend { display:flex; gap:18px; margin-top:16px; font-size:13px; color:var(--mute); }
+  .legend span::before { content:""; display:inline-block; width:14px; height:14px; border-radius:4px; vertical-align:-2px; margin-right:6px; border:1.5px solid var(--line); }
+  .legend .t::before { background:var(--taken); border-color:var(--taken); }
+  section.info { padding:48px 32px; border-top:1px solid var(--line); }
+  section.info h2 { font-size:22px; margin:0 0 14px; }
+  .price { font-size:28px; font-weight:800; }
+  .price small { font-size:15px; color:var(--mute); font-weight:400; }
+  .note { color:var(--mute); }
+  footer { padding:28px 32px 120px; color:var(--mute); font-size:13px; border-top:1px solid var(--line); }
+  .bar { position:fixed; left:0; right:0; bottom:0; z-index:6; display:flex; align-items:center; gap:18px; flex-wrap:wrap; padding:16px 32px; background:var(--bg2); box-shadow:0 -8px 24px rgba(0,0,0,.35); transform:translateY(110%); transition:transform .3s; }
+  .bar.show { transform:none; }
+  .bar .who { font-weight:800; font-size:18px; min-width:72px; }
+  .hours button { font:inherit; font-size:14px; padding:6px 14px; margin-right:6px; border-radius:20px; border:1.5px solid var(--line); background:transparent; color:var(--ink); cursor:pointer; }
+  .hours button.on { border-color:var(--acc); color:var(--acc); }
+  .bar .sum { font-weight:800; font-size:18px; margin-left:auto; }
+  .go { font:inherit; font-weight:700; padding:10px 22px; border:0; border-radius:8px; background:var(--acc); color:#1a1a1a; cursor:pointer; }
+  .dim { position:fixed; inset:0; z-index:9; background:rgba(0,0,0,.55); display:flex; align-items:center; justify-content:center; }
+  .box { background:var(--ink); color:#16332a; border-radius:12px; padding:26px 28px 20px; width:300px; }
+  .box p { margin:0 0 20px; font-size:17px; font-weight:600; }
+  .box div { display:flex; justify-content:flex-end; gap:8px; }
+  .box button { font:inherit; padding:8px 18px; border-radius:8px; border:0; cursor:pointer; }
+  .box .no { background:#dfe5e0; }
+  .box .yes { background:var(--acc); font-weight:700; }
+  .toast { position:fixed; left:50%; top:90px; transform:translateX(-50%); z-index:10; background:var(--ink); color:#16332a; padding:10px 18px; border-radius:8px; font-weight:600; }
+  [hidden] { display:none !important; }
+  @media (max-width:560px) { nav { display:none; } .grid { grid-template-columns:repeat(6, 1fr); } }
+</style>
+</head>
+<body>
+<header id="hd">
+  <div class="logo">책상 하나<i></i></div>
+  <nav><a href="#seats">좌석</a><a href="#price">요금</a><a href="#way">오시는 길</a></nav>
+</header>
+
+<div class="hero">
+  <h1>오늘 앉을 자리,<br>미리 골라 두세요</h1>
+  <div class="left">남은 자리 <b id="left">11</b> / 30</div>
+</div>
+
+<div class="map" id="seats">
+  <div class="window">창 가</div>
+  <div class="grid" id="grid"></div>
+  <div class="legend"><span>빈 자리</span><span class="t">찬 자리</span></div>
+</div>
+
+<section class="info" id="price">
+  <h2>요금</h2>
+  <div class="price">3,000원 <small>/ 1시간</small></div>
+  <p class="note">2시간·4시간·6시간 단위로 예약할 수 있어요. 음료는 가져오셔도 돼요.</p>
+</section>
+
+<section class="info" id="way">
+  <h2>오시는 길</h2>
+  <p class="note">역 3번 출구에서 걸어서 2분, 꽃집 건물 2층이에요.<br>매일 오전 7시 ~ 새벽 2시</p>
+</section>
+
+<footer>책상 하나 스터디카페</footer>
+
+<div class="bar" id="bar">
+  <div class="who" id="who"></div>
+  <div class="hours" id="hours"><button data-h="2" class="on">2시간</button><button data-h="4">4시간</button><button data-h="6">6시간</button></div>
+  <div class="sum" id="sum"></div>
+  <button class="go" id="go">예약하기</button>
+</div>
+
+<div class="dim" id="dim" hidden>
+  <div class="box"><p id="ask"></p><div><button class="no" id="no">취소</button><button class="yes" id="yes">예약</button></div></div>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+  const rows = "ABCDE", free = new Set(["A1","A4","B2","B6","C3","C5","D1","D4","E2","E5","E6"]);
+  const grid = document.getElementById("grid"), bar = document.getElementById("bar");
+  let pick = null, hours = 2;
+  const won = n => n.toLocaleString("ko-KR") + "원";
+  function info(id) {
+    const tags = [];
+    if (id[0] === "A") tags.push("창가");
+    if (id[1] === "1" || id[1] === "6") tags.push("콘센트");
+    return [id, ...(tags.length ? tags : ["일반석"])].join(" · ");
+  }
+  for (const r of rows) for (let c = 1; c <= 6; c++) {
+    const id = r + c, b = document.createElement("button");
+    b.className = "seat" + (free.has(id) ? "" : " taken");
+    b.textContent = id; b.dataset.id = id;
+    b.onmouseenter = () => { if (b.classList.contains("taken")) return; const t = document.createElement("span"); t.className = "tip"; t.textContent = info(id); b.append(t); };
+    b.onmouseleave = () => b.querySelector(".tip")?.remove();
+    b.onclick = () => {
+      if (b.classList.contains("taken")) return;
+      if (pick === b) { b.classList.remove("pick"); pick = null; bar.classList.remove("show"); return; }
+      pick?.classList.remove("pick");
+      pick = b; b.classList.add("pick");
+      update(); bar.classList.add("show");
+    };
+    grid.append(b);
+  }
+  function update() {
+    document.getElementById("who").textContent = pick ? pick.dataset.id : "";
+    document.getElementById("sum").textContent = won(hours * 3000);
+  }
+  document.getElementById("hours").onclick = e => {
+    const h = e.target.dataset.h; if (!h) return;
+    hours = +h;
+    for (const x of e.currentTarget.children) x.classList.toggle("on", x === e.target);
+    update();
+  };
+  const dim = document.getElementById("dim");
+  document.getElementById("go").onclick = () => { document.getElementById("ask").textContent = `${pick.dataset.id} 자리, ${hours}시간 예약할까요?`; dim.hidden = false; };
+  document.getElementById("no").onclick = () => dim.hidden = true;
+  document.getElementById("yes").onclick = () => {
+    dim.hidden = true;
+    const id = pick.dataset.id;
+    pick.querySelector(".tip")?.remove();
+    pick.classList.remove("pick"); pick.classList.add("taken"); pick = null;
+    bar.classList.remove("show");
+    const left = document.getElementById("left"); left.textContent = +left.textContent - 1;
+    const t = document.getElementById("toast"); t.textContent = `${id} 자리를 예약했어요`; t.hidden = false;
+    setTimeout(() => t.hidden = true, 1800);
+  };
+  addEventListener("scroll", () => document.getElementById("hd").classList.toggle("small", scrollY > 30));
+</script>
+</body>
+</html>

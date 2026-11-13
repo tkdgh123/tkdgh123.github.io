@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>우리달</title>
+<meta name="description" content="둘이 같이 쓰는 달력">
+<meta name="theme-color" content="#FFE6EE">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="우리달">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&display=swap">
+<link rel="stylesheet" href="style.css">
+<script>try { const v = JSON.parse(localStorage.getItem("uridal")), k = localStorage.getItem("uridal-skin") || (v && v.me ? (v.me === "a" ? "sky" : "pink") : ""); if (k) document.documentElement.dataset.skin = k; } catch {}</script>
+<script type="module" src="app.js"></script>
+</head>
+<body>
+
+<div id="boot" class="boot"><img src="icon-192.png" alt="" width="84" height="84"><b>우리달</b><button class="link" id="bootReset" type="button" hidden>처음 화면으로</button></div>
+
+<!-- 처음 시작 -->
+<section id="setup" class="setup" hidden>
+  <div class="setup-top">
+    <img class="logo" src="icon-192.png" alt="" width="88" height="88">
+    <h1>우리달</h1>
+    <p>둘이 같이 쓰는 달력</p>
+  </div>
+
+  <div class="setup-body" id="setupChoose">
+    <button class="big" id="goNew" type="button">새 달력 만들기</button>
+    <button class="big ghost" id="goJoin" type="button">받은 코드로 들어가기</button>
+  </div>
+
+  <form class="setup-body" id="newForm" hidden>
+    <label class="who-in a">남자친구 : <input id="nA" required maxlength="12" autocomplete="off" placeholder="이름"></label>
+    <label class="who-in b">여자친구 : <input id="nB" required maxlength="12" autocomplete="off" placeholder="이름"></label>
+    <label>사귄 날 <input id="nStart" type="date" required></label>
+    <div class="me-pick"><span>나는</span><div class="seg two-way" id="nMe" data-v="a"><button type="button" class="a on" data-w="a">남자친구</button><button type="button" class="b" data-w="b">여자친구</button></div></div>
+    <button class="big" type="submit">만들기</button>
+    <button class="link back" type="button">뒤로</button>
+  </form>
+
+  <div class="setup-body" id="shareBox" hidden>
+    <p class="lead">이 코드를 상대에게 보내 주세요. 코드를 아는 사람만 달력을 볼 수 있어요.</p>
+    <output class="code" id="shareCode"></output>
+    <button class="big" id="copyLink" type="button">링크 보내기</button>
+    <button class="big ghost" id="startApp" type="button">시작하기</button>
+  </div>
+
+  <form class="setup-body" id="joinForm" hidden>
+    <label>받은 코드 <input id="jCode" required autocomplete="off" autocapitalize="characters" placeholder="XXXX-XXXX-XXXX-XXXX-XXXX"></label>
+    <button class="big" type="submit">들어가기</button>
+    <p class="err" id="jErr" hidden></p>
+    <button class="link back" type="button">뒤로</button>
+  </form>
+
+  <div class="setup-body" id="pickBox" hidden>
+    <p class="lead">나는 누구예요?</p>
+    <div class="pick" id="pickWho"></div>
+  </div>
+</section>
+
+<!-- 앱 -->
+<div id="app" class="app" hidden>
+  <header class="top">
+    <button class="codebtn" id="codeBtn" type="button">코드</button>
+    <button class="skinbtn" id="skinBtn" type="button" aria-label="화면 고르기"><i></i><i></i><i></i></button>
+    <button class="hpic" id="hPic" type="button" aria-label="키티 사진"></button>
+    <div class="couple"><span class="chip a" id="hA"></span><span class="beat" aria-hidden="true">♥</span><span class="chip b" id="hB"></span></div>
+    <b class="dnum" id="hD"></b>
+    <span class="next" id="hNext"></span>
+  </header>
+
+  <main>
+    <section id="tab-cal" class="tab">
+      <div class="pushask" id="pushAsk" hidden><span>상대가 일정·기분을 남기면 알림 받기</span><button class="pill" id="pushAskOn" type="button">켜기</button><button class="x" id="pushAskX" type="button" aria-label="닫기">×</button></div>
+      <div class="mhead">
+        <button class="icon" id="prevM" type="button" aria-label="이전 달">‹</button>
+        <h2 id="mTitle"></h2>
+        <button class="icon" id="nextM" type="button" aria-label="다음 달">›</button>
+        <button class="pill" id="todayBtn" type="button">오늘</button>
+      </div>
+      <div class="week"><span class="sun">일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span class="sat">토</span></div>
+      <div class="gwrap">
+        <div class="grid" id="grid"></div>
+        <div class="props" aria-hidden="true"><i class="bowbig"></i><i class="wh l"></i><i class="wh r"></i><i class="apple"></i><i class="apple s"></i><i class="milk"></i><i class="bear"></i></div>
+      </div>
+      <div class="agenda" id="agenda"></div>
+    </section>
+
+    <section id="tab-wish" class="tab" hidden>
+      <h2 class="ttl">하고 싶은 것</h2>
+      <form class="addrow" id="wishForm">
+        <div class="kinds" id="wishKinds">
+          <button type="button" class="on" data-k="place">장소</button>
+          <button type="button" data-k="food">맛집</button>
+          <button type="button" data-k="todo">할 것</button>
+        </div>
+        <div class="inline">
+          <input id="wishIn" required maxlength="60" placeholder="예: 서울숲 산책" autocomplete="off">
+          <button class="add" type="submit">추가</button>
+        </div>
+      </form>
+      <div id="wishList"></div>
+    </section>
+
+    <section id="tab-us" class="tab" hidden>
+      <div class="hero-d"><small>우리가 사귄 날</small><b id="usSince"></b></div>
+      <h2 class="ttl">다가오는 날</h2>
+      <ol class="soon" id="soonList"></ol>
+      <button class="pill wide" id="addAnniv" type="button">+ 기념일·생일 추가</button>
+      <ul class="annivs" id="annivList"></ul>
+
+      <section class="album" id="album">
+        <h2 class="ttl">키티 사진</h2>
+        <div class="pics" id="picList"></div>
+        <label class="pill wide addpic">+ 사진 넣기<input type="file" id="picIn" accept="image/*" multiple hidden></label>
+        <p class="hint">누른 사진이 맨 위 동그라미에 걸려요. ×는 두 번 누르면 지워져요.</p>
+      </section>
+
+      <h2 class="ttl">설정</h2>
+      <div class="settings">
+        <label>남자친구 이름 <input id="sA" maxlength="12"></label>
+        <label>여자친구 이름 <input id="sB" maxlength="12"></label>
+        <label>사귄 날 <input id="sStart" type="date"></label>
+        <button class="pill" id="saveSet" type="button">저장</button>
+        <button class="pill" id="skinBtn2" type="button">화면 고르기</button>
+        <div class="coderow"><span>알림</span><span class="pstate" id="pushState"></span><button class="pill" id="pushBtn" type="button" hidden>켜기</button></div>
+        <div class="coderow"><span>커플 코드</span><output class="code small" id="sCode"></output><button class="pill" id="sCopy" type="button">링크 보내기</button></div>
+        <button class="pill" id="installBtn" type="button" hidden>홈 화면에 앱 설치</button>
+        <p class="hint" id="iosHint" hidden>Safari 아래 공유 버튼 → 홈 화면에 추가하면 앱처럼 열려요.</p>
+        <button class="link danger" id="leave" type="button">초기화 (처음 화면으로)</button>
+      </div>
+    </section>
+  </main>
+
+  <nav class="tabbar" aria-label="메뉴">
+    <button type="button" data-tab="cal" class="on"><span class="ti">▦</span>달력</button>
+    <button type="button" data-tab="wish"><span class="ti">☆</span>하고 싶은 것</button>
+    <button type="button" data-tab="us"><span class="ti">♡</span>우리</button>
+  </nav>
+</div>
+
+<dialog id="sheet"><form method="dialog" id="sheetForm"></form></dialog>
+<div class="toast" id="toast" role="status" hidden></div>
+</body>
+</html>

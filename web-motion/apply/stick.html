@@ -1,0 +1,893 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>옷 갈아입는 쫄라맨 · 창업실 적용 4</title>
+<link rel="stylesheet" href="apply.css">
+<style>
+/* 작품마다 옷·소품을 갖춰 입은 쫄라맨이 그 작품다운 동작을 함. 넘어갈 땐 펄쩍 뛰며 옷이 날아가고 새 옷이 떨어져 입혀짐 */
+body { height: 100svh; overflow: hidden; background: var(--paper); user-select: none; -webkit-user-select: none }
+canvas.bg { z-index: 1; touch-action: none }
+.ttl { position: fixed; z-index: 2; left: 0; right: 0; top: var(--gy, 64svh); margin: 0; padding: 0 var(--m); text-align: center; font: 300 var(--fs, 120px)/1.08 var(--serif); letter-spacing: -.03em; pointer-events: none }
+.ttl a { pointer-events: auto; text-decoration: none; display: inline-block; overflow: hidden; padding: 0 .04em .12em; vertical-align: top }
+.ttl a:hover { text-decoration: underline 2px; text-underline-offset: .14em }
+.ttl i { font-style: normal; display: inline-block; white-space: pre; will-change: transform }
+.ttl.out { z-index: 3; pointer-events: none }
+.ttl.out a { overflow: visible; pointer-events: none }
+.nav { position: fixed; z-index: 4; left: 50%; bottom: clamp(18px, 4vh, 36px); transform: translateX(-50%); display: flex; align-items: center; gap: 14px }
+.nav button { width: 42px; height: 42px; border-radius: 50%; border: 1.5px solid var(--rule); background: none; color: var(--ink); font-size: 16px; cursor: pointer; transition: border-color .2s }
+.nav button:hover { border-color: var(--ink) }
+.nav span { min-width: 64px; text-align: center }
+.nav b { font-weight: 500 }
+</style>
+</head>
+<body>
+<nav class="top mono"><a href="../#apply">← 움직이는 웹사이트</a><span class="right"><a href="pile.html">← 이전</a><span>창업실 적용 4 / 4 · 옷 갈아입는 쫄라맨</span></span></nav>
+<canvas class="bg" id="cv"></canvas>
+<h1 class="ttl" id="ttl"></h1>
+<div class="nav mono"><button id="prev" type="button" aria-label="이전 작품">←</button><span id="idx"></span><button id="next" type="button" aria-label="다음 작품">→</button></div>
+
+<script type="module">
+import { WORKS, ROOT } from "./works.js";
+const INK = "#151514", PAPER = "#fbfaf6";
+const D = Math.PI / 180;
+const cl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+const L2 = (p, q, k) => [lerp(p[0], q[0], k), lerp(p[1], q[1], k)];
+const rnd = (a, b) => a + Math.random() * (b - a);
+const E = { l: k => k, io: k => k < .5 ? 4 * k * k * k : 1 - (-2 * k + 2) ** 3 / 2, o: k => 1 - (1 - k) ** 3, i: k => k * k * k, b: k => 1 + 2.7 * (k - 1) ** 3 + 1.7 * (k - 1) ** 2 };
+const bounce = k => { const n = 7.5625, d = 2.75; return k < 1 / d ? n * k * k : k < 2 / d ? n * (k -= 1.5 / d) * k + .75 : k < 2.5 / d ? n * (k -= 2.25 / d) * k + .9375 : n * (k -= 2.625 / d) * k + .984375; };
+// 각도: 0 = 아래, 90 = 오른쪽, 180 = 위, -90 = 왼쪽
+const at = (p, a, l) => [p[0] + Math.sin(a * D) * l, p[1] + Math.cos(a * D) * l];
+const ang = (p, q) => Math.atan2(q[1] - p[1], q[0] - p[0]);
+const norm = (p, q) => { const d = Math.hypot(q[0] - p[0], q[1] - p[1]) || 1; return [(q[0] - p[0]) / d, (q[1] - p[1]) / d]; };
+
+/* ───────── 몸 ───────── */
+// 굵은 검은 선 + 얼굴 없는 동그란 머리(몸통과 살짝 떨어짐), 손발은 둥근 끝
+const LEN = { T: .33, N: .024, R: .112, UA: .2, FA: .19, TH: .25, SH: .245, W: .042, SW: .05 };
+const BASE = { x: 0, y: 0, t: 0, h: 0, f: 0, la1: -18, la2: -8, ra1: 18, ra2: 8, ll1: -10, ll2: -4, rl1: 10, rl2: 4, rot: 0, sq: 0,
+  ik: 0, ikL: 0, ikR: 0, ikf: 0, st: 0, sw: 0, pd: 26, pg: 0, row: 0, env: 1 };
+// 넘길 때: 웅크림 → 늘어나며 뜀 → 무릎 당겨 공중제비 → 펴기 → 찌그러지며 착지 → 섬
+const STAND = {}, CROUCH = { h: 8, la1: -38, la2: -22, ra1: 38, ra2: 22, ll1: -58, ll2: 16, rl1: 58, rl2: -16, sq: -.1 };
+const LAUNCH = { la1: -168, la2: -174, ra1: 168, ra2: 174, ll1: -5, ll2: -2, rl1: 5, rl2: 2, sq: .14 };
+const TUCK = { h: 10, la1: -80, la2: -150, ra1: 80, ra2: 150, ll1: -140, ll2: -14, rl1: 140, rl2: 14 };
+const OPEN = { la1: -115, la2: -125, ra1: 115, ra2: 125, ll1: -14, ll2: -6, rl1: 14, rl2: 6 };
+const LAND = { h: -6, la1: -95, la2: -112, ra1: 95, ra2: 112, ll1: -55, ll2: 14, rl1: 55, rl2: -14, sq: -.16 };
+const JUMP = [[240, "io", CROUCH], [90, "o", LAUNCH], [190, "o", TUCK], [180, "l", TUCK], [160, "io", OPEN], [100, "o", LAND], [290, "io", STAND], [250, "l", STAND]];
+
+function rig(p, S, gx, gy, now) {
+  const hip = [0, 0], neck = at(hip, 180 - p.t, LEN.T), head = at(neck, 180 - p.t - p.h, LEN.N + LEN.R), sh = at(neck, -p.t, .035);
+  // 어깨: 앞모습이면 몸통 양옆(어깨 폭), 옆모습이면 몸통 선의 앞·뒤 가장자리(오른팔이 바라보는 쪽)
+  const o = LEN.SW * (1 - Math.abs(p.f)) + LEN.W / 2 * p.f, ct = Math.cos(p.t * D), st = Math.sin(p.t * D);
+  const shR = [sh[0] + ct * o, sh[1] + st * o], shL = [sh[0] - ct * o, sh[1] - st * o];
+  const eL = at(shL, p.la1, LEN.UA), hL = at(eL, p.la2, LEN.FA), eR = at(shR, p.ra1, LEN.UA), hR = at(eR, p.ra2, LEN.FA);
+  const kL = at(hip, p.ll1, LEN.TH), fL = at(kL, p.ll2, LEN.SH), kR = at(hip, p.rl1, LEN.TH), fR = at(kR, p.rl2, LEN.SH);
+  const low = Math.max(fL[1], fR[1], kL[1], kR[1]) + LEN.W / 2;
+  const ox = gx + p.x * S, oy = gy - low * S + p.y * S, px = q => [ox + q[0] * S, oy + q[1] * S];
+  const th = (p.t + p.h) * D;
+  return { p, S, gx, gy, now, hip: px(hip), neck: px(neck), head: px(head), sh: px(sh), shL: px(shL), shR: px(shR), eL: px(eL), hL: px(hL), eR: px(eR), hR: px(hR),
+    kL: px(kL), fL: px(fL), kR: px(kR), fR: px(fR), R: LEN.R * S, lw: S * LEN.W, ol: Math.max(1.3, S * .0085),
+    ct: Math.cos(p.t * D), st: Math.sin(p.t * D), hc: Math.cos(th), hs: Math.sin(th) };
+}
+// 몸통 기준 점(목이 원점, y는 엉덩이 쪽, 단위 S) · 머리 기준 점(머리 가운데가 원점, 단위 머리 반지름)
+const SLIM = .6; // 옷은 몸에 붙게: 몸통 기준 가로 폭을 줄임
+const T = (r, x, y) => (x *= SLIM, [r.neck[0] + (x * r.ct - y * r.st) * r.S, r.neck[1] + (x * r.st + y * r.ct) * r.S]);
+const H = (r, x, y, d) => { if (d) x *= r.p.f; return [r.head[0] + (x * r.hc - y * r.hs) * r.R, r.head[1] + (x * r.hs + y * r.hc) * r.R]; };
+function solve(a, b, l1, l2, bend) {
+  const d = Math.hypot(b[0] - a[0], b[1] - a[1]), dd = cl(d, 1e-3, l1 + l2 - 1e-3), base = ang(a, b);
+  const t = base + bend * Math.acos(cl((l1 * l1 + dd * dd - l2 * l2) / (2 * l1 * dd), -1, 1));
+  const j = [a[0] + Math.cos(t) * l1, a[1] + Math.sin(t) * l1], e = ang(j, b);
+  return [j, [j[0] + Math.cos(e) * l2, j[1] + Math.sin(e) * l2]];
+}
+// 팔·다리 끝을 목표에 붙임(w만큼 섞음)
+function reach(r, limb, target, w, bend) {
+  if (w <= 0) return;
+  const [root, j, e, l1, l2] = { L: ["shL", "eL", "hL", LEN.UA, LEN.FA], R: ["shR", "eR", "hR", LEN.UA, LEN.FA], fL: ["hip", "kL", "fL", LEN.TH, LEN.SH], fR: ["hip", "kR", "fR", LEN.TH, LEN.SH] }[limb];
+  const [J, X] = solve(r[root], target, l1 * r.S, l2 * r.S, r.p.f < 0 ? -bend : bend);
+  r[j] = L2(r[j], J, w); r[e] = L2(r[e], X, w);
+}
+
+/* ───────── 그리기 도구 ───────── */
+function path(g, pts, close) { g.beginPath(); g.moveTo(pts[0][0], pts[0][1]); for (let i = 1; i < pts.length; i++) g.lineTo(pts[i][0], pts[i][1]); if (close) g.closePath(); }
+function shape(g, r, pts, c, line = true) { path(g, pts, 1); g.fillStyle = c; g.fill(); if (line) { g.lineJoin = "round"; g.lineWidth = r.ol; g.strokeStyle = INK; g.stroke(); } }
+function band(g, r, pts, w, c, line = true) {
+  path(g, pts); g.lineCap = g.lineJoin = "round";
+  if (line) { g.strokeStyle = INK; g.lineWidth = w + r.ol * 2; g.stroke(); }
+  g.strokeStyle = c; g.lineWidth = w; g.stroke();
+}
+function dot(g, p, rad, c, line) { g.beginPath(); g.arc(p[0], p[1], Math.max(.1, rad), 0, 7); g.fillStyle = c; g.fill(); if (line) { g.lineWidth = line; g.strokeStyle = INK; g.stroke(); } }
+function inFrame(g, o, a, fn) { g.save(); g.translate(o[0], o[1]); g.rotate(a); fn(); g.restore(); }
+function smooth(g, pts, close) { // 점들을 부드러운 곡선으로
+  g.beginPath(); g.moveTo((pts[0][0] + pts[1][0]) / 2, (pts[0][1] + pts[1][1]) / 2);
+  const n = pts.length;
+  for (let i = 1; i < (close ? n + 1 : n - 1); i++) { const a = pts[i % n], b = pts[(i + 1) % n]; g.quadraticCurveTo(a[0], a[1], (a[0] + b[0]) / 2, (a[1] + b[1]) / 2); }
+  if (close) g.closePath(); else g.lineTo(pts[n - 1][0], pts[n - 1][1]);
+}
+const top = (r, c, len = .34, w0 = .088, w1 = .1) => [T(r, -w0 * .55, -.03), T(r, -w0, .03), T(r, -w1, len), T(r, w1, len), T(r, w0, .03), T(r, w0 * .55, -.03)];
+// 옷은 굵은 팔다리보다 조금 더 두껍게
+const CW = LEN.W + .016; // 소매·바지 굵기
+const dark = (c, k = .8) => "#" + c.slice(1).match(/../g).map(h => Math.round(parseInt(h, 16) * k).toString(16).padStart(2, "0")).join("");
+const far = r => Math.abs(r.p.f) > .5; // 옆모습이면 왼팔·왼다리가 먼 쪽
+function limb(g, r, a, j, b, k, c, dim, cuff) { // 소매·바짓가랑이(먼 쪽은 어둡게) + 굽은 관절 안쪽 주름
+  const w = CW * r.S, e = L2(j, b, k), col = dim ? dark(c) : c;
+  band(g, r, [a, j, e], w, col);
+  if (cuff) band(g, r, [L2(j, b, k - cuff.s), e], w, dim ? dark(cuff.c) : cuff.c);
+  const u = norm(j, a), v = norm(j, b), m = [u[0] + v[0], u[1] + v[1]], n = Math.hypot(m[0], m[1]);
+  if (n > .5) { const d = [m[0] / n, m[1] / n]; g.strokeStyle = dark(col, .72); g.lineWidth = r.ol; g.lineCap = "round"; path(g, [[j[0] + d[0] * w * .5, j[1] + d[1] * w * .5], [j[0] + d[0] * w * .05, j[1] + d[1] * w * .05]]); g.stroke(); }
+}
+// 소매는 몸통 옷보다 먼저 그려 어깨 이음새가 몸통 옷 뒤로 들어가게
+// 앞모습: 두 소매 모두 몸통 옷보다 먼저(어깨 이음새가 옷 뒤로). 옆모습: 먼 소매는 먼저, 가까운 팔(맨팔 포함)은 옷을 다 그린 뒤
+function sleeves(g, r, c, k = .82, cuff) {
+  const near = () => limb(g, r, r.shR, r.eR, r.hR, k, c, false, cuff);
+  limb(g, r, r.shL, r.eL, r.hL, k, c, far(r), cuff);
+  if (!far(r)) return near();
+  (r.late ||= []).push(() => { g.strokeStyle = INK; g.lineWidth = r.lw; g.lineCap = g.lineJoin = "round"; path(g, [r.shR, r.eR, r.hR]); g.stroke(); near(); });
+}
+const wear = (it, owner, ctx, r) => { it.draw.call(owner, ctx, r); r.late?.splice(0).forEach(f => f()); };
+function pants(g, r, c, k = .9, cuff) { limb(g, r, r.hip, r.kL, r.fL, k, c, far(r), cuff); limb(g, r, r.hip, r.kR, r.fR, k, c, false, cuff); }
+function torso(g, r, pts, c) { // 몸통 옷: 옆모습이면 등 쪽 그늘
+  shape(g, r, pts, c); if (!far(r)) return;
+  const s = r.p.f > 0 ? -1 : 1; g.save(); path(g, pts, 1); g.clip();
+  path(g, [T(r, s * .035, -.1), T(r, s * .3, -.1), T(r, s * .3, .7), T(r, s * .035, .7)], 1); g.fillStyle = "rgba(21,21,20,.13)"; g.fill(); g.restore();
+  path(g, pts, 1); g.lineJoin = "round"; g.lineWidth = r.ol; g.strokeStyle = INK; g.stroke();
+}
+function heart(g, x, y, s, c) { g.beginPath(); g.moveTo(x, y + s * .35); g.bezierCurveTo(x - s * .9, y - s * .3, x - s * .35, y - s * .95, x, y - s * .42); g.bezierCurveTo(x + s * .35, y - s * .95, x + s * .9, y - s * .3, x, y + s * .35); g.fillStyle = c; g.fill(); }
+
+function drawBody(g, r, col = INK, w = r.lw) {
+  g.strokeStyle = col; g.lineWidth = w; g.lineCap = g.lineJoin = "round";
+  path(g, [r.fL, r.kL, r.hip, r.kR, r.fR]); g.stroke();
+  path(g, [r.hip, r.neck]); g.stroke();
+  path(g, [r.hL, r.eL, r.shL, r.shR, r.eR, r.hR]); g.stroke();
+}
+const drawHead = (g, r) => dot(g, r.head, r.R, INK);
+
+/* ───────── 효과(입자) ───────── */
+const FX = [];
+function spark(x, y, o) { FX.push(Object.assign({ x, y, vx: 0, vy: 0, g: 0, age: 0, life: .8, draw() {} }, o)); }
+
+/* ───────── 작품별 옷·소품·동작 ───────── */
+// keys: [들어오는 시간 ms, 이징, 자세, 도착할 때 일어날 일]
+const C = [
+{ t: "넋굿", bg: "#c8323c", base: { f: 1 },
+  items: [
+    { at: "hip", on: "pop", layer: "back", draw(g, r) { // 여우 꼬리 셋
+      for (let i = 0; i < 3; i++) {
+        const a = (-128 + i * 26 + Math.sin(r.now / 360 + i * 1.4) * 9) * (r.p.f < 0 ? -1 : 1);
+        const base = L2(r.hip, r.neck, .06), tip = at(base, a, .42 * r.S), n = [-(tip[1] - base[1]), tip[0] - base[0]], k = .19;
+        const c1 = [lerp(base[0], tip[0], .5) + n[0] * k, lerp(base[1], tip[1], .5) + n[1] * k], c2 = [lerp(base[0], tip[0], .5) - n[0] * k, lerp(base[1], tip[1], .5) - n[1] * k];
+        g.beginPath(); g.moveTo(base[0], base[1]); g.quadraticCurveTo(c1[0], c1[1], tip[0], tip[1]); g.quadraticCurveTo(c2[0], c2[1], base[0], base[1]);
+        g.fillStyle = "#e8873a"; g.fill(); g.lineWidth = r.ol; g.strokeStyle = INK; g.stroke();
+        const t0 = L2(base, tip, .72), m1 = L2(c1, tip, .62), m2 = L2(c2, tip, .62);
+        g.beginPath(); g.moveTo(t0[0], t0[1]); g.quadraticCurveTo(m1[0], m1[1], tip[0], tip[1]); g.quadraticCurveTo(m2[0], m2[1], t0[0], t0[1]); g.fillStyle = PAPER; g.fill(); g.stroke();
+      } } },
+    { at: "neck", on: "wipe", layer: "front", draw(g, r) { // 저고리 + 치마
+      const cuff = { c: "#2b6cb0", s: .16 };
+      sleeves(g, r, PAPER, .8, cuff);
+      torso(g, r, [T(r, -.1, .18), T(r, .1, .18), T(r, .18, .44), T(r, -.18, .44)], "#c8323c");
+      torso(g, r, top(r, 0, .22, .088, .105), PAPER);
+      band(g, r, [T(r, -.055, -.005), T(r, .03, .11)], .022 * r.S, "#2b6cb0", false);
+      const sw = Math.sin(r.now / 300) * .02;
+      band(g, r, [T(r, .03, .11), T(r, .05 + sw, .27)], .02 * r.S, "#c8323c");
+      band(g, r, [T(r, .03, .11), T(r, .0 + sw, .24)], .02 * r.S, "#c8323c");
+    } },
+    { at: "head", on: "drop", layer: "head", draw(g, r) { // 여우 귀
+      for (const s of [-1, 1]) {
+        shape(g, r, [H(r, s * .8, -.52), H(r, s * .18, -.98), H(r, s * .74, -1.66)], "#e8873a");
+        shape(g, r, [H(r, s * .66, -.68), H(r, s * .32, -.92), H(r, s * .67, -1.36)], "#f6b6a8", false);
+      } } },
+    { at: "hR", on: "toss", layer: "hand", draw(g, r) { // 부적
+      inFrame(g, r.hR, ang(r.eR, r.hR), () => {
+        const S = r.S; g.fillStyle = "#f0c93a"; g.fillRect(-.02 * S, -.03 * S, .15 * S, .06 * S);
+        g.lineWidth = r.ol; g.strokeStyle = INK; g.strokeRect(-.02 * S, -.03 * S, .15 * S, .06 * S);
+        g.strokeStyle = "#c8323c"; g.lineWidth = r.ol * 1.2; g.beginPath();
+        for (let i = 0; i <= 8; i++) g.lineTo((.01 + i * .014) * S, (i % 2 ? -.014 : .014) * S);
+        g.stroke();
+      }); } },
+  ],
+  keys: [
+    [600, "io", { t: 4, h: 2, ra1: 40, ra2: 115, la1: -44, la2: -20, ll1: -16, ll2: -6, rl1: 18, rl2: 8 }],
+    [380, "io", { t: -14, h: -10, ra1: -130, ra2: -100, la1: 70, la2: 85, ll1: -24, ll2: -8, rl1: 24, rl2: 12 }],
+    [130, "o", { t: 20, h: 8, ra1: 95, ra2: 92, la1: -60, la2: -40, ll1: -32, ll2: -12, rl1: 32, rl2: 4 }, "throw"],
+    [520, "io", { t: 15, h: 6, ra1: 50, ra2: 35, la1: -55, la2: -30, ll1: -32, ll2: -12, rl1: 32, rl2: 4 }],
+    [500, "io", { t: 5, h: 2, ra1: 35, ra2: 100, la1: -42, la2: -18, ll1: -16, ll2: -6, rl1: 18, rl2: 8 }],
+  ],
+  on: { throw(r) { // 부적이 날아가 오행 다섯 색으로 터짐
+    const s = r.S, h = [...r.hR], a = ang(r.eR, r.hR);
+    spark(h[0], h[1], { vx: Math.cos(a) * s * 2.6, vy: Math.sin(a) * s * 2.6 - s * .3, g: s * .9, life: .42, rot: 0,
+      draw(g, p) { inFrame(g, [p.x, p.y], p.age * 18, () => { g.fillStyle = "#f0c93a"; g.fillRect(-.06 * s, -.025 * s, .12 * s, .05 * s); g.lineWidth = r.ol; g.strokeStyle = INK; g.strokeRect(-.06 * s, -.025 * s, .12 * s, .05 * s); }); },
+      end(p) {
+        spark(p.x, p.y, { life: .7, draw(g, q) { const k = E.o(q.age / q.life); g.globalAlpha *= 1 - k; g.lineWidth = s * .012; g.strokeStyle = INK; g.beginPath(); g.arc(q.x, q.y, s * (.05 + .3 * k), 0, 7); g.stroke(); } });
+        ["#2b6cb0", "#d64545", "#e0b021", PAPER, INK].forEach((c, i) => { const b = i / 5 * Math.PI * 2 - Math.PI / 2;
+          spark(p.x, p.y, { vx: Math.cos(b) * s * 1.1, vy: Math.sin(b) * s * 1.1, life: .9, draw(g, q) { const k = q.age / q.life; g.globalAlpha *= 1 - k * k; dot(g, [q.x, q.y], s * .045 * (1 - k * .5), c, r.ol); } }); });
+      } });
+  } } },
+
+{ t: "브라운 로그", bg: "#a0683a", base: { f: 1, sw: 140 },
+  tip: r => [at(r.hR, r.p.sw, .56 * r.S), at(r.hR, r.p.sw, .22 * r.S)],
+  items: [
+    { at: "hip", on: "pop", layer: "back", draw(g, r) { const f = r.p.f < 0 ? -1 : 1; band(g, r, [[r.hip[0] - .02 * r.S * f, r.hip[1] - .03 * r.S], [r.hip[0] - .36 * r.S * f, r.hip[1] + .12 * r.S]], .03 * r.S, "#2a1d14"); } },
+    { at: "neck", on: "wipe", layer: "front", draw(g, r) { // 무복
+      pants(g, r, "#4a3424", .86, { c: "#e9e2d0", s: .3 });
+      sleeves(g, r, "#7a5232", .78); torso(g, r, top(r, 0, .33, .092, .115), "#7a5232");
+      band(g, r, [T(r, -.06, 0), T(r, .06, .17)], .03 * r.S, "#e9e2d0");
+      band(g, r, [T(r, -.115, .29), T(r, .115, .29)], .042 * r.S, "#2a1d14");
+    } },
+    { at: "head", on: "drop", layer: "head", draw(g, r) { // 상투와 붉은 머리띠
+      dot(g, H(r, -.05, -1.12), r.R * .3, INK);
+      const f = r.p.f < 0 ? -1 : 1, start = H(r, -f * .92, -.32), pts = [start];
+      for (let j = 1; j <= 5; j++) pts.push([start[0] - f * j * r.R * .34, start[1] + j * r.R * .16 + Math.sin(r.now / 110 + j * .9) * r.R * .14 * j / 5]);
+      band(g, r, pts, r.R * .16, "#b8272c");
+      g.save(); g.beginPath(); g.arc(r.head[0], r.head[1], r.R + r.ol, 0, 7); g.clip();
+      band(g, r, [H(r, -1.2, -.32), H(r, 1.2, -.32)], r.R * .26, "#b8272c"); g.restore();
+    } },
+    { at: "hR", on: "toss", layer: "hand", draw(g, r) { // 환도
+      const S = r.S; inFrame(g, r.hR, Math.atan2(Math.cos(r.p.sw * D), Math.sin(r.p.sw * D)), () => {
+        shape(g, r, [[.01 * S, -.013 * S], [.3 * S, -.019 * S], [.56 * S, -.045 * S], [.55 * S, -.006 * S], [.3 * S, .012 * S], [.01 * S, .012 * S]], "#dfe3e8");
+        band(g, r, [[-.1 * S, 0], [-.005 * S, 0]], .028 * S, "#2a1d14");
+        g.beginPath(); g.ellipse(0, 0, .014 * S, .042 * S, 0, 0, 7); g.fillStyle = "#b08a3e"; g.fill(); g.lineWidth = r.ol; g.strokeStyle = INK; g.stroke();
+      }); } },
+  ],
+  keys: [
+    [520, "io", { t: 6, h: 2, ra1: 45, ra2: 110, sw: 150, la1: -35, la2: -15, ll1: -32, ll2: -12, rl1: 34, rl2: 12 }],
+    [360, "io", { t: -8, h: -6, ra1: 165, ra2: 190, sw: 215, la1: 55, la2: 80, ll1: -28, ll2: -8, rl1: 36, rl2: 14 }],
+    [120, "o", { t: 22, h: 8, ra1: 80, ra2: 72, sw: 45, la1: -60, la2: -40, ll1: -40, ll2: -14, rl1: 48, rl2: 4 }, "slash"],
+    [380, "io", { t: 18, h: 6, ra1: 72, ra2: 64, sw: 40, la1: -56, la2: -36, ll1: -40, ll2: -14, rl1: 48, rl2: 4 }],
+    [340, "io", { f: -1, t: -8, h: -6, ra1: -165, ra2: 170, sw: 145, la1: -55, la2: -80, ll1: -36, ll2: -14, rl1: 28, rl2: 8 }],
+    [120, "o", { f: -1, t: -22, h: -8, ra1: -80, ra2: -72, sw: -45, la1: 60, la2: 40, ll1: -48, ll2: -4, rl1: 40, rl2: 14 }, "slash"],
+    [420, "io", { f: -1, t: -18, h: -6, ra1: -72, ra2: -64, sw: -40, la1: 56, la2: 36, ll1: -48, ll2: -4, rl1: 40, rl2: 14 }],
+    [480, "io", { f: 1, t: 6, h: 2, ra1: 45, ra2: 110, sw: 150, la1: -35, la2: -15, ll1: -32, ll2: -12, rl1: 34, rl2: 12 }],
+  ],
+  on: { slash(r) { const tip = at(r.hR, r.p.sw, .56 * r.S); for (let i = 0; i < 7; i++) spark(tip[0], tip[1], { vx: rnd(-1, 1) * r.S, vy: rnd(-1.2, .3) * r.S, g: r.S * 2.5, life: .5, c: i % 2 ? "#b8272c" : INK, draw(g, p) { g.globalAlpha *= 1 - p.age / p.life; dot(g, [p.x, p.y], r.S * .012, p.c); } }); } } },
+
+{ t: "마디", bg: "#ff6a1a", base: { f: 1 },
+  items: [
+    { at: "hip", on: "wipe", layer: "front", draw(g, r) { // 마네킹 몸
+      const w = .062 * r.S, c = "#e6e3db";
+      for (const seg of [[r.fL, r.kL, r.hip], [r.hip, r.kR, r.fR], [r.hL, r.eL, r.shL, r.shR, r.eR, r.hR]]) band(g, r, seg, w, c);
+      band(g, r, [r.hip, L2(r.hip, r.neck, .55), r.neck], .08 * r.S, c);
+      for (const j of [r.kL, r.kR, r.eL, r.eR, r.hip, r.shL, r.shR]) dot(g, j, .024 * r.S, "#ff6a1a", r.ol);
+    } },
+    { at: "head", on: "drop", layer: "head", draw(g, r) { g.beginPath(); g.ellipse(r.head[0], r.head[1] - r.R * .05, r.R * 1.0, r.R * 1.14, (r.p.t + r.p.h) * D, 0, 7); g.fillStyle = "#e6e3db"; g.fill(); g.lineWidth = r.ol; g.strokeStyle = INK; g.stroke(); } },
+  ],
+  keys: (() => { const W = [
+      [250, "io", { t: 6, rl1: 28, rl2: 16, ll1: -24, ll2: -52, la1: 38, la2: 115, ra1: -40, ra2: 20 }],
+      [250, "io", { t: 6, y: -.025, rl1: 4, rl2: 2, ll1: 18, ll2: -40, la1: 12, la2: 95, ra1: -14, ra2: 70 }],
+      [250, "io", { t: 6, ll1: 28, ll2: 16, rl1: -24, rl2: -52, ra1: 38, ra2: 115, la1: -40, la2: 20 }],
+      [250, "io", { t: 6, y: -.025, ll1: 4, ll2: 2, rl1: 18, rl2: -40, ra1: 12, ra2: 95, la1: -14, la2: 70 }]];
+    return [...W, ...W, ...W,
+      [220, "io", { t: 22, h: 6, ll1: 40, ll2: -30, rl1: 50, rl2: -24, la1: -38, la2: -20, ra1: -30, ra2: -14 }],
+      [240, "o", { t: -4, y: -.44, ll1: 70, ll2: -8, rl1: 82, rl2: 4, la1: 137, la2: 152, ra1: 132, ra2: 148 }],
+      [170, "io", { t: -6, y: -.47, ll1: 88, ll2: -4, rl1: 100, rl2: 8, la1: 145, la2: 160, ra1: 140, ra2: 156 }],
+      [240, "i", { t: 16, ll1: 40, ll2: -30, rl1: 50, rl2: -24, la1: 70, la2: 90, ra1: 60, ra2: 80 }, "land"],
+      [320, "io", { t: 6, rl1: 28, rl2: 16, ll1: -24, ll2: -52, la1: 38, la2: 115, ra1: -40, ra2: 20 }]]; })(),
+  fx(g, r, tl, a) { // 무릎 각도가 따라 나옴
+    g.save(); g.globalAlpha *= a;
+    const a1 = ang(r.hip, r.kR), a2 = ang(r.kR, r.fR), deg = Math.round(Math.abs(((a2 - a1) / D + 540) % 360 - 180));
+    g.strokeStyle = "#ff6a1a"; g.lineWidth = r.ol; g.beginPath(); g.arc(r.kR[0], r.kR[1], .06 * r.S, Math.min(a1, a2), Math.max(a1, a2)); g.stroke();
+    g.fillStyle = "#ff6a1a"; g.font = `500 ${Math.max(10, .045 * r.S)}px "IBM Plex Mono", monospace`; g.fillText(deg + "°", r.kR[0] + .07 * r.S, r.kR[1] + .02 * r.S);
+    g.restore();
+  },
+  on: { land(r) { for (const s of [-1, 1]) for (let i = 0; i < 4; i++) spark(r.gx + s * .12 * r.S, r.gy, { vx: s * rnd(.3, .9) * r.S, vy: -rnd(.05, .3) * r.S, life: .55, draw(g, p) { g.globalAlpha *= (1 - p.age / p.life) * .5; dot(g, [p.x, p.y], r.S * (.015 + p.age * .05), "#c9c6bc"); } }); } } },
+
+{ t: "프로그래밍기초 복습 노트", bg: "#4a5ca8", base: { f: 1, x: -.2, t: 10, ik: 1, ll1: 84, ll2: -2, rl1: 88, rl2: 3 },
+  // 의자에 앉아 책상 위 노트북(화면 90°)으로 타자. 가구는 땅 기준이라 몸이 움직여도 제자리
+  desk(r) { const S = r.S, X = r.gx + r.p.x * S, top = r.gy - .44 * S; return { S, X, top, kb: top - .026 * S, lid: X + .5 * S }; },
+  post(r) {
+    const { S, X, kb } = this.desk(r), j = Math.sin(r.now / 42) * .008 * S, k = Math.cos(r.now / 37) * .008 * S;
+    reach(r, "R", [X + .37 * S, kb + j], r.p.ik, 1);
+    reach(r, "L", [X + .31 * S, kb + k], r.p.ik, 1);
+  },
+  items: [
+    { at: "neck", on: "wipe", layer: "front", draw(g, r) { // 후드티
+      const c = "#34406b"; sleeves(g, r, c, .9); torso(g, r, top(r, 0, .34, .09, .1), c);
+      shape(g, r, [T(r, -.1, -.03), T(r, -.02, -.06), T(r, -.04, .03)], c);
+      band(g, r, [T(r, .01, .01), T(r, .02, .09)], .008 * r.S, PAPER, false);
+    } },
+    { at: "head", on: "drop", layer: "head", draw(g, r) { // 안경(옆모습: 앞쪽 알 하나 + 귀로 가는 다리)
+      const a = (r.p.t + r.p.h) * D, e = H(r, .72, -.1, 1);
+      g.strokeStyle = "#8d929c"; g.lineWidth = r.ol * 1.3; g.lineCap = "round"; path(g, [e, H(r, -.15, -.18, 1)]); g.stroke();
+      g.beginPath(); g.ellipse(e[0], e[1], r.R * .3, r.R * .24, a, 0, 7); g.fillStyle = "rgba(205,226,255,.9)"; g.fill(); g.lineWidth = r.ol * 1.4; g.strokeStyle = INK; g.stroke();
+    } },
+    { at: "gnd", on: "pop", layer: "back", draw(g, r) { // 의자
+      const { S, X } = this.desk(r), seat = r.gy - .27 * S, x0 = X - .14 * S, x1 = X + .1 * S, c = "#8a6a4a";
+      band(g, r, [[x0 + .015 * S, seat - .34 * S], [x0 + .015 * S, r.gy]], .024 * S, c);
+      band(g, r, [[x1 - .015 * S, seat], [x1 - .015 * S, r.gy]], .02 * S, c);
+      shape(g, r, [[x0, seat], [x1, seat], [x1, seat + .028 * S], [x0, seat + .028 * S]], c);
+    } },
+    { at: "gnd", on: "drop", layer: "back", draw(g, r) { // 책상 + 노트북
+      const { S, X, top, lid } = this.desk(r), c = "#c9a77c";
+      for (const x of [.36, .66]) band(g, r, [[X + x * S, top], [X + x * S, r.gy]], .022 * S, c);
+      shape(g, r, [[X + .17 * S, top], [X + .72 * S, top], [X + .72 * S, top + .03 * S], [X + .17 * S, top + .03 * S]], c);
+      shape(g, r, [[X + .26 * S, top - .016 * S], [lid + .018 * S, top - .016 * S], [lid + .018 * S, top], [X + .26 * S, top]], "#9aa0aa");
+      shape(g, r, [[lid, top - .016 * S], [lid + .018 * S, top - .016 * S], [lid + .018 * S, top - .24 * S], [lid, top - .24 * S]], "#9aa0aa");
+      band(g, r, [[lid - .004 * S, top - .03 * S], [lid - .004 * S, top - .225 * S]], .007 * S, "#7fb0ff", false);
+    } },
+  ],
+  keys: [
+    [1800, "l", { ik: 1 }],
+    [300, "io", { ik: 1, t: 16, h: 10 }],
+    [260, "o", { ik: 0, t: -10, h: -12, ra1: 165, ra2: 176, la1: 130, la2: 150 }, "ok"],
+    [560, "io", { ik: 0, t: -8, h: -10, ra1: 160, ra2: 172, la1: 126, la2: 146 }],
+    [420, "io", { ik: 1, t: 8, h: 0 }],
+  ],
+  fx(g, r, tl, a) {
+    if (tl < 2000 && Math.random() < .045) {
+      const s = r.S, w = ["{", "}", ";", "int", "for", "printf", "0x1F", "&&", "++", "*p"][Math.random() * 10 | 0];
+      const { X, top } = this.desk(r);
+      spark(X + .5 * s, top - rnd(.2, .26) * s, { vx: rnd(.12, .3) * s, vy: -rnd(.28, .45) * s, life: 1.5, w,
+        draw(g, p) { g.globalAlpha *= Math.sin(Math.PI * p.age / p.life) * .9; g.fillStyle = p.w.length > 2 ? "#2b44a6" : INK; g.font = `500 ${Math.max(12, .055 * s)}px "IBM Plex Mono", monospace`; g.fillText(p.w, p.x, p.y); } });
+    }
+  },
+  on: { ok(r) { const s = r.S, h = [r.head[0], r.head[1] - .32 * s]; spark(h[0], h[1], { life: 1.1, draw(g, p) {
+    const k = p.age / p.life, sc = k < .25 ? E.b(k / .25) : 1; g.globalAlpha *= k > .75 ? (1 - k) / .25 : 1;
+    dot(g, [p.x, p.y], .07 * s * sc, "#2b44a6"); g.strokeStyle = "#fff"; g.lineWidth = .014 * s * sc; g.lineCap = g.lineJoin = "round";
+    path(g, [[p.x - .03 * s * sc, p.y], [p.x - .008 * s * sc, p.y + .022 * s * sc], [p.x + .033 * s * sc, p.y - .022 * s * sc]]); g.stroke(); } }); } } },
+
+{ t: "인공지능 입문 복습 노트", bg: "#e0b021", base: { f: 1, x: -.32 },
+  nodes: [[.92, -1.02], [.72, -.68], [1.14, -.68], [.62, -.34], [.82, -.34], [1.04, -.34], [1.24, -.34]],
+  edges: [[0, 1], [0, 2], [1, 3], [1, 4], [2, 5], [2, 6]],
+  visit: [[1000, 0], [1400, 1], [1800, 3], [2200, 4], [2600, 2], [3000, 5]],
+  pos(r, i) { const n = this.nodes[i]; return [r.gx + (n[0] + r.p.x) * r.S, r.gy + n[1] * r.S]; },
+  post(r, tl) {
+    const v = this.visit; let k = 0; while (k < v.length - 1 && tl > v[k + 1][0]) k++;
+    const u = k < v.length - 1 ? E.io(cl((tl - v[k + 1][0] + 260) / 260)) : 0;
+    const tg = L2(this.pos(r, v[k][1]), this.pos(r, v[Math.min(k + 1, v.length - 1)][1]), u);
+    const d = norm(r.shR, tg), L = (LEN.UA + LEN.FA) * r.S * .97;
+    reach(r, "R", [r.shR[0] + d[0] * L, r.shR[1] + d[1] * L], r.p.ik, -1);
+    r.glow = cl((tl - 3000) / 200) * cl((4500 - tl) / 300);
+  },
+  items: [
+    { at: "neck", on: "wipe", layer: "front", draw(g, r) { // 흰 가운
+      pants(g, r, "#3b3f4a", .9);
+      sleeves(g, r, PAPER, .88); torso(g, r, [T(r, -.05, -.03), T(r, -.09, .03), T(r, -.125, .5), T(r, .125, .5), T(r, .09, .03), T(r, .05, -.03)], PAPER);
+      path(g, [T(r, -.05, -.005), T(r, 0, .16), T(r, .05, -.005)]); g.lineWidth = r.ol; g.strokeStyle = INK; g.stroke();
+      band(g, r, [T(r, .045, .12), T(r, .045, .07)], .01 * r.S, "#2b44a6", false);
+    } },
+    { at: "head", on: "drop", layer: "head", draw(g, r) { // 전구 머리띠
+      g.lineWidth = r.ol * 1.4; g.strokeStyle = INK; g.beginPath(); g.arc(r.head[0], r.head[1], r.R * 1.08, Math.PI * 1.1 + (r.p.t + r.p.h) * D, Math.PI * 1.9 + (r.p.t + r.p.h) * D); g.stroke();
+      const s0 = H(r, .1, -1.06), s1 = H(r, .35, -1.6), b = H(r, .42, -1.9);
+      g.beginPath(); g.moveTo(s0[0], s0[1]); g.quadraticCurveTo(s1[0] - r.R * .3, s1[1], b[0], b[1]); g.stroke();
+      const gl = r.glow || 0;
+      if (gl > .05) { g.save(); g.globalAlpha *= gl; g.strokeStyle = "#e0b021"; g.lineWidth = r.ol * 1.4; for (let i = 0; i < 7; i++) { const a = -Math.PI * .95 + i * Math.PI * .15; path(g, [[b[0] + Math.cos(a) * r.R * .5, b[1] + Math.sin(a) * r.R * .5], [b[0] + Math.cos(a) * r.R * .78, b[1] + Math.sin(a) * r.R * .78]]); g.stroke(); } g.restore(); }
+      dot(g, b, r.R * .3, gl > .5 ? "#ffd23f" : "#efe9d8", r.ol);
+    } },
+    { at: "hR", on: "toss", layer: "hand", draw(g, r) { const a = ang(r.eR, r.hR); band(g, r, [r.hR, [r.hR[0] + Math.cos(a) * .3 * r.S, r.hR[1] + Math.sin(a) * .3 * r.S]], .014 * r.S, "#6b4a2e"); dot(g, [r.hR[0] + Math.cos(a) * .3 * r.S, r.hR[1] + Math.sin(a) * .3 * r.S], .012 * r.S, PAPER, r.ol); } },
+  ],
+  keys: [
+    [700, "io", { t: -4, h: -8, ik: 0, ra1: 40, ra2: 145, la1: -30, la2: -12 }],
+    [300, "io", { t: 6, ik: 1, la1: -30, la2: -14 }],
+    [2900, "l", { t: 6, ik: 1, la1: -30, la2: -14 }],
+    [240, "o", { t: -8, h: -8, ik: 0, ra1: 155, ra2: 170, la1: -140, la2: -160 }],
+    [660, "io", { t: -6, h: -6, ik: 0, ra1: 150, ra2: 166, la1: -135, la2: -155 }],
+  ],
+  fx(g, r, tl, a) { // 탐색 나무: 자라고 → 차례로 방문 → 목표 찾으면 길이 파랗게
+    const S = r.S, grow = i => E.b(cl((tl - 120 - i * 90) / 300)), fade = cl((4700 - tl) / 400) * a;
+    const seen = new Set(this.visit.filter(v => tl >= v[0]).map(v => v[1])), goal = tl >= 3000, way = new Set([0, 2, 5]);
+    g.save(); g.globalAlpha *= fade;
+    for (const [p, q] of this.edges) { const k = Math.min(grow(p), grow(q)); if (k <= 0) continue; const A = this.pos(r, p), B = L2(A, this.pos(r, q), k);
+      g.strokeStyle = goal && way.has(p) && way.has(q) ? "#2b44a6" : INK; g.lineWidth = goal && way.has(p) && way.has(q) ? r.ol * 3 : r.ol; path(g, [A, B]); g.stroke(); }
+    this.nodes.forEach((_, i) => { const k = grow(i); if (k <= 0) return; const P = this.pos(r, i);
+      dot(g, P, .042 * S * k, i === 5 && goal ? "#ffd23f" : seen.has(i) ? "#2b44a6" : PAPER, r.ol * 1.3); });
+    g.restore();
+  } },
+
+{ t: "LMS 할 일·알림", bg: "#d6332c", base: { f: 0, ikL: 1 },
+  board(r) { return [r.hL[0] + .075 * r.S, r.hL[1] - .05 * r.S]; }, // 왼손이 판 왼쪽 가장자리를 잡음
+  post(r, tl) {
+    const S = r.S; reach(r, "L", [r.neck[0] - .05 * S, r.neck[1] + .25 * S], r.p.ikL, 1);
+    const b = this.board(r), row = r.p.row, box = [b[0] - .04 * S, b[1] - .05 * S + row * .055 * S];
+    const u = norm(r.shR, box); reach(r, "R", [box[0] - u[0] * .19 * S, box[1] - u[1] * .19 * S], r.p.ikR, -1);
+    r.checks = this.checks; r.ring = r.now - (this.ringAt || -1e9) < 900 ? 1 : 0;
+  },
+  checks: 0,
+  items: [
+    { at: "neck", on: "pop", layer: "back", draw(g, r) { const f = r.p.f < 0 ? -1 : 1; g.save(); g.translate(...T(r, -.1 * f, .14)); g.rotate(r.p.t * D);
+      g.beginPath(); g.roundRect(-.08 * r.S, -.12 * r.S, .16 * r.S, .25 * r.S, .04 * r.S); g.fillStyle = "#2b44a6"; g.fill(); g.lineWidth = r.ol; g.strokeStyle = INK; g.stroke();
+      g.beginPath(); g.roundRect(-.06 * r.S - f * .03 * r.S, .0, .1 * r.S, .09 * r.S, .02 * r.S); g.fillStyle = "#3a56c4"; g.fill(); g.stroke(); g.restore(); } },
+    { at: "neck", on: "wipe", layer: "front", draw(g, r) { pants(g, r, "#2c2f38", .9); sleeves(g, r, "#e9e5da", .55); torso(g, r, top(r, 0, .34, .088, .1), "#e9e5da"); band(g, r, [T(r, .06, -.01), T(r, .045, .2)], .022 * r.S, "#1f3486"); } },
+    { at: "gnd", on: "drop", layer: "back", draw(g, r) { // 자명종
+      const S = r.S, sh = r.ring ? Math.sin(r.now / 22) * .12 : 0, c = [r.gx - .5 * S, r.gy - .1 * S];
+      inFrame(g, [c[0], r.gy], sh, () => {
+        for (const s of [-1, 1]) dot(g, [s * .055 * S, -.17 * S], .035 * S, "#d6332c", r.ol);
+        band(g, r, [[-.05 * S, -.005 * S], [-.07 * S, .0]], .012 * S, INK, false); band(g, r, [[.05 * S, -.005 * S], [.07 * S, 0]], .012 * S, INK, false);
+        dot(g, [0, -.09 * S], .085 * S, "#d6332c", r.ol); dot(g, [0, -.09 * S], .066 * S, PAPER, r.ol);
+        g.strokeStyle = INK; g.lineWidth = r.ol * 1.4; path(g, [[0, -.13 * S], [0, -.09 * S], [.03 * S, -.075 * S]]); g.stroke();
+      });
+      if (r.ring) { g.strokeStyle = INK; g.lineWidth = r.ol * 1.3; for (const s of [-1, 1]) for (let i = 0; i < 3; i++) { const a = -Math.PI / 2 + s * (.5 + i * .3); path(g, [[c[0] + Math.cos(a) * .15 * S, c[1] - .06 * S + Math.sin(a) * .15 * S], [c[0] + Math.cos(a) * .2 * S, c[1] - .06 * S + Math.sin(a) * .2 * S]]); g.stroke(); } }
+    } },
+    { at: "hL", on: "toss", layer: "hand", draw(g, r) { // 할 일 판
+      const S = r.S, b = this.board(r);
+      g.beginPath(); g.roundRect(b[0] - .085 * S, b[1] - .12 * S, .17 * S, .23 * S, .012 * S); g.fillStyle = "#b0875a"; g.fill(); g.lineWidth = r.ol; g.strokeStyle = INK; g.stroke();
+      g.fillStyle = PAPER; g.fillRect(b[0] - .07 * S, b[1] - .095 * S, .14 * S, .19 * S); g.strokeRect(b[0] - .07 * S, b[1] - .095 * S, .14 * S, .19 * S);
+      for (let i = 0; i < 3; i++) { const y = b[1] - .05 * S + i * .055 * S; g.strokeRect(b[0] - .055 * S, y - .015 * S, .03 * S, .03 * S);
+        path(g, [[b[0] - .01 * S, y], [b[0] + .055 * S, y]]); g.stroke();
+        if ((r.checks || 0) > i) { g.save(); g.strokeStyle = "#2b44a6"; g.lineWidth = r.ol * 2.2; g.lineCap = "round"; path(g, [[b[0] - .055 * S, y - .002 * S], [b[0] - .04 * S, y + .016 * S], [b[0] - .015 * S, y - .03 * S]]); g.stroke(); g.restore(); } }
+    } },
+    { at: "hR", on: "toss", layer: "hand", draw(g, r) { // 연필
+      inFrame(g, r.hR, ang(r.eR, r.hR), () => { const S = r.S;
+        shape(g, r, [[-.04 * S, -.014 * S], [.16 * S, -.014 * S], [.2 * S, 0], [.16 * S, .014 * S], [-.04 * S, .014 * S]], "#f2c230");
+        g.fillStyle = "#f4a6b8"; g.fillRect(-.065 * S, -.014 * S, .025 * S, .028 * S); g.strokeRect(-.065 * S, -.014 * S, .025 * S, .028 * S); dot(g, [.195 * S, 0], .005 * S, INK); }); } },
+  ],
+  keys: [
+    [600, "io", { ikL: 1, ikR: 0, h: 4, ra1: 22, ra2: 10 }, "reset"],
+    [500, "io", { ikL: 1, ikR: 0, h: 6, ra1: 20, ra2: 8 }, "ring"],
+    [150, "o", { y: -.16, ikL: 1, h: -4, ra1: 150, ra2: 165, ll1: -35, ll2: 10, rl1: 35, rl2: -10 }],
+    [260, "i", { y: 0, ikL: 1, h: 0, ra1: 60, ra2: 30, ll1: -24, ll2: 4, rl1: 24, rl2: -4 }],
+    [380, "io", { ikL: 1, ikR: 1, row: 0, h: 6 }, "tick"],
+    [320, "io", { ikL: 1, ikR: 1, row: 1, h: 6 }, "tick"],
+    [320, "io", { ikL: 1, ikR: 1, row: 2, h: 6 }, "tick"],
+    [260, "o", { ikL: 1, ikR: 0, h: -4, ra1: 155, ra2: 170 }],
+    [860, "io", { ikL: 1, ikR: 0, h: -2, ra1: 150, ra2: 165 }],
+  ],
+  on: { reset() { this.checks = 0; }, ring() { this.ringAt = performance.now(); }, tick(r) { this.checks = Math.min(3, this.checks + 1); } } },
+
+{ t: "덜미", bg: "#e0b021", base: { f: 1, ik: 1 },
+  letter(g, r, S, lock) { // 편지 한 장(지금 자리가 가운데)
+    shape(g, r, [[-.075 * S, -.05 * S], [.075 * S, -.05 * S], [.075 * S, .05 * S], [-.075 * S, .05 * S]], PAPER);
+    path(g, [[-.075 * S, -.05 * S], [0, .01 * S], [.075 * S, -.05 * S]]); g.stroke();
+    if (lock) { g.beginPath(); g.arc(0, .005 * S, .018 * S, Math.PI, 0); g.lineWidth = r.ol * 1.4; g.stroke(); g.fillStyle = "#e0b021"; g.fillRect(-.026 * S, .005 * S, .052 * S, .038 * S); g.lineWidth = r.ol; g.strokeRect(-.026 * S, .005 * S, .052 * S, .038 * S); }
+  },
+  post(r) { const c = T(r, .25, .17); reach(r, "R", c, r.p.ik, 1); reach(r, "L", [c[0] - .06 * r.S, c[1] + .02 * r.S], r.p.ik, 1); r.lock = this.locked; this.hand = [r.hR[0] + .02 * r.S, r.hR[1] - .03 * r.S]; },
+  locked: 0,
+  items: [
+    { at: "neck", on: "wipe", layer: "front", draw(g, r) { // 검은 후드티
+      const c = "#2a2d35"; pants(g, r, "#3e4350", .9); sleeves(g, r, c, .9); torso(g, r, top(r, 0, .35, .092, .104), c);
+      shape(g, r, [T(r, -.06, .22), T(r, .06, .22), T(r, .075, .32), T(r, -.075, .32)], "#353945");
+      for (const s of [-1, 1]) band(g, r, [T(r, s * .02, .01), T(r, s * .024, .1)], .008 * r.S, PAPER, false);
+    } },
+    { at: "head", on: "drop", layer: "head", draw(g, r) { // 후드: 얼굴만 빼고 덮음
+      const f = r.p.f;
+      g.save(); g.beginPath(); g.arc(...H(r, -.1 * f, -.06), r.R * 1.34, 0, 7); g.arc(...H(r, .14 * f, .06), r.R * .86, 0, 7, true);
+      g.fillStyle = "#2a2d35"; g.fill("evenodd"); g.lineWidth = r.ol; g.strokeStyle = INK; g.stroke(); g.restore();
+    } },
+    { at: "hR", on: "toss", layer: "hand", draw(g, r) { // 편지(잠금)
+      const k = r.p.env; if (k < .02) return;
+      inFrame(g, [r.hR[0] + .02 * r.S, r.hR[1] - .03 * r.S], -.1, () => this.letter(g, r, r.S * k, r.lock));
+    } },
+  ],
+  keys: [
+    [550, "io", { ik: 1, h: 10, env: 1, ll1: -14, ll2: -6, rl1: 16, rl2: 6 }, "unlock"],
+    [450, "io", { ik: 1, h: 12, env: 1, ll1: -14, ll2: -6, rl1: 16, rl2: 6 }, "lock"],
+    [450, "io", { ik: 1, h: 8, env: 1, ll1: -14, ll2: -6, rl1: 16, rl2: 6 }],
+    [320, "io", { ik: 0, t: -14, h: -8, ra1: -140, ra2: -110, la1: 55, la2: 80, ll1: -24, ll2: -8, rl1: 24, rl2: 10, env: 1 }],
+    [130, "o", { ik: 0, t: 18, h: 6, ra1: 100, ra2: 96, la1: -55, la2: -35, ll1: -30, ll2: -12, rl1: 32, rl2: 4, env: 1 }, "fly"],
+    [150, "l", { ik: 0, t: 16, h: 4, ra1: 96, ra2: 90, la1: -52, la2: -32, ll1: -30, ll2: -12, rl1: 32, rl2: 4, env: 0 }],
+    [700, "io", { ik: 0, t: 4, h: -10, ra1: 35, ra2: 70, la1: -28, la2: -12, ll1: -14, ll2: -6, rl1: 16, rl2: 6, env: 0 }, "incoming"],
+    [560, "io", { ik: 0, t: 8, h: -4, ra1: 95, ra2: 120, la1: 80, la2: 115, ll1: -14, ll2: -6, rl1: 16, rl2: 6, env: 0 }],
+    [10, "l", { ik: 0, t: 8, h: -4, ra1: 95, ra2: 120, la1: 80, la2: 115, ll1: -14, ll2: -6, rl1: 16, rl2: 6, env: 1 }],
+    [400, "io", { ik: 1, t: 2, h: 6, env: 1, ll1: -14, ll2: -6, rl1: 16, rl2: 6 }],
+  ],
+  on: { unlock() { this.locked = 0; }, lock(r) { this.locked = 1; const c = [r.hR[0] + .02 * r.S, r.hR[1] - .03 * r.S]; spark(c[0], c[1], { life: .5, draw(g, p) { const k = p.age / p.life; g.globalAlpha *= 1 - k; g.strokeStyle = "#e0b021"; g.lineWidth = r.ol * 1.5; g.beginPath(); g.arc(p.x, p.y, r.S * (.03 + .1 * k), 0, 7); g.stroke(); } }); },
+    fly(r) { // 종이비행기로 접혀 날아감, 점선 자국
+      const S = r.S, x0 = r.hR[0], y0 = r.hR[1];
+      spark(x0, y0, { life: 1.6, trail: [], draw(g, p) {
+        const k = p.age, x = x0 + k * S * 1.5, y = y0 - Math.sin(k * 3) * .25 * S - k * .25 * S, a = Math.atan2(-Math.cos(k * 3) * .75 - .25, 1.5);
+        p.trail.push([x, y]); g.save(); g.setLineDash([S * .015, S * .02]); g.strokeStyle = "rgba(21,21,20,.35)"; g.lineWidth = r.ol; path(g, p.trail.length > 1 ? p.trail : [[x, y], [x, y]]); g.stroke(); g.restore();
+        inFrame(g, [x, y], a, () => { shape(g, r, [[.07 * S, 0], [-.05 * S, -.04 * S], [-.03 * S, 0], [-.05 * S, .03 * S]], PAPER); path(g, [[.07 * S, 0], [-.03 * S, 0]]); g.stroke(); });
+      } });
+    },
+    incoming(r) { const S = r.S, self = this, sx = r.gx + 1.6 * S, sy = r.gy - .9 * S;
+      spark(sx, sy, { life: .6, draw(g, p) { const k = E.io(cl(p.age / .56)), [tx, ty] = self.hand, x = lerp(sx, tx, k), y = lerp(sy, ty, k) - Math.sin(k * Math.PI) * .2 * S;
+        inFrame(g, [x, y], (1 - k) * 3 - .1 * k, () => self.letter(g, r, S, 1)); } }); } } },
+
+{ t: "학과 진로 지도", bg: "#2b44a6", base: { f: 1, x: -.25 },
+  // 과잠 입은 학생이 문항을 고민(?) → 깨달음(!) → 흥미가 겹치는 직무 막대가 솟고 → 가장 높은 직무를 가리키며 기뻐함
+  bars: [["기획", .42, "62%"], ["AI 개발", .7, "91%"], ["데이터", .52, "74%"]],
+  bar(r, i) { const S = r.S; return [r.gx + (r.p.x + .45 + i * .17) * S, r.gy]; },
+  items: [
+    { at: "neck", on: "wipe", layer: "front", draw(g, r) { // 과잠(몸판 남색, 소매 크림) + 청바지
+      pants(g, r, "#5b6f93", .88); sleeves(g, r, "#efe6cf", .84);
+      torso(g, r, top(r, 0, .34, .092, .104), "#23315e");
+      band(g, r, [T(r, -.09, .325), T(r, .09, .325)], .018 * r.S, "#efe6cf", false);
+      const p = T(r, .03, .1); g.save(); g.translate(p[0], p[1]); g.rotate(r.p.t * D); g.fillStyle = "#efe6cf"; g.font = `700 ${.05 * r.S}px "IBM Plex Mono", monospace`; g.textAlign = "center"; g.fillText("AI", 0, 0); g.restore();
+    } },
+  ],
+  keys: [
+    [600, "io", { t: -2, h: -10, ra1: 22, ra2: 150, la1: -26, la2: -10, ll1: -14, ll2: -6, rl1: 16, rl2: 6 }],
+    [600, "io", { t: -1, h: -4, ra1: 20, ra2: 148, la1: -26, la2: -10, ll1: -14, ll2: -6, rl1: 16, rl2: 6 }],
+    [500, "io", { t: 2, h: 8, ra1: 24, ra2: 152, la1: -24, la2: -8, ll1: -14, ll2: -6, rl1: 16, rl2: 6 }],
+    [180, "o", { t: -6, h: -12, ra1: 60, ra2: 30, la1: -40, la2: -20, ll1: -16, ll2: -6, rl1: 18, rl2: 6 }],
+    [320, "io", { t: 6, h: 2, ra1: 105, ra2: 100, la1: -34, la2: -16, ll1: -20, ll2: -8, rl1: 26, rl2: 6 }],
+    [900, "l", { t: 6, h: 2, ra1: 103, ra2: 98, la1: -34, la2: -16, ll1: -20, ll2: -8, rl1: 26, rl2: 6 }],
+    [220, "o", { t: -4, h: -6, y: -.05, ra1: 160, ra2: 172, la1: -50, la2: -24, ll1: -16, ll2: -6, rl1: 18, rl2: 6 }],
+    [520, "io", { t: 0, h: 0, ra1: 30, ra2: 60, la1: -26, la2: -10, ll1: -14, ll2: -6, rl1: 16, rl2: 6 }],
+  ],
+  fx(g, r, tl, a) {
+    const S = r.S, fade = cl((3600 - tl) / 300) * a;
+    g.save(); g.globalAlpha *= a; g.textAlign = "center"; g.fillStyle = INK;
+    // 고민하는 동안 머리 위로 ? 셋, 깨달으면 !
+    [[100, -.18, -.2], [650, .02, -.3], [1150, .2, -.22]].forEach(([t0, dx, dy]) => { const k = (tl - t0) / 650; if (k < 0 || k > 1) return;
+      g.save(); g.globalAlpha *= Math.sin(Math.PI * k); g.font = `600 ${.15 * S * E.b(cl(k * 3))}px "IBM Plex Mono", monospace`; g.fillText("?", r.head[0] + dx * S, r.head[1] + (dy - .05 * k) * S); g.restore(); });
+    const ex = (tl - 1700) / 600; if (ex > 0 && ex < 1) { g.save(); g.globalAlpha *= 1 - ex * ex; g.fillStyle = "#2b44a6"; g.font = `700 ${.19 * S * E.b(cl(ex * 4))}px "IBM Plex Mono", monospace`; g.fillText("!", r.head[0] + .04 * S, r.head[1] - .2 * S); g.restore(); }
+    // 직무 막대: 차례로 솟고, 가장 높은 막대에 불이 들어옴
+    g.globalAlpha = fade; g.font = `500 ${Math.max(12, .052 * S)}px "IBM Plex Mono", monospace`;
+    this.bars.forEach(([name, h, pc], i) => { const k = E.b(cl((tl - 1880 - i * 110) / 380)); if (k <= 0) return;
+      const [x, y] = this.bar(r, i), top = y - h * S * k, best = i === 1 && tl > 2500;
+      shape(g, r, [[x - .055 * S, y], [x + .055 * S, y], [x + .055 * S, top], [x - .055 * S, top]], best ? "#2b44a6" : "#d9d4c6");
+      g.fillStyle = best ? "#2b44a6" : INK; g.fillText(name, x, top - .075 * S); g.fillText(pc, x, top - .02 * S); });
+    g.restore();
+  } },
+
+{ t: "우리달", bg: "#f2a5b5", base: { f: 0, ik: 1 },
+  post(r) { const S = r.S, c = T(r, 0, .03); reach(r, "L", [c[0] - .18 * S, c[1] + .14 * S], r.p.ik, -1); reach(r, "R", [c[0] + .18 * S, c[1] + .14 * S], r.p.ik, 1); r.cal = c; r.heart = this.heart; }, // 달력 양옆 가장자리를 잡음
+  heart: 0,
+  items: [
+    { at: "neck", on: "wipe", layer: "front", draw(g, r) { // 분홍 가디건
+      pants(g, r, "#9fb4d9", .9); sleeves(g, r, "#ffdfe6", .86); torso(g, r, top(r, 0, .34, .09, .11), "#ffdfe6");
+      for (let i = 0; i < 3; i++) dot(g, T(r, .0, .08 + i * .08), .009 * r.S, "#f2a5b5", r.ol * .7);
+    } },
+    { at: "head", on: "drop", layer: "head", draw(g, r) { // 베레모
+      g.save(); g.translate(...H(r, .12, -.82)); g.rotate((r.p.t + r.p.h - 10) * D);
+      g.beginPath(); g.ellipse(0, 0, r.R * 1.18, r.R * .42, 0, 0, 7); g.fillStyle = "#f2a5b5"; g.fill(); g.lineWidth = r.ol; g.strokeStyle = INK; g.stroke();
+      band(g, r, [[0, -r.R * .4], [r.R * .05, -r.R * .62]], r.R * .14, "#f2a5b5"); g.restore();
+    } },
+    { at: "neck", on: "toss", layer: "hand", draw(g, r) { // 달력, 넘기는 장, 하트
+      const S = r.S, c = r.cal || T(r, 0, .03), w = .36 * S, h = .3 * S, x = c[0] - w / 2, y = c[1] - .015 * S;
+      const page = (yy, hh, fill) => { g.beginPath(); g.rect(x, yy, w, hh); g.fillStyle = fill; g.fill(); g.lineWidth = r.ol; g.strokeStyle = INK; g.stroke(); };
+      page(y, h, PAPER); g.fillStyle = "#f2a5b5"; g.fillRect(x + r.ol / 2, y + r.ol / 2, w - r.ol, .055 * S);
+      for (let i = 0; i < 7; i++) for (let j = 0; j < 4; j++) { g.fillStyle = "#d9d4c6"; g.fillRect(x + .025 * S + i * .047 * S, y + .085 * S + j * .05 * S, .028 * S, .028 * S); }
+      const hk = r.heart || 0; if (hk > 0) heart(g, x + .025 * S + 4 * .047 * S + .014 * S, y + .085 * S + 2 * .05 * S + .016 * S, .05 * S * E.b(cl(hk)), "#e2557a");
+      for (const s of [.3, .7]) { band(g, r, [[x + w * s, y - .02 * S], [x + w * s, y + .02 * S]], .012 * S, "#8d8a80", false); }
+      const pg = r.p.pg; if (pg > .01 && pg < .99) { const hh = h * Math.cos(pg * Math.PI); g.save(); g.globalAlpha *= 1 - cl((pg - .8) / .2); page(y, hh, hh > 0 ? PAPER : "#efe9dc"); if (hh > 0) { g.fillStyle = "#f2a5b5"; g.fillRect(x + r.ol / 2, y + r.ol / 2, w - r.ol, Math.min(hh, .055 * S)); } g.restore(); }
+    } },
+  ],
+  keys: [
+    [700, "io", { ik: 1, pg: 0, y: 0 }, "reset"],
+    [480, "io", { ik: 1, pg: .999, t: 3 }],
+    [10, "l", { ik: 1, pg: 0 }],
+    [260, "o", { ik: 1, y: -.07 }, "heart"],
+    [260, "i", { ik: 1, y: 0 }],
+    [240, "o", { ik: 1, y: -.04 }],
+    [240, "i", { ik: 1, y: 0 }],
+    [700, "io", { ik: 1, t: -3, h: -6 }],
+  ],
+  on: { reset() { this.heart = 0; }, heart(r) { this.heart = .01; const self = this, t0 = performance.now(); (function grow() { self.heart = Math.min(1, (performance.now() - t0) / 350); if (self.heart < 1) requestAnimationFrame(grow); })();
+    for (let i = 0; i < 6; i++) spark(r.gx + rnd(-.3, .3) * r.S, r.neck[1] + rnd(-.1, .1) * r.S, { vx: rnd(-.1, .1) * r.S, vy: -rnd(.25, .45) * r.S, life: rnd(1, 1.6), ph: rnd(0, 6), c: i % 2 ? "#f2a5b5" : "#c7b4e8",
+      draw(g, p) { g.globalAlpha *= Math.sin(Math.PI * p.age / p.life); heart(g, p.x + Math.sin(p.age * 5 + p.ph) * .03 * r.S, p.y, .05 * r.S, p.c); } }); } } },
+
+{ t: "레이싱 휠", bg: "#d6332c", base: { f: 0, ik: 1, y: -.08, ll1: -95, ll2: 80, rl1: 95, rl2: -80 }, // 다리는 접어 차체 뒤에
+  post(r) { const S = r.S, c = T(r, 0, .12), a = r.p.st * D, R = .13 * S; r.wheel = c;
+    reach(r, "L", [c[0] - Math.cos(a) * R, c[1] - Math.sin(a) * R], r.p.ik, -1); reach(r, "R", [c[0] + Math.cos(a) * R, c[1] + Math.sin(a) * R], r.p.ik, 1); },
+  items: [
+    { at: "neck", on: "wipe", layer: "front", draw(g, r) { sleeves(g, r, "#d6332c", .86); torso(g, r, top(r, 0, .34, .092, .104), "#d6332c"); for (const s of [-1, 1]) band(g, r, [T(r, s * .03, -.005), T(r, s * .03, .33)], .014 * r.S, PAPER, false); dot(g, r.hL, .028 * r.S, INK); dot(g, r.hR, .028 * r.S, INK); } },
+    { at: "gnd", on: "drop", layer: "front", draw(g, r) { // 경주차 앞모습
+      const S = r.S, cx = r.gx, gy = r.gy, roll = r.p.st * .0016;
+      g.save(); g.translate(cx, gy); g.rotate(roll);
+      for (const s of [-1, 1]) { g.beginPath(); g.roundRect(s * .5 * S - .09 * S, -.3 * S, .18 * S, .3 * S, .05 * S); g.fillStyle = "#1f2024"; g.fill(); g.lineWidth = r.ol; g.strokeStyle = INK; g.stroke(); }
+      shape(g, r, [[-.62 * S, -.03 * S], [.62 * S, -.03 * S], [.6 * S, -.1 * S], [-.6 * S, -.1 * S]], "#2a2d35");
+      shape(g, r, [[-.42 * S, -.08 * S], [.42 * S, -.08 * S], [.3 * S, -.3 * S], [.16 * S, -.36 * S], [-.16 * S, -.36 * S], [-.3 * S, -.3 * S]], "#d6332c");
+      shape(g, r, [[-.13 * S, -.09 * S], [.13 * S, -.09 * S], [.06 * S, -.3 * S], [-.06 * S, -.3 * S]], PAPER);
+      g.fillStyle = INK; g.font = `600 ${.085 * S}px "IBM Plex Mono", monospace`; g.textAlign = "center"; g.fillText("26", 0, -.16 * S); g.textAlign = "start";
+      g.restore();
+    } },
+    { at: "head", on: "drop", layer: "head", draw(g, r) { // 헬멧
+      g.save(); g.translate(r.head[0], r.head[1]); g.rotate((r.p.t + r.p.h) * D);
+      g.beginPath(); g.arc(0, -r.R * .05, r.R * 1.2, 0, 7); g.fillStyle = "#d6332c"; g.fill(); g.lineWidth = r.lw * .8; g.strokeStyle = INK; g.stroke();
+      g.save(); g.clip(); g.fillStyle = PAPER; g.fillRect(-r.R * .16, -r.R * 1.4, r.R * .32, r.R * 2.8); g.restore();
+      g.beginPath(); g.roundRect(-r.R * .92, -r.R * .38, r.R * 1.84, r.R * .5, r.R * .22); g.fillStyle = "#1d2230"; g.fill(); g.lineWidth = r.ol; g.stroke();
+      g.strokeStyle = "rgba(255,255,255,.7)"; g.lineWidth = r.R * .08; path(g, [[r.R * .2, -r.R * .3], [r.R * .5, r.R * .04]]); g.stroke(); g.restore();
+    } },
+    { at: "neck", on: "toss", layer: "hand", draw(g, r) { // 핸들
+      const c = r.wheel || T(r, 0, .12), R = .13 * r.S, a = r.p.st * D;
+      g.save(); g.translate(c[0], c[1]); g.rotate(a);
+      g.beginPath(); g.arc(0, 0, R, 0, 7); g.lineWidth = .026 * r.S + r.ol * 2; g.strokeStyle = INK; g.stroke(); g.lineWidth = .026 * r.S; g.strokeStyle = "#2a2d35"; g.stroke();
+      for (const b of [-Math.PI / 2 + Math.PI, 0, Math.PI]) { path(g, [[0, 0], [Math.cos(b) * R, Math.sin(b) * R]]); g.lineWidth = .016 * r.S; g.strokeStyle = "#2a2d35"; g.stroke(); }
+      dot(g, [0, 0], .03 * r.S, "#d6332c", r.ol); g.fillStyle = "#e0b021"; g.fillRect(-.006 * r.S, -R - .014 * r.S, .012 * r.S, .028 * r.S); g.restore();
+    } },
+  ],
+  keys: [
+    [520, "io", { ik: 1, st: -55, t: -8, h: -4, y: -.08 }],
+    [420, "io", { ik: 1, st: -55, t: -8, h: -4 }],
+    [620, "io", { ik: 1, st: 50, t: 8, h: 4 }],
+    [420, "io", { ik: 1, st: 50, t: 8, h: 4 }],
+    [420, "io", { ik: 1, st: 0, t: 0, h: 0 }],
+    [140, "o", { ik: 1, st: 4, y: -.115 }],
+    [180, "i", { ik: 1, st: 0, y: -.08 }],
+    [300, "io", { ik: 1, st: -6 }],
+  ],
+  fxBack(g, r, tl, a) { // 앞으로 달리는 속도선
+    const vp = [r.gx, r.gy - .55 * r.S]; this.lines = this.lines || [];
+    if (this.lines.length < 16) this.lines.push({ a: rnd(0, Math.PI * 2), d: rnd(.2, .5), v: rnd(1.4, 2.4) });
+    g.save(); g.beginPath(); g.rect(0, 0, W, r.gy - .02 * r.S); g.clip(); g.globalAlpha *= a * .28; g.strokeStyle = INK; g.lineCap = "round";
+    for (const l of this.lines) { l.d += l.v * .016; if (l.d > 2.6) Object.assign(l, { a: rnd(0, Math.PI * 2), d: rnd(.3, .6), v: rnd(1.4, 2.4) });
+      const p0 = [vp[0] + Math.cos(l.a) * l.d * r.S, vp[1] + Math.sin(l.a) * l.d * r.S * .62], p1 = [vp[0] + Math.cos(l.a) * (l.d + .12 * l.d) * r.S, vp[1] + Math.sin(l.a) * (l.d + .12 * l.d) * r.S * .62];
+      g.lineWidth = r.ol * (.5 + l.d); path(g, [p0, p1]); g.stroke(); }
+    g.restore();
+  } },
+
+{ t: "액셀 페달 3D", bg: "#f2c230", base: { f: 1, pd: 26 },
+  pedal(r) { const S = r.S, gx = r.gx + .38 * S, hinge = [gx - .12 * S, r.gy - .035 * S], a = r.p.pd * D, end = [hinge[0] + Math.cos(a) * .3 * S, hinge[1] - Math.sin(a) * .3 * S]; return { gx, hinge, end, a }; },
+  post(r) {
+    const S = r.S, P = this.pedal(r);
+    if (r.p.ikh > 0) { const bolt = L2(P.hinge, P.end, .45), sp = r.now / 120, h = [bolt[0] + Math.cos(sp) * .025 * S, bolt[1] + Math.sin(sp) * .025 * S], u = norm(r.shR, h); reach(r, "R", [h[0] - u[0] * .17 * S, h[1] - u[1] * .17 * S], r.p.ikh, 1); r.bolt = bolt; }
+    if (r.p.ikf > 0) { const foot = L2(P.hinge, P.end, .62); reach(r, "fR", [foot[0], foot[1] - .022 * S], r.p.ikf, -1); }
+  },
+  items: [
+    { at: "gnd", on: "pop", layer: "back", draw(g, r) { // 나무 페달 + 스프링
+      const S = r.S, P = this.pedal(r);
+      shape(g, r, [[P.gx - .15 * S, r.gy - .028 * S], [P.gx + .2 * S, r.gy - .028 * S], [P.gx + .2 * S, r.gy], [P.gx - .15 * S, r.gy]], "#c99a5e");
+      const s0 = [P.gx + .07 * S, r.gy - .028 * S], s1 = L2(P.hinge, P.end, .66);
+      g.strokeStyle = INK; g.lineWidth = r.ol * 1.3; g.beginPath(); for (let i = 0; i <= 10; i++) { const p = L2(s0, s1, i / 10); g.lineTo(p[0] + (i % 2 ? .016 : -.016) * S * (i && i < 10 ? 1 : 0), p[1]); } g.stroke();
+      band(g, r, [P.hinge, P.end], .032 * S, "#d8ad72");
+      dot(g, P.hinge, .016 * S, "#7d7f86", r.ol);
+    } },
+    { at: "neck", on: "wipe", layer: "front", draw(g, r) { // 작업복
+      pants(g, r, "#5c7290", .9); sleeves(g, r, PAPER, .45); torso(g, r, top(r, 0, .34, .088, .1), PAPER);
+      shape(g, r, [T(r, -.07, .12), T(r, .07, .12), T(r, .1, .35), T(r, -.1, .35)], "#5c7290");
+      for (const s of [-1, 1]) band(g, r, [T(r, s * .055, .13), T(r, s * .05, -.005)], .018 * r.S, "#4b5f7a");
+      shape(g, r, [T(r, -.035, .17), T(r, .035, .17), T(r, .035, .23), T(r, -.035, .23)], "#4b5f7a");
+    } },
+    { at: "head", on: "drop", layer: "head", draw(g, r) { // 안전모
+      g.save(); g.translate(...H(r, 0, -.18)); g.rotate((r.p.t + r.p.h) * D);
+      g.beginPath(); g.ellipse(0, 0, r.R * 1.12, r.R * 1.05, 0, Math.PI, 0); g.closePath(); g.fillStyle = "#f2c230"; g.fill(); g.lineWidth = r.ol; g.strokeStyle = INK; g.stroke();
+      const f = r.p.f < 0 ? -1 : 1; g.beginPath(); g.ellipse(f * r.R * .25, 0, r.R * 1.45, r.R * .16, 0, 0, 7); g.fill(); g.stroke();
+      path(g, [[0, -r.R * 1.05], [0, -r.R * .1]]); g.stroke(); g.restore();
+    } },
+    { at: "hR", on: "toss", layer: "hand", draw(g, r) { // 렌치
+      inFrame(g, r.hR, ang(r.eR, r.hR), () => { const S = r.S; band(g, r, [[-.03 * S, 0], [.15 * S, 0]], .024 * S, "#a8adb5");
+        g.beginPath(); g.arc(.17 * S, 0, .03 * S, .7, Math.PI * 2 - .7); g.lineWidth = .02 * S + r.ol * 2; g.strokeStyle = INK; g.stroke(); g.lineWidth = .02 * S; g.strokeStyle = "#a8adb5"; g.stroke(); }); } },
+  ],
+  keys: [
+    [600, "io", { x: .14, t: 42, h: 12, rl1: 86, rl2: 4, ll1: 2, ll2: -88, ikh: 1, ikf: 0, la1: 40, la2: 70, pd: 26 }],
+    [1400, "l", { x: .14, t: 44, h: 14, rl1: 86, rl2: 4, ll1: 2, ll2: -88, ikh: 1, ikf: 0, la1: 40, la2: 70, pd: 26 }],
+    [460, "io", { x: .1, t: 2, h: 0, ikh: 0, ra1: 30, ra2: 50, la1: -28, la2: -12, rl1: 20, rl2: 10, ll1: -6, ll2: -4 }],
+    [260, "io", { x: .1, t: -2, ikf: 1, ra1: 30, ra2: 40, la1: -24, la2: -10, ll1: -6, ll2: -4, pd: 26 }],
+    [220, "o", { x: .1, t: -6, ikf: 1, ra1: 34, ra2: 44, la1: -28, la2: -14, ll1: -8, ll2: -4, pd: 8 }, "vroom"],
+    [480, "l", { x: .1, t: -6, ikf: 1, ra1: 34, ra2: 44, la1: -28, la2: -14, ll1: -8, ll2: -4, pd: 8 }],
+    [240, "io", { x: .1, t: -2, ikf: 1, ra1: 30, ra2: 40, la1: -24, la2: -10, ll1: -6, ll2: -4, pd: 26 }],
+    [180, "o", { x: .1, t: -6, ikf: 1, ra1: 34, ra2: 44, la1: -28, la2: -14, ll1: -8, ll2: -4, pd: 8 }, "vroom"],
+    [420, "io", { x: .1, t: -3, ikf: 1, ra1: 30, ra2: 40, la1: -24, la2: -10, ll1: -6, ll2: -4, pd: 26 }],
+    [420, "io", { x: .12, t: 10, ikf: 0, rl1: 20, rl2: 10, ll1: -6, ll2: -4, pd: 26 }],
+  ],
+  fx(g, r, tl, a) { // 페달 위 눈금: 밟은 만큼 바늘이 올라감
+    const S = r.S, P = this.pedal(r), c = [P.gx + .34 * S, r.gy - .62 * S], R = .12 * S, k = cl((26 - r.p.pd) / 18);
+    g.save(); g.globalAlpha *= a; g.lineWidth = r.ol * 1.3; g.strokeStyle = INK;
+    g.beginPath(); g.arc(c[0], c[1], R, Math.PI, 0); g.stroke();
+    for (let i = 0; i <= 6; i++) { const t = Math.PI + i / 6 * Math.PI; path(g, [[c[0] + Math.cos(t) * R * .82, c[1] + Math.sin(t) * R * .82], [c[0] + Math.cos(t) * R, c[1] + Math.sin(t) * R]]); g.stroke(); }
+    g.strokeStyle = "#d6332c"; g.lineWidth = r.ol * 2.4; g.beginPath(); g.arc(c[0], c[1], R, -Math.PI * .25, 0); g.stroke();
+    const n = Math.PI + k * Math.PI * .95; g.strokeStyle = INK; g.lineWidth = r.ol * 2; path(g, [c, [c[0] + Math.cos(n) * R * .85, c[1] + Math.sin(n) * R * .85]]); g.stroke(); dot(g, c, .014 * S, INK);
+    if (r.p.ikh > .5 && Math.random() < .08 && r.bolt) spark(r.bolt[0], r.bolt[1], { vx: rnd(-.4, .4) * S, vy: -rnd(.2, .6) * S, g: S * 2, life: .35, draw(g, p) { g.globalAlpha *= 1 - p.age / p.life; dot(g, [p.x, p.y], .008 * S, "#e0b021"); } });
+    g.restore();
+  },
+  on: { vroom(r) { for (let i = 0; i < 3; i++) spark(r.gx + .7 * r.S, r.gy - (.3 + i * .08) * r.S, { vx: r.S * .9, life: .45, draw(g, p) { g.globalAlpha *= 1 - p.age / p.life; g.strokeStyle = INK; g.lineWidth = r.ol; path(g, [[p.x, p.y], [p.x + .1 * r.S, p.y]]); g.stroke(); } }); } } },
+
+{ t: "움직이는 웹사이트", bg: "#2b44a6", base: { f: 0 }, ghost: 1,
+  items: [
+    { at: "gnd", on: "pop", layer: "back", draw(g, r) { // 브라우저 창: 그 안에서 춤추고, 글줄 블록이 박자에 맞춰 들썩임
+      const S = r.S, x0 = r.gx - .66 * S, y0 = r.gy - 1.42 * S, w = 1.32 * S, h = 1.42 * S, bar = .11 * S, beat = r.now / 240 * Math.PI;
+      g.beginPath(); g.roundRect(x0, y0, w, h, .04 * S); g.fillStyle = "#fff"; g.fill();
+      g.save(); g.clip();
+      g.fillStyle = "#ecebe5"; g.fillRect(x0, y0, w, bar);
+      ["#e2557a", "#e0b021", "#3fae6a"].forEach((c, i) => dot(g, [x0 + (.06 + i * .045) * S, y0 + bar / 2], .014 * S, c));
+      g.beginPath(); g.roundRect(x0 + .24 * S, y0 + .025 * S, .8 * S, .06 * S, .03 * S); g.fillStyle = "#fff"; g.fill();
+      g.fillStyle = "#6b6f7a"; g.font = `500 ${.036 * S}px "IBM Plex Mono", monospace`; g.textAlign = "left"; g.fillText("tkdgh123.github.io/web-motion", x0 + .27 * S, y0 + .067 * S);
+      for (const [side, cx] of [[-1, x0 + .08 * S], [1, x0 + w - .25 * S]]) for (let i = 0; i < 6; i++) {
+        const k = Math.max(0, Math.sin(beat + i * .7 + (side > 0 ? 1.6 : 0))), y = y0 + bar + (.14 + i * .16) * S - k * .035 * S, ww = (i % 3 === 0 ? .17 : .12 + (i % 2) * .03) * S;
+        g.fillStyle = i % 3 === 0 ? "#2b44a6" : "#d9d4c6"; g.globalAlpha = i % 3 === 0 ? .85 : 1; g.beginPath(); g.roundRect(cx, y, ww, (i % 3 === 0 ? .05 : .028) * S, .014 * S); g.fill(); g.globalAlpha = 1; }
+      g.restore();
+      g.beginPath(); g.roundRect(x0, y0, w, h, .04 * S); g.lineWidth = r.ol * 1.4; g.strokeStyle = INK; g.stroke();
+      path(g, [[x0, y0 + bar], [x0 + w, y0 + bar]]); g.lineWidth = r.ol; g.stroke();
+    } },
+    { at: "fR", on: "pop", layer: "front", draw(g, r) { for (const [k, f] of [[r.kL, r.fL], [r.kR, r.fR]]) { const s = f[0] < r.hip[0] ? -1 : 1; g.beginPath(); g.roundRect(f[0] - .035 * r.S + s * .012 * r.S, f[1] - .03 * r.S, .07 * r.S, .045 * r.S, .02 * r.S); g.fillStyle = PAPER; g.fill(); g.lineWidth = r.ol; g.strokeStyle = INK; g.stroke(); g.fillStyle = "#2b44a6"; g.fillRect(f[0] - .03 * r.S + s * .012 * r.S, f[1] + .002 * r.S, .06 * r.S, .01 * r.S); } } },
+    { at: "neck", on: "wipe", layer: "front", draw(g, r) { pants(g, r, "#2c2f38", .82); sleeves(g, r, "#2b44a6", .5); torso(g, r, top(r, 0, .34, .095, .108), "#2b44a6"); band(g, r, [T(r, -.09, .3), T(r, .09, .3)], .02 * r.S, PAPER, false); } },
+    { at: "head", on: "drop", layer: "head", draw(g, r) { // 옆으로 쓴 모자 + 선글라스
+      g.save(); g.translate(...H(r, 0, -.5)); g.rotate((r.p.t + r.p.h - 8) * D);
+      g.beginPath(); g.ellipse(0, 0, r.R * 1.02, r.R * .78, 0, Math.PI, 0); g.closePath(); g.fillStyle = "#2b44a6"; g.fill();
+      g.beginPath(); g.ellipse(r.R * 1.2, -r.R * .02, r.R * .62, r.R * .14, -.15, 0, 7); g.fill(); g.restore();
+      g.save(); g.translate(r.head[0], r.head[1]); g.rotate((r.p.t + r.p.h) * D); g.fillStyle = INK; g.strokeStyle = PAPER; g.lineWidth = r.ol;
+      for (const s of [-1, 1]) { g.beginPath(); g.roundRect(s * r.R * .48 - r.R * .3 + r.p.f * r.R * .3, -r.R * .2, r.R * .6, r.R * .32, r.R * .12); g.fill(); g.stroke(); }
+      g.fillRect(-r.R * .2 + r.p.f * r.R * .3, -r.R * .16, r.R * .4, r.R * .07); g.restore();
+    } },
+  ],
+  keys: [
+    [240, "o", { x: -.05, t: -8, la1: -125, la2: -165, ra1: 40, ra2: -20, ll1: -22, ll2: -10, rl1: 6, rl2: 4 }],
+    [240, "o", { x: .05, t: 8, ra1: 125, ra2: 165, la1: -40, la2: 20, rl1: 22, rl2: 10, ll1: -6, ll2: -4 }],
+    [240, "o", { x: -.04, t: -6, la1: -90, la2: -88, ra1: 90, ra2: 92, y: -.04, ll1: -14, rl1: 14 }],
+    [240, "o", { x: .04, t: 6, la1: -90, la2: -40, ra1: 90, ra2: 150, ll1: -10, rl1: 10 }],
+    [240, "o", { x: 0, t: 0, la1: -60, la2: -150, ra1: 60, ra2: 150, ll1: -36, ll2: 8, rl1: 36, rl2: -8 }],
+    [170, "l", { f: 1, la1: -100, la2: -100, ra1: 100, ra2: 100, ll1: -8, rl1: 8, y: -.06 }],
+    [170, "l", { f: -1, la1: -100, la2: -100, ra1: 100, ra2: 100, ll1: -8, rl1: 8, y: -.1 }],
+    [170, "l", { f: 0, la1: -100, la2: -100, ra1: 100, ra2: 100, ll1: -8, rl1: 8, y: -.04 }],
+    [200, "o", { f: 0, t: -6, la1: -150, la2: -168, ra1: 40, ra2: -62, ll1: -14, ll2: -6, rl1: 26, rl2: 34, y: 0 }, "pose"],
+    [650, "l", { f: 0, t: -6, la1: -152, la2: -170, ra1: 40, ra2: -62, ll1: -14, ll2: -6, rl1: 26, rl2: 34 }],
+  ],
+  on: { pose(r) { const s = r.S, h = r.hL; for (let i = 0; i < 8; i++) { const a = i / 8 * Math.PI * 2; spark(h[0], h[1], { vx: Math.cos(a) * .7 * s, vy: Math.sin(a) * .7 * s, life: .5, draw(g, p) { g.globalAlpha *= 1 - p.age / p.life; g.strokeStyle = "#2b44a6"; g.lineWidth = r.ol * 1.4; path(g, [[p.x, p.y], [p.x - p.vx * .06, p.y - p.vy * .06]]); g.stroke(); } }); } } } },
+];
+// 작품 정보 붙이기
+for (const c of C) { const w = WORKS.find(x => x.t === c.t); c.href = ROOT + w.href; c.total = c.keys.reduce((a, k) => a + k[0], 0); }
+
+/* ───────── 자세 계산 ───────── */
+const full = (c, p) => Object.assign({}, BASE, c ? c.base : null, p);
+// 각도는 짧은 쪽으로 돌아감(크게 휘두를 땐 키를 180° 안쪽으로 나눔)
+const ANG = new Set(["t", "h", "la1", "la2", "ra1", "ra2", "ll1", "ll2", "rl1", "rl2", "sw"]);
+const wrap = d => ((d % 360) + 540) % 360 - 180;
+const mix = (a, b, k) => { const o = {}; for (const key in a) { const B = b[key] ?? a[key]; o[key] = ANG.has(key) ? a[key] + wrap(B - a[key]) * k : lerp(a[key], B, k); } return o; };
+// 관절마다 스프링: 멈출 때 살짝 넘쳤다 돌아오고, 머리·팔뚝은 늦게 따라옴 [세기, 감쇠]
+const SPR = { t: [380, .6], h: [200, .4], la1: [340, .5], ra1: [340, .5], la2: [210, .38], ra2: [210, .38], ll1: [560, .72], rl1: [560, .72], ll2: [480, .66], rl2: [480, .66], sw: [260, .45], sq: [300, .28] };
+const cur = {}, vel = {};
+function follow(p, dt) {
+  const o = { ...p };
+  for (const k in SPR) {
+    if (!(k in cur)) { cur[k] = p[k]; vel[k] = 0; }
+    const [K, z] = SPR[k], c = 2 * z * Math.sqrt(K), h = dt / 4;
+    for (let i = 0; i < 4; i++) { const e = k === "sq" ? p[k] - cur[k] : wrap(p[k] - cur[k]); vel[k] += (K * e - c * vel[k]) * h; cur[k] += vel[k] * h; }
+    o[k] = cur[k];
+  }
+  return o;
+}
+function loopPose(c, tl) {
+  tl = ((tl % c.total) + c.total) % c.total;
+  let s = 0;
+  for (let i = 0; i < c.keys.length; i++) {
+    const [d, e, p] = c.keys[i];
+    if (tl < s + d || i === c.keys.length - 1) { const prev = c.keys[(i - 1 + c.keys.length) % c.keys.length][2]; return mix(full(c, prev), full(c, p), E[e](cl((tl - s) / d))); }
+    s += d;
+  }
+}
+function fire(c, from, to, r) { // from~to(루프 안 시간) 사이에 도착한 동작의 일
+  if (!c.on) return;
+  let s = 0; const T0 = c.total;
+  for (const [d, , , ev] of c.keys) { s += d; if (!ev) continue; const at = s % T0;
+    const hit = from <= to ? at > from && at <= to : at > from || at <= to; if (hit && c.on[ev]) c.on[ev].call(c, r); }
+}
+
+/* ───────── 화면 ───────── */
+const cv = document.getElementById("cv"), g = cv.getContext("2d"), ttl = document.getElementById("ttl");
+const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const rgba = (c, a) => `rgba(${c.slice(1).match(/../g).map(h => parseInt(h, 16)).join(",")},${a})`;
+const DUST = Array.from({ length: 22 }, (_, i) => ({ x: Math.random(), y: Math.random(), s: rnd(2.5, 5.5), v: rnd(.012, .03), ph: rnd(0, 6), kind: i % 3 }));
+function backdrop(cA, cB, k, now, dt) { // 작품 색으로 은은한 빛 + 천천히 떠오르는 점·고리·십자
+  for (const [c, a] of [[cA, 1 - k], [cB, k]]) { if (a <= 0) continue;
+    const gr = g.createRadialGradient(GX, GY - .55 * S, 0, GX, GY - .55 * S, 1.6 * S); gr.addColorStop(0, rgba(c, .2 * a)); gr.addColorStop(1, rgba(c, 0)); g.fillStyle = gr; g.fillRect(0, 0, W, Hh); }
+  const c = k < .5 ? cA : cB; g.save(); g.strokeStyle = g.fillStyle = c; g.lineWidth = 1.5; g.lineCap = "round";
+  for (const d of DUST) { if (!calm) { d.y -= d.v * dt; if (d.y < -.03) Object.assign(d, { y: 1.03, x: Math.random() }); }
+    const x = d.x * W + Math.sin(now / 1700 + d.ph) * 14, y = d.y * Hh; g.globalAlpha = .28 + .14 * Math.sin(now / 900 + d.ph);
+    if (d.kind === 0) dot(g, [x, y], d.s * .6, c); else if (d.kind === 1) { g.beginPath(); g.arc(x, y, d.s, 0, 7); g.stroke(); } else { path(g, [[x - d.s, y], [x + d.s, y]]); g.stroke(); path(g, [[x, y - d.s], [x, y + d.s]]); g.stroke(); } }
+  g.restore();
+}
+let W, Hh, dpr, S, GX, GY = 0, gyTarget = 0;
+function layout() {
+  dpr = Math.min(devicePixelRatio, 2); W = innerWidth; Hh = innerHeight;
+  cv.width = W * dpr; cv.height = Hh * dpr;
+  const fs = Math.round(cl(W * .085, 40, 132));
+  document.body.style.setProperty("--fs", fs + "px");
+  document.body.style.setProperty("--gy", Math.round(Hh * (W < 700 ? .66 : .69)) + "px");
+}
+function measure() { // 제목 글자 윗선 = 땅
+  const a = ttl.querySelector("a"); if (!a) return;
+  const fs = parseFloat(getComputedStyle(ttl).fontSize), rc = a.getBoundingClientRect();
+  gyTarget = rc.top + fs * .2;
+  S = cl(Math.min((gyTarget - 100) / 1.32, W * .5), 110, 330);
+  GX = W / 2;
+}
+addEventListener("resize", () => { layout(); measure(); GY = gyTarget; });
+
+function setTitle(c) {
+  ttl.innerHTML = `<a href="${c.href}">${[...c.t].map(ch => `<i>${ch === " " ? " " : ch}</i>`).join("")}</a>`;
+}
+function swapTitle(c) {
+  const old = ttl.cloneNode(true); old.removeAttribute("id"); old.classList.add("out"); document.body.appendChild(old);
+  [...old.querySelectorAll("i")].forEach((el, i) => el.animate([{ transform: "none", opacity: 1 }, { opacity: 0, offset: .3 }, { transform: `translate(${rnd(-80, 80)}px, ${rnd(45, 70)}vh) rotate(${rnd(-80, 80)}deg)`, opacity: 0 }],
+    { duration: rnd(700, 1000), delay: i * 22, easing: "cubic-bezier(.5,0,.9,.45)", fill: "forwards" }));
+  setTimeout(() => old.remove(), 1600);
+  setTitle(c); measure();
+  [...ttl.querySelectorAll("i")].forEach((el, i) => el.animate([{ transform: "translateY(110%)" }, { transform: "none" }], { duration: 650, delay: 120 + i * 35, easing: "cubic-bezier(.2,.8,.2,1)", fill: "backwards" }));
+}
+
+/* ───────── 상태 ───────── */
+const idxEl = document.getElementById("idx");
+let ci = cl(parseInt(location.hash.slice(1)) - 1 || 0, 0, C.length - 1), loopT0 = performance.now(), prevTl = 0, trans = null, queued = null;
+let worn = C[ci].items.map(it => ({ it, k: 1 })), sprites = [], ghosts = [], trail = [], smear = [];
+const showIdx = () => { idxEl.innerHTML = `<b>${String(ci + 1).padStart(2, "0")}</b> / ${C.length}`; };
+
+function go(d) {
+  const n = (ci + d + C.length) % C.length;
+  if (trans) { queued = d; return; }
+  if (calm) { ci = n; worn = C[ci].items.map(it => ({ it, k: 1 })); setTitle(C[ci]); measure(); GY = gyTarget; loopT0 = performance.now(); showIdx(); history.replaceState(null, "", "#" + (ci + 1)); return; }
+  trans = { from: ci, to: n, t0: performance.now(), aT: performance.now() - loopT0, gy0: GY, off: false, on: false };
+}
+
+function anchor(it, r) {
+  if (it.at === "gnd") return [r.gx, r.gy];
+  return r[it.at] || r.neck;
+}
+function toSprite(w, r) { // 입던 옷을 그림 한 장으로 떠서 날려 보냄
+  const sz = Math.ceil(2.8 * r.S), c = document.createElement("canvas"); c.width = c.height = sz;
+  const x = c.getContext("2d"), [ax, ay] = anchor(w.it, r);
+  x.translate(sz / 2 - ax, sz / 2 - ay); wear(w.it, C.find(cc => cc.items.includes(w.it)), x, r);
+  const out = Math.sign(ax - r.hip[0] || rnd(-1, 1));
+  sprites.push({ c, sz, x: ax, y: ay, vx: out * rnd(1.3, 2.1) * r.S, vy: -rnd(1.1, 1.7) * r.S, rot: 0, vr: rnd(-7, 7), age: 0 });
+}
+function drawItem(w, r, owner) {
+  const it = w.it, k = w.k; if (k <= 0) return;
+  if (k >= 1) return wear(it, owner, g, r);
+  g.save();
+  const [ax, ay] = anchor(it, r);
+  if (it.on === "drop") { const e = bounce(k); g.translate(0, -(1 - e) * r.S * 1.3); g.globalAlpha *= cl(k * 5); g.translate(ax, ay); g.rotate((1 - e) * .5); g.translate(-ax, -ay); }
+  else if (it.on === "toss") { const e = E.o(k), sx = ax + r.S * 1.4, sy = ay - r.S * .6; g.translate(lerp(sx, ax, e) - ax, lerp(sy, ay, e) - ay - Math.sin(Math.PI * e) * r.S * .45); g.translate(ax, ay); g.rotate((1 - e) * Math.PI * 3); g.translate(-ax, -ay); }
+  else if (it.on === "pop") { const e = E.b(k); g.translate(ax, ay); g.scale(e, e); g.translate(-ax, -ay); }
+  else { const top = r.head[1] - r.R * 2, bot = r.gy + r.S * .05; g.beginPath(); g.rect(0, top, W, (bot - top) * E.o(k)); g.clip(); }
+  wear(it, owner, g, r); g.restore();
+}
+
+function frame(now) {
+  requestAnimationFrame(frame);
+  if (!S) return;
+  const dt = Math.min(.05, (now - (frame.t || now)) / 1000); frame.t = now;
+  let c = C[ci], p, fxA = 1, tl = now - loopT0;
+  if (trans) {
+    const tt = now - trans.t0, A = C[trans.from], B = C[trans.to];
+    if (tt < 1500) { let s = 0, prev = loopPose(A, trans.aT);
+      for (const [d, e, q] of JUMP) { const nx = full(null, q); if (tt < s + d) { p = mix(prev, nx, E[e](cl((tt - s) / d))); break; } s += d; prev = nx; }
+      if (tt > 300 && tt < 900) { const u = (tt - 300) / 600; p.y = -2.2 * u * (1 - u); }
+      p.rot = 360 * E.io(cl((tt - 340) / 500));
+    } else p = mix(full(null, STAND), loopPose(B, tt - 1500), E.io(cl((tt - 1500) / 400)));
+    if (tt >= 300 && !trans.off) { trans.off = true; const r0 = rig(p, S, GX, GY, now); A.post?.call(A, r0, 0); worn.forEach(w => toSprite(w, r0)); worn = []; swapTitle(B); trail = []; ghosts = []; }
+    GY = lerp(trans.gy0, gyTarget, E.io(cl((tt - 300) / 560)));
+    c = tt < 300 ? A : B; tl = tt < 300 ? trans.aT + tt : tt - 1500;
+    fxA = tt < 300 ? 1 - tt / 300 : cl((tt - 1500) / 400);
+    if (tt >= 300) worn = B.items.map((it, i) => ({ it, k: cl((tt - 1000 - i * 120) / 520) }));
+    if (tt >= 1900) { ci = trans.to; loopT0 = trans.t0 + 1500; prevTl = (now - loopT0) % B.total; trans = null; showIdx(); history.replaceState(null, "", "#" + (ci + 1)); if (queued !== null) { const q = queued; queued = null; go(q); } }
+  } else p = loopPose(c, tl);
+  p = follow({ ...p, t: p.t + Math.sin(now / 650) * 1.4 }, dt); // 숨쉬기
+
+  const r = rig(p, S, GX, GY, now);
+  const ltl = ((tl % c.total) + c.total) % c.total;
+  c.post?.call(c, r, ltl);
+  if (!trans) { fire(c, prevTl, ltl, r); prevTl = ltl; }
+
+  g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, Hh);
+  if (trans) backdrop(C[trans.from].bg, C[trans.to].bg, cl((now - trans.t0 - 300) / 900), now, dt); else backdrop(c.bg, c.bg, 1, now, dt);
+  // 바닥 그림자
+  g.save(); g.globalAlpha = .1 * cl(1 + p.y * 2.5); g.beginPath(); g.ellipse(r.hip[0], GY, S * .26, S * .025, 0, 0, 7); g.fillStyle = INK; g.fill(); g.restore();
+  if (c.fxBack && fxA > 0) c.fxBack(g, r, ltl, fxA);
+  // 몸 전체 변형: 공중제비(몸 가운데 기준 회전) + 늘어남·찌그러짐(발 밑 기준)
+  const mid = L2(r.hip, r.neck, .35), foot = GY + p.y * S;
+  g.save(); g.translate(mid[0], mid[1]); g.rotate(p.rot * D); g.translate(-mid[0], -mid[1]);
+  g.translate(r.hip[0], foot); g.scale(1 - p.sq * .6, 1 + p.sq); g.translate(-r.hip[0], -foot);
+  // 빠른 손발 잔상(화면 좌표로 모아 그림)
+  const m = g.getTransform(), scr = q => { const t = m.transformPoint(new DOMPoint(q[0], q[1])); return [t.x / dpr, t.y / dpr]; };
+  smear.push([now, ...[r.hL, r.hR, r.fL, r.fR].map(scr)]); while (smear.length > 1 && now - smear[0][0] > 90) smear.shift();
+  g.save(); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.globalAlpha = .15; g.strokeStyle = INK; g.lineWidth = r.lw * .8; g.lineCap = g.lineJoin = "round";
+  for (let j = 1; j <= 4; j++) { const pts = smear.map(s => s[j]); let d = 0; for (let i = 1; i < pts.length; i++) d += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); if (d > S * .1) { path(g, pts); g.stroke(); } }
+  g.restore();
+  const layer = L => worn.forEach(w => w.it.layer === L && drawItem(w, r, c));
+  layer("back");
+  // 잔상(움직이는 웹사이트): 브라우저 창 위에
+  if (c.ghost && !trans) { if (!frame.gt || now - frame.gt > 55) { frame.gt = now; ghosts.push(r); if (ghosts.length > 6) ghosts.shift(); }
+    ghosts.forEach((q, i) => { g.globalAlpha = .05 + i * .03; drawBody(g, q, "#2b44a6", q.lw * .9); }); g.globalAlpha = 1; }
+  drawBody(g, r);
+  layer("front");
+  drawHead(g, r);
+  layer("head");
+  // 칼끝 자국
+  if (c.tip && !trans) { const [a, b] = c.tip(r); trail.push([a, b, now]); while (trail.length && now - trail[0][2] > 160) trail.shift();
+    for (let i = 1; i < trail.length; i++) { const [a0, b0] = trail[i - 1], [a1, b1, t1] = trail[i]; if (Math.hypot(a1[0] - a0[0], a1[1] - a0[1]) < 6) continue;
+      g.fillStyle = `rgba(21,21,20,${.28 * (1 - (now - t1) / 160)})`; path(g, [a0, a1, b1, b0], 1); g.fill(); } }
+  layer("hand");
+  g.restore();
+  if (c.fx && fxA > 0) c.fx(g, r, ltl, fxA);
+  // 입자
+  for (let i = FX.length - 1; i >= 0; i--) { const q = FX[i]; q.age += dt; q.vy += q.g * dt; q.x += q.vx * dt; q.y += q.vy * dt;
+    if (q.age >= q.life) { FX.splice(i, 1); q.end?.(q); continue; } g.save(); q.draw(g, q); g.restore(); }
+  // 벗겨져 날아가는 옷
+  for (let i = sprites.length - 1; i >= 0; i--) { const s = sprites[i]; s.age += dt; s.vy += S * 4.2 * dt; s.x += s.vx * dt; s.y += s.vy * dt; s.rot += s.vr * dt;
+    if (s.age > 1 || s.y > Hh + S) { sprites.splice(i, 1); continue; }
+    g.save(); g.globalAlpha = 1 - cl((s.age - .55) / .45); g.translate(s.x, s.y); g.rotate(s.rot); g.drawImage(s.c, -s.sz / 2, -s.sz / 2); g.restore(); }
+}
+
+/* ───────── 조작 ───────── */
+document.getElementById("prev").onclick = () => go(-1);
+document.getElementById("next").onclick = () => go(1);
+addEventListener("keydown", e => { if (e.key === "ArrowRight") go(1); if (e.key === "ArrowLeft") go(-1); });
+let wt = 0; addEventListener("wheel", e => { e.preventDefault(); const t = performance.now(); if (t - wt < 900) return; wt = t; go(Math.sign(Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY)); }, { passive: false });
+let sx = null; cv.addEventListener("pointerdown", e => { sx = e.clientX; }); addEventListener("pointerup", e => { if (sx !== null && Math.abs(e.clientX - sx) > 40) go(e.clientX < sx ? 1 : -1); sx = null; });
+
+layout(); setTitle(C[ci]); showIdx();
+document.fonts.ready.then(() => { measure(); GY = gyTarget; });
+measure(); GY = gyTarget;
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

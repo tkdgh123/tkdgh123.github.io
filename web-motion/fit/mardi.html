@@ -1,0 +1,219 @@
+<!-- Claude가 만듦 (2026-11-06) — 마네킹이 관절마다 분해되며 스캔선이 지나가고, 다시 붙으면 탄력 있게 걷는다 (드론 분해·스캔 60 + 막대 인형 움직임 40) -->
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>마디 · 관절 마네킹</title>
+<link rel="icon" href="data:,">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root { --paper: #eceef0; --ink: #15171a; --muted: #5b6068; --joint: #f06a1d }
+* { box-sizing: border-box }
+html, body { margin: 0 }
+body { height: 600vh; background: var(--paper); color: var(--ink); font: 400 17px/1.6 "Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif; word-break: keep-all; -webkit-font-smoothing: antialiased; overflow-x: clip }
+canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block }
+.mono { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 12px; letter-spacing: .03em }
+.hud { position: fixed; z-index: 20; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; padding: 14px clamp(16px, 3vw, 32px); pointer-events: none }
+.hud a { pointer-events: auto; color: var(--ink); text-decoration: none; opacity: .65 }
+.hud a:hover { opacity: 1 }
+.say { position: fixed; z-index: 5; left: clamp(20px, 6vw, 100px); top: 50%; width: min(36ch, 42vw); transform: translateY(-46%); opacity: 0; transition: opacity .6s, transform .9s cubic-bezier(.2, .7, .2, 1); pointer-events: none }
+.say.on { opacity: 1; transform: translateY(-50%) }
+.say small { display: block; margin-bottom: 14px; color: var(--muted) }
+.say h1 { margin: 0; font-size: clamp(76px, 12vw, 190px); line-height: .88; letter-spacing: -.06em; font-weight: 600 }
+.say h1 b { color: var(--joint); font-weight: 600 }
+.say h2 { margin: 0; font-size: clamp(34px, 4.6vw, 70px); line-height: 1.02; letter-spacing: -.045em; font-weight: 600 }
+.say p { margin: 14px 0 0; color: #4c5257; font-size: clamp(15px, 1.3vw, 18px) }
+.read { display: grid; grid-template-columns: repeat(2, auto); gap: 6px 40px; margin-top: 26px; width: max-content }
+.read div { display: flex; flex-direction: column }
+.read b { font: 500 clamp(30px, 3.2vw, 48px)/1 "JetBrains Mono", monospace; letter-spacing: -.04em; font-variant-numeric: tabular-nums; min-width: 4ch }
+.read span { color: var(--muted); margin-top: 4px }
+.tag { position: fixed; z-index: 4; left: 0; top: 0; pointer-events: none; white-space: nowrap; opacity: 0; transition: opacity .35s; font: 500 12px "JetBrains Mono", monospace }
+.tag::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--joint); margin-right: 8px; box-shadow: 0 0 0 4px rgb(240 106 29 / .18) }
+.bar { position: fixed; z-index: 6; left: clamp(20px, 6vw, 100px); right: clamp(20px, 6vw, 100px); bottom: 20px; height: 2px; background: rgb(21 23 26 / .1) }
+.bar i { display: block; height: 100%; width: 0; background: var(--ink) }
+@media (max-width: 700px) {
+  .say { top: auto; bottom: 8vh; width: calc(100vw - 40px); transform: translateY(14px) } .say.on { transform: none }
+  .say h1 { font-size: clamp(88px, 28vw, 130px) } .read { margin-top: 14px; gap: 4px 28px }
+}
+</style>
+</head>
+<body>
+<nav class="hud mono"><a href="./index.html">← 카드별 어울림</a><a href="../../mardi/">작품 보기 →</a></nav>
+<canvas id="cv"></canvas>
+<div id="tags"></div>
+
+<div class="say on" data-a="0" data-b=".16"><small class="mono">MARDI · 3D 액션 실험</small><h1>마<b>·</b>디</h1><p>관절이 다 보이는 마네킹.</p></div>
+<div class="say" data-a=".2" data-b=".4"><h2>조각 하나에<br>뼈 하나.</h2><p>살이 휘지 않으니 뼈마다 조각을 하나씩 붙이면 끝이에요.</p></div>
+<div class="say" data-a=".44" data-b=".62"><h2>관절 여덟 곳</h2><p>스캔선이 지나가면 이름이 붙어요.</p></div>
+<div class="say" data-a=".72" data-b=".94"><small class="mono">걷기 1주기</small><h2>다시 붙으면<br>탄력 있게.</h2>
+  <div class="read"><div><b id="rh">0°</b><span class="mono">엉덩이</span></div><div><b id="rk">0°</b><span class="mono">무릎</span></div><div><b id="ra">0°</b><span class="mono">발목</span></div><div><b id="re">0°</b><span class="mono">팔꿈치</span></div></div></div>
+<div class="say" data-a=".95" data-b="1.1"><h2>볼 것은<br>관절.</h2></div>
+<div class="bar"><i id="bar"></i></div>
+
+<script type="module">
+import * as THREE from "three";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+const small = innerWidth < 700, calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const cv = document.getElementById("cv");
+const renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+const scene = new THREE.Scene();
+scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), .04).texture;
+scene.fog = new THREE.Fog("#eceef0", 7, 16);
+const camera = new THREE.PerspectiveCamera(32, 1, .1, 60);
+const sun = new THREE.DirectionalLight("#ffffff", 1.8); sun.position.set(2, 5, 3); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
+Object.assign(sun.shadow.camera, { left: -3, right: 3, top: 3, bottom: -3 }); sun.shadow.radius = 6; scene.add(sun);
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), new THREE.ShadowMaterial({ opacity: .2 }));
+floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor);
+// 바닥 줄: 걷는 동안 뒤로 흘러감
+const lineGeo = new THREE.BufferGeometry(), lp = []; for (let i = 0; i < 40; i++) lp.push(-3, 0, i * .5 - 10, 3, 0, i * .5 - 10);
+lineGeo.setAttribute("position", new THREE.Float32BufferAttribute(lp, 3));
+const lines = new THREE.LineSegments(lineGeo, new THREE.LineBasicMaterial({ color: "#15171a", transparent: true, opacity: 0 })); scene.add(lines);
+
+// ── 마네킹: 뼈(Object3D 계층) + 조각(따로 둔 메쏘). 매 프레임 뼈 자세를 조각에 복사하고 분해 거리를 더한다
+const G = new THREE.Group(); scene.add(G);
+const wood = new THREE.MeshStandardMaterial({ color: "#f1efe9", roughness: .38, metalness: .05 });
+const ball = new THREE.MeshStandardMaterial({ color: "#2b2e33", roughness: .3, metalness: .5 });
+const bone = (parent, x, y, z) => { const b = new THREE.Object3D(); b.position.set(x, y, z); parent.add(b); return b; };
+const pieces = [], tags = [], tagsBox = document.getElementById("tags");
+function piece(b, geo, mat, ox, oy, oz, label) {
+  const m = new THREE.Mesh(geo, mat.clone()); m.castShadow = true; m.userData = { b, off: new THREE.Vector3(ox, oy, oz), k: 36 + Math.random() * 30, ex: 0, v: 0, dir: new THREE.Vector3(), label };
+  geo.translate(0, 0, 0); G.add(m);
+  const w = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: "#f06a1d", wireframe: true, transparent: true, opacity: .55 })); w.visible = false; m.add(w); m.userData.w = w;
+  pieces.push(m); return m;
+}
+const cap = (r, l, ox = 0, oy = 0, oz = 0) => new THREE.CapsuleGeometry(r, l, 8, 20).translate(ox, oy, oz);
+const rbox = (w, h, d, r) => { const g = new THREE.BoxGeometry(w, h, d, 4, 4, 4); const p = g.attributes.position, v = new THREE.Vector3(); // 모서리 둥글게: 상자 점을 둥근 상자 쪽으로 밀기
+  for (let i = 0; i < p.count; i++) { v.fromBufferAttribute(p, i); const c = new THREE.Vector3(Math.max(-w / 2 + r, Math.min(w / 2 - r, v.x)), Math.max(-h / 2 + r, Math.min(h / 2 - r, v.y)), Math.max(-d / 2 + r, Math.min(d / 2 - r, v.z))); v.sub(c).normalize().multiplyScalar(r).add(c); p.setXYZ(i, v.x, v.y, v.z); } g.computeVertexNormals(); return g; };
+const J = r => new THREE.SphereGeometry(r, 28, 20);
+
+const pelvis = bone(G, 0, .98, 0);
+const waist = bone(pelvis, 0, .1, 0), neck = bone(waist, 0, .46, 0);
+piece(pelvis, rbox(.34, .2, .21, .06), wood, 0, 0, 0);
+piece(waist, J(.06), ball, 0, 0, 0, "허리");
+piece(waist, cap(.085, .12), wood, 0, .15, 0);
+piece(waist, rbox(.38, .36, .22, .09), wood, 0, .31, 0);
+piece(neck, J(.045), ball, 0, 0, 0, "목");
+piece(neck, new THREE.SphereGeometry(.105, 36, 24).scale(.92, 1.12, 1), wood, 0, .17, .01);
+const side = {};
+for (const s of [1, -1]) {
+  const sh = bone(waist, s * .23, .4, 0), el = bone(sh, 0, -.3, 0), wr = bone(el, 0, -.27, 0);
+  piece(sh, J(.052), ball, 0, 0, 0, s > 0 ? "어깨" : ""); piece(sh, cap(.042, .22), wood, 0, -.15, 0);
+  piece(el, J(.044), ball, 0, 0, 0, s > 0 ? "팔꿈치" : ""); piece(el, cap(.036, .19), wood, 0, -.135, 0);
+  piece(wr, J(.034), ball, 0, 0, 0, s > 0 ? "손목" : ""); piece(wr, rbox(.06, .11, .035, .018), wood, 0, -.07, 0);
+  const hp = bone(pelvis, s * .1, -.06, 0), kn = bone(hp, 0, -.45, 0), an = bone(kn, 0, -.43, 0);
+  piece(hp, J(.062), ball, 0, 0, 0, s > 0 ? "엉덩이" : ""); piece(hp, cap(.058, .33), wood, 0, -.225, 0);
+  piece(kn, J(.05), ball, 0, 0, 0, s > 0 ? "무릎" : ""); piece(kn, cap(.045, .33), wood, 0, -.215, 0);
+  piece(an, J(.04), ball, 0, 0, 0, s > 0 ? "발목" : ""); piece(an, rbox(.085, .06, .24, .028), wood, 0, -.055, .055);
+  side[s] = { sh, el, wr, hp, kn, an };
+}
+pieces.forEach(m => { // 분해 방향: 몸 가운데에서 바깥으로 (옆으로 더 멀리)
+  m.userData.b.updateWorldMatrix(true, false); const p = new THREE.Vector3().setFromMatrixPosition(m.userData.b.matrixWorld).add(m.userData.off.clone().applyQuaternion(m.userData.b.getWorldQuaternion(new THREE.Quaternion())));
+  m.userData.dir.set(p.x * 1.15 + (Math.random() - .5) * .2, (p.y - .95) * .42, 0.2 + Math.random() * .35 + p.z * 1.5); if (Math.abs(p.x) < .02) m.userData.dir.x = (Math.random() - .5) * .6;
+  m.userData.home = p.clone();
+  const lb = m.userData.label; if (lb) { const d = document.createElement("div"); d.className = "tag"; d.textContent = lb; tagsBox.append(d); tags.push([m, d]); }
+});
+
+// 막대 인형 같은 궤적: 왼발끝·오른손끝이 지나간 자리를 주황 선으로
+const TR = 140, trail = (() => { const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(new Float32Array(TR * 3), 3)); g.setAttribute("alpha", new THREE.BufferAttribute(new Float32Array(TR), 1));
+  const m = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, vertexShader: `attribute float alpha; varying float a; void main(){ a = alpha; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }`, fragmentShader: `varying float a; void main(){ gl_FragColor = vec4(.94, .42, .11, a * .9); }` });
+  const l = new THREE.Line(g, m); l.frustumCulled = false; G.add(l); return { g, l, pts: [] }; })();
+
+// ── 장면 키: 모델 위치·회전·분해·스캔·걷기
+const clamp01 = x => Math.min(1, Math.max(0, x)), sm = t => t * t * (3 - 2 * t), L = (a, b, t) => a + (b - a) * t;
+const bandIn = (a, b, p) => sm(clamp01((p - a) / (b - a)));
+let target = 0, prog = 0, mx = 0, my = 0, mxs = 0, mys = 0;
+const prg = () => clamp01(scrollY / (document.documentElement.scrollHeight - innerHeight));
+addEventListener("scroll", () => target = prg(), { passive: true });
+addEventListener("pointermove", e => { mx = e.clientX / innerWidth - .5; my = e.clientY / innerHeight - .5; });
+function resize() { renderer.setSize(innerWidth, innerHeight, false); camera.aspect = innerWidth / innerHeight; camera.fov = innerWidth < 700 ? 44 : 32; camera.updateProjectionMatrix(); }
+addEventListener("resize", resize); resize(); target = prog = prg();
+
+const scanDisc = new THREE.Group();
+scanDisc.add(new THREE.Mesh(new THREE.CircleGeometry(1.15, 64), new THREE.MeshBasicMaterial({ color: "#f06a1d", transparent: true, opacity: .1, side: THREE.DoubleSide, depthWrite: false })));
+scanDisc.add(new THREE.Mesh(new THREE.RingGeometry(1.13, 1.15, 96), new THREE.MeshBasicMaterial({ color: "#f06a1d", side: THREE.DoubleSide })));
+scanDisc.rotation.x = -Math.PI / 2; scanDisc.visible = false; scene.add(scanDisc);
+
+const el = id => document.getElementById(id), says = [...document.querySelectorAll(".say")], bar = el("bar");
+const rd = { h: el("rh"), k: el("rk"), a: el("ra"), e: el("re") };
+const clock = new THREE.Clock(), v = new THREE.Vector3(), q = new THREE.Quaternion(), inv = new THREE.Matrix4(), tmp = new THREE.Matrix4(), sc = new THREE.Vector3();
+let T = 0, phase = 0, walkAmt = 0, bounce = 0, bounceV = 0, lastS = 0;
+const deg = r => Math.round(r * 180 / Math.PI);
+
+renderer.setAnimationLoop(() => {
+  const rd0 = Math.min(.3, clock.getDelta()), dt = Math.min(.05, rd0) * (calm ? .15 : 1); T += dt;
+  prog += (target - prog) * (1 - Math.exp(-rd0 * 4)); const p = prog;
+  mxs += (mx - mxs) * .05; mys += (my - mys) * .05;
+  // 가로로 모델은 오른쪽(휴대폰은 위쪽)에, 카메라는 천천히 한 바퀴 돌아봄
+  const exT = bandIn(.18, .32, p) * (1 - bandIn(.66, .74, p));
+  const wk = bandIn(.7, .78, p);
+  walkAmt += (wk - walkAmt) * .1;
+  const small2 = innerWidth < 700;
+  G.position.x = small2 ? 0 : .95;
+  G.rotation.y = L(.5 + p * 1.4, 0.35, wk) + mxs * .5 + (calm ? 0 : Math.sin(T * .3) * .08);
+  const camR = (small2 ? 7.2 : 4.8) + exT * (small2 ? 1.8 : 1.4);
+  camera.position.set(Math.sin(.18 + mxs * .3) * camR, 1.35 - mys * .5 + exT * .3, Math.cos(.18) * camR); camera.lookAt(small2 ? 0 : 0, small2 ? .68 : .92, 0);
+  small2 ? camera.setViewOffset(innerWidth, innerHeight, 0, innerHeight * .16, innerWidth, innerHeight) : camera.clearViewOffset();
+  camera.updateProjectionMatrix();
+
+  // 자세: T자 → (걷기가 시작되면) 걷는 자세
+  phase += dt * 4.2 * walkAmt;
+  const ph = phase, Ts = 1 - walkAmt;
+  const bn = bounce; // 발이 땅에 닿을 때 몸이 눌렸다 튀는 탄력
+  const hipA = s => -Math.sin(ph + (s > 0 ? 0 : Math.PI)) * .5, kneeA = s => .1 + .95 * Math.max(0, Math.cos(ph + (s > 0 ? 0 : Math.PI))) ** 1.4;
+  for (const s of [1, -1]) {
+    const o = side[s], h = hipA(s) * walkAmt, k = kneeA(s) * walkAmt, sa = -Math.sin(ph + (s > 0 ? Math.PI : 0)) * .55 * walkAmt;
+    o.hp.rotation.set(h, 0, s * -.04 * walkAmt); o.kn.rotation.set(k, 0, 0); o.an.rotation.set(-(h + k) * .75 + .05 * walkAmt, 0, 0);
+    o.sh.rotation.set(sa, 0, s * (Math.PI / 2 * Ts + .09 * walkAmt)); o.el.rotation.set(-(.25 + .35 * Math.max(0, -sa / .55)) * walkAmt - 0 * Ts, 0, 0); o.wr.rotation.set(0, 0, 0);
+  }
+  pelvis.position.y = .98 - (Math.abs(Math.cos(ph)) * .035 - .02 + bn * .05) * walkAmt;
+  pelvis.rotation.y = Math.sin(ph) * .1 * walkAmt; waist.rotation.y = -Math.sin(ph) * .16 * walkAmt; waist.rotation.z = Math.sin(ph) * .03 * walkAmt;
+  neck.rotation.y = Math.sin(ph) * .07 * walkAmt;
+  if (walkAmt > .5) { const s2 = Math.sign(Math.cos(ph * 2)); if (s2 !== lastS && s2 < 0 === true) bounceV += 5; lastS = s2; }
+  bounceV += (-bounce * 140 - bounceV * 9) * dt; bounce += bounceV * dt;
+  pelvis.updateWorldMatrix(true, true); G.updateWorldMatrix(true, false); inv.copy(G.matrixWorld).invert();
+
+  // 조각: 뼈 자세를 따라가고, 분해 거리는 조각마다 스프링 (되돌아올 때 살짝 튕김)
+  const scanY = L(-.3, 2.0, clamp01((p - .43) / .17)), scanning = p > .42 && p < .66, wireOn = p > .43 && p < .68;
+  pieces.forEach(m => {
+    const u = m.userData, b = u.b;
+    u.v += ((exT - u.ex) * u.k - u.v * (exT > .5 ? 7 : 5.2)) * dt; u.ex += u.v * dt;
+    tmp.multiplyMatrices(inv, b.matrixWorld); tmp.decompose(m.position, m.quaternion, sc);
+    m.position.add(u.off.clone().applyQuaternion(m.quaternion));
+    m.position.addScaledVector(u.dir, u.ex * 1.0);
+    m.position.y += Math.sin(T * 1.3 + u.k) * .03 * u.ex;
+    const wy = m.position.y, scanned = wireOn && wy < scanY + .02;
+    u.w.visible = scanned; u.w.material.opacity = .5 + .2 * Math.sin(T * 3 + u.k);
+    m.material.emissive.set("#f06a1d"); m.material.emissiveIntensity = scanning ? Math.exp(-(((wy - scanY) / .09) ** 2)) * 1.3 : 0;
+    u.scanned = scanned;
+  });
+  scanDisc.visible = scanning; scanDisc.position.set(G.position.x, scanY, 0);
+  // 이름표
+  tags.forEach(([m, d]) => {
+    m.getWorldPosition(v); v.project(camera);
+    d.style.transform = `translate(${(v.x * .5 + .5) * innerWidth + 16}px, ${(-v.y * .5 + .5) * innerHeight - 8}px)`;
+    d.style.opacity = exT > .6 && m.userData.scanned ? 1 : 0;
+  });
+  // 바닥 줄과 궤적
+  lines.material.opacity = walkAmt * .13; lines.position.z = (phase * .18) % .5 * -1 + 0; lines.position.x = G.position.x;
+  trail.pts.forEach(t => t.z -= dt * 4.2 * .9 * walkAmt);
+  if (walkAmt > .3) {
+    side[1].an.getWorldPosition(v); G.worldToLocal(v); v.y -= .04; trail.pts.unshift(v.clone());
+  }
+  while (trail.pts.length > TR) trail.pts.pop();
+  const tp = trail.g.attributes.position, ta = trail.g.attributes.alpha;
+  for (let i = 0; i < TR; i++) { const t = trail.pts[i] || trail.pts[trail.pts.length - 1] || v; tp.setXYZ(i, t.x, t.y, t.z); ta.setX(i, trail.pts[i] ? (1 - i / TR) * walkAmt : 0); }
+  tp.needsUpdate = ta.needsUpdate = true;
+  if (walkAmt > .4) { const s1 = side[1]; rd.h.textContent = deg(-s1.hp.rotation.x) + "°"; rd.k.textContent = deg(s1.kn.rotation.x) + "°"; rd.a.textContent = deg(-s1.an.rotation.x) + "°"; rd.e.textContent = deg(-s1.el.rotation.x) + "°"; }
+  says.forEach(s => s.classList.toggle("on", p >= +s.dataset.a && p < +s.dataset.b));
+  bar.style.width = p * 100 + "%";
+  renderer.render(scene, camera);
+});
+</script>
+</body>
+</html>

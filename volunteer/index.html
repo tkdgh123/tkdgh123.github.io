@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>봉사 18시간</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="섬김의리더십 봉사 18시간: 11/16~12/7, 숭실대입구역에서 1시간 안팎 1365·VMS 1회성 봉사 모음과 시간 계산">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@300..700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+/* 왼쪽: 18칸 막대·달력·순서가 붙어 있는 계획판 / 오른쪽: 날짜별 봉사 목록 */
+:root{
+  --paper:#fbfcfa;--sheet:#f1f4ef;--line:#dde3da;--ink:#1d2420;--muted:#5d6760;
+  --go:#14704f;--go-ink:#ffffff;--warn:#b5481f;
+  --display:"Hahmlet","Nanum Myeongjo",Georgia,serif;
+  --sans:"Pretendard",-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --mono:"IBM Plex Mono","D2Coding",Consolas,monospace;
+  --k-camp:#c2413b;--k-animal:#c9731d;--k-food:#a8861a;--k-env:#2c8a62;--k-event:#6a4fc4;--k-sport:#2563b0;
+  --k-kids:#c2477f;--k-elder:#8a6440;--k-disab:#2f5d86;--k-culture:#6f7d1f;--k-goods:#6b6f78;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#141816;--sheet:#1c211e;--line:#2d3530;--ink:#e6ebe7;--muted:#a3ada6;
+  --go:#4cc493;--go-ink:#0d1a14;--warn:#f08a5d;
+  --k-camp:#ee7a73;--k-animal:#f0a65c;--k-food:#d9bb4c;--k-env:#5cc794;--k-event:#a690f5;--k-sport:#6aa5ef;
+  --k-kids:#ef84b3;--k-elder:#c79d74;--k-disab:#7fa8d1;--k-culture:#b2c25a;--k-goods:#a7abb4;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#141816;--sheet:#1c211e;--line:#2d3530;--ink:#e6ebe7;--muted:#a3ada6;
+  --go:#4cc493;--go-ink:#0d1a14;--warn:#f08a5d;
+  --k-camp:#ee7a73;--k-animal:#f0a65c;--k-food:#d9bb4c;--k-env:#5cc794;--k-event:#a690f5;--k-sport:#6aa5ef;
+  --k-kids:#ef84b3;--k-elder:#c79d74;--k-disab:#7fa8d1;--k-culture:#b2c25a;--k-goods:#a7abb4;
+  color-scheme:dark}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 16px/1.6 var(--sans);word-break:keep-all;overflow-wrap:break-word;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+a{color:inherit}
+button,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--go);outline-offset:2px}
+.wrap{max-width:1240px;margin:0 auto;padding-block:36px 120px}
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 32px;padding-bottom:22px;border-bottom:2px solid var(--ink)}
+.top a.home{font:500 13px var(--mono);color:var(--muted);text-decoration:none;display:block;margin-bottom:10px}
+h1{font:300 clamp(40px,6vw,72px)/1 var(--display);letter-spacing:-.04em;margin:0}
+h1 b{font-weight:700}
+.sub{margin:10px 0 0;color:var(--muted)}
+.facts{display:flex;flex-wrap:wrap;gap:10px 26px;margin:0;padding:0;list-style:none}
+.facts li{display:flex;flex-direction:column}
+.facts b{font:600 22px/1.1 var(--mono);font-variant-numeric:tabular-nums}
+.facts span{font-size:13px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:minmax(300px,380px) 1fr;gap:40px;margin-top:28px;align-items:start}
+.plan{position:sticky;top:max(16px,env(safe-area-inset-top,0px));display:flex;flex-direction:column;gap:22px}
+.panel h2{font:600 14px var(--sans);color:var(--muted);margin:0 0 10px}
+/* 18칸 */
+.meter{background:var(--sheet);padding:18px;border-radius:6px}
+.count{display:flex;align-items:baseline;gap:8px}
+.count b{font:600 54px/1 var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.04em}
+.count span{font:500 20px var(--mono);color:var(--muted)}
+.count em{margin-left:auto;font-style:normal;font-size:14px;color:var(--muted);text-align:right}
+.cells{display:grid;grid-template-columns:repeat(18,1fr);gap:3px;margin:14px 0 10px}
+.cells i{display:block;aspect-ratio:1/2.2;border-radius:2px;background:var(--line)}
+.state{font-size:14px;margin:0}
+.state.ok{color:var(--go);font-weight:600}
+.warns{margin:8px 0 0;padding:0;list-style:none;font-size:13px;color:var(--warn);display:flex;flex-direction:column;gap:2px}
+.presets{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.presets button{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:6px 12px;font-size:13px;cursor:pointer}
+.presets button:hover{border-color:var(--ink)}
+/* 달력 */
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cal .wd{font:500 11px var(--mono);color:var(--muted);text-align:center;padding-bottom:2px}
+.cal .wd.we{color:var(--ink)}
+.day{position:relative;border:0;background:var(--sheet);border-radius:4px;min-height:52px;padding:5px 4px 8px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:1px}
+.day.we{background:color-mix(in srgb,var(--sheet) 60%,var(--line))}
+.day .n{font:600 13px var(--mono);font-variant-numeric:tabular-nums}
+.day .c{font:400 11px var(--mono);color:var(--muted)}
+.day .mk{font-size:10px;line-height:1.2;color:var(--warn);font-weight:600}
+.day .bar{position:absolute;left:4px;right:4px;bottom:4px;height:3px;border-radius:2px;background:transparent}
+.day.has .bar{background:var(--go)}
+.day.on{outline:2px solid var(--ink);outline-offset:-2px}
+.day.blank{background:transparent;cursor:default}
+.day[disabled]{opacity:.35;cursor:default}
+.calnote{font-size:12px;color:var(--muted);margin:8px 0 0}
+/* 순서 */
+.steps{margin:0;padding:0;list-style:none;counter-reset:s;display:flex;flex-direction:column;gap:10px;font-size:14px}
+.steps li{counter-increment:s;display:grid;grid-template-columns:24px 1fr;gap:8px}
+.steps li::before{content:counter(s);font:600 13px/1.6 var(--mono);color:var(--go)}
+.steps small{display:block;color:var(--muted);font-size:13px}
+/* 거르기 */
+.filters{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.seg{display:inline-flex;background:var(--sheet);border-radius:999px;padding:3px}
+.seg button{border:0;background:transparent;border-radius:999px;padding:5px 12px;font-size:14px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.sw{display:inline-flex;align-items:center;gap:8px;border:0;background:none;cursor:pointer;font-size:14px;padding:4px 0}
+.sw .t{width:34px;height:20px;border-radius:999px;background:var(--line);position:relative;transition:background .15s;flex:none}
+.sw .t::after{content:"";position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:var(--paper);transition:transform .15s}
+.sw[aria-checked="true"] .t{background:var(--go)}
+.sw[aria-checked="true"] .t::after{transform:translateX(14px)}
+.kinds{display:flex;flex-wrap:wrap;gap:6px;width:100%}
+.kinds button{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:4px 10px 4px 8px;font-size:13px;cursor:pointer}
+.kinds button[aria-pressed="true"]{border-color:var(--ink);background:var(--sheet);font-weight:600}
+.dot{width:9px;height:9px;border-radius:2px;flex:none;background:var(--kc)}
+.dayhint{font-size:14px;color:var(--muted)}
+.dayhint button{border:0;background:none;text-decoration:underline;cursor:pointer;color:var(--ink);padding:0}
+/* 목록 */
+.group{margin-top:26px}
+.gh{display:flex;align-items:baseline;gap:10px;margin:0 0 4px;font:600 15px var(--mono)}
+.gh b{font:700 26px/1 var(--mono);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.gh .we{color:var(--warn)}
+.gh small{font:400 13px var(--sans);color:var(--muted)}
+.row{display:grid;grid-template-columns:86px 1fr auto;gap:6px 18px;padding:14px 0;border-top:1px solid var(--line);align-items:start}
+.row.picked{background:linear-gradient(90deg,color-mix(in srgb,var(--go) 9%,transparent),transparent 70%)}
+.tm{font:500 13px/1.35 var(--mono);font-variant-numeric:tabular-nums;color:var(--muted)}
+.tm b{display:block;font:600 24px/1.1 var(--mono);color:var(--ink)}
+.tm b small{font-size:13px;font-weight:500;color:var(--muted)}
+.body h3{font:600 17px/1.4 var(--sans);margin:0;text-wrap:balance}
+.body p{margin:2px 0 6px;color:var(--muted);font-size:14px;max-width:62ch}
+.meta{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:13px}
+.meta .k{display:inline-flex;align-items:center;gap:5px;font-weight:600}
+.meta .mv{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.flags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.flags span{font-size:12px;padding:1px 7px;border-radius:3px;background:var(--sheet);color:var(--ink)}
+.act{display:flex;flex-direction:column;align-items:flex-end;gap:8px;min-width:118px}
+.act a{font:500 13px var(--mono);text-decoration:none;border-bottom:1px solid currentColor;white-space:nowrap}
+.act select{font-size:13px;padding:3px 4px;border:1px solid var(--line);border-radius:4px;background:var(--paper);max-width:118px}
+.empty{padding:40px 0;color:var(--muted)}
+.foot{margin-top:40px;font-size:13px;color:var(--muted)}
+.mbar{display:none}
+@media (max-width:860px){
+  .grid{grid-template-columns:1fr;gap:28px}
+  .plan{display:contents}
+  .plan .meter{order:1}.plan .cal-p{order:2}main{order:3}.plan .steps-p{order:4}
+  .row{grid-template-columns:64px 1fr}
+  .act{grid-column:1/-1;flex-direction:row;justify-content:space-between;align-items:center;min-width:0}
+  .mbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:5;align-items:center;gap:12px;background:var(--ink);color:var(--paper);
+    padding:10px max(16px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));font-size:14px}
+  .mbar b{font:600 22px var(--mono)}
+  .mbar .mc{display:grid;grid-template-columns:repeat(18,1fr);gap:2px;flex:1}
+  .mbar .mc i{height:10px;border-radius:1px;background:color-mix(in srgb,var(--paper) 25%,transparent)}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <a class="home" href="../">← 창업실</a>
+      <h1>봉사 <b>18</b>시간</h1>
+      <p class="sub">섬김의리더십 · 숭실대입구역에서 1시간 안팎 · 한 번만 가면 되는 1365·VMS 봉사</p>
+    </div>
+    <ul class="facts">
+      <li><b>18h↑</b><span>못 채우면 이수 불가</span></li>
+      <li><b>6h</b><span>하루 인정 최대</span></li>
+      <li><b>12.07</b><span>봉사 마지막 날</span></li>
+      <li><b>12.09</b><span>확인서 제출</span></li>
+    </ul>
+  </header>
+
+  <div class="grid">
+    <aside class="plan">
+      <section class="panel meter" aria-labelledby="mh">
+        <h2 id="mh">담은 봉사</h2>
+        <div class="count"><b id="tot">0</b><span>/ 18</span><em id="cnt"></em></div>
+        <div class="cells" id="cells" aria-hidden="true"></div>
+        <p class="state" id="state"></p>
+        <ul class="warns" id="warns"></ul>
+        <div class="presets">
+          <button type="button" id="pa">추천 A · 가까운 곳 19시간</button>
+          <button type="button" id="pb">추천 B · 주말만 23시간</button>
+          <button type="button" id="pc">비우기</button>
+        </div>
+      </section>
+
+      <section class="panel cal-p" aria-labelledby="ch">
+        <h2 id="ch">날짜</h2>
+        <div class="cal" id="cal"></div>
+        <p class="calnote">숫자는 그날 갈 수 있는 봉사 수. 누르면 그날만 봐요.</p>
+      </section>
+
+      <section class="panel steps-p" aria-labelledby="sh">
+        <h2 id="sh">해야 할 순서</h2>
+        <ol class="steps">
+          <li><div>봉사마다 <b>시작 전에</b> LMS 2주차 '봉사활동계획서'를 내요.<small>과목 지정 서식만. 같은 기관이면 하나로 돼요.</small></div></li>
+          <li><div>1365나 VMS에서 신청해요.<small>'전화 확정' 표시가 있으면 담당자에게 연락해야 끝나요.</small></div></li>
+          <li><div>VMS로 한 봉사가 있으면 1365 회원정보에서 실적 연계 동의를 해 둬요.<small>그래야 확인서 하나에 다 모여요.</small></div></li>
+          <li><div>봉사한 주 일요일 밤까지 그 주 봉사일지를 내요.<small>300자 이상, 10pt·줄간격 160%, 끝에 글자 수.</small></div></li>
+          <li><div>결과보고서는 11.23이나 12.07 17시 중 한 번.<small>봉사의 의미를 비유하는 사진 한 장과 300자 이상, PDF.</small></div></li>
+          <li><div>12.09까지 1365 봉사참여실적에서 18시간을 한 파일 PDF로 뽑아 내요.<small>암호 없는 파일로. 기관이 실적을 올리는 데 1~2주 걸려서 11월 안에 끝내면 안전해요.</small></div></li>
+        </ol>
+      </section>
+    </aside>
+
+    <main>
+      <div class="filters">
+        <div class="seg" role="group" aria-label="거리">
+          <button type="button" data-far="99" aria-pressed="true">전체</button>
+          <button type="button" data-far="30" aria-pressed="false">30분 안</button>
+          <button type="button" data-far="45" aria-pressed="false">45분 안</button>
+        </div>
+        <button type="button" class="sw" id="we" role="switch" aria-checked="false"><span class="t"></span>주말만</button>
+        <button type="button" class="sw" id="mine" role="switch" aria-checked="false"><span class="t"></span>담은 것만</button>
+        <span class="dayhint" id="dayhint"></span>
+        <div class="kinds" id="kinds" aria-label="종류"></div>
+      </div>
+      <div id="list"></div>
+      <p class="foot">11월 13일 1365·VMS에서 모집 중이던 것 중 학교 기준(포털 등록 기관, 헌혈·비대면 빼고)에 맞고 3번 넘게 가야 하는 정기 봉사를 뺀 것만 모았어요. 이동 시간은 숭실대입구역에서 대중교통으로 어림한 값이에요. 남은 자리와 마감은 신청 화면에서 다시 확인하세요.</p>
+    </main>
+  </div>
+</div>
+<div class="mbar" aria-hidden="true"><b id="mtot">0</b><span>/18</span><div class="mc" id="mcells"></div></div>
+
+<script>
+const KIND={camp:"거리 캠페인",animal:"동물",food:"음식 나눔",env:"환경",event:"행사 진행",sport:"스포츠 대회",kids:"아이들",elder:"어르신",disab:"장애인과 함께",culture:"문화·전시",goods:"물품·포장"};
+const START=new Date(2026,10,16),END=new Date(2026,11,7);
+const pad=n=>String(n).padStart(2,"0");
+const key=d=>pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const ALL=[];for(let d=new Date(START);d<=END;d.setDate(d.getDate()+1))ALL.push(key(d));
+const dow=k=>{const[m,d]=k.split("-").map(Number);return new Date(2026,m-1,d).getDay()};
+const WD="일월화수목금토";
+const pick=fn=>ALL.filter(k=>fn(dow(k),k));
+const URL={"1365":id=>"https://www.1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo="+id,"VMS":id=>"https://www.vms.or.kr/partspace/recruitView.do?seq="+id};
+
+// u 고유 이름 · k 종류 · s 포털 · d 날짜(뒤 @는 그날 따로 올라온 모집 번호) · t 시간 · h 인정(하루 6시간 상한 반영 전) · m 이동(분, 어림)
+const I=[
+{u:"cmp",k:"camp",s:"1365",id:"3549760",d:["11-21"],t:"12:00-18:00",h:6,ti:"숭실대입구역·상도역 장애인식개선 캠페인",w:"시각장애인연합회와 역 앞 거리 홍보, 길 안내, 행사 세팅·정리",p:"마을발전소(상도로37길) 집결",m:0,seat:"남은 9자리",due:"11.19",f:["사전교육 2시간 필수(아래 칸)"]},
+{u:"cmp0",k:"camp",s:"1365",id:"3536935",d:["11-18","11-19"],t:"",h:2,ti:"장애인식개선 캠페인 사전교육",w:"11/21 캠페인 전에 받는 교육. 수·목 중 하루, 시간도 따로 인정돼요",p:"시각장애인연합회 동작지회(상도동)",m:5,seat:"남은 5자리",due:"11.19",f:["시간은 담당자 안내"]},
+{u:"hs",k:"food",s:"1365",id:"3549468",d:["11-28"],t:"11:00-13:00",h:2,ti:"흑석동 어르신 도시락 걸어서 배달",w:"후원 도시락을 나눠 담고 어르신 댁까지 걸어서 전달",p:"흑석종합사회복지관",m:15,seat:"남은 1자리",due:"11.24",f:["활동일 4일 전 마감"]},
+{u:"mj1",k:"food",s:"1365",id:"3550359",d:["11-26"],t:"14:00-17:00",h:3,ti:"겨울나기 맛장 만들기 1일차",w:"저소득 주민께 드릴 장을 만들고 나눠 담기",p:"상도종합사회복지관",m:10,seat:"남은 5자리",due:"11.25"},
+{u:"mj2",k:"food",s:"1365",id:"3550359",d:["11-27"],t:"10:00-15:00",h:5,ti:"겨울나기 맛장 만들기 2일차",w:"장 만들기 마무리와 소분",p:"상도종합사회복지관",m:10,seat:"남은 5자리",due:"11.25"},
+{u:"bday",k:"elder",s:"1365",id:"3528213",d:["11-25"],t:"15:00-17:00",h:2,ti:"어르신 생신잔치 보조",w:"생신 축하 진행, 사진, 어르신 도시락 포장",p:"상도종합사회복지관",m:10,seat:"하루 3명",due:"상시"},
+{u:"won",k:"elder",s:"1365",id:"3547191",d:["11-30"],t:"13:30-16:30",h:3,ti:"어르신 원예 작품 만들기 보조",w:"노인일자리 어르신들의 원예 프로그램 진행 돕기",p:"상도은빛복지관",m:10,seat:"남은 4자리",due:"11.27"},
+{u:"won2",k:"elder",s:"1365",id:"3547195",d:["12-07"],t:"09:30-12:30",h:3,ti:"어르신 원예 작품 만들기 보조",w:"같은 프로그램의 12월 회차",p:"상도은빛복지관",m:10,seat:"남은 4자리",due:"12.04",f:["마지막 날이라 실적 등록이 늦을 수 있음"]},
+{u:"sbal",k:"event",s:"1365",id:"3547204",d:["11-27"],t:"09:30-17:30",h:8,ti:"어르신 1년 배움 성과발표회 돕기",w:"전시 준비, 관람객 자리 안내, 뒷정리",p:"김영삼도서관 대강당",m:10,seat:"남은 12자리",due:"11.26"},
+{u:"jeon",k:"culture",s:"VMS",id:"523323",d:["11-20"],t:"13:00-18:00",h:5,ti:"어르신 사회교육 전시 물품 세팅",w:"전시물 설치와 행사 물품 옮기기",p:"동작문화복지센터 4층",m:15,seat:"남은 7자리",due:"11.18",f:["대학생 대상"]},
+{u:"gu",k:"event",s:"1365",id:"3550811",d:["11-27"],t:"09:00-14:00",h:5,ti:"연예인 봉사단과 겨울나기 나눔 행사",w:"동작구청 특별 나눔 행사 현장 운영",p:"동작구청 4층 대강당",m:10,seat:"남은 28자리",due:"11.15",f:["점심 없음"]},
+{u:"dem",k:"elder",s:"1365",id:"3540796",d:pick((w,k)=>[2,4,5].includes(w)&&k<"12-01"),t:"09:00-12:00",h:3,ti:"주민센터 순회 치매검진 보조",w:"동작구 주민센터에서 검진 안내. 11월 화·목·금 중 하루",p:"동작구 주민센터(날마다 다름)",m:15,seat:"하루 1명",due:"11월"},
+{u:"baz",k:"goods",s:"1365",id:"3549676",d:["11-19"],t:"09:00-16:00",h:7,ti:"복지관 미니 나눔장터(바자회) 판매",w:"주민 대상 기증 물품(여성 의류 위주) 판매",p:"동작종합사회복지관(대방동)",m:25,seat:"남은 4자리",due:"11.18"},
+{u:"kim",k:"kids",s:"VMS",id:"524292",d:["11-25"],t:"13:00-17:00",h:4,ti:"초등학생과 김장하는 쿠킹데이",w:"아이들 출결·위생 챙기고 김장 만들기 함께",p:"동작 거점키움센터(대방역 서울가족플라자)",m:25,seat:"남은 2자리",due:"11.23",f:["20~40세"]},
+{u:"mok",k:"event",s:"VMS",id:"524406",d:["11-25"],t:"10:00-13:00",h:3,ti:"부모 목공 교실 진행 보조",w:"재료 나누기, 안전 관리, 완성품 포장",p:"동작 거점키움센터(대방역 서울가족플라자)",m:25,seat:"남은 2자리",due:"11.23"},
+{u:"damu",k:"event",s:"VMS",id:"524922",d:["12-02"],t:"08:00-14:00",h:5,ti:"다문화가족 송년회 진행",w:"참석자 안내, 만들기 체험 지원, 도시락 배부",p:"서울가족플라자 B1(대방역)",m:25,seat:"남은 4자리",due:"11.28",f:["20~40세","점심 빼고 5시간"]},
+{u:"ict",k:"kids",s:"1365",id:"3547505",d:["11-28"],t:"13:00-18:00",h:5,ti:"청소년 ICT 스포츠존 운영",w:"체감형 스포츠 기기 안내와 이용 청소년 응대",p:"대방청소년센터",m:25,seat:"남은 1자리",due:"11.27"},
+{u:"bor",k:"disab",s:"1365",id:"3550447",d:["11-19"],t:"13:00-18:00",h:5,ti:"장애인 전동보조기기 안전교육 보조",w:"관악구장애인단체연합회 야외 안전교육 진행 돕기",p:"보라매공원",m:20,seat:"남은 10자리",due:"11.18",f:["비 오면 취소"]},
+{u:"book",k:"culture",s:"VMS",id:"524838",d:["11-25","11-26","11-27"],t:"09:00-18:00",h:6,ti:"장애인 작가 출판기념회·전시 운영",w:"전시장 세팅, 방문객 응대, 부스 지원. 3시간 이상 원하는 만큼",p:"동작아트갤러리",m:25,seat:"남은 10자리",due:"11.24",f:["4시간 넘으면 점심"]},
+{u:"jang",k:"food",s:"1365",id:"3549675",d:["11-25"],t:"09:00-12:00",h:3,ti:"복지관 김장 포장·나르기",w:"김장 포장하고 옮기기, 장소 정리",p:"중앙사회복지관(봉천동)",m:25,seat:"남은 10자리",due:"11.24"},
+{u:"dosi",k:"food",s:"VMS",id:"523793",d:["11-18"],t:"09:00-12:00",h:3,ti:"관악구 어르신 댁 도시락 배달",w:"어르신 가정까지 걸어서 도시락 전달",p:"관악노인종합복지관",m:25,seat:"남은 4자리",due:"11.16",f:["전화 확정","비 와도 진행"]},
+{u:"sadang",k:"food",s:"1365",id:"3543956",d:pick(w=>w>0&&w<6),t:"09:00-13:00",h:4,ti:"사당어르신복지관 경로식당",w:"어르신 점심 배식 돕기. 평일 중 하루",p:"사당어르신종합복지관",m:25,seat:"하루 5명",due:"상시"},
+{u:"gwd",k:"disab",s:"1365",id:"3528291",d:pick(w=>w>0&&w<6),t:"10:30-13:30",h:3,ti:"장애인복지관 식당 배식",w:"이용인 점심 배식과 식당 정리. 평일 중 하루",p:"관악구장애인종합복지관",m:25,seat:"하루 5명",due:"상시",f:["전화 확정","점심"]},
+{u:"gul",k:"culture",s:"1365",id:"3544787",d:pick((w,k)=>w!==1&&k<"12-01"),t:"14:00-17:00",h:3,ti:"도서관 사서 업무 보조",w:"반납 도서 분류, 열람실 정리. 11월 화~일 중 하루",p:"글빛정보도서관(서울대입구역)",m:25,seat:"하루 2명",due:"11월",f:["실적은 다음 주 수요일 뒤 등록"]},
+{u:"gp",k:"camp",s:"1365",id:"3544045",d:["11-27"],t:"14:00-16:00",h:2,ti:"가정폭력 예방 거리 캠페인",w:"신림역 일대에서 홍보물 나눠 주기",p:"신림역 일대",m:25,seat:"남은 19자리",due:"11.20"},
+{u:"dog1",k:"animal",s:"1365",id:"3538498",d:["11-23","11-24","11-25","11-26","11-27"],t:"10:00-12:30",h:3,ti:"유기견·유기묘 보호소 오전 돌봄",w:"견사·묘사 청소, 배변 치우기, 밥 주기",p:"동물구조119 입양센터(문래동)",m:30,seat:"하루 4명",due:"11.18",f:["중·대형견 많음","취소는 3일 전"]},
+{u:"dog2",k:"animal",s:"1365",id:"3538596",d:["11-23","11-24","11-25","11-26","11-28","11-29"],t:"14:00-17:30",h:4,ti:"유기견·유기묘 보호소 오후 돌봄",w:"청소에 놀아 주기, 목욕·미용까지",p:"동물구조119 입양센터(문래동)",m:30,seat:"하루 4명",due:"11.18",f:["중·대형견 많음","취소는 3일 전"]},
+{u:"chi",k:"elder",s:"1365",id:"3546615",d:["11-26"],t:"09:00-17:00",h:8,ti:"주민 치매검진 접수·안내",w:"문진표 작성 돕기, 번호표 나눠 주기, 질서 안내",p:"YDP미래평생학습관(대림역)",m:20,seat:"남은 3자리",due:"11.25",f:["전화 확정","점심"]},
+{u:"man",k:"disab",s:"1365",id:"3524521",d:["11-19"],t:"08:00-17:00",h:8,ti:"발달장애 청소년 만보 걷기 대회",w:"접수처·부스 운영, 보행 지원, 코스 안내",p:"영등포공원",m:25,seat:"남은 8자리",due:"11.18",f:["전화 확정","사전교육 참석 요청"]},
+{u:"bil",k:"kids",s:"VMS",id:"523898",d:["11-21"],t:"12:00-17:00",h:5,ti:"다문화 어린이 이중언어 발표회",w:"행사장 세팅과 무대 진행 보조",p:"신길종합복지관 3층",m:25,seat:"남은 6자리",due:"11.20",f:["중국어·베트남어 하면 환영"]},
+{u:"plog",k:"env",s:"1365",id:"3548897",d:["11-21"],t:"09:30-12:30",h:3,ti:"분리수거 교육 + 담배꽁초 줍깅",w:"친환경 교육 듣고 신도림 거리 정화",p:"신도림동",m:25,seat:"남은 15자리",due:"11.20"},
+{u:"rehab",k:"disab",s:"VMS",id:"524179",d:["11-25"],t:"11:00-13:00",h:2,ti:"초등학생 장애체험 교육 보조",w:"안내보행·저시력 체험 코스 안내",p:"서울신도림초(국립재활원)",m:25,seat:"남은 2자리",due:"11.24",f:["20~50세","전화 확정"]},
+{u:"net",k:"goods",s:"1365",id:"3538612",d:["12-01","12-02","12-03","12-04"],t:"14:00-18:00",h:4,ti:"넷마블 나눔 바자회 준비",w:"바자회 물품 정리와 준비",p:"넷마블 G타워(구로디지털단지)",m:25,seat:"하루 5명",due:"12.01"},
+{u:"sen",k:"elder",s:"1365",id:"3546910",d:["11-19"],t:"11:00-16:00",h:5,ti:"시니어 예술제 행사 돕기",w:"의자 세팅, 안내, 정리",p:"삼익아트홀(7호선 학동역)",m:25,seat:"남은 8자리",due:"11.18",f:["만 50세 이하","점심"]},
+{u:"mara",k:"sport",s:"1365",id:"3538504",d:["11-22"],t:"07:00-15:00",h:8,ti:"서울 억새풀 마라톤 운영",w:"급수, 물품 보관, 간식 지급, 주변 청소",p:"영롱이억새구장(문래동)",m:30,seat:"남은 17자리",due:"11.17",f:["만 55세 미만"]},
+{u:"nanum",k:"disab",s:"1365",id:"3542844",d:["12-02"],t:"09:00-17:00",h:8,ti:"장애인 700명 나눔의 한마당 진행",w:"행사 진행 보조, 물품 옮기기·정리",p:"영등포아트홀",m:30,seat:"남은 28자리",due:"12.01",f:["점심"]},
+{u:"dif",k:"goods",s:"1365",id:"3548822",d:["11-18"],t:"14:00-17:00",h:3,ti:"이웃 선물 디퓨저·룸스프레이 만들기",w:"취약계층에 보낼 방향제와 양말목 키링 만들기",p:"하이서울유스호스텔(영등포)",m:30,seat:"남은 65자리",due:"11.17"},
+{u:"onsu",k:"culture",s:"VMS",id:"525154",d:["11-16","11-17","11-18","11-19","11-20"],t:"09:00-12:30",h:3,ti:"온수역 어르신 시화·AI 작품전 안내",w:"역을 오가는 시민에게 전시 안내, 방명록 이벤트",p:"7호선 온수역 안",m:30,seat:"남은 30자리",due:"11.19",f:["오후 12:10~18:00 타임도 있음"]},
+{u:"coat",k:"goods",s:"1365",id:"3533401",d:["12-05"],t:"11:00-14:00",h:3,ti:"겨울 외투 나눔 플리마켓",w:"외투 나눔과 플리마켓 운영 보조",p:"금천구가족센터",m:30,seat:"남은 9자리",due:"12.03"},
+{u:"abuse",k:"camp",s:"VMS",id:"524948",d:["11-19"],t:"14:00-17:00",h:3,ti:"아동학대 예방의 날 캠페인",w:"구청·경찰서와 아동·보호자 대상 캠페인",p:"용산꿈나무종합타운",m:30,seat:"남은 4자리",due:"11.18"},
+{u:"box",k:"goods",s:"1365",id:"3546506",d:["11-24","11-26@3546520"],t:"10:00-16:00",h:6,ti:"학대피해아동 생필품 상자 나르기",w:"세제·휴지 등 지원 물품 수백 상자 운반",p:"대한아동학대방지협회(당산동)",m:35,seat:"남은 3·6자리",due:"하루 전",f:["점심"]},
+{u:"toy",k:"kids",s:"1365",id:"3549703",d:["11-24","11-25","11-26","11-27","11-28@3549704"],t:"14:00-17:00",h:3,ti:"장난감도서관 장난감 소독·정리",w:"빌려 가는 장난감을 닦고 정리",p:"장난감도서관 당산2호점",m:35,seat:"하루 1명",due:"11.18",f:["11/28(토)은 9~12시"]},
+{u:"choir",k:"culture",s:"1365",id:"3519331",d:["12-01"],t:"17:30-21:30",h:4,ti:"탈북 여성 합창단 정기음악회",w:"리셉션 안내, 대기실 간식 세팅, 공연 관람",p:"여의도 CCMM빌딩",m:35,seat:"남은 1자리",due:"11.30"},
+{u:"bl",k:"goods",s:"1365",id:"3546530",d:["11-20","11-23","11-24","11-25"],t:"10:00-17:00",h:7,ti:"혈액암 환우 소식지 포장·발송",w:"환우 가정에 보낼 소식지 봉투 작업",p:"한국혈액암협회(국회의사당역)",m:35,seat:"하루 8명",due:"11.24",f:["점심"]},
+{u:"gch",k:"kids",s:"1365",id:"3546422",d:["11-28"],t:"10:30-17:30",h:7,ti:"청소년 연말 성과공유회 운영 스태프",w:"금천구 청소년 리더 행사장 운영",p:"금천구청 12층",m:35,seat:"남은 18자리",due:"11.26"},
+{u:"mt",k:"env",s:"1365",id:"3546452",d:["11-19"],t:"09:00-13:00",h:4,ti:"삼성산 쓰레기 줍기",w:"자연보호협의회와 산길 청소",p:"금천 자연보호 사무실(독산로) 집결",m:35,seat:"남은 4자리",due:"11.18",f:["비 오면 취소"]},
+{u:"dance",k:"sport",s:"1365",id:"3549188",d:["11-22"],t:"09:00-13:00",h:4,ti:"댄스스포츠 대회 스태프 (오전)",w:"경기 진행 보조, 참가자 안내, 질서 유지",p:"리세움 댄스스포츠(양재)",m:35,seat:"남은 4자리",due:"11.19",f:["점심","지각하면 미인정"]},
+{u:"dance2",k:"sport",s:"1365",id:"3549192",d:["11-22"],t:"14:00-18:00",h:4,ti:"댄스스포츠 대회 스태프 (오후)",w:"경기 진행 보조, 대회 정리",p:"리세움 댄스스포츠(양재)",m:35,seat:"남은 2자리",due:"11.19",f:["지각하면 미인정"]},
+{u:"jam",k:"culture",s:"1365",id:"3550833",d:["11-22"],t:"10:00-18:00",h:8,ti:"도서관 '청소년 작가와의 만남' 운영",w:"행사 세팅·안내·정리",p:"잠원도서관 5층",m:35,seat:"남은 5자리",due:"11.21"},
+{u:"run",k:"sport",s:"1365",id:"3550367",d:["11-21"],t:"12:30-16:30",h:4,ti:"청소년 러닝 교실·한강 런티켓 캠페인",w:"러닝 지도 보조, 한강공원 안전 지도",p:"용산청소년센터 → 이촌한강공원",m:35,seat:"남은 3자리",due:"11.19",f:["19~30세 대학생"]},
+{u:"yun",k:"culture",s:"1365",id:"3546155",d:["11-18","11-19@3546201"],t:"13:30-17:30",h:4,ti:"윤봉길의사기념관 서화전 준비",w:"기념관 서화 전시 준비 보조",p:"매헌윤봉길의사기념관(양재)",m:40,seat:"남은 2·3자리",due:"당일",f:[]},
+{u:"yj",k:"env",s:"1365",id:"3548829",d:["11-28"],t:"10:00-13:00",h:3,ti:"양재천 쓰담쓰담 환경정화",w:"걸으며 쓰레기 담기 캠페인",p:"양재시민의숲",m:40,seat:"남은 25자리",due:"11.27"},
+{u:"gpe",k:"camp",s:"VMS",id:"524013",d:["12-06"],t:"07:30-15:30",h:8,ti:"연말 거리 모금 캠페인",w:"굿피플 연말 모금과 안내",p:"여의도순복음교회 광장",m:40,seat:"남은 14자리",due:"12.01",f:["실적 등록이 늦을 수 있음","방한 준비"]},
+{u:"tree",k:"env",s:"1365",id:"3548458",d:["11-18"],t:"14:00-16:00",h:2,ti:"한강공원 나무 심기",w:"숲 보완 식재와 정돈",p:"양화한강공원 원신숲",m:45,seat:"남은 7자리",due:"11.17"},
+{u:"lib",k:"culture",s:"1365",id:"3550462",d:["11-23"],t:"14:00-17:00",h:3,ti:"도서관 휴관일 서가 정리",w:"새 서가에 책 옮겨 꽂기, 번호순 정리",p:"항동푸른도서관",m:45,seat:"남은 5자리",due:"11.22",f:["힘쓰는 일"]},
+{u:"chg",k:"goods",s:"VMS",id:"525082",d:["11-18","11-20@525083","11-24@525084","11-26@525085","11-27@525086"],t:"13:00-18:00",h:5,ti:"점자연습장·찜질팩 선물 수선·포장",w:"취약계층에 보낼 손으로 만든 물품 검수와 수선",p:"체인지메이커(양천구 신정동)",m:45,seat:"하루 5명",due:"하루 전"},
+{u:"tap",k:"culture",s:"1365",id:"3545825",d:["11-28"],t:"10:00-13:00",h:3,ti:"탑골공원 국가유산 지킴이",w:"문화유산 주변 점검과 정화",p:"탑골공원",m:45,seat:"남은 50자리",due:"11.26"},
+{u:"beau",k:"goods",s:"1365",id:"3541572",d:["11-24"],t:"09:00-16:00",h:7,ti:"아름다운가게 기부물품 바자회",w:"기부 물품 진열·판매, 행사 안내",p:"을지로 페럼타워",m:45,seat:"남은 5자리",due:"11.20",f:["전화 확정","점심"]},
+{u:"guk",k:"culture",s:"1365",id:"3549079",d:["12-05"],t:"09:00-14:00",h:5,ti:"국악 축제 보조 스태프 (오전)",w:"주민 국악 축제 현장 보조",p:"강남구민회관(대치역)",m:45,seat:"남은 8자리",due:"12.04",f:["김밥 제공"]},
+{u:"art",k:"disab",s:"1365",id:"3545569",d:["11-21"],t:"09:00-17:00",h:8,ti:"장애인 예술제 무대·안내",w:"연극 무대 돕기, 입구 안내, 마무리",p:"강남구 개포동",m:50,seat:"남은 10자리",due:"11.20",f:["점심"]},
+{u:"yeong",k:"culture",s:"1365",id:"3546859",d:["11-21"],t:"10:00-18:00",h:8,ti:"유네스코 무형유산 영산재 축제 운영",w:"영산재·태고문화축제 행사 지원",p:"종로구(장소는 신청 화면에서 확인)",m:50,seat:"남은 28자리",due:"11.19"},
+{u:"aqua",k:"sport",s:"1365",id:"3534274",d:["11-22"],t:"06:30-11:30",h:5,ti:"아쿠아마라톤(수영) 대회 운영",w:"참가자 안내, 경기 진행 보조",p:"KBS스포츠월드 수영장(화곡)",m:50,seat:"남은 20자리",due:"11.18"},
+{u:"wy",k:"goods",s:"VMS",id:"524261",d:["11-27"],t:"09:40-12:40",h:3,ti:"먹거리 꾸러미 정리",w:"쌀·잡곡·유정란 등 꾸러미 정리·분류",p:"우양재단(마포 월드컵북로)",m:50,seat:"남은 5자리",due:"11.26"},
+{u:"world",k:"kids",s:"VMS",id:"524704",d:["11-27"],t:"09:00-12:00",h:3,ti:"세계 문화 체험 부스 운영",w:"어린이·주민 대상 세계 문화 체험 부스",p:"광진구가족센터",m:50,seat:"남은 10자리",due:"11.20"},
+{u:"mus",k:"kids",s:"1365",id:"3548566",d:["11-21"],t:"13:00-17:00",h:4,ti:"자연사박물관 어린이 과학 체험",w:"'공진화' 주제 체험 진행과 원리 설명",p:"서대문자연사박물관",m:55,seat:"남은 1자리",due:"11.17"},
+{u:"leaf",k:"env",s:"1365",id:"3548956",d:["11-24"],t:"13:00-17:00",h:4,ti:"월드컵공원 낙엽 플로깅",w:"산책로 낙엽 수거와 정리",p:"월드컵공원 평화의공원",m:55,seat:"남은 29자리",due:"11.23"},
+{u:"lotte",k:"culture",s:"1365",id:"3550115",d:["11-24"],t:"14:30-18:30",h:4,ti:"롯데콘서트홀 공연장 운영",w:"공연장 질서 유지, 포토존 관리, 관람객 안내",p:"롯데월드몰 8층",m:55,seat:"남은 7자리",due:"11.23",f:["20~35세"]},
+{u:"drone",k:"disab",s:"VMS",id:"524977",d:["11-26"],t:"13:00-18:00",h:5,ti:"농아인 드론축구단 친선대회 보조",w:"드론축구 대회 행사 보조",p:"서대문농아인복지관 8층",m:55,seat:"남은 4자리",due:"11.25"},
+{u:"bob",k:"food",s:"VMS",id:"523130",d:["11-17","11-19@523132","11-20@523134","11-23@523137","11-24@523138","11-26@523428","11-27@524576","11-30@524577","12-01@524578","12-02@524588","12-03@524595","12-04@524596","12-05@524597"],t:"09:00-14:00",h:5,ti:"밥퍼 어르신 무료급식",w:"38년째 이어 온 청량리 무료급식 배식",p:"밥퍼나눔운동본부(청량리)",m:55,seat:"하루 5명",due:"하루 전"},
+{u:"hug",k:"sport",s:"VMS",id:"522253",d:["12-05"],t:"06:00-12:00",h:6,ti:"위기아동 기부 마라톤 허그런",w:"코스 안내, 급수",p:"상암 월드컵공원 평화광장",m:55,seat:"남은 98자리",due:"11.25",f:["20~30세"]},
+{u:"flower",k:"culture",s:"1365",id:"3547495",d:["12-03","12-04","12-05","12-06"],t:"09:30-13:30",h:4,ti:"서울식물원 겨울행사 운영",w:"'헤세의 정원' 행사 시민 응대",p:"서울식물원(마곡)",m:55,seat:"회당 6명",due:"12.12"},
+{u:"paju",k:"disab",s:"1365",id:"3548606",d:["12-01"],t:"10:00-16:30",h:8,ti:"휠체어 이용 장애인과 파주 나들이",w:"성인 지체장애인 나들이 동행",p:"성모자애복지관(율현동) 출발",m:60,seat:"남은 3자리",due:"11.30"},
+{u:"g5",k:"sport",s:"1365",id:"3520309",d:["12-05"],t:"07:30-15:30",h:8,ti:"독거노인돕기 라이프 레이스 마라톤",w:"마라톤 행사 보조 요원",p:"가든파이브(문정동)",m:60,seat:"남은 156자리",due:"11.30"},
+{u:"blind",k:"disab",s:"1365",id:"3547108",d:["12-05"],t:"12:00-17:00",h:5,ti:"시각장애인 정기발표회 무대 보조",w:"장애인 아티스트 40명 공연 진행 돕기",p:"꿈빛극장(성북구 길음)",m:60,seat:"남은 6자리",due:"12.04"}
+];
+I.forEach(x=>{x.days=x.d.map(s=>{const[d,id]=s.split("@");return{d,id:id||x.id}});x.dset=new Set(x.days.map(o=>o.d))});
+const BY=Object.fromEntries(I.map(x=>[x.u,x]));
+const PRESET={
+  pa:[["cmp0","11-19"],["cmp","11-21"],["dance","11-22"],["mj1","11-26"],["dog2","11-29"]],
+  pb:[["bil","11-21"],["mara","11-22"],["tap","11-28"],["dog2","11-29"],["guk","12-05"]]
+};
+
+let S={sel:{},far:99,we:false,mine:false,kinds:[],day:null};
+try{const o=JSON.parse(localStorage.getItem("vol18")||"null");if(o&&o.sel)S.sel=Object.fromEntries(Object.entries(o.sel).filter(([u,d])=>BY[u]&&BY[u].dset.has(d)))}catch(e){}
+const save=()=>{try{localStorage.setItem("vol18",JSON.stringify({sel:S.sel}))}catch(e){}};
+const $=id=>document.getElementById(id);
+const fmt=k=>k.replace("-",".");
+const wa=w=>{const c=w.replace(/[^가-힣]+$/,"").slice(-1).charCodeAt(0)-44032;return w+(c>=0&&c<11172&&c%28?"과":"와")};
+const mins=t=>{const[a,b]=t.split("-");const f=s=>{const[h,m]=s.split(":").map(Number);return h*60+m};return[f(a),f(b)]};
+
+function passes(x,ignoreDay){
+  if(x.m>S.far)return false;
+  if(S.kinds.length&&!S.kinds.includes(x.k))return false;
+  if(S.mine&&!S.sel[x.u])return false;
+  let ds=x.days.map(o=>o.d);
+  if(S.we)ds=ds.filter(d=>[0,6].includes(dow(d)));
+  if(!ignoreDay&&S.day)ds=ds.filter(d=>d===S.day);
+  return ds.length>0;
+}
+
+function plan(){
+  const byDay={};
+  for(const[u,d]of Object.entries(S.sel)){(byDay[d]=byDay[d]||[]).push(BY[u])}
+  let tot=0;const cells=[];const warns=[];
+  for(const d of Object.keys(byDay).sort()){
+    const xs=byDay[d];const raw=xs.reduce((a,x)=>a+x.h,0);const got=Math.min(6,raw);tot+=got;
+    let left=got;for(const x of xs){const n=Math.min(left,x.h);for(let i=0;i<n;i++)cells.push(x.k);left-=n}
+    if(raw>6)warns.push(fmt(d)+"는 "+raw+"시간 중 6시간만 인정돼요");
+    for(let i=0;i<xs.length;i++)for(let j=i+1;j<xs.length;j++){
+      const a=xs[i],b=xs[j];if(!a.t||!b.t)continue;const[a1,a2]=mins(a.t),[b1,b2]=mins(b.t);
+      if(a1<b2&&b1<a2)warns.push(fmt(d)+" "+wa(a.ti)+" "+b.ti+" 시간이 겹쳐요");
+    }
+    if(d>="12-01")warns.push(fmt(d)+" 봉사는 12.09 전에 실적이 안 올라올 수 있어요");
+  }
+  return{tot,cells,warns,byDay};
+}
+
+function renderPlan(){
+  const p=plan();const n=Object.keys(S.sel).length;const kinds=new Set(Object.keys(S.sel).map(u=>BY[u].k)).size;
+  $("tot").textContent=p.tot;$("mtot").textContent=p.tot;
+  $("cnt").innerHTML=n?n+"번 · "+kinds+"가지":"";
+  const cellHTML=(cls)=>Array.from({length:18},(_,i)=>p.cells[i]?`<i style="background:var(--k-${p.cells[i]})"></i>`:"<i></i>").join("");
+  $("cells").innerHTML=cellHTML();$("mcells").innerHTML=cellHTML();
+  const st=$("state");
+  if(p.tot>=20){st.textContent="다 찼어요. 여유도 있어요.";st.className="state ok"}
+  else if(p.tot>=18){st.textContent="18시간이 찼어요. 1~2시간 여유를 두면 더 안전해요.";st.className="state ok"}
+  else{st.textContent=n?(18-p.tot)+"시간 더 담아야 해요.":"목록에서 봉사를 담으면 여기서 시간을 세어 줘요.";st.className="state"}
+  $("warns").innerHTML=p.warns.map(w=>`<li>${w}</li>`).join("");
+  renderCal(p.byDay);
+}
+
+function renderCal(byDay){
+  const cal=$("cal");let h=["월","화","수","목","금","토","일"].map((w,i)=>`<span class="wd${i>4?" we":""}">${w}</span>`).join("");
+  const MARK={"11-23":"보고서 1차","12-07":"봉사 끝"};
+  for(const k of ALL){
+    const w=dow(k);const cnt=I.filter(x=>x.dset.has(k)&&passes(x,true)).length;
+    const mine=byDay[k];const we=w===0||w===6;
+    const dis=S.we&&!we;
+    h+=`<button type="button" class="day${we?" we":""}${mine?" has":""}${S.day===k?" on":""}" data-d="${k}"${dis?" disabled":""} aria-pressed="${S.day===k}" aria-label="${fmt(k)} ${WD[w]}요일, 봉사 ${cnt}개${mine?", 담음":""}">
+      <span class="n">${k.endsWith("-01")||k===ALL[0]?k.replace("-","."):Number(k.slice(3))}</span><span class="c">${cnt||""}</span>${MARK[k]?`<span class="mk">${MARK[k]}</span>`:""}<span class="bar"></span></button>`;
+  }
+  // 12.07(월) 뒤 빈칸
+  for(let i=0;i<6;i++)h+='<span class="day blank"></span>';
+  cal.innerHTML=h;
+}
+
+function row(x){
+  const chosen=S.sel[x.u];
+  const shown=S.day&&x.dset.has(S.day)?S.day:(chosen||x.days[0].d);
+  const id=(x.days.find(o=>o.d===(chosen||shown))||x.days[0]).id;
+  const multi=x.days.length>1;
+  const opts=multi?`<select id="d-${x.u}" aria-label="날짜 고르기">${x.days.filter(o=>!S.we||[0,6].includes(dow(o.d))).map(o=>`<option value="${o.d}"${o.d===(chosen||shown)?" selected":""}>${fmt(o.d)} ${WD[dow(o.d)]}</option>`).join("")}</select>`:"";
+  const fl=(x.f||[]).map(s=>`<span>${s}</span>`).join("");
+  const capped=x.h>6?`<small> →6</small>`:"";
+  return `<article class="row${chosen?" picked":""}" style="--kc:var(--k-${x.k})">
+    <div class="tm"><b>${x.h}h${capped}</b>${x.t?x.t.replace("-","<br>~"):"시간 안내"}</div>
+    <div class="body"><h3>${x.ti}</h3><p>${x.w}</p>
+      <div class="meta"><span class="k"><span class="dot"></span>${KIND[x.k]}</span><span>${x.p}</span><span class="mv">${x.m?"약 "+x.m+"분":"역 앞"}</span><span>${x.seat}</span><span class="mv">마감 ${x.due}</span></div>
+      ${fl?`<div class="flags">${fl}</div>`:""}</div>
+    <div class="act">${opts}<a href="${URL[x.s](id)}" target="_blank" rel="noopener">${x.s}에서 신청 ↗</a>
+      <button type="button" class="sw" role="switch" aria-checked="${!!chosen}" data-u="${x.u}"><span class="t"></span>${chosen?"담음":"담기"}</button></div>
+  </article>`;
+}
+
+function renderList(){
+  const xs=I.filter(x=>passes(x));
+  const groups={};const multi=[];
+  for(const x of xs){
+    if(S.day)(groups[S.day]=groups[S.day]||[]).push(x);
+    else if(x.days.length===1)(groups[x.days[0].d]=groups[x.days[0].d]||[]).push(x);
+    else multi.push(x);
+  }
+  let h="";
+  for(const d of Object.keys(groups).sort()){
+    const w=dow(d);const g=groups[d].sort((a,b)=>a.m-b.m);
+    h+=`<section class="group"><h2 class="gh"><b>${fmt(d)}</b><span class="${w===0||w===6?"we":""}">${WD[w]}</span><small>${g.length}개</small></h2>${g.map(row).join("")}</section>`;
+  }
+  if(multi.length)h+=`<section class="group"><h2 class="gh"><b>여러 날</b><small>날짜를 골라 한 번만 가면 돼요 · ${multi.length}개</small></h2>${multi.sort((a,b)=>a.m-b.m).map(row).join("")}</section>`;
+  $("list").innerHTML=h||`<p class="empty">조건에 맞는 봉사가 없어요. 거리나 종류를 넓혀 보세요.</p>`;
+  $("dayhint").innerHTML=S.day?`${fmt(S.day)} ${WD[dow(S.day)]}요일만 보는 중 · <button type="button" id="clearday">모든 날짜</button>`:"";
+}
+
+function renderKinds(){
+  $("kinds").innerHTML=Object.entries(KIND).map(([k,v])=>`<button type="button" data-k="${k}" aria-pressed="${S.kinds.includes(k)}" style="--kc:var(--k-${k})"><span class="dot"></span>${v}</button>`).join("");
+}
+function all(){renderPlan();renderList();renderKinds()}
+
+document.addEventListener("click",e=>{
+  const t=e.target.closest("button");if(!t)return;
+  if(t.dataset.u){const x=BY[t.dataset.u];if(S.sel[x.u])delete S.sel[x.u];else{const s=$("d-"+x.u);S.sel[x.u]=s?s.value:(S.day&&x.dset.has(S.day)?S.day:x.days[0].d)}save();renderPlan();renderList();return}
+  if(t.dataset.d){S.day=S.day===t.dataset.d?null:t.dataset.d;renderPlan();renderList();return}
+  if(t.dataset.k){const k=t.dataset.k;S.kinds=S.kinds.includes(k)?S.kinds.filter(v=>v!==k):[...S.kinds,k];all();return}
+  if(t.dataset.far){S.far=+t.dataset.far;document.querySelectorAll("[data-far]").forEach(b=>b.setAttribute("aria-pressed",b===t));all();return}
+  if(t.id==="we"||t.id==="mine"){S[t.id]=!S[t.id];t.setAttribute("aria-checked",S[t.id]);if(t.id==="we"&&S.day&&![0,6].includes(dow(S.day)))S.day=null;all();return}
+  if(t.id==="clearday"){S.day=null;all();return}
+  if(PRESET[t.id]){S.sel=Object.fromEntries(PRESET[t.id]);save();all();return}
+  if(t.id==="pc"){S.sel={};save();all();return}
+});
+document.addEventListener("change",e=>{
+  const s=e.target;if(s.tagName!=="SELECT"||!s.id.startsWith("d-"))return;
+  const u=s.id.slice(2);if(S.sel[u]){S.sel[u]=s.value;save();renderPlan()}
+  const x=BY[u];const o=x.days.find(o=>o.d===s.value);const a=s.parentElement.querySelector("a");if(o&&a)a.href=URL[x.s](o.id);
+});
+all();
+</script>
+</body>
+</html>

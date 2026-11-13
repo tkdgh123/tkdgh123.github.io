@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>창공설 주차 보고서</title>
+<style>
+/* 제출할 Word 문서와 같은 결: 맑은 고딕, 흰 종이 한 장 */
+:root {
+  --bg: #eef0f2; --paper: #ffffff; --ink: #1c1f23; --ink-2: #5d6670; --line: #d9dde2; --accent: #c2410c;
+  --font: "Malgun Gothic", "맑은 고딕", "Apple SD Gothic Neo", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg: #15181b; --paper: #1d2125; --ink: #e6e9ec; --ink-2: #98a2ad; --line: #30363c; --accent: #fb8a4f; color-scheme: dark }
+}
+:root[data-theme="dark"] { --bg: #15181b; --paper: #1d2125; --ink: #e6e9ec; --ink-2: #98a2ad; --line: #30363c; --accent: #fb8a4f; color-scheme: dark }
+* { box-sizing: border-box }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font); word-break: keep-all; overflow-wrap: anywhere }
+.wrap { max-width: 780px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)) }
+header { padding-block: 36px 24px }
+.back { font-size: 14px; color: var(--ink-2); text-decoration: none }
+.back:hover { color: var(--ink) }
+.kicker { display: block; margin-top: 26px; font-size: 13px; font-weight: 700; color: var(--accent) }
+h1 { margin: 6px 0 0; font-size: clamp(24px, 5vw, 30px); letter-spacing: -.01em }
+.bar { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px }
+.act { font: inherit; font-size: 14px; font-weight: 700; color: var(--ink-2); background: none; border: 1px solid var(--line); border-radius: 8px; padding: 8px 14px; cursor: pointer }
+.act:hover, .act:focus-visible { border-color: var(--accent); color: var(--accent); outline: none }
+.act[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--paper) }
+.editing article { outline: 2px dashed var(--accent); outline-offset: 4px }
+main { padding-bottom: 64px }
+article { background: var(--paper); border: 1px solid var(--line); border-radius: 6px; padding: clamp(22px, 6vw, 56px) clamp(18px, 6vw, 64px); font-size: 15.5px; line-height: 1.75 }
+article h2 { margin: 0; font-size: 22px }
+article p { margin: 0 }
+.by { margin-top: 4px !important }
+.h { margin-top: 1.4em !important; font-weight: 700 }
+.i { padding-left: 1.1em; text-indent: -1.1em }
+.s { padding-left: 2.4em; text-indent: -.75em }
+/* 사용자가 고친 10주차 PDF 모양: 기호·굵은 글씨 없이 줄만, 제목·항목 앞에 빈 줄 */
+.plain .h { font-weight: 400 }
+.plain .i, .plain .h + .r { margin-top: 1.1em !important }
+.plain .s { padding-left: 0; text-indent: 0 }
+</style>
+</head>
+<body>
+<header class="wrap">
+  <a class="back" href="../">← 창업실</a>
+  <span class="kicker">창의적공학설계 · 레이싱 휠 팀</span>
+  <h1>주차 보고서</h1>
+  <div class="bar">
+    <button type="button" class="act wk" data-w="10" aria-pressed="false">10주차</button>
+    <button type="button" class="act wk" data-w="11" aria-pressed="false">11주차</button>
+    <button type="button" class="act" id="edit" aria-pressed="false">수정</button>
+    <button type="button" class="act" id="copy">본문 복사</button>
+  </div>
+</header>
+
+<main class="wrap">
+  <article id="w10">
+    <h2>10주차 주차보고서</h2>
+    <p class="by">김창식 (20261683), 담당: 테스트(main), 기획</p>
+
+    <p class="h">* 기획</p>
+    <p class="i">- 팀 역할 분배 (100% 완료)</p>
+    <p class="s">· 이번 주 페달 작업을 기구, HW, SW, 테스트 파트로 나눠 팀원마다 맡을 일을 정함</p>
+    <p class="s">· 다음 주차부터 할 일도 파트별로 대략 나눠 둠</p>
+    <p class="i">- 액셀 페달 3D 시안 만들기 (100% 완료)</p>
+    <p class="s">· 발판, 발판과 스프링을 이어 주는 몸통, 받침판이 어떻게 맞물려 움직이는지 3D 시안으로 그림</p>
+    <p class="s">· 시안을 팀원들에게 보여 주고 페달 구조를 맞춤</p>
+    <p class="i">- 부품 챙기기 (100% 완료)</p>
+    <p class="s">· 페달 만들 때 쓸 부품과 재료를 챙겨 와 작업할 수 있게 준비함</p>
+
+    <p class="h">* 테스트</p>
+    <p class="i">- 자른 나무 치수 점검 (100% 완료)</p>
+    <p class="s">· 자른 조각들을 정해 둔 치수와 하나씩 대 보며 맞게 잘렸는지 확인함</p>
+
+    <p class="h">* 이번주 회고사항</p>
+    <p class="i">- 시간이 2시간뿐이라 나무를 자르기만 하고 붙이지는 못해서 11주차에 붙이기부터 할 예정</p>
+    <p class="i">- 센서와 베어링 자리를 아직 못 정해서 HW 파트와 같이 정해야 함</p>
+  </article>
+
+  <article id="w11" class="plain" hidden>
+    <h2>11주차 주차보고서</h2>
+    <p class="by">김창식 (20261683), 담당: 테스트, 기획</p>
+
+    <p class="h">기획</p>
+    <p class="i">핸들 3D 시안 만들기 (100% 완료)</p>
+    <p class="s">핸들 모양과 휠 베이스에 붙는 구조를 미리 3D 시안으로 정해서 페달 다음 작업을 팀원들이 바로 시작할 수 있게 함</p>
+    <p class="i">나무 자르기 챙기기 (100% 완료)</p>
+    <p class="s">다음에 어떤 나무를 잘라야 하는지 팀원들에게 계속 알려 줘서 빠뜨리거나 순서가 꼬이지 않게 함</p>
+
+    <p class="h">테스트</p>
+    <p class="i">페달 나무 부품 확인 (100% 완료)</p>
+    <p class="s">페달에 들어갈 나무 부품을 다 잘랐는지, 빠진 조각은 없는지 하나씩 확인함</p>
+    <p class="s">자른 조각의 거친 면은 사포로 다듬어 둠</p>
+
+    <p class="h">이번주 회고사항</p>
+    <p class="r">페달 나무 부품이 빠짐없이 준비돼서 다음 주에는 __부터 할 예정</p>
+    <p class="r">핸들 시안이 나와 있어서 페달이 끝나면 바로 휠 베이스 작업으로 넘어갈 수 있음</p>
+  </article>
+</main>
+
+<script>
+(() => {
+  // 고친 글은 이 브라우저에 저장되고, 원본보다 우선한다 (PDF는 이 저장본으로 만든다)
+  // 주차마다 저장 키 ffb-report-N
+  const edit = document.getElementById('edit'), copy = document.getElementById('copy');
+  const tabs = [...document.querySelectorAll('.wk')], arts = [...document.querySelectorAll('article')];
+  let art;
+  arts.forEach(a => {
+    try { const h = localStorage.getItem('ffb-report-' + a.id.slice(1)); if (h) a.innerHTML = h } catch (e) {}
+    a.addEventListener('input', () => { try { localStorage.setItem('ffb-report-' + a.id.slice(1), a.innerHTML) } catch (e) {} });
+    a.addEventListener('paste', e => {
+      e.preventDefault();
+      document.execCommand('insertText', false, e.clipboardData.getData('text/plain'));
+    });
+  });
+  const show = w => {
+    if (edit.getAttribute('aria-pressed') === 'true') edit.click();
+    tabs.forEach(t => t.setAttribute('aria-pressed', t.dataset.w === w));
+    arts.forEach(a => a.hidden = a.id !== 'w' + w);
+    art = document.getElementById('w' + w);
+    history.replaceState(null, '', '#w' + w);
+  };
+  tabs.forEach(t => t.onclick = () => show(t.dataset.w));
+  show(/^#w\d+$/.test(location.hash) && document.querySelector(location.hash) ? location.hash.slice(2) : tabs.at(-1).dataset.w);
+  edit.onclick = () => {
+    const on = edit.getAttribute('aria-pressed') !== 'true';
+    edit.setAttribute('aria-pressed', on);
+    edit.textContent = on ? '수정 끝' : '수정';
+    document.body.classList.toggle('editing', on);
+    if (on) { art.contentEditable = 'true'; art.spellcheck = false } else art.removeAttribute('contenteditable');
+  };
+  copy.onclick = async () => {
+    const text = [...art.children].map(p => (p.matches('.h, .plain .i, .plain .h + .r') ? '\n' : '') + p.innerText.trim()).join('\n');
+    try { await navigator.clipboard.writeText(text); copy.textContent = '복사됨' } catch (e) { copy.textContent = '복사 실패' }
+    setTimeout(() => copy.textContent = '본문 복사', 1500);
+  };
+})();
+</script>
+</body>
+</html>

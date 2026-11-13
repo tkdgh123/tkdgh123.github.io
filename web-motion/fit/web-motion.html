@@ -1,0 +1,232 @@
+<!-- Claude가 만듦 (2026-11-06) — 탑을 도는 문(70)마다 움직이는 웹사이트 데모 하나, 문 앞의 쫄라맨(30)이 문을 당겨 열고 안으로 손짓 -->
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>움직이는 웹사이트</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="../apply/apply.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js"}}</script>
+<style>
+/* move/tower.html을 이 카드에 맞게: 문 17개 = 데모 17개, 문 앞 쫄라맨이 문을 열어 줌 */
+body { background: #1a1210; color: #f4e9dc }
+#gl { position: fixed; inset: 0; width: 100%; height: 100%; display: block }
+.top { color: #f4e9dc }
+.card { position: fixed; z-index: 5; left: var(--m); top: 50%; width: min(400px, calc(100vw - 32px)); padding: 22px; background: rgb(26 18 16 / .82); backdrop-filter: blur(6px); transform: translate(-24px, -50%); opacity: 0; pointer-events: none; transition: opacity .4s, transform .5s var(--ease) }
+.card.on { opacity: 1; transform: translate(0, -50%); pointer-events: auto }
+.card .meta { color: #c9b6a2 } .card .meta i { font-style: normal; display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--c); margin-right: 8px }
+.card h2 { font-size: clamp(40px, 5vw, 72px); margin: 12px 0 14px; letter-spacing: -.04em }
+.card p.s { color: #e2d5c6; max-width: 32ch }
+.card img { display: block; width: 100%; height: auto; margin-top: 20px; box-shadow: 0 24px 50px -20px #000 }
+.card .go { margin-top: 20px; background: #f4e9dc; color: #1a1210 }
+.card .go:hover { background: #fff }
+.intro { position: fixed; z-index: 5; left: var(--m); bottom: 12svh; transition: opacity .5s }
+.intro h1 { font-size: clamp(54px, 8vw, 120px); letter-spacing: -.04em }
+.intro p { color: #c9b6a2; margin-top: 14px }
+.rail { position: fixed; z-index: 5; right: var(--m); top: 50%; transform: translateY(-50%); display: grid; gap: 5px; justify-items: end }
+.rail button { all: unset; cursor: pointer; width: 14px; height: 3px; background: rgb(244 233 220 / .3); transition: width .3s, background .3s }
+.rail button.on { width: 30px; background: #f4e9dc }
+.rail button:focus-visible { outline: 2px solid #f4e9dc; outline-offset: 3px }
+@media (max-width: 700px) { .card { top: auto; bottom: 14px; transform: translateY(24px) } .card.on { transform: none } .card img { display: none } .card h2 { margin: 6px 0 8px } .rail { display: none } }
+</style>
+</head>
+<body>
+<nav class="top mono" style="z-index:12"><a href="./index.html">← 카드별 어울림</a><span class="right"><a href="../index.html">작품 보기 →</a></span></nav>
+<canvas id="gl"></canvas>
+<div class="intro" id="intro"><h1>움직이는<br><b>웹사이트</b></h1><p class="mono">데모 열일곱</p></div>
+<section class="card" id="card"><p class="meta mono" id="cMeta"></p><h2 id="cT"></h2><p class="s" id="cS"></p><img id="cImg" alt=""><a class="go" id="cA" href="#">열어 보기 →</a></section>
+<nav class="rail" id="rail" aria-label="문 바로 가기"></nav>
+<div id="len"></div>
+
+<script type="module">
+import * as THREE from "three";
+const ROOT = "../";
+// 움직이는 웹사이트의 데모 17개 (그림은 그 장의 대표 그림)
+const WORKS = [
+  ["수상작", "청자 머그", "lab/cup.html", "img/more/oryzo.webp", "돌아가는 3D 제품을 스크롤로 보는 화면. Oryzo에서 배움."],
+  ["수상작", "점검 드론", "lab/drone.html", "img/more/lidar.webp", "드론이 분해되고 점 스캔이 지나감. Aevion에서 배움."],
+  ["수상작", "마디 산장", "lab/terrain.html", "img/more/primland.webp", "수식으로 만든 지형 위를 구름 사이로 날기. Primland에서 배움."],
+  ["수상작", "흩어지고 모이는 점", "lab/particles.html", "img/more/shopify.webp", "점이 글자·공·물결로 모였다 흩어짐. Shopify Editions에서 배움."],
+  ["수상작", "무대 위 카드", "lab/spotlight.html", "img/more/iventions.webp", "빛기둥 아래에서 카드가 뒤집힘. Iventions에서 배움."],
+  ["수상작", "마감 깨기", "lab/breaker.html", "img/more/lacoste.webp", "마감을 벽돌로 깨는 작은 게임. Lacoste에서 배움."],
+  ["수상작", "올려다봐", "lab/lookup.html", "img/more/dontlookup.webp", "손그림으로 만든 고개 들기 게임."],
+  ["창업실 적용", "작품 고리", "apply/ring.html", "img/apply/ring.webp", "창업실 작품 26개가 고리로 돌고 분류색으로 바탕이 바뀜."],
+  ["창업실 적용", "점으로 그린 작품", "apply/dots.html", "img/apply/dots.webp", "대표 그림 다섯 장을 점 2만 2천 개로."],
+  ["창업실 적용", "한 학기 쌓기", "apply/pile.html", "img/apply/pile.webp", "저장 235번을 날마다 종이로 쌓음."],
+  ["창업실 적용", "옷 갈아입는 쫄라맨", "apply/stick.html", "img/apply/stick.webp", "작품마다 옷을 갈아입고 그 작품다운 동작."],
+  ["더 역동적인", "쫄라맨이 넘기는 창업실", "move/push.html", "img/dyn/push.webp", "쫄라맨이 스크롤로 작품 칸을 밀고 던짐."],
+  ["더 역동적인", "집어 던지는 창업실", "move/throw.html", "img/dyn/throw.webp", "이름표 26개를 분류 통에 던져 넣기."],
+  ["더 역동적인", "창업실 그랑프리", "move/drive.html", "img/dyn/drive.webp", "분류별 구간이 있는 서킷을 직접 운전."],
+  ["더 역동적인", "창업실 은하", "move/planet.html", "img/dyn/planet.webp", "분류마다 궤도, 작품마다 행성."],
+  ["더 역동적인", "탑의 문 스물여섯", "move/tower.html", "img/dyn/tower.webp", "이 화면의 원래 판. 문마다 작품."],
+  ["더 역동적인", "숭실대 위를 날다", "move/campus.html", "img/dyn/campus.webp", "실제 지도로 세운 숭실대 위를 자유 비행."],
+].map(([cat, t, href, img, s]) => ({ cat, t, href, img, s, d: "" }));
+const $ = id => document.getElementById(id);
+const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const cl = (x, a, b) => Math.min(b, Math.max(a, x)), lerp = (a, b, k) => a + (b - a) * k, sm = k => k * k * (3 - 2 * k);
+const CAT = { 수상작: "#e9c9a0", "창업실 적용": "#a9c28f", "더 역동적인": "#8fa6ff" };
+
+/* ───────── 장면: 데모 C와 같은 해 질 녘 ───────── */
+const renderer = new THREE.WebGLRenderer({ canvas: $("gl"), antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
+const scene = new THREE.Scene(); scene.fog = new THREE.FogExp2(0x5a3c36, .0042);
+const camera = new THREE.PerspectiveCamera(50, 1, .1, 2000);
+function resize() { renderer.setSize(innerWidth, innerHeight); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); }
+addEventListener("resize", resize); resize();
+// 하늘: 위는 짙은 보라, 지평선은 복숭아빛
+const sky = new THREE.Mesh(new THREE.SphereGeometry(900, 32, 16), new THREE.ShaderMaterial({ side: THREE.BackSide, depthWrite: false, fog: false,
+  uniforms: {}, vertexShader: "varying vec3 v; void main(){ v = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.); }",
+  fragmentShader: "varying vec3 v; void main(){ float h = v.y; vec3 top = vec3(.10,.08,.16), mid = vec3(.42,.28,.30), hor = vec3(.95,.66,.48); vec3 c = h > .12 ? mix(mid, top, smoothstep(.12,.7,h)) : h > 0. ? mix(hor, mid, smoothstep(0.,.12,h)) : mix(hor * .55, vec3(.09,.06,.06), smoothstep(0.,-.2,h)); gl_FragColor = vec4(c,1.); }" }));
+scene.add(sky);
+{ const n = 900, pos = new Float32Array(n * 3); for (let i = 0; i < n; i++) { const v = new THREE.Vector3().randomDirection(); v.y = Math.abs(v.y) * .9 + .25; v.normalize().multiplyScalar(800); pos.set([v.x, v.y, v.z], i * 3); }
+  const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(pos, 3)); scene.add(new THREE.Points(g, new THREE.PointsMaterial({ color: 0xffe9d6, size: 1.4, sizeAttenuation: false, fog: false, transparent: true, opacity: .55 }))); }
+scene.add(new THREE.HemisphereLight(0xffd2b0, 0x2a1a18, .9));
+const sunL = new THREE.DirectionalLight(0xffb27a, 2.2); sunL.position.set(-120, 40, 80); scene.add(sunL);
+
+/* ───────── 탑 ───────── */
+const R = 7, TOPY = 110, N = WORKS.length, STEP = 4.6, TURN = Math.PI * 2 / 5.3;
+const doorY = i => TOPY - 16 - i * STEP, doorA = i => -i * TURN; // 위에서부터 첫 문, 나선으로 내려감
+function windowTex(dark) { const c = document.createElement("canvas"); c.width = 512; c.height = 1024; const g = c.getContext("2d");
+  g.fillStyle = dark ? "#000" : "#8a6450"; g.fillRect(0, 0, 512, 1024);
+  for (let y = 8; y < 1024; y += 22) for (let x = 6; x < 512; x += 18) { const on = Math.random() < .42; if (dark && !on) continue; g.fillStyle = dark ? `rgba(255,${200 + Math.random() * 40 | 0},150,${.5 + Math.random() * .5})` : on ? "#ffe2b8" : "#5a3f33"; g.fillRect(x, y, 8, 13); }
+  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(3, 6); t.colorSpace = THREE.SRGBColorSpace; return t; }
+const tower = new THREE.Mesh(new THREE.CylinderGeometry(R, R * 1.06, TOPY, 72, 1, true), new THREE.MeshStandardMaterial({ map: windowTex(false), emissiveMap: windowTex(true), emissive: 0xffc890, emissiveIntensity: 1.1, roughness: .8 }));
+tower.position.y = TOPY / 2; scene.add(tower);
+// 꼭대기: 둥근 지붕 + 빛
+const roof = new THREE.Mesh(new THREE.CylinderGeometry(R * 1.04, R * 1.04, 1.2, 72), new THREE.MeshStandardMaterial({ color: 0x3a2a24, roughness: .6 })); roof.position.y = TOPY + .6; scene.add(roof);
+const crown = new THREE.Mesh(new THREE.SphereGeometry(R * .9, 48, 24, 0, Math.PI * 2, 0, Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0xc9a07a, roughness: .5, metalness: .3 })); crown.position.y = TOPY + 1.2; scene.add(crown);
+const beacon = new THREE.Mesh(new THREE.SphereGeometry(.8, 16, 12), new THREE.MeshBasicMaterial({ color: 0xffe0b0 })); beacon.position.y = TOPY + R * .9 + 2; scene.add(beacon);
+// 바닥: 안개 낀 둥근 광장만 (주변 도시는 없앰)
+const ground = new THREE.Mesh(new THREE.CircleGeometry(900, 64), new THREE.MeshStandardMaterial({ color: 0x22171a, roughness: 1 })); ground.rotation.x = -Math.PI / 2; ground.position.y = -.05; scene.add(ground);
+const plaza = new THREE.Mesh(new THREE.CircleGeometry(60, 64), new THREE.MeshStandardMaterial({ color: 0x3b2a24, roughness: 1 })); plaza.rotation.x = -Math.PI / 2; scene.add(plaza);
+for (let r = 12; r < 60; r += 8) { const ring = new THREE.Mesh(new THREE.RingGeometry(r, r + .15, 96), new THREE.MeshBasicMaterial({ color: 0x8a6450, transparent: true, opacity: .35 })); ring.rotation.x = -Math.PI / 2; ring.position.y = .02; scene.add(ring); }
+
+/* ───────── 문 26개 ───────── */
+function textTex(w, h, draw) { const c = document.createElement("canvas"); c.width = w; c.height = h; draw(c.getContext("2d"), w, h); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t; }
+const doors = [], stone = new THREE.MeshStandardMaterial({ color: 0x4a352c, roughness: .9 }), wood = new THREE.MeshStandardMaterial({ color: 0x5e3a28, roughness: .7 });
+await document.fonts.load(`300 80px Hahmlet`).catch(() => {});
+WORKS.forEach((w, i) => {
+  const a = doorA(i), y = doorY(i), g = new THREE.Group(); g.position.set(Math.sin(a) * R, y, Math.cos(a) * R); g.rotation.y = a; scene.add(g);
+  const col = new THREE.Color(CAT[w.cat]);
+  // 발코니 + 난간
+  const bal = new THREE.Mesh(new THREE.CylinderGeometry(3.2, 3.2, .35, 32, 1, false, -Math.PI / 2, Math.PI), stone); bal.rotation.y = 0; bal.position.set(0, -.18, 0); g.add(bal);
+  const rail = new THREE.Mesh(new THREE.TorusGeometry(3.1, .06, 6, 32, Math.PI), new THREE.MeshStandardMaterial({ color: 0x2a1c18 })); rail.rotation.set(Math.PI / 2, 0, Math.PI); rail.position.y = 1; g.add(rail);
+  // 아치 문틀
+  const frameM = new THREE.MeshStandardMaterial({ color: col, roughness: .5, emissive: col, emissiveIntensity: .15 });
+  for (const sx of [-1, 1]) { const p = new THREE.Mesh(new THREE.BoxGeometry(.35, 3.2, .4), frameM); p.position.set(sx * 1.15, 1.6, .15); g.add(p); }
+  const arch = new THREE.Mesh(new THREE.TorusGeometry(1.15, .18, 8, 24, Math.PI), frameM); arch.position.set(0, 3.2, .15); g.add(arch);
+  // 안쪽 빛(문이 열리면 보임)
+  const glowM = new THREE.MeshBasicMaterial({ color: 0xffd9a0, transparent: true, opacity: .25 });
+  const inside = new THREE.Mesh(new THREE.PlaneGeometry(2.1, 3.2), glowM); inside.position.set(0, 1.6, .02); g.add(inside);
+  const insideTop = new THREE.Mesh(new THREE.CircleGeometry(1.05, 24, 0, Math.PI), glowM); insideTop.position.set(0, 3.2, .02); g.add(insideTop);
+  // 문짝: 왼쪽 경첩
+  const hinge = new THREE.Group(); hinge.position.set(-1.0, 0, .12); g.add(hinge);
+  const leaf = new THREE.Mesh(new THREE.BoxGeometry(2, 3.15, .12), wood); leaf.position.set(1, 1.58, 0); hinge.add(leaf);
+  const knob = new THREE.Mesh(new THREE.SphereGeometry(.08, 10, 8), new THREE.MeshStandardMaterial({ color: 0xd9b07a, metalness: .8, roughness: .3 })); knob.position.set(1.75, 1.5, .1); hinge.add(knob);
+  // 문패: 번호 + 제목
+  const plate = new THREE.Mesh(new THREE.PlaneGeometry(3.4, .85), new THREE.MeshBasicMaterial({ transparent: true, map: textTex(1024, 256, (c, W, H) => {
+    c.fillStyle = "#f4e9dc"; c.textAlign = "center"; c.textBaseline = "middle"; c.font = `500 52px "IBM Plex Mono", monospace`; c.fillText(String(i + 1).padStart(2, "0"), W / 2, 52);
+    let fs = 96; c.font = `300 ${fs}px Hahmlet, serif`; while (c.measureText(w.t).width > W - 40 && fs > 36) { fs -= 4; c.font = `300 ${fs}px Hahmlet, serif`; } c.fillText(w.t, W / 2, 170); }) }));
+  plate.position.set(0, 4.35, .3); g.add(plate);
+  // 문 옆 등 둘
+  for (const sx of [-1, 1]) { const l = new THREE.Mesh(new THREE.SphereGeometry(.16, 10, 8), new THREE.MeshBasicMaterial({ color: 0xffcf8a })); l.position.set(sx * 1.7, 2.6, .35); g.add(l); }
+  const light = new THREE.PointLight(0xffc98a, 0, 12, 1.6); light.position.set(0, 2, 1.2); g.add(light);
+  doors.push({ w, i, g, hinge, knob, glowM, light, open: 0, hit: [leaf, inside, plate] });
+});
+
+/* ───────── 스크롤 → 카메라 ───────── */
+const INTRO = 1.4, PER = .75; // 화면 높이 단위: 처음 하늘 장면, 문 하나 지나는 데 드는 스크롤
+function layout() { $("len").style.height = (INTRO + (N - 1) * PER + 1.2) * innerHeight + innerHeight + "px"; }
+addEventListener("resize", layout); layout();
+$("rail").innerHTML = WORKS.map((w, i) => `<button type="button" aria-label="${i + 1}번 문 ${w.t}" data-i="${i}"></button>`).join("");
+const railB = [...$("rail").children];
+const goDoor = i => scrollTo({ top: (INTRO + i * PER) * innerHeight, behavior: calm ? "auto" : "smooth" });
+railB.forEach(b => b.onclick = () => goDoor(+b.dataset.i));
+addEventListener("keydown", e => { if (e.key === "ArrowDown" || e.key === "ArrowRight") { e.preventDefault(); goDoor(Math.min(N - 1, Math.round(fNow) + 1)); } if (e.key === "ArrowUp" || e.key === "ArrowLeft") { e.preventDefault(); goDoor(Math.max(0, Math.round(fNow) - 1)); } });
+const ray = new THREE.Raycaster();
+$("gl").addEventListener("click", e => { ray.setFromCamera(new THREE.Vector2(e.clientX / innerWidth * 2 - 1, -e.clientY / innerHeight * 2 + 1), camera);
+  const hit = ray.intersectObjects(doors.flatMap(d => d.hit))[0]; if (!hit) return; const d = doors.find(d => d.hit.includes(hit.object)); if (Math.abs(d.i - fNow) < .3) location.href = ROOT + d.w.href; else goDoor(d.i); });
+
+function doorView(f) { // 문 번호(실수)에 맞는 카메라 자리: 문 앞 바깥에서 문을 봄, 카드 자리만큼 문을 오른쪽으로
+  const a = -f * TURN, y = doorY(f) + 2, portrait = camera.aspect < 1, dist = portrait ? 19 : 14;
+  const out = new THREE.Vector3(Math.sin(a), 0, Math.cos(a)), side = new THREE.Vector3(Math.cos(a), 0, -Math.sin(a));
+  const pos = out.clone().multiplyScalar(R + dist).addScaledVector(side, portrait ? 0 : -3); pos.y = y + (portrait ? 3 : 1.4);
+  const look = out.clone().multiplyScalar(R + 1).addScaledVector(side, portrait ? 0 : -5.2); look.y = y + (portrait ? -2.5 : .3);
+  return { pos, look };
+}
+const camPos = new THREE.Vector3(), camLook = new THREE.Vector3(); let sSm = scrollY / innerHeight, first = true, fNow = 0, shown = -1, last = performance.now();
+function frame(now) {
+  requestAnimationFrame(frame);
+  const dt = Math.min(.05, (now - last) / 1000); last = now;
+  sSm += (scrollY / innerHeight - sSm) * (calm ? 1 : 1 - Math.exp(-dt * 6));
+  const f = cl((sSm - INTRO) / PER, 0, N - 1); fNow = f;
+  // 처음: 데모 C처럼 하늘 높이에서 탑 꼭대기를 내려다봄 → 첫 문 앞으로 내려옴
+  const k = sm(cl(sSm / INTRO, 0, 1)), d0 = doorView(0), d = doorView(f);
+  const skyPos = new THREE.Vector3(30, TOPY + 120, 60), skyLook = new THREE.Vector3(0, TOPY * .55, 0);
+  const pos = k < 1 ? skyPos.clone().lerp(d0.pos, k) : d.pos, look = k < 1 ? skyLook.clone().lerp(d0.look, k) : d.look;
+  if (first) { camPos.copy(pos); camLook.copy(look); first = false; }
+  camPos.lerp(pos, 1 - Math.exp(-dt * 8)); camLook.lerp(look, 1 - Math.exp(-dt * 8)); camera.position.copy(camPos); camera.lookAt(camLook);
+  $("intro").style.opacity = 1 - cl(sSm / (INTRO * .5), 0, 1);
+  // 앞에 온 문이 열리고 안쪽이 밝아짐
+  doors.forEach(dr => { const near = k < .95 ? 0 : Math.max(0, 1 - Math.abs(dr.i - f) * 1.8); dr.open += (near - dr.open) * Math.min(1, dt * 6);
+    dr.hinge.rotation.y = -dr.open * 1.45; dr.glowM.opacity = .25 + dr.open * .75; dr.light.intensity = dr.open * 30; });
+  beacon.material.color.setHSL(.08, .9, .75 + Math.sin(now / 500) * .1);
+  // 카드
+  const cur = k >= .95 && Math.abs(f - Math.round(f)) < .32 ? Math.round(f) : -1;
+  if (cur !== shown) { shown = cur; $("card").classList.toggle("on", cur >= 0);
+    if (cur >= 0) { const w = WORKS[cur]; $("cMeta").innerHTML = `<i style="--c:${CAT[w.cat]}"></i>${String(cur + 1).padStart(2, "0")} / ${N} · ${w.cat}`; $("cT").textContent = w.t; $("cS").textContent = w.s; $("cImg").src = ROOT + w.img; $("cA").href = ROOT + w.href; }
+    railB.forEach((b, i) => b.classList.toggle("on", i === cur)); }
+  stickman(f, k, now / 1000);
+  renderer.render(scene, camera);
+}
+
+/* ───────── 쫄라맨: 앞 문의 오른쪽에 서서 손잡이를 당겨 열고, 다 열리면 안으로 손짓 ───────── */
+const inkM = new THREE.MeshStandardMaterial({ color: 0x121010, roughness: .55 });
+const capG = new THREE.CylinderGeometry(1, 1, 1, 10), ballG = new THREE.SphereGeometry(1, 16, 12);
+const man = new THREE.Group(); scene.add(man);
+const BW = .085, bones = {};
+for (const n of ["ua1", "fa1", "ua2", "fa2", "th1", "sh1", "th2", "sh2", "torso"]) { const m = new THREE.Mesh(capG, inkM); m.scale.set(n === "torso" ? BW * 1.25 : BW, 1, n === "torso" ? BW * 1.25 : BW); man.add(m); bones[n] = m; }
+const head = new THREE.Mesh(ballG, inkM); head.scale.setScalar(.25); man.add(head);
+const jointsM = [...Array(6)].map(() => { const j = new THREE.Mesh(ballG, inkM); j.scale.setScalar(BW); man.add(j); return j; });
+const UP = new THREE.Vector3(0, 1, 0), tmp = new THREE.Vector3();
+function bone(m, a, b) { tmp.subVectors(b, a); const l = tmp.length(); m.position.copy(a).addScaledVector(tmp, .5); m.scale.y = l; m.quaternion.setFromUnitVectors(UP, tmp.normalize()); }
+function ik2(a, t, l1, l2, pole) { // a에서 t로, pole 쪽으로 굽음
+  const d = Math.min(a.distanceTo(t), l1 + l2 - 1e-3), dir = t.clone().sub(a).normalize();
+  const x = (l1 * l1 - l2 * l2 + d * d) / (2 * d), h = Math.sqrt(Math.max(0, l1 * l1 - x * x));
+  const p = pole.clone().sub(a); p.addScaledVector(dir, -p.dot(dir)).normalize();
+  return a.clone().addScaledVector(dir, x).addScaledVector(p, h);
+}
+const V = (x, y, z) => new THREE.Vector3(x, y, z);
+let manDoor = -1, hop = 0;
+function stickman(f, k, t) {
+  const i = Math.round(f), dr = doors[i];
+  man.visible = k > .9;
+  if (!dr) return;
+  if (i !== manDoor) { if (manDoor >= 0) hop = 1; manDoor = i; }
+  hop = Math.max(0, hop - .035);
+  man.position.copy(dr.g.position); man.quaternion.copy(dr.g.quaternion);
+  const o = dr.open, pull = Math.min(1, o * 1.6), wave = Math.max(0, (o - .75) / .25);
+  // 문 기준 좌표(x 오른쪽, z 바깥): 처음엔 문 오른쪽, 당기며 뒤로 물러나고, 다 열리면 문 앞에서 비켜 서서 손짓
+  const bx = 1.95 - pull * .55 - wave * .2, bz = .7 + pull * 1.2;
+  const jump = Math.sin(hop * Math.PI) * 1.2, br = Math.sin(t * 2.2) * .02;
+  const hip = V(bx, 1.05 + jump + br, bz), sh = V(bx - .05 - pull * .08, 1.95 + jump + br, bz + .03);
+  bone(bones.torso, hip, sh); head.position.set(sh.x - .02, sh.y + .35, sh.z);
+  // 다리: 발은 바닥(살짝 벌림), 당길 땐 뒷발 버팀
+  const f1 = V(bx - .25 + pull * .1, jump * .3, bz - .15), f2 = V(bx + .2 + pull * .25, jump * .3, bz + .3 + pull * .2);
+  const k1 = ik2(hip, f1, .55, .52, V(bx - 1, 1, bz + 1)), k2 = ik2(hip, f2, .55, .52, V(bx - 1, 1, bz + 1));
+  bone(bones.th1, hip, k1); bone(bones.sh1, k1, f1); bone(bones.th2, hip, k2); bone(bones.sh2, k2, f2);
+  // 손: 손잡이(문짝과 함께 돔) → 다 열리면 한 손은 문 안쪽을 가리킴
+  man.updateMatrixWorld(); dr.knob.getWorldPosition(tmp); const knob = man.worldToLocal(tmp.clone());
+  const rest = V(bx + .1, 1.2, bz + .25);
+  const h1 = wave > 0 ? rest.clone().lerp(V(bx - .9, 2.35 + Math.sin(t * 5) * .08, bz - .2), wave) : rest.clone().lerp(knob, Math.min(1, .3 + pull * 1.4));
+  const h2 = wave > 0 ? knob.clone().lerp(V(bx + .2, 1.15, bz + .1), wave) : V(bx + .25, 1.25 + br * 2, bz - .05).lerp(knob, pull * .6);
+  const s1 = sh.clone().add(V(0, 0, .14)), s2 = sh.clone().add(V(0, 0, -.14));
+  const e1 = ik2(s1, h1, .42, .4, V(bx + .6, 1, bz + .6)), e2 = ik2(s2, h2, .42, .4, V(bx + .6, 1, bz - .6));
+  bone(bones.ua1, s1, e1); bone(bones.fa1, e1, h1); bone(bones.ua2, s2, e2); bone(bones.fa2, e2, h2);
+  [hip, k1, k2, e1, e2, sh].forEach((p, j) => jointsM[j].position.copy(p));
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

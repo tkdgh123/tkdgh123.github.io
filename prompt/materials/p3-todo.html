@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>오늘 할 일</title>
+<style>
+  body { margin:0; background:#eef1f6; font:16px/1.5 "Pretendard","Malgun Gothic",sans-serif; color:#20232a; display:flex; justify-content:center; padding:48px 16px; }
+  .app { width:100%; max-width:420px; background:#fff; border-radius:16px; padding:26px 24px 18px; box-shadow:0 8px 28px rgba(30,40,70,.10); }
+  h1 { font-size:22px; margin:0 0 2px; }
+  .count { color:#6b7180; font-size:14px; margin:0 0 18px; }
+  form { display:flex; gap:8px; margin-bottom:14px; }
+  input[type=text] { flex:1; font:inherit; padding:10px 12px; border:1.5px solid #d6dbe5; border-radius:10px; outline:none; }
+  input[type=text]:focus { border-color:#4f6bed; }
+  form button { font:inherit; font-weight:600; padding:0 16px; border:0; border-radius:10px; background:#4f6bed; color:#fff; cursor:pointer; }
+  ul { list-style:none; margin:0; padding:0; }
+  li { display:flex; align-items:center; gap:10px; padding:11px 4px; border-bottom:1px solid #eef0f4; }
+  li input { width:18px; height:18px; accent-color:#4f6bed; cursor:pointer; }
+  li span { flex:1; }
+  li.done span { color:#a3a8b3; text-decoration:line-through; }
+  li button { border:0; background:none; color:#a3a8b3; font-size:20px; line-height:1; cursor:pointer; padding:2px 6px; border-radius:6px; }
+  li button:hover { background:#f3f4f7; color:#e0473c; }
+  .empty { color:#a3a8b3; text-align:center; padding:24px 0; }
+</style>
+</head>
+<body>
+<div class="app">
+  <h1>오늘 할 일</h1>
+  <p class="count" id="count"></p>
+  <form id="f"><input type="text" id="t" placeholder="할 일 추가" autocomplete="off"><button>추가</button></form>
+  <ul id="list"></ul>
+</div>
+<script>
+  const KEY = "todo-demo";
+  let todos = JSON.parse(localStorage.getItem(KEY) || "null") ||
+    [{ text: "과제 제출", done: false }, { text: "장보기", done: false }, { text: "운동 30분", done: false }];
+  const save = () => localStorage.setItem(KEY, JSON.stringify(todos));
+  function render() {
+    const list = document.getElementById("list");
+    const view = [...todos].sort((a, b) => a.done - b.done);
+    list.innerHTML = view.length ? "" : '<li class="empty">할 일이 없어요</li>';
+    view.forEach((todo, i) => {
+      const li = document.createElement("li");
+      if (todo.done) li.className = "done";
+      const box = document.createElement("input");
+      box.type = "checkbox"; box.checked = todo.done;
+      box.onchange = () => { todos[i].done = !todos[i].done; save(); render(); };
+      const span = document.createElement("span"); span.textContent = todo.text;
+      const del = document.createElement("button"); del.textContent = "×"; del.title = "지우기";
+      del.onclick = () => { todos.splice(i, 1); save(); render(); };
+      li.append(box, span, del);
+      list.append(li);
+    });
+    const left = todos.filter(t => !t.done).length;
+    document.getElementById("count").textContent = `남은 일 ${left}개`;
+  }
+  document.getElementById("f").onsubmit = e => {
+    e.preventDefault();
+    const t = document.getElementById("t"), text = t.value.trim();
+    if (!text) return;
+    todos.push({ text, done: false }); t.value = ""; save(); render();
+  };
+  render();
+</script>
+</body>
+</html>

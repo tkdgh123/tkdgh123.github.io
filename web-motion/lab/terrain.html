@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>마디 산장 · 데모 3</title>
+<link rel="stylesheet" href="lab.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<style>
+/* 구름 위에서 산골짜기로 내려가는 실시간 3D 풍경 (영상 아님, 지형은 수식으로 만듦) */
+body { background: #a9c4d4; color: #fff; height: 600vh }
+.say { position: fixed; z-index: 2; left: 50%; top: 50%; transform: translate(-50%, -50%); text-align: center; pointer-events: none; opacity: 0; transition: opacity .7s; text-shadow: 0 2px 24px rgb(0 0 0 / .35); width: min(90vw, 900px) }
+.say.on { opacity: 1 }
+.say small { display: block; letter-spacing: .3em; margin-bottom: 14px }
+.say h1, .say h2 { margin: 0; font-family: "Hahmlet", serif; font-weight: 300; letter-spacing: .02em; line-height: 1.1 }
+.say h1 { font-size: clamp(42px, 7.5vw, 110px) }
+.say h2 { font-size: clamp(30px, 4.6vw, 64px) }
+.say p { margin: 14px 0 0; font-size: clamp(15px, 1.3vw, 18px) }
+.pin { position: fixed; z-index: 2; left: 0; top: 0; pointer-events: none; font: 500 12px "JetBrains Mono", monospace; color: #fff; white-space: nowrap; opacity: 0; transition: opacity .4s; text-shadow: 0 1px 8px rgb(0 0 0 / .5) }
+.pin span { display: block; padding: 3px 8px; border: 1px solid rgb(255 255 255 / .7); border-radius: 20px; background: rgb(0 0 0 / .18); backdrop-filter: blur(4px) }
+.pin::after { content: ""; display: block; width: 1px; height: 46px; background: #fff; margin: 6px auto 0 }
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@300;500&display=swap">
+</head>
+<body>
+<nav class="hud mono"><a href="../#more">← 움직이는 웹사이트</a><span class="right"><a href="drone.html">← 이전</a><span>데모 3 / 7 · 3D 풍경 비행</span><a href="particles.html">다음 →</a></span></nav>
+<canvas class="bg" id="cv"></canvas>
+<div class="say on" data-a="0" data-b=".14"><small class="mono">MADI LODGE · 가상의 산장</small><h1>구름 아래<br>골짜기</h1><p>↓ 천천히 내려 보세요</p></div>
+<div class="say" data-a=".3" data-b=".46"><h2>강을 따라</h2></div>
+<div class="say" data-a=".62" data-b=".76"><h2>능선을 넘으면</h2></div>
+<div class="say" data-a=".9" data-b="1.01"><h2>산장에 닿아요</h2><p>지형·구름·카메라 길 모두 코드로 만든 실시간 3D예요.</p></div>
+<div id="pins"></div>
+
+<script type="module">
+import * as THREE from "three";
+
+// 값 노이즈 + 여러 겹(fbm): 산 높이
+const hash = (x, y) => { const s = Math.sin(x * 127.1 + y * 311.7) * 43758.5453; return s - Math.floor(s); };
+const noise = (x, y) => { const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi, u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf);
+  const a = hash(xi, yi), b = hash(xi + 1, yi), c = hash(xi, yi + 1), d = hash(xi + 1, yi + 1); return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v; };
+const fbm = (x, y) => { let s = 0, a = .5, f = 1; for (let o = 0; o < 6; o++) { s += a * noise(x * f, y * f); a *= .5; f *= 2.03; } return s; };
+const river = z => Math.sin(z * .018) * 38 + Math.sin(z * .041) * 12;   // 강이 흐르는 x 위치
+const height = (x, z) => { const h = fbm(x * .012 + 10, z * .012 + 3) ** 1.6 * 150; const d = Math.abs(x - river(z)); return h * Math.min(1, (d / 70) ** 1.4) - 6 + Math.min(d, 30) * .15; };
+
+const cv = document.getElementById("cv");
+const renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+const scene = new THREE.Scene();
+const skyC = new THREE.Color("#a9c4d4");
+scene.background = skyC; scene.fog = new THREE.FogExp2(skyC, .0032);
+const camera = new THREE.PerspectiveCamera(55, 1, .5, 1400);
+
+scene.add(new THREE.HemisphereLight("#dfeefa", "#3d4a2a", 1.1));
+const sun = new THREE.DirectionalLight("#fff1d6", 2.4); sun.position.set(-200, 260, 120); scene.add(sun);
+
+// 지형
+const S = 900, R = innerWidth < 700 ? 220 : 320;
+const g = new THREE.PlaneGeometry(S, S, R, R); g.rotateX(-Math.PI / 2);
+const P = g.attributes.position, cols = new Float32Array(P.count * 3), c = new THREE.Color();
+const low = new THREE.Color("#4b6b35"), mid = new THREE.Color("#2f4a26"), rock = new THREE.Color("#6f6a5e"), snow = new THREE.Color("#eef1f2"), sand = new THREE.Color("#8a8a63");
+for (let i = 0; i < P.count; i++) {
+  const x = P.getX(i), z = P.getZ(i), y = height(x, z); P.setY(i, y);
+  if (y < -2) c.copy(sand); else if (y < 35) c.copy(low).lerp(mid, y / 35); else if (y < 80) c.copy(mid).lerp(rock, (y - 35) / 45); else c.copy(rock).lerp(snow, Math.min(1, (y - 80) / 25));
+  c.offsetHSL(0, 0, (hash(x, z) - .5) * .05); c.toArray(cols, i * 3);
+}
+g.setAttribute("color", new THREE.BufferAttribute(cols, 3)); g.computeVertexNormals();
+scene.add(new THREE.Mesh(g, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .95, flatShading: false })));
+const water = new THREE.Mesh(new THREE.PlaneGeometry(S, S), new THREE.MeshStandardMaterial({ color: "#5f8aa0", roughness: .15, metalness: .3, transparent: true, opacity: .9 }));
+water.rotation.x = -Math.PI / 2; water.position.y = -3; scene.add(water);
+
+// 나무: 낮은 비탈에 원뿔 수천 개 (한 번에 그리기)
+const TN = innerWidth < 700 ? 2500 : 6000;
+const trees = new THREE.InstancedMesh(new THREE.ConeGeometry(1.6, 6, 6).translate(0, 3, 0), new THREE.MeshStandardMaterial({ color: "#2b4a2b", roughness: 1 }), TN);
+const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), sc = new THREE.Vector3();
+for (let i = 0, n = 0; n < TN && i < TN * 8; i++) {
+  const x = (Math.random() - .5) * S * .8, z = (Math.random() - .5) * S * .8, y = height(x, z);
+  if (y < 2 || y > 60) continue;
+  sc.setScalar(.6 + Math.random() * .9); m4.compose(new THREE.Vector3(x, y - .5, z), q, sc); trees.setMatrixAt(n++, m4); trees.count = n;
+}
+scene.add(trees);
+
+// 산장 하나
+const lodge = new THREE.Group();
+const lx = river(-260) + 34, lz = -260, ly = height(lx, lz);
+const walls = new THREE.Mesh(new THREE.BoxGeometry(10, 5, 7), new THREE.MeshStandardMaterial({ color: "#8a5a3b" }));
+const roof = new THREE.Mesh(new THREE.ConeGeometry(8, 5, 4), new THREE.MeshStandardMaterial({ color: "#2d2a28" })); roof.position.y = 5; roof.rotation.y = Math.PI / 4;
+const glow = new THREE.PointLight("#ffb366", 60, 60); glow.position.y = 3;
+lodge.add(walls, roof, glow); walls.position.y = 2.5; lodge.position.set(lx, ly, lz); scene.add(lodge);
+
+// 구름: 부드러운 원 그림을 수십 장 띄움
+const cc = document.createElement("canvas"); cc.width = cc.height = 128;
+const cg = cc.getContext("2d"), gr = cg.createRadialGradient(64, 64, 0, 64, 64, 64);
+gr.addColorStop(0, "rgba(255,255,255,1)"); gr.addColorStop(.5, "rgba(255,255,255,.55)"); gr.addColorStop(1, "rgba(255,255,255,0)");
+cg.fillStyle = gr; cg.fillRect(0, 0, 128, 128);
+const cloudTex = new THREE.CanvasTexture(cc);
+const clouds = [];
+for (let i = 0; i < 140; i++) {
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: cloudTex, transparent: true, depthWrite: false, opacity: .55 + Math.random() * .35, fog: false }));
+  const w = 60 + Math.random() * 110; s.scale.set(w, w * .55, 1);
+  s.position.set((Math.random() - .5) * 700, 150 + Math.random() * 40, 250 - Math.random() * 600);
+  scene.add(s); clouds.push(s);
+}
+
+// 카메라 길: 구름 위 → 구름 뚫고 → 강 따라 → 능선 넘어 → 산장
+const pts = [[0, 330, 420], [10, 230, 300], [river(160), 90, 160], [river(60), 30, 60], [river(-40), 22, -40], [river(-120) - 20, Math.max(70, height(river(-120) - 20, -130) + 30), -130], [lx - 40, ly + 40, lz + 70], [lx - 26, ly + 18, lz + 40]].map(a => new THREE.Vector3(...a));
+const path = new THREE.CatmullRomCurve3(pts, false, "centripetal");
+const looks = new THREE.CatmullRomCurve3([[0, 0, 100], [river(100), 0, 80], [river(20), 10, -10], [river(-80), 15, -100], [river(-160), 20, -200], [lx, ly + 20, lz], [lx, ly + 4, lz], [lx, ly + 3, lz]].map(a => new THREE.Vector3(...a)), false, "centripetal");
+
+// 이름표
+const marks = [["강 · 3km", new THREE.Vector3(river(40), 2, 40), .3, .5], ["전망 바위", new THREE.Vector3(river(-140) - 60, height(river(-140) - 60, -140) + 4, -140), .55, .8], ["마디 산장", new THREE.Vector3(lx, ly + 9, lz), .82, 1.01]];
+const pinBox = document.getElementById("pins");
+marks.forEach(m => { const d = document.createElement("div"); d.className = "pin"; d.innerHTML = `<span>${m[0]}</span>`; pinBox.append(d); m.push(d); });
+
+const says = [...document.querySelectorAll(".say")];
+let target = 0, p = 0, mx = 0, my = 0;
+addEventListener("scroll", () => target = scrollY / (document.documentElement.scrollHeight - innerHeight), { passive: true });
+addEventListener("pointermove", e => { mx = e.clientX / innerWidth - .5; my = e.clientY / innerHeight - .5; });
+function resize() { renderer.setSize(innerWidth, innerHeight, false); camera.aspect = innerWidth / innerHeight; camera.fov = innerWidth < 700 ? 68 : 55; camera.updateProjectionMatrix(); }
+addEventListener("resize", resize); resize();
+
+const v = new THREE.Vector3(), lk = new THREE.Vector3(), clock = new THREE.Clock();
+renderer.setAnimationLoop(() => {
+  const t = clock.getElapsedTime();
+  p += (target - p) * .045;
+  path.getPointAt(p, camera.position);
+  camera.position.y = Math.max(camera.position.y, height(camera.position.x, camera.position.z) + 10);   // 땅 밑으로 안 들어가게
+  looks.getPointAt(Math.min(1, p + .01), lk);
+  lk.x += mx * 40; lk.y -= my * 25;
+  camera.lookAt(lk);
+  clouds.forEach((s, i) => { s.position.x += Math.sin(t * .1 + i) * .03; });
+  // 구름 속을 지날 땐 안개를 진하게
+  const inCloud = Math.max(0, 1 - Math.abs(camera.position.y - 170) / 50);
+  scene.fog.density = .0022 + inCloud * .006;
+  says.forEach(s => s.classList.toggle("on", p >= +s.dataset.a && p < +s.dataset.b));
+  marks.forEach(([, pos, a, b, d]) => {
+    v.copy(pos).project(camera);
+    const vis = p > a && p < b && v.z < 1;
+    d.style.opacity = vis ? 1 : 0;
+    d.style.transform = `translate(${(v.x * .5 + .5) * innerWidth}px, ${(-v.y * .5 + .5) * innerHeight - 80}px) translateX(-50%)`;
+  });
+  renderer.render(scene, camera);
+});
+</script>
+</body>
+</html>

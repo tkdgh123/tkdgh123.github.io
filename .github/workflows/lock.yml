@@ -1,0 +1,36 @@
+# 잠금 설정 화면에서 저장하면(lock/pages.json) 그대로 잠그고 푼다
+name: 잠금 적용
+on:
+  push:
+    branches: [main]
+    paths: [lock/pages.json, .github/lock_sync.py, .github/workflows/lock.yml]
+  workflow_dispatch:   # 잠금 설정 화면: 세 단계 비밀번호로 서명한 요청만 받는다(토큰만으로는 못 바꿈)
+    inputs:
+      req:
+        description: 서명된 잠금 요청
+        required: false
+permissions:
+  contents: write
+  pages: write
+concurrency: lock
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install -q cryptography
+      - run: python .github/lock_sync.py
+        env:
+          LOCK_PASSWORD: ${{ secrets.LOCK_PASSWORD }}
+          LOCK_REQUEST: ${{ inputs.req }}
+      - run: |
+          git add -A
+          git diff --cached --quiet && exit 0
+          git -c user.name="잠금 설정" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -q -m "잠금 설정 적용: $(python -c 'import json;print(", ".join(json.load(open("lock/list.json"))["pages"]))')"
+          git pull -q --rebase && git push -q
+      - run: |
+          curl -fsS -X POST -H "Authorization: Bearer ${{ github.token }}" "https://api.github.com/repos/${{ github.repository }}/pages/builds"
+        continue-on-error: true

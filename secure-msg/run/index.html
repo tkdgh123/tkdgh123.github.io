@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>덜미 시작하기</title>
+<meta name="description" content="덜미 코드를 받아 Visual Studio에서 켜고, 단어로 서로 확인해 친구와 암호화 채팅하는 법.">
+<script>document.documentElement.classList.add("js")</script>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="../site.css">
+</head>
+<body>
+<div class="board">
+<header class="topbar">
+  <a class="logo" href="../guide/" aria-label="덜미 설명서">덜미<i>.</i></a>
+  <nav class="pages" aria-label="덜미 페이지"><a href="../guide/">설명서</a><a href="../run/" aria-current="page">시작하기</a><a href="../code/">전체 코드</a><a href="../plan/">암호화 계획</a><a href="../log/">작업 기록</a><a class="home" href="/">← 창업실</a></nav>
+  <a class="get" href="../code/src/deolmi.c" download>deolmi.c 받기 <span aria-hidden="true">↓</span></a>
+</header>
+<section class="hero" aria-label="시작하기">
+  <div class="t h-name rise"><h1>시작하기</h1></div>
+  <div class="h-low">
+    <div class="t h-say rise" style="--i:1"><p>코드를 받아서 친구와 채팅하기까지. 윈도우 노트북과 Visual Studio만 있으면 된다. 위에서부터 순서대로 하면 된다.</p><div class="by">만든 사람 <b>김창식</b>(기획·결정·확인) · <b>Claude</b>(코드·사이트 작성)</div></div>
+    <a class="t h-next rise" style="--i:2" href="../code/"><span>다음 페이지</span><b>전체 코드 <span aria-hidden="true">→</span></b></a>
+  </div>
+  <div class="h-ui rise" data-ui><p class="cap">Visual Studio에서 deolmi.sln 열고 F5 — 방 열기</p>
+<pre class="term"><span class="o">이름 (한글 5글자까지): </span><span class="p">민지</span>
+<span class="o">1. 방장  2. 참가자 : </span><span class="p">1</span>
+<span class="o">덜미 - 민지 (방장)</span>
+<span class="o">[주소] <b>192.168.0.5</b> (같은 와이파이에서 이 주소로 접속)</span>
+<span class="o">[내 단어] 혜성-김치-칠판-경주-고구마-식빵-부산-주전자</span>
+
+<span class="c"># 친구 노트북 — 2를 고르고 그 주소를 친다</span>
+<span class="o">방장 주소 (같은 컴퓨터면 그냥 엔터): </span><span class="p">192.168.0.5</span>
+
+<span class="c"># 방장 화면 — 친구에게 단어를 물어보고 승인</span>
+<span class="o">[입장 심사] 현우가 들어왔습니다 · 단어 안경-레몬-…</span>
+<span class="p">/ok 현우</span></pre></div>
+</section>
+<div class="doc">
+<details class="t toc" open><summary>이 페이지 차례</summary><nav aria-label="차례"><ol><li><a href="#s01"><i>01</i>준비</a></li><li><a href="#s02"><i>02</i>코드 받기</a></li><li><a href="#s03"><i>03</i>켜기</a></li><li><a href="#s04"><i>04</i>혼자 먼저 해 보기</a></li><li><a href="#s05"><i>05</i>친구와 채팅</a></li><li><a href="#s06"><i>06</i>대화 명령</a></li><li><a href="#s07"><i>07</i>막히면</a></li></ol></nav></details>
+<main class="secs">
+
+<section class="t sec rise" id="s01">
+<h2 id="s01"><span class="n">01</span>준비 — 처음 한 번만</h2>
+<p>무료인 <b>Visual Studio Community</b>를 깐다. 설치 화면의 "워크로드"에서 <b>C++를 사용한 데스크톱 개발</b>에 체크한다 (C 컴파일러가 여기 들어 있다). 이미 깔려 있으면 이 단계는 건너뛴다.</p>
+</section>
+<section class="t sec rise" id="s02">
+<h2 id="s02"><span class="n">02</span>코드 받기</h2>
+<p>프로젝트째 받는다. 암호 라이브러리 설정까지 들어 있어서 새 빈 프로젝트에 <code>deolmi.c</code>만 넣으면 빌드되지 않는다.</p>
+<div class="step">
+<p><a class="dl" href="../code/src/deolmi_vs.zip" download style="padding:4px 10px;font-size:14px">deolmi_vs.zip 받기</a> 를 받아 압축을 푼다. 안에 <code>deolmi.c</code>, <code>deolmi.sln</code>, <code>deolmi.vcxproj</code>, 암호 라이브러리 <code>libsodium</code> 폴더, 카메라 지킴이 <code>eye</code> 폴더와 <code>카메라 준비.bat</code>이 있다. <b><code>deolmi.sln</code>을 더블클릭</b>하면 Visual Studio로 열린다.</p>
+</div>
+<p class="sub">따로 설치·설정할 것은 없다. libsodium(1.0.22 공식 빌드)과 그 경로, 한글 설정이 묶음에 다 들어 있다.</p>
+</section>
+<section class="t sec rise" id="s03">
+<h2 id="s03"><span class="n">03</span>켜기 — F5</h2>
+<p>Visual Studio에서 <b>F5</b>(또는 <b>Ctrl+F5</b>)를 누르면 빌드되고 창이 뜬다. 창에서 세 가지를 묻는다.</p>
+<div class="term" data-ui><span class="o">이름 (한글 5글자까지): </span><span class="p">창식</span>
+<span class="o">1. 방장  2. 참가자 : </span><span class="p">1</span>
+<span class="o">덜미 - 창식 (방장)</span>
+<span class="o">[주소] 192.168.0.5 (같은 와이파이에서 이 주소로 접속)</span>
+<span class="o">[내 단어] 물감-민들레-은행잎-하늘-은행잎-사자-양궁-트럭 (신원 키를 새로 만들었습니다)</span>
+<span class="o">명령어: /dm 이름(1:1 대화), /all(전체 대화), /who(접속자), /ok 이름(승인), /verify 이름(단어), /check(장부 대조),</span>
+<span class="o">        /eye(카메라 지킴이 켜고 끄기), /trace 새어 나간 줄(누구 화면인지 찾기), /quit(나가기)</span>
+<span class="o">[알림] 받은 글은 사람마다 띄어쓰기가 조금씩 다르게 보입니다 · 캡처가 새면 보낸 사람이 /trace로 누구 화면인지 찾습니다</span></div>
+<p class="sub"><b>[내 단어]</b>는 내 신원 키를 단어 8개로 바꾼 것이다. 처음 켤 때 키를 만들어 <code>%USERPROFILE%\.deolmi\이름\</code>에 두고, 같은 이름으로 켜면 늘 같은 단어가 나온다. 2를 고르면 "방장 주소"를 하나 더 묻는다. 이름이 잘못됐거나 접속이 안 되면 처음부터 다시 묻는다. 마지막 <b>[알림]</b>은 유출 추적 때문에 받은 글의 띄어쓰기가 사람마다 조금씩 다르게 보인다는 안내다 (아래 06).</p>
+</section>
+<section class="t sec rise" id="s04">
+<h2 id="s04"><span class="n">04</span>혼자 먼저 해 보기 — 노트북 한 대</h2>
+<p>03에서 켠 창은 방장으로 두고(1), 하나를 더 켠다. 프로젝트 폴더의 <code>x64\Debug\deolmi.exe</code>를 <b>더블클릭</b>하면 같은 질문이 뜬다. 이번엔 <b>2</b>를 고르고 주소는 그냥 엔터(같은 컴퓨터). 방장 창에 <code>[입장 심사] … 들어왔습니다 · 단어 …</code>가 뜨면, 참가자 창의 <code>[내 단어]</code>와 같은지 보고 방장 창에 <b><code>/ok 이름</code></b>을 친다. 그다음부터 아무 글이나 치고 엔터를 누르면 상대 창에 뜬다.</p>
+<p class="sub">승인하기 전에 방장이 친 글은 참가자에게 가지 않는다 (<code>아직 대화할 멤버가 없습니다</code>). 셋 이상이면 <b>기존 멤버 모두</b>가 <code>/ok</code> 해야 새 사람이 들어온다.</p>
+</section>
+<section class="t sec rise" id="s05">
+<h2 id="s05"><span class="n">05</span>친구와 채팅 — 노트북 두 대</h2>
+<p>둘 다 <b>같은 와이파이</b>에 있어야 한다. 친구가 들어오면 <b>친구에게 직접(옆에서, 전화로) 단어를 물어보고</b> 맞으면 <code>/ok 이름</code> — 그래야 엉뚱한 사람이나 몰래 붙은 기기가 대화를 못 본다. 한 사람(방장)이 방을 열고, 친구는 2를 골라 방장 화면의 <code>[주소]</code>를 친다. 방장이 곧 서버라서, 셋 이상이어도 모두 같은 주소로 들어온다. 인원 제한은 없다.</p>
+<div class="step">
+<p><b>방장 노트북 — 처음 한 번만</b>: 처음 방을 열 때 <b>Windows 보안 경고</b>(방화벽) 창이 뜬다. <b>개인 네트워크와 공용 네트워크를 둘 다 체크</b>하고 <b>액세스 허용</b>을 누른다. 학교 와이파이나 핫스팟은 보통 "공용"이라서, 공용을 빼면 친구가 못 들어온다.</p>
+<p class="sub">실수로 취소를 눌렀으면: 설정 → 개인 정보 및 보안 → Windows 보안 → 방화벽 및 네트워크 보호 → <b>방화벽에서 앱 허용</b> → deolmi 를 찾아 개인·공용을 켠다.</p>
+</div>
+
+<h3 id="chat">실제로 돌려 본 화면</h3>
+<p class="sub">11-06 저녁 최종 버전을 한 노트북에서 둘로 띄운 실제 출력이다 (주소만 예시, 명령어 안내 줄은 03과 같아서 뺐다). 색이 다른 줄이 직접 친 것이다. 민지가 들어오자 창식 화면에 입장 심사가 뜨고, 창식이 단어를 확인해 <code>/ok</code> 하자 대화가 열린다. 민지 화면의 창식 글에 <b>두 칸 띄운 곳</b>이 있는 게 띄어쓰기 표식이다 (다른 사람 화면에선 다른 곳이 두 칸). 마지막 <code>/check</code>는 둘이 같은 대화를 받았는지 장부로 맞춰 본 것이다.</p>
+<div class="pair">
+<div class="term" data-ui><span class="c"># 창식 (방장)</span>
+<span class="o">[알림] 민지 입장</span>
+<span class="o">[입장 심사] 민지가 들어왔습니다 · 단어 보물-두부-첼로-송편-거울-책상-거울-고구마</span>
+<span class="o">            민지에게 직접 물어보고 맞으면 /ok 민지</span>
+<span class="o">[민지 (승인 전)] 저 민지예요, 단어 불러 드릴게요</span>
+<span class="p">/ok 민지</span>
+<span class="o">[입장 심사] 민지 승인 1/1 · 이제 민지도 대화에 들어옵니다</span>
+<span class="p">확인했어요. 내일 동아리 회의는 세 시에 학생회관에서 해요</span></div>
+<div class="term" data-ui><span class="c"># 민지 (참가자)</span>
+<span class="o">덜미 - 민지 (127.0.0.1에 접속)</span>
+<span class="o">[내 단어] 보물-두부-첼로-송편-거울-책상-거울-고구마 (신원 키를 새로 만들었습니다)</span>
+<span class="o">[멤버] 창식 · 단어 물감-민들레-은행잎-하늘-은행잎-사자-양궁-트럭</span>
+<span class="o">[입장 심사] 승인을 기다리는 중 · 내 단어 보물-두부-첼로-송편-거울-책상-거울-고구마</span>
+<span class="o">            멤버들이 내 단어를 확인하고 승인하면 대화가 보입니다 (상대 단어 확인은 /verify 이름)</span>
+<span class="o">[알림] 민지 입장</span>
+<span class="p">저 민지예요, 단어 불러 드릴게요</span>
+<span class="o">[입장 심사] 창식 승인 (1/1)</span>
+<span class="o">[입장 심사] 모두 승인했습니다 · 이제 대화가 보입니다</span>
+<span class="o">[창식] 확인했어요.  내일 동아리  회의는 세 시에  학생회관에서  해요</span>
+<span class="p">/check</span>
+<span class="o">[장부] 멤버 1명과 대조합니다</span>
+<span class="o">[장부] 창식과 같음 ✔ (창식 1 · 민지 1)</span></div>
+</div>
+</section>
+<section class="t sec rise" id="s06">
+<h2 id="s06"><span class="n">06</span>대화 명령</h2>
+<div class="tbl"><table>
+<tr><th>치는 것</th><th>하는 일</th></tr>
+<tr><td>그냥 글</td><td>멤버 모두에게 (사람마다 따로 암호화해서 보낸다)</td></tr>
+<tr><td><code>/dm 이름</code> · <code>/all</code></td><td>그 사람하고만 1:1 · 다시 모두에게</td></tr>
+<tr><td><code>/who</code></td><td>지금 있는 사람 (승인 전이면 "승인 대기")</td></tr>
+<tr><td><code>/ok 이름</code></td><td>새로 온 사람 승인. 단어를 직접 물어보고 맞을 때만</td></tr>
+<tr><td><code>/verify</code> · <code>/verify 이름</code></td><td>내 단어 · 그 사람 단어 보기</td></tr>
+<tr><td><code>/check</code></td><td>지금 바로 모두와 장부 대조 (같은 대화를 받았나)</td></tr>
+<tr><td><code>/eye</code></td><td>카메라 지킴이 켜기 · 끄기 (아래 "화면 지키기")</td></tr>
+<tr><td><code>/trace 새어 나간 줄</code></td><td>내가 보낸 글이 새어 나왔을 때, 그 줄을 붙여 넣으면 누구 화면인지 찾음</td></tr>
+<tr><td><code>/quit</code></td><td>나가기 (<code>Ctrl+C</code>나 창 닫기도 된다)</td></tr>
+</table></div>
+<p class="sub">방장이 나가면 방이 닫힌다. 방장은 남들끼리의 글도 중계하지만 암호문만 넘기므로 열어 볼 수 없다.</p>
+<h3>시연 모드 — 일부러 속여서 들키는 걸 보기</h3>
+<div class="tbl"><table>
+<tr><th>치는 것</th><th>누가</th><th>하는 일 → 들키는 모습</th></tr>
+<tr><td><code>/twoface 민지 | 4시에 만나 | 3시에 만나</code></td><td>아무나</td><td>민지에게만 다른 글 → 몇 초 안에 <code>[덜미] … 다르게 받았습니다</code></td></tr>
+<tr><td><code>/drop 민지</code></td><td>방장</td><td>민지에게 가는 다음 글 한 통을 버림 → 민지 화면에 <code>[덜미] … 오지 않았습니다</code></td></tr>
+<tr><td><code>/tamper 민지</code></td><td>방장</td><td>민지에게 가는 다음 글을 1바이트 바꿈 → <code>[!] … 중간에 바뀌었습니다 · 버림</code></td></tr>
+</table></div>
+<p class="sub">장부 대조는 <b>셋 이상</b>일 때 의미가 있다. 시연은 노트북 한 대에서 창 넷(방장 + 셋)으로 해도 된다.</p>
+<h3 id="screen">화면 지키기 — 찍으면 가려지고, 새면 잡힌다</h3>
+<div class="step">
+<p><b>카메라 지킴이 준비 — 처음 한 번만</b>: 받은 deolmi 폴더의 <b><code>카메라 준비.bat</code>을 더블클릭</b>한다. python이 없으면 알아서 깔고(관리자 권한 필요 없음), 휴대폰 인식에 쓰는 mediapipe를 받는다. 인터넷이 필요하고 처음엔 몇 분 걸린다. <code>[카메라 준비] 끝</code>이 뜨면 아무 키나 눌러 닫는다. 덜미의 다른 기능은 이게 없어도 된다.</p>
+</div>
+<ol>
+<li>한 창에서 <code>/eye</code> → 몇 초 뒤 <code>[카메라] 켜졌습니다</code>. 다른 창들에는 <code>… 카메라 지킴이를 켰습니다</code>.</li>
+<li>노트북 카메라 앞에서 <b>휴대폰을 들어 화면 쪽으로</b> 향한다 → 그 창의 글이 사라지고 경고만 남는다. 다른 창에는 <code>[덜미] ○○ 화면 앞에 휴대폰이 보입니다</code>. 휴대폰을 내리면 원래대로 돌아온다.</li>
+<li>손가락으로 <b>카메라를 1초 넘게 가린다</b> → 똑같이 가려지고 다른 창에 <code>[덜미] ○○의 카메라가 가려졌습니다</code>.</li>
+<li><b>유출 추적</b> — 민지가 긴 글을 보낸 뒤, <b>현우 창</b>에서 그 줄을 마우스로 드래그해 복사한다. <b>민지 창</b>에 <code>/trace </code>를 치고 붙여 넣으면 사람마다 어떻게 보였는지 줄줄이 나오고 <code>[추적] 현우 화면에서 나온 글입니다</code>.</li>
+</ol>
+<p class="sub">글이 길수록(띄어쓰기가 많을수록) 정확하다. 캡처 <b>사진</b>이 새어 나왔으면 <code>/trace</code>에 글만 대충 쳐도 사람마다의 줄이 나오니, 사진과 띄어쓰기를 눈으로 비교한다. 복사가 안 되면 Shift를 누른 채 드래그하거나 창 메뉴의 "편집 → 표시"를 쓴다.</p>
+</section>
+<section class="t sec rise" id="s07">
+<h2 id="s07"><span class="n">07</span>막히면</h2>
+<ul>
+<li><b>F5를 눌렀는데 빌드가 안 됨</b> → 01의 "C++를 사용한 데스크톱 개발"을 안 깐 것이다 (Visual Studio Installer → 수정).</li>
+<li><code>…에 접속하지 못했습니다</code> → 방장이 아직 방을 안 열었거나 주소가 틀렸다. 방장을 먼저 켠다. 방장 노트북의 방화벽도 확인한다 (05). 친구 노트북 PowerShell에서 <code>Test-NetConnection 192.168.0.5 -Port 9000</code> 의 <code>TcpTestSucceeded</code> 가 <code>True</code> 여야 한다.</li>
+<li>그래도 안 됨 → <b>학교·카페 와이파이는 기기끼리 연결을 막는 경우가 많다.</b> 한 사람 휴대폰 핫스팟에 둘 다 연결하고 방을 다시 연다. 바뀐 주소가 <code>[주소]</code> 줄에 뜬다.</li>
+<li><code>9000번 포트로 방을 열 수 없습니다</code> → 이미 켜 둔 덜미 방장이 있다. 그 창을 닫는다 (안 보이면 명령 프롬프트에서 <code>taskkill /im deolmi.exe</code>).</li>
+<li><b>내 글이 상대에게 안 감</b> → 아직 승인 전이다. 방장과 기존 멤버가 모두 <code>/ok 이름</code> 해야 한다. <code>/who</code>로 "승인 대기"인지 본다.</li>
+<li><code>[!] ○○의 키가 전과 다릅니다</code> → 그 사람이 다른 노트북으로 왔거나 신원 키 폴더를 지웠으면 정상이다. 단어를 다시 물어보고 맞으면 <code>/ok</code>. 아니면 다른 사람이다.</li>
+<li><code>[카메라] 카메라 프로그램이 멈췄습니다</code> → 아직 <code>카메라 준비.bat</code>을 안 돌렸다 (06 "화면 지키기"). 돌렸는데 <code>[실패]</code>가 떴으면 인터넷을 확인하고 다시 돌린다.</li>
+<li><code>[카메라] 카메라를 열지 못했습니다</code> → 줌·팀즈 같은 다른 프로그램이 카메라를 쓰고 있거나, 윈도우 설정 → 개인 정보 및 보안 → 카메라에서 "데스크톱 앱이 카메라에 액세스하도록 허용"이 꺼져 있다.</li>
+<li><code>[추적] 띄어쓰기가 꼭 맞는 사람이 없습니다</code> → 내가 보낸 글이 아니거나, 누가 다시 타이핑해서 띄어쓰기가 바뀌었다. 나온 줄들과 눈으로 비교해 본다.</li>
+<li>이름을 다시 물음 → 이름은 한글 5글자(15바이트)까지, 띄어쓰기와 <code>/</code> <code>|</code> 없이. 이미 들어와 있는 이름이나 방장 이름도 안 된다.</li>
+</ul>
+</section>
+</main>
+</div>
+<footer class="end">
+  <div class="e-by"><p><b>김창식</b> — 기획 · 결정 · 실제로 돌려 보고 문제 찾기</p><p><b>Claude</b> (Anthropic의 AI) — 코드와 이 사이트 작성</p><p><a href="../log/#who">누가 무엇을 했나 자세히</a></p></div>
+  <nav class="e-nav" aria-label="덜미 페이지"><ul><li><a href="../guide/">설명서</a></li><li><a href="../run/" aria-current="page">시작하기</a></li><li><a href="../code/">전체 코드</a></li><li><a href="../plan/">암호화 계획</a></li><li><a href="../log/">작업 기록</a></li><li><a href="/">창업실로</a></li></ul></nav>
+  <a class="e-next" href="../code/"><span>다음 페이지</span><b>전체 코드 <span aria-hidden="true">→</span></b></a>
+  <p class="e-word" aria-hidden="true">덜미<i>.</i></p>
+</footer>
+</div>
+<script src="../site.js" defer></script>
+</body>
+</html>

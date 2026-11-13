@@ -1,0 +1,198 @@
+<!-- Claude가 만듦 (2026-11-06) — 폴더가 크기만큼의 상자로 떨어져 쌓이고, 지운 폴더는 깨져 사라지며 빈 공간이 늘어요 -->
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:,">
+<title>노트북 저장공간 정리 · 상자 쌓기</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@200..800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* 창업실 기본 종이·먹·파랑. C 드라이브를 위가 열린 통으로 보고 폴더를 상자로 떨어뜨림. 파란 상자(지운 폴더)를 던지거나 눌러 깨면 빈 공간이 늘어남 */
+:root { --paper: #f2f1ec; --tone: #e4e2da; --ink: #151514; --muted: #5a5954; --blue: #2b44a6;
+  --serif: "Hahmlet", "Noto Serif KR", serif; --sans: "Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif; --mono: "IBM Plex Mono", ui-monospace, monospace; color-scheme: light }
+* { box-sizing: border-box }
+html, body { margin: 0; height: 100%; overflow: hidden }
+body { background: var(--paper); color: var(--ink); font-family: var(--sans); word-break: keep-all; -webkit-font-smoothing: antialiased; user-select: none; -webkit-user-select: none }
+canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none }
+.bar { position: fixed; z-index: 60; inset: 0 0 auto; display: flex; justify-content: space-between; padding: 16px clamp(16px, 3vw, 36px); font: 400 12px var(--mono); letter-spacing: .02em; pointer-events: none }
+.bar a { color: var(--ink); opacity: .72; text-decoration: none; pointer-events: auto; padding: 6px 0 }
+.bar a:hover { opacity: 1; text-decoration: underline; text-underline-offset: 4px }
+.ttl { position: fixed; z-index: 3; left: clamp(20px, 4vw, 56px); top: 66px; pointer-events: none }
+.ttl h1 { margin: 0; font: 250 clamp(30px, 4.6vw, 68px)/1.05 var(--serif); letter-spacing: -.04em }
+.ttl h1 b { font-weight: 700 }
+.ttl p { margin: 8px 0 0; font: 400 12px var(--mono); color: var(--muted); letter-spacing: .05em }
+.hint { position: fixed; z-index: 3; left: 50%; transform: translateX(-50%); bottom: 18px; font: 500 12px var(--mono); letter-spacing: .06em; color: var(--muted); transition: opacity .5s; pointer-events: none; white-space: nowrap }
+.again { position: fixed; z-index: 5; right: clamp(16px, 3vw, 36px); bottom: 20px; font: 500 12px var(--mono); border: 0; background: var(--ink); color: var(--paper); padding: 10px 16px; cursor: pointer; opacity: 0; pointer-events: none; transition: opacity .5s }
+.again.on { opacity: 1; pointer-events: auto }
+@media (max-width: 700px) { .ttl { top: 52px } .ttl h1 { font-size: 30px } .ttl p { margin-top: 4px } }
+</style>
+</head>
+<body>
+<nav class="bar"><a href="./index.html">← 카드별 어울림</a><a href="../../storage/">작품 보기 →</a></nav>
+<canvas id="cv"></canvas>
+<header class="ttl"><h1>저장공간 <b>정리</b></h1><p>노트북 C 드라이브</p></header>
+<p class="hint" id="hint">파란 상자를 깨 보세요</p>
+<button class="again" id="again" type="button">다시 쌓기</button>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.20.0/matter.min.js"></script>
+<script>
+const { Engine, Bodies, Body, Composite, Constraint, Query, Events } = Matter;
+const cv = document.getElementById("cv"), g = cv.getContext("2d"), hint = document.getElementById("hint"), again = document.getElementById("again");
+const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const SERIF = '"Hahmlet", "Noto Serif KR", serif', SANS = '"Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif', MONO = '"IBM Plex Mono", ui-monospace, monospace';
+// 상자 크기는 대략의 비율(실제 용량 아님). 지운 것: 발로란트 · 프로젝트 작업 잔여본 · 테스트 브라우저 프로필 · Visual Studio 잔여 폴더
+const ITEMS = [
+  { n: "Windows", w: 14 }, { n: "프로그램", w: 13 }, { n: "사용자 파일", w: 12 }, { n: "앱 데이터", w: 9 }, { n: "다운로드", w: 6 },
+  { n: "발로란트", w: 9, x: 1 }, { n: "프로젝트 작업 잔여본", w: 5, x: 1 }, { n: "테스트 브라우저 프로필", w: 4, x: 1 }, { n: "Visual Studio 잔여", w: 6, x: 1 },
+];
+const TONES = ["#e4e2da", "#d8d5ca", "#cfcbbd", "#dcd9ce", "#d3d0c4"];
+const engine = Engine.create({ gravity: { y: 1.5 } }), world = engine.world;
+let W, H, dpr, NARROW, cx, cw, ctop, cbot, walls = [], boxes = [], shards = [], rings = [], held = null, doneAt = 0, doneShow = 0, started = false, order = [];
+
+function layout() {
+  dpr = Math.min(devicePixelRatio, 2); W = innerWidth; H = innerHeight; cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+  NARROW = W < 700;
+  cw = NARROW ? Math.min(W - 40, 420) : Math.min(W * .46, 560); cx = NARROW ? W / 2 : Math.max(cw / 2 + 40, W * .62);
+  ctop = NARROW ? 150 : 96; cbot = H - (NARROW ? 54 : 56);
+  Composite.remove(world, walls);
+  const st = { isStatic: true, friction: .8, restitution: .05 }, T = 60;
+  walls = [Bodies.rectangle(cx, cbot + T / 2, cw + 200, T, st), Bodies.rectangle(cx - cw / 2 - T / 2, H / 2 - H, T, H * 4, st), Bodies.rectangle(cx + cw / 2 + T / 2, H / 2 - H, T, H * 4, st), Bodies.rectangle(cx, -H * 1.5, cw + 200, T, st)];
+  Composite.add(world, walls);
+}
+function build() {
+  boxes.forEach(b => Composite.remove(world, b)); boxes = []; shards = []; doneAt = 0; doneShow = 0; again.classList.remove("on");
+  const A = cw * (cbot - ctop), total = ITEMS.reduce((s, i) => s + i.w, 0), fill = NARROW ? .5 : .52;
+  order = ITEMS.map((it, i) => ({ it, i })).sort(() => Math.random() - .5);
+  order.forEach(({ it }, k) => {
+    const area = it.w / total * A * fill, asp = 1.5 + Math.random() * .8;
+    const bw = Math.min(cw * .64, Math.sqrt(area * asp)), bh = area / bw;
+    const b = Bodies.rectangle(cx + (Math.random() - .5) * (cw - bw) * .8, -bh - k * (NARROW ? 60 : 90) - 40, bw, bh, { chamfer: { radius: 5 }, restitution: .08, friction: .7, frictionAir: .008, density: .002, angle: (Math.random() - .5) * .5 });
+    Object.assign(b, { it, bw, bh, marked: !!it.x, hp: 2, tone: TONES[Math.random() * TONES.length | 0], thrown: 0, dead: 0, shake: 0, wait: calm ? 0 : k * 130 });
+    Body.setStatic(b, true); b.startAt = performance.now() + b.wait; boxes.push(b); Composite.add(world, b);
+  });
+}
+layout(); build();
+addEventListener("resize", () => { layout(); boxes.forEach(b => { if (b.position.x > cx + cw / 2 - 20 || b.position.x < cx - cw / 2 + 20) Body.setPosition(b, { x: cx, y: b.position.y }); }); });
+again.addEventListener("click", build);
+
+/* ───────── 깨기 ───────── */
+function crack(b) { if (b.dead) return; b.hp--; b.shake = 1; rings.push({ x: b.position.x, y: b.position.y, t: performance.now() }); if (b.hp <= 0) shatter(b); }
+function shatter(b) {
+  b.dead = 1; Composite.remove(world, b); boxes = boxes.filter(x => x !== b);
+  const cols = 3, rows = 2, pw = b.bw / cols, ph = b.bh / rows, c = Math.cos(b.angle), s = Math.sin(b.angle);
+  for (let i = 0; i < cols; i++) for (let j = 0; j < rows; j++) {
+    const lx = (i + .5) * pw - b.bw / 2, ly = (j + .5) * ph - b.bh / 2, x = b.position.x + lx * c - ly * s, y = b.position.y + lx * s + ly * c;
+    const p = Bodies.rectangle(x, y, pw * .92, ph * .92, { angle: b.angle, restitution: .35, friction: .3, density: .0015, collisionFilter: { category: 2, mask: 1 } });
+    Body.setVelocity(p, { x: (lx / b.bw) * 8 + (Math.random() - .5) * 3, y: -4 - Math.random() * 6 }); Body.setAngularVelocity(p, (Math.random() - .5) * .5);
+    Object.assign(p, { w: pw * .92, h: ph * .92, t0: performance.now(), life: 900 + Math.random() * 500, col: i % 2 ^ j ? "#2b44a6" : "#4660c4" }); shards.push(p); Composite.add(world, p);
+  }
+  rings.push({ x: b.position.x, y: b.position.y, t: performance.now(), big: 1 });
+  if (!boxes.some(x => x.marked)) doneAt = performance.now();
+}
+Events.on(engine, "collisionStart", ev => {
+  for (const p of ev.pairs) {
+    const a = p.bodyA, b = p.bodyB; if (!a.it && !b.it) continue;
+    if (!(a.thrown || b.thrown)) continue;
+    const v = Math.hypot(a.velocity.x - b.velocity.x, a.velocity.y - b.velocity.y); if (v < 8) continue;
+    [a, b].forEach(x => { if (x.marked && !x.dead && performance.now() - (x.lastHit || 0) > 250) { x.lastHit = performance.now(); crack(x); } });
+  }
+});
+
+/* ───────── 잡기·던지기 (CSS 좌표 직접 사용) ───────── */
+const pt = e => { const r = cv.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
+const live = () => boxes.filter(b => !b.isStatic);
+cv.addEventListener("pointerdown", e => {
+  const p = pt(e), hit = Query.point(live(), p)[0]; if (!hit) return;
+  cv.setPointerCapture(e.pointerId); hint.style.opacity = 0;
+  const dx = p.x - hit.position.x, dy = p.y - hit.position.y, c = Math.cos(-hit.angle), s = Math.sin(-hit.angle);
+  const con = Constraint.create({ pointA: { x: p.x, y: p.y }, bodyB: hit, pointB: { x: dx * c - dy * s, y: dx * s + dy * c }, stiffness: .18, damping: .14, length: 0 });
+  Composite.add(world, con); held = { b: hit, con, x: p.x, y: p.y, t: performance.now(), moved: 0 };
+});
+cv.addEventListener("pointermove", e => {
+  const p = pt(e);
+  if (held) { held.con.pointA.x = p.x; held.con.pointA.y = p.y; held.moved = Math.max(held.moved, Math.hypot(p.x - held.x, p.y - held.y)); cv.style.cursor = "grabbing"; return; }
+  cv.style.cursor = Query.point(live(), p).length ? "grab" : "default";
+});
+const drop = () => {
+  if (!held) return; Composite.remove(world, held.con); const b = held.b, v = b.velocity, s = Math.hypot(v.x, v.y);
+  if (s > 36) Body.setVelocity(b, { x: v.x * 36 / s, y: v.y * 36 / s });
+  if (held.moved < 6 && performance.now() - held.t < 300 && b.marked) crack(b); // 가볍게 누르기도 한 번 금
+  else b.thrown = 1;
+  held = null;
+};
+cv.addEventListener("pointerup", drop); cv.addEventListener("pointercancel", drop);
+
+/* ───────── 그리기 ───────── */
+let last = performance.now();
+const ease = t => 1 - Math.pow(1 - t, 3);
+function rr(x, y, w, h, r) { g.beginPath(); g.roundRect(x, y, w, h, r); }
+let pileTop = null, settledFor = 0, shownTop = null;
+function frame(now) {
+  requestAnimationFrame(frame);
+  const dt = Math.min(33, now - last); last = now;
+  boxes.forEach(b => { if (b.isStatic && now > b.startAt) { Body.setStatic(b, false); Body.setVelocity(b, { x: 0, y: 2 }); } });
+  Engine.update(engine, dt);
+  boxes.forEach(b => { if (b.thrown && Math.hypot(b.velocity.x, b.velocity.y) < 2 && (!held || held.b !== b)) b.thrown = 0; });
+  for (let i = shards.length - 1; i >= 0; i--) { const s = shards[i]; if (now - s.t0 > s.life) { Composite.remove(world, s); shards.splice(i, 1); } }
+
+  // 쌓인 높이 = 가장 높은 가만히 있는 상자 윗면
+  const calmBoxes = boxes.filter(b => !b.isStatic && Math.hypot(b.velocity.x, b.velocity.y) < 4 && b.position.y > ctop);
+  const moving = boxes.some(b => b.isStatic || Math.hypot(b.velocity.x, b.velocity.y) > 4 || b.position.y < ctop) || (held != null);
+  if (!moving && calmBoxes.length) { pileTop = Math.min(...calmBoxes.map(b => b.bounds.min.y)); settledFor += dt; } else settledFor = 0;
+  if (pileTop !== null) shownTop = shownTop === null ? pileTop : shownTop + (pileTop - shownTop) * .1;
+  const done = doneAt && now - doneAt > 2200; doneShow += ((done ? 1 : 0) - doneShow) * .06; if (done) { again.classList.add("on"); hint.style.opacity = 0; }
+
+  g.setTransform(dpr, 0, 0, dpr, 0, 0); g.fillStyle = "#f2f1ec"; g.fillRect(0, 0, W, H);
+  const x0 = cx - cw / 2, x1 = cx + cw / 2;
+  // 통 안쪽
+  g.fillStyle = "rgba(21,21,20,.04)"; g.fillRect(x0, ctop, cw, cbot - ctop);
+  // 통 벽 (위가 열림)
+  g.strokeStyle = "#151514"; g.lineWidth = 4; g.lineJoin = "round"; g.lineCap = "round"; g.beginPath(); g.moveTo(x0 - 2, ctop); g.lineTo(x0 - 2, cbot + 2); g.lineTo(x1 + 2, cbot + 2); g.lineTo(x1 + 2, ctop); g.stroke();
+  g.font = `500 12px ${MONO}`; g.fillStyle = "#5a5954"; g.textAlign = "left"; g.textBaseline = "alphabetic"; g.fillText("C:", x0, ctop - 10);
+  g.textAlign = "right"; g.fillText("상자 크기 · 대략", x1, cbot + 22);
+
+  // 여유 공간: 통 윗선 ~ 쌓인 높이
+  if (shownTop !== null) {
+    const gap = shownTop - ctop;
+    if (gap > 18) {
+      g.setLineDash([4, 5]); g.lineWidth = 1.5; g.strokeStyle = "rgba(43,68,166,.6)"; g.beginPath(); g.moveTo(x0, shownTop - 2); g.lineTo(x1, shownTop - 2); g.stroke(); g.setLineDash([]);
+      if (!NARROW) { g.strokeStyle = "rgba(43,68,166,.6)"; g.beginPath(); g.moveTo(x1 + 14, ctop + 2); g.lineTo(x1 + 14, shownTop - 4); g.moveTo(x1 + 9, ctop + 2); g.lineTo(x1 + 19, ctop + 2); g.moveTo(x1 + 9, shownTop - 4); g.lineTo(x1 + 19, shownTop - 4); g.stroke(); }
+      if (!NARROW) { g.save(); g.translate(x1 + 36, (ctop + shownTop) / 2); g.rotate(-Math.PI / 2); g.textAlign = "center"; g.font = `500 12px ${MONO}`; g.fillStyle = "#2b44a6"; g.fillText("여유", 0, 0); g.restore(); }
+    }
+    if (doneShow > .01) {
+      g.globalAlpha = doneShow; g.textAlign = "center"; g.fillStyle = "#151514";
+      const my = ctop + (shownTop - ctop) / 2; g.font = `250 ${Math.min(NARROW ? 64 : 96, Math.max(36, (shownTop - ctop) * .5))}px ${SERIF}`; g.textBaseline = "middle"; g.fillText("82.2", cx - (NARROW ? 20 : 34), my - 6);
+      g.font = `700 ${NARROW ? 20 : 28}px ${SERIF}`; g.textAlign = "left"; g.fillText("GB", cx + (NARROW ? 46 : 78), my + 4);
+      g.font = `400 13px ${SANS}`; g.fillStyle = "#5a5954"; g.textAlign = "center"; g.fillText("정리하고 남은 공간", cx, my + (NARROW ? 38 : 56)); g.globalAlpha = 1;
+    }
+  }
+
+  // 부서진 조각
+  for (const s of shards) { const k = Math.max(0, (now - s.t0) / s.life); g.save(); g.globalAlpha = Math.max(0, 1 - k * k); g.translate(s.position.x, s.position.y); g.rotate(s.angle); g.fillStyle = s.col; rr(-s.w / 2, -s.h / 2, s.w, s.h, 3); g.fill(); g.restore(); }
+  // 상자
+  for (const b of boxes) {
+    const isHeld = held && held.b === b, sh = b.shake > .02 ? Math.sin(now * .09) * b.shake * 3 : 0; b.shake *= .88;
+    g.save(); g.translate(b.position.x + sh, b.position.y); g.rotate(b.angle + (Math.cos(b.angle) < 0 ? Math.PI : 0)); const sc = isHeld ? 1.03 : 1; g.scale(sc, sc);
+    g.shadowColor = "rgba(21,21,20,.26)"; g.shadowBlur = isHeld ? 24 : 7; g.shadowOffsetY = isHeld ? 12 : 2;
+    g.fillStyle = b.marked ? "#2b44a6" : b.tone; rr(-b.bw / 2, -b.bh / 2, b.bw, b.bh, 5); g.fill(); g.shadowColor = "transparent";
+    // 폴더 귀
+    g.fillStyle = b.marked ? "rgba(255,255,255,.22)" : "rgba(21,21,20,.1)"; rr(-b.bw / 2, -b.bh / 2, Math.min(b.bw * .3, 54), Math.min(7, b.bh * .15), [5, 5, 0, 0]); g.fill();
+    // 이름 (상자에 맞게 크기·줄 바꿈)
+    let fs = Math.max(11, Math.min(20, b.bh * .26)), lines = [b.it.n];
+    g.font = `600 ${fs}px ${SANS}`;
+    if (g.measureText(b.it.n).width > b.bw - 18) { const w = b.it.n.split(" "); if (w.length > 1) { const h = Math.ceil(w.length / 2); lines = [w.slice(0, h).join(" "), w.slice(h).join(" ")]; } while (fs > 10 && Math.max(...lines.map(l => g.measureText(l).width)) > b.bw - 16) { fs -= 1; g.font = `600 ${fs}px ${SANS}`; } }
+    g.fillStyle = b.marked ? "#fff" : "#151514"; g.textAlign = "center"; g.textBaseline = "middle";
+    lines.forEach((l, i) => g.fillText(l, 0, 2 + (i - (lines.length - 1) / 2) * fs * 1.2));
+    if (b.hp < 2) { g.strokeStyle = "rgba(255,255,255,.85)"; g.lineWidth = 2; g.beginPath(); g.moveTo(-b.bw * .1, -b.bh / 2); g.lineTo(0, -b.bh * .12); g.lineTo(-b.bw * .14, b.bh * .1); g.lineTo(b.bw * .02, b.bh / 2); g.stroke(); }
+    g.restore();
+  }
+  // 퍽 고리
+  for (let i = rings.length - 1; i >= 0; i--) { const r = rings[i], k = Math.max(0, (now - r.t) / (r.big ? 650 : 380)); if (k > 1) { rings.splice(i, 1); continue; }
+    g.strokeStyle = `rgba(43,68,166,${1 - k})`; g.lineWidth = 3 * (1 - k) + 1; g.beginPath(); g.arc(r.x, r.y, 14 + ease(k) * (r.big ? 110 : 52), 0, 7); g.stroke(); }
+}
+document.fonts.ready.then(() => requestAnimationFrame(frame));
+</script>
+</body>
+</html>

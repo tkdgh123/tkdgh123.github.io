@@ -1,0 +1,30 @@
+/* 창업실에 적용한 데모 3개 공통: 창업실 첫 화면과 같은 종이·먹·파랑, Hahmlet·Pretendard·IBM Plex Mono */
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
+@import url("https://fonts.googleapis.com/css2?family=Hahmlet:wght@200..800&family=IBM+Plex+Mono:wght@400;500&display=swap");
+:root {
+  --paper: #f2f1ec; --tone: #e4e2da; --ink: #151514; --muted: #5a5954; --rule: #c9c6bc;
+  --dark: #151618; --on-dark: #eeece6; --on-dark-soft: #9e9d97; --blue: #2b44a6;
+  --m: clamp(16px, 3.2vw, 52px);
+  --serif: "Hahmlet", "Noto Serif KR", serif;
+  --sans: "Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif;
+  --mono: "IBM Plex Mono", "Pretendard Variable", Pretendard, ui-monospace, monospace;
+  --ease: cubic-bezier(.7, 0, .2, 1);
+  color-scheme: light;
+}
+* { box-sizing: border-box }
+html, body { margin: 0 }
+body { background: var(--paper); color: var(--ink); font: 400 17px/1.6 var(--sans); word-break: keep-all; -webkit-font-smoothing: antialiased; overflow-x: clip }
+a { color: inherit }
+h1, h2, h3, p { margin: 0 }
+h1, h2, h3 { font-family: var(--serif); font-weight: 300; letter-spacing: -.02em; line-height: 1.05 }
+h1 b, h2 b { font-weight: 700 }
+.mono { font-family: var(--mono); font-size: 12.5px; letter-spacing: .02em; word-spacing: -.3em }
+.top { position: fixed; z-index: 50; inset: 0 0 auto; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 20px var(--m); color: var(--hud, var(--ink)); transition: color .6s }
+.top a { text-decoration: none }
+.top a:hover { text-decoration: underline 1px; text-underline-offset: 4px }
+.top .right { display: flex; gap: 18px; align-items: baseline }
+@media (max-width: 700px) { .top .right > span { display: none } }
+.go { display: inline-flex; align-items: center; gap: 10px; min-height: 48px; padding: 0 20px; background: var(--blue); color: #fff; font-weight: 700; font-size: 15px; text-decoration: none; transition: background-color .2s, transform .15s }
+.go:hover { background: #1f3486 } .go:active { transform: scale(.98) }
+a:focus-visible, button:focus-visible { outline: 2px solid currentColor; outline-offset: 4px }
+canvas.bg { position: fixed; inset: 0; width: 100%; height: 100%; display: block }

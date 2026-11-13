@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>구 한컴타자, 맥에서</title>
+<meta name="description" content="공식 구 한컴타자연습(Windows용)을 고치지 않고 Wine으로 맥에서 실행하는 스크립트">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+/* 맥 결: 밝은 회색 바탕, 창 하나 같은 터미널, 단계는 큰 숫자 */
+:root {
+  --bg: #f5f5f7; --ink: #1d1d1f; --muted: #6e6e73; --line: #d2d2d7;
+  --term: #1e1e1e; --term-ink: #e8e8e8; --term-soft: #8a8a8a; --prompt: #5ac36a;
+  --blue: #0066cc; --ok: #1f8a3b; --wait: #b25c00; --no: #c4302b;
+  --sans: "Pretendard Variable", Pretendard, -apple-system, system-ui, "Malgun Gothic", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  color-scheme: light;
+}
+* { box-sizing: border-box }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 17px/1.7 var(--sans); word-break: keep-all; overflow-wrap: anywhere; -webkit-font-smoothing: antialiased }
+main { max-width: 860px; margin: 0 auto; padding: 28px 20px 96px }
+a { color: var(--blue) }
+h1, h2 { margin: 0; letter-spacing: -.03em; line-height: 1.15 }
+p, ol, ul { margin: 0 }
+code { font: 500 .86em var(--mono); background: rgb(0 0 0 / .06); padding: 1px 6px; border-radius: 5px }
+.back { font-size: 15px; text-decoration: none; color: var(--muted) }
+.back:hover { color: var(--ink) }
+
+.kick { margin-top: 64px; font: 500 13px var(--mono); color: var(--muted) }
+h1 { margin-top: 12px; font-size: clamp(38px, 7vw, 64px); font-weight: 800 }
+.lede { margin-top: 18px; font-size: clamp(18px, 2.2vw, 21px); color: #424245; max-width: 30em }
+
+/* 터미널 창 */
+.win { margin-top: 44px; background: var(--term); border-radius: 12px; box-shadow: 0 24px 60px -24px rgb(0 0 0 / .45), 0 0 0 1px rgb(0 0 0 / .4); overflow: hidden }
+.bar { display: flex; align-items: center; gap: 8px; padding: 12px 14px; background: #2b2b2b; color: var(--term-soft); font: 13px var(--sans) }
+.bar i { width: 12px; height: 12px; border-radius: 50% }
+.bar i:nth-child(1) { background: #ff5f57 } .bar i:nth-child(2) { background: #febc2e } .bar i:nth-child(3) { background: #28c840 }
+.bar span { flex: 1; text-align: center; margin-right: 52px }
+.cmd { display: flex; gap: 16px; align-items: flex-start; padding: 22px 20px 24px }
+.cmd pre { flex: 1; margin: 0; font: 500 15px/1.75 var(--mono); color: var(--term-ink); white-space: pre-wrap; word-break: break-all }
+.cmd pre b { color: var(--prompt); font-weight: 500 }
+.copy { flex: none; font: 600 14px var(--sans); color: #fff; background: var(--blue); border: 0; border-radius: 8px; padding: 9px 16px; cursor: pointer }
+.copy:hover { background: #0077ed }
+.copy:focus-visible { outline: 2px solid #fff; outline-offset: 2px }
+
+/* 단계 */
+h2 { margin-top: 88px; font-size: clamp(26px, 3.6vw, 34px); font-weight: 750 }
+.steps { list-style: none; padding: 0; margin-top: 28px; counter-reset: s }
+.steps li { counter-increment: s; display: grid; grid-template-columns: 64px 1fr; padding: 22px 0; border-top: 1px solid var(--line) }
+.steps li::before { content: counter(s); font: 800 40px/1 var(--sans); color: var(--line) }
+.steps b { display: block; font-size: 19px; margin-bottom: 4px }
+.steps p { color: #424245 }
+
+/* 시험 결과 */
+.sub { margin-top: 10px; color: var(--muted) }
+.res { list-style: none; padding: 0; margin-top: 24px; background: #fff; border-radius: 14px; overflow: hidden }
+.res li { display: flex; gap: 16px; align-items: baseline; padding: 16px 22px }
+.res li + li { border-top: 1px solid #ececf0 }
+.res em { flex: none; width: 6.5em; font: 600 13px var(--sans); font-style: normal; color: var(--ok) }
+.res em.wait { color: var(--wait) } .res em.no { color: var(--no) }
+.res em::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: currentColor; margin-right: 8px; vertical-align: 1px }
+.res span small { display: block; font-size: 14.5px; color: var(--muted) }
+
+.notes { margin-top: 24px; padding-left: 1.2em; color: #424245 }
+.notes li + li { margin-top: 10px }
+
+@media (max-width: 560px) {
+  .cmd { flex-direction: column } .copy { align-self: flex-end }
+  .steps li { grid-template-columns: 44px 1fr } .steps li::before { font-size: 30px }
+  .res li { flex-direction: column; gap: 2px } .res em { width: auto }
+}
+</style>
+</head>
+<body>
+<main>
+<a class="back" href="../">← 창업실</a>
+
+<p class="kick">WINE · macOS · 2026.11.10</p>
+<h1>구 한컴타자, 맥에서</h1>
+<p class="lede">공식 Windows용 설치 파일을 그대로 받아서, 고치지 않고 Wine 위에서 실행해요. 터미널에 한 줄만 붙여 넣으면 돼요.</p>
+
+<div class="win" role="group" aria-label="터미널에 붙여 넣을 명령">
+  <div class="bar"><i></i><i></i><i></i><span>터미널</span></div>
+  <div class="cmd">
+    <pre id="cmd"><b>$</b> curl -fsSL https://tkdgh123.github.io/taja-mac/taja-mac.sh -o ~/Downloads/taja-mac.sh &amp;&amp; bash ~/Downloads/taja-mac.sh</pre>
+    <button class="copy" type="button" id="copy">복사</button>
+  </div>
+</div>
+
+<h2>세 번이면 켜져요</h2>
+<ol class="steps">
+  <li><div><b>위 명령을 터미널에 붙여 넣기</b><p>Wine(약 220MB)을 받고, 한컴타자 공식 페이지를 열어 줘요. M 칩 맥이면 Rosetta도 깔아요.</p></div></li>
+  <li><div><b>열린 페이지에서 ‘(구)한컴 타자연습’ 받기</b><p>다운로드 폴더에 <code>HTTOnline.exe</code>가 생기면 돼요. 받은 파일이 공식 파일과 같은지 스크립트가 확인해요.</p></div></li>
+  <li><div><b>같은 명령을 한 번 더</b><p>설치하고 바로 켜져요. 몇 분 걸리고, 오류 창이 잠깐 떠도 그대로 두세요. 다음부터는 <code>bash ~/Downloads/taja-mac.sh</code>만 치면 돼요.</p></div></li>
+</ol>
+
+<h2>어디까지 확인했나</h2>
+<p class="sub">같은 Wine 11.21을 맥이 아닌 리눅스에서 돌려 본 결과예요.</p>
+<ul class="res">
+  <li><em>됨</em><span>처음부터 설치하고 시작 화면까지<small>약 1분</small></span></li>
+  <li><em>됨</em><span>메뉴, 자리연습<small>맞는 키는 넘어가고 틀린 키는 오타로 세요</small></span></li>
+  <li><em>됨</em><span>케이크던지기<small>무대 고르는 화면까지 열림, 끝까지 해 보진 않음</small></span></li>
+  <li><em class="no">안 됨</em><span>낱말·글 연습의 한글 조합<small>입력기가 없는 시험 환경이라 ‘머리’가 ‘ㅁㅓㄹ’로 들어갔어요. 맥 한글 입력기로는 다를 수 있어요</small></span></li>
+  <li><em class="wait">확인 전</em><span>실제 맥에서 실행, 소리, 해상구조SOS</span></li>
+</ul>
+
+<h2>알아 둘 것</h2>
+<ul class="notes">
+  <li>이 공식 파일에는 산성비가 없어요. 게임은 케이크던지기와 해상구조SOS예요.</li>
+  <li>설치 프로그램은 한국어 Windows에서만 진행돼서, 스크립트가 Wine의 시스템 언어를 한국어로 맞춰요.</li>
+  <li>모든 파일은 <code>~/Library/Application Support/OldTaja</code> 한 곳에 들어가요. 지우려면 <code>rm -rf ~/Library/Application\ Support/OldTaja</code></li>
+  <li>스크립트 내용: <a href="taja-mac.sh">taja-mac.sh</a> · Wine: <a href="https://github.com/Gcenx/macOS_Wine_builds/releases/tag/11.21">Gcenx macOS Wine builds 11.21</a></li>
+</ul>
+</main>
+<script>
+document.getElementById("copy").onclick = async e => {
+  const b = e.currentTarget, t = document.getElementById("cmd").textContent.replace(/^\$\s*/, "");
+  try { await navigator.clipboard.writeText(t); b.textContent = "복사됨"; }
+  catch { getSelection().selectAllChildren(document.getElementById("cmd")); b.textContent = "⌘C로 복사"; }
+  setTimeout(() => b.textContent = "복사", 1800);
+};
+</script>
+</body>
+</html>

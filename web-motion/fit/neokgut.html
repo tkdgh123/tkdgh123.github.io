@@ -1,0 +1,247 @@
+<!-- Claude가 만듦 (2026-11-06) — 부서진 저승길 위를 안개 속에 날고, 원귀가 오행 다섯 색 점으로 풀려 흩어진다 (지형 70 + 점 30) -->
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>넋굿 · 부서진 저승길</title>
+<link rel="icon" href="data:,">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js"}}</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Song+Myung&family=Gowun+Batang:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+* { box-sizing: border-box }
+html, body { margin: 0 }
+body { height: 700vh; background: #11141c; color: #eae5db; font-family: "Gowun Batang", "Batang", serif; word-break: keep-all; -webkit-font-smoothing: antialiased; overflow-x: clip }
+canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block }
+.hud { position: fixed; z-index: 20; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; padding: 14px clamp(16px, 3vw, 32px); font: 400 12px "JetBrains Mono", ui-monospace, monospace; letter-spacing: .03em; pointer-events: none }
+.hud a { pointer-events: auto; color: #eae5db; text-decoration: none; opacity: .7 }
+.hud a:hover { opacity: 1 }
+.say { position: fixed; z-index: 5; left: clamp(20px, 7vw, 120px); right: clamp(20px, 7vw, 120px); top: 50%; transform: translateY(-46%); opacity: 0; transition: opacity .9s, transform 1.2s cubic-bezier(.2, .7, .2, 1); pointer-events: none; text-shadow: 0 2px 30px rgb(10 12 20 / .7) }
+.say.on { opacity: 1; transform: translateY(-50%) }
+.say small { display: block; margin-bottom: 18px; font: 400 12px "JetBrains Mono", monospace; letter-spacing: .28em; color: #a8a3ae }
+.say h1, .say h2 { margin: 0; font-family: "Song Myung", serif; font-weight: 400; line-height: 1.05 }
+.say h1 { font-size: clamp(88px, 17vw, 260px); letter-spacing: .04em }
+.say h2 { font-size: clamp(40px, 6.4vw, 96px) }
+.say p { margin: 18px 0 0; max-width: 24ch; color: #cfc9c0; font-size: clamp(16px, 1.4vw, 20px); line-height: 1.7 }
+.say.r { text-align: right } .say.r p { margin-left: auto }
+.five { display: flex; gap: clamp(12px, 2.4vw, 34px); margin-top: 26px }
+.say.r .five { justify-content: flex-end }
+.five b { font: 400 clamp(26px, 3.4vw, 46px)/1 "Song Myung", serif; color: var(--c); text-shadow: 0 0 22px var(--c) }
+.five span { display: block; margin-top: 6px; font: 400 11px "JetBrains Mono", monospace; letter-spacing: .1em; color: #a8a3ae }
+.bar { position: fixed; z-index: 6; left: clamp(20px, 7vw, 120px); right: clamp(20px, 7vw, 120px); bottom: 22px; height: 1px; background: rgb(234 229 219 / .14) }
+.bar i { display: block; height: 100%; width: 0; background: #eae5db }
+@media (max-width: 700px) {
+  .say { top: auto; bottom: 14vh; transform: translateY(14px) } .say.on { transform: none }
+  .say h1 { font-size: clamp(96px, 30vw, 150px) }
+  .say.r { text-align: left } .say.r p { margin-left: 0 } .say.r .five { justify-content: flex-start }
+}
+</style>
+</head>
+<body>
+<nav class="hud"><a href="./index.html">← 카드별 어울림</a><a href="../../neokgut/">작품 보기 →</a></nav>
+<canvas id="cv"></canvas>
+
+<div class="say on" data-a="0" data-b=".15"><small>NEOKGUT</small><h1>넋굿</h1><p>구미호 꼬마 무당이 맺힌 한을 풀어 주는 로그라이트</p></div>
+<div class="say" data-a=".2" data-b=".42"><h2>부서진<br>저승길</h2></div>
+<div class="say r" data-a=".5" data-b=".66"><small>원귀</small><h2>미워할 적이 아니라<br>풀어 줄 넋</h2></div>
+<div class="say" data-a=".7" data-b=".86"><h2>오행</h2><div class="five">
+  <div style="--c:#5fc46a"><b>木</b><span>목</span></div><div style="--c:#ee6a52"><b>火</b><span>화</span></div><div style="--c:#e8bd45"><b>土</b><span>토</span></div><div style="--c:#d9d4c8"><b>金</b><span>금</span></div><div style="--c:#5b8cf0"><b>水</b><span>수</span></div></div></div>
+<div class="say r" data-a=".91" data-b="1.1"><h2>한이 풀리면<br>길이 이어져요</h2></div>
+<div class="bar"><i id="bar"></i></div>
+
+<script type="module">
+import * as THREE from "three";
+const small = innerWidth < 700, calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+// ── 수식으로 만든 저승 지형: 길 둘레는 평평, 멀어질수록 험한 산, 길 끊긴 곳은 골짜기
+const hash = (x, y) => { const s = Math.sin(x * 127.1 + y * 311.7) * 43758.5453; return s - Math.floor(s); };
+const noise = (x, y) => { const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi, u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf);
+  const a = hash(xi, yi), b = hash(xi + 1, yi), c = hash(xi, yi + 1), d = hash(xi + 1, yi + 1); return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v; };
+const fbm = (x, y) => { let s = 0, a = .5, f = 1; for (let o = 0; o < 6; o++) { s += a * noise(x * f, y * f); a *= .5; f *= 2.03; } return s; };
+const sstep = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+const GAP = -250, roadX = z => Math.sin(z * .014) * 34 + Math.sin(z * .041) * 9, roadH = z => Math.sin(z * .02) * 2.2;
+const gapAmt = z => Math.exp(-(((z - GAP) / 20) ** 2));
+const height = (x, z) => {
+  const d = Math.abs(x - roadX(z)), w = sstep(12, 110, d);
+  const m = fbm(x * .011 + 4, z * .011 + 9) ** 1.7 * 230 + noise(x * .08, z * .08) * 3;
+  let h = roadH(z) + m * w * (.4 + .6 * sstep(30, 160, d)) - 3 * (1 - w) * 0;
+  h -= 16 * gapAmt(z) * (1 - sstep(0, 34, d));
+  return h;
+};
+
+const cv = document.getElementById("cv");
+const renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true });
+const PR = Math.min(devicePixelRatio, 2);
+renderer.setPixelRatio(PR);
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
+const scene = new THREE.Scene();
+const fogC = new THREE.Color("#1a2036");
+scene.fog = new THREE.FogExp2(fogC, .0036);
+const camera = new THREE.PerspectiveCamera(55, 1, .5, 1800);
+
+// 하늘: 위는 먹빛, 지평선은 자주빛 + 붉은 달
+const sky = new THREE.Mesh(new THREE.SphereGeometry(1500, 32, 16), new THREE.ShaderMaterial({
+  side: THREE.BackSide, depthWrite: false, fog: false,
+  vertexShader: `varying vec3 vP; void main(){ vP = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }`,
+  fragmentShader: `varying vec3 vP; void main(){ float h = normalize(vP).y; vec3 c = mix(vec3(.16,.12,.22), vec3(.03,.04,.09), smoothstep(-.05,.5,h)); c = mix(vec3(.10,.12,.2), c, smoothstep(-.3,.0,h)); gl_FragColor = vec4(c, 1.); }`
+}));
+scene.add(sky);
+const dot = (a, b = a) => { const c = document.createElement("canvas"); c.width = c.height = 128; const g = c.getContext("2d"), r = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+  r.addColorStop(0, a); r.addColorStop(.35, b); r.addColorStop(1, "rgba(255,255,255,0)"); g.fillStyle = r; g.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c); };
+const moon = new THREE.Sprite(new THREE.SpriteMaterial({ map: dot("rgba(255,226,196,1)", "rgba(226,150,130,.5)"), fog: false, depthWrite: false }));
+moon.scale.set(260, 260, 1); moon.position.set(-420, 260, -1300); scene.add(moon);
+const moonDisc = new THREE.Mesh(new THREE.CircleGeometry(46, 48), new THREE.MeshBasicMaterial({ color: "#f0d6bd", fog: false }));
+moonDisc.position.set(-420, 260, -1290); scene.add(moonDisc);
+
+scene.add(new THREE.HemisphereLight("#8d9ad0", "#1b1522", .75));
+const moonL = new THREE.DirectionalLight("#aab6ff", 1.5); moonL.position.set(-120, 200, -300); scene.add(moonL);
+
+// 지형
+const TW = 760, TL = 1150, RX = small ? 150 : 230, RZ = small ? 230 : 360;
+const tg = new THREE.PlaneGeometry(TW, TL, RX, RZ); tg.rotateX(-Math.PI / 2); tg.translate(0, 0, -TL / 2 + 420);
+{ const P = tg.attributes.position, col = new Float32Array(P.count * 3), c = new THREE.Color();
+  const A = new THREE.Color("#222a40"), B = new THREE.Color("#3a3a52"), C = new THREE.Color("#5b4558"), D = new THREE.Color("#8a8497");
+  for (let i = 0; i < P.count; i++) {
+    const x = P.getX(i), z = P.getZ(i), y = height(x, z); P.setY(i, y);
+    if (y < 30) c.copy(A).lerp(B, y / 30); else if (y < 95) c.copy(B).lerp(C, (y - 30) / 65); else c.copy(C).lerp(D, Math.min(1, (y - 95) / 60));
+    c.offsetHSL(0, 0, (hash(x, z) - .5) * .04).toArray(col, i * 3);
+  }
+  tg.setAttribute("color", new THREE.BufferAttribute(col, 3)); tg.computeVertexNormals(); }
+scene.add(new THREE.Mesh(tg, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .95 })));
+
+// 황천강: 길 옆 낮은 물
+const water = new THREE.Mesh(new THREE.PlaneGeometry(TW, TL), new THREE.MeshStandardMaterial({ color: "#27406e", roughness: .12, metalness: .5, transparent: true, opacity: .85, emissive: "#102040", emissiveIntensity: .6 }));
+water.rotation.x = -Math.PI / 2; water.position.set(0, -6.5, -TL / 2 + 420); scene.add(water);
+
+// 돌길: 판석 하나하나. 끊긴 곳의 판석은 공중에 흩어져 있다가 마지막에 제자리로 돌아와 다리가 된다
+const N = small ? 110 : 150, z0 = 340, z1 = -420, stone = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial({ color: "#8a8896", roughness: .85 }), N);
+const slabs = [];
+for (let i = 0; i < N; i++) {
+  const z = z0 + (z1 - z0) * i / (N - 1), dz = (z1 - z0) / (N - 1), inGap = Math.abs(z - GAP) < 24, cracked = !inGap && hash(i, 3) < .2;
+  const dx = (roadX(z + dz) - roadX(z)) / dz;
+  slabs.push({ x: roadX(z), y: roadH(z) + .3 + (inGap ? -.2 : 0), z, ry: Math.atan2(dx, 1), w: 6.4 + hash(i, 7) * .6, l: Math.abs(dz) * .9, gap: inGap, bad: cracked,
+    ox: (hash(i, 11) - .5) * (inGap ? 22 : 2.4), oy: inGap ? 3 + hash(i, 13) * 15 : -.5 - hash(i, 19) * .5, oz: (hash(i, 17) - .5) * (inGap ? 14 : 1), tx: (hash(i, 23) - .5) * (inGap ? 2.2 : .5), tz: (hash(i, 29) - .5) * (inGap ? 2.2 : .5), delay: hash(i, 31) * .05 });
+  stone.setColorAt(i, new THREE.Color("#8a8896").offsetHSL(0, 0, (hash(i, 5) - .5) * .12));
+}
+scene.add(stone);
+const M = new THREE.Matrix4(), Q = new THREE.Quaternion(), E = new THREE.Euler(), S3 = new THREE.Vector3(), P3 = new THREE.Vector3();
+function layoutSlabs(heal, t) {
+  slabs.forEach((s, i) => {
+    const broken = s.gap || s.bad, k = broken ? 1 - sstep(0, 1, Math.min(1, Math.max(0, (heal - s.delay) / .6))) : 0;
+    const bob = s.gap ? Math.sin(t * .8 + i) * .6 * k : 0;
+    P3.set(s.x + s.ox * k, s.y + s.oy * k + bob, s.z + s.oz * k);
+    E.set(s.tx * k, s.ry + (s.gap ? s.tx * k * 2 : 0), s.tz * k, "YXZ"); Q.setFromEuler(E);
+    S3.set(s.w, .5, s.l); stone.setMatrixAt(i, M.compose(P3, Q, S3));
+  });
+  stone.instanceMatrix.needsUpdate = true;
+}
+
+// 등불: 길가에 붉은 불 (불빛 번짐은 스프라이트)
+const glowTex = dot("rgba(255,170,110,1)", "rgba(255,90,50,.35)"), lamps = [];
+for (let i = 0; i < 26; i++) {
+  const z = 320 - i * 27 - hash(i, 2) * 6; if (Math.abs(z - GAP) < 30) continue; const side = i % 2 ? 1 : -1, x = roadX(z) + side * 6.4;
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, fog: false }));
+  sp.position.set(x, roadH(z) + 3.4, z); sp.scale.setScalar(5); scene.add(sp); lamps.push(sp);
+  const pole = new THREE.Mesh(new THREE.CylinderGeometry(.08, .1, 3, 6), new THREE.MeshStandardMaterial({ color: "#2a2430" })); pole.position.set(x, roadH(z) + 1.6, z); scene.add(pole);
+}
+
+// 안개: 낮게 깔린 큰 구름 스프라이트 (안개 위로 올라가는 첫 장면에서 바다처럼 보임)
+const mistTex = dot("rgba(120,130,190,.9)", "rgba(90,100,165,.3)"), mist = [];
+for (let i = 0; i < (small ? 90 : 170); i++) {
+  const z = 400 - Math.random() * 850, s = new THREE.Sprite(new THREE.SpriteMaterial({ map: mistTex, transparent: true, depthWrite: false, opacity: .08 + Math.random() * .1, fog: false }));
+  const w = 70 + Math.random() * 130; s.scale.set(w, w * .32, 1); s.position.set(roadX(z) + (Math.random() - .5) * 190, 5 + Math.random() * 20, z); s.userData = { x: s.position.x, ph: Math.random() * 6 };
+  scene.add(s); mist.push(s);
+}
+
+// ── 원귀 점: 실제 게임 그림(물귀신)의 흰 몸통을 점으로 뽑아, 풀리면 오행 다섯 색으로 흩어짐
+const img = new Image(); img.src = "../../neokgut/img/g_ghost0.webp";
+await img.decode().catch(() => {});
+const GN = small ? 7000 : 12000, GX = new THREE.Vector3(), ghostH = 34, ghostZ = -95;
+const ghostPts = (() => {
+  const w = img.naturalWidth || 235, h = img.naturalHeight || 360, k = document.createElement("canvas"); k.width = w; k.height = h; const g = k.getContext("2d"); g.drawImage(img, 0, 0);
+  const d = g.getImageData(0, 0, w, h).data, hit = [];
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { const i = (y * w + x) * 4; if (d[i + 3] > 200 && d[i] > 150) hit.push(x, y); }
+  const pos = new Float32Array(GN * 3), rnd = new Float32Array(GN * 4), n = hit.length / 2;
+  for (let i = 0; i < GN; i++) { const j = (Math.random() * n | 0) * 2, sc = ghostH / h;
+    pos.set([(hit[j] + Math.random() - w / 2) * sc, (h - hit[j + 1] + Math.random()) * sc, (Math.random() - .5) * .9], i * 3);
+    rnd.set([Math.random(), Math.random(), Math.random(), Math.random()], i * 4); }
+  return { pos, rnd };
+})();
+const gg = new THREE.BufferGeometry();
+gg.setAttribute("position", new THREE.BufferAttribute(ghostPts.pos, 3)); gg.setAttribute("rnd", new THREE.BufferAttribute(ghostPts.rnd, 4));
+const gm = new THREE.ShaderMaterial({
+  transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+  uniforms: { u: { value: 0 }, time: { value: 0 }, px: { value: PR }, vis: { value: 0 } },
+  vertexShader: `attribute vec4 rnd; uniform float u, time, px, vis; varying vec3 vC; varying float vA;
+    vec3 el(float k){ k = floor(k*5.); return k<1. ? vec3(.37,.77,.42) : k<2. ? vec3(.93,.42,.32) : k<3. ? vec3(.91,.74,.27) : k<4. ? vec3(.85,.83,.78) : vec3(.36,.55,.94); }
+    void main(){
+      float r = clamp((u - rnd.x * .45) / .55, 0., 1.), e = r * r * (3. - 2. * r);
+      vec3 p = position; p.x += sin(time * 1.1 + p.y * .5) * .25; p.z += sin(time * .8 + p.y) * .3;     // 둥둥 떠 있음
+      vec3 dir = normalize(vec3(rnd.y - .5, rnd.z * .5 - .15, rnd.w - .5));
+      p += dir * e * (8. + rnd.y * 46.) + vec3(sin(time + rnd.x * 30.), cos(time * .7 + rnd.y * 30.), 0.) * e * 2.2;
+      vec4 mv = modelViewMatrix * vec4(p, 1.);
+      gl_PointSize = (1.1 + rnd.z * 1.2 + e * 1.8) * px * (70. / -mv.z);
+      gl_Position = projectionMatrix * mv;
+      vC = mix(vec3(.78,.86,1.), el(rnd.w), smoothstep(0., .35, e));
+      vA = vis * mix(.5, .26, e) * (1. - .55 * smoothstep(.7, 1., e));
+    }`,
+  fragmentShader: `varying vec3 vC; varying float vA; void main(){ float d = length(gl_PointCoord - .5); if (d > .5) discard; gl_FragColor = vec4(vC, vA * smoothstep(.5, .05, d)); }`
+});
+const ghost = new THREE.Points(gg, gm); ghost.frustumCulled = false; scene.add(ghost);
+// 풀려난 넋이 길 위에 떠다니는 불씨 (안 풀린 동안엔 어둡고, 풀리면 밝아짐)
+const WN = small ? 500 : 900, wp = new Float32Array(WN * 3), wr = new Float32Array(WN * 4);
+for (let i = 0; i < WN; i++) { const z = 360 - Math.random() * 760; wp.set([roadX(z) + (Math.random() - .5) * 70, 2 + Math.random() * 34, z], i * 3); wr.set([Math.random(), Math.random(), Math.random(), Math.random()], i * 4); }
+const wg = new THREE.BufferGeometry(); wg.setAttribute("position", new THREE.BufferAttribute(wp, 3)); wg.setAttribute("rnd", new THREE.BufferAttribute(wr, 4));
+const wm = new THREE.ShaderMaterial({
+  transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+  uniforms: { time: { value: 0 }, px: { value: PR }, lit: { value: 0 } },
+  vertexShader: `attribute vec4 rnd; uniform float time, px, lit; varying vec3 vC; varying float vA;
+    vec3 el(float k){ k = floor(k*5.); return k<1. ? vec3(.37,.77,.42) : k<2. ? vec3(.93,.42,.32) : k<3. ? vec3(.91,.74,.27) : k<4. ? vec3(.85,.83,.78) : vec3(.36,.55,.94); }
+    void main(){ vec3 p = position; p.y += mod(time * (.6 + rnd.x) + rnd.y * 30., 30.) - 6.; p.x += sin(time * .5 + rnd.z * 20.) * 3.;
+      vec4 mv = modelViewMatrix * vec4(p, 1.); gl_PointSize = (2. + rnd.w * 3.) * px * (60. / -mv.z); gl_Position = projectionMatrix * mv;
+      vC = el(rnd.w * 4.999); vA = (.1 + .55 * lit) * (.5 + .5 * sin(time * 2. + rnd.x * 40.)); }`,
+  fragmentShader: `varying vec3 vC; varying float vA; void main(){ float d = length(gl_PointCoord - .5); if (d > .5) discard; gl_FragColor = vec4(vC, vA * smoothstep(.5, .0, d)); }`
+});
+const wisps = new THREE.Points(wg, wm); wisps.frustumCulled = false; scene.add(wisps);
+
+// ── 카메라: 안개 위 → 길 위로 내려와 → 원귀 앞에서 느려지고 → 끊긴 길을 건넘
+const lerpK = (K, p) => { for (let i = 0; i < K.length - 1; i++) if (p <= K[i + 1][0]) return K[i][1] + (K[i + 1][1] - K[i][1]) * ((p - K[i][0]) / (K[i + 1][0] - K[i][0])); return K[K.length - 1][1]; };
+const KZ = [[0, 380], [.16, 330], [.4, 130], [.6, -25], [.8, -150], [1, -300]];
+const KH = [[0, 150], [.16, 70], [.3, 16], [.45, 9], [1, 8]];
+const KL = [[0, -34], [.16, -6], [.3, 5], [.6, 12], [1, 6]], KA = [[0, 150], [.16, 100], [.4, 70], [1, 62]];
+const says = [...document.querySelectorAll(".say")], bar = document.getElementById("bar");
+let target = 0, p = 0, mx = 0, my = 0, smx = 0, smy = 0;
+const prog = () => Math.min(1, Math.max(0, scrollY / (document.documentElement.scrollHeight - innerHeight)));
+addEventListener("scroll", () => target = prog(), { passive: true });
+addEventListener("pointermove", e => { mx = e.clientX / innerWidth - .5; my = e.clientY / innerHeight - .5; });
+function resize() { renderer.setSize(innerWidth, innerHeight, false); camera.aspect = innerWidth / innerHeight; camera.fov = innerWidth < 700 ? 70 : 55; camera.updateProjectionMatrix(); }
+addEventListener("resize", resize); resize();
+target = prog(); p = target;
+
+const clock = new THREE.Clock(), look = new THREE.Vector3();
+let T = 0;
+renderer.setAnimationLoop(() => {
+  const rd = Math.min(.3, clock.getDelta()); T += Math.min(.05, rd) * (calm ? .15 : 1);
+  const kk = 1 - Math.exp(-rd * 3.6); p += (target - p) * kk; smx += (mx - smx) * kk * .8; smy += (my - smy) * kk * .8;
+  const z = lerpK(KZ, p), cx = roadX(z) + smx * 10;
+  camera.position.set(cx, Math.max(roadH(z) + lerpK(KH, p) + Math.sin(T * .7) * .4, height(cx, z) + 5), z);
+  const za = z - lerpK(KA, p);
+  look.set(roadX(za) + smx * 20, roadH(za) + lerpK(KL, p) - smy * 8, za); camera.lookAt(look);
+  // 원귀: 길 위에 떠 있고 카메라를 바라봄, 장면 .5~.78 에 풀림
+  ghost.position.set(roadX(ghostZ), roadH(ghostZ) + 3 + Math.sin(T * .9) * .7, ghostZ);
+  ghost.rotation.y = Math.atan2(camera.position.x - ghost.position.x, camera.position.z - ghost.position.z);
+  gm.uniforms.u.value = sstep(.54, .8, p) * 1.05; gm.uniforms.time.value = T; gm.uniforms.vis.value = sstep(.22, .4, p);
+  wm.uniforms.time.value = T; wm.uniforms.lit.value = sstep(.56, .78, p);
+  layoutSlabs(sstep(.66, .93, p), T);
+  lamps.forEach((l, i) => l.material.opacity = .75 + Math.sin(T * 3 + i * 1.7) * .2);
+  mist.forEach(s => { s.position.x = s.userData.x + Math.sin(T * .07 + s.userData.ph) * 10; });
+  // 안개 위에서는 옅게, 길로 내려오면 짙게
+  scene.fog.density = .0021 + sstep(.1, .3, p) * .0022;
+  moon.position.x = -420 + camera.position.x * .3; moonDisc.position.x = moon.position.x;
+  says.forEach(s => s.classList.toggle("on", p >= +s.dataset.a && p < +s.dataset.b));
+  bar.style.width = p * 100 + "%";
+  renderer.render(scene, camera);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>아이폰 조종 계획</title>
+<meta name="description" content="아이폰에 말하면 Claude가 그 아이폰을 직접 조작하게 만드는 계획과 준비할 일">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+/* 아이폰 설정 앱의 결: 회색 바탕, 묶음 목록, 파란 강조 */
+:root {
+  --bg: #f2f2f7; --row: #fff; --ink: #000; --soft: #5c5c63; --line: #dcdce1;
+  --blue: #0a66d8; --red: #c4281c; --green: #1c7d3a;
+  color-scheme: light;
+}
+* { box-sizing: border-box }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 17px/1.5 -apple-system, BlinkMacSystemFont, "Pretendard Variable", Pretendard, "Malgun Gothic", sans-serif; word-break: keep-all; overflow-wrap: anywhere; -webkit-font-smoothing: antialiased }
+a { color: var(--blue); text-decoration: none }
+a:hover { text-decoration: underline }
+h1, h2, h3, p, ol, ul { margin: 0; padding: 0 }
+ol, ul { list-style: none }
+.page { max-width: 640px; margin: 0 auto; padding: 18px 16px 72px }
+.back { font-size: 17px }
+header { margin: 26px 0 34px }
+h1 { font-size: clamp(34px, 8.6vw, 44px); font-weight: 700; letter-spacing: -.03em; line-height: 1.14 }
+.state { display: inline-block; margin-top: 16px; padding: 3px 11px; border-radius: 99px; background: #ffe9c7; color: #7a4a00; font-size: 15px; font-weight: 600 }
+.lead { margin-top: 14px; font-size: 19px; line-height: 1.5 }
+h2 { margin: 34px 16px 7px; font-size: 22px; font-weight: 700; letter-spacing: -.02em }
+.group { background: var(--row); border-radius: 12px; overflow: hidden }
+.group > li { position: relative; display: flex; gap: 13px; padding: 13px 16px }
+.group > li + li::before { content: ""; position: absolute; top: 0; right: 0; left: 16px; height: 1px; background: var(--line) }
+.n { flex: none; width: 29px; height: 29px; border-radius: 7px; background: var(--blue); color: #fff; font-weight: 700; font-size: 16px; line-height: 29px; text-align: center }
+.key .n { background: var(--red) }
+.t { font-weight: 600 }
+.d { margin-top: 2px; color: var(--soft); font-size: 16px }
+.path { display: block; margin-top: 3px; color: var(--blue); font-size: 16px }
+.foot { margin: 7px 16px 0; color: var(--soft); font-size: 15px }
+
+.flow { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; align-items: center; gap: 8px; padding: 18px 12px; background: var(--row); border-radius: 12px; text-align: center }
+.flow b { display: block; font-size: 18px }
+.flow span { display: block; margin-top: 3px; color: var(--soft); font-size: 15px; line-height: 1.35 }
+.flow i { color: var(--blue); font-style: normal; font-size: 21px; font-weight: 600 }
+@media (max-width: 500px) {
+  .flow { grid-template-columns: 1fr; gap: 6px; padding: 16px }
+  .flow i { transform: rotate(90deg) }
+}
+
+.can { display: block !important }
+.can .yes { margin-top: 3px; font-size: 16px }
+.can .no { margin-top: 1px; color: var(--red); font-size: 16px }
+.links a { display: block; width: 100% }
+</style>
+</head>
+<body>
+<div class="page">
+  <a class="back" href="../">‹ 창업실</a>
+
+  <header>
+    <h1>아이폰에 말하면<br>아이폰이 움직이게</h1>
+    <span class="state">시험 전 · 준비 대기</span>
+    <p class="lead">“앱들을 색깔별로 정리해줘”라고 말하면 Claude가 내 아이폰을 직접 조작하는 것이 목표예요. 아이폰 혼자서는 안 되니 노트북을 두뇌로 써요.</p>
+  </header>
+
+  <h2>작동 구조</h2>
+  <div class="flow">
+    <div><b>아이폰</b><span>Claude 앱<br>Code 탭에 말하기</span></div>
+    <i>→</i>
+    <div><b>노트북</b><span>Claude Code가<br>말을 받아 판단</span></div>
+    <i>→</i>
+    <div><b>아이폰</b><span>USB로 화면 보고<br>누르고 끌기</span></div>
+  </div>
+  <p class="foot">쓸 때는 아이폰만 들고 말하면 되지만 노트북은 켜져 있어야 해요. 탈옥은 필요 없어요.</p>
+
+  <h2>내가 먼저 할 일</h2>
+  <ol class="group">
+    <li><span class="n">1</span><div><p class="t">아이폰을 USB로 노트북에 연결</p><p class="d">충전 전용 말고 데이터가 되는 케이블로 연결해요. “이 컴퓨터를 신뢰”가 뜨면 신뢰를 누르고 암호를 입력해요.</p></div></li>
+    <li><span class="n">2</span><div><p class="t">iOS 버전 확인</p><span class="path">설정 › 일반 › 정보 › iOS 버전</span></div></li>
+    <li><span class="n">3</span><div><p class="t">시험용 무료 Apple ID 새로 만들기</p><p class="d"><a href="https://account.apple.com">account.apple.com</a>에서 만들어요. 전화번호 인증이 필요할 수 있어요. 아이폰의 기존 계정에서 로그아웃하지는 마세요.</p></div></li>
+  </ol>
+  <p class="foot">끝나면 Claude에게 “꽂았어, iOS OO”라고 말하기.</p>
+
+  <h2>Claude가 알려 주면 할 일</h2>
+  <ol class="group">
+    <li><span class="n">4</span><div><p class="t">Windows 관리자 허용 누르기</p><p class="d">USB 전달 도구를 설치하고 아이폰을 WSL로 넘길 때 몇 번 떠요.</p></div></li>
+    <li><span class="n">5</span><div><p class="t">아이폰 개발자 모드 켜기</p><span class="path">설정 › 개인정보 보호 및 보안 › 개발자 모드</span><p class="d">페어링 후에 메뉴가 나타날 수 있어요. 켜면 재부팅되니 암호를 한 번 입력해요.</p></div></li>
+    <li><span class="n">6</span><div><p class="t">새 Apple ID 로그인</p><p class="d">비밀번호는 채팅에 쓰지 말고 Claude가 띄운 설치 창에 직접 입력해요. 인증 코드를 요구할 수도 있어요.</p></div></li>
+  </ol>
+
+  <h2>Claude가 할 일</h2>
+  <ul class="group">
+    <li><div><p class="t">WSL에 Docker와 iphone-control 설치</p><p class="d">설치 전에 코드부터 읽어요.</p></div></li>
+    <li><div><p class="t">아이폰 암호 자동 입력은 끄기</p><p class="d">암호가 노트북에 저장되지 않게 해요.</p></div></li>
+    <li><div><p class="t">길게 눌러 끌기 동작 붙이기</p><p class="d">도구에 이 동작이 따로 없어서 직접 만들어야 해요.</p></div></li>
+  </ul>
+
+  <h2>시험 순서</h2>
+  <ol class="group">
+    <li><span class="n">1</span><p class="t">아이폰 화면 캡처</p></li>
+    <li><span class="n">2</span><p class="t">원하는 곳 탭</p></li>
+    <li class="key"><span class="n">3</span><div><p class="t">홈 화면 앱 하나 옮기기</p><p class="d">이번 시험의 핵심이에요. 여기서 막히면 멈춰요.</p></div></li>
+    <li><span class="n">4</span><p class="t">앱 전체를 색깔별로 정리</p></li>
+    <li><span class="n">5</span><p class="t">아이폰 Claude 앱에서 말로 시키기</p></li>
+  </ol>
+
+  <h2>걸림돌</h2>
+  <ul class="group">
+    <li><div><p class="t">Windows</p><p class="d">성공 사례를 못 찾았어요. WSL이 USB 전달을 지원하는 것까지만 확인했어요.</p></div></li>
+    <li><div><p class="t">7일 만료</p><p class="d">무료 Apple ID 서명은 7일마다 다시 해야 해요. 도구가 자동으로 해 준다고 설명돼 있어요.</p></div></li>
+    <li><div><p class="t">보안</p><p class="d">조작 도구가 켜진 동안에는 아이폰의 문자 인증번호까지 읽힐 수 있어요. USB로만 쓰고, 다 쓰면 끄고, 시험 중에는 문자·은행 앱을 열어 두지 않아요.</p></div></li>
+    <li><div><p class="t">잠금 화면</p><p class="d">재부팅한 뒤에는 암호를 직접 한 번 입력해야 조작할 수 있어요.</p></div></li>
+  </ul>
+
+  <h2>아이폰만으로 되는 것</h2>
+  <ul class="group">
+    <li class="can"><p class="t">새 Siri (iOS 27)</p><p class="yes">화면 내용 이해, 지원 앱 안의 동작</p><p class="no">홈 화면 앱 옮기기는 사례를 못 찾음</p></li>
+    <li class="can"><p class="t">Claude 앱</p><p class="yes">캘린더 읽기·추가, 리마인더 추가, 문자·메일 초안</p><p class="no">다른 앱의 화면 조작</p></li>
+    <li class="can"><p class="t">단축어 + Ask Claude</p><p class="yes">정해 둔 순서를 Claude와 묶어 실행</p><p class="no">그때그때 화면을 보고 누르기</p></li>
+  </ul>
+
+  <h2>자료</h2>
+  <ul class="group links">
+    <li><a href="https://github.com/Derrors/iphone-control">iphone-control (맥 없이 아이폰 조종)</a></li>
+    <li><a href="https://code.claude.com/docs/en/remote-control">Claude Code Remote Control 문서</a></li>
+    <li><a href="https://fuadkamal.org/2026/09/17/driving-a-real-iphone-from-claude-code/">Claude Code로 실제 아이폰을 조작한 기록</a></li>
+    <li><a href="https://support.claude.com/en/articles/11869619-use-claude-with-ios-apps">Claude와 iOS 앱</a></li>
+    <li><a href="https://www.eff.org/deeplinks/2026/09/how-limit-what-apples-new-siri-ai-can-access-ios-27">iOS 27 Siri 설명 (EFF)</a></li>
+  </ul>
+</div>
+</body>
+</html>

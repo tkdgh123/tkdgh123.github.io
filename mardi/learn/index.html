@@ -1,0 +1,812 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>마디 공부</title>
+<meta name="description" content="마디를 만들기 전에 알아 둘 것 — 뼈대 넣기, 자연스러운 움직임, Blender 기본기, Unity 애니메이션, 고퀄리티 3D 게임 사례">
+<script>document.documentElement.classList.add("js")</script>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@300;500;700&display=swap">
+<style>
+/* 마디 기획서와 같은 작업대 결: 회색 종이, 어두운 뷰포트, 관절 주황 하나. 장마다 하나씩 펼쳐 보는 교재 */
+:root {
+  --paper: #eceef0; --tone: #dfe2e6; --card: #f6f7f8; --ink: #15171a; --muted: #5b6068; --rule: #c4c8ce;
+  --vp: #1c1e22; --vp-2: #26292e; --on-vp: #e8eaed; --on-vp-soft: #8d939c;
+  --joint: #f06a1d; --joint-ink: #b7470a; --ok: #2f7d4f; --warn: #a36a00;
+  --m: clamp(16px, 4vw, 56px);
+  --display: "IBM Plex Sans KR", "Pretendard Variable", Pretendard, system-ui, sans-serif;
+  --sans: "Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif;
+  --mono: "IBM Plex Mono", "Pretendard Variable", ui-monospace, monospace;
+  color-scheme: light;
+}
+* { box-sizing: border-box }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 16.5px/1.75 var(--sans); word-break: keep-all; overflow-wrap: anywhere; -webkit-font-smoothing: antialiased; overflow-x: clip }
+a { color: inherit; text-decoration-color: var(--joint); text-underline-offset: 3px }
+h1, h2, h3, h4 { margin: 0; font-family: var(--display); letter-spacing: -.02em; line-height: 1.2; text-wrap: balance }
+p { margin: 0 }
+ul, ol { margin: 0; padding-left: 1.2em }
+.mono, code, kbd { font-family: var(--mono); font-variant-numeric: tabular-nums }
+code { font-size: .88em; background: var(--tone); padding: 1px 5px; border-radius: 3px }
+kbd { display: inline-block; font-size: 12.5px; line-height: 1; padding: 5px 7px 4px; border-radius: 4px; background: var(--ink); color: var(--paper); box-shadow: 0 2px 0 #000 }
+.wrap { max-width: 1040px; margin: 0 auto; padding-left: max(var(--m), env(safe-area-inset-left, 0px)); padding-right: max(var(--m), env(safe-area-inset-right, 0px)) }
+:focus-visible { outline: 2px solid var(--joint); outline-offset: 3px }
+
+/* 머리 */
+header { background: var(--vp); color: var(--on-vp); padding-block: 24px 0 }
+.top { display: flex; justify-content: space-between; gap: 16px; font-size: 13px; color: var(--on-vp-soft) }
+.top a { text-decoration: none } .top a:hover { color: var(--on-vp) }
+header h1 { font-size: clamp(48px, 7vw, 92px); font-weight: 300; letter-spacing: -.04em; margin-top: clamp(28px, 5vw, 56px) }
+header h1 b { font-weight: 700; color: var(--joint) }
+.lede { margin-top: 12px; color: var(--on-vp-soft); max-width: 46ch }
+nav.tabs { display: flex; gap: 4px; margin-top: 36px; overflow-x: auto; scrollbar-width: none }
+nav.tabs::-webkit-scrollbar { display: none }
+nav.tabs a { flex: none; display: flex; align-items: baseline; gap: 8px; padding: 14px 16px 16px; text-decoration: none; color: var(--on-vp-soft); border-radius: 6px 6px 0 0; font-weight: 600; font-size: 15px }
+nav.tabs a span { font: 500 12px var(--mono); color: var(--joint) }
+nav.tabs a:hover { color: var(--on-vp) }
+nav.tabs a[aria-current="page"] { background: var(--paper); color: var(--ink) }
+
+/* 장 */
+.ch { padding-block: clamp(40px, 6vw, 72px) clamp(64px, 8vw, 104px) }
+.js .ch { display: none } .js .ch.on { display: block }
+.ch-head { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 24px; align-items: end }
+.ch-num { font: 300 clamp(64px, 9vw, 120px)/.8 var(--display); color: var(--rule) }
+.ch-head h2 { font-size: clamp(30px, 4vw, 48px); font-weight: 600 }
+.ch-head p { grid-column: 2; color: var(--muted); max-width: 54ch }
+.blk { margin-top: clamp(40px, 5vw, 64px) }
+.blk > h3 { font-size: 22px; font-weight: 700 }
+.blk > h3 small { font: 500 12px var(--mono); color: var(--joint-ink); margin-left: 8px; letter-spacing: .04em }
+.blk > p.lead { margin-top: 8px; color: var(--muted); max-width: 60ch }
+.blk > *:nth-child(n+2):not(.lead) { margin-top: 18px }
+.blk > .lead + * { margin-top: 22px }
+
+/* 용어 격자 */
+.terms { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 290px), 1fr)); gap: 2px; background: var(--rule); border: 2px solid var(--rule); border-radius: 6px; overflow: hidden }
+.terms div { background: var(--card); padding: 18px 20px }
+.terms b { display: block; font-family: var(--display); font-size: 17px }
+.terms i { font: 500 12px var(--mono); font-style: normal; color: var(--muted) }
+.terms p { margin-top: 6px; font-size: 15px; color: var(--muted) }
+.terms.two { grid-template-columns: repeat(2, minmax(0, 1fr)) }
+.terms p.madi { color: var(--ink) }
+.terms p.madi::before { content: "마디 · "; font: 600 12.5px var(--mono); color: var(--joint-ink) }
+
+/* 표 */
+.tbl { overflow-x: auto; border-top: 2px solid var(--ink) }
+table { width: 100%; border-collapse: collapse; font-size: 15px; min-width: 560px }
+th, td { text-align: left; vertical-align: top; padding: 11px 14px 11px 0; border-bottom: 1px solid var(--rule) }
+th { font: 500 12px var(--mono); color: var(--muted); letter-spacing: .04em; padding-top: 12px }
+td:first-child { font-weight: 600 }
+.tag { display: inline-block; font: 500 11px var(--mono); padding: 1px 6px; border-radius: 3px; vertical-align: 1px; white-space: nowrap }
+.t-ok { background: #dcefe3; color: var(--ok) } .t-guess { background: #f6e8c9; color: var(--warn) }
+
+/* 결정 상자 */
+.decide { background: var(--vp); color: var(--on-vp); border-radius: 6px; padding: clamp(20px, 3vw, 32px) }
+.decide h4 { font-size: 13px; font-family: var(--mono); font-weight: 500; color: var(--joint); letter-spacing: .06em }
+.decide p { margin-top: 8px; font-size: 17px }
+.decide p + p { color: var(--on-vp-soft); font-size: 15px }
+
+/* 두 칸 비교 */
+.duo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px }
+.duo > div { padding: 22px; border-radius: 6px; background: var(--card) }
+.duo > div.pick { background: var(--joint); color: #1a0f07 }
+.duo h4 { font-size: 18px }
+.duo p { margin-top: 8px; font-size: 15px }
+.duo ul { margin-top: 10px; font-size: 15px; display: grid; gap: 4px }
+
+/* 뼈대 나무 */
+.tree { background: var(--vp); color: var(--on-vp); border-radius: 6px; padding: 22px 24px; overflow-x: auto; font: 500 13.5px/1.9 var(--mono) }
+.tree ul { list-style: none; padding-left: 22px; margin: 0; border-left: 1px solid rgb(255 255 255 / .14) }
+.tree > ul { border: 0; padding: 0 }
+.tree li { position: relative; white-space: nowrap }
+.tree li::before { content: ""; position: absolute; left: -22px; top: 15px; width: 16px; border-top: 1px solid rgb(255 255 255 / .14) }
+.tree > ul > li::before { display: none }
+.tree span { color: var(--on-vp-soft); font-family: var(--sans); font-size: 13px; margin-left: 8px }
+.tree b { font-weight: 500 }
+.tree li.req > .n::after { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--joint); margin-left: 8px; vertical-align: 1px }
+.legend { font-size: 13.5px; color: var(--muted) }
+.legend i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--joint); margin-right: 6px; vertical-align: 1px }
+
+/* 번호 목록 */
+.steps { list-style: none; padding: 0; counter-reset: s; display: grid; gap: 0 }
+.steps li { counter-increment: s; display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 0 14px; padding-block: 12px; border-top: 1px solid var(--rule) }
+.steps li::before { content: counter(s); font: 500 14px/1.7 var(--mono); color: var(--joint-ink) }
+
+/* 원칙 목록 */
+.princ { display: grid; gap: 0 }
+.princ div { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 4px 24px; padding-block: 16px; border-top: 1px solid var(--rule) }
+.princ b { font-family: var(--display); font-size: 17px }
+.princ b i { display: block; font: 500 11.5px var(--mono); font-style: normal; color: var(--muted) }
+.princ p { font-size: 15.5px }
+
+/* 그림 판 */
+.fig { background: var(--vp); border-radius: 6px; padding: 22px; color: var(--on-vp) }
+.fig { overflow-x: auto }
+.fig svg { display: block; width: 100%; height: auto; min-width: 600px }
+.fig figcaption { margin-top: 12px; font-size: 13.5px; color: var(--on-vp-soft) }
+figure { margin: 0 }
+
+/* 단축키 */
+.keys { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); gap: 10px 20px }
+.keys div { display: flex; align-items: center; gap: 12px; padding-block: 8px; border-bottom: 1px solid var(--rule); font-size: 15px }
+.keys kbd { flex: none; min-width: 34px; text-align: center }
+
+/* 모드 */
+.modes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px }
+.modes div { border-top: 3px solid var(--ink); padding-top: 14px }
+.modes div:last-child { border-top-color: var(--joint) }
+.modes h4 { font-size: 19px }
+.modes p { margin-top: 6px; font-size: 15px; color: var(--muted) }
+.modes kbd { margin-top: 10px }
+
+/* 퀴즈 */
+.quiz { display: grid; gap: 10px }
+details { background: var(--card); border-radius: 6px; padding: 16px 20px }
+summary { cursor: pointer; font-weight: 600; list-style: none; display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 10px; align-items: baseline }
+summary::-webkit-details-marker { display: none }
+summary::before { content: "Q"; font: 600 14px var(--mono); color: var(--joint-ink) }
+summary::after { content: "답 보기"; font: 500 12px var(--mono); color: var(--muted) }
+details[open] summary::after { content: "접기" }
+details p { margin: 10px 0 0 38px; color: var(--muted); font-size: 15.5px }
+
+/* 자료 */
+.res { list-style: none; padding: 0; display: grid; gap: 0 }
+.res li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 16px; padding-block: 12px; border-top: 1px solid var(--rule); font-size: 15px }
+.res a { font-weight: 600 }
+.res span { color: var(--muted) }
+.res em { font: 500 12px var(--mono); font-style: normal; color: var(--muted); white-space: nowrap }
+.note { font-size: 13.5px; color: var(--muted) }
+
+/* 다음 장 */
+.next { margin-top: 64px; display: flex; justify-content: flex-end }
+.next a { display: inline-flex; gap: 10px; align-items: baseline; text-decoration: none; font: 600 18px var(--display); padding: 14px 20px; border-radius: 6px; background: var(--ink); color: var(--paper) }
+.next a span { font: 500 12px var(--mono); color: var(--joint) }
+
+@media (max-width: 760px) {
+  .duo, .modes, .terms.two { grid-template-columns: minmax(0, 1fr) }
+  .princ div { grid-template-columns: minmax(0, 1fr) }
+  .ch-head { grid-template-columns: minmax(0, 1fr) } .ch-head p { grid-column: 1 }
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="top mono"><a href="../">← 마디 기획서</a><span>공부 · 2026-11-01</span></div>
+    <h1>마디 <b>공부</b></h1>
+    <p class="lede">작업 들어가기 전에 알아 둘 다섯 가지. 조사한 내용 중 확인된 것과 추정은 따로 표시했습니다.</p>
+    <nav class="tabs" aria-label="장">
+      <a href="#rig"><span>1</span>뼈대 넣기</a>
+      <a href="#motion"><span>2</span>자연스러움</a>
+      <a href="#blender"><span>3</span>Blender</a>
+      <a href="#unity"><span>4</span>Unity</a>
+      <a href="#games"><span>5</span>고퀄리티 게임</a>
+      <a href="#decide"><span>✓</span>정한 것</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+<!-- ───────── 1. 리깅 ───────── -->
+<section class="ch" id="rig" aria-labelledby="h-rig">
+  <div class="ch-head"><span class="ch-num">1</span><h2 id="h-rig">뼈대 넣기</h2><p>뼈대는 부모-자식으로 이어진 나무입니다. 마네킹은 조각 하나가 뼈 하나를 통째로 따라가서, 사람 캐릭터에서 가장 어려운 단계를 건너뜁니다.</p></div>
+
+  <div class="blk">
+    <h3>뼈대는 나무 모양</h3>
+    <p class="lead">부모가 움직이면 자식이 따라옵니다. 어깨를 돌리면 팔·손이 같이 가요. 맨 위가 엉덩이(Hips)인 건 몸의 무게중심이라 이동의 기준이기 때문입니다.</p>
+    <div class="tree" role="img" aria-label="Mixamo 표준 뼈대 계층">
+      <ul><li class="req"><b class="n">Hips</b><span>엉덩이 · 뿌리</span>
+        <ul>
+          <li class="req"><b class="n">Spine</b><span>허리</span><ul><li>Spine1<ul><li>Spine2<span>가슴</span>
+            <ul>
+              <li>Neck<span>목</span><ul><li class="req"><b class="n">Head</b><span>머리</span></li></ul></li>
+              <li>LeftShoulder<span>쇄골</span><ul><li class="req"><b class="n">LeftArm</b><span>위팔</span><ul><li class="req"><b class="n">LeftForeArm</b><span>아래팔</span><ul><li class="req"><b class="n">LeftHand</b><span>손</span></li></ul></li></ul></li></ul></li>
+              <li>RightShoulder<span>오른쪽도 같음</span></li>
+            </ul></li></ul></li></ul></li>
+          <li class="req"><b class="n">LeftUpLeg</b><span>허벅지</span><ul><li class="req"><b class="n">LeftLeg</b><span>정강이</span><ul><li class="req"><b class="n">LeftFoot</b><span>발</span><ul><li>LeftToeBase<span>발가락</span></li></ul></li></ul></li></ul></li>
+          <li class="req"><b class="n">RightUpLeg</b><span>오른쪽도 같음</span></li>
+        </ul></li></ul>
+    </div>
+    <p class="legend"><i></i>Unity가 사람형으로 인식하려면 꼭 있어야 하는 뼈 (좌우 합쳐 15개). 실제 이름 앞에는 <code>mixamorig:</code>가 붙습니다.</p>
+  </div>
+
+  <div class="blk">
+    <h3>알아야 할 말 여섯 개</h3>
+    <div class="terms">
+      <div><b>휴식 자세 <i>Rest pose</i></b><p>모든 회전값이 0인 기준 자세. 마디는 팔을 수평으로 편 T자 자세로 만듭니다. 기준이 맞아야 "팔 30° 올려"가 어느 몸에서나 같은 뜻이 돼요.</p></div>
+      <div><b>롤 <i>Bone roll</i></b><p>뼈가 길이 방향으로 얼마나 비틀려 있는지의 기준. 엉망이면 무릎이 반대로 꺾이고 손목이 꼬입니다. 좌우가 대칭으로 굽는지로 확인.</p></div>
+      <div><b>FK <i>Forward Kinematics</i></b><p>부모부터 차례로 각도를 줘서 자세를 만듦. 어깨 → 팔꿈치 → 손목. 휘두르기에 직관적이고, 마디의 첫 화면 걷기가 이 방식.</p></div>
+      <div><b>IK <i>Inverse Kinematics</i></b><p>손끝·발끝 위치를 정하면 중간 관절 각도를 계산. 발을 계단에 붙일 때 씀. 무릎이 어느 쪽으로 꺾일지는 폴 타깃(pole)이 정함.</p></div>
+      <div><b>컨스트레인트 <i>Constraint</i></b><p>뼈에 거는 규칙. 회전 제한(팔꿈치가 뒤로 안 꺾이게), 다른 뼈 따라 하기 등. Unity로는 안 넘어가서 내보낼 때 구워야(Bake) 함.</p></div>
+      <div><b>스키닝 · 웨이트 <i>Skinning</i></b><p>피부의 점 하나하나가 어느 뼈를 얼마나 따라갈지 정하는 일. 팔꿈치 안쪽이 50:50이면 살이 부드럽게 접힘. 초보가 가장 많이 막히는 곳.</p></div>
+    </div>
+  </div>
+
+  <div class="blk">
+    <h3>마네킹은 웨이트가 필요 없다</h3>
+    <div class="duo">
+      <div><h4>사람 캐릭터 (스킨)</h4><p>피부 한 장이 여러 뼈에 나뉘어 붙음.</p><ul><li>관절에서 살이 접히는 걸 칠해서 맞춰야 함</li><li>사탕 껍질처럼 비틀림, 어깨 부피 꺼짐</li><li>점 하나가 엉뚱한 뼈를 따라가 튐</li></ul></div>
+      <div class="pick"><h4>마디 마네킹 (강체)</h4><p>조각 하나 = 뼈 하나, 100%.</p><ul><li>위팔 조각은 위팔 뼈만 따라감</li><li>관절 공은 부모 쪽 뼈에 붙임. 돌아도 모양이 안 변해 티가 안 남</li><li>스크립트로 자동화하기 쉬움</li></ul></div>
+    </div>
+  </div>
+
+  <div class="blk">
+    <div class="decide">
+      <h4>계획 변경</h4>
+      <p>Mixamo에 마네킹을 올려 자동 리깅하지 않습니다. 뼈는 Blender 스크립트로 Mixamo 이름 그대로 직접 넣고, 동작은 Mixamo 기본 캐릭터로 받아 Unity가 마네킹에 옮겨 입힙니다.</p>
+      <p>Mixamo 자동 리거는 한 덩어리로 이어진 몸을 기준으로 해서, 관절 공 때문에 조각이 떨어진 마네킹은 거부되거나 살처럼 부드럽게 휘어 버릴 수 있음. 실제로 되는지는 0단계에서 한 번만 시험해 봅니다.</p>
+    </div>
+  </div>
+
+  <div class="blk">
+    <h3>자주 하는 실수</h3>
+    <div class="tbl"><table>
+      <thead><tr><th>실수</th><th>증상</th><th>고치는 법</th></tr></thead>
+      <tbody>
+        <tr><td>크기·회전 적용 안 함</td><td>Unity에서 100배 크거나 90° 누워 있음</td><td>Blender에서 <kbd>Ctrl</kbd>+<kbd>A</kbd> 적용, 내보내기 배율 설정</td></tr>
+        <tr><td>Add Leaf Bones 켜 둠</td><td>뼈 끝마다 <code>_end</code> 가짜 뼈</td><td>내보내기에서 끄기 (기본값이 켜짐)</td></tr>
+        <tr><td>롤이 제각각</td><td>팔꿈치·무릎이 반대로 꺾임</td><td>Recalculate Roll, 좌우 대칭 굽힘 확인</td></tr>
+        <tr><td>T자 자세가 아님</td><td>Unity 아바타에 빨간 뼈, 팔 꼬임</td><td>T자 자세로 다시, Unity에서 Enforce T-Pose</td></tr>
+        <tr><td>조각이 두 뼈에 걸침</td><td>그 조각만 늘어나고 찌그러짐</td><td>한 조각 = 한 뼈, 100%</td></tr>
+        <tr><td>IK 결과를 안 구움</td><td>Unity에서 발이 땅에서 뜸</td><td>내보내기에서 Bake Animation</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="blk">
+    <h3>확인 문제</h3>
+    <div class="quiz">
+      <details><summary>위팔 조각을 위팔 뼈에 100% 붙이면 웨이트 칠하기가 왜 필요 없나요?</summary><p>모든 점이 뼈 하나만 그대로 따라가니, 두 뼈 사이에서 섞어 줄 부분이 없기 때문입니다. 강체라 통째로 움직이면 끝.</p></details>
+      <details><summary>Unity에 넣은 모델이 회전 (-90, 0, 0), 크기 100으로 들어왔어요. 왜죠?</summary><p>Blender(Z가 위)와 Unity(Y가 위)의 축·단위 차이에 크기·회전 적용을 안 한 게 겹친 것. Blender에서 <kbd>Ctrl</kbd>+<kbd>A</kbd>로 적용하고, 내보내기 배율·축 설정을 확인합니다.</p></details>
+      <details><summary>Blender에서 IK로 발을 바닥에 붙였는데 Unity에선 발이 떠요.</summary><p>FBX는 IK 규칙이 아니라 뼈의 위치·회전 키만 담습니다. 내보낼 때 Bake Animation을 켜서 결과를 키로 구워야 해요.</p></details>
+    </div>
+  </div>
+
+  <div class="blk">
+    <h3>더 볼 자료</h3>
+    <ul class="res">
+      <li><a href="https://docs.unity.com/en-us/engine/6000.3/manual/animation-section/animation-mecanim/avatar-creationand-setup/class-avatar">Unity 6.3 매뉴얼 — Avatar Mapping 탭</a><em>공식 · 15분</em><span>필수 뼈와 선택 뼈 표시, 매핑 저장</span></li>
+      <li><a href="https://app.cinevva.com/guides/blender-to-unity-export-checklist">Blender → Unity 내보내기 체크리스트</a><em>2026 · 15분</em><span>Leaf Bones·배율. 값은 직접 시험해서 확인</span></li>
+      <li><a href="https://app.cinevva.com/guides/automatic-rigging-explained">자동 리깅은 어떻게 동작하나</a><em>2026 · 10분</em><span>Mixamo 같은 자동 리거가 몸을 어떻게 읽는지</span></li>
+    </ul>
+    <p class="note">영상은 "Blender armature bone parenting", "Unity humanoid avatar configure"로 찾되 Blender 4.2 이후·Unity 6 기준인지 날짜를 보고 고르세요.</p>
+  </div>
+  <div class="next"><a href="#motion"><span>2</span>자연스러움 →</a></div>
+</section>
+
+<!-- ───────── 2. 자연스러움 ───────── -->
+<section class="ch" id="motion" aria-labelledby="h-motion">
+  <div class="ch-head"><span class="ch-num">2</span><h2 id="h-motion">무엇이 움직임을 자연스럽게 만드나</h2><p>애니메이션 원칙, 사람 걸음의 숫자, 게임 액션의 박자. 마디의 관찰 도구가 재는 기준이 여기서 나옵니다.</p></div>
+
+  <div class="blk">
+    <h3>마네킹에 중요한 원칙 일곱 개 <small>디즈니 12원칙 중</small></h3>
+    <div class="princ">
+      <div><b>타이밍 · 간격<i>timing · spacing</i></b><p>같은 20프레임이어도 프레임마다 손목이 움직인 간격이 일정하면 로봇, 처음·끝이 촘촘하고 가운데가 넓으면 힘이 실린 동작.</p></div>
+      <div><b>예비 동작<i>anticipation</i></b><p>발차기 전에 무릎을 접고 몸을 뒤로 젖힘. 내려찍기 전에 두 팔을 머리 위에서 멈춤. "곧 온다"와 힘의 크기를 알려 줌.</p></div>
+      <div><b>따라오기 · 겹치기<i>follow-through · overlap</i></b><p>몸통이 멈춰도 팔·머리·무기는 관성으로 더 감. 몸통 → 어깨 → 팔꿈치 → 손목 순서로 1~3프레임씩 늦게 출발하고 멈춤.</p></div>
+      <div><b>호<i>arcs</i></b><p>관절은 회전이라 손끝·발끝은 거의 항상 곡선을 그림. 직선으로 꺾이면 기계 같음. 마디의 궤적 도구가 보는 것.</p></div>
+      <div><b>천천히 시작 · 천천히 끝<i>slow in · slow out</i></b><p>시작과 끝은 느리고 가운데가 빠름. 일정한 속도(linear)는 기계 느낌.</p></div>
+      <div><b>무게<i>weight</i></b><p>무거울수록 예비가 길고, 가속이 느리고, 멈출 때 눌렸다 올라오는 회복이 길다.</p></div>
+      <div><b>보조 동작<i>secondary action</i></b><p>걸을 때 팔 흔들기, 머리 까딱임. 주 동작보다 눈에 띄면 안 됨.</p></div>
+    </div>
+  </div>
+
+  <div class="blk">
+    <h3>걸음 한 주기</h3>
+    <p class="lead">한 발이 땅에 닿은 순간부터 같은 발이 다시 닿을 때까지. 걷기는 사실 "넘어지다 다음 발로 받치기"의 반복입니다.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 720 250" role="img" aria-label="걷기 주기 도표. 오른발은 0~60% 디딤, 60~100% 흔듦. 왼발은 50%부터 디딤. 양발 지지는 0~10%와 50~60%. 몸 높이는 디딤 중간에 가장 높고 양발 지지 때 가장 낮다.">
+        <g font-family="IBM Plex Mono, monospace" font-size="11" fill="#8d939c">
+          <text x="80" y="22">0%</text><text x="368" y="22">50%</text><text x="660" y="22">100%</text>
+        </g>
+        <g font-family="Pretendard, sans-serif" font-size="12.5" fill="#e8eaed">
+          <text x="0" y="52">오른발</text><text x="0" y="92">왼발</text><text x="0" y="200">몸 높이</text>
+        </g>
+        <!-- 축: 80~680 = 600px = 100% -->
+        <rect x="80" y="38" width="360" height="22" rx="3" fill="#f06a1d"/><rect x="440" y="38" width="240" height="22" rx="3" fill="#3a3e45"/>
+        <rect x="80" y="78" width="60" height="22" rx="3" fill="#f06a1d"/><rect x="140" y="78" width="240" height="22" rx="3" fill="#3a3e45"/><rect x="380" y="78" width="300" height="22" rx="3" fill="#f06a1d"/>
+        <g font-family="Pretendard, sans-serif" font-size="11.5" fill="#1a0f07"><text x="90" y="53">디딤 60%</text><text x="390" y="93">디딤</text></g>
+        <g font-family="Pretendard, sans-serif" font-size="11.5" fill="#e8eaed"><text x="450" y="53">흔듦 40%</text><text x="150" y="93">흔듦</text></g>
+        <rect x="80" y="110" width="60" height="8" fill="#e8eaed" opacity=".85"/><rect x="380" y="110" width="60" height="8" fill="#e8eaed" opacity=".85"/>
+        <text x="80" y="136" font-family="Pretendard, sans-serif" font-size="11.5" fill="#8d939c">흰 띠 = 두 발 모두 땅 (약 20%, 10% × 2)</text>
+        <path d="M80 214 C 140 214, 140 166, 230 166 S 320 214, 380 214 S 440 166, 530 166 S 620 214, 680 214" fill="none" stroke="#e8eaed" stroke-width="2"/>
+        <g fill="#f06a1d"><circle cx="230" cy="166" r="4"/><circle cx="530" cy="166" r="4"/><circle cx="80" cy="214" r="4"/><circle cx="380" cy="214" r="4"/><circle cx="680" cy="214" r="4"/></g>
+        <g font-family="Pretendard, sans-serif" font-size="11.5" fill="#8d939c"><text x="200" y="158">지나가기(가장 높음)</text><text x="388" y="232">닿기(가장 낮음)</text></g>
+        <text x="566" y="244" font-family="IBM Plex Mono, monospace" font-size="11" fill="#8d939c">위아래 약 4~5 cm</text>
+      </svg>
+      <figcaption>몸이 가장 높은 건 한 발 위를 지나가는 순간, 가장 낮은 건 두 발이 다 땅에 있을 때. 걷기 키 포즈는 닿기 → 내려감 → 지나가기 → 올라감.</figcaption>
+    </figure>
+  </div>
+
+  <div class="blk">
+    <h3>걷기와 달리기의 숫자</h3>
+    <div class="tbl"><table>
+      <thead><tr><th>항목</th><th>걷기</th><th>달리기</th><th>근거</th></tr></thead>
+      <tbody>
+        <tr><td>디딤 / 흔듦</td><td>약 60% / 40%</td><td>흔듦이 더 김, 빠를수록 디딤 짧아짐</td><td><span class="tag t-ok">확인</span></td></tr>
+        <tr><td>두 발 다 땅</td><td>약 20%</td><td>없음. 대신 두 발 다 공중 (한 주기 두 번)</td><td><span class="tag t-ok">확인</span></td></tr>
+        <tr><td>한 주기 (30fps)</td><td>약 30~36프레임 (1.0~1.2초)</td><td>약 20~24프레임</td><td><span class="tag t-guess">계산·통설</span></td></tr>
+        <tr><td>몸 위아래</td><td>약 4~5 cm</td><td>더 큼. 디딤 앞부분에만 약 7.3 cm 내려감</td><td><span class="tag t-ok">확인</span></td></tr>
+        <tr><td>무릎</td><td>디딤 초기 15~20°, 흔듦 초기 최대 약 60°</td><td>흔듦 중 100° 넘게 접힘</td><td><span class="tag t-ok">걷기 확인</span> <span class="tag t-guess">달리기 추정</span></td></tr>
+        <tr><td>발목</td><td>발등 쪽 최대 약 10°, 차고 나갈 때 발바닥 쪽 약 20°</td><td>차기가 더 큼</td><td><span class="tag t-ok">걷기 확인</span></td></tr>
+        <tr><td>엉덩이</td><td>닿을 때 앞으로 약 30°, 뒤로 약 10~15°</td><td>앞으로 40~50°</td><td><span class="tag t-guess">추정</span></td></tr>
+        <tr><td>팔</td><td>다리와 반대 (오른발 앞 = 왼팔 앞)</td><td>팔꿈치 약 90° 굽힘, 진폭 커짐</td><td><span class="tag t-guess">통설</span></td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="blk">
+    <h3>균형 — 무게중심과 발 사이 면</h3>
+    <p class="lead">서 있을 때는 무게중심을 바닥에 내린 점이 두 발이 만드는 면 안에 있어야 합니다. 걷고 뛸 땐 일부러 밖으로 나갔다가 다음 발이 받쳐요. 그래서 "안쪽" 규칙은 멈춘 자세에서만 엄격합니다.</p>
+    <ul class="princ" style="list-style:none;padding:0">
+      <li style="padding-block:12px;border-top:1px solid var(--rule)">한 발로 설 때 골반이 디딘 발 쪽으로 옮겨 가지 않으면 어색함</li>
+      <li style="padding-block:12px;border-top:1px solid var(--rule)">한쪽 팔·다리를 뻗으면 반대쪽 몸통·엉덩이가 반대로 밀려 균형을 맞춰야 함</li>
+      <li style="padding-block:12px;border-top:1px solid var(--rule)">가속할 땐 앞으로 기울어야 함. 내려찍은 뒤엔 체중이 앞발에 실려야 함</li>
+    </ul>
+  </div>
+
+  <div class="blk">
+    <h3>게임 액션의 박자</h3>
+    <p class="lead">영화는 예비 동작이 길수록 좋지만, 게임은 버튼을 누르자마자 반응해야 합니다. 그래서 흔한 설계는 "시작은 짧게, 회복은 길게"입니다.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 720 120" role="img" aria-label="공격 프레임 예시: 시작 6프레임, 판정 3프레임, 회복 18프레임, 히트스톱 8프레임이 판정 순간에 끼어든다">
+        <rect x="0" y="30" width="133" height="34" rx="3" fill="#8d939c"/><rect x="133" y="30" width="67" height="34" rx="3" fill="#f06a1d"/><rect x="200" y="30" width="400" height="34" rx="3" fill="#3a3e45"/>
+        <g font-family="Pretendard, sans-serif" font-size="12.5"><text x="10" y="52" fill="#1c1e22">시작 6f</text><text x="141" y="52" fill="#1a0f07">판정 3f</text><text x="210" y="52" fill="#e8eaed">회복 18f — 여기서 무게가 느껴짐</text></g>
+        <path d="M160 74v14h0" stroke="#f06a1d" stroke-width="2"/><text x="150" y="104" font-family="Pretendard, sans-serif" font-size="12" fill="#8d939c">맞는 순간 몇 프레임 멈춤(히트스톱) + 카메라 흔들림 + 소리</text>
+        <text x="0" y="18" font-family="IBM Plex Mono, monospace" font-size="11" fill="#8d939c">예시 · 60fps 기준 · 1f = 16.7ms</text>
+      </svg>
+      <figcaption>숫자는 이해를 돕는 예시예요. 실제 값은 마디에서 직접 재 보며 정합니다.</figcaption>
+    </figure>
+    <div class="terms two">
+      <div><b>히트스톱 <i>hitstop</i></b><p>맞는 순간 동작을 잠깐 멈춰 충격을 전달. 스매시 브라더스는 데미지에 비례해 늘리고 상한을 둠 (15% 기술 기준 얼티밋 15프레임, 상한 30). 사쿠라이는 "충격을 강조하는 시각 효과"라고 설명.</p></div>
+      <div><b>입력 버퍼 <i>input buffer</i></b><p>동작이 끝나기 전에 미리 누른 입력을 기억. 스트리트 파이터 6은 대부분 4프레임 일찍 눌러도 받아 줌. 손맛이 좋아지는 숨은 장치.</p></div>
+      <div><b>캔슬 구간 <i>cancel window</i></b><p>판정 뒤 일부 프레임부터 회피나 다음 공격으로 끊을 수 있는 구간. 회복이 길어도 답답하지 않게 해 줌.</p></div>
+      <div><b>읽히는 공격</b><p>사람이 화면을 보고 반응하는 데 약 0.2~0.25초(12~15프레임). 마디의 날아오는 공도 이보다 일찍 보여야 받아칠 수 있음. <span class="tag t-guess">추정</span></p></div>
+    </div>
+  </div>
+
+  <div class="blk">
+    <h3>어색함의 원인과 해결</h3>
+    <div class="tbl"><table>
+      <thead><tr><th>증상</th><th>원인</th><th>해결</th></tr></thead>
+      <tbody>
+        <tr><td>발 미끄러짐</td><td>이동 속도와 애니메이션 속 발 속도가 다름</td><td>속도별 블렌드, 재생 속도 맞추기, 디딘 발을 IK로 고정</td></tr>
+        <tr><td>두 배로 튀어 나감</td><td>애니메이션도 몸을 옮기고 코드도 옮김</td><td>루트 모션과 코드 이동 중 하나만</td></tr>
+        <tr><td>로봇 같음</td><td>일정한 속도, 직선 궤적</td><td>곡선 편집기에서 천천히 시작·끝, 관절마다 시작 시점 어긋내기</td></tr>
+        <tr><td>모션캡처가 떨림</td><td>촬영 노이즈</td><td>부드럽게 거르기, 키 줄이기</td></tr>
+        <tr><td>무릎·팔꿈치가 거꾸로</td><td>옮겨 입힐 때 오류, 과장</td><td>관절 한계 설정, 가동 범위 경고</td></tr>
+        <tr><td>동작이 바뀔 때 툭 튐</td><td>두 자세 차이가 큼</td><td>짧게 섞기(크로스페이드), 같은 발 위치에서 바꾸기</td></tr>
+        <tr><td>상체가 따로 놂</td><td>방향을 틀어도 몸이 안 기욺</td><td>가속 방향으로 몸통 기울이기, 시선은 눈 → 머리 → 몸통 순서로</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="blk">
+    <h3>관찰 도구의 시작 기준값</h3>
+    <p class="lead">처음엔 이 값으로 초록·노랑·빨강을 판정하고, 실제로 재 보며 조정합니다.</p>
+    <div class="tbl"><table>
+      <thead><tr><th>도구</th><th>기준</th><th>근거</th></tr></thead>
+      <tbody>
+        <tr><td>발 미끄러짐</td><td>디딘 발 속도가 이동 속도의 5% 미만 좋음 · 15% 넘으면 미끄러짐</td><td><span class="tag t-guess">추정</span></td></tr>
+        <tr><td>가동 범위</td><td>기획서의 관절 범위표 · 무릎·팔꿈치가 5° 넘게 거꾸로 꺾이면 경고 · 막지 않고 표시만</td><td><span class="tag t-ok">참고값</span></td></tr>
+        <tr><td>무게중심</td><td>멈춘 자세는 발 사이 면 안 · 걷기·달리기는 앞으로 나갔다 다음 발로 돌아오는지</td><td><span class="tag t-ok">원리</span></td></tr>
+        <tr><td>몸 위아래</td><td>걷기 키의 약 2.5~3% (170 cm면 4~5 cm)</td><td><span class="tag t-ok">확인</span></td></tr>
+        <tr><td>걸음 막대</td><td>디딤 60 · 흔듦 40 · 두 발 지지 20</td><td><span class="tag t-ok">확인</span></td></tr>
+        <tr><td>팔다리 반대</td><td>오른발이 앞일 때 왼팔이 앞 (위상 약 180° 차이)</td><td><span class="tag t-ok">통설</span></td></tr>
+        <tr><td>공 받아치기</td><td>허용 시간 ±3~6프레임에서 시작해 난이도로 조절</td><td><span class="tag t-guess">추정</span></td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="blk">
+    <h3>확인 문제</h3>
+    <div class="quiz">
+      <details><summary>걷기에서 두 발이 모두 땅에 닿아 있는 시간은 한 주기의 약 몇 %? 달리기는?</summary><p>약 20%. 달리기는 두 발 지지가 없고, 대신 두 발이 모두 공중에 뜨는 순간이 생깁니다.</p></details>
+      <details><summary>30fps로 보통 걷기 한 주기는 대략 몇 프레임? 몸이 가장 높은 순간은?</summary><p>약 30~36프레임. 가장 높은 건 한 발 위를 몸이 지나가는 순간(passing).</p></details>
+      <details><summary>발차기가 굼떠서 예비 동작을 12 → 3프레임으로 줄였더니 힘이 없어 보여요. 반응은 지키면서 무게를 살리려면?</summary><p>회복을 길게 하고 다리·몸통에 따라오는 동작을 넣기. 맞는 순간 히트스톱·카메라 흔들림·소리 더하기. 짧은 예비라도 첫 프레임부터 자세 변화를 크게 줘서 읽히게 하기.</p></details>
+    </div>
+  </div>
+
+  <div class="blk">
+    <h3>더 볼 자료</h3>
+    <ul class="res">
+      <li><a href="https://www.routledge.com/Game-Anim-Video-Game-Animation-Explained/Cooper/p/book/9780367707651">Jonathan Cooper, 《Game Anim》 2판</a><em>2021 · 책</em><span>게임 애니메이션 교과서. 반응성, 루트 모션, 캔슬을 게임 관점으로</span></li>
+      <li><a href="https://www.unrealengine.com/blog/game-animation-sample">Epic, Game Animation Sample</a><em>2024</em><span>모션 매칭의 실물. 무료 동작 500개 이상</span></li>
+      <li><a href="https://gdcvault.com/play/1022985/Motion-Matching-and-The-Road">Simon Clavet, Motion Matching and The Road to Next-Gen Animation</a><em>GDC 2016</em><span>For Honor 모션 매칭 발표. 해설은 <a href="https://www.gameanim.com/?p=13538">gameanim.com</a></span></li>
+      <li><a href="https://sourcegaming.info/2015/11/11/thoughts-on-hitstop-sakurais-famitsu-column-vol-490-1/">사쿠라이의 히트스톱 칼럼 (번역)</a><em>2015 · 5분</em><span>히트스톱이 왜 필요한지 만든 사람의 말로</span></li>
+      <li><a href="https://now.aapmr.org/biomechanics-normal-gait/">AAPM&amp;R, Biomechanics of Normal Gait</a><em>의학 · 20분</em><span>걸음 주기와 관절 움직임 개요</span></li>
+      <li><span style="font-weight:600">Richard Williams, 《애니메이터 서바이벌 키트》</span><em>2001/2009 · 책</em><span>걷기·달리기 키 포즈와 타이밍의 고전</span></li>
+    </ul>
+  </div>
+  <div class="next"><a href="#blender"><span>3</span>Blender →</a></div>
+</section>
+
+<!-- ───────── 3. Blender ───────── -->
+<section class="ch" id="blender" aria-labelledby="h-blender">
+  <div class="ch-head"><span class="ch-num">3</span><h2 id="h-blender">Blender 기본기</h2><p>마네킹을 스크립트로 만들고, 뼈에 붙이고, 발차기 몇 개를 손으로 움직여 Unity로 넘기는 데 필요한 것만.</p></div>
+
+  <div class="blk">
+    <div class="decide">
+      <h4>설치할 버전</h4>
+      <p>Blender 5.2 LTS (지금 5.2.3, 2028년 7월까지 지원)로 프로젝트 끝까지 고정.</p>
+      <p>5.3이 11월 10일에 나와도 갈아타지 않습니다. 단축키와 파이썬 명령이 버전마다 조금씩 바뀌어서, Claude가 쓴 스크립트가 버전 따라 깨질 수 있어요.</p>
+    </div>
+  </div>
+
+  <div class="blk">
+    <h3>노트북에서 먼저 켤 것</h3>
+    <p class="lead"><code>Edit ▸ Preferences ▸ Input</code>에서 두 개를 체크하면 숫자 패드·휠 버튼 없이도 조작됩니다.</p>
+    <div class="duo">
+      <div><h4>Emulate Numpad</h4><p>키보드 위 숫자 줄을 숫자 패드처럼. <kbd>1</kbd> 정면 · <kbd>3</kbd> 옆 · <kbd>7</kbd> 위 · <kbd>5</kbd> 원근 전환.</p></div>
+      <div><h4>Emulate 3 Button Mouse</h4><p><kbd>Alt</kbd>+드래그 = 화면 돌리기 · <kbd>Shift</kbd>+<kbd>Alt</kbd>+드래그 = 옮기기 · 두 손가락 스크롤 = 확대.</p></div>
+    </div>
+  </div>
+
+  <div class="blk">
+    <h3>모드 세 개</h3>
+    <div class="modes">
+      <div><h4>Object</h4><p>물체를 통째로 옮기고, 적용하고, 부모를 정함.</p><kbd>기본</kbd></div>
+      <div><h4>Edit</h4><p>모양 고치기. 뼈라면 기본(T자) 자세의 뼈 위치를 설계.</p><kbd>Tab</kbd></div>
+      <div><h4>Pose</h4><p>뼈를 돌려 자세를 잡고 키프레임. 애니메이션은 반드시 여기서.</p><kbd>Ctrl+Tab</kbd></div>
+    </div>
+  </div>
+
+  <div class="blk">
+    <h3>손에 익힐 단축키</h3>
+    <div class="keys">
+      <div><kbd>G</kbd>옮기기 (뒤에 <kbd>X</kbd><kbd>Y</kbd><kbd>Z</kbd>로 축 고정)</div>
+      <div><kbd>R</kbd>돌리기</div>
+      <div><kbd>S</kbd>크기</div>
+      <div><kbd>Shift+A</kbd>추가</div>
+      <div><kbd>N</kbd>정확한 숫자 패널</div>
+      <div><kbd>Ctrl+A</kbd>크기·회전 적용</div>
+      <div><kbd>F2</kbd>이름 바꾸기</div>
+      <div><kbd>F3</kbd>기능 검색</div>
+      <div><kbd>I</kbd>키프레임 넣기</div>
+      <div><kbd>Space</kbd>재생 · 정지</div>
+      <div><kbd>E</kbd>뼈 이어 만들기 (Edit)</div>
+      <div><kbd>Alt+R</kbd>회전 초기화 (Pose)</div>
+    </div>
+    <p class="note">값이 이상하면 먼저 <kbd>N</kbd> 패널의 Item 탭에서 위치·회전·크기 숫자를 봅니다.</p>
+  </div>
+
+  <div class="blk">
+    <h3>마네킹을 만들 때 지킬 네 가지</h3>
+    <ol class="steps">
+      <li><div><b>단위는 미터, 배율 1.</b> 키 1.8 m로 만들면 Unity에서 그대로 1:1.</div></li>
+      <li><div><b>늘렸으면 바로 적용.</b> <kbd>S</kbd>로 늘린 뒤 <kbd>Ctrl</kbd>+<kbd>A</kbd> ▸ Scale. 안 하면 모서리 둥글리기가 찌그러지고 Unity 크기가 어긋남. 가장 흔한 사고.</div></li>
+      <li><div><b>매끈하게.</b> 오른쪽 클릭 ▸ Shade Smooth. 모서리는 Bevel 모디파이어 0.01~0.02 m.</div></li>
+      <li><div><b>이름을 뼈와 맞추기.</b> 조각 이름 = 붙을 뼈 이름. 스크립트가 짝을 찾기 쉬워지고 Unity에서도 그대로 보임.</div></li>
+    </ol>
+  </div>
+
+  <div class="blk">
+    <h3>조각을 뼈에 붙이는 두 방법</h3>
+    <div class="duo">
+      <div><h4>뼈를 부모로 <code>Ctrl+P ▸ Bone</code></h4><p>조각이 뼈를 그대로 따라감. 손으로 할 땐 가장 쉬움.</p><ul><li>스크립트로 걸면 뼈 길이만큼 밀리는 일이 있음 <span class="tag t-guess">미확인</span></li></ul></div>
+      <div class="pick"><h4>정점 그룹 100% + Armature</h4><p>조각의 모든 점을 같은 이름 뼈에 가중치 1.0으로.</p><ul><li>스크립트로 정확하게 반복 가능</li><li>Unity에 사람형 몸으로 깔끔하게 들어감 → <b>마디는 이쪽</b></li></ul></div>
+    </div>
+  </div>
+
+  <div class="blk">
+    <h3>키프레임으로 움직이기</h3>
+    <div class="terms">
+      <div><b>30 fps로 <i>Frame Rate</i></b><p>손으로 찍을 키가 적어짐. Unity는 어떤 프레임률이든 재생.</p></div>
+      <div><b>큰 자세부터 <i>Blocking</i></b><p>예비 → 타격 → 따라오기 자세만 먼저 찍고, 사이는 나중에 다듬기.</p></div>
+      <div><b>Bezier vs Linear <i>Graph Editor</i></b><p>Bezier는 천천히 시작·끝이라 자연스러움. Linear는 일정 속도라 기계적. <kbd>T</kbd>로 바꿈. 동작의 맛은 여기서 결정됨.</p></div>
+      <div><b>궤적 보기 <i>Motion Paths</i></b><p>Pose 모드에서 뼈 선택 ▸ Calculate Path. 발끝·주먹이 매끄러운 호를 그리는지 확인. 지나간 쪽 빨강, 앞쪽 초록.</p></div>
+      <div><b>동작 하나 = 액션 하나 <i>Action Editor</i></b><p><code>Kick</code>, <code>Slam</code>, <code>RopeSwing</code>처럼 따로 만들고 방패 아이콘(Fake User)을 켜야 저장 때 안 사라짐.</p></div>
+      <div><b>회전 모드 <i>XYZ Euler</i></b><p>뼈 기본은 쿼터니언이라 곡선이 읽기 어려움. 손으로 다듬을 땐 XYZ Euler로.</p></div>
+    </div>
+  </div>
+
+  <div class="blk">
+    <h3>Unity로 내보내기 <small>File ▸ Export ▸ FBX</small></h3>
+    <div class="tbl"><table>
+      <thead><tr><th>옵션</th><th>값</th><th>이유</th></tr></thead>
+      <tbody>
+        <tr><td>Limit to Selected</td><td>켬 (뼈대 + 몸만 선택)</td><td>카메라·조명 빼기</td></tr>
+        <tr><td>Apply Scalings</td><td>FBX Units Scale</td><td>FBX All과 결과가 같았음 (크기 1) <span class="tag t-ok">직접 시험</span></td></tr>
+        <tr><td>Forward / Up</td><td>-Z / Y (기본)</td><td>Blender 정면 → Unity 정면 <span class="tag t-ok">직접 시험</span></td></tr>
+        <tr><td>Unity: Bake Axis Conversion</td><td>끔</td><td>켜면 앞뒤가 뒤집힘 <span class="tag t-ok">직접 시험</span></td></tr>
+        <tr><td>Apply Transform</td><td>끔</td><td>매뉴얼: 뼈대·애니메이션과 깨짐</td></tr>
+        <tr><td>Add Leaf Bones</td><td><b>끔</b> (기본이 켜짐)</td><td>뼈 끝 <code>_end</code> 가짜 뼈 방지</td></tr>
+        <tr><td>Bake Animation</td><td>켬</td><td>IK·규칙 결과를 키로</td></tr>
+        <tr><td>All Actions</td><td>켬</td><td>액션 하나 = Unity 클립 하나 <span class="tag t-ok">직접 시험</span></td></tr>
+        <tr><td>NLA Strips</td><td>끔</td><td>클립 중복 방지</td></tr>
+        <tr><td>Smoothing</td><td>Normals Only</td><td>매뉴얼 권장</td></tr>
+      </tbody>
+    </table></div>
+    <p class="note">첫 내보내기는 큐브 + 뼈 1개 + 액션 2개로 시험했고, 위 표의 "직접 시험" 표시가 그 결과예요 (Blender 5.2.3 → Unity 6000.3).</p>
+  </div>
+
+  <div class="blk">
+    <h3>스크립트로 만들기</h3>
+    <p class="lead">마네킹은 Claude가 파이썬 스크립트로 만들고, 화면 없이 실행해 결과를 확인합니다. 직접 할 일은 결과 파일을 열어 눈으로 보는 것.</p>
+    <div class="tree" style="white-space:pre;line-height:1.7">blender -b --factory-startup --python-exit-code 1 -P make_mannequin.py -- out.fbx
+<span style="margin:0">-b 화면 없이 · -P 스크립트 실행 · --python-exit-code 오류면 실패로 끝내기</span></div>
+    <p class="note">손으로 할 때 클릭한 모든 동작은 Info 창에 파이썬 명령으로 찍혀서, "이 클릭이 코드로는 뭐지?"를 거기서 볼 수 있어요.</p>
+  </div>
+
+  <div class="blk">
+    <h3>내장 그래픽 노트북 팁</h3>
+    <ul class="princ" style="list-style:none;padding:0">
+      <li style="padding-block:12px;border-top:1px solid var(--rule)">작업은 Solid 화면으로. 조명·그림자 화면은 확인할 때만</li>
+      <li style="padding-block:12px;border-top:1px solid var(--rule)">Cycles 렌더는 안 씀. 최종 화면은 Unity가 그림</li>
+      <li style="padding-block:12px;border-top:1px solid var(--rule)">화면이 깨지면 Preferences ▸ System ▸ Viewport에서 그래픽 방식(OpenGL / Vulkan) 바꿔 보기</li>
+    </ul>
+  </div>
+
+  <div class="blk">
+    <h3>확인 문제</h3>
+    <div class="quiz">
+      <details><summary>다리 조각을 <kbd>S</kbd>로 늘렸더니 모서리 둥글기가 한쪽만 두꺼워요.</summary><p>늘린 크기가 물체에 남아 있어서입니다. <kbd>Ctrl</kbd>+<kbd>A</kbd> ▸ Scale로 적용하면 해결.</p></details>
+      <details><summary>Unity에서 뼈 끝마다 <code>_end</code>라는 뼈가 생겼어요.</summary><p>내보내기의 Add Leaf Bones(기본 켜짐) 때문. 끄고 다시 내보냅니다.</p></details>
+      <details><summary>발차기가 로봇처럼 일정한 속도로 움직여요. 어디서 뭘 바꾸죠?</summary><p>Graph Editor에서 보간을 Linear → Bezier로(<kbd>T</kbd>), 핸들로 예비는 완만하게·타격은 가파르게. Motion Paths로 발끝 호도 같이 확인.</p></details>
+    </div>
+  </div>
+
+  <div class="blk">
+    <h3>더 볼 자료</h3>
+    <ul class="res">
+      <li><a href="https://www.blenderguru.com/posts">Blender Guru — Blender 5.0 도넛 튜토리얼</a><em>2025-11</em><span>가장 유명한 입문. 도넛이 목적이 아니라 화면·모디파이어 감각 익히기용</span></li>
+      <li><a href="https://docs.blender.org/manual/en/5.2/getting_started/index.html">Blender 5.2 매뉴얼 — 시작하기</a><em>공식</em><span>화면과 조작 참고서</span></li>
+      <li><a href="https://docs.blender.org/manual/en/5.2/animation/motion_paths.html">매뉴얼 — Motion Paths</a><em>공식 · 10분</em><span>호를 눈으로 보는 기능</span></li>
+      <li><a href="https://docs.blender.org/manual/en/5.2/editors/graph_editor/fcurves/introduction.html">매뉴얼 — Graph Editor F-Curve</a><em>공식 · 15분</em><span>보간과 핸들</span></li>
+      <li><a href="https://docs.blender.org/api/current/info_quickstart.html">Python API 빠른 시작</a><em>공식</em><span>Claude가 쓴 스크립트를 읽는 눈</span></li>
+    </ul>
+  </div>
+  <div class="next"><a href="#unity"><span>4</span>Unity →</a></div>
+</section>
+
+<!-- ───────── 4. Unity ───────── -->
+<section class="ch" id="unity" aria-labelledby="h-unity">
+  <div class="ch-head"><span class="ch-num">4</span><h2 id="h-unity">Unity 애니메이션</h2><p>가져온 동작이 화면에 나오기까지의 길. 그리고 관찰 도구와 발 IK를 어디에 끼워 넣는지.</p></div>
+
+  <div class="blk">
+    <h3>한 프레임의 흐름</h3>
+    <figure class="fig">
+      <svg viewBox="0 0 720 150" role="img" aria-label="FBX 가져오기, 아바타, 애니메이터, 루트 모션, IK, LateUpdate 스크립트, 렌더링 순서">
+        <g font-family="Pretendard, sans-serif" font-size="13" text-anchor="middle">
+          <g fill="#3a3e45"><rect x="0" y="20" width="104" height="54" rx="4"/><rect x="122" y="20" width="104" height="54" rx="4"/><rect x="244" y="20" width="104" height="54" rx="4"/><rect x="366" y="20" width="104" height="54" rx="4"/><rect x="488" y="20" width="104" height="54" rx="4" fill="#f06a1d"/><rect x="610" y="20" width="110" height="54" rx="4"/></g>
+          <g fill="#e8eaed"><text x="52" y="44">FBX 가져오기</text><text x="174" y="44">Avatar</text><text x="296" y="44">Animator</text><text x="418" y="44">루트 모션</text><text x="540" y="44" fill="#1a0f07">IK</text><text x="665" y="44">LateUpdate</text></g>
+          <g fill="#8d939c" font-size="11"><text x="52" y="62">Rig = Humanoid</text><text x="174" y="62">뼈 매핑표</text><text x="296" y="62">상태·섞기</text><text x="418" y="62">OnAnimatorMove</text><text x="540" y="62" fill="#3a1d0a">OnAnimatorIK</text><text x="665" y="62">관찰 도구</text></g>
+        </g>
+        <g stroke="#8d939c" stroke-width="1.5"><path d="M106 47h14M228 47h14M350 47h14M472 47h14M594 47h14"/></g>
+        <text x="0" y="110" font-family="Pretendard, sans-serif" font-size="13" fill="#e8eaed">동작이 뼈를 먼저 움직이고, 코드는 그 위에 얹는다.</text>
+        <text x="0" y="132" font-family="Pretendard, sans-serif" font-size="12" fill="#8d939c">Update에서 뼈를 만지면 다음 순간 Animator가 덮어씀 → 뼈를 읽거나 고치는 코드는 IK 단계나 LateUpdate에.</text>
+      </svg>
+    </figure>
+  </div>
+
+  <div class="blk">
+    <h3>가져오기 설정</h3>
+    <div class="terms">
+      <div><b>Humanoid <i>Rig 탭</i></b><p>뼈를 Unity 표준 사람 뼈대에 연결. 다른 몸의 동작을 옮겨 입히기, 발·손 IK, 시선, 관절 한계가 전부 이걸로 됨.</p></div>
+      <div><b>Copy From Other Avatar</b><p>Mixamo 동작 파일마다 마네킹의 Avatar를 지정. 모든 동작이 같은 뼈대 기준으로 재생됨.</p></div>
+      <div><b>Loop Time</b><p>걷기·달리기·대기만 켬. 킥·점프는 끔. 이음새 표시가 초록이면 매끄러움.</p></div>
+      <div><b>Bake Into Pose</b><p>제자리 동작은 위치(XZ)·회전을 포즈에 묶어 두어 몸이 새어 나가지 않게.</p></div>
+      <div><b>Mirror</b><p>오른발 킥 → 왼발 킥. 파일을 복사할 필요 없음.</p></div>
+      <div><b>Muscles &amp; Settings</b><p>관절별 회전 한계. 게임용 근사치라 의학적 범위와 정확히 같진 않음. 마디의 관절 경고와 비교 대상.</p></div>
+    </div>
+  </div>
+
+  <div class="blk">
+    <h3>Animator — 동작을 고르고 섞는 곳</h3>
+    <div class="tbl"><table>
+      <thead><tr><th>기능</th><th>마디에서 쓰는 곳</th><th>주의</th></tr></thead>
+      <tbody>
+        <tr><td>Blend Tree (1D)</td><td>속도에 따라 대기 → 걷기 → 달리기</td><td>보폭이 다른 동작은 발 박자가 어긋남</td></tr>
+        <tr><td>Transition</td><td>달리기 → 킥</td><td>즉각 반응엔 Has Exit Time 끄기, 섞는 시간 0.05~0.15초부터 <span class="tag t-guess">경험칙</span></td></tr>
+        <tr><td>Layer + Avatar Mask</td><td>하체는 걷고 상체는 철퇴 휘두르기</td><td>마스크로 부위 나누기</td></tr>
+        <tr><td>Animation Event</td><td>킥이 공에 닿는 프레임에 판정</td><td>섞이는 중 두 번 불릴 수 있어 중복 방지 필요</td></tr>
+        <tr><td>Root Motion</td><td>앞으로 튀어 나가는 내려찍기</td><td>코드 이동과 동시에 쓰면 두 배로 움직임</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="blk">
+    <h3>발을 계단에 붙이기 (IK)</h3>
+    <p class="lead">처음엔 패키지 없이 스크립트 하나(OnAnimatorIK)로 시작하고, 규칙이 여러 개 겹치면 Animation Rigging 패키지(1.3.1, Unity 6 지원)로 옮깁니다.</p>
+    <ol class="steps">
+      <li><div>Animator 레이어에서 <b>IK Pass</b> 켜기. 안 켜면 아무 일도 안 일어남 (가장 흔한 실수).</div></li>
+      <li><div>매 프레임 발 위 약 0.5 m에서 아래로 광선을 쏴 바닥을 찾음.</div></li>
+      <li><div>맞은 점 + 발목 높이를 발 목표 위치로, 바닥 기울기에 맞춰 발 회전.</div></li>
+      <li><div>발이 땅에 닿은 구간에서만 IK를 켜기. 흔드는 중엔 끔.</div></li>
+      <li><div>두 발 중 낮은 쪽만큼 엉덩이를 내려야 한쪽 다리가 쭉 펴져 뜨지 않음. 목표는 부드럽게 따라가게.</div></li>
+    </ol>
+  </div>
+
+  <div class="blk">
+    <h3>관찰 도구는 이렇게 만든다</h3>
+    <div class="tbl"><table>
+      <thead><tr><th>도구</th><th>쓰는 기능</th><th>메모</th></tr></thead>
+      <tbody>
+        <tr><td>슬로모션</td><td><code>Time.timeScale</code></td><td>물리 시간도 같이 줄이기. 화면 UI는 실제 시간으로</td></tr>
+        <tr><td>동작만 느리게</td><td><code>animator.speed</code></td><td>이동·물리는 그대로, 타격 프레임 관찰용</td></tr>
+        <tr><td>한 프레임씩</td><td><code>animator.speed = 0</code> + <code>animator.Update(1/60)</code></td><td>키 누를 때마다 한 칸</td></tr>
+        <tr><td>관절 위치</td><td><code>GetBoneTransform(HumanBodyBones.…)</code></td><td>LateUpdate에서 읽기</td></tr>
+        <tr><td>궤적</td><td>위치 기록 → <code>LineRenderer</code></td><td>게임 화면에 보이는 선</td></tr>
+        <tr><td>관절 각도</td><td>부모 대비 회전, 또는 <code>HumanPoseHandler</code> 근육값</td><td>근육값이 ±1 근처면 한계 근접 <span class="tag t-guess">검증 필요</span></td></tr>
+        <tr><td>고스트</td><td>반투명 복제 몸을 과거 시점으로 샘플</td><td>원본과 같은 몸에 쓰면 충돌</td></tr>
+        <tr><td>무게중심</td><td>관절 위치 × 부위별 질량 비율</td><td>질량 비율은 인체 측정 표(Dempster·Winter)</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="blk">
+    <h3>조작 · 카메라 · 물리</h3>
+    <div class="terms two">
+      <div><b>CharacterController</b><p>코드가 속도를 정함. 계단·경사 기본 지원. 처음엔 이걸로. 맞고 휘청일 때만 물리 몸으로 바꿈.</p></div>
+      <div><b>Cinemachine 3.1</b><p>Unity 6용 카메라. 2023년 이전 영상과 부품 이름이 달라서(<code>CinemachineCamera</code> 등) 날짜 확인 필수.</p></div>
+      <div><b>Starter Assets</b><p>Unity 무료 3인칭 예제. 구조 공부용으로만 보고 의존하지 않음 (6.3에서 동작은 미확인).</p></div>
+      <div><b>래그돌 → 액티브 래그돌</b><p>Ragdoll 마법사가 뼈마다 물리 관절을 만들어 줌. ConfigurableJoint의 목표 회전으로 애니메이션을 따라가게 하면, 맞았을 때 힘을 뺐다가 서서히 돌아오는 반응이 됨. 마지막 단계.</p></div>
+    </div>
+  </div>
+
+  <div class="blk">
+    <div class="decide">
+      <h4>새 애니메이션 시스템은 기다리지 않음</h4>
+      <p>Unity가 2025년 로드맵에서 새 애니메이션 시스템 미리보기를 예고했지만, 이름·날짜·모션 매칭 언급이 없습니다. 지금의 Animator로 만듭니다.</p>
+      <p>게임 로직이 Animator에 값을 넘기는 곳을 한 스크립트에 모아 두면 나중에 옮기기 쉬워요.</p>
+    </div>
+  </div>
+
+  <div class="blk">
+    <h3>자동 검사</h3>
+    <p class="lead">Claude는 Unity를 화면 없이 실행해 검사 코드를 돌리고, 스크린샷으로 결과를 봅니다. 그동안 같은 프로젝트를 에디터로 열어 두면 안 돼요(잠김).</p>
+  </div>
+
+  <div class="blk">
+    <h3>확인 문제</h3>
+    <div class="quiz">
+      <details><summary>Mixamo 동작 10개를 쓰는데 동작마다 자세가 미묘하게 달라요.</summary><p>각 동작 파일의 Rig를 Humanoid로 두고 Avatar를 "Copy From Other Avatar"로 마네킹 것을 지정. Configure에서 빨간 뼈(빠진 매핑)가 없는지 확인합니다.</p></details>
+      <details><summary>OnAnimatorIK 코드를 썼는데 아무 일도 안 일어나요.</summary><p>Animator 레이어의 IK Pass가 꺼져 있거나, Rig가 Humanoid가 아닙니다.</p></details>
+      <details><summary>걸을 때 캐릭터가 두 배 속도로 앞으로 튀어 나가요.</summary><p>동작 속 이동(Root Motion)과 코드 이동이 동시에 적용된 것. 제자리 동작으로 쓰거나 둘 중 하나만 씁니다.</p></details>
+    </div>
+  </div>
+
+  <div class="blk">
+    <h3>더 볼 자료</h3>
+    <ul class="res">
+      <li><a href="https://docs.unity3d.com/Packages/com.unity.animation.rigging@1.3/manual/index.html">Animation Rigging 1.3 문서</a><em>공식</em><span>IK·시선 규칙 레퍼런스</span></li>
+      <li><a href="https://docs.unity3d.com/Packages/com.unity.cinemachine@3.1/manual/index.html">Cinemachine 3.1 문서</a><em>공식</em><span>Unity 6 카메라</span></li>
+      <li><a href="https://unity.com/blog/unity-engine-2025-roadmap">Unity 2025 엔진 로드맵</a><em>2025-03</em><span>새 애니메이션 시스템 발표 원문</span></li>
+      <li><a href="https://discussions.unity.com/t/updated-to-unity-6-and-cinemachine-3-now-virtual-cameras-dont-work/1610365">Unity 6 + Cinemachine 3 전환 함정 (포럼)</a><em>2025</em><span>옛 튜토리얼을 따라 하다 막히는 지점</span></li>
+    </ul>
+    <p class="note">영상은 iHeartGameDev, Code Monkey, git-amend 채널에서 2024년 10월(Unity 6) 이후 올라온 것으로.</p>
+  </div>
+  <div class="next"><a href="#games"><span>5</span>고퀄리티 게임 →</a></div>
+</section>
+
+<!-- ───────── 5. 고퀄리티 게임 ───────── -->
+<section class="ch" id="games" aria-labelledby="h-games">
+  <div class="ch-head"><span class="ch-num">5</span><h2 id="h-games">고퀄리티 3D 게임은 어떻게 했나</h2><p>개발자가 직접 발표하거나 쓴 자료를 일본어·중국어·영어로 찾아 확인했습니다. 못 찾은 건 못 찾았다고 적었어요.</p></div>
+
+  <div class="blk">
+    <div class="decide">
+      <h4>먼저 알아 둘 것</h4>
+      <p>디아블로·명조·원신이 동작을 모션캡처로 만들었는지, 손으로 만들었는지는 공개된 1차 자료가 없습니다.</p>
+      <p>인터넷에 도는 "모션 매칭을 썼다", "히트스톱이 몇 프레임이다" 같은 말은 대부분 팬 분석이에요. 아래는 개발사가 직접 밝힌 것만 사실로 적었습니다.</p>
+    </div>
+  </div>
+
+  <div class="blk">
+    <h3>한눈에 비교</h3>
+    <div class="tbl"><table>
+      <thead><tr><th>게임</th><th>엔진</th><th>개발자가 밝힌 움직임·전투 비결</th><th>근거</th></tr></thead>
+      <tbody>
+        <tr><td>디아블로 IV</td><td>자체</td><td>피해 판정 영역을 여러 프레임에 걸쳐 움직여 이펙트와 맞춤. 맞은 부위·방향으로 래그돌에 힘</td><td><span class="tag t-ok">Blizzard 공식</span></td></tr>
+        <tr><td>명조</td><td>UE4.26 + 일부 UE5 기능</td><td>회전 각속도를 키워 지연감 줄임. 무게 없어 보이는 동작은 장치(분사)·소리로 보완</td><td><span class="tag t-ok">개발팀 인터뷰</span></td></tr>
+        <tr><td>원신</td><td>Unity (깊게 개조)</td><td>모델 완성 후 이동·액션·게임플레이를 함께 설계하고 실제 게임 안에서 검증</td><td><span class="tag t-ok">GDC 2021</span></td></tr>
+        <tr><td>젤다 야숨·왕눈</td><td>자체 + Havok 물리</td><td>"조작에 맞춘 거짓말 물리". 벽과 링크를 물리 구속으로 이어 어디든 오름. 동작은 "상황 × 액션"</td><td><span class="tag t-ok">GDC 2017 · 닌텐도 블로그</span></td></tr>
+        <tr><td>갓 오브 워 (2018)</td><td>자체</td><td>"땅에 붙은 묵직함"을 목표로 모션캡처 중심 전환</td><td><span class="tag t-ok">GDC 2019</span></td></tr>
+        <tr><td>포 아너</td><td>자체</td><td>모션 매칭: 현재 자세·속도·앞으로 갈 길로 가장 비슷한 프레임을 찾아 이어 붙임</td><td><span class="tag t-ok">GDC · nucl.ai 2016</span></td></tr>
+        <tr><td>파라곤</td><td>UE4</td><td>출발·정지·방향 전환 전용 동작, 속도에 맞춰 보폭 늘리기, 경사 맞추기</td><td><span class="tag t-ok">nucl.ai 2016</span></td></tr>
+        <tr><td>니어 오토마타</td><td>자체</td><td>게임 안에서 동작에 표시를 찍어 가며 고치는 전용 도구. 기술 하나를 수백 번 시험</td><td><span class="tag t-ok">GDC 2018</span></td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="blk">
+    <h3>네 게임 자세히</h3>
+    <div class="terms two">
+      <div><b>디아블로 IV <i>판정이 이펙트와 같이 움직인다</i></b><p>예전 디아블로는 한 프레임짜리 원 하나로 피해를 줬지만, IV는 판정 영역을 여러 프레임에 걸쳐 움직여 눈에 보이는 이펙트와 맞춥니다. 휠윈드는 캐릭터를 따라 도는 부채꼴. 큰 이펙트는 궁극기에만 써서 화면이 읽히게 함.</p><p class="madi">발차기 판정을 발 궤적 따라 움직이는 캡슐로, 내려찍기는 퍼지는 원으로.</p></div>
+      <div><b>명조 <i>작은 수치가 손맛을 만든다</i></b><p>개발팀이 직접 말한 건 "회전 각속도를 키워 지연감을 줄였다", "같은 동작도 메카에 쓰면 붕 떠 보여서 분사 날개로 납득시켰다", "강타 때 배경음을 낮춰 대비를 줬다". 저스트 회피·패링 수치는 공식 공개가 없음.</p><p class="madi">회전 속도·가속을 조절 가능한 값으로 빼 두고 직접 튜닝.</p></div>
+      <div><b>원신 <i>만든 뒤 게임 안에서 검증</i></b><p>GDC 2021 발표: 캐릭터 모델이 완성되면 게임 디자인 부서와 이동·액션을 함께 설계하고, 반드시 실제 게임 환경에서 검증하며 조정. 마디와 같은 Unity를 깊게 개조해 씀. 동작 제작 방식은 공개 안 됨.</p><p class="madi">동작은 빈 화면이 아니라 계단·경사가 있는 실제 맵에서 확인.</p></div>
+      <div><b>젤다 야숨 · 왕눈 <i>규칙이 몸짓이 된다</i></b><p>물리는 기성 엔진(Havok)에 맡기고 "재미있게 거짓말"을 얹음. 모든 벽을 오를 수 있게 하자 거대 보스 등반 같은 놀이가 생김. 애니메이터는 말 타기를 다가가는 방향마다 다르게 만드는 "상황 × 액션"으로 생각. 스태미나가 바닥나면 지친 공격 동작이 따로 있음(언론 보도).</p><p class="madi">같은 발차기도 서 있을 때·달릴 때·공중에서 변형을 준비.</p></div>
+    </div>
+  </div>
+
+  <div class="blk">
+    <h3>공통으로 보이는 원칙</h3>
+    <div class="princ">
+      <div><b>고치는 도구를 먼저</b><p>니어의 표시 도구, 디아블로의 지표, 고스트 오브 쓰시마의 데이터 밸런스. 마디의 관찰 도구가 같은 발상.</p></div>
+      <div><b>동작 위에 코드로 보정</b><p>포 아너의 발 IK, 파라곤의 보폭·경사 맞추기. 동작이 완벽하지 않아도 코드로 땅에 붙임.</p></div>
+      <div><b>출발·정지·방향 전환</b><p>걷기 자체보다 이 순간들이 느낌을 좌우함. 디아블로도 정지 동작을 따로 추가.</p></div>
+      <div><b>읽히는 게 먼저</b><p>디아블로의 화면 위계, 명조 보스의 예고 동작.</p></div>
+      <div><b>무게감은 한 단어로</b><p>갓 오브 워의 "땅에 붙은". 목표를 정하면 걷기부터 일관되게 맞출 수 있음.</p></div>
+    </div>
+  </div>
+
+  <div class="blk">
+    <h3>혼자서 따라 할 순서 <small>효과 ÷ 노력</small></h3>
+    <ol class="steps">
+      <li><div><b>프레임 데이터 + 애니메이션 이벤트.</b> 시작·판정·회복·끊기 가능 구간을 숫자로 두고 화면에 막대로 표시. <span class="note">니어 · 디아블로</span></div></li>
+      <li><div><b>판정을 동작에 맞춰 움직이기.</b> 발 궤적을 따라가는 캡슐, 퍼지는 원. <span class="note">디아블로</span></div></li>
+      <li><div><b>히트스톱 + 카메라 흔들림.</b> 출발값은 0.05~0.08초, 아주 강한 공격만 0.1초 이상. <span class="tag t-guess">제3자 경험값</span></div></li>
+      <li><div><b>입력 버퍼 + 끊기 구간.</b> 회복 끝 몇 프레임의 입력을 기억해 다음 동작으로.</div></li>
+      <li><div><b>출발·정지·방향 전환 동작 + 속도에 맞춘 보폭.</b> <span class="note">파라곤</span></div></li>
+      <li><div><b>발 IK.</b> 계단에서 발 붙이기.</div></li>
+      <li><div><b>관찰 도구.</b> 궤적, 관절 각도, 무게중심. 위 모든 조정의 눈.</div></li>
+      <li><div><b>회피·받아치기 창 + 성공 보상.</b> 창 길이는 숫자로, 성공하면 짧은 슬로모션. <span class="note">명조</span></div></li>
+      <li><div><b>회전 속도·가속을 조절 값으로.</b> <span class="note">명조</span></div></li>
+      <li><div><b>상황 × 액션 표.</b> 같은 동작의 자세별 변형. <span class="note">젤다</span></div></li>
+    </ol>
+    <p class="note">모션 매칭과 대규모 모션캡처는 1인 마네킹 프로젝트에 맞지 않아 목록 밖. 개념(앞으로 갈 길을 예측해 다음 자세 고르기)만 알아 둡니다.</p>
+  </div>
+
+  <div class="blk">
+    <h3>확인 문제</h3>
+    <div class="quiz">
+      <details><summary>포 아너의 모션 매칭은 어떤 세 가지를 비교해 다음 프레임을 고르나요?</summary><p>현재 자세, 속도, 앞으로 갈 예상 경로.</p></details>
+      <details><summary>디아블로 IV 공식 글에서 확인되는 타격감 기법은?</summary><p>피해 판정 영역을 여러 프레임에 걸쳐 움직여 이펙트와 맞추고, 맞은 방향으로 래그돌에 힘을 줌.</p></details>
+      <details><summary>"원신은 모션캡처로 만들었다"고 단정해도 되나요?</summary><p>안 됩니다. 개발사가 밝힌 건 엔진(Unity 개조), 제작 흐름, 렌더링 정도이고 동작 제작 방식은 공개 자료가 없어요.</p></details>
+      <details><summary>공 튕겨내기 미니게임의 손맛을 가장 먼저 다듬으려면 무엇부터 만들어야 하나요?</summary><p>시작·판정·회복·끊기 구간을 프레임 수로 둔 프레임 데이터와, 그걸 화면에 보여 주는 표시. 니어 오토마타의 표시 도구와 같은 발상입니다.</p></details>
+    </div>
+  </div>
+
+  <div class="blk">
+    <h3>더 볼 자료</h3>
+    <ul class="res">
+      <li><a href="https://news.blizzard.com/en-us/article/23746639/diablo-iv-quarterly-update-december-2021">Diablo IV 분기 업데이트 (2021년 12월)</a><em>Blizzard 공식 · 15분</em><span>판정 영역 애니메이션, 방향성 히트, 화면 위계</span></li>
+      <li><a href="https://www.youtube.com/watch?v=-JFyAdI_rO8">Genshin Impact: Crafting an Anime-Style Open World</a><em>GDC 2021</em><span>원신 CEO의 제작 흐름 발표</span></li>
+      <li><a href="https://www.4gamer.net/games/341/G034168/20170303060/">4Gamer — 야숨 GDC 2017 보고 (일본어)</a><em>2017</em><span>거짓말 물리, 벽 오르기, 화학 엔진</span></li>
+      <li><a href="https://www.nintendo.com/jp/character/zelda/blog/index-05.html">닌텐도 젤다 블로그 — 애니메이션 담당 (일본어)</a><em>공식</em><span>"상황 × 액션"으로 링크의 동작 만들기</span></li>
+      <li><a href="https://www.youxituoluo.com/532205.html">명조 개발팀 인터뷰 (중국어)</a><em>2024-05</em><span>UE4.26, 표정 방식, 회전 각속도</span></li>
+      <li><a href="https://gdcvault.com/play/1025836/Animation-Bootcamp-God-of-War">Animation Bootcamp: God of War</a><em>GDC 2019</em><span>모션캡처 전환과 무게감 (Vault 계정 필요할 수 있음)</span></li>
+      <li><a href="https://www.gameanim.com/?p=18866">니어 오토마타 애니메이션 표시 도구 요약</a><em>2018</em><span>조정 도구가 곧 전투감</span></li>
+      <li><a href="https://kenney.nl/learn/must-see-videos-for-indie-developers">The Art of Screenshake (영상 목록)</a><em>2013 · 약 40분</em><span>타격감 연출을 하나씩 쌓아 가는 시연</span></li>
+    </ul>
+  </div>
+  <div class="next"><a href="#decide"><span>✓</span>정한 것 →</a></div>
+</section>
+
+<!-- ───────── 정한 것 ───────── -->
+<section class="ch" id="decide" aria-labelledby="h-decide">
+  <div class="ch-head"><span class="ch-num">✓</span><h2 id="h-decide">공부해서 정한 것</h2><p>기획서에 반영하고, 0단계부터 이대로 갑니다.</p></div>
+  <div class="blk">
+    <ol class="steps">
+      <li><div><b>Mixamo 자동 리깅 안 씀.</b> Blender 스크립트로 Mixamo 이름 뼈를 직접 넣고, 동작만 Mixamo 기본 캐릭터로 받아 옮겨 입힘. <span class="tag t-ok">직접 시험</span> 조각난 마네킹은 올라가긴 했지만 자동 리깅이 두 번 다 실패.</div></li>
+      <li><div><b>Unity 뼈대는 Humanoid.</b> 옮겨 입히기·발 IK·시선·관절 한계가 전부 여기서 됨. (Blender 조사의 Generic 권고는 이 기능들 때문에 채택 안 함)</div></li>
+      <li><div><b>조각은 정점 그룹 100%로 뼈에.</b> 스크립트로 정확히 반복되고 사람형 몸으로 깔끔하게 들어감.</div></li>
+      <li><div><b>Blender 5.2 LTS 고정.</b> 5.3으로 안 갈아탐.</div></li>
+      <li><div><b>키프레임은 30 fps, Bezier.</b> 동작 하나 = 액션 하나, Fake User 켬.</div></li>
+      <li><div><b>FBX: Leaf Bones 끔, Bake 켬, All Actions 켬, NLA 끔, Apply Transform 끔.</b> 큐브 → 액션 2개 → 마네킹 순서로 시험.</div></li>
+      <li><div><b>발 IK·시선은 OnAnimatorIK부터.</b> 복잡해지면 Animation Rigging.</div></li>
+      <li><div><b>Animator로 만듦.</b> Unity 새 애니메이션 시스템은 기다리지 않음.</div></li>
+      <li><div><b>관찰 도구 기준값은 2장 표로 시작</b>하고, 추정 표시된 값은 실제로 재서 고침.</div></li>
+      <li><div><b>공격은 프레임 데이터부터.</b> 시작·판정·회복·끊기 구간을 숫자로 두고 화면에 표시. 판정은 동작을 따라 움직이게.</div></li>
+      <li><div><b>손맛 값은 전부 조절 가능하게.</b> 히트스톱 길이, 회전 속도, 받아치기 창. 같은 동작도 서 있을 때·달릴 때·공중 변형을 표로.</div></li>
+    </ol>
+  </div>
+</section>
+
+</main>
+
+<script>
+// 장 하나씩 보기: 주소 #으로 기억
+const tabs = [...document.querySelectorAll("nav.tabs a")], chs = [...document.querySelectorAll(".ch")];
+function show() {
+  const id = (location.hash || "#rig").slice(1), ok = chs.some(c => c.id === id) ? id : "rig";
+  chs.forEach(c => c.classList.toggle("on", c.id === ok));
+  tabs.forEach(t => t.getAttribute("href") === "#" + ok ? t.setAttribute("aria-current", "page") : t.removeAttribute("aria-current"));
+}
+addEventListener("hashchange", () => { show(); document.querySelector("header").scrollIntoView(); });
+show();
+</script>
+</body>
+</html>

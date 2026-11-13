@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>술술 기획서 · 창업실</title>
+<meta name="description" content="어… 하고 막힌 그 말이 다음 날 내 교재가 되는 영어 말하기, 술술의 기획서.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=TikTok+Sans:wdth,wght@75..150,300..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+:root {
+  --bg: #f5f6f5; --surface: #e9ebe9; --ink: #17191c; --muted: #5e6168;
+  --blue: #0b6e5b; --red: #f0a23b; --black: #17191c; --navy: #0f2a26;
+  --m: clamp(16px, 2.2vw, 32px);
+  --small: clamp(.8125rem, .79rem + .1vw, .875rem);
+  --body: clamp(1.0625rem, 1rem + .25vw, 1.1875rem);
+  --lead: clamp(1.25rem, 1.1rem + .7vw, 1.625rem);
+  --head: clamp(2rem, 1.3rem + 3.2vw, 4rem);
+  --ease: cubic-bezier(.2, .7, .2, 1);
+  --sans: "TikTok Sans", "Pretendard Variable", Pretendard, sans-serif;
+}
+* { box-sizing: border-box }
+html { scroll-behavior: smooth }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 var(--body)/1.5 var(--sans); word-break: keep-all; overflow-wrap: anywhere; -webkit-font-smoothing: antialiased; overflow-x: clip }
+a { color: inherit }
+img { display: block; max-width: 100% }
+h1, h2, h3, p { margin: 0 }
+:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px }
+.wide { font-weight: 800; font-stretch: 150%; text-transform: uppercase; letter-spacing: -.01em; line-height: 1 }
+.btn { display: inline-flex; align-items: center; min-height: 56px; padding: 0 26px; background: var(--blue); color: #fff; font-weight: 700; text-decoration: none; transition: transform .15s var(--ease), background .2s }
+.btn:hover { background: var(--ink) }
+.btn:active { transform: scale(.97) }
+.rise { opacity: 0; transform: translateY(24px); transition: opacity .7s var(--ease), transform .7s var(--ease); transition-delay: calc(var(--i, 0) * 80ms) }
+.rise.in, .no-js .rise, .q .rise { opacity: 1; transform: none }
+
+/* 첫 화면 */
+.hero { position: relative; height: 100svh; min-height: 640px; overflow: hidden }
+.bar { position: absolute; inset: 0 var(--m) auto; top: 28px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; font-weight: 600; z-index: 3 }
+.bar a { text-decoration: none; transition: color .2s }
+.bar a:hover { color: var(--blue) }
+.bar .mark { font-weight: 850; font-stretch: 150%; font-size: 22px }
+.bar a:last-child { justify-self: end }
+.band { position: absolute; left: 0; right: 0; top: calc(360px - .5 * var(--fs)); --fs: clamp(150px, 15vw, 230px); height: var(--fs); }
+.band .shot { position: absolute; left: 50%; top: 50%; width: max(272px, 19vw); aspect-ratio: 1; transform: translate(-50%, -50%) }
+.band .shot img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) contrast(1.05) }
+.line { position: absolute; inset: 0; z-index: 2; margin: 0; display: flex; white-space: nowrap; font-size: var(--fs); font-weight: 500; font-stretch: 150%; letter-spacing: -.02em; line-height: 1; align-items: center; color: #fff; mix-blend-mode: difference }
+.line span { display: flex; align-items: center; animation: run 38s linear infinite; padding-right: .3em }
+.line span::after { content: ""; width: .3em; height: .3em; border-radius: 50%; background: currentColor; margin-left: .3em; flex: none }
+@keyframes run { to { transform: translateX(-100%) } }
+.under { position: absolute; left: 50%; top: calc(360px + max(136px, 9.5vw) + 64px); transform: translateX(-50%); width: min(36ch, 100% - 2 * var(--m)); text-align: center }
+.under p:first-child { font-size: 22px; line-height: 1.4; font-weight: 500 }
+.under p + p { margin-top: 20px; font-size: 17px; color: var(--muted) }
+.foot { position: absolute; left: var(--m); right: var(--m); bottom: 40px; display: flex; justify-content: space-between; align-items: center; gap: 16px }
+
+/* 내 이야기: 계단 문장 */
+.stairs { position: relative; min-height: 100svh; background: var(--navy); color: #fff; padding: 14svh 4vw 12svh; display: grid; grid-template-columns: 1fr 20vw; gap: 4vw; align-items: start }
+.s p { font-size: clamp(36px, 4.4vw, 64px); font-weight: 800; line-height: 1.02; letter-spacing: -.02em; padding-left: calc(var(--k) * 6vw) }
+.s p:nth-child(odd) { color: var(--red) }
+.kept { display: grid; gap: 16px }
+.kept figure { min-width: 0; margin: 0; aspect-ratio: 3 / 2; background: #fff; color: var(--ink); padding: 14px; display: flex; flex-direction: column; justify-content: space-between }
+.kept figcaption { font-size: var(--small); font-weight: 600 }
+.call { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; flex: 1; margin-bottom: 8px }
+.call i { background: var(--blue); display: grid; place-items: end start; padding: 6px; color: #fff; font-style: normal; font-size: 12px; font-weight: 600 }
+.call i + i { background: var(--surface); color: var(--ink) }
+.pron { font-size: clamp(26px, 2.6vw, 40px); font-weight: 800; letter-spacing: -.02em }
+.pron s { color: #c77a12; text-decoration-thickness: .08em }
+.note { grid-column: 1 / -1; align-self: end; color: #fff; font-size: 16px; font-weight: 500; max-width: 36ch; margin-top: 8svh }
+
+/* 하루 10분 */
+.loop { padding: 180px var(--m) 200px }
+.loop h2 { font-size: clamp(48px, 6.4vw, 104px); font-weight: 800; letter-spacing: -.03em; line-height: 1; margin-bottom: 64px }
+.stages { display: flex; gap: 6px; height: 22vh; min-height: 170px }
+.stages > div { display: flex; flex-direction: column; min-width: 12% }
+.seg { flex: 1; padding: 20px; color: #fff; font-size: clamp(20px, 2vw, 30px); font-weight: 800; transform-origin: left; transition: transform 1s var(--ease) }
+.loop:not(.in) .seg { transform: scaleX(.02) }
+.stages > div:nth-child(2) .seg { transition-delay: .15s } .stages > div:nth-child(3) .seg { transition-delay: .3s } .stages > div:nth-child(4) .seg { transition-delay: .45s }
+.stages p { margin-top: 14px; font-size: 17px; max-width: 22ch; padding-right: 8px }
+
+/* 첫 화면 시안 */
+.first { position: relative; overflow: hidden; background: var(--surface); padding: 160px var(--m) 180px }
+.first { display: grid; grid-template-columns: 1fr 390px; column-gap: 5vw; align-items: start }
+.first > .left { min-width: 0 }
+.st { font-size: clamp(64px, 8vw, 140px); font-weight: 800; font-stretch: 150%; line-height: 1; letter-spacing: -.02em; white-space: nowrap; text-transform: uppercase; color: var(--muted) }
+h2.st { color: var(--ink); text-transform: none; letter-spacing: -.04em; font-stretch: 100% }
+.phone { position: relative; width: 390px; height: 800px; transform: rotate(2deg); background: #fff; margin-top: 20px }
+.phone iframe { width: 100%; height: 100%; border: 0; display: block }
+.facts { margin: 64px 0 0; max-width: 34em; display: grid; gap: 18px; font-size: 20px; line-height: 1.5 }
+.facts .open { font-size: 17px; font-weight: 700; color: var(--blue); text-decoration: none }
+.facts .open:hover { text-decoration: underline }
+
+/* 다음 판: 하루 살기 */
+.day { padding: 160px var(--m) 180px; background: var(--bg) }
+.day h2 { font-size: clamp(48px, 6.4vw, 104px); font-weight: 800; letter-spacing: -.03em; line-height: 1 }
+.day .lead { margin-top: 24px; font-size: var(--lead); max-width: 30ch }
+.day .pair { display: grid; grid-template-columns: 1.25fr 1fr; gap: 24px; margin-top: 56px; align-items: start }
+.day figure { margin: 0 }
+.day figure img { width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; display: block }
+.day figcaption { margin-top: 14px; font-size: 17px; max-width: 46ch }
+.day figcaption b { display: block; font-size: 20px; margin-bottom: 4px }
+.day figure.pick figcaption b { color: var(--blue) }
+.day ol { margin: 56px 0 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; counter-reset: d }
+.day li { font-size: 18px; line-height: 1.5 }
+.day li b { display: block; font-size: 22px; margin-bottom: 6px }
+@media (max-width: 760px) { .day { padding: 110px var(--m) 120px } .day .pair, .day ol { grid-template-columns: 1fr } .day h2 { font-size: 13vw } }
+
+/* 동기 네 가지: 부채 */
+.fan { position: relative; height: 240svh; background: var(--navy); color: #fff }
+.fan .stage { position: sticky; top: 0; height: 100svh; overflow: hidden; padding: 36px var(--m) }
+.fan h2 { font-size: clamp(40px, 4vw, 60px); font-weight: 800; letter-spacing: -.03em; line-height: 1.05 }
+.fan .sub { margin-top: 12px; font-size: 17px; max-width: 40ch }
+.cards { position: absolute; left: 50%; top: 54%; width: 1090px; height: 400px; transform: translate(-50%, -50%) }
+.card { position: absolute; top: 0; width: 340px; height: 400px; padding: 28px; border-radius: 28px; color: var(--ink); display: flex; flex-direction: column; justify-content: space-between; transition: transform .8s var(--ease), opacity .5s }
+.card > * { max-width: 196px }
+.card h3 { font-size: 30px; font-weight: 800; line-height: 1.08; letter-spacing: -.02em }
+.card img, .card .gap { width: 204px; height: auto; aspect-ratio: 3 / 2; object-fit: cover }
+.card p { font-size: 16px; line-height: 1.45 }
+.card:nth-child(1) { left: 0; background: var(--red); --r: -3deg }
+.card:nth-child(2) { left: 250px; background: #fff; --r: 2deg }
+.card:nth-child(3) { left: 500px; background: var(--blue); color: #fff; --r: -2deg }
+.card:nth-child(4) { left: 750px; background: var(--black); color: #fff; --r: 3deg }
+.card { transform: translateY(var(--y, 0)) rotate(var(--r)) }
+.js .card:not(.on) { --y: 120svh }
+.gap { display: flex; flex-direction: column; justify-content: center; gap: 10px }
+.gap div { height: 26px; display: flex; gap: 3px }
+.gap b { flex: var(--w); background: var(--ink) }
+.gap b.h { background: var(--red) }
+.gap span { font-size: 13px; font-weight: 700 }
+
+/* 하루 시간표 */
+.who { padding: 180px var(--m) 200px; background: var(--navy); color: #fff }
+.who .top { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: end }
+.who h2 { font-size: clamp(48px, 6.4vw, 104px); font-weight: 800; letter-spacing: -.03em; line-height: 1 }
+.who .top p { font-size: var(--lead); max-width: 30ch; color: #dfe9e5 }
+.days { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 72px }
+.days section { background: rgba(255,255,255,.05); padding: 32px 32px 40px }
+.days h3 { font-size: 22px; font-weight: 800; color: var(--red); margin-bottom: 18px }
+.slot { display: grid; grid-template-columns: auto 1fr; gap: 0 22px; padding: 16px 0; align-items: baseline }
+.slot time { grid-row: span 2; white-space: nowrap; min-width: 3.1em; font-size: clamp(30px, 2.8vw, 44px); font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.02em; line-height: 1; color: #fff }
+.slot b { font-size: 22px; font-weight: 700 }
+.slot span { font-size: 17px; color: #b9cfc8 }
+.slot.me time, .slot.me b { color: var(--red) }
+.fields { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 48px; font-size: 17px; color: #dfe9e5 }
+.fields em { font-style: normal; padding: 8px 14px; border-radius: 999px; background: rgba(255,255,255,.1); color: #fff; font-weight: 600 }
+
+/* 정한 것 */
+.faq { padding: 0 0 120px; background: var(--bg) }
+.faq .head { min-height: 32svh; background: var(--blue); color: #fff; display: flex; align-items: flex-end; padding: 56px var(--m) }
+.faq .head h2 { font-size: clamp(48px, 7vw, 120px); font-weight: 800; letter-spacing: -.03em; line-height: 1 }
+.q { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); gap: 0 48px; max-width: 1180px; margin: 0 auto; padding: 64px var(--m) 0 }
+.q h3 { font-size: clamp(26px, 2.4vw, 36px); font-weight: 800; letter-spacing: -.02em; line-height: 1.2 }
+.q .a { font-size: 19px; line-height: 1.65; display: grid; gap: 14px; max-width: 62ch }
+.q ol { margin: 0; padding-left: 1.3em; display: grid; gap: 8px }
+.q .a a { font-weight: 700; color: var(--blue) }
+.q .a b { font-weight: 700 }
+.ph { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px }
+.ph span { min-width: 54px; padding: 10px 12px 8px; background: var(--ink); color: #fff; text-align: center; font-size: 22px; font-weight: 700 }
+.ph span small { display: block; font-size: 13px; font-weight: 600; margin-top: 2px }
+.ph span.ghost { background: transparent; color: var(--muted); text-decoration: line-through }
+.ph span.bad { background: var(--red); color: var(--ink) }
+/* 끝 */
+.end { min-height: 68svh; background: var(--blue); color: #fff; padding: 40px var(--m) 32px; display: flex; flex-direction: column }
+.end .top { display: flex; justify-content: space-between; gap: 24px; font-size: 15px }
+.end .top a { font-weight: 700 }
+.end .big { margin-top: auto; font-size: clamp(64px, 12.4vw, 220px); font-weight: 850; font-stretch: 150%; letter-spacing: -.03em; line-height: .95; text-decoration: none; display: inline-block; transition: color .2s }
+.end .big:hover { color: var(--red) }
+.end .meta p { max-width: 60ch }
+.end .meta { margin-top: 40px; display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 24px; font-size: 14px; line-height: 1.5 }
+.end .meta > :last-child { text-align: right }
+.end .meta a { margin-right: 14px; font-weight: 700 }
+
+@media (max-width: 1100px) {
+  .first { grid-template-columns: 1fr }
+  .phone { margin: 48px auto 0; transform: rotate(1.5deg) }
+  .stairs { grid-template-columns: 1fr }
+  .kept { grid-template-columns: 1fr 1fr; max-width: 640px }
+}
+@media (max-width: 1180px) {
+  .fan { height: auto }
+  .fan .stage { position: static; height: auto; padding: 120px var(--m) }
+  .cards { position: static; transform: none; width: auto; height: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: 16px; margin-top: 48px }
+  .card { position: static; width: auto; height: auto; min-height: 400px; gap: 20px; transform: none !important }
+  .card > * { max-width: none }
+  .card img, .card .gap { width: 100% }
+  .js .card:not(.on) { --y: 0 }
+}
+@media (max-width: 760px) {
+  .band { --fs: 34vw; top: calc(26svh - .5 * var(--fs)) }
+  .band .shot { width: 46vw }
+  .under { top: calc(26svh + 23vw + 64px) }
+  .under p:first-child { font-size: 18px }
+  .under p + p { font-size: 16px }
+  .foot { flex-direction: column; align-items: stretch; bottom: 20px }
+  .foot .btn { justify-content: center }
+  .bar .nav-l { display: none }
+  .bar { grid-template-columns: 1fr auto }
+  .stairs { grid-template-columns: 1fr; padding: 96px var(--m) 72px; min-height: 0 }
+  .s p { font-size: 7.2vw; padding-left: calc(var(--k) * 3.5vw) }
+  .pron { font-size: 24px }
+  .kept { grid-template-columns: 1fr 1fr; gap: 10px }
+  .kept figure { padding: 10px }
+  .note { margin-top: 0 }
+  .loop { padding: 120px var(--m) }
+  .stages { flex-direction: column; height: 70svh; min-height: 520px }
+  .stages > div { min-height: 72px; flex-grow: var(--g) !important; flex-direction: row }
+  .seg { flex: none; width: 40%; font-size: 22px }
+  .loop:not(.in) .seg { transform: scaleY(.04) }
+  .stages p { margin: 0; padding: 8px 0 0 14px; font-size: 16px; max-width: none }
+  .first { padding: 110px var(--m) 120px }
+  .st { font-size: 15vw }
+  .phone { width: 100%; max-width: 390px; height: 840px; margin: 40px auto 0; transform: rotate(1deg) }
+  .facts { font-size: 17px; margin-top: 40px }
+  .card { min-height: 0 }
+  .card:nth-child(odd) { margin-right: 8vw; rotate: -1.5deg }
+  .card:nth-child(even) { margin-left: 8vw; rotate: 1.5deg }
+  .who { padding: 110px var(--m) }
+  .who .top, .days { grid-template-columns: 1fr }
+  .who h2 { font-size: 13vw }
+  .days { margin-top: 40px }
+  .days section { padding: 24px 20px 28px }
+  .slot { gap: 0 14px }
+  .slot b { font-size: 19px }
+  .faq .head { min-height: 30svh }
+  .faq .head h2 { font-size: 13vw }
+  .q { display: block; padding: 40px 20px 0 }
+  .q .a { margin-top: 14px; font-size: 17px }
+  .end .meta { grid-template-columns: 1fr }
+  .end .meta > :last-child { text-align: left }
+  .end .big { font-size: 17vw }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto }
+  .line span { animation: none; transform: translateX(-30%) }
+  .rise, .seg, .card { transition: none !important; opacity: 1 !important }
+  .loop:not(.in) .seg { transform: none }
+  .js .card:not(.on) { --y: 0 }
+}
+</style>
+</head>
+<body class="no-js">
+
+<header class="hero">
+  <nav class="bar" aria-label="위쪽">
+    <a class="nav-l" href="../../">← 창업실</a>
+    <a class="mark" href="#top" aria-label="술술 처음으로">술술</a>
+    <a href="../">써 보기</a>
+  </nav>
+  <div class="band">
+    <div class="shot"><img src="../img/mic-dark.webp" alt="오래된 은색 마이크" width="900" height="900"></div>
+    <h1 class="line" id="top" aria-label="술술"><span aria-hidden="true">술술</span><span aria-hidden="true">술술</span><span aria-hidden="true">술술</span><span aria-hidden="true">술술</span><span aria-hidden="true">술술</span><span aria-hidden="true">술술</span></h1>
+  </div>
+  <div class="under">
+    <p>어… 하고 막힌 그 말이 다음 날 내 교재가 되는 영어 말하기 프로그램이에요.</p>
+    <p>하루 10분 · 0원 · 내 대화 또는 일상 상황</p>
+  </div>
+  <div class="foot">
+    <span>기획서 · 2026년 11월</span>
+    <a class="btn" href="../">술술 써 보기</a>
+  </div>
+</header>
+
+<main>
+<section class="stairs" aria-labelledby="why">
+  <h2 id="why" class="sr" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">왜 새로 만드나</h2>
+  <div class="s">
+    <p class="rise" style="--k:0;--i:0">듀오링고는 반복만 시켰고</p>
+    <p class="rise" style="--k:1;--i:1">말해보카는 왜 하는지 몰랐다.</p>
+    <p class="rise" style="--k:2;--i:2">그래서 둘 다 끊었다.</p>
+    <p class="rise" style="--k:3;--i:3">남긴 건 영상통화와</p>
+    <p class="rise" style="--k:4;--i:4">정확한 발음, 이 둘.</p>
+  </div>
+  <div class="kept">
+    <figure class="rise" style="--i:2" data-ui><div class="call"><i>Lily</i><i>나</i></div><figcaption>듀오링고에서 남긴 것 · 실력이 그대로 드러나는 대화</figcaption></figure>
+    <figure class="rise" style="--i:3" data-ui><div class="pron" lang="en">sa<s>l</s>mon</div><figcaption>말해보카에서 남긴 것 · 소리를 정확히 짚어 주기</figcaption></figure>
+  </div>
+  <p class="note rise">둘 다 결제해서 써 봤어요. 반복은 진전이 안 느껴졌고, 발음은 좋았지만 계속할 이유가 없었어요.</p>
+</section>
+
+<section class="loop" id="loop" aria-labelledby="h-loop">
+  <h2 id="h-loop" class="rise">하루 10분, 한 바퀴</h2>
+  <div class="stages" data-ui>
+    <div style="flex-grow:4;--g:4"><div class="seg" style="background:var(--blue)">4분</div><p><b>먼저</b> 매듭 하나를 풀어요. 8~9문제, 하트 없이.</p></div>
+    <div style="flex-grow:3;--g:3"><div class="seg" style="background:var(--black)">3분</div><p><b>그다음</b> AI 상대와 말해요. 지난번 얘기를 기억해요.</p></div>
+    <div style="flex-grow:.6;--g:1"><div class="seg" style="background:var(--red);color:var(--ink)">몇 초</div><p><b>끝나면</b> 멈춘 곳마다 지어진 매듭에서 꼬인 말을 뽑아요.</p></div>
+    <div style="flex-grow:2;--g:2"><div class="seg" style="background:var(--navy)">다음 날 2분</div><p><b>다음 날</b> 꼬인 말을 풀고, 대화에서 두 번 쓰면 끝.</p></div>
+  </div>
+</section>
+
+<section class="first" id="app" aria-labelledby="h-app">
+  <div class="left">
+  <p class="st rise" aria-hidden="true">어…</p>
+  <h2 class="st rise" style="--i:1" id="h-app">첫 화면</h2>
+  <p class="st rise" style="--i:2" aria-hidden="true">다시</p>
+  <p class="st rise" style="--i:3" aria-hidden="true">말해 봐.</p>
+  <div class="facts">
+    <p class="rise">열면 한 가닥 실이 화면을 따라 흐르고, 그 위에 매듭이 엉켜 있어요. 매듭 하나가 레슨 하나예요. 맞힐수록 위쪽 매듭이 풀리고, 다 풀면 실이 곧게 펴지며 구슬이 꿰여요. 한 타래를 다 풀면 그 실로 맺은 매듭 장식을 얻어요.</p>
+    <p class="rise" style="--i:1">말 걸기에서는 내 목소리가 실을 그려요. 1.2초 넘게 멈추면 그 자리에 매듭이 지어지고, 그게 꼬인 말이 돼요. 말하기·듣기가 어려운 곳에선 '지금 말할 수 없어요'를 누르면 1시간 빠져요. 옆 화면은 눌러서 풀어 볼 수 있는 예시예요.</p>
+    <a class="open rise" style="--i:2" href="../">술술 열기 →</a>
+  </div>
+  </div>
+  <div class="phone"><iframe src="../?demo#learn" title="술술 첫 화면 예시, 실타래" allow="microphone" loading="lazy"></iframe></div>
+</section>
+
+<section class="day" id="day" aria-labelledby="h-day">
+  <h2 id="h-day" class="rise">다음 판: 하루 살기</h2>
+  <p class="lead rise" style="--i:1">영어로 사는 하루를 장면마다 오른쪽으로 걸어가요. 보기 고르기 대신 뜻만 보고 내가 직접 말해요.</p>
+  <div class="pair">
+    <figure class="pick rise" style="--i:2"><img src="../img/scenes/cafe-gemini.webp" alt="납작한 그림체의 아침 커피숍, 카운터 뒤에서 바리스타가 손을 흔드는 넓은 장면" width="1600" height="893" loading="lazy"><figcaption><b>Gemini · 이걸로 골랐어요</b>가게 전체가 넓게 보이고 사람이 작아요. 아래 바닥에 말풍선을 얹기 좋고, 다른 장면과 그림체를 맞추기 쉬워요.</figcaption></figure>
+    <figure class="rise" style="--i:3"><img src="../img/scenes/cafe-chatgpt.webp" alt="부드러운 그림체의 커피숍, 바리스타가 정면에서 손님을 반기는 장면" width="1600" height="900" loading="lazy"><figcaption><b>ChatGPT</b>따뜻하고 예쁘지만 인물이 크고 정면이라, 장면마다 얼굴이 달라지면 따로 놀 수 있어요.</figcaption></figure>
+  </div>
+  <ol>
+    <li class="rise"><b>엿듣기</b>그림 위로 대화가 흘러가요. 표현 덩어리를 누르면 뜻과 왜 그렇게 말하는지 한 줄.</li>
+    <li class="rise" style="--i:1"><b>내 차례</b>한국어로 하고 싶은 말만 보고 직접 말해요. 뜻이 통하면 통과, 막히면 힌트 세 단계.</li>
+    <li class="rise" style="--i:2"><b>수첩</b>내가 한 말과 더 자연스러운 말을 나란히 남겨요. 막힌 말만 다음 날 다른 장면에서 한 번 더.</li>
+  </ol>
+</section>
+
+<section class="fan" aria-labelledby="h-fan">
+  <div class="stage">
+    <h2 id="h-fan" class="rise">장부 대신 네 가지</h2>
+    <p class="sub rise" style="--i:1">숫자를 모으는 걸로는 계속 오지 않았어요. 사람, 소리, 바깥, 내 이야기로 붙잡아요.</p>
+    <div class="cards">
+      <article class="card on"><h3>나를 기억하는 상대</h3><img src="../img/cafe.webp" alt="카페 카운터에서 커피를 내주는 바리스타" width="1400" height="934" loading="lazy"><p>어제 한 말을 기억하고 오늘 이어서 물어요. 단골 카페 점원처럼요.</p></article>
+      <article class="card"><h3>메워지는 구멍</h3>
+        <div class="gap" aria-label="첫날은 주황 구멍이 많고 4주 뒤엔 거의 없는 파형"><span>첫날</span><div><b style="--w:3"></b><b class="h" style="--w:2"></b><b style="--w:2"></b><b class="h" style="--w:3"></b><b style="--w:1"></b><b class="h" style="--w:2"></b><b style="--w:2"></b></div><span>4주 뒤</span><div><b style="--w:6"></b><b class="h" style="--w:.6"></b><b style="--w:7"></b><b class="h" style="--w:.4"></b><b style="--w:4"></b></div></div>
+        <p>매주 같은 질문에 다시 답해요. 주황 구멍이 줄어드는 게 보이고 들려요.</p></article>
+      <article class="card"><h3>바깥 퀘스트</h3><img src="../img/airport.webp" alt="공항 출발 안내판" width="1400" height="933" loading="lazy"><p>4주마다 진짜 사람 앞에서. 영어로 주문, 길 안내, 3분 발표 녹화.</p></article>
+      <article class="card"><h3>내 영어 이야기책</h3><img src="../img/diary.webp" alt="손글씨로 채운 오래된 일기장" width="1400" height="933" loading="lazy"><p>한 달 동안 말한 문장이 내 이야기 한 권이 돼요. 내 목소리로 다시 들어요.</p></article>
+    </div>
+  </div>
+</section>
+
+<section class="who" aria-labelledby="h-who">
+  <div class="top">
+    <h2 id="h-who" class="rise">하루 시간표</h2>
+    <p class="rise" style="--i:1">영어로 사는 이틀이에요. 장면마다 그 장소 그림 위에서 말해요. '내 이야기로'를 고르면 저녁마다 친구에게 오늘 일을 말하는 장면이 붙어요.</p>
+  </div>
+  <div class="days">
+    <section class="rise" aria-label="1일째"><h3>1일째 · 도착한 날</h3>
+      <div class="slot"><time>11:00</time><b>공항 입국</b><span lang="en">I'm here for a one-week trip.</span></div>
+      <div class="slot"><time>13:00</time><b>숙소 가는 길 묻기</b><span lang="en">How do I get to the station?</span></div>
+      <div class="slot"><time>15:00</time><b>호텔 체크인</b><span lang="en">I have a reservation under Kim.</span></div>
+      <div class="slot"><time>19:00</time><b>저녁 식당 주문</b><span lang="en">Could I get the same, but less spicy?</span></div>
+      <div class="slot me"><time>22:00</time><b>친구에게 오늘 이야기</b><span lang="en">It took longer than I thought.</span></div>
+    </section>
+    <section class="rise" style="--i:1" aria-label="2일째"><h3>2일째 · 평범한 하루</h3>
+      <div class="slot"><time>08:00</time><b>아침 카페</b><span lang="en">Can I get an iced americano to go?</span></div>
+      <div class="slot"><time>10:00</time><b>모임에서 자기소개</b><span lang="en">I'm really into games these days.</span></div>
+      <div class="slot"><time>13:00</time><b>약국</b><span lang="en">I've had a headache since yesterday.</span></div>
+      <div class="slot"><time>17:00</time><b>길에서 도와주기</b><span lang="en">It's on your right, next to the bank.</span></div>
+      <div class="slot me"><time>22:00</time><b>친구에게 오늘 이야기</b><span lang="en">I ended up staying home.</span></div>
+    </section>
+  </div>
+  <p class="fields rise">넣으면 장면이 맞춰지는 칸 <em>부를 이름</em><em>하는 일</em><em>관심사</em><em>영어 쓸 곳</em><em>지금 수준</em> 모두 비워도 돼요.</p>
+</section>
+
+<section class="faq" aria-labelledby="h-faq">
+  <div class="head"><h2 id="h-faq" class="rise">정한 것, 남은 것</h2></div>
+  <div class="q">
+    <h3 class="rise">왜 하루 살기예요?</h3>
+    <div class="a rise" style="--i:1">
+      <p>보기 고르기와 조각 맞추기는 '알아보기'만 시켜요. 말하기는 내가 스스로 꺼내 말할 때 늘어요. 그래서 장면 속에서 하고 싶은 말만 한국어로 보고, 직접 말하게 했어요.</p>
+      <p>같은 문장을 바로 여러 번 시키지 않아요. 막힌 말만 다음 날 다른 장면에서 한 번 더 나와요.</p>
+    </div>
+  </div>
+  <div class="q">
+    <h3 class="rise">장면 그림은요?</h3>
+    <div class="a rise" style="--i:1"><p>그림은 그림 AI로 만들어요. 장면마다 ChatGPT와 Gemini에 한 장씩 그려 보고 더 맞는 쪽을 써요. 카페는 Gemini의 납작한 그림을 골랐고, 나머지 장면도 이 그림체에 맞춰요.</p></div>
+  </div>
+  <div class="q">
+    <h3 class="rise">대화 AI는 뭘 써요?</h3>
+    <div class="a rise" style="--i:1">
+      <p>모두 0원이에요. 말은 크롬 음성 인식으로 글로 바꾸고, 대답은 Gemini Flash-Lite 무료 등급, 소리는 브라우저 음성이 맡아요. 쓰는 사람이 자기 무료 키를 넣고, 키는 그 기기에만 저장돼요.</p>
+      <p>걸리는 점: Gemini 무료 등급은 대화가 구글 학습에 쓰여요. 그래서 키 넣는 화면에 알려 둬요.</p>
+    </div>
+  </div>
+  <div class="q">
+    <h3 class="rise">발음은요?</h3>
+    <div class="a rise" style="--i:1">
+      <p>장면 속 단어 중 헷갈리는 발음(receipt의 p처럼)은 누르면 바로 팁이 나와요. 소리 하나하나를 짚는 채점은 브라우저 안에서 도는 음소 인식 모델로 다음에 붙여요.</p>
+      <div class="ph" data-ui lang="en" aria-label="salmon 채점 예시: l은 소리 없음, 다섯 소리 중 하나가 틀림">
+        <span>s<small>OK</small></span><span class="bad">æ<small>ɑ로 들림</small></span><span class="ghost">l<small>묵음</small></span><span>m<small>OK</small></span><span>ə<small>OK</small></span><span>n<small>OK</small></span>
+      </div>
+    </div>
+  </div>
+  <div class="q">
+    <h3 class="rise">만드는 순서</h3>
+    <div class="a rise" style="--i:1">
+      <ol>
+        <li>카페 장면 하나를 끝까지 만들어 써 봐요.</li>
+        <li>나머지 장면 그림을 같은 그림체로 뽑고 이틀을 채워요.</li>
+        <li>하루 일기와 그림엽서를 붙여요.</li>
+        <li>발음 채점을 붙여요.</li>
+      </ol>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="end">
+  <div class="top"><span>술술 기획서 · 창업실 · 영어가 술술 나오는 날을 바라며 지은 이름이에요.</span><a href="#top">맨 위로</a></div>
+  <a class="big" href="../">술술 시작하기</a>
+  <div class="meta">
+    <div><a href="../../">창업실</a><a href="../">써 보기</a></div>
+    <p>장면 그림: Gemini·ChatGPT로 생성 · 사진: "Unidyne Shure 55S Microphone" Ethan Long, CC BY-SA 2.0 · "Baristas serve espresso and cappuccino at a busy cafe" Shixart1985, CC BY 2.0 · "Melbourne Airport departures board" Marek Ślusarczyk (Tupungato), CC BY 3.0 · "G-C-Woolley page of diary No2" CEphoto, Uwe Aranas, CC BY-SA 3.0 — 모두 Wikimedia Commons</p>
+    <p>서울 · 2026</p>
+  </div>
+</footer>
+
+<script>
+document.body.classList.replace("no-js", "js");
+const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target) } }), { threshold: 0, rootMargin: "0px 0px -8% 0px" });
+document.querySelectorAll(".rise, .loop").forEach(el => io.observe(el));
+// 부채: 스크롤 4분의 1마다 카드 한 장씩
+const fan = document.querySelector(".fan"), cards = [...document.querySelectorAll(".card")];
+const deal = () => {
+  if (matchMedia("(max-width: 1180px)").matches) return cards.forEach(c => c.classList.add("on"));
+  const r = fan.getBoundingClientRect(), p = -r.top / (r.height - innerHeight);
+  cards.forEach((c, i) => c.classList.toggle("on", i === 0 || p > i / 4));
+};
+addEventListener("scroll", deal, { passive: true }); addEventListener("resize", deal); deal();
+</script>
+</body>
+</html>

@@ -1,0 +1,581 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>창업실</title>
+<meta name="description" content="숭실대 AI소프트웨어학부 1학년이 노트북 한 대로 만든 게임 도록, 복습 도구, 생활 자동화를 모은 창업실">
+<script>
+if (/^#(notes|prog|quiz|wrong|code)$/.test(location.hash)) location.replace("../study.html" + location.hash);
+document.documentElement.classList.add("js");
+</script>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/wanteddev/wanted-sans@v1.0.3/packages/wanted-sans/fonts/webfonts/variable/split/WantedSansVariable.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap">
+<script src="../icons.js" defer></script>
+<style>
+/* 바탕 둘(거의 흰색·연회색) + 먹색 + 코발트 하나 */
+:root {
+  --paper: #f8f8f6; --tone: #ebebe7; --ink: #131417; --muted: #5d5e63; --line: #d3d3ce;
+  --dark: #131417; --on-dark: #f1f1ee; --on-dark-soft: #a3a4aa; --line-dark: #34353a;
+  --accent: #2337c6; --accent-dark: #8e9bff;
+  --rail: 196px; --g: clamp(16px, 3vw, 48px);
+  --sans: "Wanted Sans Variable", "Wanted Sans", system-ui, "Malgun Gothic", sans-serif;
+  --mono: "IBM Plex Mono", "Wanted Sans Variable", ui-monospace, monospace;
+  --ease: cubic-bezier(.2, .7, .2, 1);
+  color-scheme: light;
+}
+* { box-sizing: border-box }
+html { scroll-behavior: smooth }
+body { margin: 0; padding-left: var(--rail); background: var(--paper); color: var(--ink); font: 400 17px/1.6 var(--sans); word-break: keep-all; overflow-wrap: anywhere; -webkit-font-smoothing: antialiased }
+a { color: inherit }
+img { display: block; max-width: 100%; height: auto }
+h1, h2, h3 { margin: 0; letter-spacing: -.02em; line-height: 1.12 }
+p, ol, ul, figure { margin: 0 }
+ol, ul { padding: 0; list-style: none }
+.ic { display: inline-flex; width: 18px; height: 18px; flex: none }
+.back .ic { transform: scaleX(-1) }
+.lab { font: 500 12px/1.4 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted) }
+.dark .lab { color: var(--on-dark-soft) }
+.lab.ko { font: 500 14px/1.4 var(--sans); letter-spacing: 0 }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px }
+.dark a:focus-visible, .dark button:focus-visible { outline-color: var(--accent-dark) }
+section { scroll-margin-top: 0 }
+
+/* 왼쪽 목차: 지금 어디인지와 얼마나 내려왔는지 */
+.rail { position: fixed; inset: 0 auto 0 0; width: var(--rail); z-index: 10; background: var(--paper); border-right: 1px solid var(--line); display: flex; flex-direction: column; padding: 28px 24px 28px 28px }
+.rail .mark { font-weight: 750; font-size: 22px; letter-spacing: -.02em; text-decoration: none }
+.rail nav { margin-top: 56px }
+.rail nav a { display: grid; grid-template-columns: 30px 1fr; align-items: baseline; padding: 7px 0; text-decoration: none; color: var(--muted); font-weight: 560; font-size: 16px; transition: color .25s }
+.rail nav a span { font: 500 12px var(--mono) }
+.rail nav a:hover, .rail nav a[aria-current="true"] { color: var(--ink) }
+.rail nav a[aria-current="true"] span { color: var(--accent) }
+.rail .now { margin-top: auto; display: grid; gap: 10px }
+.rail .count { font: 500 30px/1 var(--mono); letter-spacing: -.02em }
+.rail .count small { font-size: 14px; color: var(--muted) }
+.rail .where { font-weight: 650; font-size: 16px }
+.rail .prog { position: absolute; top: 0; right: -1px; width: 2px; height: 100%; background: transparent }
+.rail .prog i { display: block; height: 100%; background: var(--accent); transform-origin: 0 0; transform: scaleY(var(--p, 0)) }
+
+/* 처음: 큰 제목 + 오른쪽 아래 목차 표 */
+.hero { min-height: 100svh; padding: 28px var(--g) 56px; display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 20px; grid-template-rows: auto 1fr auto }
+.hero .top { grid-column: 1 / -1; display: flex; justify-content: space-between; gap: 16px }
+.hero h1 { grid-column: 1 / -1; align-self: center; font-weight: 720; font-size: clamp(44px, 9vw, 150px); line-height: 1.04; letter-spacing: -.03em; padding: 64px 0 }
+.hero h1 em { font-style: normal; color: var(--accent) }
+.hero .foot { grid-column: 1 / -1; display: grid; grid-template-columns: subgrid; align-items: end; row-gap: 40px }
+.hero .lede { grid-column: 1 / 6; font-size: clamp(18px, 1.35vw, 21px); line-height: 1.55; color: var(--muted) }
+.hero .act { grid-column: 1 / 6; display: flex; flex-wrap: wrap; align-items: center; gap: 14px 22px; margin-top: 28px }
+.btn { display: inline-flex; align-items: center; gap: 12px; min-height: 54px; padding: 0 22px; background: var(--accent); color: #fff; font-weight: 650; text-decoration: none; transition: background-color .2s, transform .15s }
+.btn:hover { background: #1a2a9e } .btn:active { transform: scale(.98) }
+.hero .note { font-size: 15px; color: var(--muted); line-height: 1.5 }
+.hero .note b { color: var(--ink); font-weight: 650 }
+.toc { grid-column: 8 / 13; border-top: 1px solid var(--ink) }
+.toc a { display: grid; grid-template-columns: 44px 1fr auto; align-items: baseline; padding: 14px 0; border-bottom: 1px solid var(--line); text-decoration: none; transition: color .2s, padding .25s var(--ease) }
+.toc a .n { font: 500 12px var(--mono); color: var(--muted) }
+.toc a b { font-weight: 620; font-size: 19px }
+.toc a .c { font: 500 13px var(--mono); color: var(--muted) }
+.toc a:hover { color: var(--accent); padding-left: 6px }
+
+/* 01 게임: 먹색, 작품 하나씩 가로로 넘기기 */
+.dark { background: var(--dark); color: var(--on-dark) }
+.game { padding: 96px 0 104px }
+.game .head { padding: 0 var(--g); display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 20px; align-items: end }
+.game .head .lab { grid-column: 1 / -1; margin-bottom: 18px }
+.game h2 { grid-column: 1 / 6; font-weight: 700; font-size: clamp(44px, 5vw, 84px) }
+.game .head p { grid-column: 7 / 12; color: var(--on-dark-soft); font-size: 18px }
+.reel { margin-top: 56px; display: flex; gap: 28px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 0 var(--g) 8px; scroll-padding: 0 var(--g); scrollbar-width: none; overscroll-behavior-x: contain }
+.reel::-webkit-scrollbar { display: none }
+.work { flex: 0 0 min(84%, 1180px); scroll-snap-align: start; display: grid; align-content: start; grid-template-columns: repeat(12, 1fr); column-gap: 20px }
+.work .art { grid-column: 1 / -1; display: block; overflow: hidden; background: #000 }
+.work .art img { width: 100%; transition: transform .4s var(--ease), opacity .3s }
+.work .art:hover img { transform: scale(1.02) }
+.work .no { grid-column: 1 / 2; margin-top: 26px; font: 500 13px var(--mono); color: var(--on-dark-soft) }
+.work h3 { grid-column: 2 / 6; margin-top: 18px; font-weight: 700; font-size: clamp(32px, 3.2vw, 52px) }
+.work .meta { grid-column: 2 / 6; margin-top: 10px; font-size: 14px; color: var(--on-dark-soft) }
+.work .txt { grid-column: 7 / 13; grid-row: 2 / 4; margin-top: 26px }
+.work .txt p { color: #d5d5d2; max-width: 36em }
+.more { display: inline-flex; align-items: center; gap: 8px; margin-top: 18px; font-weight: 650; text-underline-offset: 5px; text-decoration-thickness: 1px }
+.more:hover { color: var(--accent-dark) }
+.reelbar { margin: 36px var(--g) 0; display: flex; align-items: center; gap: 18px; border-top: 1px solid var(--line-dark); padding-top: 18px }
+.reelbar .pos { font: 500 13px var(--mono); color: var(--on-dark-soft); margin-right: auto }
+.reelbar .pos b { color: var(--on-dark); font-weight: 500 }
+.reelbar button { width: 48px; height: 48px; display: grid; place-items: center; background: none; color: var(--on-dark); border: 1px solid var(--line-dark); cursor: pointer; transition: border-color .2s, color .2s, opacity .2s }
+.reelbar button:hover { border-color: var(--on-dark) }
+.reelbar button:disabled { opacity: .3; cursor: default; border-color: var(--line-dark) }
+.reelbar:not(.on) { display: none }
+
+/* 섹션 사이 한 줄: 오늘 공부 제목이 흘러간다 */
+.ticker { display: block; overflow: hidden; background: var(--accent); color: #fff; text-decoration: none; padding: 18px 0; white-space: nowrap }
+.ticker .row { display: inline-flex; animation: tick 38s linear infinite }
+.ticker span { font-weight: 620; font-size: clamp(22px, 2.4vw, 36px); letter-spacing: -.01em; padding-right: 1.2em }
+.ticker span i { font: 500 .45em/1 var(--mono); font-style: normal; letter-spacing: .06em; vertical-align: .5em; margin-right: .9em; opacity: .75 }
+.ticker:hover .row { animation-play-state: paused }
+.ticker:focus-visible { outline: 3px solid var(--ink); outline-offset: -3px }
+@keyframes tick { to { transform: translateX(-50%) } }
+
+/* 02 공부: 왼쪽 글을 내리면 오른쪽 고정 그림이 그 도구로 바뀐다 */
+.study { background: var(--tone); padding: 0 var(--g); display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 20px }
+.study .list { grid-column: 1 / 6; padding: 104px 0 18vh }
+.study .head .lab { margin-bottom: 18px }
+.study h2 { font-weight: 700; font-size: clamp(44px, 5vw, 84px) }
+.study .head p { margin-top: 20px; color: var(--muted); font-size: 18px; max-width: 26em }
+.tool { padding: 56px 0; min-height: 58vh; display: flex; flex-direction: column; justify-content: center; transition: opacity .3s }
+.js .tool:not(.on) { opacity: .38 }
+.tool .n { font: 500 12px var(--mono); color: var(--muted) }
+.tool h3 { margin-top: 12px; font-weight: 680; font-size: clamp(26px, 2.3vw, 36px) }
+.tool p { margin-top: 14px; color: var(--muted) }
+.tool .pic { display: none }
+.links { margin-top: 22px; border-top: 1px solid var(--ink) }
+.links a { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); text-decoration: none; font-weight: 600; transition: color .2s, padding .25s var(--ease) }
+.links a:hover { color: var(--accent); padding-left: 6px }
+.stage { grid-column: 7 / 13; position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; justify-content: center; gap: 18px; align-self: start }
+.stage .frames { display: grid }
+.stage .frames a { grid-area: 1 / 1; align-self: center; opacity: 0; visibility: hidden; transform: translateY(10px); transition: opacity .3s, transform .35s var(--ease), visibility .3s; box-shadow: 0 24px 60px -30px rgba(19, 20, 23, .45) }
+.stage .frames a.on { opacity: 1; visibility: visible; transform: none }
+.stage .cap { display: flex; justify-content: space-between; gap: 16px }
+
+/* 03 프로젝트: 표처럼 맞춘 행, 올리면 그림이 커서를 따라온다 */
+.make { padding: 104px var(--g) 112px }
+.make .head { display: flex; align-items: end; justify-content: space-between; gap: 24px; flex-wrap: wrap }
+.make .head .lab { margin-bottom: 18px }
+.make h2 { font-weight: 700; font-size: clamp(44px, 5vw, 84px) }
+.make .head p { color: var(--muted); font-size: 18px; max-width: 24em }
+.cols, .proj > li { display: grid; grid-template-columns: 64px minmax(0, 1fr) 132px 132px; column-gap: 20px }
+.cols { margin-top: 56px; padding-bottom: 12px; border-bottom: 1px solid var(--ink) }
+.proj > li { padding: 30px 0 32px; border-bottom: 1px solid var(--line); align-items: baseline }
+.proj .no { font: 500 13px var(--mono); color: var(--muted) }
+.proj .meta { display: contents; font-size: 15px; color: var(--muted) }
+.proj .name { font-weight: 660; font-size: clamp(30px, 3vw, 50px); line-height: 1.1; letter-spacing: -.02em; text-decoration: none; transition: color .2s }
+.proj > li:hover .name, .proj .name:focus-visible { color: var(--accent) }
+.proj .body { margin-top: 12px; max-width: 40em; color: var(--muted) }
+.proj .body a { color: var(--ink); font-weight: 600; text-underline-offset: 4px; text-decoration-thickness: 1px }
+.proj .thumb, .proj .tog { display: none }
+.cursor { position: fixed; left: 0; top: 0; z-index: 20; width: 320px; pointer-events: none; opacity: 0; transition: opacity .2s; box-shadow: 0 24px 60px -24px rgba(19, 20, 23, .5) }
+.cursor.on { opacity: 1 }
+.cursor img { width: 100% }
+
+/* 04 기타: 날짜순 표 + 오른쪽에 고정된 미리보기 */
+.etc { background: var(--tone); padding: 104px var(--g) 120px; display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 20px; align-items: start }
+.etc .head { grid-column: 1 / 8 }
+.etc .head .lab { margin-bottom: 18px }
+.etc h2 { font-weight: 700; font-size: clamp(44px, 5vw, 84px) }
+.etc .head p { margin-top: 20px; color: var(--muted); font-size: 18px; max-width: 28em }
+.log { grid-column: 1 / 8; margin-top: 48px; border-top: 1px solid var(--ink) }
+.log a { display: grid; grid-template-columns: 72px minmax(0, 1fr) 112px 20px; column-gap: 20px; align-items: center; padding: 18px 0; border-bottom: 1px solid var(--line); text-decoration: none; transition: color .2s, background-color .2s }
+.log a > .d { font: 500 13px var(--mono); color: var(--muted) }
+.log a > .k { font-size: 15px; color: var(--muted) }
+.log a b { font-weight: 620; font-size: 19px; line-height: 1.35 }
+.log a img { display: none }
+.log a .ic { opacity: 0; transform: translateX(-6px); transition: opacity .2s, transform .25s var(--ease) }
+.log a:hover, .log a.on { color: var(--accent) }
+.log a:hover .ic, .log a.on .ic { opacity: 1; transform: none }
+.pane { grid-column: 9 / 13; grid-row: 1 / 3; position: sticky; top: 15vh; align-self: start; margin-top: 8px }
+.pane img { width: 100%; box-shadow: 0 24px 60px -30px rgba(19, 20, 23, .45) }
+.pane .lab { margin-top: 14px }
+
+/* 끝 */
+.end { padding: 88px var(--g) 40px }
+.end .grid { display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 20px; row-gap: 40px }
+.end ol { grid-column: 1 / 7; border-top: 1px solid var(--line-dark) }
+.end ol a { display: grid; grid-template-columns: 44px 1fr auto; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--line-dark); text-decoration: none; font-weight: 600; font-size: 19px; transition: color .2s }
+.end ol a span { font: 500 12px var(--mono); color: var(--on-dark-soft) }
+.end ol a:hover { color: var(--accent-dark) }
+.end .side { grid-column: 9 / 13; align-self: end; display: grid; gap: 14px; color: var(--on-dark-soft) }
+.end .side a { color: var(--on-dark); font-weight: 600; text-underline-offset: 4px }
+.end .word { margin-top: 96px; font-weight: 760; font-size: clamp(72px, 15vw, 240px); line-height: .9; letter-spacing: -.035em }
+
+/* 들어올 때 짧게 떠오르기 (스크립트 없으면 그냥 보인다) */
+.js .rise { opacity: 0; transform: translateY(14px); transition: opacity .4s ease, transform .4s var(--ease); transition-delay: calc(var(--i, 0) * 60ms) }
+.js .rise.in { opacity: 1; transform: none }
+
+@media (max-width: 1100px) {
+  .cols, .proj > li { grid-template-columns: 52px minmax(0, 1fr) 110px 110px }
+  .hero .lede, .hero .act { grid-column: 1 / 7 }
+}
+
+/* 폰·태블릿: 목차는 위에 얇게, 행은 눌러서 펼친다 */
+@media (max-width: 900px) {
+  body { padding-left: 0 }
+  .rail { position: sticky; top: 0; bottom: auto; width: auto; height: 56px; flex-direction: row; align-items: center; justify-content: space-between; padding: 0 var(--g); border-right: 0; border-bottom: 1px solid var(--line) }
+  .rail .mark { font-size: 19px }
+  .rail nav { margin: 0; display: flex; gap: 16px }
+  .rail nav a { display: block; padding: 6px 0; font-size: 15px }
+  .rail nav a span, .rail .now { display: none }
+  .rail .prog { top: auto; bottom: -1px; left: 0; right: 0; width: 100%; height: 2px }
+  .rail .prog i { transform-origin: 0 0; transform: scaleX(var(--p, 0)) }
+  section { scroll-margin-top: 56px }
+  .hero { min-height: 0; padding-top: 20px; padding-bottom: 48px; display: block }
+  .hero .top .lab:last-child { display: none }
+  .hero h1 { font-size: clamp(38px, 10.6vw, 64px); padding: 56px 0 40px }
+  .hero .act { margin-top: 24px }
+  .hero .foot { display: block }
+  .toc { margin-top: 48px }
+  .game { padding: 72px 0 80px }
+  .game .head { display: block }
+  .game .head p { margin-top: 16px; font-size: 17px }
+  .reel { gap: 16px; margin-top: 40px }
+  .work { flex-basis: 86%; display: block }
+  .work .no { margin-top: 20px }
+  .work h3 { margin-top: 6px }
+  .work .txt { margin-top: 16px }
+  .work .txt p { font-size: 16px }
+  .study { display: block; padding-bottom: 72px }
+  .study .list { padding: 72px 0 0 }
+  .stage { display: none }
+  .tool { min-height: 0; padding: 48px 0 0 }
+  .js .tool:not(.on) { opacity: 1 }
+  .tool .pic { display: block; margin-top: 20px }
+  .make { padding: 72px var(--g) 80px }
+  .cols { display: none }
+  .proj { margin-top: 40px; border-top: 1px solid var(--ink) }
+  .proj > li { grid-template-columns: 40px minmax(0, 1fr) 44px; grid-template-areas: "no name tog" ". meta meta" ". body body"; padding: 20px 0; align-items: center }
+  .proj .no { grid-area: no } .proj .main { display: contents }
+  .proj .name { grid-area: name; font-size: clamp(26px, 7.4vw, 36px) }
+  .proj .meta { grid-area: meta; display: flex; gap: 12px; margin-top: 6px; font-size: 14px }
+  .proj .body { grid-area: body; margin-top: 16px }
+  .proj .tog { grid-area: tog; display: grid; place-items: center; width: 44px; height: 44px; background: none; border: 0; padding: 0; cursor: pointer; color: var(--ink) }
+  .proj .tog::before, .proj .tog::after { content: ""; grid-area: 1 / 1; width: 16px; height: 2px; background: currentColor; transition: transform .25s var(--ease) }
+  .proj .tog::after { transform: rotate(90deg) }
+  .proj .open .tog::after { transform: rotate(0) }
+  .js .proj > li:not(.open) .body { display: none }
+  .proj .thumb { display: block; margin-bottom: 14px }
+  .cursor { display: none }
+  .etc { display: block; padding: 72px var(--g) 80px }
+  .pane { display: none }
+  .log { margin-top: 36px }
+  .log a { grid-template-columns: 52px minmax(0, 1fr) 104px; grid-template-areas: "d b img" "d k img"; row-gap: 2px; padding: 14px 0 }
+  .log a > .d { grid-area: d; align-self: start; padding-top: 4px }
+  .log a b { grid-area: b; font-size: 17px }
+  .log a > .k { grid-area: k; font-size: 12px }
+  .log a img { grid-area: img; display: block; width: 104px }
+  .log a [data-icon] { display: none !important }
+  .log a.on { color: inherit }
+  .end { padding-top: 64px }
+  .end ol, .end .side { grid-column: 1 / -1 }
+  .end .word { margin-top: 64px }
+}
+@media (max-width: 420px) {
+  .rail nav { gap: 13px }
+  .rail nav a { font-size: 14px }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto }
+  .ticker .row { animation: none }
+  .js .rise { opacity: 1; transform: none; transition: none }
+  *, *::before, *::after { transition-duration: 0s !important }
+}
+</style>
+</head>
+<body>
+
+<aside class="rail" aria-label="목차">
+  <a class="mark" href="../">창업실</a>
+  <nav aria-label="분류">
+    <a href="#game"><span>01</span>게임</a><a href="#study"><span>02</span>공부</a><a href="#make"><span>03</span>프로젝트</a><a href="#etc"><span>04</span>기타</a>
+  </nav>
+  <div class="now" aria-hidden="true">
+    <span class="count" id="count">00 <small>/ 04</small></span>
+    <span class="where" id="where">처음</span>
+  </div>
+  <div class="prog" aria-hidden="true"><i id="prog"></i></div>
+</aside>
+
+<main>
+<section class="hero" id="top">
+  <div class="top"><span class="lab ko">숭실대 AI소프트웨어학부 · 1학년</span><span class="lab">Index — 2026</span></div>
+  <h1 class="rise">만들면서 배우는<br>1학년의 <em>창업실</em></h1>
+  <div class="foot">
+    <div style="grid-column:1/6">
+      <p class="lede rise" style="--i:1">노트북 한 대로 만든 게임 도록, 복습 도구, 생활 자동화를 한곳에 모았습니다.</p>
+      <div class="act rise" style="--i:2">
+        <a class="btn" id="today" href="../daily/">오늘 AI 공부 열기 <span class="ic" data-icon="arrow-right" data-size="18">→</span></a>
+        <p class="note" id="todayNote">아침 8시마다 한 주제씩 카톡으로 와요.</p>
+      </div>
+    </div>
+    <nav class="toc rise" style="--i:3" aria-label="목차 표">
+      <a href="#game"><span class="n">01</span><b>게임 도록</b><span class="c">02</span></a>
+      <a href="#study"><span class="n">02</span><b>공부 도구</b><span class="c">05</span></a>
+      <a href="#make"><span class="n">03</span><b>프로젝트</b><span class="c">05</span></a>
+      <a href="#etc"><span class="n">04</span><b>그때그때 정리</b><span class="c">05</span></a>
+    </nav>
+  </div>
+</section>
+
+<section class="game dark" id="game" data-n="01" data-t="게임" aria-labelledby="h-game">
+  <div class="head">
+    <span class="lab rise">01 — Games</span>
+    <h2 id="h-game" class="rise">게임</h2>
+    <p class="rise" style="--i:1">혼자 기획하고 있는 두 편. 그림과 규칙, 한 판의 흐름까지 도록으로 묶었습니다.</p>
+  </div>
+  <div class="reel" id="reel">
+    <article class="work" aria-label="넋굿">
+      <a class="art" href="../neokgut/"><img src="../neokgut/img/bg_gate.webp" alt="넋굿의 저승 입구 풍경" width="1600" height="900" loading="lazy"></a>
+      <span class="no">01.1</span>
+      <h3>넋굿</h3>
+      <p class="meta">Unity 6 · 액션 로그라이트 · 1인 개발</p>
+      <div class="txt">
+        <p>부서진 저승길 위에서 구미호 아이가 오행 술법으로 원귀를 풀어 주는 쿼터뷰 액션 로그라이트. 이야기, 한 판의 흐름, 전투, 원귀, 술법·보물, 신당까지 열두 거리로 정리했습니다.</p>
+        <a class="more" href="../neokgut/">도록 보기 <span class="ic" data-icon="arrow-right" data-size="18">→</span></a>
+      </div>
+    </article>
+    <article class="work" aria-label="브라운 로그">
+      <a class="art" href="../brown-rogue/"><img src="../brown-rogue/img/s_title.webp" alt="브라운 로그 타이틀 화면" width="1280" height="720" loading="lazy"></a>
+      <span class="no">01.2</span>
+      <h3>브라운 로그</h3>
+      <p class="meta">Python · pygame-ce · 배치 턴제 RPG · 1인 개발</p>
+      <div class="txt">
+        <p>한·중·일의 영웅 열다섯 중 다섯을 골라 3×4 진형에 세우고, 라운드 사이마다 자리를 옮기며 찢긴 저승 명부를 돌려주러 가는 동양풍 배치 턴제 RPG. 영웅, 전투, 열 장의 보스, 성장, 원정 모드까지 열한 절로 정리했습니다.</p>
+        <a class="more" href="../brown-rogue/">도록 보기 <span class="ic" data-icon="arrow-right" data-size="18">→</span></a>
+      </div>
+    </article>
+  </div>
+  <div class="reelbar" id="reelbar">
+    <span class="pos" id="reelpos"><b>01</b> / 02 넋굿</span>
+    <button type="button" class="back" id="prev" aria-label="이전 작품"><span class="ic" data-icon="arrow-right" data-size="18">←</span></button>
+    <button type="button" id="next" aria-label="다음 작품"><span class="ic" data-icon="arrow-right" data-size="18">→</span></button>
+  </div>
+</section>
+
+<a class="ticker" id="ticker" href="../daily/" aria-label="매일 AI 공부 열기">
+  <span class="row" aria-hidden="true"><span><i>Daily</i>아침 8시, AI 공부 한 주제</span><span><i>Daily</i>아침 8시, AI 공부 한 주제</span><span><i>Daily</i>아침 8시, AI 공부 한 주제</span><span><i>Daily</i>아침 8시, AI 공부 한 주제</span></span>
+</a>
+
+<section class="study" id="study" data-n="02" data-t="공부" aria-labelledby="h-study">
+  <div class="list">
+    <div class="head">
+      <span class="lab rise">02 — Study</span>
+      <h2 id="h-study" class="rise">공부</h2>
+      <p class="rise" style="--i:1">1학년 2학기 수업을 복습하려고 만든 도구들. 강의 정리, 퀴즈, 오답노트, 움직이는 강의까지.</p>
+    </div>
+
+    <article class="tool on" data-k="0">
+      <span class="n">02.1 · C언어 노트</span>
+      <h3>프로그래밍기초 복습 노트</h3>
+      <a class="pic" href="../study.html#notes"><img src="../hub/shots/study.webp" alt="C언어 복습 노트 첫 화면" width="1280" height="800" loading="lazy"></a>
+      <p>C언어 2~9장. 자료형부터 재귀까지 강의 정리, 객관식 퀴즈, 한 줄 코드 작성, 틀린 문제만 다시 푸는 오답노트를 한 화면에.</p>
+      <div class="links"><a href="../study.html#notes">강의 정리 <span class="ic" data-icon="arrow-right">→</span></a><a href="../study.html#quiz">퀴즈 풀기 <span class="ic" data-icon="arrow-right">→</span></a></div>
+    </article>
+    <article class="tool" data-k="1">
+      <span class="n">02.2 · 인공지능 입문</span>
+      <h3>인공지능 입문 복습 노트</h3>
+      <a class="pic" href="../ai.html"><img src="../hub/shots/ai.webp" alt="인공지능 입문 복습 노트 첫 화면" width="1280" height="800" loading="lazy"></a>
+      <p>1~5장. AI의 역사, 지능형 에이전트, 탐색, 복잡한 환경의 탐색, 제약 충족 문제. 원본 강의안과 수업 녹음 정리, 중간고사 정리까지.</p>
+      <div class="links"><a href="../ai.html">노트 열기 <span class="ic" data-icon="arrow-right">→</span></a><a href="../ai-motion/index.html">3장 영상 강의 <span class="ic" data-icon="arrow-right">→</span></a></div>
+    </article>
+    <article class="tool" data-k="2">
+      <span class="n">02.3 · 매일 AI 공부</span>
+      <h3>매일 AI 공부</h3>
+      <a class="pic" href="../daily/"><img src="../hub/shots/daily.webp" alt="매일 AI 공부 레슨 화면" width="1280" height="800" loading="lazy"></a>
+      <p>아침 8시 카톡으로 오는 하루 한 주제. 컴퓨터 기초부터 AI학과 전공 기초까지 차례대로, 어제 배운 걸 묻는 퀴즈와 용어 사전이 붙어 있어요.</p>
+      <div class="links"><a href="../daily/">레슨 목록 <span class="ic" data-icon="arrow-right">→</span></a><a href="../daily/?t">용어 사전 <span class="ic" data-icon="arrow-right">→</span></a></div>
+    </article>
+    <article class="tool" data-k="3">
+      <span class="n">02.4 · 영상 강의</span>
+      <h3>움직이는 그림으로 보는 강의</h3>
+      <a class="pic" href="../motion/index.html"><img src="../hub/shots/motion.webp" alt="C 프로그래밍 기초 모션 강의 제목 화면" width="1600" height="900" loading="lazy"></a>
+      <p>글로만 보면 헷갈리는 장을 움직이는 그림과 목소리로 다시 설명한 영상들.</p>
+      <div class="links"><a href="../motion/index.html">C언어 2~9장 <span class="ic" data-icon="arrow-right">→</span></a><a href="../ai-motion/index.html">AI 3장 탐색 <span class="ic" data-icon="arrow-right">→</span></a><a href="../ai-motion5/index.html">AI 5장 제약 충족 문제 <span class="ic" data-icon="arrow-right">→</span></a><a href="../hanoi/index.html">하노이의 탑 실행 추적 <span class="ic" data-icon="arrow-right">→</span></a></div>
+    </article>
+    <article class="tool" data-k="4">
+      <span class="n">02.5 · 성서 답안</span>
+      <h3>인간과 성서 서술형 답안</h3>
+      <a class="pic" href="../human-bible/"><img src="../hub/shots/bible.webp" alt="인간과 성서 서술형 답안 첫 화면" width="1280" height="800" loading="lazy"></a>
+      <p>그리스와 기독교의 인간관, 구한말 기독교와 근대화, 혐오와 그 해결. 교재 쪽수를 근거로 쓴 글을 내 말투, 교재 정리본, 외우기용으로 나눠 봅니다.</p>
+      <div class="links"><a href="../human-bible/">답안 보기 <span class="ic" data-icon="arrow-right">→</span></a></div>
+    </article>
+  </div>
+
+  <div class="stage" aria-hidden="true">
+    <div class="frames">
+      <a class="on" href="../study.html#notes" tabindex="-1"><img src="../hub/shots/study.webp" alt="" width="1280" height="800" loading="lazy"></a>
+      <a href="../ai.html" tabindex="-1"><img src="../hub/shots/ai.webp" alt="" width="1280" height="800" loading="lazy"></a>
+      <a href="../daily/" tabindex="-1"><img src="../hub/shots/daily.webp" alt="" width="1280" height="800" loading="lazy"></a>
+      <a href="../motion/index.html" tabindex="-1"><img src="../hub/shots/motion.webp" alt="" width="1600" height="900" loading="lazy"></a>
+      <a href="../human-bible/" tabindex="-1"><img src="../hub/shots/bible.webp" alt="" width="1280" height="800" loading="lazy"></a>
+    </div>
+    <div class="cap"><span class="lab ko" id="stageName">C언어 노트</span><span class="lab" id="stageNo">01 / 05</span></div>
+  </div>
+</section>
+
+<section class="make" id="make" data-n="03" data-t="프로젝트" aria-labelledby="h-make">
+  <div class="head">
+    <div><span class="lab rise" style="display:block">03 — Projects</span><h2 id="h-make" class="rise">프로젝트</h2></div>
+    <p class="rise" style="--i:1">수업 팀 과제와, 생활에서 불편했던 걸 직접 고친 것들.</p>
+  </div>
+  <div class="cols lab" aria-hidden="true"><span>No.</span><span>이름</span><span>분류</span><span>형태</span></div>
+  <ol class="proj">
+    <li data-shot="../hub/shots/uridal.webp">
+      <span class="no">03.1</span>
+      <div class="main">
+        <a class="name" href="../uridal/">우리달</a>
+        <div class="body" id="pb1"><img class="thumb" src="../hub/shots/uridal.webp" alt="우리달 달력·하고 싶은 것·기념일 화면" width="1280" height="800" loading="lazy"><p>여자친구랑 같이 쓰는 달력 앱. 남자친구·여자친구·함께 일정이 색으로 나뉘고, 날마다 기분 한 줄, 가고 싶은 곳 목록, 100일·주년 D-day까지. 휴대폰 홈 화면에 앱처럼 설치해요.</p></div>
+      </div>
+      <span class="meta"><span class="cat">생활</span><span class="kind">PWA 달력</span></span>
+      <button class="tog" type="button" aria-expanded="false" aria-controls="pb1" aria-label="우리달 자세히"></button>
+    </li>
+    <li data-shot="../hub/shots/lmsalert.webp">
+      <span class="no">03.2</span>
+      <div class="main">
+        <a class="name" href="../lms/">LMS 할 일·알림</a>
+        <div class="body" id="pb2"><img class="thumb" src="../hub/shots/lmsalert.webp" alt="LMS 할 일·마감 알림" width="1280" height="800" loading="lazy"><p>숭실대 LMS에서 아직 안 한 과제·영상·공지만 마감 순으로 모아 체크하며 지우고, 아침 8시엔 휴대폰으로, 노트북을 켜면 화면으로 알려 줘요. 신청할 수 있는 비교과 프로그램도 함께. <a href="../lms/">할 일 목록</a> · <a href="../lms-alert/">알림 설명</a></p></div>
+      </div>
+      <span class="meta"><span class="cat">생활</span><span class="kind">자동화</span></span>
+      <button class="tog" type="button" aria-expanded="false" aria-controls="pb2" aria-label="LMS 할 일·알림 자세히"></button>
+    </li>
+    <li data-shot="../hub/shots/dulmi.webp">
+      <span class="no">03.3</span>
+      <div class="main">
+        <a class="name" href="../secure-msg/guide/">덜미</a>
+        <div class="body" id="pb3"><img class="thumb" src="../hub/shots/dulmi.webp" alt="덜미 설명서" width="1280" height="800" loading="lazy"><p>프밍기2 팀 과제. C로 만드는 암호화 메신저의 원리, 계획과 발표, 서버 설계와 코드 뼈대를 한 페이지에.</p></div>
+      </div>
+      <span class="meta"><span class="cat">팀 과제</span><span class="kind">C · 설명서</span></span>
+      <button class="tog" type="button" aria-expanded="false" aria-controls="pb3" aria-label="덜미 자세히"></button>
+    </li>
+    <li data-shot="../hub/shots/jobmap-cover.webp">
+      <span class="no">03.4</span>
+      <div class="main">
+        <a class="name" href="../jobmap/">학과 진로 지도</a>
+        <div class="body" id="pb4"><img class="thumb" src="../hub/shots/jobmap-cover.webp" alt="학과 진로 지도" width="1200" height="630" loading="lazy"><p>한 문항씩 넘기는 101문항 진로 검사로 흥미가 겹치는 직무, 준비 상태, 이번 학기 할 일을 보여 줘요.</p></div>
+      </div>
+      <span class="meta"><span class="cat">진로</span><span class="kind">검사</span></span>
+      <button class="tog" type="button" aria-expanded="false" aria-controls="pb4" aria-label="학과 진로 지도 자세히"></button>
+    </li>
+    <li data-shot="../hub/shots/ffb-cover.webp">
+      <span class="no">03.5</span>
+      <div class="main">
+        <a class="name" href="../ffb-wheel/">레이싱 휠</a>
+        <div class="body" id="pb5"><img class="thumb" src="../hub/shots/ffb-cover.webp" alt="포스 피드백 레이싱 휠 발표 첫 장" width="1280" height="721" loading="lazy"><p>창공설 팀, 아두이노로 만드는 포스 피드백 레이싱 휠. 발표 자료와 <a href="../ffb-wheel/sim/">3D 설계도</a>, <a href="../ffb-wheel/srs-review/">SRS 첨삭</a>.</p></div>
+      </div>
+      <span class="meta"><span class="cat">팀 과제</span><span class="kind">아두이노</span></span>
+      <button class="tog" type="button" aria-expanded="false" aria-controls="pb5" aria-label="레이싱 휠 자세히"></button>
+    </li>
+  </ol>
+  <figure class="cursor" id="cursor" aria-hidden="true"><img alt="" width="1280" height="800"></figure>
+</section>
+
+<section class="etc" id="etc" data-n="04" data-t="기타" aria-labelledby="h-etc">
+  <div class="head">
+    <span class="lab rise">04 — Notes</span>
+    <h2 id="h-etc" class="rise">기타</h2>
+    <p class="rise" style="--i:1">진로 고민, 학교 제도 조사, 노트북 관리처럼 그때그때 정리한 것들.</p>
+  </div>
+  <div class="log">
+    <a href="../free-claude-code/" data-shot="../hub/shots/fcc.webp" class="on"><span class="d">10.31</span><b>무료 모델 Claude Code</b><span class="k">도구 설정</span><img src="../hub/shots/fcc.webp" alt="" width="1280" height="800" loading="lazy"><span class="ic" data-icon="arrow-right">→</span></a>
+    <a href="../storage/" data-shot="../hub/shots/storage.webp"><span class="d">10.31</span><b>노트북 저장공간 정리</b><span class="k">정리 제안</span><img src="../hub/shots/storage.webp" alt="" width="1280" height="800" loading="lazy"><span class="ic" data-icon="arrow-right">→</span></a>
+    <a href="../career/" data-shot="../hub/shots/career.webp"><span class="d">10.29</span><b>나의 적성과 취업 방향</b><span class="k">진로</span><img src="../hub/shots/career.webp" alt="" width="1280" height="800" loading="lazy"><span class="ic" data-icon="arrow-right">→</span></a>
+    <a href="../career/portfolio.html" data-shot="../hub/shots/portfolio.webp"><span class="d">10.29</span><b>포트폴리오 설계</b><span class="k">진로</span><img src="../hub/shots/portfolio.webp" alt="" width="1280" height="800" loading="lazy"><span class="ic" data-icon="arrow-right">→</span></a>
+    <a href="../internship/" data-shot="../hub/shots/intern.webp"><span class="d">10.29</span><b>표준 현장실습학기제 한눈에</b><span class="k">조사 정리</span><img src="../hub/shots/intern.webp" alt="" width="1280" height="800" loading="lazy"><span class="ic" data-icon="arrow-right">→</span></a>
+  </div>
+  <figure class="pane" aria-hidden="true"><img id="pane" src="../hub/shots/fcc.webp" alt="" width="1280" height="800" loading="lazy"><figcaption class="lab ko" id="paneCap">10.31 · 도구 설정</figcaption></figure>
+</section>
+</main>
+
+<footer class="end dark">
+  <div class="grid">
+    <ol>
+      <li><a href="#game"><span>01</span>게임 도록 두 편<span class="ic" data-icon="arrow-right">→</span></a></li>
+      <li><a href="#study"><span>02</span>공부 도구 다섯 가지<span class="ic" data-icon="arrow-right">→</span></a></li>
+      <li><a href="#make"><span>03</span>프로젝트 다섯<span class="ic" data-icon="arrow-right">→</span></a></li>
+      <li><a href="#etc"><span>04</span>그때그때 정리 다섯<span class="ic" data-icon="arrow-right">→</span></a></li>
+    </ol>
+    <div class="side">
+      <p>새 작업이 생기면 칸에 하나씩 더합니다.</p>
+      <p><a href="#top">맨 위로</a></p>
+    </div>
+  </div>
+  <p class="word" aria-hidden="true">창업실</p>
+</footer>
+
+<script>
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+
+// 오늘 공부할 차례: 매일 AI 공부의 완료 기록에서 아직 안 끝낸 첫 레슨 (마키에도 같은 제목)
+Promise.all([
+  fetch("../daily/lessons.json").then(r => r.json()),
+  fetch("https://script.google.com/macros/s/AKfycbxhsQA5ijXl4AtQ4kECjZCs0ZXeBAfJqVousGYJ6lEV7aZ7Saqxi8WFoAqleaTsxaTM/exec").then(r => r.json()).catch(() => ({ done: [] }))
+]).then(([data, j]) => {
+  const done = new Set(j.done || []), L = data.lessons, x = L.find(l => !done.has(l.id));
+  const btn = $("#today"), note = $("#todayNote");
+  if (!x) { note.innerHTML = `준비된 <b>${L.length}개</b>를 모두 끝냈어요.`; return; }
+  btn.href = $("#ticker").href = "../daily/?d=" + x.id;
+  btn.firstChild.textContent = `D${x.id} 공부하기 `;
+  note.innerHTML = `오늘 차례: <b>${x.title}</b><br>${L.length}개 중 ${done.size}개 끝냄`;
+  $("#ticker").setAttribute("aria-label", `오늘 차례 D${x.id} ${x.title} 공부하기`);
+  $$("#ticker .row > span").forEach(s => s.innerHTML = `<i>D${x.id}</i>${x.title}`);
+}).catch(() => {});
+
+// 왼쪽 목차: 지금 칸 번호와 스크롤 진행
+const secs = $$("main section[data-n]"), navs = $$(".rail nav a"), prog = $("#prog");
+function where() {
+  const y = innerHeight * .4;
+  let k = -1; secs.forEach((s, i) => { if (s.getBoundingClientRect().top <= y) k = i; });
+  navs.forEach((a, i) => a.setAttribute("aria-current", i === k));
+  $("#count").firstChild.textContent = (k < 0 ? "00" : secs[k].dataset.n) + " ";
+  $("#where").textContent = k < 0 ? "처음" : secs[k].dataset.t;
+  const H = document.documentElement.scrollHeight - innerHeight;
+  prog.style.setProperty("--p", H > 0 ? scrollY / H : 0);
+}
+addEventListener("scroll", where, { passive: true }); addEventListener("resize", where); where();
+
+// 게임: 가로 스냅 넘기기
+const reel = $("#reel"), works = $$(".work"), names = ["넋굿", "브라운 로그"];
+$("#reelbar").classList.add("on");
+function reelState() {
+  const max = reel.scrollWidth - reel.clientWidth;
+  const k = reel.scrollLeft > max / 2 ? 1 : 0;
+  $("#reelpos").innerHTML = `<b>0${k + 1}</b> / 02 ${names[k]}`;
+  $("#prev").disabled = reel.scrollLeft < 4; $("#next").disabled = reel.scrollLeft > max - 4;
+}
+reel.addEventListener("scroll", reelState, { passive: true }); reelState();
+$("#next").onclick = () => reel.scrollBy({ left: works[0].offsetWidth, behavior: "smooth" });
+$("#prev").onclick = () => reel.scrollBy({ left: -works[0].offsetWidth, behavior: "smooth" });
+
+// 공부: 화면 가운데에 온 도구로 오른쪽 그림이 바뀐다
+const tools = $$(".tool"), frames = $$(".stage .frames a");
+const tio = new IntersectionObserver(es => es.forEach(e => {
+  if (!e.isIntersecting) return;
+  const k = +e.target.dataset.k;
+  tools.forEach((t, i) => t.classList.toggle("on", i === k));
+  frames.forEach((f, i) => f.classList.toggle("on", i === k));
+  $("#stageName").textContent = tools[k].querySelector(".n").textContent.split("· ")[1];
+  $("#stageNo").textContent = `0${k + 1} / 05`;
+}), { rootMargin: "-45% 0px -45% 0px" });
+tools.forEach(t => tio.observe(t));
+
+// 프로젝트: 데스크톱은 커서를 따라오는 그림, 폰은 눌러서 펼치기
+const cur = $("#cursor"), curImg = cur.querySelector("img"), fine = matchMedia("(hover: hover) and (pointer: fine) and (min-width: 901px)");
+let cx = 0, cy = 0, tx = 0, ty = 0, raf = 0;
+function follow() { cx += (tx - cx) * .25; cy += (ty - cy) * .25; cur.style.transform = `translate(${cx}px, ${cy}px)`; raf = Math.abs(tx - cx) + Math.abs(ty - cy) > .5 ? requestAnimationFrame(follow) : 0; }
+$$(".proj > li").forEach(li => {
+  li.addEventListener("mouseenter", e => {
+    if (!fine.matches) return;
+    curImg.src = li.dataset.shot;
+    cx = tx = Math.min(e.clientX + 24, innerWidth - 340); cy = ty = e.clientY - 236;
+    cur.style.transform = `translate(${cx}px, ${cy}px)`; cur.classList.add("on");
+  });
+  li.addEventListener("mousemove", e => { tx = Math.min(e.clientX + 24, innerWidth - 340); ty = e.clientY - 236; if (!raf) raf = requestAnimationFrame(follow); });
+  li.addEventListener("mouseleave", () => cur.classList.remove("on"));
+  const b = li.querySelector(".tog");
+  b.onclick = () => { const o = li.classList.toggle("open"); b.setAttribute("aria-expanded", o); };
+});
+
+// 기타: 올린 행의 그림이 오른쪽 칸에
+const pane = $("#pane"), paneCap = $("#paneCap"), logs = $$(".log a");
+logs.forEach(a => {
+  const set = () => {
+    if (a.classList.contains("on")) return;
+    logs.forEach(x => x.classList.toggle("on", x === a));
+    pane.src = a.dataset.shot; paneCap.textContent = a.querySelector(".d").textContent + " · " + a.querySelector(".k").textContent;
+    pane.animate([{ opacity: .3, transform: "translateY(8px)" }, { opacity: 1, transform: "none" }], { duration: 260, easing: "cubic-bezier(.2,.7,.2,1)" });
+  };
+  a.addEventListener("mouseenter", set); a.addEventListener("focus", set);
+});
+
+// 들어올 때 짧게 떠오르기
+const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { rootMargin: "0px 0px -8% 0px" });
+$$(".rise").forEach(el => io.observe(el));
+</script>
+</body>
+</html>

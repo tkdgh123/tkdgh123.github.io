@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Adam · Paper Seminar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@300;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<style>
+:root{
+  --bg:#ffffff;--soft:#f3f5f8;--ink:#101418;--sub:#4a525c;--mute:#6b737d;--rule:#dfe3e8;
+  --blue:#2a78d6;--blue-soft:#e8f1fc;--orange:#eb6834;
+  --serif:"Hahmlet",Georgia,serif;--sans:"Pretendard",-apple-system,"Malgun Gothic",sans-serif;--mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#121418;--soft:#1b1f25;--ink:#eef1f4;--sub:#b8c0c9;--mute:#8d96a0;--rule:#2c323a;
+  --blue:#3987e5;--blue-soft:#18263a;--orange:#d95926;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121418;--soft:#1b1f25;--ink:#eef1f4;--sub:#b8c0c9;--mute:#8d96a0;--rule:#2c323a;
+  --blue:#3987e5;--blue-soft:#18263a;--orange:#d95926;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.75 var(--sans);word-break:keep-all;overflow-wrap:break-word;
+  padding-inline:max(16px,env(safe-area-inset-left,0px))}
+a{color:var(--blue)}
+img{max-width:100%;display:block}
+
+/* 위 막대 */
+.bar{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);
+  margin-inline:calc(-1 * max(16px,env(safe-area-inset-left,0px)));padding:10px max(16px,env(safe-area-inset-left,0px));border-bottom:1px solid var(--rule)}
+.bar .in{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.home{font:600 13px var(--mono);color:var(--mute);text-decoration:none}
+.tabs{display:flex;gap:4px;margin-left:auto;background:var(--soft);border-radius:999px;padding:4px}
+.tabs button{font:600 14px var(--sans);border:0;background:none;color:var(--sub);padding:6px 16px;border-radius:999px;cursor:pointer}
+.tabs button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+
+.wrap{max-width:1080px;margin:0 auto;padding-block:48px 96px}
+
+/* 표지 */
+.hero{display:grid;grid-template-columns:repeat(12,1fr);gap:24px;align-items:end;padding-bottom:40px;border-bottom:2px solid var(--ink)}
+.hero .k{grid-column:1/-1;font:600 12px var(--mono);letter-spacing:.08em;color:var(--mute);text-transform:uppercase}
+.hero h1{grid-column:1/8;margin:0;font:300 clamp(64px,13vw,150px)/.9 var(--serif);letter-spacing:-.03em}
+.hero h1 b{font-weight:700}
+.hero .meta{grid-column:8/13;font-size:15px;color:var(--sub)}
+.hero .meta strong{display:block;color:var(--ink);font:700 19px/1.4 var(--serif);margin-bottom:6px}
+.hero .meta span{font-family:var(--mono);font-size:13px}
+.core{margin-top:32px;display:grid;grid-template-columns:repeat(12,1fr);gap:24px;align-items:center}
+.core .f{grid-column:1/7;background:var(--blue-soft);border-radius:14px;padding:28px 24px;font-size:clamp(20px,3vw,28px);text-align:center;overflow-x:auto}
+.core p{grid-column:7/13;margin:0;font:300 clamp(22px,2.8vw,30px)/1.45 var(--serif)}
+.core p b{font-weight:700}
+
+/* 본문 두 단: 목차 + 내용 */
+.body{display:grid;grid-template-columns:200px 1fr;gap:56px;margin-top:56px}
+.toc{position:sticky;top:84px;align-self:start;font-size:14px}
+.toc a{display:flex;gap:10px;padding:5px 0;color:var(--sub);text-decoration:none}
+.toc a i{font:600 12px/2 var(--mono);font-style:normal;color:var(--mute);width:22px}
+.toc a.on{color:var(--ink);font-weight:600}
+.toc a.on i{color:var(--blue)}
+main,.hero>*,.core>*,.fig>*,.steps li>*{min-width:0}
+main section{padding-bottom:64px}
+.no{font:600 13px var(--mono);color:var(--blue);letter-spacing:.06em}
+h2{font:300 clamp(28px,4vw,40px)/1.25 var(--serif);margin:4px 0 20px}
+h2 b{font-weight:700}
+h3{font:700 18px/1.4 var(--sans);margin:28px 0 8px}
+p{margin:0 0 14px}
+.src{font:400 12.5px var(--mono);color:var(--mute)}
+.lead{font-size:18px;color:var(--sub);max-width:60ch}
+.eq{background:var(--soft);border-radius:12px;padding:18px 20px;margin:16px 0;overflow-x:auto;font-size:18px}
+.q{border-left:3px solid var(--blue);padding:4px 0 4px 16px;color:var(--sub);font-size:15px;margin:16px 0}
+.q em{font-style:normal;font-family:var(--mono);font-size:13.5px;color:var(--ink)}
+
+/* 세 부분 */
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:20px 0}
+.three>div{background:var(--soft);border-radius:12px;padding:18px}
+.three .big{font-size:26px;margin-bottom:6px}
+.three b{display:block;font-size:17px}
+.three small{color:var(--sub);font-size:14px;line-height:1.6;display:block;margin-top:4px}
+.three .r{background:var(--ink);color:var(--bg)}
+.three .r small{color:color-mix(in srgb,var(--bg) 75%,var(--ink))}
+
+/* 표 */
+.tw{overflow-x:auto;margin:16px 0}
+table{border-collapse:collapse;width:100%;font-size:15px;min-width:560px}
+th,td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font:600 12px var(--mono);color:var(--mute);letter-spacing:.04em;border-bottom:2px solid var(--ink)}
+td.m{white-space:nowrap;font-size:16px}
+td .s{color:var(--mute);font-size:13px}
+tr.hl td{background:var(--blue-soft)}
+.y{color:var(--blue);font-weight:700}.n{color:var(--mute)}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.chips span{font:400 14px var(--mono);background:var(--soft);border-radius:999px;padding:4px 12px}
+
+/* 그래프 */
+.viz{background:var(--soft);border-radius:14px;padding:20px;margin:20px 0}
+.pick{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.pick button{font:600 14px var(--sans);border:1px solid var(--rule);background:var(--bg);color:var(--ink);padding:7px 14px;border-radius:999px;cursor:pointer}
+.pick button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.legend{display:flex;gap:18px;flex-wrap:wrap;font-size:14px;color:var(--sub);margin-bottom:6px}
+.legend i{display:inline-block;width:18px;height:2px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.plot{position:relative}
+.plot svg{width:100%;height:auto;display:block;touch-action:pan-y}
+.plot .grid line{stroke:var(--rule);stroke-width:1}
+.plot text{fill:var(--mute);font:11px var(--mono)}
+.tip{position:absolute;pointer-events:none;background:var(--bg);border:1px solid var(--rule);border-radius:8px;padding:6px 10px;font-size:13px;white-space:nowrap;box-shadow:0 4px 14px rgb(0 0 0/.08)}
+.tip i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+.stat{display:flex;gap:28px;flex-wrap:wrap;margin-top:12px}
+.stat div{font-size:14px;color:var(--sub)}
+.stat b{display:block;font:700 26px var(--serif);color:var(--ink)}
+
+/* 성질 */
+.props{counter-reset:p;display:grid;gap:4px;margin-top:8px}
+.props>div{display:grid;grid-template-columns:56px 1fr;gap:16px;padding:18px 0;border-top:1px solid var(--rule)}
+.props>div::before{counter-increment:p;content:counter(p);font:700 34px/1 var(--serif);color:var(--blue)}
+.props h3{margin:0 0 6px}
+.props p{margin:0;color:var(--sub)}
+
+/* 실험 */
+.figs{display:grid;gap:28px;margin-top:12px}
+.fig{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:center}
+.fig.w{grid-template-columns:1fr}
+.fig .img{background:#fff;border-radius:12px;padding:12px;border:1px solid var(--rule)}
+.fig h3{margin-top:0}
+.fig p{color:var(--sub);margin:0}
+
+/* 질문 */
+details{border-top:1px solid var(--rule);padding:14px 0}
+details:last-of-type{border-bottom:1px solid var(--rule)}
+summary{font-weight:700;cursor:pointer;list-style:none;display:flex;gap:12px}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"Q";font:600 14px/1.9 var(--mono);color:var(--blue)}
+details p{margin:10px 0 0 26px;color:var(--sub)}
+
+dl{display:grid;grid-template-columns:auto 1fr;gap:10px 20px;margin:0}
+dt{font-weight:700;white-space:nowrap}
+dd{margin:0;color:var(--sub)}
+
+/* 발표 순서 */
+.talk-h{display:flex;align-items:end;justify-content:space-between;gap:24px;flex-wrap:wrap;border-bottom:2px solid var(--ink);padding-bottom:28px}
+.talk-h h1{margin:0;font:300 clamp(40px,7vw,72px)/1 var(--serif)}
+.talk-h h1 b{font-weight:700}
+.talk-h p{margin:0;color:var(--sub);max-width:36ch}
+.dl{display:grid;gap:12px;justify-items:start}
+.ppt{font:600 14px var(--sans);background:var(--blue);color:#fff;text-decoration:none;padding:9px 18px;border-radius:999px}
+.time{display:flex;height:10px;border-radius:999px;overflow:hidden;gap:2px;margin:28px 0 8px}
+.time span{background:var(--rule)}
+
+.steps{list-style:none;margin:0;padding:0}
+.steps li{display:grid;grid-template-columns:120px 1fr;gap:28px;padding:26px 0;border-bottom:1px solid var(--rule)}
+.steps .t{font:600 15px var(--mono)}
+.steps .t small{display:block;color:var(--mute);font-weight:400;font-size:12px;margin-top:2px}
+.steps h3{margin:0 0 10px;font:700 22px/1.35 var(--serif)}
+.steps .show{font-size:14px;color:var(--mute);margin:0 0 10px}
+.steps .show b{color:var(--ink);font-weight:600}
+.steps .say{margin:0;font-size:17px;background:var(--soft);border-radius:12px;padding:14px 16px}
+.steps .say::before{content:"할 말";display:block;font:600 11px var(--mono);color:var(--blue);letter-spacing:.08em;margin-bottom:4px}
+.steps .go{display:inline-block;margin-top:10px;font-size:14px;font-weight:600;text-decoration:none}
+.end{margin-top:40px;background:var(--ink);color:var(--bg);border-radius:16px;padding:28px}
+.end small{font:600 12px var(--mono);letter-spacing:.08em;opacity:.7}
+.end p{margin:8px 0 0;font:300 clamp(22px,3vw,30px)/1.45 var(--serif)}
+.end p b{font-weight:700}
+
+@media (max-width:860px){
+  .hero h1,.hero .meta,.core .f,.core p{grid-column:1/-1}
+  .body{grid-template-columns:1fr;gap:0}
+  .toc{display:none}
+  .three{grid-template-columns:1fr}
+  .fig{grid-template-columns:1fr}
+  .steps li{grid-template-columns:1fr;gap:8px}
+}
+</style>
+</head>
+<body>
+
+<div class="bar"><div class="in">
+  <a class="home" href="../">← 창업실</a>
+  <div class="tabs" role="group" aria-label="보기">
+    <button type="button" data-t="read" aria-pressed="true">내용 정리</button>
+    <button type="button" data-t="talk" aria-pressed="false">발표 순서</button>
+  </div>
+</div></div>
+
+<!-- ───────────── 내용 정리 ───────────── -->
+<div class="wrap" id="read">
+  <header class="hero">
+    <div class="k">인공지능입문 · Paper Seminar</div>
+    <h1><b>Adam</b></h1>
+    <div class="meta">
+      <strong>Adam: A Method for Stochastic Optimization</strong>
+      Diederik P. Kingma, Jimmy Lei Ba<br>
+      <span>ICLR 2015 · <a href="https://arxiv.org/abs/1412.6980">arXiv 1412.6980</a></span>
+    </div>
+  </header>
+  <div class="core">
+    <div class="f">$$\Delta_t=\alpha\cdot\frac{\hat m_t}{\sqrt{\hat v_t}}$$</div>
+    <p>기울기의 <b>평균</b>을 기울기의 <b>크기</b>로 나눈 만큼, 매개변수마다 따로 움직인다.</p>
+  </div>
+
+  <div class="body">
+    <nav class="toc" aria-label="목차">
+      <a href="#s1"><i>01</i>출발점</a>
+      <a href="#s2"><i>02</i>관통하는 개념</a>
+      <a href="#s3"><i>03</i>알고리즘</a>
+      <a href="#s4"><i>04</i>숫자로 보기</a>
+      <a href="#s5"><i>05</i>따라 나오는 성질</a>
+      <a href="#s6"><i>06</i>이전 방법과의 관계</a>
+      <a href="#s7"><i>07</i>실험</a>
+      <a href="#s8"><i>08</i>한계와 그 뒤</a>
+      <a href="#s9"><i>09</i>예상 질문</a>
+      <a href="#s10"><i>10</i>용어</a>
+    </nav>
+
+    <main>
+      <section id="s1">
+        <div class="no">01 · 출발점</div>
+        <h2>수업에서 본 경사 하강법, <b>걸음 폭이 문제</b></h2>
+        <p class="lead">lec4-1 25쪽(Gradient Descent and Newton-Raphson)에 나온 식이에요.</p>
+        <div class="eq">$$x \leftarrow x-\alpha\,\nabla f(x)\qquad\qquad x \leftarrow x-H_f^{-1}\,\nabla f(x)$$</div>
+        <div class="tw"><table>
+          <tr><th>방법</th><th>걸음 폭</th><th>문제</th></tr>
+          <tr><td><b>경사 하강법</b></td><td>α 하나를 모든 매개변수가 같이 씀</td><td>기울기가 큰 매개변수와 작은 매개변수를 한 α로 맞출 수 없어요. 미니배치마다 기울기가 흔들려요.</td></tr>
+          <tr><td><b>Newton-Raphson</b></td><td>헤세 행렬의 역행렬 \(H_f^{-1}\)</td><td>매개변수가 n개면 n×n 행렬이에요. 수백만 개면 계산할 수 없어요.</td></tr>
+        </table></div>
+        <p><b>논문의 질문:</b> 기울기만 가지고 매개변수마다 걸음 폭을 맞출 수 없을까?</p>
+      </section>
+
+      <section id="s2">
+        <div class="no">02 · 관통하는 개념</div>
+        <h2>평균 ÷ 크기 = <b>얼마나 확신하는가</b></h2>
+        <div class="three">
+          <div><div class="big">\(\hat m_t\)</div><b>방향 · 신호</b><small>최근 기울기의 평균<br>1차 모멘트</small></div>
+          <div><div class="big">\(\sqrt{\hat v_t}\)</div><b>흔들림 크기</b><small>최근 기울기 제곱의 평균, 그 제곱근<br>2차 모멘트</small></div>
+          <div class="r"><div class="big">\(\hat m_t/\sqrt{\hat v_t}\)</div><b>신호 대 잡음비 (SNR)</b><small>방향이 일정하면 1에 가깝고, 들쭉날쭉하면 0에 가까워요</small></div>
+        </div>
+        <p>이 비율에 α를 곱한 값이 실제로 움직이는 양이에요. 방향이 확실하면 크게, 불확실하면 작게 움직여요.</p>
+        <p>이름도 여기서 나왔어요. <b>Ada</b>ptive <b>M</b>oment estimation, 기울기의 모멘트를 추정해서 걸음을 맞춘다는 뜻이에요.</p>
+        <div class="q">“we will call the ratio <em>m̂t/√v̂t</em> the signal-to-noise ratio (SNR). With a smaller SNR the effective stepsize Δt will be closer to zero.”<br><span class="src">2.1절</span></div>
+      </section>
+
+      <section id="s3">
+        <div class="no">03 · 알고리즘</div>
+        <h2>Algorithm 1, <b>다섯 줄</b></h2>
+        <div class="tw"><table>
+          <tr><th>#</th><th>식</th><th>뜻</th></tr>
+          <tr><td>1</td><td class="m">\(g_t=\nabla_\theta f_t(\theta_{t-1})\)</td><td>이번 미니배치에서 기울기를 구해요</td></tr>
+          <tr><td>2</td><td class="m">\(m_t=\beta_1 m_{t-1}+(1-\beta_1)\,g_t\)</td><td>기울기의 평균을 이어서 갱신해요 <span class="s">(지수이동평균)</span></td></tr>
+          <tr><td>3</td><td class="m">\(v_t=\beta_2 v_{t-1}+(1-\beta_2)\,g_t^2\)</td><td>기울기 제곱의 평균을 이어서 갱신해요</td></tr>
+          <tr><td>4</td><td class="m">\(\hat m_t=\dfrac{m_t}{1-\beta_1^t},\ \hat v_t=\dfrac{v_t}{1-\beta_2^t}\)</td><td>0에서 시작해 작게 나온 값을 바로잡아요 <span class="s">(편향 보정)</span></td></tr>
+          <tr class="hl"><td>5</td><td class="m">\(\theta_t=\theta_{t-1}-\alpha\,\dfrac{\hat m_t}{\sqrt{\hat v_t}+\epsilon}\)</td><td>비율만큼 움직여요</td></tr>
+        </table></div>
+        <div class="chips"><span>α = 0.001</span><span>β₁ = 0.9</span><span>β₂ = 0.999</span><span>ε = 10⁻⁸</span></div>
+        <p>논문이 제시한 기본값이에요. 모든 계산은 원소별로 해서, 매개변수마다 자기만의 m, v, 걸음 폭을 가져요. 더 저장하는 건 m과 v 두 벡터뿐이에요.</p>
+      </section>
+
+      <section id="s4">
+        <div class="no">04 · 숫자로 보기</div>
+        <h2>같은 α, <b>다른 걸음</b></h2>
+        <div class="tw"><table>
+          <tr><th>최근 기울기</th><th>m̂ (평균)</th><th>√v̂ (크기)</th><th>비율</th><th>결과</th></tr>
+          <tr><td>+2, +2, +2, …</td><td>2</td><td>2</td><td><b>1</b></td><td>α만큼 성큼</td></tr>
+          <tr><td>+2, −2, +2, −2, …</td><td>≈ 0.1</td><td>2</td><td><b>≈ 0.05</b></td><td>거의 제자리</td></tr>
+          <tr><td>+0.002, +0.002, …</td><td>0.002</td><td>0.002</td><td><b>1</b></td><td>작은 기울기도 α만큼</td></tr>
+        </table></div>
+        <p>기울기를 직접 바꿔 보세요. 세로축은 한 걸음 크기를 α 단위로 잰 값이에요(β 기본값, 100걸음).</p>
+        <div class="viz">
+          <div class="pick" id="pick" role="group" aria-label="기울기 모양">
+            <button type="button" data-p="0" aria-pressed="true">방향 일정 (+2)</button>
+            <button type="button" data-p="1" aria-pressed="false">번갈아 (±2)</button>
+            <button type="button" data-p="2" aria-pressed="false">아주 작게 일정 (+0.002)</button>
+            <button type="button" data-p="3" aria-pressed="false">잡음 섞임 (평균 0.5)</button>
+          </div>
+          <div class="legend"><span><i style="background:var(--blue)"></i>Adam (편향 보정 있음)</span><span><i style="background:var(--orange)"></i>편향 보정 없음</span></div>
+          <div class="plot" id="plot"><div class="tip" id="tip" hidden></div></div>
+          <div class="stat" id="stat"></div>
+        </div>
+        <p>“아주 작게 일정”을 눌러도 그래프가 “방향 일정”과 똑같아요. 기울기에 c를 곱하면 m̂은 c배, √v̂도 c배라서 비율이 그대로이기 때문이에요.</p>
+      </section>
+
+      <section id="s5">
+        <div class="no">05 · 따라 나오는 성질</div>
+        <h2>비율 하나에서 <b>네 가지</b>가 나와요</h2>
+        <div class="props">
+          <div><div><h3>한 걸음은 대략 α를 넘지 않아요</h3><p>비율이 보통 ±1 안쪽이라 \(|\Delta_t|\lessapprox\alpha\)예요. 논문은 α를 “여기까지는 믿고 가도 되는 범위(trust region)”로 봐요. 그래서 α를 미리 정하기 쉬워요. <span class="src">2.1절</span></p></div></div>
+          <div><div><h3>최적점 근처에서 저절로 느려져요</h3><p>최적점에 가까워지면 기울기 방향이 흔들려 비율이 0에 가까워져요. 논문은 이걸 “자동 담금질(automatic annealing)”이라고 불러요. <span class="src">2.1절</span></p></div></div>
+          <div><div><h3>기울기 크기에 상관없어요</h3><p>\((c\,\hat m_t)/\sqrt{c^2\,\hat v_t}=\hat m_t/\sqrt{\hat v_t}\). 층마다 기울기 크기가 크게 달라도 같은 α로 돼요. <span class="src">2.1절</span></p></div></div>
+          <div><div><h3>편향 보정이 첫 걸음을 지켜요</h3><p>m과 v가 0에서 시작해서 처음엔 둘 다 작게 나와요. 기울기 2로 첫 걸음을 하면 \(m_1=0.2\), \(v_1=0.004\)라서 보정이 없으면 비율이 3.16이에요. 기울기가 계속 2면 12번째 걸음에서 α의 6.57배까지 커져요. 보정하면 처음부터 1이에요. <span class="src">3절 · 위 그래프 주황 선</span></p></div></div>
+        </div>
+      </section>
+
+      <section id="s6">
+        <div class="no">06 · 이전 방법과의 관계</div>
+        <h2>AdaGrad와 RMSProp의 <b>장점을 합쳤어요</b></h2>
+        <div class="tw"><table>
+          <tr><th>방법</th><th>방향 기억 (1차)</th><th>매개변수별 걸음 (2차)</th><th>편향 보정</th><th>논문이 말한 특징</th></tr>
+          <tr><td><b>SGD</b></td><td class="n">–</td><td class="n">–</td><td class="n">–</td><td>α 하나로 전부</td></tr>
+          <tr><td><b>모멘텀 SGD</b></td><td class="y">○</td><td class="n">–</td><td class="n">–</td><td>이전 방향을 관성처럼 이어 감</td></tr>
+          <tr><td><b>AdaGrad</b></td><td class="n">–</td><td class="y">○ (전부 누적)</td><td class="n">–</td><td>드문드문 나오는(희소한) 기울기에 강함</td></tr>
+          <tr><td><b>RMSProp</b></td><td class="n">–</td><td class="y">○ (최근 위주)</td><td class="n">–</td><td>목표가 계속 바뀌는 문제에 강함</td></tr>
+          <tr class="hl"><td><b>Adam</b></td><td class="y">○</td><td class="y">○</td><td class="y">○</td><td>위 둘의 장점을 합침</td></tr>
+        </table></div>
+        <p><b>AdaGrad</b>는 Adam에서 β₁ = 0, β₂를 1에 아주 가깝게, α를 \(\alpha/\sqrt t\)로 줄여 가게 둔 특수한 경우예요. <span class="src">5절</span></p>
+        <p><b>RMSProp</b>에는 편향 보정이 없어요. β₂가 1에 가까우면 걸음이 아주 커져 발산하기도 해요. <span class="src">5절 · 6.4절</span></p>
+      </section>
+
+      <section id="s7">
+        <div class="no">07 · 실험</div>
+        <h2>네 가지 실험, <b>원문 그림</b></h2>
+        <div class="figs">
+          <div class="fig w">
+            <div class="img"><img src="img/fig1.webp" alt="로지스틱 회귀 학습 비용, 왼쪽 MNIST, 오른쪽 IMDB" width="1083" height="520"></div>
+            <div><h3>6.1 로지스틱 회귀 · MNIST, IMDB</h3><p>MNIST에선 Adam이 모멘텀 SGD만큼 빠르고 AdaGrad보다 빨라요(왼쪽). 단어 1만 개짜리 희소한 IMDB 리뷰에선 AdaGrad만큼 빨라요(오른쪽).</p><p class="src">Figure 1</p></div>
+          </div>
+          <div class="fig w">
+            <div class="img"><img src="img/fig2.webp" alt="MNIST 다층 신경망 학습 비용, (a) dropout 사용 (b) SFO와 비교" width="1083" height="550"></div>
+            <div><h3>6.2 다층 신경망 · MNIST</h3><p>은닉층 2개(1000개씩)예요. (a) dropout을 넣으면 자홍색 Adam이 AdaGrad, RMSProp, SGD+Nesterov, AdaDelta보다 낮게 내려가요. (b) 2차 정보를 쓰는 SFO와 비교하면 초록 Adam이 반복 수와 시간 모두 빨라요(SFO는 한 번 반복에 5~10배 느림).</p><p class="src">Figure 2</p></div>
+          </div>
+          <div class="fig w">
+            <div class="img"><img src="img/fig3.webp" alt="CIFAR-10 CNN 학습 비용, 왼쪽 처음 3 epoch, 오른쪽 45 epoch" width="1083" height="514"></div>
+            <div><h3>6.3 합성곱 신경망 · CIFAR-10</h3><p>처음엔 Adam과 AdaGrad가 빨리 내려가지만(왼쪽), 45 epoch에서는 Adam과 SGD가 AdaGrad보다 훨씬 낮아요(오른쪽). SGD보다 조금 나은 정도지만, 층마다 학습률을 사람이 고를 필요가 없어요.</p><p class="src">Figure 3</p></div>
+          </div>
+          <div class="fig w">
+            <div class="img"><img src="img/fig4.webp" alt="VAE 학습 손실, 빨강 편향 보정 있음, 초록 없음, β 조합별" width="1083" height="423"></div>
+            <div><h3>6.4 편향 보정 · VAE</h3><p>칸마다 β₁, β₂ 조합이 다르고 가로축은 log₁₀ α예요. 빨강이 보정 있음, 초록이 없음이에요. β₂가 1에 가까우면 보정 없는 쪽이 특히 초반(10 epoch)에 튀어요. 하이퍼파라미터를 어떻게 잡아도 Adam이 RMSProp보다 같거나 나았어요.</p><p class="src">Figure 4</p></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="s8">
+        <div class="no">08 · 한계와 그 뒤</div>
+        <h2>지금도 <b>기본 최적화기</b></h2>
+        <div class="tw"><table>
+          <tr><th>무엇</th><th>내용</th><th>출처</th></tr>
+          <tr><td><b>수렴 증명 오류</b></td><td>4절의 수렴 증명에 틀린 곳이 있었어요. Adam이 수렴하지 않는 간단한 예를 보이고, v̂의 최댓값을 유지하는 AMSGrad를 제안했어요.</td><td class="src">Reddi 외, ICLR 2018<br>On the Convergence of Adam and Beyond</td></tr>
+          <tr><td><b>가중치 감쇠</b></td><td>Adam에 L2 정규화를 넣으면 가중치 감쇠와 같아지지 않아요. 둘을 떼어 낸 AdamW가 나왔어요.</td><td class="src">Loshchilov·Hutter, ICLR 2019<br>Decoupled Weight Decay Regularization</td></tr>
+          <tr><td><b>CNN에서의 한계</b></td><td>몇 epoch 뒤 v̂가 0에 가까워져 ε이 걸음을 좌우했어요. 이때는 2차 모멘트보다 1차 모멘트가 속도를 냈어요.</td><td class="src">이 논문 6.3절</td></tr>
+          <tr><td><b>그 뒤의 쓰임</b></td><td>Transformer 원논문(Attention Is All You Need)도 Adam으로 학습했어요.</td><td class="src">Vaswani 외, NeurIPS 2017</td></tr>
+        </table></div>
+      </section>
+
+      <section id="s9">
+        <div class="no">09 · 예상 질문</div>
+        <h2>질문이 오면 <b>이렇게</b></h2>
+        <details><summary>SGD에서 학습률만 잘 고르면 되지 않나요?</summary><p>매개변수마다 기울기 크기가 다르면 α 하나로는 다 맞출 수 없어요. CNN은 층마다 기울기 차이가 커서 SGD로는 층별 학습률을 사람이 정하기도 해요(6.3절). Adam은 α가 “한 걸음의 상한”이라는 뜻이 있어서 고르기도 쉬워요.</p></details>
+        <details><summary>왜 “신호 대 잡음비”라고 부르나요?</summary><p>\(|E[g]|/\sqrt{E[g^2]}\le 1\)이에요. 기울기가 늘 같은 방향이면 1, 방향이 무작위로 흔들리면 0에 가까워요. 방향에 대한 확신을 재는 값이라 그렇게 불러요(2.1절).</p></details>
+        <details><summary>β₁ = 0.9, β₂ = 0.999는 왜 그 값인가요?</summary><p>논문이 실험한 문제들에서 잘 된 기본값이에요. 대략 β₁은 최근 10번쯤, β₂는 최근 1000번쯤의 기울기를 주로 반영해요. 크기 추정은 오래 볼수록 안정되고, 희소한 기울기에도 강해지려면 β₂가 1에 가까워야 해요(6.4절).</p></details>
+        <details><summary>ε은 무슨 역할인가요?</summary><p>√v̂가 0일 때 0으로 나누지 않게 넣은 아주 작은 수(10⁻⁸)예요.</p></details>
+        <details><summary>RMSProp와 뭐가 다른가요?</summary><p>두 가지예요. RMSProp(모멘텀 버전)는 크기로 나눈 기울기에 모멘텀을 걸지만, Adam은 평균과 크기를 따로 추정해 바로 나눠요. 그리고 Adam에는 편향 보정이 있어요(5절).</p></details>
+        <details><summary>수렴 증명이 틀렸다는데 지금도 쓰나요?</summary><p>네. 증명은 2018년에 고쳐졌고(AMSGrad), 실제 학습에서는 Adam과 AdamW가 여전히 가장 흔한 기본값이에요.</p></details>
+      </section>
+
+      <section id="s10">
+        <div class="no">10 · 용어</div>
+        <h2>용어</h2>
+        <dl>
+          <dt>매개변수 θ</dt><dd>모델이 학습으로 바꾸는 숫자들(가중치)</dd>
+          <dt>기울기 g</dt><dd>매개변수를 조금 바꿀 때 손실이 얼마나 바뀌는지. 내려갈 방향을 알려 줘요</dd>
+          <dt>확률적(stochastic)</dt><dd>데이터 전체 대신 일부(미니배치)로 기울기를 구해서, 매번 조금씩 흔들려요</dd>
+          <dt>지수이동평균</dt><dd>새 값을 조금 섞고 옛 값을 조금씩 잊는 평균. β가 1에 가까울수록 오래 기억해요</dd>
+          <dt>모멘트</dt><dd>1차 = 평균 E[g], 2차 = 제곱의 평균 E[g²]</dd>
+          <dt>편향 보정</dt><dd>0에서 시작한 평균이 처음에 작게 나오는 걸 (1−βᵗ)로 나눠 바로잡기</dd>
+          <dt>희소한 기울기</dt><dd>대부분 0이고 가끔만 값이 나오는 기울기. 단어 특징처럼 드물게 나오는 입력에서 생겨요</dd>
+          <dt>하이퍼파라미터</dt><dd>학습 전에 사람이 정하는 값(α, β₁, β₂, ε)</dd>
+        </dl>
+      </section>
+    </main>
+  </div>
+</div>
+
+<!-- ───────────── 발표 순서 ───────────── -->
+<div class="wrap" id="talk" hidden>
+  <div class="talk-h">
+    <h1>발표 <b>순서</b></h1>
+    <div class="dl"><p>12월 3일 · 15분 · 슬라이드 14장. 한 문장(관통하는 개념)을 처음과 끝에 두 번 말해요.</p><a class="ppt" href="Adam_PaperSeminar.pptx" download>PPT 받기</a></div>
+  </div>
+  <div class="time" id="time" aria-hidden="true"></div>
+  <ol class="steps" id="steps"></ol>
+  <div class="end">
+    <small>마지막 슬라이드에 남길 한 문장</small>
+    <p>Adam은 기울기의 <b>평균</b>을 기울기의 <b>크기</b>로 나눈 만큼 움직여요. 확실하면 크게, 불확실하면 작게, 매개변수마다 따로요.</p>
+  </div>
+</div>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'\\(',right:'\\)',display:false}]})"></script>
+<script>
+const $ = id => document.getElementById(id);
+
+// 발표 순서: [시작(초), 끝(초), 슬라이드, 제목, 보여 줄 것, 할 말(PPT 메모와 같음), 내용 칸]
+const S = [
+  [0, 40, 1, "Adam: A Method for Stochastic Optimization", "논문 제목·저자, 관통하는 한 문장", "오늘 발표할 논문은 Adam이에요. 2015년 ICLR에 실린 논문이고, 지금도 딥러닝에서 가장 많이 쓰는 최적화 방법이에요. 결론부터 말하면, Adam은 기울기의 평균을 기울기의 크기로 나눈 만큼 움직이는 방법이에요. 이 한 문장이 어떻게 논문 전체를 설명하는지 보여 드릴게요.", "s2"],
+  [40, 120, 2, "수업에서 본 경사 하강법, 걸음 폭이 문제", "경사 하강법·Newton 식 카드 두 개, 논문의 질문", "수업 4-1에서 연속 공간의 경사 하강법을 배웠어요. 기울기 반대 방향으로 α만큼 움직이는데, 이 α 하나를 모든 매개변수가 같이 써요. 그런데 매개변수마다 기울기 크기가 다르고, 미니배치로 구한 기울기는 매번 흔들려요. Newton 방법은 헤세 행렬로 걸음을 맞추지만, 매개변수가 수백만 개면 그 행렬을 만들 수 없어요. 그래서 이 논문의 질문은, 기울기만 가지고 매개변수마다 걸음 폭을 맞출 수 없을까예요.", "s1"],
+  [120, 220, 3, "평균 ÷ 크기 = 얼마나 확신하는가", "큰 식 하나와 m̂ · √v̂ · 비율 세 줄", "이게 오늘의 핵심이에요. m̂은 최근 기울기의 평균, 곧 어느 방향으로 가야 하는지예요. √v̂는 기울기가 평소 얼마나 큰지예요. 이 둘을 나눈 값을 논문 2.1절에서 신호 대 잡음비라고 불러요. 방향이 확실할수록 1에 가깝고, 들쭉날쭉할수록 0에 가까워요. 여기에 α를 곱한 만큼 움직여요. 이름 Adam도 Adaptive Moment estimation, 모멘트를 추정해서 걸음을 맞춘다는 뜻이에요.", "s2"],
+  [220, 300, 4, "같은 α, 다른 걸음", "숫자 세 칸: 1 · 0.05 · 1", "숫자로 보면 쉬워요. 기울기가 계속 +2면 평균도 2, 크기도 2라서 비율은 1, α만큼 가요. +2와 -2를 오가면 평균이 거의 0이라 비율이 0.05, 거의 안 움직여요. 0.002처럼 아주 작은 기울기가 계속 나와도 평균과 크기가 같이 작아지니까 비율은 1이에요. 기울기 크기가 아니라, 방향이 얼마나 확실한지만큼 움직이는 거예요.", "s4"],
+  [300, 380, 5, "Algorithm 1, 매 걸음 다섯 줄", "논문 Algorithm 1 원문 + 다섯 줄 풀이", "논문의 Algorithm 1이에요. 반복문 안에서 하는 일은 다섯 줄이에요. 기울기를 구하고, 기울기의 평균 m과 기울기 제곱의 평균 v를 지수이동평균으로 갱신해요. m과 v가 0에서 시작해서 처음엔 작게 나오니까 1 빼기 베타의 t제곱으로 나눠 바로잡고, 마지막에 비율만큼 움직여요. 논문이 제시한 기본값은 α 0.001, β1 0.9, β2 0.999예요. 모든 계산이 원소별이라 매개변수마다 자기 걸음 폭을 가져요.", "s3"],
+  [380, 450, 6, "비율 하나에서 나오는 세 가지", "성질 세 칸", "이 비율 하나에서 세 가지 성질이 나와요. 첫째, 비율이 보통 1 안쪽이라 한 걸음은 대략 α를 넘지 않아요. 그래서 α를 고르기 쉬워요. 둘째, 최적점에 가까워지면 기울기 방향이 흔들려서 비율이 작아지고 저절로 천천히 가요. 셋째, 기울기 전체에 c를 곱해도 위아래가 같이 c배가 돼서 비율이 그대로예요. 층마다 기울기 크기가 크게 달라도 같은 α로 학습할 수 있어요.", "s5"],
+  [450, 510, 7, "보정이 없으면 처음 걸음이 α의 6배 넘게 커져요", "보정 있음/없음 그래프, 3.16α · 6.57α", "4번째 줄 편향 보정이 왜 필요한지 계산해 봤어요. m과 v가 0에서 시작하니까 첫 걸음에서 m은 0.2, v는 0.004예요. 그대로 나누면 비율이 3.16, α의 세 배가 넘어요. 기울기가 계속 2라면 12번째 걸음에서 6.57배까지 커져요. v가 m보다 훨씬 천천히 차기 때문이에요. 1 빼기 베타의 t제곱으로 나눠 보정하면 처음부터 정확히 1이에요. 이 효과는 뒤의 실험 4에서 논문도 직접 확인해요.", "s5"],
+  [510, 570, 8, "AdaGrad와 RMSProp의 장점을 합쳤어요", "SGD부터 Adam까지 비교 표", "Adam 전에 나온 방법들과 비교해 보면, 모멘텀은 방향을 기억하고, AdaGrad와 RMSProp은 매개변수마다 걸음을 다르게 해요. AdaGrad는 희소한 기울기에 강하고, RMSProp은 목표가 계속 바뀌는 문제에 강해요. Adam은 이 둘의 장점을 합치고 편향 보정을 더했어요. 논문 5절에 따르면 AdaGrad는 Adam의 특수한 경우이고, RMSProp은 편향 보정이 없어서 β2가 1에 가까우면 걸음이 너무 커져 발산하기도 해요.", "s6"],
+  [570, 620, 9, "단순한 모델에서도 가장 빠른 쪽", "Figure 1: MNIST · IMDB 로지스틱 회귀", "첫 번째 실험은 가장 단순한 로지스틱 회귀예요. x축은 데이터 전체를 몇 번 돌았는지, y축은 학습 비용이고 낮을수록 좋아요. 왼쪽 MNIST에서 빨간 선 Adam은 모멘텀 SGD만큼 빠르고 파란 AdaGrad보다 훨씬 빨라요. 오른쪽 IMDB는 단어 1만 개짜리 희소한 데이터인데, 하늘색 Adam이 희소한 데 강한 AdaGrad만큼 빨라요.", "s7"],
+  [620, 670, 10, "다층 신경망에서 다른 방법보다 빨리 내려가요", "Figure 2: 다층 신경망 (a) dropout (b) SFO", "두 번째는 은닉층이 두 개인 신경망이에요. 왼쪽 (a)는 dropout을 넣은 학습인데, 자홍색 Adam이 다른 네 방법보다 확실히 낮게 내려가요. 오른쪽 (b)는 곡률 정보를 쓰는 SFO라는 방법과 비교한 건데, 초록 Adam이 반복 횟수로도, 실제 걸린 시간으로도 더 빨라요. SFO는 한 번 반복에 5~10배 더 걸리고 메모리도 많이 써요.", "s7"],
+  [670, 720, 11, "CNN에서도 SGD와 함께 가장 낮아요", "Figure 3: CIFAR-10 CNN", "세 번째는 CIFAR-10 이미지 분류용 CNN이에요. 왼쪽 처음 3 epoch에서는 Adam과 AdaGrad가 빨리 내려가요. 오른쪽 45 epoch까지 보면 자홍색 Adam과 빨간 SGD가 AdaGrad보다 훨씬 낮아져요. 논문은 여기서 SGD보다 조금 나은 정도라고 솔직하게 말해요. 대신 SGD는 층마다 학습률을 사람이 골라야 하는데, Adam은 알아서 맞춰 준다는 게 장점이에요.", "s7"],
+  [720, 770, 12, "β₂가 1에 가까울수록 보정이 꼭 필요해요", "Figure 4: 편향 보정 VAE", "마지막 실험은 앞에서 계산해 본 편향 보정을 실제로 확인한 거예요. 칸마다 β1, β2 조합이 다르고, 가로축은 α, 세로축은 손실이에요. 빨강이 보정 있음, 초록이 보정 없음이에요. β2가 0.9999처럼 1에 가까울수록 초록 선이 위로 튀어요. 특히 학습 초반인 10 epoch에서 심해요. 편향 보정을 뺀 게 사실상 RMSProp인데, Adam은 어떤 설정에서도 그보다 같거나 나았어요.", "s7"],
+  [770, 840, 13, "증명엔 오류가 있었지만, 지금도 기본 최적화기", "AMSGrad · AdamW · Transformer 세 칸", "한계도 있어요. 4절의 수렴 증명에는 오류가 있어서, 2018년에 Adam이 수렴하지 않는 예와 함께 AMSGrad라는 수정판이 나왔어요. 2019년에는 Adam에서 가중치 감쇠를 제대로 하도록 고친 AdamW가 나왔어요. 그래도 Transformer 원논문도 Adam으로 학습했고, 지금도 Adam과 AdamW가 가장 흔한 기본값이에요.", "s8"],
+  [840, 900, 14, "평균을 크기로 나눈 만큼 움직인다", "정리 한 문장, 질문 받기", "정리하면, Adam은 기울기의 평균을 기울기의 크기로 나눈 만큼 움직여요. 방향이 확실하면 크게, 불확실하면 작게, 그리고 매개변수마다 따로요. 여기에 0에서 시작한 값을 바로잡는 편향 보정을 더한 게 전부예요. 감사합니다. 질문 받을게요.", "s2"],
+];
+const mm = x => `${Math.floor(x / 60)}:${String(x % 60).padStart(2, "0")}`;
+$("time").innerHTML = S.map(s => `<span style="flex:${s[1] - s[0]}"></span>`).join("");
+$("steps").innerHTML = S.map(([a, b, n, h, show, say, sec]) => `<li>
+  <div class="t">${mm(a)}–${mm(b)}<small>슬라이드 ${n} · ${b - a}초</small></div>
+  <div><h3>${h}</h3><p class="show"><b>보여 줄 것</b> · ${show}</p><p class="say">${say}</p><a class="go" href="#${sec}" data-go="${sec}">내용 보기 →</a></div>
+</li>`).join("");
+
+// 탭
+function tab(t, keep) {
+  for (const b of document.querySelectorAll(".tabs button")) b.setAttribute("aria-pressed", b.dataset.t === t);
+  $("read").hidden = t !== "read"; $("talk").hidden = t !== "talk";
+  if (t === "read" && typeof draw === "function" && $("plot").clientWidth !== W) draw(P);
+  if (!keep) { history.replaceState(null, "", t === "talk" ? "?t=talk" : location.pathname); scrollTo(0, 0); }
+}
+document.querySelector(".tabs").onclick = e => { const b = e.target.closest("button"); if (b) tab(b.dataset.t); };
+$("steps").onclick = e => { const a = e.target.closest("[data-go]"); if (!a) return; e.preventDefault(); tab("read", 1); history.replaceState(null, "", location.pathname); $(a.dataset.go).scrollIntoView(); };
+if (new URLSearchParams(location.search).get("t") === "talk") tab("talk", 1);
+
+// 목차 현재 위치
+const links = [...document.querySelectorAll(".toc a")];
+const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) links.forEach(a => a.classList.toggle("on", a.hash === "#" + e.target.id)); }), { rootMargin: "-30% 0px -60% 0px" });
+document.querySelectorAll("main section").forEach(s => io.observe(s));
+
+// Adam 계산 (논문 기본값)
+const B1 = .9, B2 = .999, EPS = 1e-8, N = 100;
+let seed = 7; const rnd = () => (seed = seed * 16807 % 2147483647) / 2147483647;
+const gauss = () => Math.sqrt(-2 * Math.log(rnd())) * Math.cos(2 * Math.PI * rnd());
+const noise = Array.from({ length: N }, () => .5 + gauss());
+const PAT = [i => 2, i => i % 2 ? -2 : 2, i => .002, i => noise[i]];
+function run(f) {
+  let m = 0, v = 0; const a = [], b = [];
+  for (let i = 0; i < N; i++) {
+    const g = f(i), t = i + 1;
+    m = B1 * m + (1 - B1) * g; v = B2 * v + (1 - B2) * g * g;
+    a.push(Math.abs(m / (1 - B1 ** t)) / (Math.sqrt(v / (1 - B2 ** t)) + EPS));
+    b.push(Math.abs(m) / (Math.sqrt(v) + EPS));
+  }
+  return [a, b];
+}
+
+// 그래프
+let W = 720, H = 300, P = 0;
+const L = 40, R = 16, T = 12, Bm = 30, YMAX = 7;
+const X = i => L + (i / (N - 1)) * (W - L - R), Y = y => T + (1 - Math.min(y, YMAX) / YMAX) * (H - T - Bm);
+const path = d => d.map((y, i) => (i ? "L" : "M") + X(i).toFixed(1) + " " + Y(y).toFixed(1)).join("");
+let cur = [[], []];
+function draw(p) {
+  P = p; W = Math.max(300, $("plot").clientWidth || 720); H = W < 560 ? 240 : 300;
+  cur = run(PAT[p]);
+  const ticks = [0, 1, 2, 4, 6];
+  $("plot").querySelector("svg")?.remove();
+  $("plot").insertAdjacentHTML("afterbegin", `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="걸음 크기 그래프">
+    <g class="grid">${ticks.map(t => `<line x1="${L}" x2="${W - R}" y1="${Y(t)}" y2="${Y(t)}"/><text x="${L - 8}" y="${Y(t) + 4}" text-anchor="end">${t ? t + "α" : 0}</text>`).join("")}
+    ${[1, 25, 50, 75, 100].map(t => `<text x="${X(t - 1)}" y="${H - 8}" text-anchor="middle">${t}</text>`).join("")}</g>
+    <path d="${path(cur[1])}" fill="none" stroke="var(--orange)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="${path(cur[0])}" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    <line id="cx" y1="${T}" y2="${H - Bm}" stroke="var(--mute)" stroke-width="1" visibility="hidden"/>
+    <circle id="d0" r="4" fill="var(--blue)" stroke="var(--soft)" stroke-width="2" visibility="hidden"/>
+    <circle id="d1" r="4" fill="var(--orange)" stroke="var(--soft)" stroke-width="2" visibility="hidden"/>
+    <rect x="${L}" y="0" width="${W - L - R}" height="${H}" fill="transparent" id="hit"/>
+  </svg>`);
+  const f = x => x.toFixed(2) + "α";
+  const pk = cur[1].reduce((a, y, i) => y > cur[1][a] ? i : a, 0);
+  $("stat").innerHTML = `<div><b>${f(cur[0][N - 1])}</b>100번째 걸음 · Adam</div><div><b>${f(cur[1][N - 1])}</b>100번째 걸음 · 보정 없음</div><div><b>${f(cur[1][pk])}</b>보정 없음 최대 (${pk + 1}번째)</div>`;
+  const svg = $("plot").querySelector("svg"), tip = $("tip");
+  const move = e => {
+    const r = svg.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * W;
+    const i = Math.max(0, Math.min(N - 1, Math.round((x - L) / (W - L - R) * (N - 1))));
+    for (const [id, k] of [["d0", 0], ["d1", 1]]) { const c = svg.getElementById(id); c.setAttribute("cx", X(i)); c.setAttribute("cy", Y(cur[k][i])); c.setAttribute("visibility", "visible"); }
+    const cx = svg.getElementById("cx"); cx.setAttribute("x1", X(i)); cx.setAttribute("x2", X(i)); cx.setAttribute("visibility", "visible");
+    tip.hidden = false;
+    tip.innerHTML = `<b>${i + 1}번째 걸음</b><br><i style="background:var(--blue)"></i>Adam ${f(cur[0][i])}<br><i style="background:var(--orange)"></i>보정 없음 ${f(cur[1][i])}`;
+    const px = X(i) / W * r.width;
+    tip.style.left = Math.min(px + 12, r.width - tip.offsetWidth) + "px"; tip.style.top = "8px";
+  };
+  const leave = () => { tip.hidden = true; for (const id of ["d0", "d1", "cx"]) svg.getElementById(id).setAttribute("visibility", "hidden"); };
+  svg.addEventListener("pointermove", move); svg.addEventListener("pointerdown", move); svg.addEventListener("pointerleave", leave);
+}
+$("pick").onclick = e => { const b = e.target.closest("button"); if (!b) return; for (const x of $("pick").children) x.setAttribute("aria-pressed", x === b); draw(+b.dataset.p); };
+draw(0);
+let rw = 0; addEventListener("resize", () => { cancelAnimationFrame(rw); rw = requestAnimationFrame(() => draw(P)); });
+</script>
+</body>
+</html>

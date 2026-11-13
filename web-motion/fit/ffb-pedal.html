@@ -1,0 +1,197 @@
+<!-- Claude가 만듦 (2026-11-06) — 페달이 돌다 멈추면 커서가 치수 상자를 붙이고, 모르는 치수는 ?로 깜빡인다 (돌아가는 3D 제품 60 + 커서가 짓는 페이지 40) -->
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>액셀 페달 3D · 치수</title>
+<link rel="icon" href="data:,">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root { --sky-top: #e9edf0; --sky-bottom: #cbd3d9; --ink: #1c2228; --soft: #56616b; --accent: #c8102e }
+* { box-sizing: border-box }
+html, body { margin: 0 }
+body { height: 600vh; background: linear-gradient(180deg, var(--sky-top), var(--sky-bottom)) fixed; color: var(--ink); font: 400 17px/1.6 "Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif; word-break: keep-all; -webkit-font-smoothing: antialiased; overflow-x: clip }
+canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block }
+.mono { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 12px; letter-spacing: .03em }
+.hud { position: fixed; z-index: 30; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; padding: 14px clamp(16px, 3vw, 32px); pointer-events: none }
+.hud a { pointer-events: auto; color: var(--ink); text-decoration: none; opacity: .6 }
+.hud a:hover { opacity: 1 }
+.say { position: fixed; z-index: 5; left: clamp(20px, 6vw, 100px); top: 50%; width: min(32ch, 38vw); transform: translateY(-46%); opacity: 0; transition: opacity .6s, transform .9s cubic-bezier(.2, .7, .2, 1); pointer-events: none }
+.say.on { opacity: 1; transform: translateY(-50%) }
+.say small { display: block; margin-bottom: 14px; color: var(--soft) }
+.say h1 { margin: 0; font-size: clamp(56px, 8.6vw, 136px); line-height: .92; letter-spacing: -.055em; font-weight: 700 }
+.say h2 { margin: 0; font-size: clamp(32px, 4.4vw, 64px); line-height: 1.04; letter-spacing: -.045em; font-weight: 700 }
+.say p { margin: 14px 0 0; color: var(--soft); font-size: clamp(15px, 1.3vw, 18px) }
+.say q { color: var(--accent); quotes: none; font-family: "JetBrains Mono", monospace; font-weight: 700 }
+.dim { position: fixed; z-index: 4; left: 0; top: 0; pointer-events: none; opacity: 0; transition: opacity .35s; text-align: center; white-space: nowrap }
+.dim span { display: block; margin-bottom: 3px; font: 400 10.5px "JetBrains Mono", monospace; color: var(--soft); letter-spacing: .04em }
+.dim b { display: inline-block; padding: 3px 9px; border-radius: 5px; background: #fff; box-shadow: 0 4px 14px -4px rgb(28 34 40 / .3); font: 700 14px "JetBrains Mono", monospace; letter-spacing: -.02em }
+.dim.q b { color: var(--accent); animation: blink 1.1s steps(2, jump-none) infinite }
+@keyframes blink { 50% { opacity: .25 } }
+.cur { position: fixed; z-index: 6; left: 0; top: 0; pointer-events: none; opacity: 0; transition: opacity .3s; will-change: transform }
+.cur svg { display: block; width: 20px; height: 20px; filter: drop-shadow(0 2px 3px rgb(0 0 0 / .25)) }
+.cur i { position: absolute; left: 16px; top: 18px; padding: 2px 8px; border-radius: 9px; background: var(--ink); color: #fff; font: 500 11px "JetBrains Mono", monospace; font-style: normal; letter-spacing: .02em }
+.bar { position: fixed; z-index: 6; left: clamp(20px, 6vw, 100px); right: clamp(20px, 6vw, 100px); bottom: 20px; height: 2px; background: rgb(28 34 40 / .12) }
+.bar i { display: block; height: 100%; width: 0; background: var(--ink) }
+@media (max-width: 700px) {
+  .dim span { display: none }
+  .say { top: auto; bottom: 8vh; left: 20px; width: calc(100vw - 40px); transform: translateY(14px) } .say.on { transform: none }
+  .say h1 { font-size: clamp(56px, 18vw, 96px) }
+}
+</style>
+</head>
+<body>
+<nav class="hud mono"><a href="./index.html">← 카드별 어울림</a><a href="../../ffb-wheel/pedal/">작품 보기 →</a></nav>
+<canvas id="cv"></canvas>
+<div id="dims"></div>
+<div class="cur" id="cur"><svg viewBox="0 0 20 20"><path d="M2 1l15 7.5-6.5 2L8 17z" fill="#1c2228" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/></svg><i>창공설</i></div>
+
+<div class="say on" data-a="0" data-b=".16"><small class="mono">FFB RACING WHEEL · PEDAL</small><h1>액셀<br>페달</h1></div>
+<div class="say" data-a=".2" data-b=".4"><h2>밟으면<br>스프링이 눌려요</h2><p class="mono">∠AOB 60° → 15°</p></div>
+<div class="say" data-a=".46" data-b=".72"><h2>치수는<br>하나씩 붙여요</h2></div>
+<div class="say" data-a=".76" data-b=".92"><h2>모르는 치수는<br><q>?</q></h2><p>값을 넣으면 모델이 바로 바뀌어요.</p></div>
+<div class="say" data-a=".94" data-b="1.1"><h2>입력하면<br>바로 바뀌는 3D.</h2></div>
+<div class="bar"><i id="bar"></i></div>
+
+<script type="module">
+import * as THREE from "three";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
+const mob = innerWidth < 700, calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const cv = document.getElementById("cv");
+const renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+const scene = new THREE.Scene();
+scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), .04).texture;
+const camera = new THREE.PerspectiveCamera(28, 1, .1, 60);
+const sun = new THREE.DirectionalLight("#fff6ea", 2.2); sun.position.set(3, 7, 5); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
+Object.assign(sun.shadow.camera, { left: -5, right: 5, top: 5, bottom: -5, far: 25 }); sun.shadow.radius = 6; scene.add(sun);
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), new THREE.ShadowMaterial({ opacity: .22 }));
+floor.rotation.x = -Math.PI / 2; floor.position.y = -.16; floor.receiveShadow = true; scene.add(floor);
+
+// ── 모델 (mm → 0.01): x 앞뒤, y 위, z 폭. 받침판 윗면 y=0, 회전축 O=(30,25)
+const root = new THREE.Group(); scene.add(root);
+const M = new THREE.Group(); M.scale.setScalar(.01); M.position.set(-1.5, 0, 0); root.add(M);
+const wood = () => new THREE.MeshStandardMaterial({ color: "#dcc9a6", roughness: .6 }), steel = () => new THREE.MeshStandardMaterial({ color: "#8d949b", roughness: .3, metalness: .9 });
+const rubber = new THREE.MeshStandardMaterial({ color: "#23272b", roughness: .7 }), red = new THREE.MeshStandardMaterial({ color: "#c8102e", roughness: .35, metalness: .3 });
+const box = (w, h, d, r = 2) => new RoundedBoxGeometry(w, h, d, 3, r);
+const add = (g, m, p, parent = M) => { const o = new THREE.Mesh(g, m); o.castShadow = o.receiveShadow = true; o.position.set(...p); parent.add(o); return o; };
+const cylZ = (r, l) => new THREE.CylinderGeometry(r, r, l, 32).rotateX(Math.PI / 2);
+const OX = 30, OY = 25, OA = 66.5, OB = 212, BX = OX + OB, W0 = 90;
+const baseG = new THREE.Group(); M.add(baseG);       // 폭에 따라 늘어나는 것들
+const baseP = add(box(300, 15, 1, 3), wood(), [150, -7.5, 0], baseG); baseP.scale.z = W0; baseP.geometry = new RoundedBoxGeometry(300, 15, 1, 3, 3);
+[-1, 1].forEach(s => { add(box(30, OY + 15, 15), wood(), [OX, (OY + 15) / 2 - 7, s * 23.5]); add(cylZ(15, 15), wood(), [OX, OY, s * 23.5]); });
+add(cylZ(4, 78), steel(), [OX, OY, 0]);
+const bpl = add(box(15, 60, 1), wood(), [BX + 12, 30, 0], baseG); bpl.scale.z = W0;
+// 발판 (O에서 앞으로 위로 a 각도)
+const pedal = new THREE.Group(); pedal.position.set(OX, OY, 0); M.add(pedal);
+add(box(250, 15, 30, 3), wood(), [110, 0, 0], pedal);
+add(box(78, 19, 48, 5), rubber, [195, 12, 0], pedal);
+add(cylZ(6, 36), steel(), [OA, 0, 0], pedal);
+// 막대 몸통 (U), 전산볼트, 스프링
+const ubox = add(box(110.3, 40, 52, 4), wood(), [0, 0, 0]);
+const rod = add(new THREE.CylinderGeometry(4, 4, 1, 14).rotateZ(Math.PI / 2), steel(), [0, 0, 0]);
+const coil = (() => { const pts = [], n = 9, seg = 140; for (let i = 0; i <= seg; i++) { const t = i / seg, a = t * n * Math.PI * 2; pts.push(new THREE.Vector3(t * 78, Math.cos(a) * 8.9, Math.sin(a) * 8.9)); }
+  return add(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 240, 1.7, 8), red, [0, 0, 0]); })();
+const X = new THREE.Vector3(1, 0, 0), q = new THREE.Quaternion();
+const AOB = (deg) => { const a = deg * Math.PI / 180; return a; };
+function pose(deg) { // 발판 각도 deg(60=놓음, 15=밟음) → 연결 부품 배치
+  const a = AOB(deg); pedal.rotation.z = a;
+  const A = new THREE.Vector3(OX + OA * Math.cos(a), OY + OA * Math.sin(a), 0), B = new THREE.Vector3(BX, OY, 0), d = B.clone().sub(A), len = d.length(); d.normalize();
+  q.setFromUnitVectors(X, d);
+  const C = A.clone().addScaledVector(d, 110.3);
+  ubox.position.copy(A).addScaledVector(d, 55.15); ubox.quaternion.copy(q);
+  rod.position.copy(A).addScaledVector(d, (len + 18) / 2 - 8); rod.scale.x = len + 26; rod.quaternion.copy(q);
+  coil.position.copy(C); coil.quaternion.copy(q); coil.scale.x = (len - 110.3) / 78;
+  return { A, B, C, d, a };
+}
+pose(60);
+
+// ── 치수 상자: 3D 선 + 라벨(DOM). 모르는 값은 ? 로 깜빡임
+const dimsBox = document.getElementById("dims"), dimLines = new THREE.Group(); M.add(dimLines);
+const lineMat = new THREE.LineBasicMaterial({ color: "#1c2228" }), qMat = new THREE.LineBasicMaterial({ color: "#c8102e" });
+const V = (x, y, z) => new THREE.Vector3(x, y, z);
+const rest = pose(60), dirP = V(Math.cos(rest.a), Math.sin(rest.a), 0), nP = V(-Math.sin(rest.a), Math.cos(rest.a), 0), ZF = 34;
+const nrm = V(-rest.d.y, rest.d.x, 0);
+const ptsLine = (a, b, tk) => { const t = b.clone().sub(a).normalize(), n = tk.clone().multiplyScalar(6); return [a, b, a.clone().sub(n), a.clone().add(n), b.clone().sub(n), b.clone().add(n)]; };
+const arcPts = []; for (let i = 0; i <= 24; i++) { const a = rest.a * i / 24; arcPts.push(V(OX + Math.cos(a) * 52, OY + Math.sin(a) * 52, ZF)); }
+const DIMS = [
+  { n: "받침판 길이", v: "300", pts: ptsLine(V(0, -20, 48), V(300, -20, 48), V(0, 1, 0)), at: V(150, -20, 48) },
+  { n: "발판 길이", v: "250", pts: ptsLine(V(OX, OY, ZF).addScaledVector(dirP, -15).addScaledVector(nP, 30), V(OX, OY, ZF).addScaledVector(dirP, 235).addScaledVector(nP, 30), nP), at: V(OX, OY, ZF).addScaledVector(dirP, 110).addScaledVector(nP, 30) },
+  { n: "스프링 놓음 길이", v: "78", pts: ptsLine(rest.C.clone().setZ(ZF).addScaledVector(nrm, -30), rest.B.clone().setZ(ZF).addScaledVector(nrm, -30), nrm), at: rest.C.clone().lerp(rest.B, .5).setZ(ZF).addScaledVector(nrm, -30) },
+  { n: "∠AOB", v: "60° → 15°", pts: arcPts.flatMap((p, i) => i ? [arcPts[i - 1], p] : []), seg: true, at: arcPts[16] },
+  { n: "받침판 폭", v: "?", q: 1, pts: ptsLine(V(316, -14, -W0 / 2), V(316, -14, W0 / 2), V(1, 0, 0)), at: V(316, -14, 0) },
+  { n: "O·B 높이", v: "?", q: 1, pts: ptsLine(V(-4, 0, ZF), V(-4, OY, ZF), V(1, 0, 0)).map(p => p.x < 0 ? p : p), at: V(-4, OY / 2, ZF) },
+  { n: "O 받이 앞뒤", v: "?", q: 1, pts: ptsLine(V(OX - 15, 62, ZF), V(OX + 15, 62, ZF), V(0, 1, 0)), at: V(OX, 62, ZF) },
+];
+DIMS.forEach(d => {
+  const g = new THREE.BufferGeometry().setFromPoints(d.pts), l = new THREE.LineSegments(g, d.q ? qMat : lineMat);
+  if (!d.seg) { // 시작·끝 선 + 눈금 둘: 점 순서 [a,b,a-n,a+n,b-n,b+n] → 쌍으로 그림
+    g.setFromPoints([d.pts[0], d.pts[1], d.pts[2], d.pts[3], d.pts[4], d.pts[5]]);
+  }
+  l.visible = false; dimLines.add(l); d.l = l;
+  const e = document.createElement("div"); e.className = "dim" + (d.q ? " q" : ""); e.innerHTML = `<span>${d.n}</span><b>${d.v}</b>`; dimsBox.append(e); d.e = e; d.s = 0;
+});
+
+// ── 장면
+const clamp01 = x => Math.min(1, Math.max(0, x)), sm = t => t * t * (3 - 2 * t), L = (a, b, t) => a + (b - a) * t, band = (a, b, p) => sm(clamp01((p - a) / (b - a)));
+let target = 0, prog = 0, mx = 0, my = 0, mxs = 0, mys = 0;
+const prg = () => clamp01(scrollY / (document.documentElement.scrollHeight - innerHeight));
+addEventListener("scroll", () => target = prg(), { passive: true });
+addEventListener("pointermove", e => { mx = e.clientX / innerWidth - .5; my = e.clientY / innerHeight - .5; });
+function resize() { renderer.setSize(innerWidth, innerHeight, false); camera.aspect = innerWidth / innerHeight; camera.fov = innerWidth < 700 ? 40 : 28; camera.updateProjectionMatrix(); }
+addEventListener("resize", resize); resize(); target = prog = prg();
+
+const BGS = [["#e9edf0", "#cbd3d9"], ["#dfe5e9", "#bcc7cf"], ["#f1f3f4", "#d6dde2"]];
+const says = [...document.querySelectorAll(".say")], bar = document.getElementById("bar"), cur = document.getElementById("cur"), st = document.documentElement.style;
+const c1 = new THREE.Color(), c2 = new THREE.Color(), clock = new THREE.Clock(), v = new THREE.Vector3(), cp = { x: -50, y: -50 };
+let T = 0;
+renderer.setAnimationLoop(() => {
+  const rd = Math.min(.3, clock.getDelta()); T += Math.min(.05, rd) * (calm ? .15 : 1);
+  prog += (target - prog) * (1 - Math.exp(-rd * 4)); const p = prog;
+  mxs += (mx - mxs) * .05; mys += (my - mys) * .05;
+  const still = band(.38, .46, p);                          // 이때부터 페달이 멈춰 놓은 자세로
+  const press = (1 - still) * (.5 - .5 * Math.cos(T * 1.5)) ;  // 밟았다 놓았다
+  const widthK = 1 + .5 * band(.88, .95, p) * Math.sin(T * 1.2 - .6) * (1 - band(.96, 1, p) * .3);
+  const deg = L(60, 15, press) ;
+  const r = pose(deg);
+  baseG.scale.z = 1; baseP.scale.z = W0 * widthK; bpl.scale.z = W0 * widthK;
+  // 카메라: 처음엔 3/4 로 돌려 보다가, 스프링 가까이, 멈추면 비스듬히 정면
+  const spin = (1 - still) * (T * .35 + p * 2.2);
+  const view = band(.14, .26, p) * (1 - band(.36, .46, p));
+  const az = L(-.75 - spin, -.55 + Math.sin(T * .3) * .05, still) + mxs * .3 - view * .2;
+  const dist = (mob ? 1.55 : 1) * L(L(8.4, 6.2, view), 7.2, still);
+  const lookX = 0;
+  camera.position.set(Math.sin(az) * dist, L(2.6, 1.5, view) + (still > .5 ? 1.7 - mys * .6 : 0), Math.cos(az) * dist);
+  camera.lookAt(lookX, L(.85, .55, view), 0);
+  camera.setViewOffset(innerWidth, innerHeight, mob ? 0 : -innerWidth * .13, mob ? innerHeight * .08 : 0, innerWidth, innerHeight);
+  camera.updateProjectionMatrix();
+  // 배경 색을 장면마다 살짝
+  const bi = p < .45 ? [0, 1, band(.14, .3, p)] : p < .8 ? [1, 2, band(.5, .7, p)] : [2, 0, band(.9, 1, p)];
+  [0, 1].forEach(k => { c1.set(BGS[bi[0]][k]).lerp(c2.set(BGS[bi[1]][k]), bi[2]); st.setProperty(k ? "--sky-bottom" : "--sky-top", "#" + c1.getHexString()); });
+  // 치수: 커서가 붙인 순서대로
+  const n = still > .95 ? clamp01((p - .47) / .3) * (DIMS.length + .4) : 0;
+  let lastShown = -1;
+  DIMS.forEach((d, i) => {
+    const shown = n > i + .35; d.l.visible = shown; if (shown) lastShown = i;
+    d.s += ((shown ? 1 : 0) - d.s) * .2; v.copy(d.at); M.localToWorld(v); v.project(camera);
+    const sx = Math.min(innerWidth - 44, Math.max(44, (v.x * .5 + .5) * innerWidth)), sy = Math.min(innerHeight - 70, Math.max(70, (-v.y * .5 + .5) * innerHeight)); d.sx = sx; d.sy = sy;
+    d.e.style.transform = `translate(${sx}px, ${sy}px) translate(-50%, -135%)`; d.e.style.opacity = d.s > .5 ? 1 : 0;
+  });
+  // 커서: 방금 붙인 치수 쪽으로 미끄러지고, 다 붙이면 사라짐
+  const ct = DIMS[Math.max(0, Math.min(DIMS.length - 1, Math.ceil(n - .35)))];
+  const active = still > .95 && n > .05 && p < .93;
+  if (ct && active) { cp.x += (ct.sx + 18 - cp.x) * (1 - Math.exp(-rd * 6)); cp.y += (ct.sy + 6 - cp.y) * (1 - Math.exp(-rd * 6)); }
+  cur.style.transform = `translate(${cp.x}px, ${cp.y}px)`; cur.style.opacity = active ? 1 : 0;
+  says.forEach(s => s.classList.toggle("on", p >= +s.dataset.a && p < +s.dataset.b));
+  bar.style.width = p * 100 + "%";
+  renderer.render(scene, camera);
+});
+</script>
+</body>
+</html>

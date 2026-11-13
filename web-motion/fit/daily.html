@@ -1,0 +1,178 @@
+<!-- Claude가 만듦 (2026-11-06) — 하루 한 장 레슨 종이가 쌓이고, 맨 위 장에 빛이 떨어지면 뒤집혀 어제 퀴즈가 나온다 -->
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>하루 한 장 쌓기 · 카드별 어울림</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@200..800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<style>
+:root{--paper:#f2f1ec;--dark:#151618;--on:#eeece6;--soft:#9e9d97;--blue:#2b44a6;--blue-l:#8fa3ee;--bad:#c4472a;
+ --serif:"Hahmlet","Noto Serif KR",serif;--sans:"Pretendard Variable",Pretendard,system-ui,"Malgun Gothic",sans-serif;--mono:"IBM Plex Mono","Pretendard Variable",ui-monospace,monospace;--hud:var(--soft);--m:clamp(16px,3.4vw,56px)}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--dark);color:var(--on);font:400 17px/1.55 var(--sans);word-break:keep-all;-webkit-font-smoothing:antialiased;height:900svh;overflow-x:clip}
+.top{position:fixed;z-index:70;inset:0 0 auto;display:flex;justify-content:space-between;gap:12px;padding:16px var(--m);font:500 12px/1 var(--mono);letter-spacing:.02em;word-spacing:-.25em;pointer-events:none}
+.top a{pointer-events:auto;text-decoration:none;color:var(--hud);padding:6px 0}.top a:hover{color:var(--on);text-decoration:underline;text-underline-offset:4px}
+canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
+.lab{position:fixed;z-index:5;left:var(--m);top:50%;transform:translateY(-52%);pointer-events:none;max-width:min(46vw,640px)}
+.eyebrow{font:500 12.5px var(--mono);color:var(--soft);margin:0}
+.num{display:block;font:200 clamp(120px,19vw,300px)/.82 var(--serif);letter-spacing:-.05em;margin:.06em 0 .12em -.04em;font-variant-numeric:tabular-nums;transition:opacity .35s,transform .5s cubic-bezier(.2,.8,.2,1)}
+.lab h1{margin:0;font:400 clamp(24px,2.7vw,44px)/1.25 var(--serif);letter-spacing:-.025em;transition:opacity .35s,transform .5s cubic-bezier(.2,.8,.2,1)}
+.unit{font:500 12.5px var(--mono);color:var(--blue-l);margin:14px 0 0}
+.lab.sw .num,.lab.sw h1{opacity:0;transform:translateY(12px)}
+.quiz{position:fixed;z-index:6;left:var(--m);bottom:clamp(22px,6vh,56px);width:min(54vw,720px);opacity:0;transform:translateY(14px);transition:opacity .5s,transform .6s cubic-bezier(.2,.8,.2,1);pointer-events:none}
+.quiz.on{opacity:1;transform:none;pointer-events:auto}
+.qh{font:500 12px var(--mono);color:var(--soft);margin:0 0 10px}
+.opts{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.opt{font:500 clamp(14px,1.15vw,17px)/1.3 var(--sans);text-align:left;color:var(--on);background:#222327;border:0;border-radius:10px;padding:13px 16px;cursor:pointer;transition:background-color .2s,transform .15s}
+.opt:hover:not(:disabled){background:#2d2f36}.opt:active:not(:disabled){transform:scale(.985)}
+.opt:disabled{cursor:default}
+.opt.good{background:var(--blue);color:#fff}.opt.bad{background:var(--bad);color:#fff}
+.opt:focus-visible{outline:2px solid var(--blue-l);outline-offset:3px}
+.why{margin:12px 0 0;min-height:1.5em;color:var(--soft);font-size:14.5px;opacity:0;transition:opacity .4s}.why.on{opacity:1}
+.hint{position:fixed;z-index:6;right:var(--m);bottom:22px;font:500 12px var(--mono);color:var(--soft);transition:opacity .5s;pointer-events:none}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (max-width:820px){
+ .lab{top:76px;transform:none;max-width:calc(100vw - 2 * var(--m));display:grid;grid-template-columns:auto 1fr;column-gap:14px;align-items:end}
+ .lab .eyebrow{grid-column:1/-1;margin-bottom:6px}.num{font-size:92px;margin:0}
+ .lab h1{font-size:20px;align-self:center}.unit{grid-column:1/-1;margin-top:8px}
+ .quiz{width:calc(100vw - 2 * var(--m));bottom:18px}.opts{gap:6px}.opt{padding:11px 12px;font-size:13.5px}
+ .hint{bottom:auto;top:56px}
+}
+@media (prefers-reduced-motion:reduce){.num,.lab h1,.quiz,.why{transition:none}}
+</style>
+</head>
+<body>
+<nav class="top"><a href="./index.html">← 카드별 어울림</a><a href="../../daily/">작품 보기 →</a></nav>
+<canvas id="cv" aria-label="하루에 한 장씩 쌓이는 레슨 종이"></canvas>
+<div class="lab" id="lab"><p class="eyebrow">매일 AI 공부</p><b class="num" id="num">01</b><h1 id="ttl"></h1><p class="unit" id="unit"></p></div>
+<div class="quiz" id="quiz"><p class="qh" id="qh">어제 퀴즈</p><p class="sr" id="qs"></p><div class="opts" id="opts"></div><p class="why" id="why"></p></div>
+<p class="hint" id="hint">↓ 스크롤</p>
+<script type="module">
+import * as THREE from "three";
+const LS=[{"t":"컴퓨터는 네 부품으로 일해요","u":"컴퓨터의 몸","q":"전원을 끄면 내용이 사라지는 부품은?","o":["SSD","RAM","USB 메모리","하드디스크"],"a":1,"w":"RAM은 전기가 있어야 내용을 기억해요. 나머지는 전원을 꺼도 남아요."},{"t":"0과 1, 비트와 바이트","u":"컴퓨터의 몸","q":"8비트로 나타낼 수 있는 경우의 수는?","o":["8","16","256","1024"],"a":2,"w":"2를 여덟 번 곱하면 256이에요."},{"t":"글자도 사진도 결국 숫자예요","u":"컴퓨터의 몸","q":"UTF-8로 저장할 때 한글 한 글자는 보통 몇 바이트?","o":["1","2","3","4"],"a":2,"w":"UTF-8에서 영어는 1바이트, 한글은 3바이트를 써요."},{"t":"CPU, 명령을 처리하는 두뇌","u":"컴퓨터의 몸","q":"CPU 클럭 3GHz는 1초에 박자가 몇 번?","o":["3천 번","300만 번","30억 번","3조 번"],"a":2,"w":"G(기가)는 10억이에요. 3 × 10억 = 30억."},{"t":"메모리 계층: 빠를수록 작고 비싸요","u":"컴퓨터의 몸","q":"다음 중 데이터를 가장 빨리 읽을 수 있는 곳은?","o":["SSD","RAM","CPU 캐시","USB 메모리"],"a":2,"w":"CPU 캐시는 CPU 바로 안에 있어서 가장 빨라요."},{"t":"GPU는 왜 AI의 주인공일까","u":"컴퓨터의 몸","q":"GPU가 AI 계산에 잘 맞는 가장 큰 이유는?","o":["클럭이 CPU보다 훨씬 높아서","같은 계산을 동시에 아주 많이 해서","저장 용량이 커서","전기를 덜 써서"],"a":1,"w":"GPU는 코어 수천 개로 같은 종류의 계산을 동시에 처리해요."},{"t":"운영체제: 컴퓨터의 관리인","u":"컴퓨터의 몸","q":"실행 중인 프로그램 하나를 부르는 말은?","o":["파일","프로세스","드라이버","폴더"],"a":1,"w":"실행 중인 프로그램은 프로세스, 저장된 프로그램은 파일이에요."},{"t":"코드가 실행되기까지: 컴파일러와 인터프리터","u":"코드와 데이터","q":"C 코드를 실행 전에 기계어로 미리 바꾸는 프로그램은?","o":["인터프리터","컴파일러","운영체제","브라우저"],"a":1,"w":"실행 전에 통째로 번역하는 게 컴파일러예요."},{"t":"자료구조: 데이터를 담는 그릇","u":"코드와 데이터","q":"먼저 들어간 것이 먼저 나오는 자료구조는?","o":["스택","큐","딕셔너리","집합"],"a":1,"w":"큐는 줄 서기와 같아요. 먼저 온 사람이 먼저 나가요."},{"t":"알고리즘과 Big-O: 얼마나 빨리 늘어날까","u":"코드와 데이터","q":"정렬된 데이터 100만 개에서 이진 탐색은 최대 약 몇 번 비교할까?","o":["20번","1,000번","50만 번","100만 번"],"a":0,"w":"2를 20번 곱하면 약 100만이에요. 반씩 20번 줄이면 하나가 남아요."},{"t":"인터넷과 API: 프로그램끼리의 약속","u":"코드와 데이터","q":"API에 요청할 때 '출입증'으로 함께 보내는 것은?","o":["접근 토큰","바탕화면 아이콘","모니터 해상도","폴더 이름"],"a":0,"w":"접근 토큰이 있어야 서버가 누가 보낸 요청인지 알고 허락해요."},{"t":"클라우드: 남의 컴퓨터를 빌려 쓰기","u":"코드와 데이터","q":"다음 중 클라우드에서 계산이 일어나는 것은?","o":["메모장에 글쓰기","코랩에서 코드 실행","윈도우 계산기","사진 앱으로 사진 보기"],"a":1,"w":"코랩의 코드는 구글 데이터센터의 컴퓨터에서 실행돼요."}];
+const $=id=>document.getElementById(id),cl=(x,a=0,b=1)=>Math.min(b,Math.max(a,x)),sm=x=>(x=cl(x),x*x*(3-2*x)),eo=x=>1-(1-cl(x))**3;
+const calm=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const STEPS=LS.length-1,W=2,D=2.7,TH=.04;
+await Promise.all(["200 100px Hahmlet","500 40px Hahmlet","700 40px 'Pretendard Variable'","500 20px 'IBM Plex Mono'"].map(f=>document.fonts.load(f,"가A1").catch(()=>0)));
+
+const renderer=new THREE.WebGLRenderer({canvas:$("cv"),antialias:true});
+renderer.setClearColor(0x151618);renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+const scene=new THREE.Scene();scene.fog=new THREE.Fog(0x151618,12,28);
+const cam=new THREE.PerspectiveCamera(34,1,.1,60);
+scene.add(new THREE.HemisphereLight(0xe6e8ff,0x2a2b30,1.0));
+const key=new THREE.DirectionalLight(0xfff4e4,1.5);key.position.set(-4,8,4);key.castShadow=true;key.shadow.mapSize.set(1024,1024);key.shadow.radius=5;
+Object.assign(key.shadow.camera,{left:-4,right:4,top:4,bottom:-4,near:1,far:20});scene.add(key);
+const root=new THREE.Group();scene.add(root);
+const floor=new THREE.Mesh(new THREE.PlaneGeometry(40,40),new THREE.ShadowMaterial({opacity:.28}));floor.rotation.x=-Math.PI/2;floor.receiveShadow=true;root.add(floor);
+
+// 종이 앞면(레슨)·뒷면(어제 퀴즈) 그림
+function wrap(g,t,x,y,w,lh){let line="",yy=y;for(const ch of t){const test=line+ch;if(g.measureText(test).width>w&&line){g.fillText(line.trim(),x,yy);yy+=lh;line=ch}else line=test}g.fillText(line.trim(),x,yy);return yy}
+function paperTex(bg,draw){
+  const c=Object.assign(document.createElement("canvas"),{width:640,height:864}),g=c.getContext("2d");
+  g.fillStyle=bg;g.fillRect(0,0,640,864);
+  for(let i=0;i<2400;i++){g.fillStyle=`rgba(${bg==="#2b44a6"?"255,255,255":"90,80,60"},${Math.random()*.045})`;g.fillRect(Math.random()*640,Math.random()*864,1.2,1.2)}
+  draw(g);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=8;return t;
+}
+const front=LS.map((l,i)=>paperTex("#f4f1e8",g=>{
+  g.textBaseline="alphabetic";g.fillStyle="#2b44a6";g.font="500 22px 'IBM Plex Mono',monospace";g.fillText("매일 AI 공부",48,70);g.textAlign="right";g.fillStyle="#8a8984";g.fillText("DAY",592,70);g.textAlign="left";
+  g.fillStyle="#151514";g.font="200 330px Hahmlet,serif";g.fillText(String(i+1).padStart(2,"0"),36,430);
+  g.font="500 46px Hahmlet,serif";wrap(g,l.t,48,520,544,64);
+  g.fillStyle="#5a5954";g.font="500 21px 'IBM Plex Mono',monospace";g.fillText(l.u,48,806);
+}));
+const back=LS.map((l,i)=>i===0?null:paperTex("#2b44a6",g=>{
+  g.textBaseline="alphabetic";g.fillStyle="rgba(255,255,255,.7)";g.font="500 22px 'IBM Plex Mono',monospace";g.fillText(`어제 퀴즈 · ${String(i).padStart(2,"0")}`,48,70);
+  g.fillStyle="#fff";g.font="700 54px 'Pretendard Variable',sans-serif";wrap(g,LS[i-1].q,48,250,544,76);
+}));
+const sideMat=new THREE.MeshStandardMaterial({color:0xe6e1d3,roughness:.95});
+const sheets=LS.map((l,i)=>{
+  const g=new THREE.Group();
+  const body=new THREE.Mesh(new THREE.BoxGeometry(W,TH,D),sideMat);body.castShadow=body.receiveShadow=true;g.add(body);
+  const top=new THREE.Mesh(new THREE.PlaneGeometry(W,D),new THREE.MeshStandardMaterial({map:front[i],color:0xd8d5cc,roughness:.9}));top.rotation.x=-Math.PI/2;top.position.y=TH/2+.0007;top.receiveShadow=true;g.add(top);
+  if(back[i]){const bt=new THREE.Mesh(new THREE.PlaneGeometry(W,D),new THREE.MeshStandardMaterial({map:back[i],color:0x8a8a8a,roughness:.85}));bt.rotation.x=Math.PI/2;bt.position.y=-TH/2-.0007;g.add(bt)}
+  g.userData={yaw:(Math.random()-.5)*.14,ox:(Math.random()-.5)*.07,oz:(Math.random()-.5)*.07};
+  g.visible=false;root.add(g);return g;
+});
+
+// 빛기둥과 먼지
+const spot=new THREE.SpotLight(0xffe3b8,0,30,.3,.6,1.4);spot.position.set(0,10,1.5);spot.castShadow=false;root.add(spot,spot.target);
+const beamMat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide,
+  uniforms:{col:{value:new THREE.Color("#ffe3b8")},time:{value:0},k:{value:0}},
+  vertexShader:`varying vec3 vN;varying vec3 vV;varying float vY;void main(){vY=uv.y;vec4 w=modelViewMatrix*vec4(position,1.);vN=normalize(normalMatrix*normal);vV=normalize(-w.xyz);gl_Position=projectionMatrix*w;}`,
+  fragmentShader:`uniform vec3 col;uniform float time;uniform float k;varying vec3 vN;varying vec3 vV;varying float vY;void main(){float rim=pow(abs(dot(vN,vV)),2.2);float a=rim*pow(vY,1.3)*.95*k*(.9+.1*sin(time*3.+vY*20.));gl_FragColor=vec4(col,a);}`});
+const beam=new THREE.Mesh(new THREE.CylinderGeometry(.22,2.1,9,48,1,true),beamMat);root.add(beam);
+const DN=700,dp=new Float32Array(DN*3);
+for(let i=0;i<DN;i++){const y=Math.random(),r=(.25+y*1.9)*Math.sqrt(Math.random()),a=Math.random()*7;dp.set([Math.cos(a)*r,8.6-y*8.6,Math.sin(a)*r],i*3)}
+const dust=new THREE.Points(new THREE.BufferGeometry().setAttribute("position",new THREE.BufferAttribute(dp,3)),new THREE.PointsMaterial({color:0xffe9c8,size:.028,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false}));root.add(dust);
+
+function resize(){
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight,false);
+  cam.aspect=innerWidth/innerHeight;cam.fov=innerWidth<820?44:34;cam.updateProjectionMatrix();
+  root.position.x=innerWidth<820?0:Math.min(2.4,innerWidth/1440*2.1+.2);root.position.z=innerWidth<820?-.4:0;
+}
+addEventListener("resize",resize);resize();
+
+// 날마다 바뀌는 글자와 퀴즈
+const lab=$("lab"),num=$("num"),ttl=$("ttl"),unit=$("unit"),quiz=$("quiz"),opts=$("opts"),why=$("why");
+let shown=-1,qShown=-1,swT=0;
+function showDay(d){
+  shown=d;lab.classList.add("sw");clearTimeout(swT);
+  swT=setTimeout(()=>{num.textContent=String(d+1).padStart(2,"0");ttl.textContent=LS[d].t;unit.textContent=LS[d].u;lab.classList.remove("sw")},calm?0:260);
+}
+function showQuiz(q){
+  qShown=q;quiz.classList.toggle("on",q>=0);why.classList.remove("on");
+  if(q<0)return;
+  const L=LS[q];$("qh").textContent=`어제 퀴즈 · ${String(q+1).padStart(2,"0")}`;$("qs").textContent=L.q;why.textContent="";
+  opts.innerHTML=L.o.map((o,i)=>`<button class="opt" type="button" data-i="${i}">${o}</button>`).join("");
+}
+opts.addEventListener("click",e=>{
+  const b=e.target.closest(".opt");if(!b||qShown<0)return;
+  const L=LS[qShown],i=+b.dataset.i;
+  [...opts.children].forEach((o,j)=>{o.disabled=true;if(j===L.a)o.classList.add("good");else if(j===i)o.classList.add("bad")});
+  why.textContent=L.w;why.classList.add("on");
+});
+
+const tmp=new THREE.Vector3();let u=0,mx=0,my=0;
+addEventListener("pointermove",e=>{mx=e.clientX/innerWidth-.5;my=e.clientY/innerHeight-.5});
+addEventListener("scroll",()=>{if(scrollY>20)$("hint").style.opacity=0},{passive:true});
+const clock=new THREE.Clock();
+function frame(){
+  const max=document.documentElement.scrollHeight-innerHeight,goal=cl(scrollY/Math.max(1,max));
+  const dt=Math.min(.25,clock.getDelta());u+=(goal-u)*(calm?1:1-Math.exp(-dt*5.5));if(Math.abs(goal-u)<1e-4)u=goal;
+  const v=u*STEPS,i=Math.min(STEPS-1,Math.floor(v+1e-6)),t=Math.min(1,v-i);   // i번째 걸음: i+2일째 종이가 내려옴
+  const cur=i+1;
+  const land=eo(t/.3),flip=sm((t-.5)/.35);
+  const bTail=i>0?1-sm(t/.15):0,b=Math.max(sm((t-.3)/.2)*(1-sm((t-.97)/.03)*0),bTail);
+  const bk=u>=.999?1:Math.max(b,i===0?.4*(1-sm(t/.25)):0);
+  sheets.forEach((g,k)=>{
+    const ud=g.userData,y0=k*TH+TH/2;
+    if(k>cur){g.visible=false;return}
+    g.visible=!(k===cur&&land<.02);let y=y0,rx=0,rz=0,ry=ud.yaw;
+    if(k===0){}
+    else if(k<cur){rx=Math.PI}
+    else{ // 지금 내려오는 종이
+      y=y0+(1-land)*5;rz=(1-land)*.35;ry=ud.yaw+(1-land)*.7;rx=Math.PI*flip;y+=Math.sin(Math.PI*flip)*1.2;
+    }
+    g.children[0].castShadow=y-y0<.9;g.position.set(ud.ox,y,ud.oz);g.rotation.set(rx,ry,rz,"YXZ");
+  });
+  const topY=(cur+1)*TH;
+  beam.position.set(0,topY+4.5,0);dust.position.set(0,topY,0);spot.target.position.set(0,topY,0);
+  beamMat.uniforms.k.value=bk;beamMat.uniforms.time.value=clock.elapsedTime;dust.material.opacity=bk*.75;spot.intensity=260*bk;dust.rotation.y=clock.elapsedTime*.06;
+  const narrow=innerWidth<820;
+  tmp.set(narrow?0:0,narrow?6.4:5.4,narrow?7.4:6.6);
+  cam.position.set(tmp.x+(calm?0:mx*.9),tmp.y-(calm?0:my*.4),tmp.z);cam.lookAt(narrow?0:root.position.x*.12,narrow?-.1:.35,0);
+  if(narrow)cam.position.y+=0;
+  renderer.render(scene,cam);
+  const dd=t>.2?cur:cur-1;if(dd!==shown)showDay(dd);
+  const q=t>.88||u>=.999?cur-1:-1;if(q!==qShown)showQuiz(q);
+  requestAnimationFrame(frame);
+}
+showDay(0);num.textContent="01";ttl.textContent=LS[0].t;unit.textContent=LS[0].u;lab.classList.remove("sw");
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

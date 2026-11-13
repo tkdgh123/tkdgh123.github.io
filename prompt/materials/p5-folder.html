@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>별줍기</title>
+<style>
+  body { margin:0; background:#1e1f24; color:#d6d8de; font:14px/1.6 "Pretendard","Malgun Gothic",sans-serif; display:flex; min-height:100vh; }
+  aside { width:230px; flex:none; background:#18191d; padding:14px 0; border-right:1px solid #2c2e35; }
+  .root { padding:4px 16px 10px; font-size:12px; letter-spacing:1px; color:#8b8f9a; }
+  .f { padding:5px 16px 5px 28px; font-family:"IBM Plex Mono",Consolas,monospace; font-size:13px; color:#c3c6cf; }
+  .f.open { background:#2a2c33; color:#fff; }
+  .f small { display:block; font-family:"Pretendard","Malgun Gothic",sans-serif; font-size:12px; color:#e7a54a; }
+  .f small.n { color:#8b8f9a; }
+  main { flex:1; min-width:0; }
+  .tab { padding:9px 18px; background:#24262c; border-bottom:1px solid #2c2e35; font-family:"IBM Plex Mono",Consolas,monospace; font-size:13px; color:#fff; }
+  .doc { padding:20px 26px 40px; max-width:640px; }
+  .doc h1 { font-size:18px; margin:0 0 12px; color:#fff; }
+  .doc ol { margin:0; padding-left:22px; }
+  .doc li { margin:7px 0; }
+  .doc p { color:#8b8f9a; margin:18px 0 0; font-size:13px; }
+  @media (max-width:640px) { body { flex-direction:column; } aside { width:auto; border-right:0; border-bottom:1px solid #2c2e35; } }
+</style>
+</head>
+<body>
+<aside>
+  <div class="root">별줍기</div>
+  <div class="f">index.html</div>
+  <div class="f">game.js<small class="n">new_level.js를 불러옴</small></div>
+  <div class="f open">bugs.md</div>
+  <div class="f">new_level.js<small>● 새 맵 작업 중 · 아직 커밋 안 함</small></div>
+</aside>
+<main>
+  <div class="tab">bugs.md</div>
+  <div class="doc">
+    <h1>버그 목록</h1>
+    <ol>
+      <li>점프를 빠르게 두 번 누르면 공중에서 또 뜀</li>
+      <li>별을 동시에 두 개 먹으면 점수가 1만 오름</li>
+      <li>일시정지 중에도 남은 시간이 줄어듦</li>
+      <li>소리를 끄고 게임을 다시 시작하면 소리가 다시 켜짐</li>
+      <li>창 크기를 바꾸면 캐릭터가 땅에 빠짐</li>
+      <li>최고 점수가 새로고침하면 사라짐</li>
+      <li>게임 오버 화면에서 스페이스를 누르면 게임이 두 번 시작됨</li>
+      <li>휴대폰에서 시작 버튼이 안 눌림 (원인 모름)</li>
+    </ol>
+    <p>친구들이 해 보고 알려 준 것</p>
+  </div>
+</main>
+</body>
+</html>

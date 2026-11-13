@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>릴스 속 Claude Code 도구</title>
+<meta name="description" content="릴스 2개에 나온 헤드룸·태스크 옵저버·게임 개발 스킬 77개를 저장소에서 직접 확인하고, 이 노트북에 맞는지 정리">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* '무료 모델 Claude Code' 안내와 같은 결: 창업실 종이색, 고딕 제목, 명령은 JetBrains Mono */
+:root {
+  --paper: #f2f1ec; --tone: #e4e2da; --ink: #151514; --muted: #5a5954; --rule: #c9c6bc;
+  --dark: #151618; --on-dark: #eeece6; --on-dark-soft: #9e9d97; --dark-rule: rgb(238 236 230 / .14);
+  --go: #2f6b3a; --try: #8a5a00; --hold: #6b6a64;
+  --m: clamp(16px, 3.2vw, 52px); --g: clamp(12px, 1.6vw, 24px);
+  --sans: "Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif;
+  --mono: "JetBrains Mono", "Pretendard Variable", Pretendard, ui-monospace, monospace;
+  color-scheme: light;
+}
+* { box-sizing: border-box }
+html { scroll-behavior: smooth }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 17px/1.7 var(--sans); word-break: keep-all; overflow-wrap: anywhere; -webkit-font-smoothing: antialiased; overflow-x: clip }
+a { color: inherit; text-underline-offset: 4px }
+h1, h2, h3 { margin: 0; font-weight: 700; letter-spacing: -.03em; line-height: 1.15 }
+p, ul, ol, dl, dd { margin: 0 }
+ul, ol { padding: 0; list-style: none }
+code, pre { font-family: var(--mono); font-variant-ligatures: none }
+code { font-size: .86em; padding: 1px 5px; background: rgb(21 21 20 / .07) }
+a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px }
+.grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--g) }
+
+.topbar { display: flex; justify-content: space-between; align-items: baseline; padding: 26px var(--m) 0 }
+.topbar .mark { font-weight: 700; font-size: 18px; text-decoration: none }
+.topbar nav { display: flex; gap: clamp(14px, 2.4vw, 34px); font-weight: 600; font-size: 15px }
+.topbar nav a { text-decoration: none; padding: 6px 0 }
+.topbar nav a:hover { text-decoration: underline 1px }
+
+.hero { padding: 96px var(--m) 104px; align-items: start }
+.kick { grid-column: 1 / 13; font: 400 13px var(--mono); color: var(--muted); margin-bottom: 24px }
+.hero h1 { grid-column: 1 / 11; font-size: clamp(40px, 5.6vw, 88px); line-height: 1.05; letter-spacing: -.045em }
+.lede { grid-column: 1 / 6; margin-top: 48px; font-size: clamp(18px, 1rem + .3vw, 21px); line-height: 1.6 }
+.sum { grid-column: 7 / 13; margin-top: 48px; background: var(--dark); color: var(--on-dark); padding: 8px 24px }
+.sum li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 16px; padding: 18px 0; border-top: 1px solid var(--dark-rule) }
+.sum li:first-child { border-top: 0 }
+.sum b { font-size: 19px; font-weight: 600; letter-spacing: -.02em }
+.sum span { grid-column: 1; color: var(--on-dark-soft); font-size: 15px; line-height: 1.5 }
+.sum em { grid-row: 1 / 3; grid-column: 2; align-self: center; font: normal 500 13px var(--mono); padding: 5px 10px; border: 1px solid currentColor; white-space: nowrap }
+.sum .go em { color: #8fd19e } .sum .try em { color: #f0c46a } .sum .hold em { color: var(--on-dark-soft) }
+
+.sec { padding: 96px var(--m) }
+.sec.tone { background: var(--tone) }
+.sh { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--g); align-items: baseline; padding-top: 18px; border-top: 1px solid var(--ink) }
+.sh .idx { grid-column: 1 / 4; font: 400 13px var(--mono); color: var(--muted) }
+.sh h2 { grid-column: 4 / 13; font-size: clamp(32px, 4vw, 60px); letter-spacing: -.04em }
+.sh h2 small { display: block; margin-top: 12px; font-size: clamp(17px, 1.3vw, 20px); font-weight: 500; letter-spacing: -.01em; color: var(--muted); line-height: 1.5 }
+.badge { display: inline-block; margin-top: 18px; font: 500 13px var(--mono); padding: 5px 10px; border: 1px solid currentColor }
+.badge.go { color: var(--go) } .badge.try { color: var(--try) } .badge.hold { color: var(--hold) }
+
+.body { margin-top: 56px; row-gap: 48px }
+.col { grid-column: 4 / 13; min-width: 0 }
+.vs { grid-column: 4 / 13; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--g) }
+.vs > div { padding-top: 14px; border-top: 1px solid var(--rule) }
+.vs h3, .col h3 { font-size: 14px; font-weight: 600; color: var(--muted); letter-spacing: 0; margin-bottom: 10px }
+.vs p { max-width: 30em }
+.facts { grid-column: 4 / 13; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--g) }
+.facts div { padding-top: 12px; border-top: 1px solid var(--ink) }
+.facts b { display: block; font: 500 clamp(24px, 2.4vw, 36px)/1.1 var(--mono); letter-spacing: -.03em }
+.facts span { display: block; margin-top: 6px; font-size: 14px; color: var(--muted); line-height: 1.45 }
+.list li { position: relative; padding: 10px 0 10px 22px; border-top: 1px solid var(--rule); max-width: 46em }
+.list li::before { content: ""; position: absolute; left: 2px; top: 22px; width: 8px; height: 2px; background: var(--ink) }
+.list li b { font-weight: 600 }
+.term { margin: 0; background: var(--dark); color: var(--on-dark); padding: 20px 24px; white-space: pre; overflow-x: auto; font-size: 14px; line-height: 1.85 }
+.term .d { color: var(--on-dark-soft); font-family: var(--sans) }
+.col .term + p, .col p + .term { margin-top: 16px }
+.col p { max-width: 42em }
+
+.order { margin-top: 56px; counter-reset: o }
+.order li { display: grid; grid-template-columns: clamp(56px, 7vw, 104px) minmax(0, 1fr); column-gap: var(--g); padding: 26px 0; border-top: 1px solid var(--rule) }
+.order li::before { counter-increment: o; content: counter(o, decimal-leading-zero); font: 400 clamp(32px, 3.6vw, 52px)/1 var(--mono); letter-spacing: -.04em }
+.order b { display: block; font-size: clamp(20px, 1.8vw, 26px); letter-spacing: -.03em; line-height: 1.3 }
+.order p { margin-top: 8px; max-width: 40em; color: #2d2d2b }
+
+.src { padding: 56px var(--m) 72px; background: var(--dark); color: var(--on-dark-soft); font-size: 14px }
+.src .grid > div { grid-column: span 4; min-width: 0 }
+.src h3 { font-size: 13px; font-weight: 500; font-family: var(--mono); color: var(--on-dark); margin-bottom: 10px }
+.src li { padding: 3px 0 }
+
+@media (max-width: 900px) {
+  .hero h1, .lede, .sum, .sh .idx, .sh h2, .col, .vs, .facts { grid-column: 1 / -1 }
+  .sh h2 { margin-top: 10px }
+  .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 24px }
+  .src .grid > div { grid-column: 1 / -1; margin-top: 24px }
+}
+@media (max-width: 600px) {
+  .topbar nav { display: none }
+  .hero { padding-top: 56px }
+  .vs { grid-template-columns: minmax(0, 1fr); row-gap: 24px }
+  .sum { padding: 4px 18px }
+  .sum li { grid-template-columns: minmax(0, 1fr) }
+  .sum em { grid-row: auto; grid-column: 1; justify-self: start; margin-top: 6px }
+  .term { font-size: 12.5px; padding: 16px }
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <a class="mark" href="../">창업실</a>
+  <nav><a href="#headroom">헤드룸</a><a href="#observer">태스크 옵저버</a><a href="#gamedev">게임 스킬</a><a href="#order">해 볼 순서</a></nav>
+</header>
+
+<main>
+<section class="hero grid">
+  <p class="kick">릴스 2개 (11.06) · 저장소 3곳 직접 확인 (11.08)</p>
+  <h1>릴스 속 Claude Code 도구 셋, 진짜 쓸 만할까</h1>
+  <p class="lede">영상이 말한 것과 저장소에 실제로 적힌 것을 나눠 보고, 이 노트북(클로드 구독 로그인 · Windows · Unity 6000.3)에 맞는지 따졌어요.</p>
+  <ul class="sum">
+    <li class="go"><b>게임 개발 스킬 77개</b><span>엔진과 할 일을 보고 맞는 스킬만 불러와요</span><em>깔아 볼 만함</em></li>
+    <li class="try"><b>헤드룸</b><span>클로드에 보내는 도구 출력을 줄여요</span><em>한 번 시험</em></li>
+    <li class="hold"><b>태스크 옵저버</b><span>내가 고친 걸 모아 스킬 수정안을 내요</span><em>지금은 보류</em></li>
+  </ul>
+</section>
+
+<section class="sec tone" id="gamedev">
+  <div class="sh"><span class="idx">01 · 두 번째 릴스</span><h2>게임 개발 스킬 77개<small>gamedev-skills/awesome-gamedev-agent-skills</small><span class="badge go">깔아 볼 만함</span></h2></div>
+  <div class="body grid">
+    <div class="vs">
+      <div><h3>영상이 말한 것</h3><p>스킬 77개로 Claude Code가 게임 개발자가 된다. 엔진과 할 일을 알아서 골라 스킬을 쓰고, 아트 방향을 맞추고, Steam·App Store 출시까지 돕는다.</p></div>
+      <div><h3>저장소에서 확인한 것</h3><p>맞아요. 스킬마다 엔진 버전이 박혀 있고, <code>router</code> 스킬이 프로젝트 파일로 엔진을 알아내 필요한 것만 불러와요. 다만 출시 스킬은 <b>Steam·itch.io뿐</b>이고 App Store 스킬은 없어요.</p></div>
+    </div>
+    <div class="facts">
+      <div><b>49</b><span>엔진 스킬 (Unity 8 · Godot 16 · 웹 6 …)</span></div>
+      <div><b>15</b><span>공통 기술 (손맛·카메라·저장·아트 방향 …)</span></div>
+      <div><b>9 + 4</b><span>장르 + 작업 흐름</span></div>
+      <div><b>★7.6k</b><span>Apache-2.0 · 10.28 마지막 수정</span></div>
+    </div>
+    <div class="col">
+      <h3>이 노트북에선</h3>
+      <ul class="list">
+        <li><b>Unity 스킬이 딱 맞는 버전이에요.</b> 스킬 기준은 Unity 6.3 LTS(6000.3), 넋굿·마디는 6000.3.26f1이에요.</li>
+        <li><b>쓸 데가 바로 있어요.</b> 마디의 <code>unity-animation</code>(휴머노이드 IK), 퍼즐 데모의 <code>game-feel</code>·<code>puzzle</code>, 브라운 로그의 pygame 스킬, 넋굿의 <code>roguelike</code>.</li>
+        <li><b>평소엔 거의 안 무거워요.</b> 스킬은 짧은 설명만 늘 떠 있고, 본문은 필요할 때만 읽혀요.</li>
+      </ul>
+    </div>
+    <div class="col">
+      <h3>설치 (Unity만 쓸 때)</h3>
+      <pre class="term">claude plugin marketplace add gamedev-skills/awesome-gamedev-agent-skills
+claude plugin install router@awesome-gamedev-agent-skills
+claude plugin install unity@awesome-gamedev-agent-skills
+<span class="d">전부 깔려면 마지막 두 줄 대신</span>  claude plugin install gamedev@awesome-gamedev-agent-skills</pre>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="headroom">
+  <div class="sh"><span class="idx">02 · 첫 번째 릴스</span><h2>헤드룸<small>headroomlabs-ai/headroom (옛 chopratejas/headroom)</small><span class="badge try">한 번 시험</span></h2></div>
+  <div class="body grid">
+    <div class="vs">
+      <div><h3>영상이 말한 것</h3><p>도구 출력·로그를 클로드에 닿기 전에 걸러서 20분의 1로 줄인다. 데이터 덩어리는 최대 95%까지 줄고 답은 그대로다.</p></div>
+      <div><h3>저장소에서 확인한 것</h3><p>내 컴퓨터에서 도는 중계기예요. 실제 측정은 <b>입력 21~57% 감소</b>(작업 4종)이고, 90% 넘게 줄어드는 건 같은 모양 JSON·로그가 반복될 때뿐이에요. 글이나 코드는 조금밖에 안 줄어요. 정답률은 차이가 오차 안이었어요.</p></div>
+    </div>
+    <div class="facts">
+      <div><b>21–57%</b><span>저장소가 잰 입력 감소 (작업 4종)</span></div>
+      <div><b>~20%</b><span>코딩 에이전트에서의 대표값</span></div>
+      <div><b>1/20</b><span>영상 수치 = 반복 데이터일 때 최대치</span></div>
+      <div><b>★79k</b><span>Apache-2.0 · 오늘도 수정 중</span></div>
+    </div>
+    <div class="col">
+      <h3>이 노트북에선</h3>
+      <ul class="list">
+        <li><b>구독 한도에 여유가 생기는 쪽이에요.</b> 돈이 아니라 사용량 한도가 덜 차요. 다만 우리 작업은 대부분 코드·글이라 20% 안팎을 기대하는 게 맞아요.</li>
+        <li><b>켜 두면 꺼지는 기능이 있어요.</b> 중계기를 거치면 Claude Code의 Remote Control을 못 써요.</li>
+        <li><b>같이 깔리는 게 있어요.</b> 코드 탐색 도구 Serena가 그 프로젝트에 등록되고, 익명 사용 통계가 기본으로 켜져 있어요.</li>
+        <li>이 노트북에서 아직 돌려 보지 않았어요. 실제로 얼마나 줄지는 <code>headroom savings</code>로 재야 알아요.</li>
+      </ul>
+    </div>
+    <div class="col">
+      <h3>시험해 보기 (PowerShell, 한 세션만)</h3>
+      <pre class="term">uv tool install --python 3.13 "headroom-ai[all]"
+$env:HEADROOM_TELEMETRY = "off"
+headroom wrap claude --code-memory none
+<span class="d">끝나고 얼마나 줄었는지</span>  headroom savings
+<span class="d">되돌리기</span>  headroom unwrap claude</pre>
+      <p><code>uv</code>는 이미 깔려 있어요. <code>wrap</code>은 그 창에서만 중계기를 켜고, Claude를 끄면 같이 꺼져요.</p>
+    </div>
+  </div>
+</section>
+
+<section class="sec tone" id="observer">
+  <div class="sh"><span class="idx">03 · 첫 번째 릴스</span><h2>태스크 옵저버<small>rebelytics/one-skill-to-rule-them-all</small><span class="badge hold">지금은 보류</span></h2></div>
+  <div class="body grid">
+    <div class="vs">
+      <div><h3>영상이 말한 것</h3><p>내가 클로드 결과물을 고칠 때마다 옆에서 기록하고, 같은 잔소리를 반복하지 않게 스킬 고칠 점을 제안한다. 바꿀지는 내가 고른다.</p></div>
+      <div><h3>저장소에서 확인한 것</h3><p>맞아요. 고친 것·반복하는 일을 기록해 스킬 수정안과 새 스킬 후보를 내고, 승인 전엔 아무것도 안 바꿔요. 깔기만 해선 안 켜지고 CLAUDE.md에 켜기 문구를 넣어야 해요.</p></div>
+    </div>
+    <div class="col">
+      <h3>보류하는 이유</h3>
+      <ul class="list">
+        <li><b>같은 일을 이미 하고 있어요.</b> 지적받은 걸 규칙으로 남긴 기억 파일이 17개 있고, 세션마다 읽혀요.</li>
+        <li><b>저장소도 그렇게 말해요.</b> 스킬이 적은 작은 환경에선 기본 기억 기능으로 충분할 수 있다고 적혀 있어요.</li>
+        <li><b>토큰을 더 써요.</b> 세션마다 관찰하고 기록하는 몫이 붙어서, 헤드룸으로 아끼려는 것과 방향이 반대예요.</li>
+        <li>내가 만든 스킬이 여러 개로 늘고, 같은 지적을 여러 프로젝트에서 반복하게 되면 그때 다시 볼 만해요.</li>
+      </ul>
+    </div>
+    <div class="col">
+      <h3>나중에 깔 때</h3>
+      <pre class="term">npx skills add rebelytics/one-skill-to-rule-them-all --skill task-observer -g
+<span class="d">그다음 references/environments.md의 켜기 문구를 CLAUDE.md에</span></pre>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="order">
+  <div class="sh"><span class="idx">04</span><h2>해 볼 순서</h2></div>
+  <ol class="order">
+    <li><div><b>게임 스킬은 router + unity만</b><p>마디에서 다음 동작을 짤 때 써 보고, 스킬 없이 짤 때와 답이 어떻게 다른지 비교해요.</p></div></li>
+    <li><div><b>헤드룸은 긴 작업 한 번만 감싸서</b><p>우리길처럼 로그·JSON이 많이 오가는 작업에서 <code>headroom savings</code> 숫자를 보고 계속 쓸지 정해요.</p></div></li>
+    <li><div><b>태스크 옵저버는 스킬이 늘면</b><p>지금은 기억 파일로 충분해요.</p></div></li>
+  </ol>
+</section>
+</main>
+
+<footer class="src">
+  <div class="grid">
+    <div><h3>릴스</h3><ul><li><a href="https://www.instagram.com/reel/DfZKfvDBXmN/">헤드룸 · 태스크 옵저버</a></li><li><a href="https://www.instagram.com/reel/DfaqbIXNKep/">게임 개발 스킬 77개</a></li></ul></div>
+    <div><h3>저장소</h3><ul><li><a href="https://github.com/gamedev-skills/awesome-gamedev-agent-skills">awesome-gamedev-agent-skills</a></li><li><a href="https://github.com/headroomlabs-ai/headroom">headroom</a></li><li><a href="https://github.com/rebelytics/one-skill-to-rule-them-all">one-skill-to-rule-them-all</a></li></ul></div>
+    <div><h3>확인한 것</h3><ul><li>별 수·수정일·라이선스: GitHub, 11.08</li><li>수치: 각 저장소 README와 문서</li><li>세 도구 모두 이 노트북엔 아직 안 깔았어요</li></ul></div>
+  </div>
+</footer>
+</body>
+</html>

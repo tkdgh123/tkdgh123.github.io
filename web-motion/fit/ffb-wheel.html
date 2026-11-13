@@ -1,0 +1,229 @@
+<!-- Claude가 만듦 (2026-11-06) — 휠 베이스가 스크롤로 돌다가 모터·벨트·축으로 분해되고, 스캔선이 부품 이름을 짚는다 (드론 분해·스캔 60 + 돌아가는 3D 제품 40) -->
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>레이싱 휠 · 분해도</title>
+<link rel="icon" href="data:,">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root { --bg: #f2f1ec; --fg: #151514; --soft: #5a5954; --blue: #2b44a6; --hl: #6f86f0 }
+* { box-sizing: border-box }
+html, body { margin: 0 }
+body { height: 700vh; background: var(--bg); color: var(--fg); font: 400 17px/1.6 "Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif; word-break: keep-all; -webkit-font-smoothing: antialiased; overflow-x: clip }
+canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block }
+.mono { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 12px; letter-spacing: .03em }
+.hud { position: fixed; z-index: 20; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; padding: 14px clamp(16px, 3vw, 32px); pointer-events: none }
+.hud a { pointer-events: auto; color: var(--fg); text-decoration: none; opacity: .65 }
+.hud a:hover { opacity: 1 }
+.say { position: fixed; z-index: 5; left: clamp(20px, 6vw, 100px); top: 50%; width: min(34ch, 40vw); transform: translateY(-46%); opacity: 0; transition: opacity .6s, transform .9s cubic-bezier(.2, .7, .2, 1); pointer-events: none }
+.say.on { opacity: 1; transform: translateY(-50%) }
+.say.tr { left: auto; right: clamp(20px, 6vw, 100px); top: 17%; text-align: right; transform: translateY(-40%) } .say.tr.on { transform: translateY(-50%) }
+.say small { display: block; margin-bottom: 14px; color: var(--soft) }
+.say h1 { margin: 0; font-size: clamp(60px, 9.4vw, 148px); line-height: .9; letter-spacing: -.055em; font-weight: 700 }
+.say h2 { margin: 0; font-size: clamp(32px, 4.4vw, 66px); line-height: 1.02; letter-spacing: -.045em; font-weight: 700 }
+.say p { margin: 14px 0 0; color: var(--soft); font-size: clamp(15px, 1.3vw, 18px) }
+.stats { display: grid; grid-template-columns: repeat(3, auto); gap: 8px 34px; margin-top: 24px; width: max-content }
+.stats b { display: block; font: 500 clamp(26px, 3vw, 44px)/1.05 "JetBrains Mono", monospace; letter-spacing: -.04em }
+.stats span { color: var(--soft) }
+.tag { position: fixed; z-index: 4; left: 0; top: 0; pointer-events: none; white-space: nowrap; opacity: 0; transition: opacity .35s; color: var(--fg); font: 500 12px/1.35 "JetBrains Mono", monospace }
+.tag::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--hl); margin-right: 8px; box-shadow: 0 0 0 4px rgb(111 134 240 / .22); vertical-align: 1px }
+@media (max-width: 700px) { .tag::before { display: none } .tag { font-size: 11px } .tag small { margin-left: 0 !important } }
+.tag small { display: block; margin: 0 0 0 15px; opacity: .6; font-size: 11px }
+.bar { position: fixed; z-index: 6; left: clamp(20px, 6vw, 100px); right: clamp(20px, 6vw, 100px); bottom: 20px; height: 2px; background: color-mix(in srgb, var(--fg) 14%, transparent) }
+.bar i { display: block; height: 100%; width: 0; background: var(--fg) }
+@media (max-width: 700px) {
+  .say, .say.tr { top: auto; bottom: 8vh; left: 20px; right: 20px; width: auto; text-align: left; transform: translateY(14px) } .say.on, .say.tr.on { transform: none }
+  .say h1 { font-size: clamp(60px, 19vw, 100px) } .stats { gap: 6px 22px }
+}
+</style>
+</head>
+<body>
+<nav class="hud mono"><a href="./index.html">← 카드별 어울림</a><a href="../../ffb-wheel/">작품 보기 →</a></nav>
+<canvas id="cv"></canvas>
+<svg id="lead" style="position:fixed;inset:0;width:100%;height:100%;z-index:3;pointer-events:none"></svg>
+<div id="tags"></div>
+
+<div class="say on" data-a="0" data-b=".13"><small class="mono">CHANGGONGSEOL · FORCE FEEDBACK</small><h1>레이싱<br>휠</h1></div>
+<div class="say" data-a=".17" data-b=".33"><h2>돌리면<br>모터가 되받아쳐요</h2><p>포스 피드백 휠 베이스, 우리가 산 부품의 실제 치수로.</p></div>
+<div class="say tr" data-a=".38" data-b=".5"><h2>축 하나에<br>줄줄이.</h2></div>
+<div class="say tr" data-a=".52" data-b=".7"><small class="mono">부품 이름은 스캔선이 짚어요</small><h2>부품 열두 개</h2></div>
+<div class="say" data-a=".74" data-b=".94"><h2>벨트 하나로<br>잇습니다.</h2><div class="stats"><div><b>1 : 3</b><span class="mono">20T → 60T</span></div><div><b>280mm</b><span class="mono">GT2 벨트</span></div><div><b>24V</b><span class="mono">250W 모터</span></div></div></div>
+<div class="say" data-a=".95" data-b="1.1"><h2>직접 만든<br>레이싱 휠.</h2></div>
+<div class="bar"><i id="bar"></i></div>
+
+<script type="module">
+import * as THREE from "three";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
+const mob = innerWidth < 700, calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const cv = document.getElementById("cv");
+const renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+const scene = new THREE.Scene();
+scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), .04).texture;
+const camera = new THREE.PerspectiveCamera(28, 1, .1, 100);
+const sun = new THREE.DirectionalLight("#fff6ea", 2.1); sun.position.set(4, 8, 6); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
+Object.assign(sun.shadow.camera, { left: -7, right: 7, top: 7, bottom: -7, far: 30 }); sun.shadow.radius = 5; scene.add(sun);
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), new THREE.ShadowMaterial({ opacity: .22 }));
+floor.rotation.x = -Math.PI / 2; floor.position.y = -.16; floor.receiveShadow = true; scene.add(floor);
+
+// ── 모델: 단위 mm, G 크기 0.01. 조향축은 z 방향 (핸들이 +z, 사용자 쪽). 축 높이 95
+const G = new THREE.Group(); G.scale.setScalar(.01); scene.add(G);
+const YA = 95;
+const mat = {
+  wood: () => new THREE.MeshStandardMaterial({ color: "#d8c3a0", roughness: .62 }), alu: () => new THREE.MeshStandardMaterial({ color: "#b6bcc2", roughness: .3, metalness: .85 }),
+  steel: () => new THREE.MeshStandardMaterial({ color: "#6a7077", roughness: .35, metalness: .9 }), black: () => new THREE.MeshStandardMaterial({ color: "#1b1c1e", roughness: .55, metalness: .1 }),
+  red: () => new THREE.MeshStandardMaterial({ color: "#d4261d", roughness: .4 }), pcb: () => new THREE.MeshStandardMaterial({ color: "#2b44a6", roughness: .5, metalness: .1 }),
+  motor: () => new THREE.MeshStandardMaterial({ color: "#2a2d32", roughness: .4, metalness: .7 })
+};
+const cylZ = (r, z0, z1, seg = 48) => new THREE.CylinderGeometry(r, r, z1 - z0, seg).rotateX(Math.PI / 2).translate(0, 0, (z0 + z1) / 2);
+const mesh = (g, m, parent, p = [0, 0, 0], r = [0, 0, 0]) => { const o = new THREE.Mesh(g, m); o.castShadow = o.receiveShadow = true; o.position.set(...p); o.rotation.set(...r); parent.add(o); return o; };
+const svg = document.getElementById("lead"), parts = [], tagBox = document.getElementById("tags");
+// 부품: outer(분해 위치) > spin(돌아가는 부분)
+function part(name, sub, ex, anchor, spinK = 0) {
+  const outer = new THREE.Group(), spin = new THREE.Group(); outer.add(spin); G.add(outer);
+  const P = { name, sub, ex: new THREE.Vector3(...ex), outer, spin, spinK, anchor: new THREE.Vector3(...anchor), tag: null, scanned: false, mats: [] };
+  if (name) { const d = document.createElement("div"); d.className = "tag"; d.innerHTML = name + (sub ? `<small>${sub}</small>` : ""); tagBox.append(d); P.tag = d; }
+  parts.push(P); return P;
+}
+const done = P => { P.spin.traverse(o => { if (o.isMesh) P.mats.push(o.material); }); return P; };
+
+// 바닥판 + 모터 받침쇠
+const base = part("바닥판", "합판", [0, -150, 0], [150, 0, 40]);
+mesh(new RoundedBoxGeometry(320, 16, 360, 3, 4), mat.wood(), base.spin, [20, -8, 80]); done(base);
+// 핸들 (+ 빨간 12시 표시)
+const wh = part("핸들", "350mm · PCD 70×6", [0, 0, 340], [-120, 120, 320], 1);
+mesh(new THREE.TorusGeometry(175, 17, 28, 120), mat.black(), wh.spin, [0, 0, 316]);
+mesh(new THREE.TorusGeometry(175, 18, 16, 10, .11), mat.red(), wh.spin, [0, 0, 316], [0, 0, Math.PI / 2 - .055]);
+mesh(cylZ(58, 296, 312, 64), mat.alu(), wh.spin, [0, 0, 0]);
+for (let i = 0; i < 3; i++) { const a = i / 3 * Math.PI * 2 + Math.PI / 2; mesh(new RoundedBoxGeometry(34, 120, 12, 2, 3), mat.alu(), wh.spin, [Math.cos(a) * 88, Math.sin(a) * 88, 306], [0, 0, a - Math.PI / 2]); }
+for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2; mesh(cylZ(4, 312, 322, 16), mat.steel(), wh.spin, [Math.cos(a) * 35, Math.sin(a) * 35, 0]); }
+done(wh);
+// 띄움 조각 2장, 나무판
+const sp = part("띄움 조각", "15T 2장씩", [0, 0, 290], [60, 60, 280], 1);
+[-1, 1].forEach(s => mesh(new RoundedBoxGeometry(30, 70, 30, 2, 3), mat.wood(), sp.spin, [s * 50, 0, 278]));
+done(sp);
+const pl = part("나무판", "Ø110 15T · M5 4개", [0, 0, 190], [-60, 60, 252], 1);
+mesh(cylZ(55, 238, 253, 48), mat.wood(), pl.spin); for (let i = 0; i < 4; i++) { const a = i / 4 * Math.PI * 2 + Math.PI / 4; mesh(cylZ(3, 253, 262, 8), mat.steel(), pl.spin, [Math.cos(a) * 40, Math.sin(a) * 40, 0]); }
+done(pl);
+// 베어링 블록 둘 (608ZZ)
+const blk = (z, name, ex) => { const b = part(name, "608ZZ", ex, [38, YA + 20, z]); const h = YA + 34;
+  mesh(new RoundedBoxGeometry(64, h, 34, 3, 4), mat.wood(), b.spin, [0, h / 2 - 2, z]); mesh(new THREE.TorusGeometry(15, 5, 12, 40), mat.steel(), b.spin, [0, YA, z + 17]); done(b); return b; };
+blk(168, "앞 베어링 블록", [0, 0, 80]); blk(36, "뒤 베어링 블록", [0, 0, -120]);
+// 조향축 (M8 전산볼트)
+const sh = part("조향축", "M8 전산볼트", [0, 70, 0], [0, YA + 12, 340], 1);
+mesh(cylZ(4, -30, 310, 16), mat.steel(), sh.spin, [0, YA, 0]); for (let z = -26; z < 306; z += 6) mesh(new THREE.TorusGeometry(4.2, .8, 4, 12), mat.steel(), sh.spin, [0, YA, z]); done(sh);
+// 60T 풀리
+const p60 = part("60T 풀리", "보어 8", [0, 120, -40], [0, YA + 40, 100], 1);
+mesh(cylZ(21, 92, 106, 60), mat.alu(), p60.spin); mesh(cylZ(26, 90, 93, 60), mat.alu(), p60.spin); mesh(cylZ(26, 105, 108, 60), mat.alu(), p60.spin); done(p60);
+// 모터 (MY1016) + 20T 풀리
+const D = 96, motor = part("MY1016", "24V 250W", [190, 0, -100], [D + 50, YA + 50, 40], 0); motor.spin.position.y = YA;
+mesh(cylZ(45, -10, 78, 56), mat.motor(), motor.spin, [D, 0, 0]); mesh(cylZ(40, 78, 84, 56), mat.steel(), motor.spin, [D, 0, 0]); mesh(cylZ(3.5, 84, 110, 12), mat.steel(), motor.spin, [D, 0, 0]);
+mesh(cylZ(46, -14, -10, 56), mat.black(), motor.spin, [D, 0, 0]); done(motor);
+const p20 = part("20T 풀리", "모터 축", [190, 60, 80], [D + 12, YA + 22, 100], -3);
+mesh(cylZ(7, 92, 106, 24), mat.alu(), p20.spin); mesh(cylZ(10, 90, 93, 24), mat.alu(), p20.spin); mesh(cylZ(10, 105, 108, 24), mat.alu(), p20.spin); done(p20);
+// 모터 받침쇠
+const br = part("모터 받침쇠", "긴 구멍으로 장력", [120, -90, -60], [D + 54, 8, 20]);
+mesh(new RoundedBoxGeometry(110, 8, 90, 2, 3), mat.steel(), br.spin, [D, 5, 38]); mesh(new RoundedBoxGeometry(70, YA - 50, 70, 2, 3), mat.steel(), br.spin, [D, 8 + (YA - 50) / 2, 38]); done(br);
+// GT2 벨트: 두 풀리를 감싸는 닫힌 곡선
+const belt = part("GT2 벨트", "280mm · 폭 6", [60, 220, 20], [D / 2, YA + 38, 99], 0);
+{ const r1 = 24, r2 = 9, phi = Math.acos((r1 - r2) / D), pts = [], N = 40;
+  for (let i = 0; i <= N; i++) { const a = phi + (2 * Math.PI - 2 * phi) * i / N; pts.push(new THREE.Vector3(Math.cos(a) * r1, Math.sin(a) * r1, 0)); }
+  for (let i = 0; i <= 14; i++) { const a = -phi + 2 * phi * i / 14; pts.push(new THREE.Vector3(D + Math.cos(a) * r2, Math.sin(a) * r2, 0)); }
+  const m = mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts, true), 160, 1.7, 6, true), mat.black(), belt.spin, [0, 0, 99]); m.scale.z = 1.7; belt.spin.position.y = 0; belt.beltY = YA; belt.spin.children[0].position.y = YA; }
+done(belt);
+// AS5600 + 자석
+const as = part("AS5600 + 자석", "틈 1.5", [0, 0, -260], [24, YA + 24, -34]);
+mesh(new THREE.BoxGeometry(28, 28, 2), mat.pcb(), as.spin, [0, YA, -40]); mesh(cylZ(3, -33, -30.5, 16), mat.red(), as.spin, [0, YA, 0]); mesh(new THREE.BoxGeometry(8, 6, 4), mat.black(), as.spin, [8, YA - 6, -38]); done(as);
+
+// 축과 같이 도는 부품의 회전 중심 = 축 (0, YA), 모터 풀리는 (D, YA)
+[wh, sp, pl, p60].forEach(P => P.spin.position.y = YA);
+sh.spin.position.y = YA; sh.spin.children.forEach(c => c.position.y -= YA);
+p20.spin.position.set(D, YA, 0);
+
+// ── 스캔면
+const scan = new THREE.Group();
+scan.add(new THREE.Mesh(new THREE.PlaneGeometry(520, 420), new THREE.MeshBasicMaterial({ color: "#6f86f0", transparent: true, opacity: .1, side: THREE.DoubleSide, depthWrite: false })));
+{ const l = new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints([[-260, -210, 0], [260, -210, 0], [260, 210, 0], [-260, 210, 0]].map(a => new THREE.Vector3(...a))), new THREE.LineBasicMaterial({ color: "#6f86f0" })); scan.add(l); }
+scan.visible = false; scan.position.y = YA + 40; G.add(scan);
+
+// ── 장면
+const clamp01 = x => Math.min(1, Math.max(0, x)), sm = t => t * t * (3 - 2 * t), L = (a, b, t) => a + (b - a) * t;
+const band = (a, b, p) => sm(clamp01((p - a) / (b - a)));
+const KC = [ // 카메라 방위(rad), 높이, 거리, 바라보는 곳 z(mm)
+  [0, .42, .5, 11, 1.8], [.15, 1.0, .38, 11.5, 1.8], [.34, -1.55, .12, 17, 2.2], [.62, -1.55, .12, 17, 2.2], [.78, -2.65, .4, 10.5, 1.6], [1, -3.5, .3, 10, 1.6]
+];
+const frames = [[0, 0], [.15, 0], [.3, 1], [.7, 1], [.76, 0], [1, 0]];
+const interp = (K, p, i0) => { for (let i = 0; i < K.length - 1; i++) if (p <= K[i + 1][0]) { const t = sm((p - K[i][0]) / (K[i + 1][0] - K[i][0])); return K[i].slice(1).map((v, j) => L(v, K[i + 1][j + 1], t)); } return K[K.length - 1].slice(1); };
+let target = 0, prog = 0, mx = 0, my = 0, mxs = 0, mys = 0;
+const prg = () => clamp01(scrollY / (document.documentElement.scrollHeight - innerHeight));
+addEventListener("scroll", () => target = prg(), { passive: true });
+addEventListener("pointermove", e => { mx = e.clientX / innerWidth - .5; my = e.clientY / innerHeight - .5; });
+function resize() { renderer.setSize(innerWidth, innerHeight, false); camera.aspect = innerWidth / innerHeight; camera.fov = innerWidth < 700 ? 40 : 28; camera.updateProjectionMatrix(); }
+addEventListener("resize", resize); resize(); target = prog = prg();
+
+const says = [...document.querySelectorAll(".say")], bar = document.getElementById("bar"), root = document.documentElement.style;
+const BG = [["#f2f1ec", "#151514", "#5a5954"], ["#151618", "#eeece6", "#9e9d97"]].map(a => a.map(c => new THREE.Color(c)));
+const col = new THREE.Color(), clock = new THREE.Clock(), v = new THREE.Vector3(), sv = new THREE.Vector3();
+let T = 0, steer = 0, belt3 = 0;
+renderer.setAnimationLoop(() => {
+  const rd = Math.min(.3, clock.getDelta()), dt = Math.min(.05, rd) * (calm ? .15 : 1); T += dt;
+  prog += (target - prog) * (1 - Math.exp(-rd * 4)); const p = prog;
+  mxs += (mx - mxs) * .05; mys += (my - mys) * .05;
+  const ex = band(.34, .46, p) * (1 - band(.72, .8, p));
+  const dark = band(.3, .4, p) * (1 - band(.74, .82, p));
+  BG[0].forEach((c, i) => { col.copy(c).lerp(BG[1][i], dark); root.setProperty(["--bg", "--fg", "--soft"][i], "#" + col.getHexString()); });
+  // 카메라
+  const [az, el, dist, lz] = interp(KC, p);
+  const side = Math.abs(az) < .01 ? 0 : 1;
+  const A = az + mxs * .25, R = dist * (mob ? L(1.55, 1.25, ex) : 1);
+  G.rotation.x = mob ? -Math.PI / 2 * ex : 0;
+  camera.position.set(Math.sin(A) * R * Math.cos(el * .6), Math.sin(el) * R * .9 + 1.2, Math.cos(A) * R * Math.cos(el * .6));
+  // 분해된 장면: 옆에서 본 도면 구도(+x 쪽에서). 아닐 땐 위 키 프레임의 방위
+  const sideAz = Math.PI / 2 + .12, ez = ex;
+  const A2 = L(A, sideAz, ez);
+  camera.position.set(Math.sin(A2) * R, L(Math.sin(el) * R * .9 + 1.2, 1.4 - mys * .6, ez), Math.cos(A2) * R * L(1, .05, ez));
+  mob ? camera.lookAt(0, L(1.2, 2.2, ez), L(lz, -.95, ez)) : camera.lookAt(-1.5 * (1 - ez) * Math.cos(A2), L(1.2, 1.15, ez), L(lz, 2.2, ez));
+  mob ? camera.setViewOffset(innerWidth, innerHeight, 0, innerHeight * .09, innerWidth, innerHeight) : camera.clearViewOffset();
+  camera.updateProjectionMatrix();
+  floor.position.y = -.16 - ex * 1.5; floor.visible = !(mob && ex > .1); floor.material.opacity = .22 * (1 - dark * .85);
+  // 핸들 각도: 두 번째 장면에서 좌우로, 분해 때는 천천히
+  const swing = Math.sin(T * .9) * 1.3 * band(.12, .2, p) * (1 - ex) + Math.sin(T * .35) * .25 * (1 - band(.1, .16, p));
+  steer += (swing - steer) * .25; const roll = calm ? 0 : T * .5 * ex;
+  const scanZ = L(480, -330, clamp01((p - .5) / .2)), scanning = p > .5 && p < .72;
+  scan.visible = scanning; scan.position.z = scanZ;
+  parts.forEach(P => {
+    P.outer.position.copy(P.ex).multiplyScalar(ex);
+    P.spin.rotation.z = P === belt ? 0 : (P.spinK ? (steer + roll) * P.spinK : 0);
+    const pz = P.anchor.z + P.ex.z * ex, scanned = p > .5 && pz > scanZ - 4 || p > .7;
+    P.scanned = scanned; const hit = scanning ? Math.exp(-(((pz - scanZ) / 70) ** 2)) : 0;
+    P.mats.forEach(m => { m.emissive.set("#6f86f0"); m.emissiveIntensity = hit * .9; });
+    if (P.tag) {
+      sv.copy(P.anchor).add(P.outer.position); G.localToWorld(sv); sv.project(camera);
+      P.sx = (sv.x * .5 + .5) * innerWidth; P.sy = (-sv.y * .5 + .5) * innerHeight; P.vis = ex > .6 && P.scanned && p > .5;
+      if (!mob) { P.tag.style.transform = `translate(${P.sx + 12}px, ${P.sy - 8}px)`; P.tag.style.opacity = P.vis ? 1 : 0; }
+    }
+  });
+  if (mob) { // 폰: 이름표를 오른쪽 한 줄 열로 모으고 선으로 잇는다 (겹치면 아래로 밀기)
+    const colX = innerWidth * .64; let last = -1e9; svg.innerHTML = "";
+    parts.filter(P => P.tag && P.vis).sort((a, b) => a.sy - b.sy).forEach(P => {
+      const ly = Math.max(P.sy, last + 33); last = ly;
+      P.tag.style.transform = `translate(${colX}px, ${ly - 9}px)`; P.tag.style.opacity = 1;
+      svg.insertAdjacentHTML("beforeend", `<circle cx="${P.sx}" cy="${P.sy}" r="2.6" fill="#6f86f0"/><path d="M${P.sx} ${P.sy}L${colX - 6} ${ly}" stroke="#6f86f0" stroke-opacity=".55" stroke-width="1" fill="none"/>`);
+    });
+    parts.forEach(P => { if (P.tag && !P.vis) P.tag.style.opacity = 0; });
+  }
+  // 벨트: 두 풀리 사이를 도는 모습은 풀리 각도에 맞춰 약간 흔들 (재질 변화 없음)
+  says.forEach(s => s.classList.toggle("on", p >= +s.dataset.a && p < +s.dataset.b));
+  bar.style.width = p * 100 + "%";
+  renderer.render(scene, camera);
+});
+</script>
+</body>
+</html>

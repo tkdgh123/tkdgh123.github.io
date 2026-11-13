@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>교수님 머리 뽑기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@700&family=Jua&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; height: 100%; background: #1d2a24; overflow: hidden; }
+  body { font-family: 'Jua', 'Malgun Gothic', sans-serif; color: #fff; user-select: none; -webkit-user-select: none; }
+  canvas { position: fixed; inset: 0; width: 100%; height: 100%; touch-action: none; display: block; }
+  .hud { position: fixed; top: max(12px, env(safe-area-inset-top)); left: 16px; right: 16px; display: flex; justify-content: space-between; pointer-events: none; font-size: clamp(18px, 3.2vw, 28px); text-shadow: 0 2px 0 #000, 0 0 6px #000; }
+  [hidden] { display: none !important; }
+  .panel { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; background: rgba(10, 16, 13, .55); text-align: center; padding: 16px; }
+  .panel h1 { margin: 0; font-size: clamp(40px, 9vw, 84px); font-weight: normal; text-shadow: 0 4px 0 #000; }
+  .panel p { margin: 0; font-size: clamp(18px, 3.6vw, 28px); line-height: 1.45; text-shadow: 0 2px 0 #000; }
+  .panel button { margin-top: 10px; font: inherit; font-size: clamp(22px, 4.4vw, 34px); padding: .35em 1.4em; border: 0; border-radius: 999px; background: #ffd23f; color: #2b1d0e; box-shadow: 0 5px 0 #b8860b; cursor: pointer; }
+  .panel.end { justify-content: flex-end; background: linear-gradient(transparent 45%, rgba(10, 16, 13, .8)); padding-bottom: max(28px, env(safe-area-inset-bottom)); gap: 8px; }
+  .panel .row { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+  .panel button small { font-size: .62em; opacity: .75; margin-left: .25em; }
+  .panel button.sub { background: rgba(255,255,255,.9); box-shadow: 0 5px 0 #8a8a8a; }
+  .panel button:active { transform: translateY(4px); box-shadow: 0 1px 0 #b8860b; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div class="hud"><span id="left"></span><span id="time"></span></div>
+
+<div class="panel" id="title">
+  <h1>교수님 머리 뽑기</h1>
+  <p>교수님이 칠판을 볼 때 머리카락을 잡아 끌어 뽑으세요.<br>돌아보기 전에 커서를 내 태블릿 위로!</p>
+  <div class="row">
+    <button data-lv="쉬움">쉬움<small>5가닥</small></button>
+    <button data-lv="보통">보통<small>9가닥</small></button>
+    <button data-lv="어려움">어려움<small>15가닥</small></button>
+  </div>
+</div>
+<div class="panel end" id="caught" hidden>
+  <h1>들켰다!</h1>
+  <p id="caughtMsg"></p>
+  <div class="row"><button class="again">다시 하기</button><button class="sub levelBtn">난이도 바꾸기</button></div>
+</div>
+<div class="panel end" id="win" hidden>
+  <h1>다 뽑았다!</h1>
+  <p id="winMsg"></p>
+  <div class="row"><button class="again">다시 하기</button><button class="sub levelBtn">난이도 바꾸기</button></div>
+</div>
+
+<script src="img/heads.js"></script>
+<script>
+const VW = 1200, VH = 900;           // 무대 크기(교수님 그림과 같은 좌표)
+const PS = 0.8, PX = (VW - VW * PS) / 2, PY = VH - VH * PS;  // 교수님을 놓는 크기·자리
+const LEVELS = { '쉬움': 5, '보통': 9, '어려움': 15 };   // 난이도별 머리카락 수
+let level = '보통', HAIRS = LEVELS[level];
+
+const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+const $ = id => document.getElementById(id);
+const img = {};
+for (const k of ['back', 'look', 'angry', 'bald', 'room', 'desk']) { img[k] = new Image(); img[k].src = `img/${k}.${k === 'room' ? 'jpg' : 'webp'}`; }
+const TABLET = { x: 0.553, y: 0.025, w: 0.31, h: 0.615 };   // desk.webp 안 태블릿 자리(그림 폭·높이 비율)
+
+// ── 화면 맞추기: 교수님 몸이 늘 화면 아래에 붙고, 머리카락 위 칠판까지 보이게
+//    가로 화면은 무대 폭 1000, 세로 화면(휴대폰)은 머리 쪽 640만 보여 머리를 크게
+let scale = 1, ox = 0, oy = 0, viewW = 1000;
+function resize() {
+  const dpr = Math.min(devicePixelRatio || 1, 2);
+  cv.width = innerWidth * dpr; cv.height = innerHeight * dpr;
+  scale = Math.min(innerWidth / (innerWidth < innerHeight ? 640 : 1000), innerHeight / 860) * dpr;
+  ox = cv.width / 2 - 600 * scale;
+  oy = cv.height - 900 * scale;
+  viewW = cv.width / scale;
+}
+addEventListener('resize', resize); resize();
+const toStage = e => { const d = Math.min(devicePixelRatio || 1, 2); return { x: (e.clientX * d - ox) / scale, y: (e.clientY * d - oy) / scale }; };
+
+// ── 정수리 윤곽 위의 자리 t(0~1) → 무대 좌표와 바깥 방향
+function scalp(pose, t, depth = 9) {
+  const H = HEADS[pose] || HEADS.look, [ax, ay] = H.apex;
+  const half = (H.contour.at(-1)[0] - H.contour[0][0]) / 2;
+  const arc = H.contour.filter(([, y]) => y <= ay + half * 0.5);
+  const i = Math.min(arc.length - 1, Math.max(0, Math.round(t * (arc.length - 1))));
+  const [x, y] = arc[i], cx = ax, cy = ay + half;           // 머리 가운데쯤
+  const nx = x - cx, ny = y - cy, n = Math.hypot(nx, ny);
+  return { x: PX + (x - nx / n * depth) * PS, y: PY + (y - ny / n * depth) * PS, ang: Math.atan2(ny, nx) };
+}
+
+// ── 게임 상태
+let state = 'title', hairs = [], flying = [], pops = [], grab = null, pointer = null, cursor = null;  // cursor = 마지막 커서(손가락) 자리
+let prof = 'write', profT = 0, turn = 0, shake = 0, tug = { x: 0, y: 0 }, t0 = 0, elapsed = 0, chalk = 0;
+
+function newGame() {
+  hairs = [];
+  for (let i = 0; i < HAIRS; i++) {
+    hairs.push({
+      t: 0.06 + 0.88 * (i + 0.5 + (Math.random() - 0.5) * 0.6) / HAIRS,
+      len: 55 + Math.random() * 75,
+      curl: (Math.random() < 0.5 ? -1 : 1) * (Math.random() < 0.4 ? 0.2 + Math.random() * 0.4 : 1 + Math.random() * 1.3),
+      tilt: (Math.random() - 0.5) * 0.8,
+      depth: 9 + Math.random() * 30,           // 윤곽에서 안쪽으로 들어간 뿌리 깊이
+      strength: 110 + Math.random() * 110,   // 이만큼 더 당겨야 뽑힘
+      phase: Math.random() * 7, gone: false,
+    });
+  }
+  flying = []; pops = []; grab = null; shake = 0; chalk = 0; page = 0;
+  setProf('write'); t0 = performance.now(); elapsed = 0;
+  state = 'play';
+  for (const p of ['title', 'caught', 'win']) $(p).hidden = true;
+}
+
+const pulled = () => hairs.filter(h => h.gone).length;
+const rand = (a, b) => a + Math.random() * (b - a);
+function setProf(s) {
+  prof = s;
+  const k = pulled() / HAIRS * 9;   // 뽑은 비율만큼 빨라짐(어느 난이도든 끝에선 같은 빠르기)
+  if (s === 'write') profT = rand(1.7, 4.2) - k * 0.12;
+  if (s === 'warn') profT = Math.max(0.5, 0.95 - k * 0.05);   // 태블릿으로 옮길 틈
+  if (s === 'look') profT = rand(1.3, 2.3);
+  if (s === 'look') turn = 0.16;   // 휙 돌아서기
+}
+const pose = () => state === 'win' ? 'bald' : prof === 'caught' ? 'angry' : prof === 'look' ? 'look' : 'back';
+
+// ── 머리카락 모양(쉬는 모양): 뿌리에서 바깥으로 뻗다가 끝이 말림
+function strand(h, now) {
+  const r = scalp(pose(), h.t, h.depth);
+  const pts = [[r.x, r.y]];
+  let a = r.ang + h.tilt + Math.sin(now / 600 + h.phase) * 0.07, x = r.x, y = r.y;
+  const n = 14, seg = h.len / n;
+  for (let i = 1; i <= n; i++) {
+    const s = i / n;
+    a += h.curl * s * s * 0.42;
+    x += Math.cos(a) * seg; y += Math.sin(a) * seg;
+    pts.push([x, y]);
+  }
+  return { root: r, pts };
+}
+// 잡아당길 때: 뿌리에서 손끝까지 팽팽하게
+function pulledStrand(h, now) {
+  const r = scalp(pose(), h.t, h.depth), p = pointer;
+  const pts = [], wob = Math.sin(now / 30) * 2;
+  for (let i = 0; i <= 14; i++) {
+    const s = i / 14, sag = Math.sin(s * Math.PI) * (1 - Math.min(1, dist(r, p) / (h.len + h.strength))) * 18;
+    pts.push([r.x + (p.x - r.x) * s + wob * s, r.y + (p.y - r.y) * s + sag]);
+  }
+  return { root: r, pts };
+}
+const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+
+// ── 내 책상: 화면 맨 아래 가운데, 좁은 화면이면 폭에 맞춰 줄임
+function desk() {
+  const w = Math.min(viewW, 1000), h = w * (img.desk.naturalHeight || 1) / (img.desk.naturalWidth || 4);
+  const x = 600 - w / 2, y = 900 - h;
+  return { x, y, w, h, tab: { x: x + TABLET.x * w, y: y + TABLET.y * h, w: TABLET.w * w, h: TABLET.h * h } };
+}
+function onTablet() {
+  if (!cursor) return true;                  // 아직 한 번도 안 움직였으면 봐줌
+  const t = desk().tab, m = 12;
+  return cursor.x > t.x - m && cursor.x < t.x + t.w + m && cursor.y > t.y - m && cursor.y < t.y + t.h + m;
+}
+
+function drawStrand(pts, w = 1) {
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  for (const [col, lw] of [['#24150f', 7.5 * w], ['#5d5a60', 3.6 * w]]) {
+    ctx.strokeStyle = col; ctx.lineWidth = lw; ctx.beginPath();
+    pts.forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y));
+    ctx.stroke();
+  }
+}
+
+// ── 입력
+cv.addEventListener('pointerdown', e => {
+  cursor = toStage(e);
+  if (state !== 'play') return;
+  pointer = cursor;
+  const reach = e.pointerType === 'touch' ? 85 : 45, now = performance.now();
+  let best = null, bd = reach;
+  for (const h of hairs) {
+    if (h.gone) continue;
+    for (const [x, y] of strand(h, now).pts) {
+      const d = Math.hypot(x - pointer.x, y - pointer.y);
+      if (d < bd) { bd = d; best = h; }
+    }
+  }
+  if (best) { grab = best; cv.setPointerCapture(e.pointerId); if (prof === 'look') caught('hair'); }
+});
+cv.addEventListener('pointermove', e => { cursor = toStage(e); if (grab) pointer = cursor; });
+const release = () => { grab = null; tug = { x: 0, y: 0 }; };
+cv.addEventListener('pointerup', release);
+cv.addEventListener('pointercancel', release);
+
+function pop(h) {
+  const { root, pts } = pulledStrand(h, performance.now());
+  h.gone = true; release();
+  const dx = pointer.x - root.x, dy = pointer.y - root.y, n = Math.hypot(dx, dy) || 1;
+  flying.push({ pts: strand(h, performance.now()).pts.map(([x, y]) => [x - root.x, y - root.y]), x: root.x, y: root.y,
+    vx: dx / n * 700 + rand(-80, 80), vy: dy / n * 700 - 300, rot: 0, vr: rand(-12, 12), life: 1.6 });
+  pops.push({ x: root.x, y: root.y - 20, life: 0.7, text: pulled() === HAIRS ? '뽁!!!' : '뽁!' });
+  shake = 0.18;
+  if (pulled() === HAIRS) return win();
+  if (prof === 'write') profT -= 0.5;      // 뽑을 때마다 교수님이 수상해함
+}
+
+function caught(why) {
+  turn = prof === 'look' ? 0 : 0.16;
+  prof = 'caught'; state = 'caught'; release(); shake = 0.4;
+  setTimeout(() => {
+    if (state !== 'caught') return;          // 그사이 새 판을 시작했으면 띄우지 않음
+    $('caughtMsg').innerHTML = `${why === 'hair' ? '머리카락을 잡고 있었어요.' : '커서가 태블릿 밖에 있었어요.'}<br>${pulled()}가닥 뽑고 남은 머리카락 ${HAIRS - pulled()}가닥.`;
+    $('caught').hidden = false;
+  }, 900);
+}
+function win() {
+  state = 'win'; turn = 0.16;
+  const sec = elapsed.toFixed(1);
+  const key = 'profHairBest_' + level;
+  let best = null; try { best = parseFloat(localStorage.getItem(key)); } catch (e) {}
+  const record = !best || elapsed < best;
+  if (record) try { localStorage.setItem(key, elapsed.toFixed(1)); } catch (e) {}
+  setTimeout(() => {
+    if (state !== 'win') return;
+    $('winMsg').innerHTML = `${level} · ${sec}초 만에 ${HAIRS}가닥 모두!<br>${record ? '최고 기록!' : `최고 기록 ${best.toFixed(1)}초`}`;
+    $('win').hidden = false;
+  }, 1300);
+}
+
+// ── 판서(칠판 글씨): 교수님이 쓰는 동안 한 글자씩
+const LINES = ['∂f/∂x = 0', 'e^iπ + 1 = 0', '∇·E = ρ/ε₀', 'O(n log n)', 'lim sin x/x = 1', 'det(A) ≠ 0', 'P(A|B) = ?', '시험 범위: 전부'];
+const PAGE = 3;
+let page = 0;
+const pageChars = () => LINES.slice((page * PAGE) % LINES.length).slice(0, PAGE).join('').length;
+
+// ── 그리기
+let last = performance.now();
+function frame(now) {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  if (state === 'play') {
+    elapsed = (now - t0) / 1000;
+    profT -= dt;
+    if (prof === 'write') { chalk += dt * 8; if (chalk > pageChars() + 12) { chalk = 0; page++; } if (profT <= 0) setProf(Math.random() < 0.28 ? 'fake' : 'warn'); }
+    else if (prof === 'fake') { if (profT <= -0.5) setProf('write'); }      // 멈칫했다가 다시 판서
+    else if (prof === 'warn') { if (profT <= 0) setProf('look'); }
+    else if (prof === 'look') { if (turn <= 0 && (grab || !onTablet())) caught(grab ? 'hair' : 'tablet'); else if (profT <= 0) { setProf('write'); turn = 0.16; } }
+    if (grab) {
+      const r = scalp(pose(), grab.t, grab.depth), d = dist(r, pointer), over = d - grab.len * 0.6;
+      const k = Math.max(0, Math.min(1, over / grab.strength));
+      tug = { x: (pointer.x - r.x) / (d || 1) * k * 16, y: (pointer.y - r.y) / (d || 1) * k * 16 };
+      if (over > grab.strength) pop(grab);
+    }
+  }
+  turn = Math.max(0, turn - dt); shake = Math.max(0, shake - dt);
+  draw(now, dt);
+  requestAnimationFrame(frame);
+}
+
+function draw(now, dt) {
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.fillStyle = '#1d2a24'; ctx.fillRect(0, 0, cv.width, cv.height);
+  ctx.setTransform(scale, 0, 0, scale, ox, oy);
+
+  // 교실 배경: 보이는 화면 가운데 기준으로 화면을 덮게 키움
+  const vh = cv.height / scale, bs = Math.max(cv.width / scale / VW, vh / VH, 1);
+  ctx.save();
+  ctx.translate(600 - VW * bs / 2, 900 - vh / 2 - VH * bs / 2); ctx.scale(bs, bs);
+  if (img.room.complete && img.room.naturalWidth) ctx.drawImage(img.room, 0, 0, VW, VH);
+  ctx.restore();
+  // 판서는 무대 좌표에(배경을 키워도 칠판이 늘 이 자리를 덮음)
+  ctx.font = '40px Gaegu, Jua, sans-serif'; ctx.fillStyle = 'rgba(245,245,235,.85)'; ctx.textBaseline = 'top';
+  const vw = cv.width / scale, tall = vh > 1000;          // 세로 화면이면 머리 위 빈 칠판에
+  const tx = tall ? 600 - vw / 2 + 40 : 805, ty = tall ? 900 - vh + 150 : 140;
+  let left = Math.floor(chalk);
+  for (let i = 0; i < PAGE && left > 0; i++) {
+    const L = LINES[(page * PAGE + i) % LINES.length], n = Math.min(L.length, left); left -= L.length;
+    ctx.fillText(L.slice(0, n), tx, ty + i * 48);
+  }
+
+  // 교수님
+  const p = pose(), im = img[p];
+  ctx.save();
+  let sx = 1, bx = 0, by = 0, rot = 0;
+  if (turn > 0) sx = Math.max(0.05, Math.abs(turn / 0.16 * 2 - 1));          // 휙 돌아서기
+  if (shake > 0) { bx = rand(-1, 1) * 14 * shake / 0.4; by = rand(-1, 1) * 6 * shake / 0.4; }
+  if (state === 'play' && prof === 'write' && !grab) { rot = Math.sin(now / 160) * 0.012; by += Math.abs(Math.sin(now / 160)) * 3; }
+  if (prof === 'warn' || prof === 'fake') rot = 0.035;                       // 고개 갸웃
+  ctx.translate(600 + bx + tug.x, 900 + by + tug.y);
+  ctx.rotate(rot); ctx.scale(sx, 1);
+  ctx.translate(-600, -900);
+  // 돌아서는 중간까지는 앞 자세를 보여 줌
+  const shown = turn > 0.08 ? (p === 'back' ? 'look' : 'back') : p;
+  const sim = img[shown];
+  if (sim.complete && sim.naturalWidth) ctx.drawImage(sim, PX, PY, VW * PS, VH * PS);
+  if (turn <= 0.08) {
+    for (const h of hairs) if (!h.gone && h !== grab) drawStrand(strand(h, now).pts);
+    if (grab) { const k = Math.min(1, Math.max(0, (dist(scalp(p, grab.t, grab.depth), pointer) - grab.len * 0.6) / grab.strength)); drawStrand(pulledStrand(grab, now).pts, 1 - k * 0.45); }
+  }
+  ctx.restore();
+
+  // 내 책상과 태블릿(앞쪽): 커서가 올라가 있으면 화면이 밝게, 경고 중엔 테두리가 깜박임
+  if (img.desk.complete && img.desk.naturalWidth) {
+    const d = desk(), t = d.tab, on = onTablet() && cursor;
+    ctx.drawImage(img.desk, d.x, d.y, d.w, d.h);
+    const warnBlink = state === 'play' && (prof === 'warn' || prof === 'fake') && !on && Math.sin(now / 70) > 0;
+    if (on || warnBlink) {
+      ctx.save(); ctx.lineWidth = 7; ctx.strokeStyle = on ? 'rgba(120,230,255,.95)' : 'rgba(255,90,74,.95)';
+      ctx.shadowColor = ctx.strokeStyle; ctx.shadowBlur = 18;
+      ctx.beginPath(); ctx.roundRect(t.x, t.y, t.w, t.h, 14); ctx.stroke(); ctx.restore();
+    }
+  }
+
+  // 교수님 말
+  const head = scalp('back', 0.5);
+  let say = null;
+  if (state === 'play' && (prof === 'warn' || prof === 'fake')) say = '흠…?';
+  if (state === 'caught') say = '이 녀석!!!';
+  if (state === 'win') say = '내 머리…!';
+  if (say) {
+    ctx.font = '54px Jua, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    ctx.lineWidth = 10; ctx.strokeStyle = '#000'; ctx.fillStyle = state === 'caught' ? '#ff5a4a' : '#fff';
+    const tx2 = Math.max(600 - vw / 2 + 140, head.x - 250);    // 좁은 화면에서도 안 잘리게
+    ctx.strokeText(say, tx2, head.y + 10); ctx.fillText(say, tx2, head.y + 10);
+    ctx.textAlign = 'left';
+  }
+
+  // 날아가는 머리카락
+  for (const f of flying) {
+    f.vy += 2200 * dt; f.x += f.vx * dt; f.y += f.vy * dt; f.rot += f.vr * dt; f.life -= dt;
+    ctx.save(); ctx.translate(f.x, f.y); ctx.rotate(f.rot); drawStrand(f.pts); ctx.restore();
+  }
+  flying = flying.filter(f => f.life > 0);
+  // 뽁!
+  for (const q of pops) {
+    q.life -= dt; q.y -= 90 * dt;
+    ctx.globalAlpha = Math.max(0, q.life / 0.7);
+    ctx.font = '60px Jua, sans-serif'; ctx.textAlign = 'center'; ctx.lineWidth = 10; ctx.strokeStyle = '#000'; ctx.fillStyle = '#ffd23f';
+    ctx.strokeText(q.text, q.x, q.y); ctx.fillText(q.text, q.x, q.y);
+    ctx.globalAlpha = 1; ctx.textAlign = 'left';
+  }
+  pops = pops.filter(q => q.life > 0);
+
+  $('left').textContent = state === 'title' ? '' : `${level} · 남은 머리카락 ${HAIRS - pulled()}`;
+  $('time').textContent = state === 'title' ? '' : `${elapsed.toFixed(1)}초`;
+}
+
+document.querySelectorAll('[data-lv]').forEach(b => b.onclick = () => { level = b.dataset.lv; HAIRS = LEVELS[level]; newGame(); });
+document.querySelectorAll('.again').forEach(b => b.onclick = newGame);
+document.querySelectorAll('.levelBtn').forEach(b => b.onclick = () => { $('caught').hidden = $('win').hidden = true; newGame(); state = 'title'; $('title').hidden = false; });
+document.fonts?.load('40px Gaegu'); document.fonts?.load('40px Jua');   // 캔버스 글씨용 글꼴 미리 받기
+// 첫 화면에서도 머리카락이 보이게
+newGame(); state = 'title'; $('title').hidden = false;
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

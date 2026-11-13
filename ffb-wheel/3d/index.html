@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>레이싱 휠 3D</title>
+<script>/* 따로 열면 레이싱 휠 페이지의 3D 조립 순서 칸으로 */if(window.top===window)location.replace("../?t=build"+location.search.replace("?","&")+location.hash);else document.documentElement.classList.add("framed")</script>
+<meta name="description" content="창공설 레이싱 휠 3D — 주차(10~14주차)와 1·2일차를 고르면 그날 만들 부품만 보이는 휠 베이스·페달 모델">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
+<style>
+/* 휠 베이스·페달을 한 주소에서 탭으로 + 주차 고르기. 두 모델은 ../wheel/, ../pedal/ 그대로, ?w=주차만 넘김 */
+:root { --ink: #1C2228; --ink-soft: #56616B; --rule: #C3CBD2; --page: #F4F5F6; --accent: #C8102E; --ok: #0E7A3E; --ui: "IBM Plex Sans KR", "Malgun Gothic", system-ui, sans-serif; color-scheme: light }
+* { box-sizing: border-box }
+html, body { margin: 0; height: 100% }
+body { background: var(--page); color: var(--ink); font: 13px var(--ui); display: flex; flex-direction: column; overflow: hidden }
+.pad { padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)) }
+nav { flex: none; display: flex; align-items: center; gap: 4px; height: 44px; border-bottom: 1px solid var(--rule) }
+nav a { color: var(--ink-soft); text-decoration: none; white-space: nowrap }
+nav a:hover { color: var(--ink) }
+nav b { font-size: 15px; margin: 0 auto 0 14px; white-space: nowrap }
+button { font: inherit; cursor: pointer }
+nav button { border: 1px solid var(--rule); background: #fff; color: var(--ink-soft); padding: 6px 11px; border-radius: 3px; white-space: nowrap }
+nav button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+/* 레이싱 휠 페이지 안: 위 줄(창업실·제목) 빼고 휠 베이스|페달은 일차 줄로 */
+.framed nav { display: none }
+.goal button[data-v] { border-color: var(--rule); color: var(--ink-soft) }
+.goal button[data-v][aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff }
+.goal button[data-v="wheel"] { margin-left: auto }
+
+/* 주차 줄: 달력 칸처럼 날짜를 나눠서 */
+.weeks { flex: none; display: flex; gap: 0; overflow-x: auto; border-bottom: 1px solid var(--rule); background: #fff; scrollbar-width: none }
+.weeks::-webkit-scrollbar { display: none }
+.weeks button { flex: 1 0 auto; min-width: 104px; border: 0; border-right: 1px solid var(--rule); background: none; color: var(--ink-soft); padding: 7px 12px 8px; text-align: left; line-height: 1.35; position: relative }
+.weeks button:last-child { border-right: 0 }
+.weeks button b { display: block; font-size: 14px; color: var(--ink) }
+.weeks button span { font-size: 11.5px; font-variant-numeric: tabular-nums }
+.weeks button i { font-style: normal; font-size: 10.5px; margin-left: 6px; color: var(--ok) }
+.weeks button[aria-pressed="true"] { background: var(--page) }
+.weeks button[aria-pressed="true"]::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 3px; background: var(--accent) }
+.weeks button:hover b { color: var(--accent) }
+
+.goal { flex: none; display: flex; align-items: center; gap: 10px; min-height: 40px; padding-top: 6px; padding-bottom: 6px; border-bottom: 1px solid var(--rule) }
+.days { flex: none; display: flex; border: 1px solid var(--ink); border-radius: 3px; overflow: hidden }
+.days button { border: 0; background: #fff; color: var(--ink); padding: 4px 10px; line-height: 1.25; text-align: left; font-weight: 500 }
+.days button + button { border-left: 1px solid var(--ink) }
+.days button span { display: block; font-size: 11px; font-weight: 400; color: var(--ink-soft); font-variant-numeric: tabular-nums }
+.days button[aria-pressed="true"] { background: var(--ink); color: #fff }
+.days button[aria-pressed="true"] span { color: #C3CBD2 }
+.goal p { margin: 0; flex: 1; min-width: 0; line-height: 1.45 }
+.goal p b { margin-right: 8px }
+.goal p span { color: var(--ink-soft) }
+.goal button { flex: none; border: 1px solid var(--ink); background: #fff; color: var(--ink); padding: 5px 11px; border-radius: 3px }
+.goal button[aria-expanded="true"] { background: var(--ink); color: #fff }
+
+.wrap { flex: 1; position: relative; min-height: 0 }
+iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block }
+iframe[hidden] { display: none }
+.todo { position: absolute; top: 0; right: 0; z-index: 2; width: min(420px, 100%); max-height: 100%; overflow-y: auto; background: #fff; border-left: 1px solid var(--rule); border-bottom: 1px solid var(--rule); box-shadow: 0 10px 30px rgba(28,34,40,.12); padding: 14px 18px 16px }
+.todo[hidden] { display: none }
+.todo h3 { margin: 0 0 6px; font-size: 12px; font-weight: 500; color: var(--ink-soft) }
+.todo ul { list-style: none; margin: 0 0 14px; padding: 0 }
+.todo li { display: grid; grid-template-columns: 74px 1fr; gap: 8px; padding: 6px 0; border-top: 1px solid #E3E7EA; line-height: 1.5 }
+.todo li em { font-style: normal; color: var(--ink-soft); font-size: 12px }
+.todo li em b { display: block; color: var(--ink); font-size: 13px; font-weight: 500 }
+.todo .new li { grid-template-columns: 1fr }
+.todo .new li::before { content: none }
+.todo a { color: var(--accent); text-decoration: none; font-weight: 500 }
+.todo a:hover { text-decoration: underline }
+@media (max-width: 520px) { .goal { flex-wrap: wrap } .goal p { order: 9; flex-basis: 100% } nav b { display: none } nav a { margin-right: auto } .goal p span { display: none } .weeks button { min-width: 92px; padding: 6px 10px } }
+</style>
+</head>
+<body>
+<nav class="pad" aria-label="레이싱 휠 3D">
+  <a href="../../#make">← 창업실</a>
+  <b>레이싱 휠 3D</b>
+  <button type="button" data-v="wheel" data-src="../wheel/" aria-pressed="true">휠 베이스</button>
+  <button type="button" data-v="pedal" data-src="../pedal/" aria-pressed="false">페달</button>
+</nav>
+<div class="weeks pad" id="weeks" role="group" aria-label="주차"></div>
+<div class="goal pad"><div class="days" id="days" role="group" aria-label="일차"></div><p id="goal"></p><button type="button" id="tTodo" aria-expanded="false" aria-controls="todo">할 일</button></div>
+<div class="wrap">
+  <iframe id="f-wheel" title="휠 베이스 3D" hidden></iframe>
+  <iframe id="f-pedal" title="페달 3D" hidden></iframe>
+  <div class="todo" id="todo" hidden></div>
+</div>
+<script>
+// 주차 = 파트 분배(../parts/)와 같은 내용, 1·2일차 = 그 주 1·2차시(화·수). model = 그 주에 먼저 보여 줄 모델, done = 이미 한 주
+// 일차마다 shows = 3D에 보이는 것(그날 만드는 것만), jobs = [역할, 이름, 할 일]
+const P = (a, b, c, d) => [["기구", "김도영", a], ["HW", "최민호", b], ["SW", "황찬웅", c], ["기획/테스트", "김창식", d]];
+const WEEKS = [
+  { w: 10, s: "2026-11-03", done: true, model: "pedal", title: "페달 수치와 나무 자르기", goal: "액셀·브레이크 페달의 수치를 정하고 나무를 잘랐어요.",
+    days: [
+      { shows: ["페달: 정한 수치의 나무 조각 6가지"], jobs: P("페달 수치 확정", "센서 자리 수치", "밟는 각도 수치", "수치 표 정리") },
+      { shows: ["페달: 자른 나무 조각 6가지 (붙이기 전)"], jobs: P("나무 자르기", "나무 자르기 함께", "나무 자르기 함께", "조각 치수 확인 · 진행 동영상") }] },
+  { w: 11, s: "2026-11-10", model: "pedal", title: "페달 완성", goal: "두 페달을 밟으면 시리얼 모니터의 값이 바뀐다.",
+    days: [
+      { shows: ["나무 붙이기: 받침판 1장(같이 씀) + 칸마다 O 받이 U자(B 판 폭) · B 판", "페달 막대 · 발판 · 막대 몸통 U (옆벽 2 + 앞벽)", "액셀·브레이크 두 벌 같이"],
+        jobs: P("조각 맞대 보기 · 축 구멍 표시·뚫기 · 붙이기", "보드 핀 확인 · 책상에서 먼저 연결 · 자석 자리 정하기", "두 방식 비교 · 방식 정하기 · 코드 뼈대", "시험 표 양식 · 정상 항목 적기 · 결과보고서 틀") },
+      { shows: ["O핀 · 장너트 · 와셔", "전산볼트를 U에 (페달에 걸기 전에) → 스프링 · B 구멍 · 뒤 너트 → A핀", "AS5600 + 자석 · 센서 받침 · 사이 조각", "선: A0(액셀) · A1(브레이크) · 5V · GND"],
+        jobs: P("회전축 끼우기 · 복귀 스프링 달기 · 밟아 보기 · 휠 베이스 수치 그리기", "센서 장착 · 배선 · 선 고정 · 회로도", "배선된 센서로 확인 · 놓은 값·밟은 값 기록 · 출력 모양 정하기", "1차 시험 · 결과 기록 · 진행 동영상") }] },
+  { w: 12, s: "2026-11-17", model: "wheel", title: "휠 베이스와 조향 센서", goal: "핸들 축을 돌리면 각도가 나오고, 페달 보정이 저장된다.",
+    days: [
+      { shows: ["자르기: 바닥판 · 베어링 블록 나무 · 센서 받침 · 전자부 나무판(핸들 왼쪽)", "우노 + 브레드보드(5V·GND 나누기)", "조향 AS5600 → 우노 A4·A5 · USB"],
+        jobs: P("실물 대 보기 · 수치 확정·재단 목록 · 자르기", "조향 센서 배선 · I2C 확인 · 핸들 축 끝에 장착", "조향 각도 읽기 · 바퀴 수 세기 · 시작 위치", "페달 예외 시험 · 11주차 못 한 정상 시험") },
+      { shows: ["조립: 608ZZ · 세로 볼트 · 조향축 · 60T 풀리(축 꿸 때 같이) · 앞 블록 너트", "BTS7960 + 신호선 D8·D9·D10 (24V는 아직)"],
+        jobs: P("조립 · 핸들 축 받침 · 돌려 보기 · 모터 자리 준비", "모터 드라이버 신호선 · EN 풀다운 · 회로도 갱신", "텍스트 명령 · 페달 보정 · 시험 돕기", "조향·저장 시험 · 오류 기록 · 진행 동영상") }] },
+  { w: 13, s: "2026-11-24", model: "wheel", title: "모터와 힘", goal: "보낸 힘만큼 핸들이 움직이고, 문제가 생기면 모터가 꺼진다.",
+    days: [
+      { shows: ["MY1016 · 모터 받침쇠 · 20T 풀리 · GT2 벨트", "LRS-350-24 · 24V 스위치 · 전원선 · 모터선 · 220V 선"],
+        jobs: P("모터 고정 · 풀리·벨트 · 손으로 돌려 보기", "24V 배선 · 전원 스위치 · 두 번 확인", "시리얼 프레임 · 모드 전환 · 게임 소프트웨어 쪽", "안전 시험 순서 · 시험하는 동안 24V 스위치 옆 대기") },
+      { shows: ["나무판 · 띄움 조각 2개 · 핸들 · M5 볼트 4개", "핸들 가로 살에 패들 2개 (받침 철판 + 마이크로 스위치)", "패들 선: 꼬인 선 → 우노 D4·D7"],
+        jobs: P("핸들·패들 장착 · 바닥 고정 · 처음 돌릴 때 보기", "패들 스위치 D4·D7 · 선 정리 · 회로도 갱신", "힘 계산 · 엔드스톱 · 통신 두절", "모터 관찰 · 시연 시나리오 초안 · 진행 동영상") }] },
+  { w: 14, s: "2026-12-01", model: "wheel", title: "합치기와 전시 준비", goal: "처음부터 끝까지 시연이 되고, 최종 작품 검토를 받는다.",
+    days: [
+      { shows: ["합치기: 페달 두 벌을 책상 밑에", "페달 선 → 책상 다리 → 우노 A0·A1", "시연: 핸들 · 패들 · 두 페달"], jobs: P("보강 · 분리·조립 연습", "최종 회로도 · 배선 점검", "버그 고치기 · 게임 연결 시험", "전체 시나리오 시험 · 오류 목록") },
+      { shows: ["새로 만드는 부품 없음 — 휠 베이스 + 페달 다 된 모습"], jobs: P("전시 배치 · 시연 연습 · 결과보고서", "여분 챙기기 · 결과보고서", "코드 정리 · 결과보고서 · 결과물 zip 준비", "전시회 요약 템플릿 · 전시 준비 연락 · 결과보고서 · 진행 동영상") }] },
+];
+const DOW = "일월화수목금토";
+const md = (s, add = 0) => { const t = new Date(s + "T00:00"); t.setDate(t.getDate() + add); return { t, txt: `${t.getMonth() + 1}.${t.getDate()}`, dow: DOW[t.getDay()] }; };
+WEEKS.forEach(k => { k.d = `${md(k.s).txt} – ${md(k.s, 6).txt}`; k.days.forEach((d, i) => d.date = md(k.s, i)); });
+const $ = id => document.getElementById(id);
+const tabs = [...document.querySelectorAll("nav button")];
+if (document.documentElement.classList.contains("framed")) $("tTodo").before(...tabs);
+const q = new URLSearchParams(location.search);
+// 오늘이 든 주·일차 (이미 한 주면 다음 주 1일차)
+function today() {
+  const t = new Date(); let i = WEEKS.findLastIndex(k => md(k.s).t <= t);
+  if (i < 0) return [WEEKS[0].w, 1];
+  if (WEEKS[i].done && i < WEEKS.length - 1) return [WEEKS[i + 1].w, 1];
+  return [WEEKS[i].w, t >= WEEKS[i].days[1].date.t ? 2 : 1];
+}
+let [W, D] = WEEKS.some(k => k.w === +q.get("w")) ? [+q.get("w"), +q.get("d") === 2 ? 2 : 1] : today();
+let V = tabs.some(t => t.dataset.v === q.get("v")) ? q.get("v") : null;
+["v", "w", "d"].forEach(k => q.delete(k));
+let rest = (q.size ? "&" + q : "") + location.hash;   // 처음 연 모델에만 넘기는 나머지(#d= 치수, ?cam= 등)
+
+$("weeks").innerHTML = WEEKS.map(k => `<button type="button" data-w="${k.w}"><b>${k.w}주차${k.done ? "<i>한 일</i>" : ""}</b><span>${k.d}</span></button>`).join("");
+const wkBtns = [...$("weeks").children];
+const week = () => WEEKS.find(k => k.w === W);
+
+function show(v) {
+  V = v; const key = W + "-" + D;
+  for (const t of tabs) {
+    const on = t.dataset.v === v, f = $("f-" + t.dataset.v);
+    t.setAttribute("aria-pressed", on);
+    if (on && f.dataset.k !== key) { f.src = t.dataset.src + `?w=${W}&d=${D}` + rest; f.dataset.k = key; rest = ""; }
+    f.hidden = !on;
+  }
+  history.replaceState(null, "", `?w=${W}&d=${D}` + (v === week().model ? "" : "&v=" + v));
+}
+function pick(w, d, v) {
+  W = w; D = d; const k = week(), day = k.days[D - 1];
+  wkBtns.forEach(b => b.setAttribute("aria-pressed", +b.dataset.w === W));
+  $("days").innerHTML = k.days.map((x, i) => `<button type="button" data-d="${i + 1}" aria-pressed="${i + 1 === D}">${i + 1}일차<span>${x.date.txt} ${x.date.dow}</span></button>`).join("");
+  $("goal").innerHTML = `<b>${k.title}</b><span>${k.goal}</span>`;
+  $("todo").innerHTML = `<h3>${k.w}주차 ${D}일차 · ${day.date.txt} ${day.date.dow} · 할 일</h3><ul>${day.jobs.map(([r, n, j]) => `<li><em><b>${n}</b>${r}</em><span>${j}</span></li>`).join("")}</ul>` +
+    `<h3>이날 3D 조립 순서에 나오는 것</h3><ul class="new">${day.shows.map(s => `<li>${s}</li>`).join("")}</ul><a href="../?t=plan#w${k.w}" target="_top">자세한 순서·준비물 → 주차별 계획</a>`;
+  show(v || k.model);
+}
+wkBtns.forEach(b => b.addEventListener("click", () => { pick(+b.dataset.w, 1); b.scrollIntoView({ inline: "nearest", block: "nearest" }); }));
+$("days").addEventListener("click", e => { const b = e.target.closest("button"); if (b) pick(W, +b.dataset.d, V); });
+for (const t of tabs) t.addEventListener("click", () => show(t.dataset.v));
+$("tTodo").addEventListener("click", e => { const open = $("todo").hidden; $("todo").hidden = !open; e.currentTarget.setAttribute("aria-expanded", open); });
+addEventListener("keydown", e => { if (e.key === "Escape" && !$("todo").hidden) $("tTodo").click(); });
+// 조립 단계를 넘기다 다음 날로 가면 위 주차·일차 칸만 따라 바꿈(모델은 다시 안 불러옴)
+addEventListener("message", e => {
+  const d = e.origin === location.origin && e.data?.legoDay; if (!d) return;
+  const w = Math.floor(d / 10), dd = d % 10; if (w === W && dd === D) return;
+  $("f-" + V).dataset.k = w + "-" + dd; pick(w, dd, V);
+  wkBtns.find(b => +b.dataset.w === W).scrollIntoView({ inline: "nearest", block: "nearest" });
+});
+pick(W, D, V);
+wkBtns.find(b => +b.dataset.w === W).scrollIntoView({ inline: "nearest", block: "nearest" });
+</script>
+</body>
+</html>

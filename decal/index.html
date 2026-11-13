@@ -1,0 +1,719 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="color-scheme" content="light dark">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>데칼코마니</title>
+<meta name="description" content="선을 그어 판을 반으로 접으면, 똑같이 겹치는 색 점이 짝으로 터지는 2분 퍼즐">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@300;700&display=swap">
+<style>
+:root { color-scheme: light dark; --bg: #e9e8e4; --paper: #fbfaf7; --ink: #1c1b19; --muted: #6f6c66; --red: #d8443c;
+  --on-ink: #fff; --track: #d6d4ce; --track2: #dcdad4; --label: #5f5c56; --s2: #ece4da; --s3: #efdcd6; --ov: rgb(233 232 228 / .82);
+  --hover: rgb(255 255 255 / .45); --shadow: rgb(40 30 20 / .28); --seg-shadow: rgb(40 30 20 / .15); --seg-on: var(--paper);
+  /* 캔버스(판) 색: 빈 칸 점, 들린 종이 밑, 접힌 종이 뒷면, 먹(rgb 세 값), 마지막 물감, 번쩍임 세기 */
+  --empty: #d9d6cf; --under: #efebe4; --back: rgb(245 241 233 / .72); --ink-rgb: 28 27 25; --c5: #33312d; --flash: .55 }
+/* 다크 모드: 어두운 종이에 밝은 먹. 검정 물감은 흰 물감으로 */
+@media (prefers-color-scheme: dark) { :root {
+  --bg: #141312; --paper: #23211e; --ink: #ecebe6; --muted: #9b978f; --red: #ef5b50;
+  --on-ink: #141312; --track: #34322e; --track2: #302e2a; --label: #a5a198; --s2: #221a12; --s3: #2a1613; --ov: rgb(20 19 18 / .84);
+  --hover: rgb(255 255 255 / .05); --shadow: rgb(0 0 0 / .65); --seg-shadow: rgb(0 0 0 / .45); --seg-on: #45423d;
+  --empty: #3b3935; --under: #1b1a18; --back: rgb(46 43 39 / .8); --ink-rgb: 236 235 230; --c5: #e8e4dc; --flash: .1 } }
+* { box-sizing: border-box }
+html, body { height: 100% }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 500 16px/1.4 "Pretendard Variable", Pretendard, system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow: hidden; -webkit-user-select: none; user-select: none }
+.app { height: 100svh; max-width: 560px; margin: 0 auto; padding: max(14px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 14px }
+.top { display: flex; justify-content: space-between; align-items: flex-end }
+.back { color: var(--muted); text-decoration: none; font-size: 14px; padding: 6px 0 }
+.back:hover { color: var(--ink) }
+.score { margin-left: auto; text-align: right; line-height: 1 }
+/* ×2·×3은 곱해지는 점수 바로 왼쪽에 (×1일 땐 안 보임) */
+.sc { display: flex; align-items: baseline; justify-content: flex-end; gap: 8px }
+.score b { display: block; font: 700 44px/1 Hahmlet, serif; font-variant-numeric: tabular-nums; letter-spacing: -.02em }
+.score span { font-size: 13px; color: var(--muted) }
+.score span.hot { color: var(--red); font-weight: 700 }
+.timer { display: flex; align-items: center; gap: 12px }
+.timer .time { flex: 1 }
+.sec { min-width: 3.4em; text-align: right; font: 700 20px/1 Hahmlet, serif; font-variant-numeric: tabular-nums; transition: color .3s }
+.sec.low { color: var(--red) }
+.sec.pop { animation: pop .3s }
+.sec.hit { animation: jolt .6s }
+@keyframes jolt { 0%, 70% { color: var(--red) } 20% { transform: translateX(-6px) scale(1.25) } 50% { transform: translateX(5px) } 75% { transform: translateX(-2px) } }
+body::after { content: ""; position: fixed; inset: 0; pointer-events: none; box-shadow: inset 0 0 110px rgb(216 68 60 / .5); opacity: 0; transition: opacity .5s }
+body.low::after { opacity: 1; animation: beat .5s infinite alternate }
+.time { height: 6px; border-radius: 3px; background: var(--track); overflow: hidden }
+.time i { display: block; height: 100%; width: 100%; background: var(--ink); transform-origin: left; border-radius: 3px }
+.time[data-s="2"] i { background: #f08a24 }
+.time[data-s="3"] i, .time.low i { background: var(--red) }
+.time.low i { animation: beat .5s infinite alternate }
+@keyframes beat { to { opacity: .35 } }
+body { transition: background 1.2s }
+body[data-s="2"] { background: var(--s2) }
+body[data-s="3"] { background: var(--s3) }
+.mult { font: 700 26px/1 Hahmlet, serif; font-style: normal; color: var(--muted) }
+.mult[hidden] { display: none }
+/* 콤보: 판 왼쪽, 판 높이만 한 막대가 남은 시간만큼 아래로 줄어든다. 색 = 콤보 크기(1 검정 → 2·3 주황 → 4 이상 빨강) */
+.cbar { position: absolute; left: calc(-1 * var(--cbw)); top: 0; bottom: 0; width: 8px; border-radius: 4px; background: var(--track2); overflow: hidden; display: flex; align-items: flex-end; visibility: hidden }
+.cbar.on { visibility: visible }
+.cbar s { width: 100%; height: 100%; border-radius: 4px; background: var(--ink); transform: scaleY(0); transform-origin: bottom }
+.cbar[data-c="2"] s, .cbar[data-c="3"] s { background: #f08a24 }
+.cbar[data-c="4"] s { background: var(--red) }
+.cbar.late s { animation: beat .25s infinite alternate }
+/* 막대 이름표: 막대 바로 위(판 밖)에 글자로 — 색만으로 뜻을 전하지 않게. 판을 가리지 않고 손가락 길과도 안 겹침 */
+.cblab { position: absolute; left: calc(-1 * var(--cbw)); bottom: calc(100% + 3px); font: 700 13px/1 Pretendard, system-ui, sans-serif; color: var(--label); white-space: nowrap; pointer-events: none; visibility: hidden }
+.cblab.on { visibility: visible }
+.cblab.go { color: var(--ink) }
+.cblab small { font: inherit; color: #f08a24 }
+.cblab[data-c="4"] small { color: var(--red) }
+/* 설명의 콤보 단계: 막대와 이름표를 깜빡여 눈이 가게 */
+.cbar.hl { animation: hl .8s infinite alternate }
+@keyframes hl { to { box-shadow: 0 0 0 4px rgb(240 138 36 / .45) } }
+/* 처음 설명: 판 아래 글 + 버튼, 판에서는 손가락이 직접 그어 보인다 */
+.tut { display: grid; gap: 6px; justify-items: center; text-align: center }
+.tut[hidden] { display: none }
+.tut .n { font-size: 13px; color: var(--muted) }
+.tut h2 { margin: 0; font: 700 22px/1.3 Hahmlet, serif; word-break: keep-all }
+.tut p { margin: 0; min-height: 2.8em; max-width: 24em; color: var(--muted); word-break: keep-all }
+.tut-btns { display: flex; gap: 8px }
+.tut-btns button { min-height: 46px; padding: 0 22px; border: 0; border-radius: 23px; background: none; color: var(--muted); font: 700 15px Pretendard, system-ui, sans-serif; cursor: pointer }
+.tut-btns #tutnext { min-width: 128px; background: var(--ink); color: var(--on-ink) }
+.mult[data-s="2"] { color: #f08a24 }
+.mult[data-s="3"] { color: var(--red) }
+.mult.up { animation: up .6s }
+@keyframes up { 30% { transform: scale(1.7) } }
+.stage { flex: 1; min-height: 0; display: grid; place-items: center }
+.board { position: relative; --cbw: 16px; touch-action: none }
+canvas { display: block; background: var(--paper); border-radius: 20px; box-shadow: 0 1px 0 rgb(0 0 0 / .04), 0 18px 40px -18px var(--shadow); touch-action: none; cursor: crosshair }
+.snd { border: 0; background: none; color: var(--muted); padding: 6px; margin-left: 4px; cursor: pointer; display: grid }
+.snd:hover { color: var(--ink) }
+.snd[hidden] { display: none }
+.score b.pop { animation: pop .35s }
+@keyframes pop { 30% { transform: scale(1.18) } }
+.ov .nb { color: var(--red); font: 700 22px/1 Hahmlet, serif; animation: nb .5s both }
+@keyframes nb { from { transform: scale(2.4) rotate(-8deg); opacity: 0 } 60% { transform: scale(.94) rotate(-3deg); opacity: 1 } to { transform: rotate(-3deg) } }
+.ov { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; text-align: center; gap: 14px; padding: 24px; background: var(--ov); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); border-radius: 20px; transition: opacity .3s }
+.ov[hidden] { display: grid; opacity: 0; pointer-events: none }
+.ov h1 { margin: 0; font: 300 clamp(40px, 11vw, 60px)/1 Hahmlet, serif; letter-spacing: -.03em }
+.ov h1 b { font-weight: 700 }
+.ov p { margin: 0; color: var(--muted); max-width: 17em; word-break: keep-all }
+.ov .big { font: 700 64px/1 Hahmlet, serif; color: var(--ink) }
+.ov button { margin-top: 10px; min-width: 160px; min-height: 52px; border: 0; border-radius: 26px; background: var(--ink); color: var(--on-ink); font: 700 17px Pretendard, system-ui, sans-serif; cursor: pointer; transition: transform .15s }
+.ov button:active { transform: scale(.96) }
+.ov button:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px }
+.modes { display: flex; gap: 10px }
+.modes button { min-width: 0; width: 128px; display: grid; gap: 3px; place-content: center; padding: 10px 0 }
+.modes button:not(.on) { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--ink) }
+/* 순위 (rank.js) */
+.rk-line { display: flex; gap: 10px; align-items: baseline; justify-content: center; flex-wrap: wrap; min-height: 1.4em; font-size: 14px }
+.rk-line span { color: var(--muted) }
+.ov .rk-link, .rk-link { min-width: 0; min-height: 0; margin: 0; padding: 4px 2px; border: 0; border-radius: 0; background: none; color: var(--ink); font: 700 14px Pretendard, system-ui, sans-serif; text-decoration: underline 1.5px; text-underline-offset: 4px; cursor: pointer }
+.rk-link:hover { color: var(--red) }
+#rk { position: fixed; inset: 0; z-index: 30; background: var(--bg); overflow-y: auto; overscroll-behavior: contain; -webkit-user-select: text; user-select: text; animation: rkin .22s ease-out }
+@keyframes rkin { from { opacity: 0; transform: translateY(14px) } }
+.rk-in-wrap { max-width: 560px; margin: 0 auto; padding: max(14px, env(safe-area-inset-top)) 16px max(28px, env(safe-area-inset-bottom)) }
+.rk-top { display: flex; justify-content: space-between; align-items: center; min-height: 52px }
+.rk-top h2, .rk-name { margin: 0; font: 300 40px/1 Hahmlet, serif; letter-spacing: -.03em }
+.rk-name { margin: 18px 0 22px; font-weight: 700; font-size: 34px; overflow-wrap: anywhere }
+.rk-x { width: 44px; height: 44px; border: 0; background: none; color: var(--muted); font-size: 20px; cursor: pointer; margin-right: -10px }
+.rk-x:hover { color: var(--ink) }
+.rk-btn { min-height: 46px; padding: 0 22px; border: 0; border-radius: 23px; background: var(--ink); color: var(--on-ink); font: 700 15px Pretendard, system-ui, sans-serif; cursor: pointer; white-space: nowrap }
+.rk-btn:disabled { opacity: .5 }
+.rk-me { display: grid; gap: 12px; justify-items: start; margin: 14px 0 6px; padding: 18px; background: var(--paper); border-radius: 18px; color: var(--muted); word-break: keep-all }
+.rk-me p { margin: 0 }
+.rk-me.rk-in { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 16px; padding: 12px 18px }
+.rk-me.rk-in b { color: var(--ink); margin-right: auto; overflow-wrap: anywhere }
+.rk-prev { margin-left: 2px; color: var(--muted); opacity: .6; font: 500 13px Pretendard, system-ui, sans-serif; letter-spacing: 0 }
+.rk-name .rk-prev { font-size: 16px; vertical-align: middle }
+.rk-sub { display: flex; flex-wrap: wrap; gap: 4px 18px; align-items: baseline }
+.rk-acts { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 16px }
+.rk-del { color: var(--muted); font-size: 14px }
+.rk-del.open { flex-basis: 100% }
+.rk-link.rk-muted { color: var(--muted); font-weight: 500 }
+.rk-link.rk-danger { color: var(--red) }
+.rk-ok { color: var(--ink) }
+.rk-row { display: flex; gap: 8px; width: 100% }
+.rk-row input { flex: 1; min-width: 0; min-height: 46px; padding: 0 16px; border: 0; border-radius: 23px; background: var(--bg); color: var(--ink); font: 500 16px Pretendard, system-ui, sans-serif }
+.rk-row input:focus { outline: 2px solid var(--ink) }
+.rk-note { color: var(--red); font-size: 14px }
+.rk-note:empty { display: none }
+.rk-tabs { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin: 18px 0 8px }
+.rk-seg { display: flex; padding: 3px; background: var(--track2); border-radius: 22px }
+.rk-seg button { min-height: 38px; padding: 0 18px; border: 0; border-radius: 19px; background: none; color: var(--muted); font: 700 14px Pretendard, system-ui, sans-serif; cursor: pointer }
+.rk-seg button.on { background: var(--seg-on); color: var(--ink); box-shadow: 0 1px 3px var(--seg-shadow) }
+.rk-list, .rk-recent { margin: 0; padding: 0; list-style: none }
+.rk-list button { display: grid; grid-template-columns: 2.6em 1fr auto; gap: 10px; align-items: baseline; width: 100%; padding: 13px 6px; border: 0; border-bottom: 1px solid var(--track); background: none; color: var(--ink); text-align: left; font: inherit; cursor: pointer }
+.rk-list button:hover { background: var(--hover) }
+.rk-list i { font: 700 18px/1 Hahmlet, serif; font-style: normal; color: var(--muted); font-variant-numeric: tabular-nums }
+.rk-list li:nth-child(-n+3):not(.gap) i { color: var(--ink); font-size: 22px }
+.rk-list span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.rk-list b, .rk-recent b { font: 700 20px/1 Hahmlet, serif; font-variant-numeric: tabular-nums }
+.rk-list .mine button { background: var(--paper); box-shadow: inset 3px 0 0 var(--red) }
+.rk-list .gap { margin-top: 18px }
+.rk-empty { padding: 48px 0; text-align: center; color: var(--muted); word-break: keep-all }
+.rk-stats { display: flex; flex-wrap: wrap; gap: 10px 34px; margin: 0 0 30px }
+.rk-stats dt { font-size: 13px; color: var(--muted) }
+.rk-stats dd { margin: 4px 0 0; font: 700 32px/1 Hahmlet, serif; font-variant-numeric: tabular-nums }
+.rk-h { margin: 0 0 4px; font-size: 14px; color: var(--muted) }
+.rk-adm { margin: 22px 0 0; text-align: right; color: var(--muted); font-size: 14px }
+.rk-recent li:not(.rk-empty) { display: grid; grid-template-columns: auto 1fr auto; gap: 14px; align-items: baseline; padding: 12px 6px; border-bottom: 1px solid var(--track); font-variant-numeric: tabular-nums }
+.rk-recent span:nth-child(2) { color: var(--muted); font-size: 14px }
+</style>
+</head>
+<body>
+<main class="app">
+  <header class="top">
+    <a class="back" href="../">← 창업실</a>
+    <button class="snd" id="snd"></button>
+    <button class="snd" id="again" aria-label="다시 하기" title="다시 하기" hidden><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></button>
+    <div class="score"><div class="sc"><i class="mult" id="mult" hidden></i><b id="score">0</b></div><span id="best">최고 0</span></div>
+  </header>
+  <div class="timer"><div class="time" id="time"><i id="bar"></i></div><b class="sec" id="sec">120초</b></div>
+  <div class="stage" id="stage"><div class="board">
+    <i class="cbar" id="cbar"><s id="cbfill"></s></i><b class="cblab" id="cblab">콤보</b>
+    <canvas id="cv" aria-label="데칼코마니 판"></canvas>
+    <div class="ov" id="ov">
+      <h1>데칼<b>코마니</b></h1>
+      <p id="msg">선을 그어 반으로 접으면 똑같이 겹치는 색이 터져요</p>
+    </div>
+  </div></div>
+  <div class="tut" id="tut" hidden>
+    <span class="n" id="tutn"></span><h2 id="tuth"></h2><p id="tutp"></p>
+    <div class="tut-btns"><button id="tutskip">건너뛰기</button><button id="tutnext">다음</button></div>
+  </div>
+</main>
+<script src="../game-fx.js"></script>
+<script src="core.js"></script>
+<script type="module" src="rank.js"></script>
+<script>
+const { N, TIME, MIN, PENALTY, DRIP, idx, inB, reflect, dirOf, along, AXES } = DecalCore, HINT = 10000;
+const COLORS = ["#2f6be0", "#e4473f", "#21985f", "#8a55e8", "#f08a24", "#33312d"];
+// 판 색은 CSS 변수에서 읽는다 — 휴대폰이 다크 모드면 어두운 종이·밝은 먹, 바뀌면 바로 따라감
+let P = {};
+const pal = () => {
+  const s = getComputedStyle(document.documentElement), v = k => s.getPropertyValue("--" + k).trim();
+  P = { paper: v("paper"), ink: v("ink"), muted: v("muted"), red: v("red"), empty: v("empty"), under: v("under"), back: v("back"), inkRgb: v("ink-rgb"), flash: +v("flash") };
+  COLORS[5] = v("c5");
+};
+pal(); matchMedia("(prefers-color-scheme: dark)").addEventListener("change", pal);
+const $ = id => document.getElementById(id);
+const cv = $("cv"), ctx = cv.getContext("2d");
+let grid, born, S = 40, playing = false, score = 0, left = TIME, last = 0;
+let drag = null, axis = null, miss = 0, texts = [];
+let best = 0, mode = "easy";
+try { mode = localStorage.getItem("decal-mode") === "normal" ? "normal" : "easy" } catch {}
+
+// 판·접기·점수 규칙은 core.js(서버 검증과 같은 파일). 여기는 그리기에 필요한 것만
+const at = (ax, t) => { const [ox, oy, dx, dy] = dirOf(ax); return [ox + t * dx, oy + t * dy] };
+const pairsFor = (ax, seg) => DecalCore.pairsFor(grid, ax, seg);
+// 판의 무작위는 씨앗 하나로(랭킹 판은 서버가 준 씨앗), 접은 기록은 log에 — 판이 끝나면 씨앗과 기록으로 서버가 다시 둬 본다
+let R = Math.random, seed = 0, log = [], tk = null, nextDrop = DRIP;
+function refill(n) {
+  const g0 = DecalCore.refill(grid, R, n), now = performance.now();
+  grid.forEach((c, i) => { if (c >= 0 && g0[i] < 0) born[i] = now + Math.random() * 160 });
+}
+// 고민하는 동안(판 시작·접기가 끝난 때부터) 1.5초마다 빈칸에 한 점이 떨어진다 — 물방울처럼 작은 파문과 소리
+function drop() {
+  const i = DecalCore.drip(grid, R), now = performance.now();
+  if (i < 0) return;
+  born[i] = now; rings.push({ x: i % N, y: i / N | 0, n: 0, t0: now + 120, s: .45 });
+  FX.tone(FX.pent(5 + (i % 5)) * 2, { d: .07, vol: .05, to: FX.pent(5 + (i % 5)) * 1.5 });
+}
+function newBoard(s) {
+  seed = s ?? Math.random() * 2 ** 32 >>> 0; R = DecalCore.rng(seed); log = [];
+  grid = new Array(N * N).fill(-1);
+  born = new Array(N * N).fill(0);
+  refill(DecalCore.START); nextDrop = DRIP;
+}
+
+// 손가락으로 그은 선을 가장 가까운 접는 선으로
+function snap(p, q) {
+  const dx = q[0] - p[0], dy = q[1] - p[1];
+  if (Math.hypot(dx, dy) < 0.7) return null;
+  const ang = ((Math.atan2(dy, dx) * 180 / Math.PI) + 180) % 180;
+  const mx = (p[0] + q[0]) / 2, my = (p[1] + q[1]) / 2;
+  const half = v => Math.min(N - 1.5, Math.max(0.5, Math.round(v * 2) / 2));
+  if (ang < 22.5 || ang >= 157.5) return { t: "H", a: half(my) };
+  if (ang < 67.5) return { t: "D1", a: Math.max(-(N - 2), Math.min(N - 2, Math.round(mx - my))) };
+  if (ang < 112.5) return { t: "V", a: half(mx) };
+  return { t: "D2", a: Math.max(1, Math.min(2 * N - 3, Math.round(mx + my))) };
+}
+function axisEnds(ax) {
+  const L = -2, R = N + 1;
+  if (ax.t === "V") return [ax.a, L, ax.a, R];
+  if (ax.t === "H") return [L, ax.a, R, ax.a];
+  if (ax.t === "D1") return [L, L - ax.a, R, R - ax.a];
+  return [L, ax.a - L, R, ax.a - R];
+}
+
+// 접기: 쉬움은 선 한쪽 전체, 보통은 짝이 있는 칸까지만 띠로 넘어가 덮고(T_HIT, 철썩) 잠깐 눌러 뒷면 물감이 짝과 겹쳐 보인 뒤(HOLD) 터지며 펼쳐진다(T_END). 점수·판 계산은 바로
+const T_HIT = 220, HOLD = 130, T_END = 600;
+let fl = null, passed = false, seen = false;
+// 콤보: 한 쌍이라도 접은 뒤(접는 동작이 끝난 때부터) 정해진 시간 안에 또 접으면 이어진다(색·쌍 수 상관없음).
+// 시간은 2초에서 2분 끝 1.2초까지 줄고, 콤보 2부터 그 접기 점수 ×1.5, ×2 … 최대 ×3. 헛접기·시간 넘김이면 끊김
+let combo = 0, cdl = -1, cw = 1;
+const cbWin = () => DecalCore.cbWin(el), cbMul = DecalCore.cbMul;
+try { seen = !!localStorage.getItem("decal-seen") } catch {}
+function fold(ax, seg) {
+  const ps = pairsFor(ax, seg), now = performance.now(), ok = ps.length >= MIN;
+  const [ox, oy, dx, dy] = dirOf(ax);
+  let pos = 0, neg = 0;
+  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { const v = (x - ox) * -dy + (y - oy) * dx; if (v > .01) pos++; else if (v < -.01) neg++ }
+  // 접히는 넓이. 띠의 끝은 늘 칸과 칸 사이에 오게 칸 중심에서 잰다(점이 반으로 잘리지 않게)
+  const V = (x, y) => Math.abs((x - ox) * -dy + (y - oy) * dx);
+  // 길이: 쉬움은 판 끝까지, 보통은 그은 선만큼(칸 위치에 맞춰 반올림). 깊이: 맞은 짝 중 가장 먼 칸까지, 헛접기는 선 바로 옆 줄
+  const step = ax.t[0] === "D" ? Math.SQRT1_2 : 1;
+  let u0 = -30, u1 = 30, vm = 30;
+  if (seg) {
+    u0 = Math.ceil((seg[0] - .4) / step - 1e-6) * step; u1 = Math.floor((seg[1] + .4) / step + 1e-6) * step;
+    if (u0 > u1) u0 = u1 = Math.round((seg[0] + seg[1]) / 2 / step) * step;
+    vm = ok ? Math.max(...ps.map(([x, y]) => V(x, y))) : ax.t[0] === "D" ? Math.SQRT1_2 : ax.a % 1 ? .5 : 1;
+  }
+  const m = ax.t[0] === "D" ? .36 : .5;
+  fl = { ax, seg, ok, ps, t0: now, e: el, side: pos <= neg ? 1 : -1, u0: u0 - m, u1: u1 + m, vm: vm + m, snap: grid.slice(), bg: getComputedStyle(document.body).backgroundColor };
+  FX.noise({ d: .19, vol: .22, f: 500, to: 2600, q: .8 });
+  if (playing) log.push([ax.t, ax.a, seg ? seg[0] : null, seg ? seg[1] : null, el]);
+  if (!ok) { left = Math.max(0, left - PENALTY); combo = 0; cdl = -1; return }
+  for (const [x, y, mx, my] of ps) grid[idx(x, y)] = grid[idx(mx, my)] = -1;
+  const n = ps.length;
+  combo = el <= cdl ? combo + 1 : 1; cdl = -1;
+  fl.combo = combo; fl.cf = cbMul(combo);
+  fl.pts = DecalCore.points(n, mult, fl.cf);
+  score += fl.pts;
+}
+// 덮이는 순간: 맞은 짝은 물감이 터지며 점수 칸으로 날아가고, 틀리면 붉게 튕긴다
+function impact(now) {
+  const f = fl, [x1, y1, x2, y2] = f.seg ? [...at(f.ax, f.seg[0]), ...at(f.ax, f.seg[1])] : axisEnds(f.ax);
+  const lx = Math.min(N - 1.5, Math.max(.5, (x1 + x2) / 2)), ly = Math.min(N - 1, Math.max(.5, (y1 + y2) / 2));
+  if (!f.ok) {
+    miss = now; missAx = f.ax; missSeg = f.seg;
+    texts.push({ x: lx, y: ly, s: "-" + PENALTY + "초", red: true, t0: now });
+    FX.shake(.6); FX.tone(190, { d: .24, type: "triangle", vol: .3, to: 70 });
+    $("sec").classList.remove("hit"); void $("sec").offsetWidth; $("sec").classList.add("hit");
+    try { navigator.vibrate && navigator.vibrate(40) } catch {}
+    return;
+  }
+  lastAx = f.ax; lastSeg = f.seg; lastT = now;
+  if (!seen) { seen = true; try { localStorage.setItem("decal-seen", 1) } catch {} }
+  if (playing && !passed && best > 0 && score > best) {
+    passed = true; $("best").textContent = "새 최고 기록"; $("best").classList.add("hot");
+    const b = $("best").getBoundingClientRect();
+    FX.burst(b.left + b.width / 2, b.top + b.height / 2, "#d8443c", { n: 16, v: 300, up: 60, size: 5, shape: "k", life: 900, g: 200 });
+    [4, 5, 7, 9].forEach((k, j) => FX.tone(FX.pent(k), { d: .25, type: "triangle", vol: .12, at: .25 + j * .08 }));
+  }
+  const n = f.ps.length, r = cv.getBoundingClientRect(), scr = (x, y) => [r.left + px(x), r.top + px(y)];
+  let cx = 0, cy = 0;
+  f.ps.forEach(([x, y, mx, my, c], i) => {
+    cx += mx; cy += my;
+    for (const [a, b] of [[x, y], [mx, my]]) {
+      blots.push({ x: a, y: b, c, t0: now, seed: Math.random() * 1e4 });
+      FX.burst(...scr(a, b), COLORS[c], { n: 6, v: 220 + 40 * n, size: S * .07, life: 650 });
+    }
+    FX.home(...scr(mx, my), COLORS[c], $("score"), { n: 2, size: S * .08, delay: 120 + i * 50, hit: () => FX.pop($("score")) });
+  });
+  cx /= n; cy /= n;
+  texts.push({ x: cx, y: cy, s: "+" + f.pts, sub: n + "쌍" + (mult > 1 ? " ×" + mult : "") + (f.cf > 1 ? " · 콤보 " + f.combo + " ×" + f.cf : ""), big: n >= 3, t0: now });
+  rings.push({ x: cx, y: cy, n, t0: now });
+  // 쌍마다 물방울 소리가 한 음씩 올라감(배수·콤보가 클수록 높게)
+  const base = (mult - 1) * 2 + Math.min(Math.max(f.combo - 1, 0), 4);
+  f.ps.forEach((p, i) => FX.tone(FX.pent(base + i) * 2, { d: .22, vol: .2, at: .03 + i * .07, to: FX.pent(base + i) }));
+  FX.shake(.12 + .13 * n); FX.punch(.012 * n);
+  if (n >= 3) {
+    FX.stop(90); flashT = now;
+    [0, 2, 4].forEach(k => FX.tone(FX.pent(base + n + k, 261.63), { d: .7, type: "triangle", vol: .1, at: .03 + n * .07 }));
+    FX.burst(...scr(cx, cy), "#f2c14e", { n: 10 + 3 * n, v: 420, up: 60, size: S * .09, shape: "k", life: 800, g: 300 });
+  }
+  try { navigator.vibrate && navigator.vibrate(n >= 3 ? [20, 40, 30] : 15) } catch {}
+}
+
+// 그리기
+const px = v => (v + 0.5) * S;
+const backOut = t => 1 + 2.7 * (t - 1) ** 3 + 1.7 * (t - 1) ** 2;
+function rnd(seed) { let s = seed; return () => (s = (s * 9301 + 49297) % 233280) / 233280 }
+function dot(x, y, r, c, a = 1) {
+  if (!(r > 0)) return;
+  ctx.globalAlpha = a;
+  ctx.fillStyle = c;
+  ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill();
+  ctx.fillStyle = "rgb(255 255 255 / .22)";
+  ctx.beginPath(); ctx.arc(x - r * .3, y - r * .32, r * .32, 0, 7); ctx.fill();
+  ctx.globalAlpha = 1;
+}
+function blot(x, y, r, c, a, seed) {
+  const R = rnd(seed);
+  ctx.globalAlpha = a; ctx.fillStyle = c;
+  ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill();
+  for (let i = 0; i < 9; i++) {
+    const ang = R() * 6.28, d = r * (0.7 + R() * 0.75), rr = r * (0.12 + R() * 0.28);
+    ctx.beginPath(); ctx.arc(x + Math.cos(ang) * d, y + Math.sin(ang) * d, rr, 0, 7); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+}
+function line(ax, color, w, dash, seg) {
+  const [x1, y1, x2, y2] = seg ? [...at(ax, seg[0]), ...at(ax, seg[1])] : axisEnds(ax);
+  ctx.save();
+  ctx.beginPath(); ctx.roundRect(0, 0, S * N, S * N, 20); ctx.clip();
+  ctx.strokeStyle = color; ctx.lineWidth = w; ctx.lineCap = "round";
+  ctx.setLineDash(dash || []);
+  ctx.beginPath(); ctx.moveTo(px(x1), px(y1)); ctx.lineTo(px(x2), px(y2)); ctx.stroke();
+  ctx.restore();
+}
+// 접히는 쪽(종이 날개) 판별과 그 영역 경로. side 쪽 반, 보통 모드면 그은 구간 폭만
+function flapOf(f) {
+  const [ox, oy, dx, dy] = dirOf(f.ax), nx = -dy * f.side, ny = dx * f.side;
+  const { u0, u1, vm } = f;
+  return {
+    ox, oy, nx, ny,
+    has: (x, y) => { const v = (x - ox) * nx + (y - oy) * ny, u = (x - ox) * dx + (y - oy) * dy; return v > .01 && v <= vm && u >= u0 && u <= u1 },
+    onCrease: (x, y) => { const v = (x - ox) * nx + (y - oy) * ny, u = (x - ox) * dx + (y - oy) * dy; return Math.abs(v) < .01 && u >= u0 && u <= u1 },
+    crease: () => { const a = [px(ox + u0 * dx), px(oy + u0 * dy)], b = [px(ox + u1 * dx), px(oy + u1 * dy)]; ctx.beginPath(); ctx.moveTo(...a); ctx.lineTo(...b) },
+    // 기본은 접히는 띠, path(-1, 0)은 접는 선 바로 맞은편(남는 쪽) 한 칸 폭
+    path: (v0 = 0, v1 = vm) => {
+      const P = (u, v) => [px(ox + u * dx + v * nx), px(oy + u * dy + v * ny)];
+      ctx.beginPath(); [P(u0, v0), P(u1, v0), P(u1, v1), P(u0, v1)].forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)); ctx.closePath();
+    },
+  };
+}
+const boardPath = () => { ctx.beginPath(); ctx.roundRect(0, 0, S * N, S * N, 20) };
+function draw(now) {
+  ctx.clearRect(0, 0, S * N, S * N);
+  const t = fl ? now - fl.t0 : 0, G = fl && t < T_HIT + HOLD ? fl.snap : grid, F = fl && flapOf(fl);
+  if (fl && !fl.touch && t >= T_HIT) { fl.touch = true; FX.noise({ d: .12, vol: .35, f: 700, type: "lowpass" }); FX.tone(120, { d: .14, vol: .3, to: 55 }); FX.shake(.15); FX.punch(-.01) }
+  if (fl && !fl.hit && t >= T_HIT + HOLD) { fl.hit = true; impact(now) }
+  // 들린 종이 밑자리: 점이 없는 살짝 그늘진 종이
+  if (F) { ctx.save(); boardPath(); ctx.clip(); F.path(); ctx.fillStyle = P.under; ctx.fill(); ctx.restore() }
+  if (playing && left < 10) {
+    const f = left % 1;
+    ctx.globalAlpha = .07 + .1 * f; ctx.fillStyle = P.red; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.font = `700 ${S * (4 + .6 * f)}px Hahmlet, serif`; ctx.fillText(Math.ceil(left), S * N / 2, S * N / 2 + S * .3);
+    ctx.globalAlpha = 1;
+  }
+  ctx.fillStyle = P.empty;
+  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+    if (F && F.has(x, y)) continue;
+    const c = G[idx(x, y)];
+    if (c < 0) { ctx.beginPath(); ctx.arc(px(x), px(y), Math.max(1.5, S * .04), 0, 7); ctx.fill(); continue; }
+    const b = Math.min(1, Math.max(0, (now - born[idx(x, y)]) / 260));
+    // 접는 선 위의 점은 남는 쪽 반만 여기 그리고, 나머지 반은 종이와 같이 접힌다
+    const cut = F && F.onCrease(x, y);
+    if (cut) { ctx.save(); F.path(-1, 0); ctx.clip() }
+    if (b > 0) dot(px(x), px(y), S * .34 * backOut(b), COLORS[c]);
+    if (cut) ctx.restore();
+    ctx.fillStyle = P.empty;
+  }
+  if (F) {
+    // 접히는 띠: s=1 펼침 → 0 세워짐 → -1 반대편을 덮음. 그림자·테두리로 따로 든 종이처럼 보이고,
+    // 덮인 동안엔 뒷면에 물감이 비쳐 짝과 겹치는 게 보인다
+    const s = t < T_HIT ? 1 - 2 * (t / T_HIT) ** 2 : t < T_HIT + HOLD ? -1 : Math.min(1, -1 + 2 * (1 - (1 - (t - T_HIT - HOLD) / (T_END - T_HIT - HOLD)) ** 3));
+    const k = 1 - s, on = F.nx * px(F.ox) + F.ny * px(F.oy), lift = 1 - Math.abs(s);
+    ctx.save();
+    ctx.setTransform(D * (1 - k * F.nx * F.nx), -D * k * F.nx * F.ny, -D * k * F.nx * F.ny, D * (1 - k * F.ny * F.ny), D * k * on * F.nx, D * k * on * F.ny);
+    boardPath(); ctx.clip();
+    ctx.shadowColor = `rgb(40 30 20 / ${.14 + .22 * lift})`; ctx.shadowBlur = D * (5 + 16 * lift); ctx.shadowOffsetY = D * (2 + 7 * lift);
+    F.path(); ctx.fillStyle = s >= 0 ? P.paper : P.back; ctx.fill();
+    ctx.shadowColor = "transparent";
+    ctx.save(); F.path(); ctx.clip();
+    for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+      if (!F.has(x, y) && !F.onCrease(x, y)) continue;
+      const c = G[idx(x, y)];
+      if (c >= 0) dot(px(x), px(y), S * .34, COLORS[c], s >= 0 ? 1 : .45);
+      else if (s >= 0) { ctx.fillStyle = P.empty; ctx.beginPath(); ctx.arc(px(x), px(y), Math.max(1.5, S * .04), 0, 7); ctx.fill() }
+    }
+    ctx.fillStyle = !fl.ok && t > T_HIT ? `rgb(216 68 60 / ${.12 + .25 * lift})` : `rgb(40 30 20 / ${.1 * lift})`;
+    ctx.fillRect(-S * 3, -S * 3, S * (N + 6), S * (N + 6));
+    ctx.restore();
+    F.path(); ctx.strokeStyle = !fl.ok && t > T_HIT ? "rgb(216 68 60 / .6)" : "rgb(" + P.inkRgb + " / .2)"; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.restore();
+    // 접는 선(주름)
+    ctx.save(); boardPath(); ctx.clip(); F.crease(); ctx.strokeStyle = "rgb(" + P.inkRgb + " / .35)"; ctx.lineWidth = 2; ctx.stroke(); ctx.restore();
+    // 접는 동작이 끝나 새 점이 나온 때부터 콤보 시간이 흐른다
+    if (t > T_END && (!playing || el - fl.e >= DecalCore.FOLD)) {
+      const { ok, ps } = fl; fl = null;
+      if (playing) { if (log.length) log[log.length - 1][5] = el; nextDrop = el + DRIP; if (ok) refill(DecalCore.after(ps.length)) }
+      if (ok && combo && (playing || tut?.cb)) { cw = cbWin(); cdl = el + cw }
+    }
+  }
+  blots = blots.filter(b => now - b.t0 < 380);
+  for (const b of blots) { const k = (now - b.t0) / 380; blot(px(b.x), px(b.y), S * .34 * (1 + 1.1 * Math.sqrt(k)), COLORS[b.c], 1 - k, b.seed) }
+  if (now - flashT < 260) { ctx.save(); boardPath(); ctx.clip(); ctx.fillStyle = `rgb(255 255 255 / ${P.flash * (1 - (now - flashT) / 260)})`; ctx.fillRect(0, 0, S * N, S * N); ctx.restore() }
+  // 10초 동안 가만히 있으면 가장 많이 겹치는 선이 반짝인다
+  if (playing && !drag && !fl && now - lastAct > (seen ? HINT : 2500)) {
+    hint = hint || findHint();
+    if (hint) line(hint.ax, `rgb(${P.inkRgb} / ${.1 + .25 * (.5 + .5 * Math.sin(now / 200))})`, S * .16, null, hint.seg);
+    // 처음 하는 사람에겐 손가락이 그 선을 따라 그어 보인다
+    if (hint && !seen && hint.ax) {
+      const [ox, oy, dx, dy] = dirOf(hint.ax), ts = [];
+      for (let t = -12; t <= 12; t += .1) { const x = ox + t * dx, y = oy + t * dy; if (x > -.4 && y > -.4 && x < N - .6 && y < N - .6 && (!hint.seg || (t >= hint.seg[0] && t <= hint.seg[1]))) ts.push(t) }
+      if (ts.length) {
+      const k = (now / 1400) % 1, e = Math.min(1, k / .7), t = ts[0] + (ts[ts.length - 1] - ts[0]) * (1 - (1 - e) ** 2), [fx, fy] = [ox + t * dx, oy + t * dy];
+      ctx.globalAlpha = k < .8 ? 1 : (1 - k) * 5;
+      ctx.fillStyle = "rgb(" + P.inkRgb + " / .22)"; ctx.beginPath(); ctx.arc(px(fx), px(fy), S * .32, 0, 7); ctx.fill();
+      ctx.strokeStyle = P.ink; ctx.lineWidth = 2; ctx.stroke();
+      ctx.globalAlpha = 1;
+      }
+    }
+  }
+  if (axis) line(axis, "rgb(" + P.inkRgb + " / .5)", 3, [8, 8], segNow());
+  if (finger) {
+    ctx.fillStyle = "rgb(" + P.inkRgb + " / .22)"; ctx.beginPath(); ctx.arc(px(finger[0]), px(finger[1]), S * .32, 0, 7); ctx.fill();
+    ctx.strokeStyle = P.ink; ctx.lineWidth = 2; ctx.stroke();
+  }
+  if (now - miss < 320 && missAx) line(missAx, "rgb(216 68 60 / " + (1 - (now - miss) / 320) + ")", 4, null, missSeg);
+  rings = rings.filter(r => now - r.t0 < 600);
+  for (const r of rings) {
+    const k = (now - r.t0) / 600; if (k < 0) continue;
+    ctx.strokeStyle = `rgb(${P.inkRgb} / ${.35 * (1 - k)})`; ctx.lineWidth = S * .08 * (1 - k) + 1;
+    ctx.beginPath(); ctx.arc(px(r.x), px(r.y), S * (.4 + (r.s ?? 1 + r.n * .8) * Math.sqrt(k)), 0, 7); ctx.stroke();
+  }
+  if (now - stageT < 900) {
+    const k = (now - stageT) / 900;
+    ctx.save(); ctx.beginPath(); ctx.roundRect(0, 0, S * N, S * N, 20); ctx.clip();
+    ctx.strokeStyle = mult === 3 ? `rgb(216 68 60 / ${1 - k})` : `rgb(240 138 36 / ${1 - k})`; ctx.lineWidth = S * .5 * (1 - k);
+    ctx.strokeRect(0, 0, S * N, S * N); ctx.restore();
+  }
+  if (lastAx && now - lastT < 520) line(lastAx, "rgb(" + P.inkRgb + " / " + .8 * (1 - (now - lastT) / 520) + ")", 3, null, lastSeg);
+  texts = texts.filter(t => now - t.t0 < 900);
+  for (const t of texts) {
+    const k = (now - t.t0) / 900;
+    if (k < 0) continue;
+    ctx.globalAlpha = k < .7 ? 1 : 1 - (k - .7) / .3;
+    const f1 = `700 ${S * (t.big ? .78 : .56)}px Hahmlet, serif`, f2 = `700 ${S * .36}px Pretendard, system-ui, sans-serif`;
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.lineWidth = 5; ctx.strokeStyle = P.paper; ctx.lineJoin = "round";
+    // 글씨가 판 가장자리에서 잘리지 않게 판 안쪽으로 당긴다
+    ctx.font = f2; let w = t.sub ? ctx.measureText(t.sub).width : 0;
+    ctx.font = f1; w = Math.max(w, ctx.measureText(t.s).width) / 2 + 6;
+    const xx = Math.min(S * N - w, Math.max(w, px(t.x))), yy = Math.max(S, px(t.y) - S * .5) - k * S * .7;
+    ctx.strokeText(t.s, xx, yy); ctx.fillStyle = t.red ? P.red : P.ink; ctx.fillText(t.s, xx, yy);
+    if (t.sub) { ctx.font = f2; ctx.strokeText(t.sub, xx, yy + S * .55); ctx.fillStyle = P.muted; ctx.fillText(t.sub, xx, yy + S * .55) }
+    ctx.globalAlpha = 1;
+  }
+}
+let blots = [], rings = [], stageT = -1e4, flashT = -1e4, shown = 0, axKey = "", D = 1;
+let missAx = null, missSeg = null, lastAx = null, lastSeg = null, lastT = 0;
+let cur = null, lastAct = 0, hint = null, finger = null, tut = null;
+function segNow() {
+  if ((tut ? tut.mode : mode) === "easy" || !axis || !cur) return null;
+  const a = along(axis, ...drag), b = along(axis, ...cur);
+  return [Math.min(a, b), Math.max(a, b)];
+}
+function findHint() {
+  const all = AXES.map(ax => [ax, pairsFor(ax)]), m = Math.max(...all.map(v => v[1].length));
+  if (!m) return null;
+  const top = all.filter(v => v[1].length === m), [ax, ps] = top[Math.random() * top.length | 0];
+  if (mode === "easy") return { ax };
+  const ts = ps.map(([x, y, mx, my]) => along(ax, (x + mx) / 2, (y + my) / 2));
+  return { ax, seg: [Math.min(...ts) - .3, Math.max(...ts) + .3] };
+}
+
+let el = 0, mult = 1, tick = 0;
+function stage(m, fx) {
+  mult = m;
+  document.body.dataset.s = $("time").dataset.s = $("mult").dataset.s = m;
+  $("mult").textContent = "×" + m; $("mult").hidden = m === 1;
+  if (!fx) return;
+  FX.music(true, { bpm: [0, 80, 100, 120][m] });
+  $("mult").classList.remove("up"); void $("mult").offsetWidth; $("mult").classList.add("up");
+  texts.push({ x: (N - 1) / 2, y: 1.2, s: "점수 ×" + m, big: true, t0: stageT = performance.now() });
+  FX.shake(.45);
+  const b = $("mult").getBoundingClientRect();
+  FX.burst(b.left + b.width / 2, b.top + b.height / 2, m === 3 ? "#d8443c" : "#f08a24", { n: 18, v: 380, up: 80, size: 5, shape: "s", life: 800 });
+  [0, 1, 2, 3].forEach(i => FX.tone(FX.pent(m * 2 + i, 392), { d: .3, type: "triangle", vol: .16, at: i * .07 }));
+  FX.noise({ d: .5, vol: .08, f: 4000, type: "highpass", at: .2 });
+  try { navigator.vibrate && navigator.vibrate([30, 60, 30]) } catch {}
+}
+function paintCombo() {
+  // 막대 자리는 게임 중 늘 보이고, 콤보가 이어지는 동안 차 있다가 남은 시간만큼 줄어든다(설명에서는 콤보 단계에서만)
+  const c = $("cbar"), lab = $("cblab"), on = combo > 0 && (cdl >= 0 || !!(fl && fl.ok)) && (!tut || tut.cb), shown = playing || !!tut?.cb;
+  c.classList.toggle("on", shown); lab.classList.toggle("on", shown); c.classList.toggle("hl", !!tut?.cb);
+  const k = on ? (cdl >= 0 ? Math.max(0, (cdl - el) / cw) : 1) : 0;
+  $("cbfill").style.transform = `scaleY(${k})`;
+  c.dataset.c = lab.dataset.c = on ? Math.min(combo, 4) : 0;
+  c.classList.toggle("late", on && k < .35);
+  // 이름표: 평소 "콤보", 이어지는 동안 "콤보 2 · 다음 ×2"(바뀔 때만 다시 씀)
+  const key = on ? combo : 0;
+  if (lab.dataset.k !== String(key)) {
+    lab.dataset.k = key; lab.classList.toggle("go", on);
+    lab.innerHTML = on ? `콤보 ${combo} <small>· 다음 ×${cbMul(combo + 1)}</small>` : "콤보";
+  }
+}
+function loop(now) {
+  if (playing || tut) {
+    // 설명 중엔 콤보 시간만 흐르고 남은 시간은 그대로(헛접기 -3초만 보여 줌)
+    if (last) { const dt = Math.min(.1, (now - last) / 1000); if (playing) left -= dt; el += dt; }
+    if (playing && !fl) while (el >= nextDrop) { drop(); nextDrop += DRIP }
+    if (cdl >= 0 && el > cdl) { combo = 0; cdl = -1; FX.tone(392, { d: .16, type: "triangle", vol: .08, to: 262 }) }
+    const m = el < 40 ? 1 : el < 80 ? 2 : 3;
+    if (playing && m !== mult) stage(m, true);
+    const sec = Math.max(0, Math.ceil(left));
+    if (sec !== tick) {
+      tick = sec; $("sec").textContent = sec + "초";
+      if (left < 10 && sec > 0) {
+        FX.music(true, { bpm: 150 });
+        $("sec").classList.remove("hit"); FX.pop($("sec"));
+        FX.tone(70, { d: .12, vol: .4, to: 48 }); FX.tone(62, { d: .1, vol: .25, to: 45, at: .16 });
+        if (left < 5) { FX.tone(1320, { d: .07, type: "triangle", vol: .12 }); try { navigator.vibrate && navigator.vibrate(12) } catch {} }
+      }
+    }
+    if (playing && left <= 0) end();
+    $("bar").style.transform = `scaleX(${Math.max(0, left) / TIME})`;
+    $("time").classList.toggle("low", left < 10); $("sec").classList.toggle("low", left < 10); document.body.classList.toggle("low", playing && left < 10);
+  }
+  paintCombo();
+  if (shown < score) { shown += Math.ceil((score - shown) * .2); $("score").textContent = shown }
+  last = now;
+  if (!FX.stopped()) draw(now);
+  requestAnimationFrame(loop);
+}
+
+function size() {
+  // 양옆에 콤보 막대 자리(16px)씩 비워 판이 가운데 오게
+  const st = $("stage"), side = Math.floor(Math.min(st.clientWidth - 32, st.clientHeight));
+  S = side / N;
+  const d = devicePixelRatio || 1;
+  cv.width = side * d; cv.height = side * d;
+  cv.style.width = cv.style.height = side + "px";
+  ctx.setTransform(d, 0, 0, d, 0, 0); D = d;
+}
+addEventListener("resize", size);
+
+const cell = e => { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) / S - .5, (e.clientY - r.top) / S - .5] };
+// 누르기는 판을 감싼 칸에서 받는다 — 캔버스의 둥근 모서리 바깥은 캔버스에 안 닿아, 모서리에서 시작한 대각선이 씹혔다
+cv.parentNode.addEventListener("pointerdown", e => { if (!playing || fl) return; cv.setPointerCapture(e.pointerId); drag = cur = cell(e); axis = null; axKey = ""; lastAct = performance.now(); hint = null });
+cv.addEventListener("pointermove", e => {
+  if (!drag) return;
+  cur = cell(e); axis = snap(drag, cur);
+  const k = axis ? axis.t + axis.a : "";
+  if (k !== axKey) { axKey = k; if (k) FX.tone(2000, { d: .025, type: "triangle", vol: .05 }) }
+});
+const up = () => {
+  if (drag && axis && playing) fold(axis, segNow());
+  drag = null; axis = null; lastAct = performance.now();
+};
+cv.addEventListener("pointerup", up);
+cv.addEventListener("pointercancel", () => { drag = null; axis = null });
+
+// 쉬움: 선이 판 끝까지 접힘 · 보통: 그은 만큼만 접힘. 최고 점수는 모드마다
+const NAME = { easy: "쉬움", normal: "보통" }, KEY = { easy: "decal-best", normal: "decal-best-normal" };
+const loadBest = () => { best = 0; try { best = +localStorage.getItem(KEY[mode]) || 0 } catch {} $("best").textContent = NAME[mode] + " 최고 " + best; $("best").classList.remove("hot") };
+const modes = () => `<div class="modes">${["easy", "normal"].map(m => `<button data-m="${m}" class="${m === mode ? "on" : ""}">${NAME[m]}</button>`).join("")}</div>`;
+const RKLINE = '<div class="rk-line"><span class="rk-line" id="ov-rk"></span><button class="rk-link" data-tut>설명</button></div>';
+const bind = () => {
+  $("ov").querySelectorAll("[data-m]").forEach(b => b.onclick = () => start(b.dataset.m));
+  $("ov").querySelector("[data-tut]").onclick = () => tutShow(0);
+};
+
+// 설명: 진짜 판 위에서 손가락이 선을 그어 보인다. 판은 7줄 글자(. 빈칸, 0~5 색), go = 차례로 긋는 선(가운데 선은 V·H 3, D1 0, D2 6)
+const TUT = [
+  { h: "선을 그어 반으로 접어요", p: "양쪽에 같은 색이 똑같이 겹치면 짝으로 터져요",
+    dots: ["3......", ".0...0.", ".....4.", "....5..", "1.....1", ".......", ".02.2.."], go: [{ t: "V", a: 3 }] },
+  { h: "가로·세로·대각선 다 돼요", p: "많이 겹칠수록 크게 — 1쌍 10 · 2쌍 40 · 3쌍 120 · 4쌍 320",
+    dots: ["...4...", "..0..1.", "....3..", "4......", "..3...2", "51.....", "....2.."], go: [{ t: "D1", a: 0 }] },
+  { h: "겹치는 게 없으면 3초가 줄어요", p: "아무 데나 긋지 말고 잘 보고 접어요",
+    dots: [".......", "....2..", ".0...3.", ".......", ".5.....", "..1....", "....4.."], go: [{ t: "H", a: 3 }] },
+  { h: "한 쌍이라도 빨리 이어 접으면 콤보", p: "왼쪽 막대가 다 줄기 전에 또 접어요. 막대는 갈수록 빨리 줄고, 콤보마다 ×1.5, ×2 … 최대 ×3",
+    // 한 쌍(10)으로 콤보 시작 → 바로 3쌍을 이어 접어 ×1.5(180)
+    dots: ["...4...", ".0...0.", "....3.5", ".......", "....3.5", ".......", "...4..."], go: [{ t: "V", a: 3 }, { t: "H", a: 3 }], gap: 250, rest: 2600, cb: true },
+  // 보통 모드: 위쪽만 짧게 그어 그 부분(2쌍)만 접히고, 아래 짝은 그대로 남는다
+  { h: "쉬움은 판 끝까지, 보통은 그은 만큼만", p: "쉬움은 선이 판 끝까지 이어져 한 번에 다 접혀요. 보통은 짧게 그으면 그 부분만 접혀요",
+    dots: [".0...0.", "..1.1..", ".......", "2......", ".......", ".3...3.", "4.....4"], go: [{ t: "V", a: 3, part: .4 }], mode: "normal", rest: 2200 },
+  { h: "40초마다 점수 ×2, ×3", p: "2분 동안 최고 점수에 도전해요. 마지막 40초가 제일 커요",
+    dots: ["..0....", ".1.45..", ".......", "3..2.4.", "......0", ".....1.", "...3..."], go: [{ t: "D2", a: 6 }], mult: 3 },
+];
+function tutBoard(s) {
+  const now = performance.now();
+  grid = s.dots.join("").split("").map(c => c === "." ? -1 : +c);
+  born = grid.map((_, i) => now + (i % N) * 25);
+  fl = null; blots = []; texts = []; rings = []; drag = axis = cur = finger = null;
+  score = shown = 0; $("score").textContent = 0; left = TIME; el = 0; tick = -1; combo = 0; cdl = -1;
+  stage(s.mult || 1);
+}
+// 판 안쪽 끝에서 끝까지(part면 그 비율만큼) 손가락이 그 선을 긋고, 놓는 순간 진짜 입력처럼 접힌다
+function gesture(ax, tok) {
+  const lo = -.3, hi = N - .7, ps = [];
+  for (let t = -20; t <= 20; t += .05) {
+    const [x, y] = ax.t === "V" ? [ax.a, t] : ax.t === "H" ? [t, ax.a] : ax.t === "D1" ? [ax.a + t, t] : [t, ax.a - t];
+    if (x >= lo && y >= lo && x <= hi && y <= hi) ps.push([x, y]);
+  }
+  const p = ps[0], q = ps[Math.round((ps.length - 1) * (ax.part || 1))], t0 = performance.now();
+  return new Promise(res => {
+    const f = now => {
+      if (tut?.tok !== tok) return res();
+      const k = Math.min(1, (now - t0) / 650), e = 1 - (1 - k) ** 2;
+      drag = p; cur = finger = [p[0] + (q[0] - p[0]) * e, p[1] + (q[1] - p[1]) * e]; axis = snap(drag, cur);
+      if (k < 1) return requestAnimationFrame(f);
+      if (axis) fold(axis, segNow());
+      drag = axis = cur = finger = null; res();
+    };
+    requestAnimationFrame(f);
+  });
+}
+function tutShow(i) {
+  const s = TUT[i], tok = {};
+  tut = { tok, cb: !!s.cb, mode: s.mode || "easy" };
+  $("ov").hidden = true; $("tut").hidden = false;
+  $("tutn").textContent = i + 1 + " / " + TUT.length; $("tuth").textContent = s.h; $("tutp").textContent = s.p;
+  $("tutnext").textContent = i === TUT.length - 1 ? "시작하기" : "다음";
+  $("tutnext").onclick = () => i === TUT.length - 1 ? tutEnd() : tutShow(i + 1);
+  size();
+  const W = ms => new Promise((r, j) => setTimeout(() => tut?.tok === tok ? r() : j(), ms));
+  (async () => {
+    for (;;) {
+      tutBoard(s); await W(900);
+      for (const ax of s.go) { await gesture(ax, tok); await W(T_END + (s.gap ?? 600)) }
+      await W(s.rest ?? 1500);
+    }
+  })().catch(() => {});
+}
+function tutEnd() {
+  tut = null; drag = axis = cur = finger = null; fl = null; texts = []; blots = []; rings = [];
+  try { localStorage.setItem("decal-tut", 1) } catch {}
+  $("tut").hidden = true; size();
+  score = shown = 0; $("score").textContent = 0; left = TIME; el = 0; combo = 0; cdl = -1; tick = 0; stage(1);
+  $("sec").textContent = TIME + "초"; $("bar").style.transform = "";
+  newBoard(); $("ov").hidden = false;
+}
+$("tutskip").onclick = tutEnd;
+// 다시 하기: "이번 판은 글렀네" 할 때 그 자리에서 같은 모드로 새 판(버린 판은 저장하지 않음)
+$("again").onclick = () => { if (playing) { drag = axis = null; start(mode) } };
+function start(m) {
+  mode = m; try { localStorage.setItem("decal-mode", m) } catch {}
+  loadBest();
+  // 랭킹 판이면 서버가 미리 준 씨앗(표)으로 판을 만든다. 표가 없으면 이 기기 씨앗(점수는 랭킹에 못 올라감)
+  tk = window.RK?.take?.() || null;
+  newBoard(tk?.seed); score = shown = 0; left = TIME; blots = []; rings = []; fl = null; combo = 0; cdl = -1; tick = 0; last = 0; texts = []; hint = null; lastAct = performance.now(); el = 0; stage(1);
+  $("score").textContent = 0;
+  $("ov").hidden = true; playing = true; $("again").hidden = false;
+  [0, 1, 2, 3, 4].forEach(i => FX.tone(FX.pent(i) * 2, { d: .18, vol: .1, at: .05 + i * .05, to: FX.pent(i) }));
+  passed = false; FX.music(true, { bpm: 80, root: 261.63 });
+}
+function end() {
+  playing = false; left = 0; drag = null; axis = null; combo = 0; cdl = -1; stage(1); $("again").hidden = true; document.body.classList.remove("low"); $("sec").classList.remove("low");
+  const now = performance.now(), nb = score > best;
+  // 남은 점들이 판 밖으로 흘러 떨어진다
+  const r = cv.getBoundingClientRect();
+  grid.forEach((c, i) => { if (c >= 0) FX.burst(r.left + px(i % N), r.top + px(i / N | 0), COLORS[c], { n: 1, v: 90, up: 40, size: S * .3, life: 1000, g: 1400, delay: Math.random() * 250 }) });
+  grid.fill(-1); fl = null; texts = []; blots = [];
+  FX.shake(.5); FX.music(false);
+  [3, 2, 0].forEach((i, j) => FX.tone(FX.pent(i, 392), { d: .35, type: "triangle", vol: .16, at: j * .13 }));
+  if (nb) { best = score; try { localStorage.setItem(KEY[mode], best) } catch {} }
+  $("best").textContent = NAME[mode] + " 최고 " + best;
+  setTimeout(() => {
+    $("ov").innerHTML = `<p>점수</p><div class="big">${score}</div>${nb ? '<p class="nb">최고 기록</p>' : `<p>${NAME[mode]} 최고 ${best}</p>`}${modes()}${RKLINE}`;
+    bind(); window.RK?.ended(mode, score, { ticket: tk?.id, seed, log });
+    $("ov").hidden = false;
+    FX.count($("ov").querySelector(".big"), score);
+    if (nb) [0, 2, 4, 5, 7].forEach((i, j) => FX.tone(FX.pent(i), { d: j === 4 ? .8 : .2, type: "triangle", vol: .16, at: j * .09 }));
+  }, 900);
+}
+$("ov").insertAdjacentHTML("beforeend", modes() + RKLINE); bind(); loadBest();
+FX.button($("snd")); FX.board(cv.parentNode);
+newBoard(); size(); requestAnimationFrame(loop);
+// 처음 온 사람(콤보가 생긴 뒤 처음인 사람 포함)에게는 설명부터
+let tutDone = false; try { tutDone = !!localStorage.getItem("decal-tut") } catch {}
+if (!tutDone) tutShow(0);
+</script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+[
+ {
+  "code": "1.ssu.aisw.1.21521532115124451443134421311345124153245435353554.000000.3k",
+  "school": "ssu",
+  "dept": "aisw",
+  "year": 1,
+  "sector": [
+   "own"
+  ],
+  "top3": "ncs,strategy,cs"
+ },
+ {
+  "code": "1.ssu.jp.2.43314515331333145433215122315542142312122414454535.000000.8",
+  "school": "ssu",
+  "dept": "jp",
+  "year": 2,
+  "sector": [
+   "gov"
+  ],
+  "top3": "media,mech,rnd"
+ },
+ {
+  "code": "1.ssu.none.3.42152543542254422433133411243551524535313534523332.000000.w",
+  "school": "ssu",
+  "dept": "none",
+  "year": 3,
+  "sector": [
+   "startup"
+  ],
+  "top3": "media,data,itpm"
+ },
+ {
+  "code": "1.etc.-.4.24534515352344414411214232412155532221222511511333.000000.74",
+  "school": "etc",
+  "dept": null,
+  "year": 4,
+  "sector": [
+   "unsure"
+  ],
+  "top3": "media,sales,marketing"
+ },
+ {
+  "code": "1.ssu.mechanical.1.23441232222551452225431433111145113324113544352541.000000.18",
+  "school": "ssu",
+  "dept": "mechanical",
+  "year": 1,
+  "sector": [
+   "public",
+   "gov",
+   "startup"
+  ],
+  "top3": "civil,sales,ncs"
+ },
+ {
+  "code": "1.etc.-.2.33343532152152122344555355331544442512234224313342.000000.3o",
+  "school": "etc",
+  "dept": null,
+  "year": 2,
+  "sector": [
+   "public",
+   "own"
+  ],
+  "top3": "finance,marketing,strategy"
+ },
+ {
+  "code": "1.ssu.eng.3.45212114414241445115354345434331434242244542331325.000000.4",
+  "school": "ssu",
+  "dept": "eng",
+  "year": 3,
+  "sector": [
+   "public"
+  ],
+  "top3": "mech,rnd,civil"
+ },
+ {
+  "code": "1.ssu.math.4.55235431342245245242321534153554325454233313415422.000000.1y",
+  "school": "ssu",
+  "dept": "math",
+  "year": 4,
+  "sector": [
+   "mid",
+   "public",
+   "grad"
+  ],
+  "top3": "cs,hr,ncs"
+ }
+]
