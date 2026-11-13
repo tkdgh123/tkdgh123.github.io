@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>홈커밍데이 멘토 특강 — 창업실</title>
+<meta name="description" content="2026년 11월 13일 숭실대 홈커밍데이 멘토 특강 세 편을 들으며 정리한 노트.">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@200..800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --paper: #f3f2ee; --ink: #141413; --muted: #5d5c57; --rule: #cbc8bf; --blue: #1f3fa8; --mark: #b3261e;
+  --m: clamp(16px, 4vw, 64px);
+  --serif: "Hahmlet", "Noto Serif KR", serif;
+  --sans: "Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif;
+  --mono: "IBM Plex Mono", "Pretendard Variable", Pretendard, ui-monospace, monospace;
+}
+* { box-sizing: border-box }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 16.5px/1.75 var(--sans); word-break: keep-all; -webkit-font-smoothing: antialiased }
+a { color: inherit }
+h1, h2, p { margin: 0 }
+.mono { font-family: var(--mono); font-size: 12.5px; letter-spacing: .02em; line-height: 1.5 }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 var(--m) }
+.bar { display: flex; justify-content: space-between; align-items: center; padding-block: 22px; gap: 16px }
+.bar a { text-decoration: none }
+.bar .home b { font: 600 23px/1 var(--serif) }
+
+.hero { padding-block: clamp(40px, 8vh, 96px) 34px }
+.hero .mono { color: var(--muted) }
+.hero h1 { margin-top: 14px; font: 250 clamp(46px, 8vw, 116px)/1 var(--serif); letter-spacing: -.035em }
+.hero h1 b { font-weight: 600 }
+
+.jump { position: sticky; top: 0; z-index: 5; display: flex; gap: 0; background: var(--paper); border-block: 1.5px solid var(--ink); margin-bottom: 8px; overflow-x: auto }
+.jump a { flex: 1 1 0; min-width: 120px; padding: 12px 16px 12px 0; text-decoration: none; font-weight: 650; font-size: 15px; white-space: nowrap }
+.jump a + a { padding-left: 16px; border-left: 1px solid var(--rule) }
+.jump a .mono { color: var(--muted); margin-right: 10px }
+.jump a:hover, .jump a.on { color: var(--blue) }
+
+.talk { padding-block: 56px 40px; scroll-margin-top: 50px }
+.talk + .talk { border-top: 1.5px solid var(--ink) }
+.th { display: grid; grid-template-columns: auto 1fr; gap: clamp(16px, 3vw, 40px); align-items: end }
+.no { font: 200 clamp(84px, 13vw, 180px)/.8 var(--serif); letter-spacing: -.05em; width: 1.15em }
+.who { color: var(--muted) }
+.th h2 { margin-top: 8px; font: 450 clamp(26px, 3.4vw, 44px)/1.18 var(--serif); letter-spacing: -.02em; max-width: 18em }
+
+.glance { list-style: none; margin: 40px 0 0; padding: 0; border-top: 1px solid var(--ink) }
+.glance li { display: grid; grid-template-columns: minmax(110px, 13em) 1fr; gap: 20px; padding: 14px 0; border-bottom: 1px solid var(--rule) }
+.gk { font: 600 15px/1.6 var(--sans) }
+.gv { font: 400 clamp(17px, 1.45vw, 19.5px)/1.6 var(--serif) }
+.gv b { font-weight: 650 }
+
+.notes { margin-top: 44px }
+.nl { display: flex; justify-content: space-between; align-items: center; color: var(--muted); padding-bottom: 8px; border-bottom: 1px solid var(--ink) }
+.all { font: 500 12.5px/1 var(--mono); background: none; border: 0; color: var(--blue); cursor: pointer; padding: 6px 0 }
+.sec { border-bottom: 1px solid var(--rule) }
+.sec summary { display: grid; grid-template-columns: 4.2em 1fr auto; gap: 14px; align-items: baseline; padding: 15px 0; cursor: pointer; list-style: none }
+.sec summary::-webkit-details-marker { display: none }
+.sec summary::after { content: "+"; font: 300 22px/1 var(--sans); color: var(--muted) }
+.sec[open] summary::after { content: "–" }
+.sec .t { color: var(--muted) }
+.sh { font-weight: 650; font-size: 17px }
+.sec summary:hover .sh { color: var(--blue) }
+.sb { padding: 0 0 22px calc(4.2em + 14px); max-width: 52em }
+.sb ul, .sb ol { margin: 0; padding-left: 1.2em }
+.sb li { margin: 4px 0 }
+.sb li::marker { color: var(--muted) }
+.sb ul ul { margin-top: 2px }
+.sb .key { font-weight: 600 }
+.sb .key::marker { content: "● "; color: var(--mark); font-size: .8em }
+.sb ol .key::marker { content: counter(list-item) ". "; color: var(--mark); font-size: 1em }
+.sb b { font-weight: 650 }
+.ask { margin: 14px 0 6px; font: 500 17px/1.5 var(--serif) }
+.ask:first-child { margin-top: 0 }
+.q { font-size: 13px; color: var(--muted) }
+
+footer { padding-block: 40px 60px; color: var(--muted) }
+
+@media (max-width: 640px) {
+  .glance li { grid-template-columns: 1fr; gap: 2px }
+  .sec summary { grid-template-columns: 3.6em 1fr auto; gap: 10px }
+  .sb { padding-left: 0 }
+  .th { grid-template-columns: 1fr }
+  .no { font-size: 72px }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="bar"><a class="home" href="../"><b>창업실</b></a><span class="mono">2026.11.13</span></div>
+  <div class="hero">
+    <p class="mono">숭실대 홈커밍데이 · 멘토 특강 세 편</p>
+    <h1>먼저 걸어 본<br><b>선배들</b>의 이야기</h1>
+  </div>
+  <nav class="jump"><a href="#t1"><span class="mono">01</span>안종훈</a><a href="#t2"><span class="mono">02</span>정재윤</a><a href="#t3"><span class="mono">03</span>오정민</a></nav>
+  
+<section class="talk" id="t1">
+  <header class="th">
+    <span class="no">01</span>
+    <div>
+      <p class="mono who">안종훈 멘토님 · 18:50~19:10</p>
+      <h2>급변하는 AI 시장, 무엇을 공부해야 할까? (1)</h2>
+    </div>
+  </header>
+  <ol class="glance"><li><span class="gk">AI 공부의 세 축</span><span class="gv">① 기본기(문제를 깊게 이해하는 힘) ② 활용력(새로운 것에 도전해 내 경험을 녹이는 힘) ③ 방향성(기업·나의 경험을 잇고 내 길을 찾는 힘)</span></li>
+<li><span class="gk">기본기</span><span class="gv">점수만 보지 말고 픽셀·loss까지 들여다보며 "왜 되는지" 파기 — AI는 마법이 아니라 목표를 향한 최적화</span></li>
+<li><span class="gk">활용력</span><span class="gv">규격형 인재보다 <b>내 특화 경험을 이야기로 풀어내는 사람</b>이 뽑힘</span></li>
+<li><span class="gk">방향성</span><span class="gv">소거법으로 싫은 걸 지워 가며 좋아하는 걸 찾기, 일할 날이 기니 재미있는 일 하기</span></li>
+<li><span class="gk">취업 직전</span><span class="gv">직무·기업 요구 분석 + 내 강점 스토리. 학교 기본기 + 사회가 요구하는 경험</span></li></ol>
+  <div class="notes">
+    <p class="mono nl">들으면서 적은 것 <button class="all" type="button">모두 펼치기</button></p>
+    <details class="sec" open><summary><span class="t mono">18:52</span><span class="sh">멘토 소개</span></summary><div class="sb"><ul>
+<li>○○대 소프트웨어학과 석사 → 의료 비전 AI 연구 → 지금 삼성 MX사업부에서 휴대폰에 비전 AI를 넣는 일</li>
+<li>갤럭시의 AI 지우기·검색·색 보정 같은 기능이 이런 비전 AI</li>
+<li>취업 전에 여러 대회 등에 도전하며 준비</li>
+</ul></div></details>
+<details class="sec"><summary><span class="t mono"></span><span class="sh">AI 공부하는 사람의 고민 세 가지</span></summary><div class="sb"><ol>
+<li><b>공부 방향</b> — 새 기술·키워드가 계속 쏟아지는데 무엇을 공부해야 하나</li>
+<li><b>기술 수명</b> — 빨리 뜬 만큼 빨리 식지 않을까, 내가 배운 기술이 내일 쓸모없어지지 않을까</li>
+<li><b>진로(커리어 패스)</b> — AI를 공부하고 나서 갈 수 있는 곳은 어디고, 그러려면 무엇을 해야 하나</li>
+</ol></div></details>
+<details class="sec"><summary><span class="t mono">18:54</span><span class="sh">빠르게 바뀌는 시장</span></summary><div class="sb"><ul>
+<li>AI 키워드가 분기·달 단위로 생겼다 사라지고 합쳐짐. 채용 공고의 키워드도 계속 바뀜</li>
+<li>그래서 "무엇을 공부할지", "배운 기술이 계속 유효할지" 판단이 어려움</li>
+</ul></div></details>
+<details class="sec"><summary><span class="t mono"></span><span class="sh">멘토가 꼽은 핵심 세 가지</span></summary><div class="sb"><ol>
+<li><b>기본기</b> — 문제를 이해하는 힘</li>
+<li><b>활용력</b> — (도구·모델을) 활용하는 힘 <span class="q">녹음상 "대형버스…"로 들려 대상 불확실</span></li>
+<li><b>방향성</b> — 나아갈 방향을 찾는 힘</li>
+</ol>
+<ul>
+<li>"뻔하고 추상적일 수 있지만 결국 이 세 가지"라며 강조. 이제 각각을 자기 경험으로 설명</li>
+</ul></div></details>
+<details class="sec"><summary><span class="t mono"></span><span class="sh">경험 ① 석사 시절 (기본기 이야기 시작)</span></summary><div class="sb"><ul>
+<li>의료 AI 석사를 시작할 때는 지금 같은 AI 도우미가 없어 스택오버플로·블로그를 뒤지며 공부</li>
+<li>좋은 모델·코드를 가져다 써도 <b>왜 잘 되는지 모르겠고, 무엇을 해결해야 할지 막막했음</b></li>
+<li>해결법: <b>모델이 어떻게 학습하는지, loss가 실제로 어떻게 줄어드는지 깊게 파고듦</b></li>
+<li>예: 두 영상을 맞붙이는(정합·매칭) 모델 — 점수는 높은데 정말 잘 되는지 모름 → <b>픽셀 하나하나 확인 + loss 분석</b>으로 어디서 한계에 부딪히는지 찾음</li>
+<li>그러다 <b>밝기가 달라지면 매칭이 잘 안 되는 문제</b>를 발견 → 이걸 푸는 과정이 석사 연구가 됨</li>
+<li class="key">"AI는 뭐든 되는 마법이 아니라, 정해진 목표(식)를 향해 최적화해 가는 과정"</li>
+<li class="key">결국 중요한 건 <b>내가 하는 일을 어디까지 깊게 이해했느냐</b></li>
+<li>지식이 넓어진 지금 같은 상황일수록 이 깊은 이해가 가장 중요</li>
+</ul></div></details>
+<details class="sec"><summary><span class="t mono">18:58</span><span class="sh">경험 ② 취업 준비 — 새로운 것에 도전하는 힘</span></summary><div class="sb"><ul>
+<li>석사 뒤 돌아보니 내가 한 것(의료 AI)이 가고 싶은 회사의 실제 분야(휴대폰 AI)와 잘 맞지 않았음</li>
+<li>포트폴리오를 기업이 원하는 것과 어떻게 이어서 <b>"나만의 이야기"로 풀어낼지</b> 고민</li>
+<li>예: 삼성 AI 대회 — 이미지와 질문을 받고 답하는 과제(VQA). 비전-언어 모델(VLM)은 처음이라 새로 공부함</li>
+<li>단순히 성능 점수로 승부하기엔 잘하는 경쟁자가 너무 많다고 판단 → 나만의 접근을 고민</li>
+<li>석사 때 다룬 정합(영상 맞추기) 기술을 VQA에 접목 → 성능은 다른 팀보다 낮았지만 입상 <span class="q">녹음상 "3위"로 들림</span></li>
+<li class="key">회사가 원하는 건 <b>모두 똑같은 규격형 인재가 아님</b> — 각자 특화된 경험을 잘 녹여 <b>이야기로 만들어 내는 힘</b>이 점점 중요해질 것</li>
+</ul></div></details>
+<details class="sec"><summary><span class="t mono">19:01</span><span class="sh">경험 ③ 기업과 이어지는 방향성</span></summary><div class="sb"><ul>
+<li>대회·실무를 해 보니 <b>학교에서 하는 것과 기업에서 하는 것은 차이가 큼</b></li>
+<li>학부 수업은 기본기 중심이라 기업이 원하는 실무 기술을 바로 다루긴 어려움</li>
+<li>그러니 <b>기업이 원하는 것 – 내가 보는 것 – 내가 경험한 것</b>이 어떻게 이어지는지, 그 기업에 어떤 가치를 만들 수 있을지 고민해 보라</li>
+<li>예: 멘토가 면접 등에서 꺼낸 이야기 ① <b>근거 있는(신뢰할 수 있는) AI</b> — 성능만큼 신뢰도가 중요, 특히 의료는 실수 하나가 생명에 직결</li>
+<li>믿을 수 있는 근거를 함께 보여 주는 쪽으로, 프로젝트가 나아갈 AI 방향까지 덧붙여 제시 → 그 점이 좋게 평가받은 것 같다고 함</li>
+</ul></div></details>
+<details class="sec"><summary><span class="t mono">19:02</span><span class="sh">방향 정하는 법 — 소거법</span></summary><div class="sb"><ul>
+<li>학부생은 무엇을 하고 싶은지 잘 모르는 게 당연. AI는 키워드·분야(도메인)·모델링 종류가 너무 많음</li>
+<li class="key"><b>소거법으로 시작</b>: 해 보고 재미없으면 빼고, 남은 쪽을 더 깊이 파 보면 하고 싶은 게 보임</li>
+<li>학부~취업은 6년뿐이지만 일하며 살 날은 훨씬 길다 → <b>재미있는 일을 하는 게 낫다</b></li>
+<li>취업에만 매달리지 말고 <b>내가 좋아하는 것·싫어하는 것</b>을 생각해 보기</li>
+<li>멘토 예: 처음엔 보안을 하고 싶어 보안 공부·대회까지 해 봤는데, 적성이 아님을 금방 알게 됨</li>
+<li>"현실적으로 어려운 것도 많지만, 내가 어디에 맞는 사람인지 잘 찾아 나가길"</li>
+<li>예: 4학년까지 다니다 공무원 시험으로 진로를 바꿔 잘 사는 친구도 있음 — 진로는 바뀔 수 있으니 미리 많이 생각해 두기</li>
+</ul></div></details>
+<details class="sec"><summary><span class="t mono">19:04</span><span class="sh">취업이 가까운 사람에게</span></summary><div class="sb"><ul>
+<li>4학년이거나 취업이 코앞이면 <b>직무 요구 분석, 지원 기업에 무엇이 필요한지</b>에 집중</li>
+<li class="key">가장 중요한 건 <b>내 강점에 대한 스토리</b></li>
+<li>채용 시장이 얼어붙은 건 사실 → 학교 커리큘럼과 기본기는 꼭 챙기되, <b>사회가 요구하는 능력과 그에 맞는 경험</b>을 만들어야 함</li>
+<li>(이야기를 어떻게 세우고 설명할지는 다음 발표자 선배가 다룰 예정이라 넘어감)</li>
+</ul></div></details>
+<details class="sec"><summary><span class="t mono"></span><span class="sh">마무리</span></summary><div class="sb"><ul>
+<li>흔들리는 시장 속에서 <b>자기만의 중심(기둥)을 단단히 세우길</b></li>
+<li class="key">"흔들리는 시장 속에서 <b>나만의 무기</b>를 만들었으면 좋겠다" <span class="q">녹음상 "액괴"로 들려 정확한 단어 불확실 — 엣지·무기 정도의 뜻</span></li>
+</ul></div></details>
+<details class="sec"><summary><span class="t mono">19:05</span><span class="sh">질의응답</span></summary><div class="sb"><p class="ask">Q. 기업이 원하는 게 무엇인지 예시를 들어 주신다면?</p>
+<ul>
+<li class="key">결국 <b>바로 실무에 투입될 수 있는 사람</b></li>
+<li>예: 친구 A는 유행하는 기술 키워드 <span class="q">녹음상 "RCC·RTP"로 들림</span> 공부에 집중 → 아직 취업 못 함
+<ul>
+<li>친구 B는 삼성 카메라 최적화 관련 <b>협업 프로젝트</b>를 해 봄 → 잘 풀림</li>
+</ul></li>
+<li>지원하는 회사·시스템에 <b>1대1로 맞아떨어지는 경험</b>을 쓰는 게 중요</li>
+<li>그런 협업 프로젝트까지 가기 어려운 건 사실 — 작은 경험이 다음 경험을 부르도록 <b>꼬리에 꼬리를 물며 쌓는 수밖에</b> 없음</li>
+<li>1강 끝 (19:07 "여기서 마무리하겠습니다")</li>
+</ul></div></details>
+  </div>
+</section>
+<section class="talk" id="t2">
+  <header class="th">
+    <span class="no">02</span>
+    <div>
+      <p class="mono who">정재윤 멘토님 · 19:10~19:30</p>
+      <h2>척척학사로 AI 하는 방법</h2>
+    </div>
+  </header>
+  <ol class="glance"><li><span class="gk">학사로도 AI 취업 가능</span><span class="gv">한 번 뚫고 2년 넘게 다니면 석사를 이김. 신입이 어렵지 경력 이직은 쉬움</span></li>
+<li><span class="gk">승부는 연구 경험</span><span class="gv">코딩은 AI가, 자격증은 필요 없음. 학부연구생 1년 ≈ AI 경력, 1년 반이면 논문 한 편</span></li>
+<li><span class="gk">논문 기준</span><span class="gv">국내 학회는 안 봄. 해외 탑티어 워크숍(영어 4·8쪽) 이상, 안 되면 arXiv라도</span></li>
+<li><span class="gk">핏·스토리</span><span class="gv">지원 회사와 맞는 경험 하나가 면접 30분을 채움. 분야를 빨리 정할수록 유리</span></li>
+<li><span class="gk">회사 고르기</span><span class="gv">스타트업은 까다롭고, 대기업·은행·증권사는 뽑아서 키우는 편</span></li>
+<li><span class="gk">분야</span><span class="gv">좋아하는 걸 먼저, 취업이 우선이면 NLP. 트렌드는 바뀌어도 바탕은 그대로</span></li>
+<li><span class="gk">석사</span><span class="gv">혼자 준비가 어렵다면 석사도 좋은 선택</span></li></ol>
+  <div class="notes">
+    <p class="mono nl">들으면서 적은 것 <button class="all" type="button">모두 펼치기</button></p>
+    <details class="sec" open><summary><span class="t mono">19:13</span><span class="sh">학사로 AI 취업, 가능한가</span></summary><div class="sb"><ul>
+<li>취업이 어렵긴 하지만, 한 번 들어가면 연봉 6천 이상에 경력 쌓아 이직도 잘 됨</li>
+<li class="key"><b>학사로 한 번 뚫고 2년 이상 다니면 석사를 이길 수 있음</b> — 석사보다 경력 있는 학사가 대우가 더 좋음</li>
+<li>요즘 흐름: AI(에이전트)를 쓰면서 <b>잘하는 개인 한 명이 할 수 있는 일이 크게 늘어</b> 기업들이 "잘하는 개인"을 뽑으려 함 → 석사가 예전보다 덜 필요</li>
+<li>서류에서 석사가 없어도 <b>물어볼 만한 것(프로젝트)이나 연구 비슷한 경험</b>이 있으면 면접까지 봄</li>
+<li>학사를 뽑는 곳 예: 당근, 크래프톤, 하이퍼커넥트, 업스테이지 등 + <b>은행·증권사</b>(학사 채용 많음)</li>
+<li>원하는 분야가 아니어도 "학사로 AI 하고 싶다"면 길·공고는 많음 — 연구 역량을 보여 주면 노력으로 가능</li>
+<li>반대로 <b>무엇을 키워야 할지(판 짜기) 모르겠다면 석사도 방법</b> — 석사 과정이 알아서 능력과 연구 경험을 키워 줌</li>
+<li>석사는 압박 속에서 연구 경험이 저절로 쌓임. 학사로서 스스로 준비할 자신이 없다면 대학원 없이는 취업이 어려울 수 있음</li>
+</ul></div></details>
+<details class="sec"><summary><span class="t mono">19:15</span><span class="sh">멘토의 취업 당시 이력서</span></summary><div class="sb"><ul>
+<li><b>숭실대 출신 선배</b>. 이력서는 별것 없었음 — 학점 4.1(코로나 시기), 대신 <b>수상이 많았음</b>
+<ul>
+<li>LG 주최 대회 수상, 숭실대 AI융합학부 경진대회 수상, 삼성 대회 수상</li>
+</ul></li>
+<li>오늘의집 면접은 떨어짐. 붙은 회사 면접에서는 <b>대회 경험만</b> 물어봄</li>
+<li>삼성 대회에서 GAN을 썼는데, 면접에서 <b>회사와 가장 관련 깊은 그 GAN 대회 이야기만 30분</b> 동안 함 → 비전팀 입사</li>
+<li class="key"><b>회사와 맞아떨어지는 경험이 있으면 가장 좋음</b></li>
+<li class="key">추천·NLP·비전 등 <b>분야를 빨리 정할수록 스토리를 만들기 유리</b> — 멘토도 GAN·비전 경험을 묶어 스토리를 짜서 지원</li>
+</ul></div></details>
+<details class="sec"><summary><span class="t mono"></span><span class="sh">지금(경력 3년 8개월)의 준비</span></summary><div class="sb"><ul>
+<li>취업 때 부족했던 <b>연구 논문</b>을 채우려 회사에서 <b>약 15편</b> 씀. 정부 과제 등 <b>프로젝트도 많이</b> 함</li>
+<li class="key"><b>늘 "내 스펙에서 부족한 게 뭐지?"를 찾아 채움</b> — 학벌은 그대로지만, 학사라서 연구 경험·논문을 최대한 쌓음</li>
+<li>대회 수상은 예전 것도 계속 남음(그때의 1등이 사라지지 않음) → <b>발자취가 계속 따라오는 느낌</b></li>
+<li><b>결론: 최대한 빨리 준비하면 학사로도 취업할 수 있다</b></li>
+</ul></div></details>
+<details class="sec"><summary><span class="t mono"></span><span class="sh">신입은 어렵고, 경력은 쉽다</span></summary><div class="sb"><ul>
+<li>예전에 스캐터랩에 지원했을 땐 서류에서 바로 떨어짐 → 지금은 같은 회사에서 먼저 "관심 있냐"며 커피챗 연락이 옴. 미스트랄에서도 연락</li>
+<li class="key"><b>한 번만 들어가면 경력직 이직은 요즘 쉬움</b> — 경력이 쌓이면 불러 주는 곳이 많음. 어려운 건 신입</li>
+<li>그 첫 관문에서 가장 중요한 건 <b>연구 경험</b></li>
+</ul></div></details>
+<details class="sec"><summary><span class="t mono">19:19</span><span class="sh">멘토가 지금 하는 일</span></summary><div class="sb"><ul>
+<li>피지컬 AI(로봇)가 좋아서 분야를 옮겨 옴: <b>비전 → NLP → LLM → VLM → VLA</b>(시각-언어-행동 모델)</li>
+<li>텔레오퍼레이션(사람이 원격 조종)으로 데이터 수집 → 시뮬레이션 환경에서 학습 → <b>월드 모델</b> 만드는 과제로 연구·개발</li>
+<li class="key">유행(뜨는 분야)을 따라 계속 옮겨 가며 커리어를 이어 감</li>
+</ul></div></details>
+<details class="sec"><summary><span class="t mono"></span><span class="sh">질의응답</span></summary><div class="sb"><p class="ask">Q. (질문 내용 잘 안 들림 — 학사 취업 경쟁 관련)</p>
+<ul>
+<li>학사 취업은 <b>같은 학사인데 나보다 학벌 좋은 사람들</b>과 싸워야 함 — AI판이 좁기 때문</li>
+<li>동시에 석사 출신과도 경쟁해야 함</li>
+<li>박사는 다른 레벨. 석사·학사를 같은 자리에서 보는 회사라면 <b>석사는 논문을 들고 옴</b></li>
+<li class="key">그래서 학사로 취업하려면 <b>논문을 들고 가거나</b>, 학벌·학점이 아주 좋거나, 연구 경험(= 사실상 논문)이 있어야 함 — "이게 요즘 현실"</li>
+<li>논문이 어렵다지만 <b>AI 학회는 많음</b> — 3개월마다 열리는 곳도 있고, NLP 쪽은 ARR 심사에 Findings 트랙도 있음</li>
+<li>"학사라는 힘든 길을 골랐으면 어려운 건 당연"</li>
+</ul>
+<p class="ask">Q. (질문 잘 안 들림 — 무엇을 준비해야 하나)</p>
+<ul>
+<li>요즘 지원자 중엔 <b>논문 한 편 정도 써서 오는 학사</b>도 있음</li>
+<li class="key"><b>AI 연구자가 되려면 무엇이든 연구 경험이 있어야 함 — 요즘은 연구 경험 말고는 다 필요 없다</b>
+<ul>
+<li>코딩 잘하는 건 AI가 다 해 주고, <b>자격증은 필요 없음</b></li>
+<li>학점도 보긴 보지만, 경험이 아주 많으면 취업이 꽤 쉬움</li>
+</ul></li>
+<li class="key"><b>학부연구생을 3학년 중순부터 1년 반쯤 하면 논문이 적어도 한 편은 나옴</b> — 아주 잘하는 사람이 아니어도 열심히 하면 가능</li>
+<li>학사로 살아남으려면 석사도, 학벌 좋은 학사도 이겨야 함 → <b>논문은 하나라도 쓰는 게 맞다</b>, 못 썼으면 어떻게든 연구 경험을 만들어야 함</li>
+</ul>
+<p class="ask">Q. 학사도 정말 괜찮은가? (멘토가 채용 담당자에게 늘 물어본 것)</p>
+<ul>
+<li>옛날엔 "석사여야 한다"는 말이 많았음. LG 대회 우승 때 받은 채용 기회도 석사 이상이었음</li>
+<li class="key">요즘은 공고에 "석사 이상"이라 써 있어도 <b>실제로는 학사도 뽑음</b> — 당근도 예전엔 없었는데 지금은 학사를 2~3명 뽑음</li>
+<li>학사 지원자가 많이 들고 오기(논문·경험) 때문</li>
+<li>어떤 회사는 <span class="q">이름 불확실</span> <b>학사를 일찍 뽑아 똑똑한 사람으로 키우겠다</b>는 기조가 강함 → <b>학회 논문 하나만 있어도 다른 지원자와 같은 출발선</b></li>
+</ul></div></details>
+<details class="sec"><summary><span class="t mono">19:25</span><span class="sh">면접에서 갈리는 것</span></summary><div class="sb"><ul>
+<li>서류가 붙으면 승부는 면접. 이때도 중요한 건 <b>연구 경험</b></li>
+<li>면접관은 내가 쓴 논문에 대해 <b>"직접 써 본 사람만 답할 수 있는 질문"</b>을 함 → 잘 답할수록 좋은 결과</li>
+<li>현실: 논문이 하나도 없으면 서류부터 힘듦. 그런데 논문을 쓰려면 학부연구생을 해야 하고, 학교 다니면서 쓰기는 쉽지 않음</li>
+</ul></div></details>
+<details class="sec"><summary><span class="t mono"></span><span class="sh">회사 종류에 따라 다름</span></summary><div class="sb"><ul>
+<li>이건 높은 기준(특히 <b>스타트업</b>) — 스타트업이 오히려 까다로워서 경험이 없으면 아예 안 됨</li>
+<li class="key"><b>대기업·농협·증권사 등은 경험이 좀 없어도 뽑아서 키우겠다는 경향이 강함</b> → 논문 없는 학사에게 오히려 길</li>
+<li>대기업 공채는 오히려 학사·석사를 함께 보기도 함. AI 에이전트 부서처럼 <b>논문이 없어도 되는 곳도 있지만, 연구 경험은 꼭 필요</b></li>
+<li class="key"><b>학부연구생 1년 정도 = 사실상 AI 쪽 경력</b>으로 쳐 줌 → 지원할 수 있는 곳이 많아짐</li>
+<li>이걸 다 혼자 준비하기 힘들면 → 석사 2년이면 알아서 쌓이는 능력치. 멘토는 빨리 돈을 벌고 싶어 학사 취업을 택함</li>
+<li>멘토는 2~3학년 땐 논문 쓰기엔 부족하다 싶어 <b>대회</b>에 집중 → 하지만 <b>지금 회사들은 대회보다 논문을 봄</b> → 그래서 연구 경험이 중요</li>
+</ul>
+<p class="ask">Q. 학부연구생은 3학년쯤부터 한다고 하셨는데, 기간은 얼마나 걸리나요?</p>
+<ul>
+<li>학부연구생을 하는 것만으로도 일단 좋음 — 연구 경험이 쌓이니까</li>
+<li class="key"><b>국내 학회(KSC 등) 논문은 아무도 안 봄</b> — 2~3쪽짜리라 연구로 보기 애매</li>
+<li>적어도 <b>해외 탑티어 학회의 워크숍</b>(보통 4쪽 또는 8쪽, 영어)은 되어야 인정</li>
+<li><b>기간: 처음엔 적어도 1년</b> — 1년쯤 하면 워크숍이 아니어도 2티어 학회를 노릴 수 있고, 1티어는 공저자로라도 이름을 올릴 수 있음 (제1저자가 가장 좋지만 처음부터는 어려움)</li>
+<li>멘토도 학부연구생 때 첫 논문을 공저로 쓰는 데 1년 걸림. <b>쓸수록 빨라짐</b></li>
+<li>1년 했는데 논문이 안 나와도 괜찮음 → 꾸준히 했다면 <b>arXiv에라도 올려 이력서에 넣기</b>. 학회 심사 중(under review)이라고 적어 두는 사람도 많다고 함</li>
+<li class="key">가장 좋은 건 그 논문 주제가 <b>지원할 회사와 핏이 맞는 것</b> — 가고 싶은 곳·분야(NLP 등)가 있으면 최대한 거기에 맞추기</li>
+<li>다만 교수님이 원하는 주제는 다를 수 있으니 <b>잘 조율</b>해야 함</li>
+</ul>
+<p class="ask">Q. 왜 비전을 고르셨나요? 어느 분야가 유리한가요?</p>
+<ul>
+<li>처음엔 그냥 <b>이미지 처리가 좋아서</b> 비전을 고름</li>
+<li>분야 고르는 기준은 둘: <b>좋아하는 것</b> vs <b>전략적인 것</b>. 전략적으로 가면 <b>일자리가 가장 많은 NLP</b>가 지금 가장 뜨거움</li>
+<li>비전으로 간 진짜 이유는 <b>스토리</b> — 삼성 대회가 비전(GAN)이었고, 마음AI에 지원할 때도 입 모양 움직임을 만드는 생성(GAN) 일이라 대회 경험과 핏이 맞았음</li>
+<li>비전·NLP 가리지 않고 다 지원했지만(이루다 만든 스캐터랩 등), <b>결국 뽑아 준 곳은 나와 핏이 가장 잘 맞는 회사</b></li>
+<li>회사에서 트렌드 따라 옮겨 감: 라마2 이후 LLM 파인튜닝(NLP) → 비전 경험 살려 VLM → 로보틱스 뜨자 VLA (스타트업이라 가능, 대기업은 부서가 잘 안 바뀜)</li>
+<li class="key"><b>트렌드는 바뀌어도 바탕(기본)은 안 바뀜</b> — VLM은 NLP·비전 했던 사람이 잘함, 배경이 비슷하니까</li>
+<li class="key">결론: <b>재미있는 AI를 먼저 고르되, 취업이 우선이면 NLP가 가장 유리</b> — 비전을 가도 NLP는 필요하고, 추천 시스템도 요즘은 트랜스포머·LLM으로 함. 뭘 할지 모르겠으면 NLP</li>
+<li>2강 끝 (19:31 "질문은 여기까지, 마무리하겠습니다")</li>
+</ul></div></details>
+  </div>
+</section>
+<section class="talk" id="t3">
+  <header class="th">
+    <span class="no">03</span>
+    <div>
+      <p class="mono who">오정민 멘토님 · 19:30~19:50</p>
+      <h2>다시, 숭실로. 18학번 선배가 먼저 걸어 본 창업 5년</h2>
+    </div>
+  </header>
+  <ol class="glance"><li><span class="gk">창업 계기</span><span class="gv">교수실 점자 명패에 이름 없이 '교수실'만 → "약자의 목소리를 개발자가 안 듣고 있었다" → 점자 기술 스타트업 데브파이브</span></li>
+<li><span class="gk">학교 시절</span><span class="gv">대회에 빠져 상을 휩쓸다 소프트웨어 마에스트로에서 "우물 안 개구리"를 깨닫고 더 열심히. 교수님이 좋아할 학생은 아니었지만 별별 경험을 다 함</span></li>
+<li><span class="gk">경력 쌓기</span><span class="gv">전공을 살린 일(코딩 강사·SI 개발) → 강의 경력과 말하는 힘</span></li>
+<li><span class="gk">창업 과정</span><span class="gv">청년창업 SMART 2030 → 생애최초 청년창업 → 예비창업패키지 최우수 → R&amp;D, 대체복무로 회사 유지, 기술은 모두 오픈소스</span></li>
+<li><span class="gk">AI 시대</span><span class="gv">실력은 평준화 → 특허처럼 나를 증명할 지렛대가 필요</span></li>
+<li><span class="gk">후배에게 세 가지 힘</span><span class="gv">① 직접 만드는 힘 ② 설명하는 힘 ③ 신뢰를 쌓는 힘. 학생 때 할 수 있는 시도(대회·해커톤·소마·오픈소스 아카데미·예창패)가 많다</span></li></ol>
+  <div class="notes">
+    <p class="mono nl">들으면서 적은 것 <button class="all" type="button">모두 펼치기</button></p>
+    <details class="sec" open><summary><span class="t mono">19:41</span><span class="sh">멘토 소개</span></summary><div class="sb"><ul>
+<li><b>숭실대 18학번</b>, 스마트시스템소프트웨어학과 입학. 오늘 행사는 <b>홈커밍데이</b> 발표</li>
+<li>소프트웨어 전공 후배들에게 "내가 어떻게 살아왔고, <b>학교에서 무엇을 했는지</b>"를 이야기하려 함. 연락처는 발표 자료에 있으니 언제든 연락해도 됨</li>
+<li>자주 받는 질문 세 가지에 농담으로 답함: ① 나이(예전 행사 때 멘티들이 더 나이 많아 보였다고) ② 연봉 — <b>스타트업이라 플러스·마이너스를 오가며 출렁임</b> ③ 주민번호 뒷자리</li>
+<li>발표 자료는 회사 디자인 매니저가 만들어 줌</li>
+</ul></div></details>
+<details class="sec"><summary><span class="t mono">19:43</span><span class="sh">발표 순서</span></summary><div class="sb"><ol>
+<li>학교 다닐 때 오정민은 어떤 사람이었고 무엇을 했나</li>
+<li><b>23살, 대학교 3학년 때 처음 창업</b> → 5년 동안의 우여곡절과 지금 하는 일</li>
+<li>후배들에게 하고 싶은 말</li>
+</ol></div></details>
+<details class="sec"><summary><span class="t mono"></span><span class="sh">멘토 이력</span></summary><div class="sb"><ul>
+<li><b>숭실대 AI융합학부 졸업</b>(당시 이름), 이후 <b>데브파이브</b> 창업</li>
+<li>소프트웨어 마에스트로 연수생 → Expert, 오픈소스 컨트리뷰션 아카데미 멘토, 책 집필(『이토록 쉬운 HTML CSS』), 여러 곳 강연, 장관상 여러 번 수상</li>
+<li><b>한 달 뒤 새 책 출간 예정</b> — <span class="q">녹음상 "클로즈…"로 들림, Claude 관련 책으로 추정</span> 원래 지금 나왔어야 하는데 프로그램 화면이 갑자기 바뀌어 다시 쓰는 중</li>
+</ul></div></details>
+<details class="sec"><summary><span class="t mono"></span><span class="sh">입학 (2018)</span></summary><div class="sb"><ul>
+<li>2018년 숭실대 신입생. <b>소프트웨어 특기자 전형이 막 생긴 때</b>(2017·2018)라 몇 명 뽑는지, 몇 점이면 붙는지 같은 정보가 전혀 없던 상태</li>
+<li><b>정보올림피아드 수상</b> 덕분에 숭실대가 받아 준 것 같다며 학교에 감사</li>
+</ul></div></details>
+<details class="sec"><summary><span class="t mono">19:45</span><span class="sh">학교 다닐 때</span></summary><div class="sb"><ul>
+<li><b>2019년 소프트웨어 마에스트로 합격</b> — 학과에서 처음 뽑힌 사례라 진통이 있었음
+<ul>
+<li>응원해 준 교수님도 있었지만, "학교 일도 아닌데 왜 네 결석을 봐줘야 하냐"는 교수님도 있었음 → 공식 서류를 보여 주며 하나하나 해결</li>
+</ul></li>
+<li>3학년 때 현장실습을 나갔다 돌아오니 코로나가 터짐</li>
+</ul></div></details>
+<details class="sec"><summary><span class="t mono"></span><span class="sh">창업의 씨앗 — 점자 명패 이야기</span></summary><div class="sb"><ul>
+<li>졸업 작품을 준비하다 점자 교육을 받게 됨</li>
+<li>강사님이 물음: <b>"교수실 문 옆 점자 명패에 뭐라고 적혀 있는지 아세요?"</b></li>
+<li>"교수님 이름이겠죠?"라고 답했더니 → <b>이름 없이 '교수실'이라고만 적혀 있다</b>는 답</li>
+<li>(기사에 따르면 이 경험이 시각장애인의 정보 접근 문제에 눈뜨고 창업을 결심한 계기)</li>
+<li>시각장애인은 그 명패로는 교수실을 찾아갈 수 없음 → "분노라는 거창한 말이 아니라 그냥 <b>어이가 없었다</b>"</li>
+<li>그래서 <b>졸업 논문(작품) 주제를 이걸로</b> 정함</li>
+</ul></div></details>
+<details class="sec"><summary><span class="t mono">19:47</span><span class="sh">"범인"을 찾아다니다</span></summary><div class="sb"><ul>
+<li>누가 잘못했나? 학교 행정실? 아니었음. 국회의원? 그것도 아니었음</li>
+<li>점자 쪽을 직접 들여다봄: <b>점자 프린터는 해마다 새 모델이 나오는데</b>, 점자 소프트웨어는 국가 기관이 만든 <b>'점사랑'</b> 하나 — 윈도 XP 시절에 만든 듯한 낡은 화면·버튼 그대로</li>
+<li>당시 멘토는 <b>오픈소스 컨트리뷰션 아카데미 멘티</b>(지금은 멘토)</li>
+<li class="key">소프트웨어 업계는 약자를 위한 것도 없으면 오픈소스로 직접 만들어 왔는데, <b>점자 분야에는 그런 손길이 없었다</b>는 걸 깨달음</li>
+<li class="key">개발자가 할 일이 이렇게 많은데 약자들은 옛날 프로그램을 쓰고 있음 → <b>"우리 개발자들이 약자의 목소리를 듣지 않고 있구나"</b> — 상심, 업계에 대한 배신감 → <b>그래서 창업</b></li>
+</ul></div></details>
+<details class="sec"><summary><span class="t mono">19:49</span><span class="sh">다시 학교 시절로 — 대회에 빠지다</span></summary><div class="sb"><ul>
+<li>소프트웨어 특기자라 교내 대회에 계속 나감</li>
+<li>집에선 컴퓨터 앞에 앉아 있으면 혼났는데, 학교에선 교수님이 "잘한다, 잘한다" → <b>프로그래밍이 너무 재밌어서</b> 상을 하나씩 받으며 대회를 계속 나감</li>
+<li>외부 대회로 넓혀 같은 대회를 기수마다 나감 → 순위가 6·3·4등에서 3·2·2·1·2등으로 오르며 <b>이 생태계가 돌아가는 방식</b>을 알게 됨</li>
+<li>"솔직히 제가 천재인 줄 알았어요" → 2학년 2학기에 <b>소프트웨어 마에스트로(전국 150명)</b>에 붙음…(다음 조각에 이어짐)</li>
+</ul></div></details>
+<details class="sec"><summary><span class="t mono">19:51</span><span class="sh">소프트웨어 마에스트로에서 깨진 자만</span></summary><div class="sb"><ul>
+<li>소마에서 손 움직임·압력을 감지하는 장치 같은 프로젝트를 함</li>
+<li>짝이 잘 맞던 동료에게 학교를 물으니 이름난 학교 출신 — 주변이 다 나보다 뛰어남 <span class="q">학교 이름은 잘 안 들림</span></li>
+<li class="key"><b>"내가 우물 안 개구리였구나"</b> 를 진심으로 느낌 → 이 사람들 발끝이라도 따라가려면 정말 열심히 해야겠다</li>
+<li>그런데 억지로 하는 게 아니라 <b>같이 하는 게 너무 재밌어서 밤새며</b> 함</li>
+<li class="key"><b>후배들에게 소프트웨어 마에스트로를 강력 추천</b></li>
+</ul></div></details>
+<details class="sec"><summary><span class="t mono"></span><span class="sh">교수님이 좋아하는 학생은 아니었다</span></summary><div class="sb"><ul>
+<li>뭐만 하면 밖에 나가고, 해커톤 나가고 → 교수님들이 좋아하는 스타일은 아니었음</li>
+<li>대신 <b>별별 경험을 다 쌓음</b> — 남을 가르치는 일(강의)도 하게 됨</li>
+<li>(아버지 이야기: 학생 때 돈을 벌고 싶어 알바를 해 보겠다고 했더니…(다음 조각))</li>
+<li>아버지의 조건: <b>"전공과 관련된 일이면 용돈은 그대로 주고 번 돈도 네 것. 전공과 상관없는 알바면 용돈을 다 끊겠다"</b> → 계산해 보니 일반 알바가 손해 → 전공을 살린 일을 찾음</li>
+</ul></div></details>
+<details class="sec"><summary><span class="t mono">19:53</span><span class="sh">강사·개발 일로 쌓은 경력</span></summary><div class="sb"><ul>
+<li>코딩 학원 강사로 시작 → 반응이 좋아 강의가 이어짐
+<ul>
+<li>삼성 OS <b>타이젠</b> 강의 → 삼성전자 <b>타이젠 스페셜리스트</b></li>
+<li>베어유 프론트엔드 강의, 삼성 청년 SW 아카데미·이노베이션 캠퍼스 등 여러 교육 기관 강의 <span class="q">기관 이름 일부 불확실</span></li>
+</ul></li>
+<li class="key">강의로 <b>강사 경력과 말하는 능력</b>이 자연스럽게 쌓임</li>
+<li>창업 외에 <b>SI(회사 의뢰 개발)도 계속</b> 하며 경험을 넓힘, 오픈소스 컨트리뷰션 아카데미에선 멘토로 활동</li>
+<li>실제 일에서 문제를 풀다 보니 알고리즘 실력도 붙음: DP는 약했지만 그래프(다익스트라)는 강해짐 → 숭실대 교내 대회에서 그래프 문제가 두 개 나와 <b>상금·장학금</b></li>
+<li>"여러분도 꼭 장학금 받으세요, 학교생활이 아주 행복해집니다"</li>
+</ul></div></details>
+<details class="sec"><summary><span class="t mono">19:55</span><span class="sh">창업 시작</span></summary><div class="sb"><ul>
+<li>점자 명패를 보고 "잘못된 건 남이 아니라 <b>우리(개발자)</b>였구나" → 창업</li>
+<li><b>청년창업 SMART 2030</b>(경기)에 그냥 신청해 봄 → 선정</li>
+<li>코딩만 배운 사람이 처음으로 <b>사업계획서</b>를 쓰며 시장 규모(TAM·SAM·SOM) 같은 낯선 개념과 씨름 — "그것도 모르면서 뽑혔다"며 웃음</li>
+<li>이후 <b>생애최초 청년창업 지원사업 → 예비창업패키지 (최우수) 졸업 → R&amp;D 사업</b> 등으로 이어 감</li>
+<li>지원사업에만 기대지 않고 <b>자체 기술력</b>으로 인정받으며 조금씩 매출을 냄 <span class="q">녹음 불확실</span></li>
+<li>군대는 졸업 후 <b>산업기능요원 등 대체복무로 추정</b> <span class="q">녹음상 "비행티네"</span> — 회사를 유지하면서 복무할 수 있었음. 현역이었다면 창업을 이어 가기 어려웠을 것</li>
+</ul></div></details>
+<details class="sec"><summary><span class="t mono">19:58</span><span class="sh">5년의 흐름</span></summary><div class="sb"><ul>
+<li>대학 때 창업 → 대체복무 신분으로 회사 유지 → <b>법인 전환</b> → 2025년 여러 기관과 연결 → 2026년 국가 과제를 하며 운영 중</li>
+<li>"오늘부로 (국회 관련으로 들리는) 한 가지 일이 끝나서 정말 기쁘다" <span class="q">무슨 일인지는 두 번 받아 적어도 불확실</span></li>
+</ul></div></details>
+<details class="sec"><summary><span class="t mono"></span><span class="sh">창업하고 가장 힘들었던 것 세 가지</span></summary><div class="sb"><ol>
+<li><b>돈을 어떻게 벌지</b> — 직원 월급을 줘야 하니까</li>
+<li><span class="q">시각장애인 사용자와 관련된 어려움으로 들림 — 잘 안 들림</span></li>
+<li><span class="q">잘 안 들림</span></li>
+</ol></div></details>
+<details class="sec"><summary><span class="t mono"></span><span class="sh">점자 기술을 오픈소스로</span></summary><div class="sb"><ul>
+<li>한글을 점자로 바꾸는 부분을 <b>Braillify</b>로 오픈소스 공개</li>
+<li>점역으로 먹고사는 분들이 처음엔 싫어하기도 했지만, 결국 많이 좋아해 주심</li>
+<li>올해(2026)가 <b>한글 점자 '훈맹정음' 100주년</b>이라는 언급으로 들림 <span class="q">불확실</span></li>
+<li>힘들었던 점: <b>협력해야 할 사람들이 오히려 경쟁사가 되는</b> 일, 도와주는 사람이 많지 않았던 일</li>
+</ul></div></details>
+<details class="sec"><summary><span class="t mono">20:00</span><span class="sh">지금 하는 일</span></summary><div class="sb"><ul>
+<li>만든 기술은 <b>전부 오픈소스로 공개</b> — Braillify, Devup-UI 등</li>
+<li>대표가 된 뒤에도 <b>계속 직접 코딩</b> 중</li>
+<li class="key"><b>AI 시대엔 실력이 평준화된다</b> → 그럼 나를 어떻게 증명하나? → <b>레버리지(지렛대)가 되는 힘</b>이 더 중요
+<ul>
+<li>예: 정보처리기사는 예전엔 쳐 줬지만 지금은 있어도 안 봄 → 대신 <b>특허</b>처럼 실력을 증명해 주는 것을 따기 시작</li>
+</ul></li>
+</ul></div></details>
+<details class="sec"><summary><span class="t mono"></span><span class="sh">후배들에게: 세 가지 힘</span></summary><div class="sb"><ol>
+<li><b>직접 만드는 힘</b> — AI가 많이 해 주지만, 과정을 직접 겪어 보는 건 확실히 다르다. <b>뭐라도 직접 만들어 보라</b></li>
+<li><b>설명하는 힘</b> — 아무리 멋지게 만들어도 <b>써 줄(사 줄) 사람이 없으면 아무것도 아니다</b>. 먼저 설득할 수 있어야</li>
+<li><b>신뢰를 쌓는 힘</b> — "이거 써도 괜찮은 거 맞아?" 의심받으면 끝. <b>사람으로서의 신뢰와 기술로서의 신뢰</b>를 함께 쌓기</li>
+</ol></div></details>
+<details class="sec"><summary><span class="t mono">20:02</span><span class="sh">AI 시대에 변하는 것과 변하지 않는 것</span></summary><div class="sb"><ul>
+<li>기술이 빠르게 변하는 만큼 <b>개발자도 빠르게 변해야</b> 함</li>
+<li class="key">그래도 <b>글은 AI가 써 줄 수 있지만, 말은 내가 한다</b> → 말하는 능력, 지금까지 쌓아 온 신뢰를 꾸준히 쌓는 일을 절대 가볍게 여기지 말 것</li>
+<li><b>경험을 계속 많이 해 보라</b> — 멘토 자신도 멘티로 시작해 멘토가 됨</li>
+<li class="key">"학교에 있어서 못 해"가 아님 — <b>교내 대회, 캡스톤, 해커톤, 소프트웨어 마에스트로, 오픈소스 컨트리뷰션 아카데미, 예비창업패키지 지원</b> 등 학생이 해 볼 수 있는 게 정말 많다</li>
+</ul></div></details>
+<details class="sec"><summary><span class="t mono"></span><span class="sh">마지막 소식</span></summary><div class="sb"><ul>
+<li>어제 발표된 소식: <b>React 관련 큰 해외 행사에 연사로 선정</b> <span class="q">행사 이름 불확실</span> → 영어로 발표하게 됨</li>
+<li>글로벌·오픈소스 행사에 관심 있으면 연락 달라고 함</li>
+<li>휴대폰 화면의 QR코드로 연락처(인스타 등)를 받아 가라고 함 — "먼저 말 걸어 주시면 감사하겠다"</li>
+<li>3강 끝 (20:04, 질의응답 없이 식사·경품 추첨으로 넘어감)</li>
+</ul></div></details>
+  </div>
+</section>
+  <footer class="mono">현장 녹음을 받아 적어 정리했어요. 잘 안 들린 곳은 작은 회색 글씨로 남겨 두었어요.</footer>
+</div>
+<script>
+document.querySelectorAll(".all").forEach(b => b.addEventListener("click", () => {
+  const ds = b.closest(".notes").querySelectorAll("details"), open = [...ds].some(d => !d.open);
+  ds.forEach(d => d.open = open); b.textContent = open ? "모두 접기" : "모두 펼치기";
+}));
+const links = [...document.querySelectorAll(".jump a")];
+const io = new IntersectionObserver(es => es.forEach(e => {
+  if (e.isIntersecting) links.forEach(a => a.classList.toggle("on", a.hash === "#" + e.target.id));
+}), { rootMargin: "-45% 0px -50% 0px" });
+document.querySelectorAll(".talk").forEach(s => io.observe(s));
+</script>
+</body>
+</html>
