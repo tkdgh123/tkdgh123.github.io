@@ -14,7 +14,8 @@ let P = [];
 
 /* ── 채점하는 Claude ─────────────────────
    claude: claude.ai에서 연 사람의 Claude 계정 (보는 사람의 사용량)
-   laptop: 이 노트북의 Claude Code (실행.bat)
+   laptop: 이 노트북의 Claude Code (실행.bat) — 만든 사람 개인 연습용. 개인 구독으로 남을 채점하는 건 Anthropic 약관상 안 된다
+   key:    보는 사람이 넣은 자기 Anthropic API 키 (이 브라우저에만 저장, 요금은 키 주인에게)
    null:   스스로 채점 */
 const AI = { kind: null, sample: null };
 const LOCAL = location.port === "47321";
@@ -22,7 +23,49 @@ if (!LOCAL && new URLSearchParams(location.search).has("local")) store.set("pp:l
 const API = B ? null : LOCAL ? "" : store.get("pp:local") ? "http://127.0.0.1:47321" : null;
 let onAI = null; // 지금 화면이 채점기가 바뀌었을 때 할 일
 
+/* 내 API 키: 공식 SDK를 브라우저에서 불러 바로 Anthropic에 보낸다. 키는 키 주인의 브라우저에만 있으니 dangerouslyAllowBrowser가 맞는 쓰임이다 */
+const SDK_URL = "https://cdn.jsdelivr.net/npm/@anthropic-ai/sdk@1.3.0/+esm";
+const KEY_MODEL = "claude-opus-5-5", KEY_PRICE = { in: 4 / 1e6, out: 20 / 1e6 }; // 달러, Opus 5.5 표준 요금
+const CAN_KEY = !B; // claude.ai 안에서는 바깥 주소로 못 보낸다
+let keyApi = null;
+async function keyAsk(prompt, schema) {
+  if (!keyApi) {
+    const { default: Anthropic } = await import(SDK_URL).catch(() => { throw new Error("Claude 연결 도구를 불러오지 못했어요. 인터넷을 확인해 주세요."); });
+    keyApi = { Anthropic, client: new Anthropic({ apiKey: store.get("pp:key"), dangerouslyAllowBrowser: true }) };
+  }
+  const { Anthropic, client } = keyApi;
+  let r;
+  try {
+    r = await client.beta.messages.create({
+      model: KEY_MODEL, max_tokens: 16000,
+      betas: ["server-side-fallback-2026-07-01"], fallbacks: "default", // 안전 분류로 거절되면 다른 모델이 이어 받는다
+      output_config: { effort: "medium", format: { type: "json_schema", schema } },
+      messages: [{ role: "user", content: prompt }],
+    });
+  } catch (e) {
+    if (e instanceof Anthropic.AuthenticationError) throw new Error("API 키가 맞지 않아요. 키를 다시 넣어 주세요.");
+    if (e instanceof Anthropic.PermissionDeniedError) throw new Error("이 키로는 쓸 수 없어요. 키 권한을 확인해 주세요.");
+    if (e instanceof Anthropic.RateLimitError) throw new Error("요청이 많아 잠시 막혔어요. 조금 뒤에 다시 보내 주세요.");
+    if (e instanceof Anthropic.BadRequestError && /credit/i.test(e.message)) throw new Error("API 크레딧이 부족해요. Anthropic 콘솔에서 충전해 주세요.");
+    if (e instanceof Anthropic.APIConnectionError) throw new Error("Anthropic에 연결하지 못했어요. 인터넷을 확인해 주세요.");
+    throw new Error("결과를 받아 오지 못했어요. 다시 보내 주세요.");
+  }
+  const u = r.usage || {};
+  store.set("pp:cost", (store.get("pp:cost") || 0) + (u.input_tokens || 0) * KEY_PRICE.in + (u.output_tokens || 0) * KEY_PRICE.out);
+  if (r.stop_reason === "refusal") throw new Error("이 말은 채점하지 않겠다는 답이 왔어요. 표현을 바꿔 다시 보내 주세요.");
+  if (r.stop_reason === "max_tokens") throw new Error("답이 너무 길어 끊겼어요. 다시 보내 주세요.");
+  try { return JSON.parse(r.content.filter(b => b.type === "text").map(b => b.text).join("")); }
+  catch { throw new Error("결과를 읽지 못했어요. 다시 보내 주세요."); }
+}
+function setKey(k) {
+  keyApi = null;
+  if (k) { store.set("pp:key", k); if (AI.kind !== "claude" && AI.kind !== "laptop") AI.kind = "key"; }
+  else { store.del("pp:key"); if (AI.kind === "key") AI.kind = null; }
+  changedAI();
+}
+
 async function ask(prompt, schema) {
+  if (AI.kind === "key") return keyAsk(prompt, schema);
   if (AI.kind === "claude") {
     try { return await AI.sample.json(prompt, { modelTier: "default" }); }
     catch (e) {
@@ -135,7 +178,7 @@ const SEND_SCHEMA = {
   type: "object", additionalProperties: false, required: ["items", "result", "changed"],
   properties: {
     items: { type: "array", items: { type: "object", additionalProperties: false, required: ["id", "level", "quote", "why"],
-      properties: { id: { type: "string" }, level: { type: "integer", minimum: 0, maximum: 4 }, quote: { type: "string" }, why: { type: "string" } } } },
+      properties: { id: { type: "string" }, level: { type: "integer", enum: [0, 1, 2, 3, 4] }, quote: { type: "string" }, why: { type: "string" } } } },
     result: { type: "array", items: { type: "string" } },
     changed: { type: "string" },
   },
@@ -214,13 +257,14 @@ async function boot() {
   $("#app").innerHTML = `<aside class="side"></aside><main id="main"></main>`;
   addEventListener("hashchange", route);
   document.addEventListener("click", e => { if (!e.target.closest(".clipwrap")) $$(".menu-pop").forEach(m => m.hidden = true); });
+  if (CAN_KEY && store.get("pp:key")) AI.kind = "key";
   route();
   if (window.claude && typeof claude.use === "function") {
     claude.use("sample").then(s => { if (s) { AI.kind = "claude"; AI.sample = s; changedAI(); } }).catch(() => {});
   }
   if (API != null) {
     const ok = await fetch(API + "/api/ping", { method: "POST", targetAddressSpace: "loopback" }).then(r => r.ok, () => false);
-    if (ok && !AI.kind) { AI.kind = "laptop"; changedAI(); setInterval(() => fetch(API + "/api/ping", { method: "POST", targetAddressSpace: "loopback" }).catch(() => {}), 60000); }
+    if (ok && AI.kind !== "claude") { AI.kind = "laptop"; changedAI(); setInterval(() => fetch(API + "/api/ping", { method: "POST", targetAddressSpace: "loopback" }).catch(() => {}), 60000); }
   }
 }
 function changedAI() { drawSide(); onAI ? onAI() : route(); }
@@ -229,12 +273,26 @@ function route() {
   onAI = null;
   const h = location.hash.slice(2);
   if (h === "tutorial") return showTutorial();
+  if (h === "about") return showAbout();
   const p = P.find(x => x.id === h);
   p ? showProblem(p) : showHome();
   $("#main").scrollTop = 0;
 }
 
-const aiName = () => AI.kind === "claude" ? "내 Claude 계정" : AI.kind === "laptop" ? "이 노트북의 Claude" : "스스로 채점";
+const aiName = () => AI.kind === "claude" ? "내 Claude 계정" : AI.kind === "laptop" ? "이 노트북의 Claude" : AI.kind === "key" ? "내 API 키" : "스스로 채점";
+const won = d => d < 0.01 ? "1센트 미만" : "약 $" + d.toFixed(2);
+function keyBox() {
+  if (!CAN_KEY) return "";
+  const k = store.get("pp:key");
+  if (k) return `<div class="keybox"><span>키 …${esc(k.slice(-4))} · 지금까지 ${won(store.get("pp:cost") || 0)}</span><button class="btn ghost" id="keyOff">키 지우기</button></div>`;
+  return `<form class="keybox" id="keyForm"><input id="keyIn" type="password" autocomplete="off" spellcheck="false" placeholder="내 Anthropic API 키 (sk-ant-…)" aria-label="내 Anthropic API 키"><button class="btn">키로 채점</button></form>
+    <p class="fine">키는 이 브라우저에만 남고, 요금은 키 주인에게 가요. 한 문제에 몇백 원쯤(추정). <a href="#/about">이용 안내</a></p>`;
+}
+function wireKey() {
+  const f = $("#keyForm"), off = $("#keyOff");
+  if (f) f.onsubmit = e => { e.preventDefault(); const v = $("#keyIn").value.trim(); if (/^sk-ant-/.test(v)) setKey(v); else { $("#keyIn").value = ""; $("#keyIn").placeholder = "sk-ant-로 시작하는 키를 넣어 주세요"; } };
+  if (off) off.onclick = () => setKey(null);
+}
 
 function drawSide() {
   const cur = location.hash.slice(2);
@@ -244,6 +302,7 @@ function drawSide() {
       <a class="brand" href="#">프롬프트 연습</a>
       <a class="row${cur === "" ? " on" : ""}" href="#">문제 목록</a>
       <a class="row${cur === "tutorial" ? " on" : ""}" href="#/tutorial">하는 법</a>
+      <a class="row${cur === "about" ? " on" : ""}" href="#/about">이용 안내</a>
       <div class="group">문제</div>
       ${P.map(p => {
         const best = store.get("pp:best:" + p.id);
@@ -254,6 +313,27 @@ function drawSide() {
   const side = $(".side"), btn = $(".menu", side);
   btn.onclick = () => { const o = side.classList.toggle("open"); btn.setAttribute("aria-expanded", o); };
   $$(".nav a", side).forEach(a => a.onclick = () => side.classList.remove("open"));
+}
+
+function showAbout() {
+  document.title = "이용 안내 — 프롬프트 연습";
+  drawSide();
+  $("#main").innerHTML = `
+    <div class="canvas about">
+      <header class="title"><div><h1>이용 안내</h1><p>무엇이 어디로 가고, 무엇이 남는지.</p></div></header>
+      <section class="panel"><h2>채점은 누가 하나요</h2>
+        <table class="list"><thead><tr><th>방식</th><th>보낸 말이 가는 곳</th><th>요금</th></tr></thead><tbody>
+          <tr><td>내 Claude 계정</td><td>claude.ai에서 열었을 때. 내 계정으로 Anthropic에</td><td>내 Claude 요금제 사용량</td></tr>
+          ${CAN_KEY ? `<tr><td>내 API 키</td><td>이 브라우저에서 Anthropic API로 바로. 중간 서버 없음</td><td>키 주인에게 청구</td></tr>` : ""}
+          <tr><td>스스로 채점</td><td>어디에도 안 감. 모범 답안과 나란히 보고 직접 매김</td><td>없음</td></tr>
+        </tbody></table>
+        <p class="fine">Anthropic으로 간 내용은 그 계정·키에 적용되는 Anthropic 약관과 개인정보 처리방침을 따라요.</p></section>
+      <section class="panel"><h2>이 기기에 남는 것</h2>
+        <p>푼 기록·점수·하는 법 본 여부${CAN_KEY ? "·API 키" : ""}는 이 브라우저 저장소에만 있어요. 이 프로그램을 만든 사람에게는 아무것도 오지 않아요. 브라우저 기록을 지우면 함께 지워져요.</p></section>
+      <section class="panel"><h2>권리</h2>
+        <p>문제·자료·채점 기준·화면·코드의 저작권은 만든 사람(김창식)에게 있어요. 개인 연습은 자유롭게 쓰되, 복제해 다시 배포하거나 팔려면 먼저 연락해 주세요: hanchic431@gmail.com</p>
+        <p>이 프로그램은 Anthropic이 만들거나 보증한 것이 아니에요. Claude는 Anthropic의 상표예요. 글꼴 IBM Plex Sans KR은 SIL 오픈 폰트 라이선스를 따라요.</p></section>
+    </div>`;
 }
 
 function showHome() {
@@ -279,7 +359,8 @@ function showHome() {
           <div class="ai"><span>채점하는 Claude</span><b><i class="dot ${AI.kind || "self"}"></i>${aiName()}</b>
             <p>${AI.kind === "claude" ? "claude.ai에 로그인한 내 Claude 계정이 결과를 예상하고 채점해요. 처음 보낼 때 사용을 허락하는 창이 떠요."
               : AI.kind === "laptop" ? "이 노트북의 Claude Code가 채점해요. 실행.bat이 켜져 있는 동안만 돼요."
-              : `Claude에 연결되지 않아 모범 답안과 나란히 놓고 스스로 매겨요.${ARTIFACT_URL && !B ? ` <a href="${ARTIFACT_URL}" target="_blank" rel="noopener">claude.ai에서 열면</a> 내 Claude 계정으로 채점받아요.` : ""}`}</p></div>
+              : AI.kind === "key" ? `내 Anthropic API 키로 Claude가 결과를 예상하고 채점해요.`
+              : `Claude에 연결되지 않아 모범 답안과 나란히 놓고 스스로 매겨요.${ARTIFACT_URL && !B ? ` <a href="${ARTIFACT_URL}" target="_blank" rel="noopener">claude.ai에서 열면</a> 내 Claude 계정으로 채점받아요.` : ""}`}</p>${keyBox()}</div>
         </div>
       </section>
       <section class="panel">
@@ -294,6 +375,7 @@ function showHome() {
         </table>
       </section>
     </div>`;
+  wireKey();
   $$(".list tbody tr").forEach(tr => {
     tr.onclick = e => { if (!e.target.closest("a")) location.hash = "#/" + tr.dataset.id; };
     tr.onkeydown = e => { if (e.key === "Enter") location.hash = "#/" + tr.dataset.id; };
@@ -463,7 +545,7 @@ function showMark(p, a) {
       <div class="big"><b class="num">${s}</b><span>/ 100</span></div>
       <div class="over">${a.self ? `<p>항목마다 내 말이 그만큼 전했는지 점수를 눌러 매겨요. 아래 모범 답안과 견줘 보세요.</p>`
         : a.review ? `<p>${esc(plain(p, a.review.overall))}</p>` : `<p class="wait" id="over">${a.reviewError ? `${esc(a.reviewError)} <button class="btn ghost" id="rev">다시 받기</button>` : "Claude가 보낸 말을 돌아보는 중이에요"}</p>`}
-        <p class="meta">보낸 말 ${a.turns.length}번 · 채점 ${a.self ? "스스로" : a.by === "laptop" ? "이 노트북의 Claude" : a.by === "claude" ? "내 Claude 계정" : "Claude"}</p></div>
+        <p class="meta">보낸 말 ${a.turns.length}번 · 채점 ${a.self ? "스스로" : a.by === "laptop" ? "이 노트북의 Claude" : a.by === "claude" ? "내 Claude 계정" : a.by === "key" ? "내 API 키" : "Claude"}</p></div>
     </section>
     <section class="panel">
       <h2>항목별 점수</h2>
