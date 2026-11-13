@@ -163,13 +163,13 @@ body[data-c="프로젝트"] .go:hover { background: #e3e7f8 }
 .rooms { position: fixed; inset: 0; z-index: 30; display: flex; padding-top: 84px; background: #0e0e0f; transition: opacity .45s var(--ease), visibility 0s }
 body.in .rooms { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .45s var(--ease), visibility 0s .45s }
 body:not(.in) :is(.stage, .cap, .ticks, .hint, .tabs) { visibility: hidden }
-.room { position: relative; flex: 1 1 0; min-width: 0; display: grid; grid-template-rows: auto 1fr auto auto auto; padding: 24px clamp(16px, 1.8vw, 30px) 34px; background: var(--rb); color: var(--rf); text-decoration: none; overflow: hidden; transition: flex-grow .7s var(--ease), opacity .3s }
+.room { position: relative; flex: 1 1 0; min-width: 0; display: grid; grid-template-rows: auto 1fr auto auto auto; padding: 24px clamp(16px, 1.8vw, 30px) 34px; background: var(--rb); color: var(--rf); text-decoration: none; overflow: hidden; transition: flex-grow .34s var(--out), opacity .3s }
 .room:first-child { flex-grow: 1.45 }
 .rooms:not(.going) .room:hover, .rooms:not(.going) .room:focus-visible { flex-grow: 2.1 }
 .room:focus-visible { outline: 2px solid currentColor; outline-offset: -8px }
 .room .rn { opacity: .66; white-space: nowrap }
 .fan { position: relative; align-self: center; height: min(36svh, 300px) }
-.fan img { position: absolute; left: 50%; top: 50%; width: min(100%, 380px); aspect-ratio: 16 / 10; object-fit: cover; translate: -50% -50%; box-shadow: 0 30px 50px -28px rgb(0 0 0 / .65); transition: rotate .6s var(--out), translate .6s var(--out) }
+.fan img { position: absolute; left: 50%; top: 50%; width: min(100%, 380px); aspect-ratio: 16 / 10; object-fit: cover; translate: -50% -50%; box-shadow: 0 30px 50px -28px rgb(0 0 0 / .65); transition: rotate .34s var(--out), translate .34s var(--out) }
 .fan img:nth-child(1) { rotate: -7deg; translate: -57% -45% }
 .fan img:nth-child(2) { rotate: 6deg; translate: -43% -53% }
 .fan img:nth-child(3) { rotate: -1deg }
