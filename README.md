@@ -14,7 +14,7 @@
 | 우리길 | `urigil/` | 서울 데이트 코스를 짜 주는 PWA | 공개, 혼자 |
 | 프롬프트 연습 | `prompt/` | AI에게 일을 맡기는 말 연습·채점 | 공개, 혼자 |
 
-나머지는 사이트 첫 화면의 '전체' 탭에 있어요.
+나머지는 사이트 첫 화면에서 분류(게임·공부·프로젝트·기타)를 골라 보면 돼요.
 
 ## 어떻게 만들었나
 
@@ -26,4 +26,4 @@
 
 ## 연락
 
-GitHub [@tkdgh123](https://github.com/tkdgh123)
+hanchic431@gmail.com · GitHub [@tkdgh123](https://github.com/tkdgh123)
