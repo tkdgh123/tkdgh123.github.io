@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>김창식 — 창업실</title>
+<meta name="description" content="숭실대 AI소프트웨어학부 1학년 김창식. 무엇을 만들지 정하고, 직접 써 보며 고치고, 맞는지 확인하는 사람.">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@200..800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* 창업실 첫 화면과 같은 종이·먹·잉크 블루 */
+:root {
+  --paper: #f2f1ec; --tone: #e4e2da; --ink: #151514; --muted: #5a5954; --rule: #c9c6bc; --blue: #2b44a6;
+  --m: clamp(16px, 4vw, 64px);
+  --serif: "Hahmlet", "Noto Serif KR", serif;
+  --sans: "Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif;
+  --mono: "IBM Plex Mono", "Pretendard Variable", Pretendard, ui-monospace, monospace;
+  color-scheme: light;
+}
+* { box-sizing: border-box }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 17px/1.7 var(--sans); word-break: keep-all; -webkit-font-smoothing: antialiased }
+a { color: inherit }
+h1, h2, h3, p, dl, dd { margin: 0 }
+.mono { font-family: var(--mono); font-size: 12.5px; letter-spacing: .02em; line-height: 1.5 }
+.wrap { max-width: 1180px; margin: 0 auto; padding: 0 var(--m) }
+a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px }
+
+.bar { display: flex; justify-content: space-between; align-items: center; padding-block: 22px }
+.bar .home { display: flex; align-items: baseline; gap: 12px; text-decoration: none }
+.bar .home b { font: 600 23px/1 var(--serif) }
+.bar .home span { color: var(--muted) }
+.bar nav { display: flex; gap: 22px; font-weight: 600; font-size: 15px }
+.bar nav a { text-decoration: none; padding: 6px 0 }
+.bar nav a:hover { color: var(--blue) }
+
+/* 머리 */
+.hero { padding-block: clamp(56px, 11vh, 130px) clamp(48px, 8vh, 96px); display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 32px 64px; align-items: end }
+.hero h1 { font: 250 clamp(64px, 11vw, 168px)/.92 var(--serif); letter-spacing: -.04em }
+.hero .who { margin-top: 22px; color: var(--muted) }
+.hero .lead { font-size: clamp(18px, 1.6vw, 21px); line-height: 1.65; text-wrap: pretty }
+.hero .lead b { font-weight: 650 }
+.links { margin-top: 26px; display: flex; flex-wrap: wrap; gap: 10px }
+.btn { display: inline-flex; align-items: center; gap: 10px; min-height: 48px; padding: 0 20px; background: var(--blue); color: #fff; font-weight: 700; font-size: 15px; text-decoration: none }
+.btn:hover { background: #1f3486 }
+.btn.line { background: none; color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--ink) }
+.btn.line:hover { background: var(--tone) }
+
+/* 일하는 방식 */
+.how { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 clamp(20px, 3vw, 48px); padding-block: 40px 72px; border-top: 1.5px solid var(--ink) }
+.how h2 { grid-column: 1 / -1; font: 500 15px/1 var(--sans); color: var(--muted); margin-bottom: 26px }
+.how .n { font: 200 54px/1 var(--serif); letter-spacing: -.03em; color: var(--blue) }
+.how h3 { font: 600 21px/1.35 var(--serif); margin: 14px 0 8px }
+.how p { color: var(--muted); font-size: 16px }
+.honest { grid-column: 1 / -1; margin-top: 36px; padding: 20px 24px; background: var(--tone); font-size: 16px }
+.honest b { font-weight: 650 }
+
+/* 대표작 */
+.sec { padding-block: 40px 24px; border-top: 1.5px solid var(--ink); display: flex; justify-content: space-between; align-items: baseline; gap: 20px; flex-wrap: wrap }
+.sec h2 { font: 500 15px/1 var(--sans); color: var(--muted) }
+.sec .mono { color: var(--muted) }
+.work { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 28px clamp(28px, 4vw, 64px); padding-block: 28px 72px }
+.work + .work { padding-top: 0 }
+.shot { display: block; aspect-ratio: 16 / 10; overflow: hidden; background: var(--tone) }
+.shot img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .6s cubic-bezier(.2, .8, .2, 1) }
+.shot:hover img { transform: scale(1.03) }
+.work .meta { color: var(--muted) }
+.work h3 { font: 300 clamp(38px, 4.6vw, 64px)/1.05 var(--serif); letter-spacing: -.025em; margin: 10px 0 12px }
+.work .one { color: var(--muted); max-width: 32em }
+.facts { margin-top: 22px; display: grid; grid-template-columns: 7.2em minmax(0, 1fr); font-size: 15.5px; line-height: 1.6 }
+.facts dt, .facts dd { padding: 10px 0; border-top: 1px solid var(--rule) }
+.facts dt { font: 500 12.5px/1.9 var(--mono); color: var(--muted) }
+.acts { margin-top: 22px; display: flex; flex-wrap: wrap; gap: 6px 22px }
+.acts a { font-weight: 650; font-size: 15px; text-decoration: none; padding: 6px 0; background: linear-gradient(currentColor, currentColor) 0 calc(100% - 3px) / 100% 1px no-repeat }
+.acts a:first-child { color: var(--blue) }
+.acts a:hover { background-size: 0 1px }
+
+/* 나머지 대표작 */
+.rows { padding-block: 8px 80px }
+.row { display: grid; grid-template-columns: minmax(0, 15em) minmax(0, 1fr) minmax(0, 1fr); gap: 6px 32px; padding: 22px 0; border-top: 1px solid var(--rule); text-decoration: none }
+.row:last-child { border-bottom: 1px solid var(--rule) }
+.row h3 { font: 500 23px/1.25 var(--serif); transition: color .2s }
+.row .meta { color: var(--muted); margin-top: 4px }
+.row p { font-size: 15.5px; color: var(--muted) }
+.row p b { display: block; font: 500 12px/1.8 var(--mono); color: var(--ink) }
+.row:hover h3 { color: var(--blue) }
+
+.foot { padding-block: 40px 64px; border-top: 1.5px solid var(--ink); display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; color: var(--muted) }
+.foot a { font-weight: 600; color: var(--ink) }
+
+@media (max-width: 900px) {
+  .hero, .work { grid-template-columns: 1fr }
+  .how { grid-template-columns: 1fr; gap: 28px }
+  .how h2 { margin-bottom: 0 }
+  .honest { margin-top: 4px }
+  .row { grid-template-columns: 1fr }
+}
+@media (max-width: 520px) {
+  .bar .home span { display: none }
+  .facts { grid-template-columns: 1fr }
+  .facts dd { border-top: 0; padding-top: 0 }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="bar">
+  <a class="home" href="../"><b>창업실</b><span class="mono">← 작품 고리로</span></a>
+  <nav><a href="#works">대표작</a><a href="#contact">연락</a></nav>
+</header>
+
+<section class="hero">
+  <div>
+    <h1>김창식</h1>
+    <p class="who mono">숭실대학교 AI대학 AI소프트웨어학부 1학년 · 2026</p>
+  </div>
+  <div>
+    <p class="lead">2026년 가을, 개발을 처음 배우면서 만들기 시작했어요. 코드는 대부분 AI(Claude Code)가 쓰고, 저는 <b>무엇을 왜 만들지 정하고, 직접 써 보며 이상한 곳을 찾고, 맞게 됐는지 확인</b>하는 일을 해요.</p>
+    <div class="links" id="contact">
+      <a class="btn" href="https://github.com/tkdgh123">GitHub · tkdgh123 <span aria-hidden="true">→</span></a>
+      <a class="btn line" href="#works">대표작 보기</a>
+    </div>
+  </div>
+</section>
+
+<section class="how" aria-labelledby="howH">
+  <h2 id="howH">일하는 방식</h2>
+  <div><p class="n">01</p><h3>정해요</h3><p>누가 쓰는지, 무엇을 빼야 하는지. 진로 검사에서 가짜 4글자 유형을 쓰지 않고 2024년 이후 자료만 쓰기로 한 것처럼요.</p></div>
+  <div><p class="n">02</p><h3>직접 써 봐요</h3><p>만든 걸 제가 써 보고 걸리는 곳을 말로 짚어요. 데이트 코스 앱에서 가게 사진이 엉뚱한 걸 보고 "식당이면 음식·실내·바깥 사진이어야 한다"고 짚어 바꾸게 했어요.</p></div>
+  <div><p class="n">03</p><h3>확인해요</h3><p>되는지는 숫자와 화면으로 봐요. 게임은 자동 시험 269개(11월 10일), 진로 검사는 단위 83개·화면 29개 시험(11월 1일)을 통과했어요.</p></div>
+  <p class="honest"><b>솔직하게:</b> 아래 작품은 2026년 10월 중순부터 11월 13일까지 약 한 달 동안 만들었어요. 그래서 넓게는 했지만 깊게 검증된 건 아직 적어요. 실제 사용자 수를 잰 건 데칼코마니 하나뿐이고, 나머지는 "재지 않음"이라고 그대로 적었어요.</p>
+</section>
+
+<div class="sec" id="works"><h2>대표작 3</h2><span class="mono">숫자는 2026-11-13 기준</span></div>
+
+<article class="work">
+  <a class="shot" href="../lossy-brush/"><img src="../lossy-brush/img/cover_pixel.webp" alt="일필휘지 게임 화면" loading="lazy"></a>
+  <div>
+    <p class="meta mono">게임 · Godot 4 · 개발 중 · 혼자</p>
+    <h3>일필휘지</h3>
+    <p class="one">플레이어가 붓이 되어 그은 획이 다리가 되고 칼이 되는 수묵 액션.</p>
+    <dl class="facts">
+      <dt>지금 상태</dt><dd>PC 실행본은 맵 20장 넘게 이어져요. 웹에서는 1장 '사계' 맛보기만 할 수 있어요(PC 브라우저).</dd>
+      <dt>내가 정한 것</dt><dd>이름, 그리고 직접 해 보며 짚은 문제들. 해 보고 "너무 쉽다"고 짚었고(보스도 일반 귀신처럼 원 세 번이면 끝나는 구조였어요), 이야기 장면에서는 AI 그림을 모두 빼고 픽셀 인물로만 가기로 했어요.</dd>
+      <dt>알려진 한계</dt><dd>다른 사람이 끝까지 해 본 시험이 아직 적어요. 그림 재료 일부는 그림 AI로 만들었어요.</dd>
+      <dt>써 본 사람</dt><dd>재지 않음</dd>
+    </dl>
+    <p class="acts"><a href="../lossy-brush/play/">맛보기 하기 →</a><a href="../lossy-brush/">기획서</a><a href="../lossy-brush/review/">평가 기록</a></p>
+  </div>
+</article>
+
+<article class="work">
+  <a class="shot" href="../secure-msg/guide/"><img src="../hub/shots/dulmi.webp" alt="덜미 설명서 화면" loading="lazy"></a>
+  <div>
+    <p class="meta mono">C · 프로그래밍기초2 팀 과제 · 제출 버전</p>
+    <h3>덜미</h3>
+    <p class="one">같은 와이파이의 윈도우 노트북끼리 대화하는 C 메신저. 방장도 내용을 못 보게 암호화했어요.</p>
+    <dl class="facts">
+      <dt>함께</dt><dd>4명이 각자 전체 버전을 만들어 좋은 것을 고르는 방식이에요. 제 버전은 서버·클라이언트·암호화를 모두 담았고, 그 뒤 팀원 코드와 합쳤어요.</dd>
+      <dt>내가 정한 것</dt><dd>실행이 한 파일(deolmi.c)에서 끝나게 하기. 팀 과제라서 AI가 한 일을 코드 주석·설명서·작업 기록에 항목마다 밝히기.</dd>
+      <dt>알려진 한계</dt><dd>배우려고 만든 설계예요. 외부 보안 검토는 받지 않았어요.</dd>
+      <dt>확인</dt><dd>중계 규칙과 메시지 조각 처리를 자동 테스트(test_server.c·test_net.c)로 확인해요.</dd>
+    </dl>
+    <p class="acts"><a href="../secure-msg/guide/">설명서 →</a><a href="../secure-msg/code/">전체 코드</a><a href="../secure-msg/log/">작업 기록(누가 무엇을)</a></p>
+  </div>
+</article>
+
+<article class="work">
+  <a class="shot" href="../jobmap/"><img src="../hub/shots/jobmap-cover.webp" style="object-position: left center" alt="학과 진로 지도 첫 화면" loading="lazy"></a>
+  <div>
+    <p class="meta mono">웹 · 진로 검사 · 공개 · 혼자</p>
+    <h3>학과 진로 지도</h3>
+    <p class="one">101문항으로 흥미가 겹치는 직무 3개와 이번 학기에 할 일을 보여 주는 대학생 진로 검사.</p>
+    <dl class="facts">
+      <dt>내가 정한 것</dt><dd>그럴듯한 가짜 4글자 유형은 쓰지 않기, 2024년 이후 자료만 쓰기, 학과 진로는 숭실대만이 아니라 전국 대학 기준으로 보기.</dd>
+      <dt>알려진 한계</dt><dd>101문항이 진로를 제대로 가리는지는 검증하지 않았어요. 문항이 길다는 의견도 아직 받아 보지 않았어요.</dd>
+      <dt>확인</dt><dd>단위 시험 83개 + 화면 시험 29개 통과(11월 1일).</dd>
+      <dt>써 본 사람</dt><dd>셀 수 없음: 답이 서버로 가지 않는 구조예요</dd>
+    </dl>
+    <p class="acts"><a href="../jobmap/">검사 해 보기 →</a></p>
+  </div>
+</article>
+
+<div class="sec"><h2>그 밖의 대표작</h2><span class="mono">전체 목록은 <a href="../#all">작품 고리</a>에</span></div>
+
+<div class="rows">
+  <a class="row" href="../decal/">
+    <div><h3>데칼코마니</h3><p class="meta mono">게임 · 공개 · 혼자</p></div>
+    <p><b>무엇</b>선을 그어 판을 반으로 접으면 겹치는 색 점이 터지는 2분 퍼즐. 직접 해 보고 "새 점이 더 많이, 더 자주 나와야 한다"고 정했어요.</p>
+    <p><b>써 본 사람</b>랭킹에 점수를 남긴 계정 6개. 따로 알린 적은 없어요.</p>
+  </a>
+  <a class="row" href="../urigil/">
+    <div><h3>우리길</h3><p class="meta mono">PWA · 공개 · 혼자</p></div>
+    <p><b>무엇</b>날짜와 시간만 고르면 서울 데이트 코스를 날씨·해 지는 시각에 맞춰 지도 위 동선으로 짜 줘요.</p>
+    <p><b>알려진 한계</b>장소 자료를 직접 모아서 동네마다 후보 수가 달라요. 써 본 사람은 재지 않음.</p>
+  </a>
+  <a class="row" href="../prompt/">
+    <div><h3>프롬프트 연습</h3><p class="meta mono">웹 · 공개 · 혼자</p></div>
+    <p><b>무엇</b>AI에게 일을 맡기는 말을 쓰면 결과를 미리 보여 주고 100점 만점으로 채점한 뒤, 더 좋게 고친 말을 줘요.</p>
+    <p><b>알려진 한계</b>AI 채점은 claude.ai나 이 노트북 서버에서만 돼요. 그 밖에선 스스로 채점해요.</p>
+  </a>
+  <a class="row" href="../neokgut/">
+    <div><h3>넋굿</h3><p class="meta mono">Unity 6 · 개발 중 · 혼자</p></div>
+    <p><b>무엇</b>구미호 아이가 오행 술법으로 원귀를 풀어 주는 쿼터뷰 액션 로그라이트.</p>
+    <p><b>알려진 한계</b>실행본은 공개하지 않았고, 도록과 개발 영상만 있어요.</p>
+  </a>
+  <a class="row" href="../sulsul/">
+    <div><h3>술술</h3><p class="meta mono">영어 말하기 · 개발 중 · 혼자</p></div>
+    <p><b>무엇</b>말하다 막힌 표현이 다음 날 내 교재가 되는 영어 말하기 연습.</p>
+    <p><b>알려진 한계</b>장면 그림 일부를 다시 그리는 중이에요. 써 본 사람은 재지 않음.</p>
+  </a>
+  <a class="row" href="../ffb-wheel/">
+    <div><h3>창공설 레이싱 휠</h3><p class="meta mono">Arduino · 팀 4명 · 진행 중</p></div>
+    <p><b>무엇</b>아두이노로 만드는 포스 피드백 레이싱 휠. 제 역할은 기획과 테스트예요.</p>
+    <p><b>알려진 한계</b>하드웨어는 아직 만드는 중이에요(14주차까지).</p>
+  </a>
+  <a class="row" href="../ai-data/">
+    <div><h3>AI와 데이터 기초 시험 정리</h3><p class="meta mono">공부 · 혼자</p></div>
+    <p><b>무엇</b>판다스·시각화 수업 1~10주차를 실습 코드를 진짜로 돌린 결과와 함께 정리하고, 풀면 채점되는 문제를 붙였어요.</p>
+    <p><b>쓰는 사람</b>저 혼자 시험 공부에 써요.</p>
+  </a>
+  <a class="row" href="../adam/">
+    <div><h3>Adam 논문 발표</h3><p class="meta mono">논문 세미나 · 발표 준비</p></div>
+    <p><b>무엇</b>ICLR 2015 Adam 논문을 "기울기의 평균을 크기로 나눈 만큼 움직인다"는 한 개념으로 정리한 15분 발표 자료.</p>
+    <p><b>일정</b>12월 3일 수업에서 발표해요.</p>
+  </a>
+  <a class="row" href="../stamp/">
+    <div><h3>뒤집기 도장</h3><p class="meta mono">게임 · 공개 · 혼자</p></div>
+    <p><b>무엇</b>다른 색 위에 덧찍으면 내 색으로 뒤집히고, 한 줄을 한 색으로 채우면 지워지는 퍼즐.</p>
+    <p><b>써 본 사람</b>재지 않음.</p>
+  </a>
+</div>
+
+<footer class="foot">
+  <span>김창식 · <a href="https://github.com/tkdgh123">github.com/tkdgh123</a></span>
+  <a href="../">← 창업실 작품 고리</a>
+</footer>
+
+</div>
+</body>
+</html>
