@@ -44,11 +44,11 @@ button { font: inherit; color: inherit }
 a:focus-visible, button:focus-visible { outline: 2px solid currentColor; outline-offset: 4px }
 
 /* 머리: 이름 · 분류 · 오늘 공부와 목록 */
-.bar { position: fixed; z-index: 50; inset: 0 0 auto; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 20px; padding: 20px var(--m) }
+.bar { position: fixed; z-index: 50; inset: 0 0 auto; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 20px; padding: 20px var(--m) }
 .mark { justify-self: start; display: flex; align-items: baseline; gap: 14px; text-decoration: none; white-space: nowrap }
 .mark b { font: 600 23px/1 var(--serif); letter-spacing: -.01em }
 .mark span { color: var(--soft); transition: color .9s }
-.tabs { display: flex; gap: 2px }
+.tabs { display: flex; gap: 2px; justify-self: center }
 .tabs button { flex: none; font-weight: 600; font-size: 15px; background: none; border: 0; padding: 10px 13px; cursor: pointer; opacity: .55; transition: opacity .2s }
 .tabs button i { font: normal 11px var(--mono); margin-left: 5px; opacity: .75 }
 .tabs button:hover, .tabs button[aria-pressed="true"] { opacity: 1 }
@@ -58,12 +58,13 @@ a:focus-visible, button:focus-visible { outline: 2px solid currentColor; outline
 .chip { display: flex; align-items: center; gap: 10px; min-height: 42px; padding: 0 14px; min-width: 0; text-decoration: none; font-size: 14px; background: color-mix(in srgb, currentColor 9%, transparent); transition: background-color .2s }
 .chip:hover { background: color-mix(in srgb, currentColor 16%, transparent) }
 .chip .mono { color: var(--soft); white-space: nowrap; transition: color .9s }
-.chip b { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 15em }
+.chip b { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 11em }
 .chip .dot { width: 7px; height: 7px; flex: none; border-radius: 50%; background: #ff7a45; box-shadow: 0 0 0 0 rgb(255 122 69 / .6); animation: ping 2.4s infinite }
 @keyframes ping { 70%, 100% { box-shadow: 0 0 0 9px rgb(255 122 69 / 0) } }
 .chip.done .dot { background: currentColor; animation: none; opacity: .5 }
 .chip, .listbtn { border: 0; cursor: pointer }
-.listbtn { display: flex; align-items: center; gap: 10px; min-height: 42px; padding: 0 14px; font-weight: 600; font-size: 14px; background: color-mix(in srgb, currentColor 9%, transparent) }
+.listbtn { text-decoration: none }
+.listbtn { display: flex; align-items: center; gap: 10px; min-height: 42px; padding: 0 14px; font-weight: 600; font-size: 14px; white-space: nowrap; background: color-mix(in srgb, currentColor 9%, transparent) }
 .listbtn:hover { background: color-mix(in srgb, currentColor 16%, transparent) }
 .listbtn svg { width: 14px; height: 14px }
 
@@ -158,6 +159,7 @@ body[data-c="프로젝트"] .go:hover { background: #e3e7f8 }
 .peek { position: fixed; left: 0; top: 0; z-index: 90; width: 300px; aspect-ratio: 16 / 10; object-fit: cover; pointer-events: none; opacity: 0; box-shadow: 0 30px 60px -28px rgb(0 0 0 / .5); translate: var(--x, 0) var(--y, 0); rotate: var(--r, 0deg); scale: var(--sc, .92); transition: opacity .2s, scale .3s var(--out) }
 .peek.on { opacity: 1; --sc: 1 }
 
+@media (max-width: 1300px) { .mark span { display: none } }
 @media (max-width: 1100px) {
   .bar { grid-template-columns: auto minmax(0, 1fr); row-gap: 6px }
   .tabs { grid-column: 1 / -1; grid-row: 2; margin-inline: calc(-1 * var(--m)); padding-inline: calc(var(--m) - 13px); overflow-x: auto; scrollbar-width: none }
@@ -199,6 +201,7 @@ body[data-c="프로젝트"] .go:hover { background: #e3e7f8 }
   <div class="tabs" id="tabs" role="toolbar" aria-label="분류"></div>
   <div class="side">
     <a class="chip" id="today" href="daily/"><i class="dot" aria-hidden="true"></i><span class="mono">오늘 AI 공부</span><b id="todayT">열기</b></a>
+    <a class="listbtn" href="about/"><svg viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="4" r="2.9" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M1.5 14c0-3.2 2.4-5.4 5.5-5.4s5.5 2.2 5.5 5.4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><span>소개</span></a>
     <button class="listbtn" id="openList" type="button" aria-expanded="false" aria-controls="list"><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M0 2.5h14M0 7h14M0 11.5h14" stroke="currentColor" stroke-width="1.6"/></svg><span>전체 목록</span></button>
   </div>
 </header>
@@ -238,7 +241,7 @@ const W = [
   ["게임", "마디", "11.01", "mardi/", "mardi/img/cover.webp", "관절이 다 보이는 마네킹 하나를 사람처럼 자연스럽게 움직이게 만드는 3D 액션 실험.", "Unity 6 · Blender · 기획 중", 0, "기획서 보기", [["움직임 비교", "mardi/?v=study"]]],
   ["게임", "데칼코마니", "11.06", "decal/", "hub/shots/decal.webp", "선을 그어 판을 반으로 접으면, 똑같이 겹치는 색 점이 짝으로 터지는 2분 퍼즐.", "HTML 캔버스 · Firebase 랭킹 · 2분 퍼즐", 0, "바로 하기", [["앱 출시 길잡이", "decal/store/"]]],
   ["게임", "뒤집기 도장", "11.06", "stamp/", "hub/shots/stamp.webp", "다른 색 위에 덧찍으면 내 색으로 뒤집히고, 한 줄을 한 색으로 채우면 지워지는 퍼즐.", "HTML 캔버스 · 배치 퍼즐", 0, "바로 하기"],
-  ["게임", "일필휘지", "11.10", "lossy-brush/", "lossy-brush/img/cover_pixel.webp", "붓이 되어 길을 긋는 수묵 액션. 대숲을 떠나 본 적 없는 화공 대신, 스무 살의 그가 어머니가 말하던 바다까지 걸어가요.", "Godot 4 · 기획서", 0, "기획서 보기", [["평가 기록", "lossy-brush/review/"]]],
+  ["게임", "일필휘지", "11.10", "lossy-brush/", "lossy-brush/img/cover_pixel.webp", "붓이 되어 길을 긋는 수묵 액션. 대숲을 떠나 본 적 없는 화공 대신, 스무 살의 그가 어머니가 말하던 바다까지 걸어가요.", "Godot 4 · 웹 맛보기", 0, "기획서 보기", [["맛보기 하기", "lossy-brush/play/"], ["평가 기록", "lossy-brush/review/"]]],
   ["게임", "교수님 머리 뽑기", "11.12", "prof-hair/", "hub/shots/prof-hair.webp", "교수님이 판서하는 동안 정수리 머리카락을 몰래 뽑아요. 돌아보는 순간 커서가 내 태블릿 위에 없으면 끝.", "HTML 캔버스 · 난이도 3단계", 0, "바로 하기"],
   ["공부", "봉사 18시간", "11.13", "volunteer/", "hub/shots/volunteer.webp", "섬김의리더십 봉사 18시간을 12/7까지. 숭실대입구역에서 1시간 안팎, 한 번만 가면 되는 1365·VMS 봉사 74개를 날짜별로 모으고, 담으면 하루 6시간 상한까지 계산해 줘요.", "1365 · VMS · 섬김의리더십", 0, "봉사 고르기"],
   ["공부", "프롬프트 연습", "11.13", "prompt/", "hub/shots/prompt.webp", "Claude에게 일을 맡기는 말을 쓰면 만들 결과를 미리 보여 주고, 100점 만점으로 채점한 뒤 보낸 말마다 더 좋게 고친 말을 줘요. claude.ai에서 열면 내 Claude 계정이 채점해요.", "Claude 기준 · 5문제", 0, "풀어 보기"],
@@ -274,8 +277,17 @@ const W = [
 ].map(toW);
 function toW([cat, t, d, href, img, s, tag, lock, label, more = []], id) { return { id, cat, t, d, href, img, s, tag, lock, label, more }; }
 
-const CATS = ["전체", "게임", "공부", "프로젝트", "기타"];
-const HASH = { game: "게임", study: "공부", make: "프로젝트", etc: "기타" }, SLUG = Object.fromEntries(Object.entries(HASH).map(([k, v]) => [v, k]));
+// 대표작: 처음 오는 사람이 먼저 보는 고리. [주소, 상태 · 함께]
+const PICK = [
+  ["lossy-brush/", "개발 중 · 혼자"], ["secure-msg/guide/", "제출 · 팀 과제"], ["jobmap/", "공개 · 혼자"],
+  ["decal/", "공개 · 혼자"], ["urigil/", "공개 · 혼자"], ["prompt/", "공개 · 혼자"],
+  ["neokgut/", "개발 중 · 혼자"], ["sulsul/", "개발 중 · 혼자"], ["ffb-wheel/", "진행 중 · 팀 4명"],
+  ["ai-data/", "공부 · 혼자"], ["adam/", "발표 준비 · 혼자"], ["stamp/", "공개 · 혼자"],
+];
+const STATE = Object.fromEntries(PICK);
+const CATS = ["대표", "전체", "게임", "공부", "프로젝트", "기타"];
+const of = c => c === "대표" ? PICK.map(([h]) => W.find(w => w.href === h)).filter(Boolean) : c === "전체" ? W : W.filter(w => w.cat === c);
+const HASH = { all: "전체", game: "게임", study: "공부", make: "프로젝트", etc: "기타" }, SLUG = Object.fromEntries(Object.entries(HASH).map(([k, v]) => [v, k]));
 const COLOR = { 게임: "var(--dark)", 공부: "var(--rule)", 프로젝트: "var(--blue)", 기타: "var(--olive)" };
 const $ = id => document.getElementById(id);
 const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -285,16 +297,16 @@ const mod = (x, m) => ((x % m) + m) % m;
 const esc = s => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 const STEP = 32;   // 이웃 카드 사이 각도. 분류마다 개수가 달라도 같은 휘어짐으로 끝없이 돈다
 const stage = $("stage"), ring = $("ring");
-let list = [], cards = [], cat = "전체", pos = 0, vel = 0, target = 0, cur = -1, born = 0, cw = 400;
+let list = [], cards = [], cat = "대표", pos = 0, vel = 0, target = 0, cur = -1, born = 0, cw = 400;
 const measure = () => { cw = cards[0]?.offsetWidth || 400; };
 addEventListener("resize", measure);
 
 // 분류 단추
-const drawTabs = () => $("tabs").innerHTML = CATS.map(c => `<button type="button" data-c="${c}"><span>${c}</span><i>${c === "전체" ? W.length : W.filter(w => w.cat === c).length}</i></button>`).join("");
+const drawTabs = () => $("tabs").innerHTML = CATS.map(c => `<button type="button" data-c="${c}"><span>${c}</span><i>${of(c).length}</i></button>`).join("");
 $("tabs").onclick = e => { const b = e.target.closest("button"); if (b && b.dataset.c !== cat) swap(b.dataset.c); };
 
 function swap(c) {
-  history.replaceState(null, "", c === "전체" ? location.pathname : "#" + SLUG[c]);
+  history.replaceState(null, "", c === "대표" ? location.pathname : "#" + SLUG[c]);
   if (calm) return build(c, 0);
   stage.classList.add("swap");
   setTimeout(() => { build(c, 0); stage.classList.remove("swap"); }, 220);
@@ -302,14 +314,14 @@ function swap(c) {
 function build(c, start) {
   cat = c;
   for (const b of $("tabs").children) b.setAttribute("aria-pressed", b.dataset.c === c);
-  list = c === "전체" ? W : W.filter(w => w.cat === c);
+  list = of(c);
   const n = list.length;
   ring.innerHTML = list.map((w, i) => {
     const near = Math.abs(mod(i - start + n / 2, n) - n / 2) <= 3, lz = near ? "" : ' loading="lazy"';
     return `<div class="card" data-i="${i}"><a class="face" href="${w.href}" draggable="false" tabindex="-1"><img src="${w.img}" alt="${esc(w.t)}" draggable="false"${lz}>${w.lock ? '<span class="lk mono">잠금</span>' : ""}<i class="glare"></i></a><div class="refl" aria-hidden="true"><img src="${w.img}" alt=""${lz}></div></div>`;
   }).join("");
   cards = [...ring.children]; measure();
-  $("ticks").innerHTML = list.map((w, i) => `<button type="button" tabindex="-1" data-i="${i}" data-t="${esc(w.t)}"${i && w.cat !== list[i - 1].cat ? ' class="gap"' : ""}></button>`).join("");
+  $("ticks").innerHTML = list.map((w, i) => `<button type="button" tabindex="-1" data-i="${i}" data-t="${esc(w.t)}"${c !== "대표" && i && w.cat !== list[i - 1].cat ? ' class="gap"' : ""}></button>`).join("");
   target = start; pos = calm ? start : start - 1.2; vel = 0; cur = -1; born = performance.now();
   // 처음엔 가까운 그림만, 조금 뒤에 나머지도 미리 받아 둔다
   setTimeout(() => ring.querySelectorAll("img[loading]").forEach(im => im.loading = "eager"), 1500);
@@ -364,7 +376,7 @@ function show(i) {
   try { sessionStorage.setItem("hub", JSON.stringify({ c: cat, i })); } catch (e) {}
   $("txt").classList.add("out"); $("no").classList.add("out"); clearTimeout(tm);
   tm = setTimeout(() => {
-    $("meta").textContent = `${w.d} · ${w.cat} · ${w.tag}${w.lock ? " · 잠금" : ""}`;
+    $("meta").textContent = `${w.d} · ${w.cat}${STATE[w.href] ? " · " + STATE[w.href] : ""} · ${w.tag}${w.lock ? " · 잠금" : ""}`;
     let k = 0;
     $("ttl").innerHTML = w.t.split(" ").map(word => `<span class="w">${[...word].map(ch => `<span style="--k:${k++}">${esc(ch)}</span>`).join("")}</span>`).join(" ");
     $("ttl").classList.toggle("long", w.t.length > 9);
@@ -462,7 +474,7 @@ const hideHint = () => $("hint").classList.add("gone");
 let listOpen = false;
 function drawList() {
   $("listN").textContent = W.length;
-  $("cols").innerHTML = CATS.slice(1).map((c, n) => {
+  $("cols").innerHTML = CATS.slice(2).map((c, n) => {
     const ws = W.filter(w => w.cat === c);
     return `<section class="col"><h3><i class="c" style="background:${COLOR[c]}"></i>${c}<span class="mono">${two(n + 1)} · ${ws.length}</span></h3><ul>${ws.map(w => `<li><a href="${w.href}" data-img="${w.img}"><b>${esc(w.t)}</b><span class="mono">${w.d} · ${w.tag}${w.lock ? " · 잠금" : ""}</span></a></li>`).join("")}</ul></section>`;
   }).join("");
@@ -502,7 +514,7 @@ Promise.all([
 }).catch(() => {});
 
 // 시작: 주소의 #분류 → 이 탭에서 마지막으로 보던 작품 → 맨 앞
-let startCat = HASH[location.hash.slice(1)] || "전체", startI = 0;
+let startCat = HASH[location.hash.slice(1)] || "대표", startI = 0;
 try { const s = JSON.parse(sessionStorage.getItem("hub")); if (s && s.c === startCat) startI = s.i; } catch (e) {}
 // 이 기기에 열쇠가 있을 때만: 잠긴 작품의 진짜 카드(lock/hub.enc)와 금고 카드(vault/data.bin)를 푼다.
 // 열쇠가 없으면 공개 카드("잠긴 작업")만 보이고, 금고 카드는 아예 없다.
@@ -525,8 +537,10 @@ async function secretCards() {
   if (vk) try { const c = (await open(vk, "vault/data.bin", "changupsil-vault-v1")).card; W.push(toW([c.cat, c.t, c.d, "vault/", c.img || "hub/shots/locked.webp", c.s, c.tag, 1, c.label, []], W.length)); } catch (e) {}
 }
 secretCards().catch(() => {}).then(() => {
+  // 열쇠가 없는 기기에선 잠긴 작업 칸을 아예 안 보인다(빈 카드는 미완성처럼 보여서)
+  for (let i = W.length; i--;) if (W[i].t === "잠긴 작업") W.splice(i, 1);
   drawTabs(); drawList();
-  build(startCat, Math.min(startI, (startCat === "전체" ? W : W.filter(w => w.cat === startCat)).length - 1));
+  build(startCat, Math.min(startI, of(startCat).length - 1));
   requestAnimationFrame(frame);
 });
 addEventListener("hashchange", () => { const c = HASH[location.hash.slice(1)]; if (c && c !== cat) swap(c); });
