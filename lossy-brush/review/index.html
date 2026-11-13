@@ -232,5 +232,6 @@ document.getElementById("scores").innerHTML = ROWS.map(([name, why, s]) =>
   `<tr><td>${name}<small class="why-m">${why}</small></td>${s.map(v => `<td><div class="score"><b>${v}</b><span class="bar${v <= 4 ? " low" : ""}"><i style="width:${v * 10}%"></i></span></div></td>`).join("")}<td class="why">${why}</td></tr>`).join("");
 document.querySelector(".board tfoot tr").innerHTML = "<td>평균</td>" + DATES.map((d, i) => `<td>${(ROWS.reduce((a, r) => a + r[2][i], 0) / ROWS.length).toFixed(1)}</td>`).join("") + "<td></td>";
 </script>
+<script src="../../hub/back.js" data-cat="game" defer></script>
 </body>
 </html>

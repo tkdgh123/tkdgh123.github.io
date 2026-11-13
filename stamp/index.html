@@ -54,7 +54,7 @@ canvas { display: block; touch-action: none }
 <body>
 <main class="app">
   <header class="top">
-    <div class="lt"><a class="back" href="../">← 창업실</a><button class="snd" id="snd"></button></div>
+    <div class="lt"><button class="snd" id="snd"></button></div>
     <div class="score"><b id="score">0</b><span id="best">최고 0</span></div>
     <div class="combo" id="combo"></div>
   </header>
@@ -498,5 +498,6 @@ menu(`<h1>뒤집기 <i>도</i><span>장</span></h1><p>한 줄을 한 색으로 �
 if (!learned) $("go").onclick = lesson;
 requestAnimationFrame(loop);
 </script>
+<script src="../hub/back.js" data-cat="game" defer></script>
 </body>
 </html>

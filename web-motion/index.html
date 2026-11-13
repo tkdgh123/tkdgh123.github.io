@@ -200,7 +200,7 @@ b { font-weight: 700 }
 </head>
 <body>
 
-<nav class="top mono"><a href="../">← 창업실</a><span>2026.11.04 · 조사 + 데모</span></nav>
+<nav class="top mono"><span>2026.11.04 · 조사 + 데모</span></nav>
 
 <header class="hero grid">
   <h1>스크롤하면<br>움직이는 <span>사이트</span></h1>
@@ -701,5 +701,6 @@ function frame() {
 new IntersectionObserver(es => { running = es[0].isIntersecting; if (running) { clock.getDelta(); frame(); } }).observe(box);
 pick(0);
 </script>
+<script src="../hub/back.js" data-cat="etc" defer></script>
 </body>
 </html>

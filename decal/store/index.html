@@ -342,7 +342,7 @@ footer p { color: var(--soft); font-size: 15px }
 
 <footer class="wrap">
   <p class="name">데칼코마니</p>
-  <p>2026년 11월 11일 기준으로 조사했어요. 정책과 금액은 바뀔 수 있으니 내기 직전에 출처를 다시 확인해요. <a href="../">게임으로 돌아가기</a> · <a href="../../">창업실</a></p>
+  <p>2026년 11월 11일 기준으로 조사했어요. 정책과 금액은 바뀔 수 있으니 내기 직전에 출처를 다시 확인해요. <a href="../">게임으로 돌아가기</a></p>
 </footer>
 
 <script>
@@ -363,5 +363,6 @@ boxes.forEach(b => { b.checked = !!done[b.dataset.k]; b.onchange = () => { done[
 document.getElementById("reset").onclick = () => { boxes.forEach(b => b.checked = false); done = {}; try { localStorage.removeItem(KEY) } catch {} paint() };
 paint();
 </script>
+<script src="../../hub/back.js" data-cat="game" defer></script>
 </body>
 </html>

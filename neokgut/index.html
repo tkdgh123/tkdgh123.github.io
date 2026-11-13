@@ -29,7 +29,6 @@ iframe[hidden] { display: none }
 </head>
 <body>
 <nav aria-label="넋굿">
-  <a href="../#game">← 창업실</a>
   <button type="button" data-v="plan" data-src="plan.html" aria-pressed="true">기획 도록</button>
   <button type="button" data-v="video" data-src="videos/" aria-pressed="false">개발 영상</button>
 </nav>
@@ -54,5 +53,6 @@ for (const t of tabs) t.addEventListener("click", () => {
   history.replaceState(null, "", t === tabs[0] ? location.pathname : "?v=" + t.dataset.v);
 });
 </script>
+<script src="../hub/back.js" data-cat="game" defer></script>
 </body>
 </html>

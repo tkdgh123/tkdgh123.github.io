@@ -165,7 +165,7 @@ canvas { display: block; background: var(--paper); border-radius: 20px; box-shad
 <body>
 <main class="app">
   <header class="top">
-    <a class="back" href="../">← 창업실</a>
+    
     <button class="snd" id="snd"></button>
     <button class="snd" id="again" aria-label="다시 하기" title="다시 하기" hidden><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></button>
     <div class="score"><div class="sc"><i class="mult" id="mult" hidden></i><b id="score">0</b></div><span id="best">최고 0</span></div>
@@ -715,5 +715,6 @@ newBoard(); size(); requestAnimationFrame(loop);
 let tutDone = false; try { tutDone = !!localStorage.getItem("decal-tut") } catch {}
 if (!tutDone) tutShow(0);
 </script>
+<script src="../hub/back.js" data-cat="game" defer></script>
 </body>
 </html>

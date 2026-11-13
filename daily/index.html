@@ -25,7 +25,7 @@ const LAPTOP = '<svg viewBox="0 0 44 44" aria-hidden="true"><rect x="7" y="9" wi
 const HAND = '<svg viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="17" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M17 15l12 7-12 7z" fill="currentColor"/></svg>';
 
 function nav(on) {
-  return `<header class="top"><a class="mark" href="../#study">← 창업실</a><nav><a class="${on === "home" ? "on" : ""}" href="./">전체 목록</a><a class="${on === "terms" ? "on" : ""}" href="?t">용어 사전</a></nav></header>`;
+  return `<header class="top"><nav><a class="${on === "home" ? "on" : ""}" href="./">전체 목록</a><a class="${on === "terms" ? "on" : ""}" href="?t">용어 사전</a></nav></header>`;
 }
 
 function quizHTML(qz, label, id) {
@@ -153,5 +153,6 @@ fetch("lessons.json").then(r => r.json()).then(data => {
   });
 }).catch(() => { app.innerHTML = "<p>레슨을 불러오지 못했어요. 잠시 뒤 새로고침해 주세요.</p>"; });
 </script>
+<script src="../hub/back.js" data-cat="study" defer></script>
 </body>
 </html>

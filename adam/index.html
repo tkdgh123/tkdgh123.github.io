@@ -176,7 +176,7 @@ dd{margin:0;color:var(--sub)}
 <body>
 
 <div class="bar"><div class="in">
-  <a class="home" href="../">← 창업실</a>
+  
   <div class="tabs" role="group" aria-label="보기">
     <button type="button" data-t="read" aria-pressed="true">내용 정리</button>
     <button type="button" data-t="talk" aria-pressed="false">발표 순서</button>
@@ -487,5 +487,6 @@ $("pick").onclick = e => { const b = e.target.closest("button"); if (!b) return;
 draw(0);
 let rw = 0; addEventListener("resize", () => { cancelAnimationFrame(rw); rw = requestAnimationFrame(() => draw(P)); });
 </script>
+<script src="../hub/back.js" data-cat="study" defer></script>
 </body>
 </html>

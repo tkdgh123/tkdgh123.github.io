@@ -96,7 +96,7 @@ section[hidden] { display: none }
 </head>
 <body>
 <header>
-  <a class="back" href="../#make">← 창업실</a>
+  
   <h1>창공설 · 레이싱 <b>휠</b></h1>
   <nav role="tablist" aria-label="보기 선택">
     <button role="tab" id="tab-slides" aria-controls="slides" aria-selected="true"><i>01</i><span>발표</span></button>
@@ -176,5 +176,6 @@ document.addEventListener("keydown", e => {
 show(0);
 openTab(SRC[Q.get("t")] ? Q.get("t") : location.hash === "#sim" ? "sim" : "slides");
 </script>
+<script src="../hub/back.js" data-cat="make" defer></script>
 </body>
 </html>

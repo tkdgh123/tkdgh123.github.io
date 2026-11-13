@@ -99,7 +99,7 @@ footer { margin-top: 100px; font-size: 14.5px; color: var(--ink-2) }
 </style>
 </head>
 <body>
-<a class="back" href="../">창업실</a>
+
 <header class="hero">
   <div class="name"><h1>일필휘지</h1><p>붓이 되어 사계를 그리는 수묵 액션</p></div>
   <a class="play" href="play/">맛보기 하기<small>1장 사계 · PC 브라우저</small></a>
@@ -417,5 +417,6 @@ const MOBS = [
 ];
 document.getElementById("mobs").innerHTML = MOBS.map(([k, n, s]) => `<div class="mob"><img src="img/m_${k}.png" alt="${n}" loading="lazy"><h4>${n}</h4><p>${s}</p></div>`).join("");
 </script>
+<script src="../hub/back.js" data-cat="game" defer></script>
 </body>
 </html>
