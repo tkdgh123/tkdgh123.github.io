@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>과제 3 안내 · 따릉이 데이터</title>
+<style>
+  body { margin:0; background:#eef1f4; font:15px/1.7 "Pretendard","Malgun Gothic",sans-serif; color:#1b1f24; }
+  .wrap { max-width:760px; margin:24px auto; padding:0 16px 40px; }
+  .card { background:#fff; border:1px solid #d9dee4; border-radius:8px; padding:24px 28px; margin-bottom:16px; }
+  .lms { font-size:12px; color:#5a6470; margin-bottom:4px; }
+  h1 { font-size:20px; margin:0 0 12px; }
+  h2 { font-size:16px; margin:0 0 10px; }
+  ul { padding-left:20px; margin:6px 0; }
+  table { border-collapse:collapse; width:100%; font:13px/1.5 "Consolas","D2Coding",monospace; }
+  th, td { border:1px solid #d9dee4; padding:4px 8px; text-align:right; }
+  th { background:#f3f5f8; }
+  td.d { text-align:left; }
+  td.e { background:#fff8e6; }
+  .file { font:13px "Consolas",monospace; color:#5a6470; margin-bottom:8px; }
+  .doc { font-size:14px; color:#3a4350; }
+  .doc b { color:#1b1f24; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <div class="lms">AI와 데이터 기초 · 과제</div>
+    <h1>과제 3. 비 오는 날, 따릉이는 얼마나 덜 탈까?</h1>
+    <ul>
+      <li>데이터: 서울 따릉이 일별 대여 기록, 2025년 6~8월 (92일)</li>
+      <li>Colab에서 판다스와 matplotlib만 써서 분석하세요.</li>
+      <li>그래프를 2개 이상 넣으세요.</li>
+      <li>결측치를 어떻게 처리했는지 보고서에 꼭 쓰세요.</li>
+      <li>제출: .ipynb 파일 · 마감 11월 28일(금) 23:59</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h2>데이터 미리 보기</h2>
+    <div class="file">ttareungi_2025summer.csv · 92행</div>
+    <table>
+      <tr><th>날짜</th><th>대여건수</th><th>강수량(mm)</th><th>평균기온(℃)</th></tr>
+      <tr><td class="d">2025-06-01</td><td>128,402</td><td class="e"></td><td>22.4</td></tr>
+      <tr><td class="d">2025-06-02</td><td>131,977</td><td class="e"></td><td>23.1</td></tr>
+      <tr><td class="d">2025-06-03</td><td>74,215</td><td>18.5</td><td>20.8</td></tr>
+      <tr><td class="d">2025-06-04</td><td>119,630</td><td>0.4</td><td>21.9</td></tr>
+      <tr><td class="d">2025-06-05</td><td>135,118</td><td class="e"></td><td>24.0</td></tr>
+      <tr><td class="d">…</td><td>…</td><td>…</td><td>…</td></tr>
+      <tr><td class="d">2025-08-31</td><td>126,054</td><td class="e"></td><td>27.3</td></tr>
+    </table>
+  </div>
+  <div class="card doc">
+    <h2>데이터 설명서 (공공데이터 포털)</h2>
+    <p><b>강수량(mm)</b>: 그날 서울 관측소 기준 누적 강수량. <b>비가 오지 않은 날은 값을 기록하지 않아 빈칸으로 둡니다.</b> 빈칸은 0mm로 보면 됩니다.</p>
+    <p><b>대여건수</b>: 그날 빌린 횟수의 합. 천 단위 쉼표가 들어 있는 문자열입니다.</p>
+  </div>
+</div>
+</body>
+</html>

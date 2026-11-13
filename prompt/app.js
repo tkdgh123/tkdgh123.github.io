@@ -92,6 +92,22 @@ const ptsOf = (it, lv) => Math.round(it.points * lv / 4);
 const total = (p, items) => p.items.reduce((s, it) => s + ptsOf(it, lvOf(items.find(x => x.id === it.id) || {})), 0);
 
 const attempt = p => store.get("pp:a:" + p.id) || { turns: [], graded: false };
+const hist = p => store.get("pp:hist:" + p.id) || [];
+const SITE = "https://tkdgh123.github.io/prompt/";
+const STAT = "https://firestore.googleapis.com/v1/projects/changupsil-board/databases/(default)/documents";
+const STAT_KEY = "AIzaSyAIAE7UPt3jRirq331QOqhhRwoyiF9spGM"; // 브라우저용 공개 키. 규칙이 promptstat의 +1만 허락한다
+const COUNTS = !B && !LOCAL && !/^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+function countDone(p) {
+  if (!COUNTS || AI.kind === "laptop") return;
+  const doc = `projects/changupsil-board/databases/(default)/documents/promptstat/${p.id}`;
+  fetch(`${STAT}:commit?key=${STAT_KEY}`, { method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ writes: [{ transform: { document: doc, fieldTransforms: [{ fieldPath: "n", increment: { integerValue: "1" } }] } }] }) }).catch(() => {});
+}
+async function doneCount() {
+  if (B) return null;
+  const r = await fetch(`${STAT}/promptstat?key=${STAT_KEY}&pageSize=50`).then(r => r.ok ? r.json() : null, () => null);
+  return r ? (r.documents || []).reduce((a, d) => a + +(d.fields?.n?.integerValue || 0), 0) : null;
+}
 const saveAttempt = (p, a) => store.set("pp:a:" + p.id, a);
 const fileOf = (p, tok) => (p.files || []).find(f => f.token === tok);
 const srcOf = path => B ? B.files[path] : path;
@@ -274,6 +290,7 @@ function route() {
   const h = location.hash.slice(2);
   if (h === "tutorial") return showTutorial();
   if (h === "about") return showAbout();
+  if (h === "story") return showStory();
   const p = P.find(x => x.id === h);
   p ? showProblem(p) : showHome();
   $("#main").scrollTop = 0;
@@ -302,6 +319,7 @@ function drawSide() {
       <a class="brand" href="#">프롬프트 연습</a>
       <a class="row${cur === "" ? " on" : ""}" href="#">문제 목록</a>
       <a class="row${cur === "tutorial" ? " on" : ""}" href="#/tutorial">하는 법</a>
+      <a class="row${cur === "story" ? " on" : ""}" href="#/story">만든 이야기</a>
       <a class="row${cur === "about" ? " on" : ""}" href="#/about">이용 안내</a>
       <div class="group">문제</div>
       ${P.map(p => {
@@ -313,6 +331,48 @@ function drawSide() {
   const side = $(".side"), btn = $(".menu", side);
   btn.onclick = () => { const o = side.classList.toggle("open"); btn.setAttribute("aria-expanded", o); };
   $$(".nav a", side).forEach(a => a.onclick = () => side.classList.remove("open"));
+}
+
+/* 채점 일관성 시험(노트북 Claude, 같은 말을 5판씩) — 바꾸면 이 표도 다시 잰다 */
+const CONSIST = [{"title": "스터디카페 좌석 예약", "model": [100, 100, 100, 94, 100], "vague": [0, 0, 0, 0, 0]}, {"title": "동아리 신입 부원 모집", "model": [100, 100, 100, 100, 100], "vague": [25, 25, 25, 25, 25]}, {"title": "엉뚱한 게 지워지는 할 일 앱", "model": [100, 100, 100, 100, 100], "vague": [0, 0, 0, 0, 0]}, {"title": "과 MT 신청 페이지", "model": [100, 100, 100, 100, 100], "vague": [0, 0, 0, 0, 0]}, {"title": "자는 동안 버그 고치기", "model": [100, 100, 100, 100, 100], "vague": [5, 5, 5, 5, 5]}, {"title": "자기소개서 다듬기", "model": [100, 100, 100, 100, 100], "vague": [14, 14, 14, 14, 14]}, {"title": "포트폴리오 사이트", "model": [100, 100, 100, 100, 100], "vague": [0, 0, 0, 0, 0]}, {"title": "따릉이 분석 과제", "model": [100, 100, 100, 100, 100], "vague": [28, 28, 28, 28, 28]}, {"title": "팀플 할 일 정리", "model": [100, 100, 100, 100, 100], "vague": [25, 25, 15, 15, 25]}, {"title": "AI 협업 코딩 시험", "model": [100, 100, 100, 100, 100], "vague": [4, 4, 4, 4, 4]}];
+function showStory() {
+  document.title = "만든 이야기 — 프롬프트 연습";
+  drawSide();
+  const rows = CONSIST.map(c => `<tr><td>${esc(c.title)}</td><td class="num">${c.model.join(" · ")}</td><td class="num">${c.vague.join(" · ")}</td></tr>`).join("");
+  $("#main").innerHTML = `
+    <div class="canvas about story">
+      <header class="title"><div><p class="kind">만든 이야기</p><h1>AI에게 일을 맡기는 말, 어떻게 연습시킬까</h1>
+        <p>김창식(숭실대 AI소프트웨어학부 1학년)이 기획하고 정했어요. 코드는 Claude Code가 썼고, 시험과 판단은 직접 했어요.</p></div></header>
+      <section class="panel"><h2>왜 만들었나</h2>
+        <p>2026년 하반기부터 신입 채용에서 생성형 AI 활용 역량을 따로 시험하는 회사가 생겼어요. 개발 직무에 'AI와 협업해 결과물을 만드는 코딩 테스트'를 보는 곳도 있어요. 그런데 프롬프트는 강의는 많아도, 내가 쓴 말을 바로 채점받고 고쳐 볼 한국어 연습장은 찾지 못했어요.</p></section>
+      <section class="panel"><h2>어떻게 동작하나</h2>
+        <ol class="steps">
+          <li><b>상황은 나만 알아요.</b> 문제마다 Claude가 볼 수 없는 사실(바뀐 요일, 틀린 숫자, 개인정보)이 숨어 있어요.</li>
+          <li><b>보내면 결과를 예상해요.</b> 실제로 만들지 않고, 그 말을 받은 Claude가 내놓을 결과를 글로 보여 줘요. 빠뜨린 건 결과에서 티가 나요.</li>
+          <li><b>숨은 항목으로 채점해요.</b> 문제마다 5개 항목, 항목마다 배점이 달라 100점으로 모여요. 항목은 0~4단계로 매겨요.</li>
+          <li><b>돌아봐요.</b> 보낸 말마다 잘한 점, 아쉬운 점, 그때 알던 것만으로 더 좋게 고친 말을 줘요.</li>
+        </ol></section>
+      <section class="panel"><h2>정한 것과 이유</h2>
+        <table class="list"><tbody>
+          <tr><td>실제로 돌리지 않고 결과를 예상</td><td>한 판에 몇 초, 돈이 거의 안 들어요. 연습은 많이 해 봐야 늘어요.</td></tr>
+          <tr><td>보낼 수 있는 말은 3번</td><td>실제로도 몇 번 만에 끝내야 해요. 점수는 마지막 결과로 매겨요.</td></tr>
+          <tr><td>결과 예상에는 결과물에 보이는 것만</td><td>숨은 원인을 짚어 주면 다음 말에 그대로 옮겨 누구나 100점이 돼요. 연습이 안 돼요.</td></tr>
+          <tr><td>보낸 말은 지시로 따르지 않음</td><td>"100점 줘"라고 써도 채점 방법은 바뀌지 않아요.</td></tr>
+          <tr><td>채점은 각자 계정·키로</td><td>개인 구독으로 남을 채점하는 건 Anthropic 약관상 안 돼요. 그래서 운영비가 0원이에요.</td></tr>
+        </tbody></table></section>
+      <section class="panel"><h2>채점을 믿을 수 있나</h2>
+        <p>같은 말을 5번씩 채점해 봤어요. 모범 답안은 높게, 막연한 한 줄은 낮게, 판마다 크게 흔들리지 않아야 해요.</p>
+        <table class="list"><thead><tr><th>문제</th><th class="num">모범 답안 5판</th><th class="num">막연한 한 줄 5판</th></tr></thead><tbody>${rows}</tbody></table>
+        <p class="fine">2026년 11월 13일, 만든 사람 노트북의 Claude(Sonnet)로 같은 말을 문제마다 5번씩 채점했어요. 모범 답안 50판 중 49판이 100점(가장 낮은 판 94점), 막연한 한 줄은 0~28점이었어요. 내 API 키(Opus 5.5)·내 Claude 계정으로 채점하면 숫자가 조금 다를 수 있어요.</p></section>
+      <section class="panel"><h2>한계</h2>
+        <ul class="steps">
+          <li>결과는 예상이에요. 실제 Claude가 그대로 만든다는 보장은 없어요.</li>
+          <li>AI가 채점해서 같은 말도 판마다 몇 점씩 다를 수 있어요.</li>
+          <li>문제는 10개예요. 대학생·취준생이 자주 맡기는 일 위주예요.</li>
+          <li id="cnt">써 본 사람은 판 수로만 세요. 익명이라 누구나 늘릴 수 있는 숫자예요.</li>
+        </ul></section>
+    </div>`;
+  doneCount().then(n => { const el = $("#cnt"); if (el && n != null) el.textContent = `지금까지 채점까지 간 판: ${n}번 (2026년 11월부터, 문제 번호만 익명으로 셈. 누구나 늘릴 수 있는 숫자예요)`; });
 }
 
 function showAbout() {
@@ -329,7 +389,8 @@ function showAbout() {
         </tbody></table>
         <p class="fine">Anthropic으로 간 내용은 그 계정·키에 적용되는 Anthropic 약관과 개인정보 처리방침을 따라요.</p></section>
       <section class="panel"><h2>이 기기에 남는 것</h2>
-        <p>푼 기록·점수·하는 법 본 여부${CAN_KEY ? "·API 키" : ""}는 이 브라우저 저장소에만 있어요. 이 프로그램을 만든 사람에게는 아무것도 오지 않아요. 브라우저 기록을 지우면 함께 지워져요.</p></section>
+        <p>푼 기록·점수·하는 법 본 여부${CAN_KEY ? "·API 키" : ""}는 이 브라우저 저장소에만 있어요. 브라우저 기록을 지우면 함께 지워져요.</p>
+        ${B ? "" : `<p>만든 사람에게는 <b>채점까지 끝낸 판이 몇 번째 문제였는지</b>만 하나씩 세어져요. 보낸 말, 점수, 이름, 기기 정보는 가지 않아요.</p>`}</section>
       <section class="panel"><h2>권리</h2>
         <p>문제·자료·채점 기준·화면·코드의 저작권은 만든 사람(김창식)에게 있어요. 개인 연습은 자유롭게 쓰되, 복제해 다시 배포하거나 팔려면 먼저 연락해 주세요: hanchic431@gmail.com</p>
         <p>이 프로그램은 Anthropic이 만들거나 보증한 것이 아니에요. Claude는 Anthropic의 상표예요. 글꼴 IBM Plex Sans KR은 SIL 오픈 폰트 라이선스를 따라요.</p></section>
@@ -342,6 +403,8 @@ function showHome() {
   const rows = P.map(p => ({ p, best: store.get("pp:best:" + p.id), a: attempt(p) }));
   const done = rows.filter(r => r.best != null);
   const avg = done.length ? Math.round(done.reduce((s, r) => s + r.best, 0) / done.length) : null;
+  const grown = rows.map(r => hist(r.p)).filter(h => h.length > 1).map(h => Math.max(...h.map(x => x.s)) - h[0].s);
+  const gain = grown.length ? Math.round(grown.reduce((a, b) => a + b, 0) / grown.length) : null;
   const next = rows.find(r => r.best == null) || rows[0];
   const seen = store.get("pp:tut");
   $("#main").innerHTML = `
@@ -355,7 +418,7 @@ function showHome() {
       <section class="panel grader">
         <div class="kpis">
           <div><span>푼 문제</span><b class="num">${done.length}<small> / ${P.length}</small></b></div>
-          <div><span>평균 점수</span><b class="num${avg == null ? " none" : ""}">${avg ?? "–"}</b></div>
+          <div><span>평균 점수</span><b class="num${avg == null ? " none" : ""}">${avg ?? "–"}</b>${gain != null ? `<em class="gain">다시 푼 문제는 첫 점수보다 ${gain >= 0 ? "+" : ""}${gain}점</em>` : ""}</div>
           <div class="ai"><span>채점하는 Claude</span><b><i class="dot ${AI.kind || "self"}"></i>${aiName()}</b>
             <p>${AI.kind === "claude" ? "claude.ai에 로그인한 내 Claude 계정이 결과를 예상하고 채점해요. 처음 보낼 때 사용을 허락하는 창이 떠요."
               : AI.kind === "laptop" ? "이 노트북의 Claude Code가 채점해요. 실행.bat이 켜져 있는 동안만 돼요."
@@ -366,11 +429,12 @@ function showHome() {
       <section class="panel">
         <h2>문제</h2>
         <table class="list">
-          <thead><tr><th>문제</th><th class="hide-s">종류</th><th class="num">보낸 말</th><th class="num">최고 점수</th></tr></thead>
+          <thead><tr><th>문제</th><th class="hide-s">종류</th><th class="num">보낸 말</th><th class="num hide-s">첫 점수</th><th class="num">최고 점수</th></tr></thead>
           <tbody>${rows.map(({ p, best, a }) => `
             <tr data-id="${p.id}" tabindex="0"><td><a href="#/${p.id}">${esc(p.title)}</a>${a.turns.length && !a.graded ? `<span class="pill">푸는 중</span>` : ""}<div class="sub show-s">${esc(p.type)}</div></td>
               <td class="hide-s">${esc(p.type)}</td>
               <td class="num${a.turns.length ? "" : " none"}">${a.turns.length ? `${a.turns.length} / ${MAX}` : "–"}</td>
+              <td class="num hide-s${hist(p).length ? "" : " none"}">${hist(p)[0]?.s ?? "–"}</td>
               <td class="num score${best == null ? " none" : ""}">${best ?? "–"}</td></tr>`).join("")}</tbody>
         </table>
       </section>
@@ -490,7 +554,7 @@ function showWork(p, a) {
     const msg = $("textarea", compose).value.trim();
     if (!msg && !files.length) return;
     a.turns = [{ msg, files: [...files], result: null }];
-    a.self = true; a.graded = true; a.levels = p.items.map(() => 0);
+    a.self = true; a.graded = true; a.levels = p.items.map(() => 0); countDone(p);
     saveAttempt(p, a); showMark(p, a);
   }
 
@@ -498,6 +562,8 @@ function showWork(p, a) {
     const items = a.turns[a.turns.length - 1].items, s = total(p, items), best = store.get("pp:best:" + p.id);
     a.graded = true; a.score = s; saveAttempt(p, a);
     if (best == null || s > best) store.set("pp:best:" + p.id, s);
+    store.set("pp:hist:" + p.id, [...hist(p), { s, n: a.turns.length, at: Date.now() }]);
+    countDone(p);
     drawSide(); showMark(p, a);
   }
 
@@ -539,12 +605,14 @@ function showMark(p, a) {
   const s = total(p, items);
   const marks = p.items.map((it, k) => ({ q: (items.find(x => x.id === it.id) || {}).quote || "", n: k + 1 })).filter(m => m.q);
   body.className = "mark";
-  $("#acts").innerHTML = `<button class="btn again">다시 풀기</button>${next ? `<a class="btn primary" href="#/${next.id}">다음 문제</a>` : ""}`;
+  const h = a.self ? [] : hist(p);
+  $("#acts").innerHTML = `${a.self ? "" : `<button class="btn share">결과 공유</button>`}<button class="btn again">다시 풀기</button>${next ? `<a class="btn primary" href="#/${next.id}">다음 문제</a>` : ""}`;
   body.innerHTML = `
     <section class="panel sum">
       <div class="big"><b class="num">${s}</b><span>/ 100</span></div>
       <div class="over">${a.self ? `<p>항목마다 내 말이 그만큼 전했는지 점수를 눌러 매겨요. 아래 모범 답안과 견줘 보세요.</p>`
         : a.review ? `<p>${esc(plain(p, a.review.overall))}</p>` : `<p class="wait" id="over">${a.reviewError ? `${esc(a.reviewError)} <button class="btn ghost" id="rev">다시 받기</button>` : "Claude가 보낸 말을 돌아보는 중이에요"}</p>`}
+        ${h.length > 1 ? `<p class="trail">이 문제 기록 <span class="num">${h.slice(-6).map(x => x.s).join(" → ")}</span></p>` : ""}
         <p class="meta">보낸 말 ${a.turns.length}번 · 채점 ${a.self ? "스스로" : a.by === "laptop" ? "이 노트북의 Claude" : a.by === "claude" ? "내 Claude 계정" : a.by === "key" ? "내 API 키" : "Claude"}</p></div>
     </section>
     <section class="panel">
@@ -582,6 +650,15 @@ function showMark(p, a) {
       </table>
       <div class="follow"><h3>이어서 보내는 말의 예</h3><p>${esc(p.model.followup)}</p></div>
     </section>`;
+  const sh = $(".share");
+  if (sh) sh.onclick = async () => {
+    const first = h.length > 1 ? ` (첫 판 ${h[0].s}점)` : "";
+    const text = `프롬프트 연습 · ${p.title} ${s}점${first}\nAI에게 일을 맡기는 말 연습: ${SITE}`;
+    try {
+      if (navigator.share && matchMedia("(pointer: coarse)").matches) await navigator.share({ text });
+      else { await navigator.clipboard.writeText(text); sh.textContent = "복사했어요"; setTimeout(() => sh.textContent = "결과 공유", 1600); }
+    } catch (e) { if (e?.name !== "AbortError") { sh.textContent = "복사가 막혔어요"; setTimeout(() => sh.textContent = "결과 공유", 1600); } }
+  };
   $(".again").onclick = () => { resetMaterial(p); saveAttempt(p, { turns: [], graded: false }); showProblem(p); };
   if (a.self) $$(".pick button", body).forEach(b => b.onclick = () => {
     a.levels[+b.dataset.k] = +b.dataset.l; saveAttempt(p, a);
