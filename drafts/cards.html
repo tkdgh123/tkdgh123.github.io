@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>카드 견본 — 창업실</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+:root { --tone: #e4e2da; --ink: #151514; --muted: #5a5954; --rule: #c9c6bc; color-scheme: light }
+* { box-sizing: border-box }
+body { margin: 0; background: var(--tone); color: var(--ink); font: 400 16px/1.6 "Pretendard Variable", Pretendard, system-ui, sans-serif; word-break: keep-all; padding: 28px clamp(16px, 4vw, 56px) 80px }
+a { color: inherit }
+header { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 48px }
+header a { font-weight: 700; text-decoration: none }
+h1 { margin: 0 0 8px; font-size: clamp(30px, 4vw, 48px); letter-spacing: -.03em }
+h2 { margin: 64px 0 20px; font-size: 20px; letter-spacing: -.01em }
+.pair { display: grid; grid-template-columns: repeat(2, minmax(0, 460px)); gap: 28px }
+.pair + .pair { margin-top: 36px }
+figure { margin: 0 }
+figcaption { margin-top: 10px; font-size: 14px; color: var(--muted) }
+img { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; box-shadow: 0 30px 50px -30px rgb(0 0 0 / .55) }
+.row { display: flex; gap: 18px; overflow-x: auto; padding-bottom: 30px }
+.row figure { flex: none; width: 260px }
+.row .new figcaption { color: var(--ink); font-weight: 700 }
+@media (max-width: 640px) { .pair { grid-template-columns: 1fr } }
+</style>
+</head>
+<body>
+<header><a href="./">← 시안 모음</a><span>11.13</span></header>
+<h1>글 위주 카드 견본</h1>
+
+<h2>지금 카드 · 견본 (첫 화면 고리 앞 카드 크기)</h2>
+<div class="pair">
+  <figure><img src="../hub/shots/ai.webp" alt="지금 인공지능 입문 복습 노트 카드"><figcaption>지금 · 인공지능 입문 복습 노트</figcaption></figure>
+  <figure><img src="shots/card-ai.webp" alt="견본: 복습 노트, 강의 슬라이드 → 한국어 풀이 → 퀴즈"><figcaption>견본</figcaption></figure>
+</div>
+<div class="pair">
+  <figure><img src="../hub/shots/study.webp" alt="지금 프로그래밍기초 복습 노트 카드"><figcaption>지금 · 프로그래밍기초 복습 노트</figcaption></figure>
+  <figure><img src="shots/card-study.webp" alt="견본: 복습 노트, 코드 → 실행 결과 → 퀴즈"><figcaption>견본</figcaption></figure>
+</div>
+
+<h2>공부 칸 다른 카드들 사이에서 (옆 카드 크기)</h2>
+<div class="row">
+  <figure><img src="../hub/shots/ai-data.webp" alt=""><figcaption>AI와 데이터 기초</figcaption></figure>
+  <figure><img src="../hub/shots/adam.webp" alt=""><figcaption>Adam 논문 발표</figcaption></figure>
+  <figure class="new"><img src="shots/card-study.webp" alt=""><figcaption>견본 · 프로그래밍기초</figcaption></figure>
+  <figure class="new"><img src="shots/card-ai.webp" alt=""><figcaption>견본 · 인공지능 입문</figcaption></figure>
+  <figure><img src="../hub/shots/daily.webp" alt=""><figcaption>매일 AI 공부</figcaption></figure>
+</div>
+</body>
+</html>
