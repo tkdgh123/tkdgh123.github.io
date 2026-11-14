@@ -147,6 +147,32 @@
     setTimeout(() => t.hidden = true, 1800);
   };
   addEventListener("scroll", () => document.getElementById("hd").classList.toggle("small", scrollY > 30));
+
+  // 연습 프로그램이 '화면 찍기'를 할 때, 찍힌 화면에 보이는 것을 채점기에 글로 알려 준다
+  window.describeView = () => {
+    const $ = id => document.getElementById(id), L = [];
+    const seen = el => { const r = el.getBoundingClientRect(), mid = r.top + r.height / 2; return r.height > 0 && mid > 0 && mid < innerHeight; }; // 반 넘게 보이면
+    L.push($("hd").classList.contains("small") ? "맨 위 메뉴가 얇아지고(높이 52px, 로고 글자 작아짐) 아래로 그림자가 진 모습. 스크롤해 내려온 상태" : "맨 위 메뉴: 로고 '책상 하나'와 주황 점, 오른쪽에 좌석·요금·오시는 길. 높이 76px, 그림자 없음");
+    if (seen(document.querySelector(".hero"))) L.push(`짙은 초록 바탕에 큰 제목 '오늘 앉을 자리, 미리 골라 두세요', 그 아래 '남은 자리 ${$("left").textContent} / 30'(숫자는 주황)`);
+    if (seen(grid)) {
+      const taken = [...grid.children].filter(b => b.classList.contains("taken")).map(b => b.dataset.id);
+      const booked = taken.filter(id => free.has(id));
+      L.push(`'창 가' 글씨 아래 A1~E6 좌석표 5줄×6칸. 찬 자리 ${taken.length}개는 회색으로 칠해짐, 빈 자리는 테두리만. 아래 범례 '빈 자리·찬 자리'`);
+      if (booked.length) L.push(`처음엔 빈 자리였던 ${booked.join("·")}이(가) 회색(찬 자리)으로 바뀌어 있음`);
+    }
+    const tip = document.querySelector(".tip");
+    if (tip) L.push(`${tip.parentElement.dataset.id} 자리 바로 위에 흰 말풍선 '${tip.textContent}'. 마우스를 그 자리에 올려 둔 순간`);
+    if (pick) L.push(`${pick.dataset.id} 자리가 주황색으로 칠해짐(고른 자리)`);
+    if (bar.classList.contains("show")) {
+      const h = [...$("hours").children].map(b => b.textContent + (b.classList.contains("on") ? "(주황 테두리, 골라 둔 것)" : "")).join(" · ");
+      L.push(`화면 아래에 붙은 막대: 자리 '${$("who").textContent}', 단추 ${h}, 금액 '${$("sum").textContent}', 주황 '예약하기' 단추`);
+    }
+    if (!$("dim").hidden) L.push(`화면이 어두워지고 가운데 흰 확인 창 '${$("ask").textContent}', 단추 '취소'·'예약'`);
+    if (!$("toast").hidden) L.push(`위쪽 가운데 흰 알림 '${$("toast").textContent}'`);
+    if (seen(document.querySelector(".price"))) L.push("'요금' 칸: '3,000원 / 1시간', '2시간·4시간·6시간 단위로 예약할 수 있어요. 음료는 가져오셔도 돼요.'");
+    if (seen($("way").querySelector("p"))) L.push("'오시는 길' 칸: '역 3번 출구에서 걸어서 2분, 꽃집 건물 2층이에요. 매일 오전 7시 ~ 새벽 2시'");
+    return L.join("\n");
+  };
 </script>
 </body>
 </html>

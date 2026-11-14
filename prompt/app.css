@@ -58,6 +58,17 @@ svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width:
 .side .mob { display: none; }
 .nav { display: flex; flex-direction: column; min-height: 100%; }
 .brand { font-weight: 700; font-size: 16px; text-decoration: none; padding: 0 12px 22px; }
+.nav .top { display: flex; justify-content: space-between; align-items: flex-start; }
+.fold, .unfold { width: 32px; height: 32px; margin-top: -6px; border: 0; border-radius: var(--radius-control); background: none; color: var(--muted); display: grid; place-items: center; }
+.fold:hover, .unfold:hover { background: var(--raised); color: var(--text); }
+.unfold { display: none; }
+@media (min-width: 1101px) {
+  #app { transition: grid-template-columns .2s; }
+  #app.folded { grid-template-columns: 52px minmax(0, 1fr); }
+  #app.folded .side { padding: 28px 0 0; overflow: hidden; }
+  #app.folded .nav { display: none; }
+  #app.folded .unfold { display: grid; margin: -6px auto 0; }
+}
 .nav .row { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 34px; padding: 5px 12px; border-radius: var(--radius-control); text-decoration: none; color: var(--muted); line-height: 1.4; }
 .nav .row:hover { color: var(--text); background: var(--raised); }
 .nav .row.on { color: var(--text); background: var(--active); font-weight: 500; }
@@ -127,6 +138,7 @@ th.num, td.num { text-align: right; padding-right: 0; padding-left: 12px; white-
 .view .bar { display: flex; align-items: center; gap: 12px; padding: 0 4px 10px; font-size: 13px; color: var(--muted); }
 .view .bar h2 { margin: 0; font-size: 14px; color: var(--text); }
 .view .bar .btn { margin-left: auto; height: 28px; }
+.view .bar .btn + .btn { margin-left: 0; }
 .view iframe { flex: 1; width: 100%; min-height: 0; border: 1px solid var(--border); border-radius: var(--radius-control); background: #fff; }
 
 .chat { display: flex; flex-direction: column; padding: 0; min-height: 0; }
@@ -143,11 +155,19 @@ th.num, td.num { text-align: right; padding-right: 0; padding-left: 12px; white-
 .res ul { margin: 0; padding-left: 18px; }
 .res li { margin: 2px 0; }
 .res .hint { margin: 4px 0 0; font-size: 13px; color: var(--muted); }
+.res .rep { margin: 2px 0 8px; padding-left: 10px; border-left: 2px solid var(--border); }
+.res .rep b { display: block; font-size: 12px; font-weight: 500; color: var(--muted); }
+.pasted { text-decoration: underline dotted var(--muted); text-underline-offset: 3px; color: var(--muted); }
+.pnote { font-size: 12px; color: var(--muted); }
 .res.wait .lab::after { content: ""; display: inline-block; width: 14px; animation: dots 1.2s steps(4) infinite; }
 @keyframes dots { 0% { content: ""; } 25% { content: "."; } 50% { content: ".."; } 75% { content: "..."; } }
 
 .file { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 3px 12px 3px 3px; border: 1px solid var(--border); border-radius: var(--radius-control); background: var(--surface); font-size: 13px; color: var(--text); vertical-align: middle; white-space: nowrap; }
-.file img { width: 54px; height: 32px; object-fit: cover; object-position: top left; border-radius: 3px; }
+.file img { width: 54px; height: 32px; object-fit: cover; object-position: top left; border-radius: 3px; cursor: zoom-in; }
+#big { max-width: min(92vw, 900px); padding: 12px; border: 1px solid var(--border); border-radius: var(--radius-card); background: var(--surface); color: var(--text); }
+#big::backdrop { background: rgba(0, 0, 0, .5); }
+#big img { display: block; max-width: 100%; max-height: 78vh; margin: 0 auto 10px; border-radius: 4px; }
+#big .btn { margin-left: auto; display: flex; }
 .file .doc { width: 32px; height: 32px; display: grid; place-items: center; background: var(--raised); border-radius: 3px; color: var(--muted); }
 .file.hit { border-color: var(--hue); box-shadow: inset 0 -2px 0 var(--hue); }
 .file.hit::after { content: attr(data-n); font-size: 11px; color: var(--hue); margin-left: -2px; align-self: flex-start; }
@@ -259,6 +279,8 @@ th.num, td.num { text-align: right; padding-right: 0; padding-left: 12px; white-
 .s-res .lab { font-size: 10.5px; color: #5d6168; }
 .s-res .chg { margin: 0 0 2px; font-weight: 500; }
 .s-res ul { margin: 0; padding-left: 14px; }
+.s-res .rep { margin: 1px 0 4px; padding-left: 7px; border-left: 2px solid #e3e5e9; }
+.s-res .rep b { display: block; font-size: 10px; font-weight: 500; color: #5d6168; }
 .s-res.wait .lab::after { content: "..."; }
 .stage .file { height: 30px; font-size: 11px; padding: 2px 8px 2px 2px; background: #fff; border-color: #e3e5e9; color: #0c0d0f; }
 .s-thumb { position: relative; width: 40px; height: 24px; border-radius: 3px; background: #fffaf2; border: 1px solid #e8e1d4; }
