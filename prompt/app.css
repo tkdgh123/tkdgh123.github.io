@@ -157,7 +157,25 @@ th.num, td.num { text-align: right; padding-right: 0; padding-left: 12px; white-
 .res .hint { margin: 4px 0 0; font-size: 13px; color: var(--muted); }
 .res .rep { margin: 2px 0 8px; padding-left: 10px; border-left: 2px solid var(--border); }
 .res .rep b { display: block; font-size: 12px; font-weight: 500; color: var(--muted); }
-.pasted { text-decoration: underline dotted var(--muted); text-underline-offset: 3px; color: var(--muted); }
+.res .exb { margin: 8px 0 0 -10px; height: 30px; font-size: 13px; }
+.mine .exb { margin: 8px 0 0 -10px; height: 30px; font-size: 13px; }
+.twin { color: var(--text); font-weight: 500; }
+#ex { width: min(96vw, 1100px); height: min(90vh, 900px); padding: 14px 16px; border: 1px solid var(--border); border-radius: var(--radius-card); background: var(--surface); color: var(--text); flex-direction: column; gap: 10px; }
+#ex[open] { display: flex; }
+#ex::backdrop { background: rgba(0, 0, 0, .5); }
+#ex .exh { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+#ex .exh b { display: block; font-weight: 500; }
+#ex .exh span { font-size: 13px; color: var(--muted); }
+#ex .rep { margin: 0; padding-left: 10px; border-left: 2px solid var(--border); font-size: 14px; }
+#ex .rep b { display: block; font-size: 12px; font-weight: 500; color: var(--muted); }
+#ex .tabs { display: flex; gap: 4px; flex-wrap: wrap; font-size: 13px; }
+#ex .tabs.one { color: var(--muted); }
+#ex .tabs button { border: 1px solid var(--border); background: var(--raised); border-radius: var(--radius-control); padding: 3px 10px; }
+#ex .tabs button[aria-selected="true"] { background: var(--primary); color: var(--on-primary); border-color: var(--primary); }
+#ex .exbody { flex: 1; min-height: 0; display: flex; }
+#ex .exbody iframe { flex: 1; width: 100%; border: 1px solid var(--border); border-radius: var(--radius-control); background: #fff; }
+#ex .exbody pre { flex: 1; margin: 0; overflow: auto; padding: 12px 14px; background: var(--raised); border-radius: var(--radius-control); font: 13px/1.6 ui-monospace, Consolas, "IBM Plex Sans KR", monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
+.pasted {text-decoration: underline dotted var(--muted); text-underline-offset: 3px; color: var(--muted); }
 .pnote { font-size: 12px; color: var(--muted); }
 .res.wait .lab::after { content: ""; display: inline-block; width: 14px; animation: dots 1.2s steps(4) infinite; }
 @keyframes dots { 0% { content: ""; } 25% { content: "."; } 50% { content: ".."; } 75% { content: "..."; } }
