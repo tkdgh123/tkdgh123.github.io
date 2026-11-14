@@ -471,7 +471,8 @@ function showStory() {
           <li>AI가 채점해서 같은 말도 판마다 몇 점씩 다를 수 있어요.</li>
           <li>문제는 10개예요. 대학생·취준생이 자주 맡기는 일 위주예요.</li>
           <li id="cnt">써 본 사람은 판 수로만 세요. 익명이라 누구나 늘릴 수 있는 숫자예요.</li>
-        </ul></section>
+        </ul>
+        <p class="fine">학습 효과·채점 신뢰도·시장을 직접 시험한 기록: <a href="${SITE}review/" target="_blank" rel="noopener">프롬프트 연습 평가</a></p></section>
     </div>`;
   doneCount().then(n => { const el = $("#cnt"); if (el && n != null) el.textContent = `지금까지 채점까지 간 판: ${n}번 (2026년 11월부터, 문제 번호만 익명으로 셈. 누구나 늘릴 수 있는 숫자예요)`; });
 }
