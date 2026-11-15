@@ -65,6 +65,7 @@ figcaption b { font: 400 36px/1 var(--brush); margin-right: 8px }
 
 .mobs { display: flex; flex-wrap: wrap; gap: 42px 30px; align-items: flex-start }
 .mob { flex: 1 1 220px; max-width: 320px }
+.px { image-rendering: pixelated; width: 100% }
 .mob img { image-rendering: pixelated; height: 140px; width: auto; object-fit: contain; object-position: left bottom; margin-bottom: 8px }
 .mob h4 { font: 400 36px/1 var(--brush); margin: 0 }
 .mob p { margin: 4px 0 0; font-size: 15.5px; line-height: 1.55 }
@@ -146,7 +147,7 @@ footer { margin-top: 100px; font-size: 14.5px; color: var(--ink-2) }
     <div class="scroll"><table class="table">
       <tr><th>관점</th><th>강점</th><th>약점</th><th>한 일</th></tr>
       <tr><td>처음 하는 사람</td><td>긋는 순간 바로 이해돼요</td><td>두 손 조작이 어렵고, 귀신마다 공략이 달라요</td><td>순하게 난이도, 첫 만남 공략 한 줄, 귀록</td></tr>
-      <tr><td>숙련자</td><td>연속 베기와 그림 평가</td><td>잘하는 보람이 약해요</td><td>일필 표시, 먹 환급, 신품, 맵마다 숨은 빈 낙관 3개, 매섭게 난이도</td></tr>
+      <tr><td>숙련자</td><td>연속 베기와 그림 평가</td><td>잘하는 보람이 약해요</td><td>일필 표시, 먹 환급, 신품(받은 폭마다 먹 그릇 +5), 맵마다 숨은 빈 낙관 3개, 매섭게 난이도</td></tr>
       <tr><td>리뷰어</td><td>화풍과 맵 규칙이 새로워요</td><td>"너무 짧다", "조작이 답답하다"가 흔한 불만이에요</td><td>맵 21장, R 바로 다시, 입력 여유, 화면 전환 끊김 제거</td></tr>
       <tr><td>미술</td><td>수묵과 도트가 하나로 묶여요</td><td>맵의 모양이 비슷해요</td><td>맵마다 표식과 해·달, 세로 맵, 배 맵, 호수 반영, 원근감, 표지와 화첩 그림 교체</td></tr>
       <tr><td>시장</td><td>내 그림이 남아 자랑할 수 있어요</td><td>수묵·긋기 자체는 이미 있고, 한국어뿐이었어요</td><td>영어 지원, 표구한 그림 저장, 내 획이 맵이 되는 사계 병풍</td></tr>
@@ -284,9 +285,43 @@ footer { margin-top: 100px; font-size: 14.5px; color: var(--ink-2) }
       <figure style="margin:0"><img src="img/cliff.webp" alt="해송이 선 벼랑 턱과 오른쪽으로 쏟아지는 폭포가 보이는 죽서루 화면" width="1600" height="1000" loading="lazy"><figcaption>죽서루. 위로 오르는 벼랑과 폭포.</figcaption></figure>
     </div>
     <h3>화첩은 장마다 그림 한 폭</h3>
-    <figure style="margin:0"><img src="img/album_chapters.webp" alt="소상팔경 산수화 위에 강을 따라 여덟 맵 두루마리가 놓이고, 깬 세 곳 둘레만 그림이 진한 화첩 화면" width="1440" height="900" loading="lazy"><figcaption>사계·소상팔경·관동팔경·병풍이 한 쪽씩이에요. 장 그림 위 길을 따라 맵이 놓이고, 깬 맵 둘레만 그림이 진해져요. 장을 다 깨면 한 폭이 살아나고 다음 장이 열려요. 장 안에서는 아무 순서로나 깨요(봄은 연습이라 먼저). 장 그림 4폭은 ChatGPT와 Gemini에 같은 부탁으로 한 장씩 그려 비교하고, 여백이 넉넉한 Gemini로 나머지를 받았어요.</figcaption></figure>
+    <figure style="margin:0"><img src="img/album_chapters.webp" alt="소상팔경 산수화 위에 강을 따라 여덟 맵 두루마리가 놓이고, 깬 세 곳 둘레만 그림이 진한 화첩 화면" width="1440" height="900" loading="lazy"><figcaption>사계·소상팔경·관동팔경·병풍이 한 쪽씩이에요. 장 그림 위 길을 따라 맵이 놓이고, 깬 맵 둘레만 그림이 진해져요. 장을 다 깨면 한 폭이 살아나고 다음 장이 열려요. 처음 걷는 길은 장 안에서도 한 폭씩 차례로 열려요(이야기가 그 차례에 기대요). 다 그린 폭은 언제든 다시 펼쳐요. 장 그림 4폭은 ChatGPT와 Gemini에 같은 부탁으로 한 장씩 그려 비교하고, 여백이 넉넉한 Gemini로 나머지를 받았어요.</figcaption></figure>
     <h3>끝나면 두루마리를 펼쳐요</h3>
     <p>가로 맵을 끝내면 그림을 줄이지 않고 처음부터 간 데까지 흘려 보여 줘요. 그리기 전의 땅 위에 내가 그은 획이 그 자리에서 다시 나타나요.</p>
+  </section>
+
+  <section>
+    <h2>맵 고민: 차례와 계속할 이유</h2>
+    <p class="sub">11-15에 나눈 고민이에요. 이야기를 하려면 맵을 차례로 열어야 하는데 '화첩'이라 마음대로 고를 수 있었고, 재미는 있는데 계속할 이유가 잘 안 보였어요.</p>
+    <h3>화첩은 갈 곳을 고르는 곳이 아니라 다녀온 곳을 다시 보는 곳</h3>
+    <p>실제 기행 화첩도 다닌 길을 따라 엮은 책이에요. 나그네는 어머니가 거슬러 온 길을 거꾸로 내려가고, 강물과 바닷길은 순서가 있어요. 자유 순서로 하면 처음 보는 뱃사공이 작별 인사를 하는 식으로 이야기가 어긋났어요. 그래서 처음 걷는 길은 한 폭씩, 다 그린 폭은 언제든 다시 펼치게 했어요(셀레스트처럼 장은 차례로, 깬 장은 언제든). 한 맵에서 막히는 문제는 순서를 풀지 않고 난이도와 맵 설계로 풀어요.</p>
+    <h3>계속하게 되는 세 가지 힘</h3>
+    <div class="scroll"><table class="table">
+      <tr><th>힘</th><th>지금</th><th>빈 곳</th></tr>
+      <tr><td>궁금함</td><td>맵마다 두세 줄 이야기</td><td>대사가 거의 답이고 질문이 적어요. "바다는 어떻게 생겼어요?", "닮았구려" 정도만 다음을 궁금하게 해요.</td></tr>
+      <tr><td>커짐</td><td>신품을 받은 폭마다 먹 그릇 +5(11-15)</td><td>22맵 내내 쓰는 붓이 같아요. 가장 큰 구멍이에요.</td></tr>
+      <tr><td>남김</td><td>내 획이 장 그림에 스미고, 병풍 땅이 내 획으로 짜여요</td><td>이 게임만의 가장 좋은 재료인데 잘 안 보여요.</td></tr>
+    </table></div>
+    <h3>다른 게임은 한 맵을 어떻게 붙잡나</h3>
+    <div class="scroll wide"><table class="table">
+      <tr><th>게임</th><th>맵 안의 목표</th><th>잘하면 얻는 것</th></tr>
+      <tr><td>Devil May Cry</td><td>같은 기술을 되풀이하면 등급이 떨어지고 섞으면 올라가요</td><td>등급만큼 받은 구슬로 새 기술</td></tr>
+      <tr><td>Neon White</td><td>맵마다 숨은 지름길 하나, 메달 시간</td><td>숨은 선물이 인물과의 대화를 열어요</td></tr>
+      <tr><td>마리오 원더</td><td>맵 가운데 꽃을 만지면 규칙이 통째로 바뀌어요</td><td>모은 씨앗이 다음 코스를 열어요</td></tr>
+      <tr><td>오카미</td><td>꽃 피우기, 먹이 주기 같은 작은 일</td><td>먹물 통과 체력이 커지지만, 안 써도 깨서 약하다는 평</td></tr>
+      <tr><td>Sumioni (실패)</td><td>그리기는 호평</td><td>"다 베기만 한다", "그린 발판이 퍼즐로 안 쓰인다"는 평</td></tr>
+    </table></div>
+    <p class="note">공통점은 잘한 결과가 다시 놀이 안으로 돌아온다는 거예요(능력, 새 맵, 이야기). 품계와 유물이 도장으로만 남던 것이 "잘해서 얻는 이점이 적다"의 까닭이었어요.</p>
+    <h3>이 게임에 옮긴다면</h3>
+    <ul class="rules">
+      <li>본 것을 그릴 수 있게 된다<small>화공의 한은 "본 적이 없어서 못 그렸다"예요. 장마다 본 것 하나가 새 붓법이 되면 이야기와 손이 같은 말을 해요(강을 보고 흐르는 획, 바다를 보고 밀어내는 획). 한 번에 넣지 않고 2장 첫 붓법 하나로 시험해요.</small></li>
+      <li>마지막 한 폭은 내가 그린다<small>월송정의 "그래서, 바다는 어떻게 생겼느냐"에 플레이어가 빈 폭에 바다를 그려 답해요. 게임 전체가 이 한 폭을 향해 가요.</small></li>
+      <li>획을 섞을수록 오르는 기세<small>베기, 다리, 벽, 봉인을 섞으면 오르고 베기만 되풀이하면 떨어져요. 처치의 95%가 베기 연타라는 문제를 겨냥해요.</small></li>
+      <li>맵마다 획 지름길 하나<small>잘 그으면 크게 돌아가지 않아도 되는 자리. 신품으로 가는 길이 눈에 보여요.</small></li>
+      <li>유물 셋이 장면 한 줄을 연다<small>맵의 유물을 다 모으면 그 맵 장면에 한 줄이 더 붙어요.</small></li>
+      <li>장면 끝마다 질문 하나<small>대사만 고치면 돼요. '빈 폭' 이야기를 중간 장에서도 다시 꺼내요.</small></li>
+    </ul>
+    <p class="note">넣지 않을 것: 시간 제한 메달(붓으로 천천히 긋는 놀이가 속도전이 돼요), 모으는 개수만 늘리는 보상(놀이를 바꾸지 못해요). 한 걸음씩 넣고 다음 맵이 궁금해지는지 확인한 뒤 넓혀요.</p>
   </section>
 
   <section>
@@ -298,7 +333,9 @@ footer { margin-top: 100px; font-size: 14.5px; color: var(--ink-2) }
       <li>둘레가 번져요<small>내가 그은 획과 같은 번짐이에요.</small></li>
       <li>붉은 것은 눈뿐<small>낙관과 같은 인주예요.</small></li>
       <li>늘 움직여요<small>날갯짓·다리·출렁임에 눈을 깜박이고, 덤빌 때는 눈살을 찌푸리고, 베이면 눈을 질끈 감아요.</small></li>
+      <li>배경과 섞이지 않아요<small>큰 귀신이 두른 것은 그 맵의 날씨와 갈려요. 회오리귀 낙엽은 먹 테두리를 두른 짙은 인주빛 큰 잎이라 뒤에 지는 주황 단풍과 달라요.</small></li>
     </ul>
+    <figure style="margin:24px 0 48px;max-width:640px"><img src="img/gale_leaves_1116.webp" alt="회오리귀 둘레를 도는 붉은 낙엽, 두 장이 베여 반으로 갈라져 떨어진다. 배경에는 옅은 주황 단풍이 진다" width="800" height="600" loading="lazy"><figcaption>회오리귀 낙엽은 회오리에 휘말려 앞뒤로 뒤집히며 돌고, 지나온 길에 먹 바람 꼬리가 끌려요. 베면 두 쪽으로 갈라져 떨어지고, 다시 두를 땐 바깥에서 빨려 들어와요.</figcaption></figure>
     <div class="mobs" id="mobs"></div>
   </section>
 
@@ -360,7 +397,7 @@ footer { margin-top: 100px; font-size: 14.5px; color: var(--ink-2) }
 
   <section>
     <h2>멈춘 그림은 그림 AI로</h2>
-    <p class="sub">코드로 그린 표지와 틀은 별로라는 평을 받았어요. 멈춰 있는 그림은 그림 AI에 맡겨요. 귀신·보스·이야기 인물도 대충 그린 것 같다는 평을 받아 그림 AI의 픽셀 그림으로 바꿨고, 무사만 코드 그림이에요.</p>
+    <p class="sub">코드로 그린 표지와 틀은 별로라는 평을 받았어요. 멈춰 있는 그림은 그림 AI에 맡겨요. 귀신·보스·이야기 인물도 대충 그린 것 같다는 평을 받아 그림 AI의 픽셀 그림으로 바꿨어요. 나그네도 ChatGPT가 그린 모습에 Gemini가 몸짓을 그려요.</p>
     <figure style="margin:0"><img src="img/title.webp" alt="왼쪽에 산수, 오른쪽에 번진 먹 귀신, 가운데 붓을 멘 나그네가 있는 표지" width="1600" height="900" loading="lazy"><figcaption>들어가면 처음 보는 표지예요. 안내 글을 빼고 제목만 남겼어요.</figcaption></figure>
     <div class="scroll wide"><table class="table">
       <tr><th>자리</th><th>전</th><th>지금</th></tr>
@@ -369,7 +406,13 @@ footer { margin-top: 100px; font-size: 14.5px; color: var(--ink-2) }
       <tr><td>빈 칸</td><td>'눌러서 그리기' 글씨</td><td>글씨 없이 Gemini가 그린 붓과 먹 한 점</td></tr>
       <tr><td>화첩 뒤 산</td><td>코드로 만든 각진 능선</td><td>Gemini가 그린 먼 산</td></tr>
       <tr><td>귀신·보스·인물</td><td>코드로 짠 도형, 한 장면</td><td>Gemini 픽셀 그림(초록 바탕·먹 5단+인주). 평소·덤빌 때·베일 때 장면</td></tr>
+      <tr><td>나그네</td><td>코드로 찍은 무사</td><td>ChatGPT가 그린 작고 귀여운 나그네, 몸짓 24장면은 Gemini</td></tr>
     </table></div>
+    <h3>나그네는 ChatGPT가 그리고 Gemini가 움직여요</h3>
+    <div>
+      <figure style="margin:0 0 28px;max-width:300px"><img class="px" src="img/hero_chatgpt.webp" alt="큰 검은 삿갓에 붉은 띠, 붉은 목도리와 허리띠를 한 작은 나그네" width="360" height="345" loading="lazy"><figcaption>ChatGPT 그림. 특징만 적은 같은 부탁 글을 ChatGPT와 Gemini에 넣어 한 장씩 받고, 더 마음에 든 쪽을 골랐어요.</figcaption></figure>
+      <figure style="margin:0"><img class="px" src="img/hero_motions.webp" alt="서기, 걷기, 달리기, 뛰기, 떨어지기, 칼 치켜들기, 내리베기, 몸 낮추기, 앉기, 절하기, 삿갓 벗고 무릎 꿇기를 하는 나그네" width="2800" height="260" loading="lazy"><figcaption>코드로 옮겨 움직여 보니 달리기, 앉기, 베기가 어색했어요. 그래서 Gemini에 그 그림을 넣고 같은 비율로 24장면을 받아 게임 크기로 줄였어요. 서기, 걷기, 달리기, 뛰기, 칼 치켜들기, 내리베기, 몸 낮추기, 앉기, 절, 쓰러짐까지 같은 나그네예요.</figcaption></figure>
+    </div>
     <p class="note">표지는 ChatGPT와 Gemini에 같은 요청을 넣어 비교했고, 한지색과 먹 대비가 맞는 Gemini를 골랐어요. 멈춤 메뉴·귀록·끝 화면은 아직 코드 그림이고, 바꿀지는 보류예요.</p>
   </section>
 
@@ -399,7 +442,9 @@ footer { margin-top: 100px; font-size: 14.5px; color: var(--ink-2) }
       <li><b>조작 다듬기 (11-11) · 시험 중</b><p>붓 굵기를 직접 골라요: 처음은 굵은 붓, 우클릭하면 얇은 붓, 다시 우클릭하면 굵은 붓. 귀신마다 베면 차는 먹이 달라요(털 1 ~ 먹거머리·돌거북 12, 큰 귀신 40, 가두면 더 많이). 바람은 맵마다 한 방향으로만 불고 잎·안개도 같은 쪽으로 흘러요(서 있으면 버티고 걸을 때만 받아요). 걷는 그림은 덜 촐싹거리게, 화첩 화살표는 붓으로 그린 그림으로 바꿨어요.</p><p class="goal">확인: 얇은·굵은 붓을 상황에 맞게 바꿔 쓰는지.</p></li>
       <li><b>붓 익히기와 보스 점검 (11-11 새벽) · 시험 중</b><p>처음엔 연습 두루마리 '붓 익히기'만 열려요. 구간마다 한 가지씩 배워요: 흐린 선 따라 다리, 뛰기, 달리기, 혼자 다리, 비탈, 베기와 먹 충전, 우클릭 얇은 붓, 얇은 다리는 무너짐, 안개귀 가두기, 지붕으로 돌 막기, 높은 곳 빈 낙관, 큰 귀신. 사계는 장치(번개·장마·바람·눈 등)와 특수 귀신을 빼 단순하게 했어요. 큰 귀신 11종을 공격 봇으로 점검해 너무 쉬운 것을 고쳤어요: 한 획에 한 번만 맞고 1.2초 버티기, 가둔 원은 찢고 나옴, 이무기 매듭은 한 획에 하나, 돌기둥귀는 원으로 못 가둠(껍질을 깨야 함), 설귀는 고드름·얼음 가시로 공격, 달귀·안개산귀·파도귀는 풀려나면 달려듦. 일반 귀신 17종도 점검해 붓털귀·우산귀의 떨림을 없애고, 우산귀는 내리꽂고 도깨비불은 나타나면 달려들게 했어요. 그림자 무사는 1.3초 전 내가 휘두른 칼질까지 따라 해서, 내가 벤 자리에 서 있으면 베여요. 먹귀는 2배 그림을 손으로 다듬어 눈이 또렷해졌어요. 붓 굵기는 커서 옆 먹 견본과 바꿀 때 뜨는 이름으로 보여요. 쓰러질 때는 무릎 꿇고 삿갓이 떨어지며 화면이 다가가요.</p><p class="goal">확인: 처음 하는 사람이 붓 익히기만으로 규칙을 알아채는지.</p></li>
       <li><b>밤샘 다듬기 (11-12) · 시험 중</b><p>세션 둘이 나눠 맡아 평가 → 래퍼런스 → 고치기를 되풀이했어요. 맵마다 기승전결과 손으로 놓은 귀신, 맵마다 다른 먼 그림과 대표 장면(해돋이·달빛 바다·정자), 픽셀로만 연기하는 새 이야기, 픽셀 표지, 사계 초반 난이도 낮추기, 짧은 획 연타보다 긋기가 이득이 되게. 새벽 뒤쪽에는 바다로 기운 해송과 결이 있는 총석정 기둥, 가두면 둘레 귀신이 잠깐 멎는 먹 울림과 2·3장의 가둬야만 하는 안개귀, 같은 무늬가 복사돼 있던 세로 맵 두 장(연사모종·죽서루)을 다시, 비어 있던 맵 날씨 소리(파도·비·바람·강물·폭포·밤 호수), 이야기에 할머니·주모와 중간 단서, 맵 끝에서 만날 사람이 맵 안 표식 곁(매인 배·정자·일주문)에 미리 서 있게. 점수는 <a href="review/">평가 기록</a>에 날짜별로 쌓여요.</p><p class="goal">확인: 사람의 플레이로 봄·여름 초반과 낙산일출 썰물 길.</p></li>
-      <li><b>다음</b><p>소리를 직접 들어 보고 고치기(효과음이 겹쳐 쓰이는 곳), 실제 사람 시험, 스팀 페이지와 데모. 공개는 직접 결정해 주세요.</p><p class="goal">확인: 처음 하는 사람의 소감과 플레이 기록.</p></li>
+      <li><b>화첩 차례와 잘한 보람 (11-15), 시험 중</b><p>처음 걷는 길은 한 폭씩 차례로 열고, 다 그린 폭은 언제든 다시 펼쳐요. 끝 화면에 품계 기준을 한 줄로 보여 주고("쓰인 획 12/20, 다침 2번, 신품은 쓰인 획 14, 다침 1번 이하"), 신품을 받은 폭마다 먹 그릇이 5씩 커져 다음 맵에서 쓸 먹이 늘어요. 노트북 전체 화면에서 칸이 떨리던 것은 한 칸을 화면 픽셀 정수로 맞춰 고쳤어요.</p><p class="goal">확인: 먹 그릇 +5가 손에 느껴지는지, 신품을 노려 다시 하는지.</p></li>
+      <li><b>새 나그네 (11-16), 시험 중</b><p>ChatGPT가 그린 작고 귀여운 나그네로 바꿨어요. 놀이, 이야기, 따라귀와 그림자 무사, 쓰러짐, 물에 빠짐, 화첩, 표지까지 모두 같은 나그네예요. 목도리와 칼은 그림에 들어 있고, 공중이나 달리며 벨 때만 코드가 칼날을 그려요. 회오리귀 낙엽도 배경 단풍과 갈리게 바꿨어요. 대화에서 정한 것들은 <a href="talks/">대화 정리</a>에 모았어요.</p><p class="goal">확인: 직접 해 보고 크기와 움직임 소감. 아래 맵 사진 몇 장은 아직 옛 나그네예요.</p></li>
+      <li><b>다음</b><p>후보: 획을 섞을수록 오르는 기세, 맵마다 잘 그으면 크게 줄어드는 획 지름길, 유물 셋을 모으면 장면에 한 줄 더, 장마다 본 것이 새 붓법, 월송정 뒤 빈 폭에 바다를 직접 그리기. 그리고 소리를 직접 들어 보고 고치기, 실제 사람 시험, 스팀 페이지와 데모. 공개는 직접 결정해 주세요.</p><p class="goal">확인: 처음 하는 사람의 소감과 플레이 기록.</p></li>
     </ol>
   </section>
 
@@ -409,7 +454,7 @@ footer { margin-top: 100px; font-size: 14.5px; color: var(--ink-2) }
     <div class="never"><span>방 진행 로그라이크</span><span>강화 트리</span><span>모양 인식</span><span>긴 이야기 장면</span><span>같은 모양 맵 늘리기</span></div>
   </section>
 
-  <footer>Godot 4 · 소리 Stable Audio 3, Gemini 음악 · 표지·화첩·전환 그림, 귀신·보스·인물 픽셀 그림 Gemini · 글꼴 동해 독도, 연성 (OFL) · 기획·제작 Claude와 함께. 2026.11<br>시장 조사 출처: <a href="https://vaporlens.app/app/1634080/nocturnal">Vaporlens 리뷰 요약</a>, <a href="https://store.steampowered.com/app/577380">Draw The Way</a>, <a href="https://store.steampowered.com/app/418270/Draw_Slasher/">Draw Slasher</a>, <a href="https://store.steampowered.com/app/2473980/Draw">Draw</a>, <a href="https://fingermoon.itch.io/ink-escape">Ink Escape</a>, <a href="https://presskit.gg/field-guides/how-to-build-game-demo">Presskit 데모 안내</a></footer>
+  <footer>Godot 4 · 소리 Stable Audio 3, Gemini 음악 · 표지·화첩·전환 그림, 귀신·보스·인물 픽셀 그림 Gemini · 나그네 ChatGPT 그림, 몸짓 Gemini · 글꼴 동해 독도, 연성 (OFL) · 기획·제작 Claude와 함께. 2026.11<br>시장 조사 출처: <a href="https://vaporlens.app/app/1634080/nocturnal">Vaporlens 리뷰 요약</a>, <a href="https://store.steampowered.com/app/577380">Draw The Way</a>, <a href="https://store.steampowered.com/app/418270/Draw_Slasher/">Draw Slasher</a>, <a href="https://store.steampowered.com/app/2473980/Draw">Draw</a>, <a href="https://fingermoon.itch.io/ink-escape">Ink Escape</a>, <a href="https://presskit.gg/field-guides/how-to-build-game-demo">Presskit 데모 안내</a></footer>
 </main>
 <script>
 const MOBS = [
