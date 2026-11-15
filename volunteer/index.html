@@ -404,6 +404,9 @@ function renderPlan(){
 function renderCal(byDay){
   const cal=$("cal");let h=["월","화","수","목","금","토","일"].map((w,i)=>`<span class="wd${i>4?" we":""}">${w}</span>`).join("");
   const MARK={"11-23":"보고서 1차","12-07":"봉사 끝"};
+  // 첫날 앞 빈칸(월요일 시작)
+  const lead=(dow(ALL[0])+6)%7;
+  for(let i=0;i<lead;i++)h+='<span class="day blank"></span>';
   for(const k of ALL){
     const w=dow(k);const cnt=I.filter(x=>passes(x,true)&&okDays(x).includes(k)).length;
     const mine=byDay[k];const we=w===0||w===6;
@@ -411,8 +414,8 @@ function renderCal(byDay){
     h+=`<button type="button" class="day${we?" we":""}${mine?" has":""}${S.day===k?" on":""}" data-d="${k}"${dis?" disabled":""} aria-pressed="${S.day===k}" aria-label="${fmt(k)} ${WD[w]}요일, 봉사 ${cnt}개${mine?", 담음":""}">
       <span class="n">${k.endsWith("-01")||k===ALL[0]?k.replace("-","."):Number(k.slice(3))}</span><span class="c">${cnt||""}</span>${MARK[k]?`<span class="mk">${MARK[k]}</span>`:""}<span class="bar"></span></button>`;
   }
-  // 12.07(월) 뒤 빈칸
-  for(let i=0;i<6;i++)h+='<span class="day blank"></span>';
+  // 마지막 주 뒤 빈칸
+  for(let i=(lead+ALL.length)%7;i&&i<7;i++)h+='<span class="day blank"></span>';
   cal.innerHTML=h;
 }
 
