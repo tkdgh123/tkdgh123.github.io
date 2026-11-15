@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>일필휘지 달리기 고르기</title>
+<meta name="description" content="나그네가 Shift로 낮게 달리는 모습 세 가지와, 삿갓을 고정한 걷기">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=East+Sea+Dokdo&family=Yeon+Sung&family=Gowun+Dodum&display=swap">
+<style>
+:root { --paper: #EDE7D6; --paper-2: #E2DAC5; --ink: #15151A; --ink-2: #57544F; --seal: #B8211E; --brush: "East Sea Dokdo", "Yeon Sung", serif; --say: "Yeon Sung", "Gowun Dodum", serif; --read: "Gowun Dodum", "Yeon Sung", sans-serif }
+* { box-sizing: border-box }
+html { background: var(--paper); -webkit-text-size-adjust: 100% }
+body { margin: 0; color: var(--ink); background: var(--paper); font: 17px/1.75 var(--read); overflow-x: hidden }
+.back { display: inline-block; margin: 14px max(20px, 4vw) 0; font: 18px var(--say); text-decoration: none; color: inherit }
+main { width: min(1120px, 100% - 40px); margin: 0 auto; padding-bottom: 120px }
+h1 { margin: 40px 0 6px; font: 400 clamp(64px, 11vw, 140px)/.92 var(--brush) }
+.lead { font: clamp(19px, 2.1vw, 24px)/1.5 var(--say); color: var(--ink-2); margin: 0 0 44px; max-width: 32em }
+h2 { font: 400 clamp(46px, 6vw, 72px)/1 var(--brush); margin: 90px 0 18px }
+.row { display: flex; flex-wrap: wrap; gap: 34px 40px }
+figure { margin: 0; flex: 1 1 300px; min-width: 0 }
+canvas { display: block; width: 100%; height: auto; image-rendering: pixelated; background: var(--paper-2) }
+figcaption { padding-top: 10px; font: 17px/1.5 var(--say); color: var(--ink-2) }
+figcaption b { display: block; font: 400 40px/1 var(--brush); color: var(--ink); margin-bottom: 4px }
+figcaption b i { font-style: normal; color: var(--seal) }
+.now { color: var(--seal) }
+.speed { margin: 26px 0 0; font: 17px var(--say); color: var(--ink-2) }
+.speed button { font: 17px var(--say); background: none; border: 0; border-bottom: 2px solid transparent; padding: 2px 6px; cursor: pointer; color: var(--ink-2) }
+.speed button[aria-pressed="true"] { color: var(--ink); border-color: var(--seal) }
+</style>
+</head>
+<body>
+<a class="back" href="../">← 일필휘지</a>
+<main>
+<h1>달리기 고르기</h1>
+<p class="lead">Shift로 달릴 때 나그네가 몸을 낮춰 달리는 모습 세 가지예요. 게임에는 지금 <span class="now">다</span>가 들어 있어요.</p>
+
+<div class="row">
+	<figure><canvas data-set="gemini" data-fps="12" data-run="1"></canvas>
+		<figcaption><b>가</b>Gemini에 서 있는 그림을 넣고 받은 낮은 달리기 4장면. 삿갓이 출렁이지 않게 키를 맞췄어요.</figcaption></figure>
+	<figure><canvas data-set="chatgpt" data-fps="12" data-run="1"></canvas>
+		<figcaption><b>나</b>이 캐릭터를 처음 그린 ChatGPT의 닌자 달리기 4장면. 삿갓을 앞으로 내밀고 팔을 뒤로 뻗었어요.</figcaption></figure>
+	<figure><canvas data-set="code" data-fps="18" data-run="1"></canvas>
+		<figcaption><b><i>다</i></b>엉덩이, 무릎, 발, 뒤로 뻗은 팔, 목도리를 뼈대로 장면마다 다시 그린 6장면. 삿갓과 얼굴은 서 있는 그림 그대로예요.</figcaption></figure>
+</div>
+<p class="speed">빠르기 <button type="button" data-k="1" aria-pressed="true">게임과 같게</button><button type="button" data-k="0.35" aria-pressed="false">느리게</button></p>
+
+<h2>지금까지의 달리기</h2>
+<div class="row">
+	<figure style="max-width:360px"><canvas data-set="low_old" data-fps="16" data-run="1"></canvas>
+		<figcaption>몸을 거의 세운 채 달렸어요.</figcaption></figure>
+</div>
+
+<h2>걷기</h2>
+<div class="row">
+	<figure><canvas data-set="walk_old" data-fps="8" data-run="0.6"></canvas>
+		<figcaption><b>전</b>장면마다 삿갓 높이가 2칸 반 오르내리고 모양도 바뀌었어요.</figcaption></figure>
+	<figure><canvas data-set="walk_new" data-fps="8" data-run="0.6"></canvas>
+		<figcaption><b><i>후</i></b>삿갓은 늘 같은 모양이고, 발을 모을 때만 반 칸 올라가요.</figcaption></figure>
+</div>
+</main>
+<script src="frames.js"></script>
+<script>
+const COLORS = { K: "#121217", D: "#262429", M: "#45424A", R: "#B8211F", Q: "#6E1417", W: "#CCBA9E", S: "#D6D6DB" };
+const DOT = 4; // 반 칸 한 점
+let pace = 1;
+const scenes = [...document.querySelectorAll("canvas")].map(c => {
+	const set = FRAMES[c.dataset.set];
+	const w = 120, h = 58;
+	c.width = w * DOT; c.height = h * DOT;
+	// 미리 장면마다 그려 둔다
+	const pics = set.map(rows => {
+		const p = document.createElement("canvas"); p.width = rows[0].length * DOT; p.height = rows.length * DOT;
+		const x = p.getContext("2d");
+		rows.forEach((r, y) => [...r].forEach((ch, k) => { if (COLORS[ch]) { x.fillStyle = COLORS[ch]; x.fillRect(k * DOT, y * DOT, DOT, DOT); } }));
+		return p;
+	});
+	return { c, x: c.getContext("2d"), pics, w, h, fps: +c.dataset.fps, run: +c.dataset.run, t: Math.random() };
+});
+function ground(s, shift) {
+	const { x, w, h } = s, top = (h - 6) * DOT;
+	x.fillStyle = "#1c1c21"; x.fillRect(0, top, w * DOT, 6 * DOT);
+	x.fillStyle = "#3a3a40";
+	for (let k = -2; k < w / 6 + 2; k++) {
+		const gx = Math.round(((k * 6 * DOT - shift) % (w * DOT) + w * DOT) % (w * DOT));
+		x.fillRect(gx, top, DOT * 2, DOT);
+		x.fillRect((gx + 3 * DOT) % (w * DOT), top + 3 * DOT, DOT, DOT);
+	}
+}
+let last = performance.now();
+function tick(now) {
+	const dt = Math.min((now - last) / 1000, 0.1) * pace; last = now;
+	for (const s of scenes) {
+		s.t += dt;
+		s.x.fillStyle = "#E2DAC5"; s.x.fillRect(0, 0, s.c.width, s.c.height);
+		ground(s, s.t * 92 * 2 * DOT * s.run * 0.5);
+		const pic = s.pics[Math.floor(s.t * s.fps) % s.pics.length];
+		const left = Math.round((s.w * DOT - pic.width) / 2 / DOT) * DOT;
+		s.x.drawImage(pic, left, (s.h - 6) * DOT - pic.height);
+	}
+	requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+document.querySelectorAll(".speed button").forEach(b => b.addEventListener("click", () => {
+	pace = +b.dataset.k;
+	document.querySelectorAll(".speed button").forEach(o => o.setAttribute("aria-pressed", String(o === b)));
+}));
+</script>
+<script src="../../hub/back.js" data-cat="game" defer></script>
+</body>
+</html>
