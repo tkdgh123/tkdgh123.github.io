@@ -500,7 +500,7 @@ function showMine(id) {
         <header class="title"><div><h1>내 일로 연습</h1><p>Claude에게 보내려던 말을 그대로 넣어요. 보내기 전에 결과를 미리 보고, 고친 말과 나란히 견줘요.</p></div></header>
         <section class="panel put1">
           <textarea id="mineIn" aria-label="Claude에게 보내려던 말" placeholder="예: 우리 동아리 홍보 포스터 문구 써 줘">${esc(store.get("pp:mineDraft") || "")}</textarea>
-          <div class="tools"><span class="note">보낸 말은 채점하는 Claude(${aiName()})에게만 가요</span><button class="btn primary send" id="mineGo"${noAI || mineBusy ? " disabled" : ""}>결과 미리 보기</button></div>
+          <div class="tools">${noAI ? "" : `<span class="note">넣은 말은 ${aiName()}에게만 가요</span>`}<button class="btn primary send" id="mineGo"${noAI || mineBusy ? " disabled" : ""}>결과 미리 보기</button></div>
           ${noAI ? need : ""}${wait()}<p class="err" hidden></p>
         </section>
         ${list.length ? `<section class="panel"><h2>지난 내 일</h2><table class="list"><tbody>${list.map(x => `
