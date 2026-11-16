@@ -401,6 +401,93 @@ th.num, td.num { text-align: right; padding-right: 0; padding-left: 12px; white-
 .gap input:focus { outline: 2px solid var(--hue); outline-offset: 1px; }
 .edit textarea { min-height: 110px; }
 
+/* ── 첫 화면 세 입구, 점수 막대 ── */
+.doors { grid-template-columns: 1.2fr 1fr 1fr; }
+.list td.score { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
+.list .bar { display: inline-block; width: 88px; height: 6px; border-radius: 3px; background: var(--active); overflow: hidden; }
+.list .bar i { display: block; height: 100%; background: var(--hue); border-radius: 3px; }
+.list td.score.full { color: var(--hue); }
+
+/* ── 짧은 판: 자료 없이 대화만 ── */
+.work.solo { grid-template-columns: minmax(0, 760px); justify-content: center; }
+.turn.before { padding: 14px; margin-bottom: 22px; border: 1px dashed var(--control); border-radius: var(--radius-card); }
+.turn.before > .lab { font-size: 12px; color: var(--muted); }
+.turn.before .res .rep { margin: 2px 0 8px; padding-left: 10px; border-left: 2px solid var(--border); }
+.turn.before .res .rep b { display: block; font-size: 12px; font-weight: 500; color: var(--muted); }
+.turn.before .res ul { margin: 0; padding-left: 18px; }
+
+/* ── 기다리는 동안 원칙 하나 ── */
+.wtip { margin-top: 10px; padding: 10px 12px; background: var(--raised); border-radius: var(--radius-control); font-size: 14px; animation: rise .4s ease-out; }
+.wtip span { display: block; font-size: 12px; color: var(--muted); }
+.wtip b { display: block; font-weight: 500; margin-bottom: 4px; }
+.wtip .msg { margin: 0 0 4px; padding-left: 10px; border-left: 2px solid var(--hue); }
+.wtip a { font-size: 13px; color: var(--hue); }
+
+/* ── 실제 화면 미리 보기 ── */
+.pv { margin-top: 10px; height: 340px; border: 1px solid var(--border); border-radius: var(--radius-control); overflow: hidden; background: #fff; }
+.pv iframe { width: 100%; height: 100%; border: 0; display: block; }
+.res .exb, .mine .exb { margin-top: 8px; height: 32px; font-size: 13px; }
+.pvwait { margin: 10px 0 0; padding: 10px 12px; border-radius: var(--radius-control); background: var(--raised); color: var(--muted); font-size: 13px; }
+.pvwait::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 8px; border-radius: 50%; background: var(--hue); animation: blink 1s steps(2) infinite; }
+
+/* ── 채점: 점수와 고친 말을 위에, 나머지는 접기 ── */
+.hero { display: grid; grid-template-columns: auto 1fr; gap: 8px 36px; align-items: center; }
+.hero .score { display: flex; align-items: baseline; gap: 6px; }
+.hero .score b { font-size: 56px; font-weight: 700; line-height: 1; color: var(--hue); }
+.hero .score span { font-size: 17px; color: var(--muted); }
+.hero p { margin: 0; font-size: 16px; }
+.hero .meta { margin-top: 6px; font-size: 13px; color: var(--muted); }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+.chips span { padding: 2px 10px; border-radius: 4px; background: var(--active); font-size: 13px; font-weight: 500; animation: rise .5s ease-out both; }
+.chips span.up { background: var(--hue-soft); color: var(--hue); }
+.chips span:nth-child(2) { animation-delay: .1s; } .chips span:nth-child(3) { animation-delay: .2s; }
+.nextup h2 { margin-bottom: 4px; }
+.nextup .fine { margin: 0 0 10px; }
+.bettermsg { padding: 14px 16px; background: var(--raised); border-left: 3px solid var(--hue); border-radius: 0 var(--radius-control) var(--radius-control) 0; font-size: 15px; }
+.lost { margin: 14px 0 0; font-size: 14px; color: var(--muted); }
+.lost b { color: var(--text); font-weight: 500; }
+.lost a, .tipl { color: var(--hue); }
+.tipl { display: inline-block; margin-top: 4px; font-size: 13px; }
+details.sect { padding: 0; }
+details.sect > summary { display: flex; align-items: baseline; gap: 12px; padding: 16px 24px; cursor: pointer; list-style: none; }
+details.sect > summary::-webkit-details-marker { display: none; }
+details.sect > summary::after { content: "펼치기"; margin-left: auto; font-size: 13px; color: var(--muted); }
+details.sect[open] > summary::after { content: "접기"; }
+details.sect > summary h2 { margin: 0; }
+details.sect > summary span { font-size: 14px; color: var(--muted); }
+details.sect > summary:hover { background: var(--raised); border-radius: var(--radius-card); }
+details.sect > :not(summary) { margin: 0 24px 20px; }
+
+/* ── 잘 쓰는 법 ── */
+.gnav { display: flex; gap: 8px; flex-wrap: wrap; }
+.gnav a { display: inline-flex; gap: 8px; align-items: baseline; padding: 6px 14px; border-radius: var(--radius-control); background: var(--surface); border: 1px solid var(--border); text-decoration: none; font-weight: 500; }
+.gnav a b { font-size: 13px; color: var(--muted); font-weight: 400; }
+.tips h2 { font-size: 13px; color: var(--muted); font-weight: 500; margin-bottom: 4px; }
+.tip { padding: 20px 0; border-top: 1px solid var(--rule); scroll-margin-top: 64px; }
+.tip:first-of-type { border-top: 0; padding-top: 8px; }
+.tip.on h3 { color: var(--hue); }
+.tip h3 { margin: 0 0 6px; font-size: 19px; font-weight: 500; }
+.tip .tw { margin: 0 0 12px; max-width: 48em; color: var(--muted); }
+.pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+.ba { padding: 12px 14px; border-radius: var(--radius-control); background: var(--raised); }
+.ba span { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+.ba p { margin: 0; font-size: 14px; }
+.ba.good { background: var(--hue-soft); }
+.ba.good span { color: var(--hue); font-weight: 500; }
+.tip .src { margin-top: 10px; }
+.tip .src a { color: var(--muted); }
+.tip .tp { display: block; margin-top: 2px; }
+.tip .tp a { color: var(--hue); }
+
+/* ── 내 일: 먼저 찾아보기 ── */
+.note-in { min-height: 80px !important; }
+.mynote { margin: 0 0 14px; padding: 10px 12px; border-radius: var(--radius-control); background: var(--raised); font-size: 14px; }
+.mynote b { display: block; font-size: 12px; font-weight: 500; color: var(--muted); }
+.mwait { padding: 14px 18px; }
+.put1 .mwait { border: 0; padding: 0; margin-top: 12px; }
+.mwait .wait { margin: 0; }
+.mwait .wait span::after { content: ""; }
+
 /* ── 휴대폰·좁은 창 ── */
 @media (max-width: 1100px) {
   #app { display: block; height: auto; }
@@ -420,6 +507,8 @@ th.num, td.num { text-align: right; padding-right: 0; padding-left: 12px; white-
   .thread { max-height: none; overflow: visible; }
   .cap { grid-template-columns: 1fr; }
   .cap p { min-height: 0; }
+  .doors { grid-template-columns: 1fr 1fr; }
+  .mine-door { grid-column: 1 / -1; }
 }
 @media (max-width: 640px) {
   .title h1 { font-size: 22px; }
@@ -432,6 +521,13 @@ th.num, td.num { text-align: right; padding-right: 0; padding-left: 12px; white-
   .sum { grid-template-columns: 1fr; }
   .back { grid-template-columns: 1fr; gap: 12px; }
   .doors { grid-template-columns: 1fr; }
+  .hero { grid-template-columns: 1fr; }
+  .hero .score b { font-size: 46px; }
+  .pair { grid-template-columns: 1fr; }
+  details.sect > summary { padding: 14px 16px; flex-wrap: wrap; }
+  details.sect > :not(summary) { margin: 0 16px 16px; }
+  .list .bar { width: 48px; }
+  .pv { height: 300px; }
   .door { padding: 20px; }
   .vs .cols { grid-template-columns: 1fr; }
   .vs .col { padding: 0; }
@@ -455,3 +551,4 @@ th.num, td.num { text-align: right; padding-right: 0; padding-left: 12px; white-
 .steps { margin: 0; padding-left: 20px; max-width: 46em; }
 .steps li { margin: 6px 0; }
 .story .list td:first-child { font-weight: 500; width: 34%; }
+.vs .said p { margin: 0; }

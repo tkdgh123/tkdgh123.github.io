@@ -379,20 +379,36 @@ function cleanExample(d, t) {
   if (!files.length) throw new Error("예시 결과를 받지 못했어요. 다시 눌러 주세요.");
   return { say: t.reply || "", files };
 }
-async function openExample(p, a, k, btn) {
-  const t = a.turns[k];
-  if (!t.example) {
-    if (!AI.kind || btn.disabled) return;
-    btn.disabled = true;
-    const t0 = Date.now(), tick = setInterval(() => btn.textContent = `예시 만드는 중 ${Math.round((Date.now() - t0) / 1000)}초`, 1000);
-    try {
-      t.example = cleanExample(await ask(await examplePrompt(p, a.turns.slice(0, k + 1)), EXAMPLE_SCHEMA), t);
-      saveAttempt(p, a);
-    } catch (e) { btn.textContent = "예시를 만들지 못했어요 · 다시"; btn.title = e.message; return; }
-    finally { clearInterval(tick); btn.disabled = false; }
-    btn.textContent = "예시 결과 보기";
-  }
-  const ex = t.example;
+// 예시 결과 만들기. 웹 페이지 문제(p.preview)는 결과 예상이 오면 바로 시작해 결과 칸 안에 실제 화면을 띄운다
+const exJobs = {}; // 만드는 중: "문제:번째" → 시작 시각
+async function makeExample(p, a, k, redraw) {
+  const key = p.id + ":" + k, t = a.turns[k];
+  if (!t || t.example || exJobs[key] || !AI.kind) return;
+  exJobs[key] = Date.now(); delete t.exampleError; redraw();
+  try { t.example = cleanExample(await ask(await examplePrompt(p, a.turns.slice(0, k + 1)), EXAMPLE_SCHEMA), t); }
+  catch (e) { t.exampleError = e.message; }
+  delete exJobs[key]; saveAttempt(p, a); redraw();
+}
+const pageOf = t => t.example?.files.find(f => f.kind === "page");
+function exBlock(p, t, k) {
+  if (t.example) return `${pageOf(t) ? `<div class="pv"><iframe sandbox="allow-scripts allow-forms" title="예시 결과 ${k + 1}" data-pv="${k}"></iframe></div>` : ""}<button class="btn exb" data-k="${k}">${pageOf(t) ? "크게 보기" : "예시 결과 보기"}</button>`;
+  const t0 = exJobs[p.id + ":" + k];
+  if (t0) return `<p class="pvwait">${p.preview ? "실제 화면" : "예시 결과"} 만드는 중 <span data-t0="${t0}"></span></p>`;
+  if (!AI.kind) return "";
+  return `${t.exampleError ? `<p class="err">${esc(t.exampleError)}</p>` : ""}<button class="btn exb" data-k="${k}">${p.preview ? "실제 화면 만들기" : "예시 결과 만들기"}</button>`;
+}
+// exBlock을 그린 뒤: 미리 보기 틀 채우기, 단추 잇기
+function wireEx(root, p, a, redraw) {
+  $$("iframe[data-pv]", root).forEach(f => f.srcdoc = withMemStore(pageOf(a.turns[+f.dataset.pv]).content));
+  $$(".exb", root).forEach(b => b.onclick = () => {
+    const k = +b.dataset.k;
+    a.turns[k].example ? openExample(a, k) : makeExample(p, a, k, redraw);
+  });
+}
+setInterval(() => $$("[data-t0]").forEach(e => e.textContent = `${Math.round((Date.now() - e.dataset.t0) / 1000)}초`), 1000);
+
+function openExample(a, k) {
+  const t = a.turns[k], ex = t.example;
   const dlg = $("#ex") || document.body.appendChild(Object.assign(document.createElement("dialog"), { id: "ex" }));
   dlg.innerHTML = `
     <div class="exh"><div><b>예시 결과 ${k + 1}</b><span>결과 예상에 맞춰 Claude가 한 번 만들어 본 것이에요. 점수는 결과 예상으로 매겨요.</span></div><button class="btn">닫기</button></div>
@@ -414,7 +430,6 @@ async function openExample(p, a, k, btn) {
 // 예시 페이지는 따로 가둔 틀에서 열려 브라우저 저장소를 못 쓴다. 저장하는 앱도 돌아가게 메모리 저장소를 먼저 끼운다
 const MEM_STORE = `<script>(function(){var m={},s={getItem:function(k){return k in m?m[k]:null},setItem:function(k,v){m[k]=String(v)},removeItem:function(k){delete m[k]},clear:function(){m={}},key:function(i){return Object.keys(m)[i]||null},get length(){return Object.keys(m).length}};try{localStorage.getItem("x")}catch(e){Object.defineProperty(window,"localStorage",{configurable:true,value:s});Object.defineProperty(window,"sessionStorage",{configurable:true,value:s})}})()<\/script>`;
 const withMemStore = html => /<head[^>]*>/i.test(html) ? html.replace(/<head[^>]*>/i, m => m + MEM_STORE) : MEM_STORE + html;
-const exButton = (t, k) => t.example || AI.kind ? `<button class="btn ghost exb" data-k="${k}">${t.example ? "예시 결과 보기" : "예시 결과 만들기"}</button>` : "";
 
 /* ── 내 일로 연습 ──
    학습자가 실제로 맡기려던 말을 넣으면: 그 말로 나올 결과 + Claude가 짐작으로 채운 곳(질문).
@@ -492,7 +507,7 @@ function showMine(id) {
   const m = id && mines().find(x => x.id === id);
   const noAI = !AI.kind;
   const need = `<p class="fine">이 연습은 Claude가 결과를 예상해야 해요. ${ARTIFACT_URL && !B ? `<a href="${ARTIFACT_URL}" target="_blank" rel="noopener">claude.ai에서 열거나</a> ` : ""}${CAN_KEY ? `<a href="#">첫 화면</a> 아래에서 API 키를 넣어 주세요.` : "Claude 사용을 허락해 주세요."}</p>`;
-  const wait = () => mineBusy && mineBusy.id === (m?.id || "") ? `<p class="wait">결과 예상하는 중 <span class="sec">${Math.round((Date.now() - mineBusy.t0) / 1000)}초</span></p>` : "";
+  const wait = () => mineBusy && mineBusy.id === (m?.id || "") ? `<div class="panel mwait"><p class="wait">결과 예상하는 중 <span data-t0="${mineBusy.t0}"></span></p>${waitTip(null, Math.floor(mineBusy.t0 / 1000))}</div>` : "";
   if (!m) {
     const list = mines();
     $("#main").innerHTML = `
@@ -503,7 +518,7 @@ function showMine(id) {
           <div class="tools">${noAI ? "" : `<span class="note">넣은 말은 ${aiName()}에게만 가요</span>`}<button class="btn primary send" id="mineGo"${noAI || mineBusy ? " disabled" : ""}>결과 미리 보기</button></div>
           ${noAI ? need : ""}${wait()}<p class="err" hidden></p>
         </section>
-        ${list.length ? `<section class="panel"><h2>지난 내 일</h2><table class="list"><tbody>${list.map(x => `
+        ${list.length ? `<section class="panel"><h2>지난 내 일</h2>${list.length > 1 ? `<p class="trail">처음 말에서 Claude가 짐작으로 채운 곳 <span class="num">${list.slice(0, 8).reverse().map(x => x.rounds[0].gaps.length).join(" → ")}</span>개 <span class="sub">(줄수록 처음부터 잘 전한 거예요)</span></p>` : ""}<table class="list"><tbody>${list.map(x => `
           <tr data-id="${x.id}" tabindex="0"><td><a href="#/mine/${x.id}">${esc(x.rounds[0].msg.split("\n")[0].slice(0, 60))}</a></td>
             <td class="num">${x.rounds.length > 1 ? `고친 말 ${x.rounds.length - 1}번` : "처음 말만"}</td>
             <td class="num hide-s">${new Date(x.at).toLocaleDateString("ko-KR", { month: "numeric", day: "numeric" })}</td></tr>`).join("")}</tbody></table></section>` : ""}
@@ -531,14 +546,19 @@ function showMine(id) {
   const R = m.rounds, first = R[0], now = R[R.length - 1], two = R.length > 1;
   const firstLines = new Set(first.result);
   const more = R.length < MINE_ROUNDS;
-  const gapsHTML = now.gaps.length ? `
+  const findHTML = `
+      <h2>먼저 찾아보세요</h2>
+      <p class="fine">결과를 보니 내 뜻과 다른 곳이 있나요? Claude가 짐작으로 채운 곳을 보기 전에 먼저 적어 보면, 다음엔 처음부터 챙기게 돼요.</p>
+      <textarea id="noteIn" class="note-in" aria-label="내가 먼저 찾은 곳" placeholder="예: 날짜와 장소가 빈칸이야, 말투가 너무 딱딱해">${esc(now.noted || "")}</textarea>
+      <div class="tools"><button class="btn primary" id="reveal">Claude가 짐작한 곳 보기</button></div>`;
+  const gapsHTML = !now.revealed ? findHTML : (now.noted ? `<p class="mynote"><b>내가 먼저 찾은 것</b>${esc(now.noted)}</p>` : "") + (now.gaps.length ? `
       <h2>Claude가 짐작으로 채운 곳</h2>
       <p class="fine">맞으면 비워 두고, 다르면 내 뜻을 짧게 적어요.</p>
       <div class="gaps">${now.gaps.map((g, i) => `
         <label class="gap"><b>${esc(g.q)}</b><span>말 안 하면: ${esc(g.guess)}</span>
           <input data-i="${i}" value="${esc(g.ans)}" placeholder="비워 두면 짐작대로" autocomplete="off"></label>`).join("")}</div>
       <div class="tools"><button class="btn primary" id="fill"${noAI || mineBusy ? " disabled" : ""}>답을 넣어 고친 말 만들기</button></div>`
-    : `<h2>짐작으로 채운 곳</h2><p class="fine">크게 어긋날 만한 곳이 더 없어요. 아래에서 직접 고쳐 볼 수 있어요.</p>`;
+    : `<h2>짐작으로 채운 곳</h2><p class="fine">크게 어긋날 만한 곳이 더 없어요. 아래에서 직접 고쳐 볼 수 있어요.</p>`);
   $("#main").innerHTML = `
     <div class="canvas task">
       <header class="title"><div><div class="kind">내 일로 연습</div><h1>${esc(first.msg.split("\n")[0].slice(0, 40))}</h1></div>
@@ -571,6 +591,8 @@ function showMine(id) {
       ${noAI ? need : ""}
     </div>`;
   $$(".gap input").forEach(inp => inp.oninput = () => { now.gaps[+inp.dataset.i].ans = inp.value; saveMine(m); });
+  $("#noteIn")?.addEventListener("input", e => { now.noted = e.target.value; saveMine(m); });
+  $("#reveal")?.addEventListener("click", () => { now.noted = $("#noteIn").value.trim(); now.revealed = true; saveMine(m); route(); });
   $("#fill")?.addEventListener("click", () => {
     if (!now.gaps.some(g => g.ans.trim())) { const e = $(".err"); e.textContent = "하나라도 답을 적어야 고친 말이 달라져요."; e.hidden = false; return $(".gap input")?.focus(); }
     runMine(m.id, async () => { m.rounds.push(await mineRound("fill", now)); saveMine(m); return m.id; });
@@ -590,10 +612,9 @@ function showMine(id) {
 async function runMine(id, job) {
   mineBusy = { id, t0: Date.now() };
   route();
-  const tick = setInterval(() => { const s = $(".sec"); if (s) s.textContent = `${Math.round((Date.now() - mineBusy.t0) / 1000)}초`; }, 1000);
   let err = "", to = id;
   try { to = await job(); } catch (e) { err = e.message; }
-  clearInterval(tick); mineBusy = null;
+  mineBusy = null;
   const here = location.hash.slice(2), want = to ? "mine/" + to : "mine";
   if (here !== want && (here === "mine" || here === "mine/" + id)) location.hash = "#/" + want; else route();
   if (err) { const e = $(".err"); if (e) { e.textContent = err; e.hidden = false; } }
@@ -649,6 +670,7 @@ function route() {
   if (h === "about") return showAbout();
   if (h === "story") return showStory();
   if (h === "mine" || h.startsWith("mine/")) return showMine(h.slice(5));
+  if (h === "guide" || h.startsWith("guide/")) return showGuide(h.slice(6));
   const p = P.find(x => x.id === h);
   p ? showProblem(p) : showHome();
   $("#main").scrollTop = 0;
@@ -676,16 +698,13 @@ function drawSide() {
     <button class="unfold" aria-label="메뉴 펴기" title="메뉴 펴기">${sideIcon}</button>
     <nav class="nav">
       <div class="top"><a class="brand" href="#">프롬프트 연습</a><button class="fold" aria-label="메뉴 접기" title="메뉴 접기">${sideIcon}</button></div>
-      <a class="row${cur === "" ? " on" : ""}" href="#">처음</a>
+      <a class="row${cur === "" || P.some(p => p.id === cur) ? " on" : ""}" href="#">연습</a>
       <a class="row${cur.startsWith("mine") ? " on" : ""}" href="#/mine">내 일로 연습</a>
+      <a class="row${cur.startsWith("guide") ? " on" : ""}" href="#/guide">잘 쓰는 법</a>
       <a class="row${cur === "tutorial" ? " on" : ""}" href="#/tutorial">하는 법</a>
+      <div class="group">이 프로그램</div>
       <a class="row${cur === "story" ? " on" : ""}" href="#/story">만든 이야기</a>
       <a class="row${cur === "about" ? " on" : ""}" href="#/about">이용 안내</a>
-      <div class="group">문제</div>
-      ${P.map(p => {
-        const best = store.get("pp:best:" + p.id);
-        return `<a class="row${cur === p.id ? " on" : ""}" href="#/${p.id}"><span>${esc(p.title)}</span><b class="num${best == null ? " none" : ""}">${best ?? "–"}</b></a>`;
-      }).join("")}
       <div class="who"><span class="dot ${AI.kind || "self"}"></span>채점: ${aiName()}</div>
     </nav>`;
   const side = $(".side"), btn = $(".menu", side);
@@ -700,7 +719,8 @@ const CONSIST = [{"title": "스터디카페 좌석 예약", "model": [100, 100, 
 function showStory() {
   document.title = "만든 이야기 — 프롬프트 연습";
   drawSide();
-  const rows = CONSIST.map(c => `<tr><td>${esc(c.title)}</td><td class="num">${c.model.join(" · ")}</td><td class="num">${c.vague.join(" · ")}</td><td class="num hide-s${c.paste ? "" : " none"}">${c.paste ? c.paste.join(" · ") : "–"}</td><td class="num hide-s">${c.twin ? c.twin.join(" · ") : "–"}</td></tr>`).join("");
+  const quick = P.filter(p => p.consist).map(p => ({ title: `짧은 판: ${p.title}`, ...p.consist }));
+  const rows = [...CONSIST, ...quick].map(c => `<tr><td>${esc(c.title)}</td><td class="num">${c.model.join(" · ")}</td><td class="num">${c.vague.join(" · ")}</td><td class="num hide-s${c.paste ? "" : " none"}">${c.paste ? c.paste.join(" · ") : "–"}</td><td class="num hide-s${c.twin ? "" : " none"}">${c.twin ? c.twin.join(" · ") : "–"}</td></tr>`).join("");
   $("#main").innerHTML = `
     <div class="canvas about story">
       <header class="title"><div><p class="kind">만든 이야기</p><h1>AI에게 일을 맡기는 말, 어떻게 연습시킬까</h1>
@@ -729,17 +749,52 @@ function showStory() {
       <section class="panel"><h2>채점을 믿을 수 있나</h2>
         <p>같은 말을 5번씩 채점해 봤어요. 모범 답안은 높게, 막연한 한 줄은 낮게, 상황과 자료를 통째로 붙여넣기만 한 말은 그 사이에 와야 하고, 판마다 크게 흔들리지 않아야 해요.</p>
         <table class="list"><thead><tr><th>문제</th><th class="num">모범 답안 5판</th><th class="num">막연한 한 줄 5판</th><th class="num hide-s">통째로 붙여넣기 5판</th><th class="num hide-s">쌍둥이 문제 모범 5판</th></tr></thead><tbody>${rows}</tbody></table>
-        <p class="fine">2026년 11월 15일 저녁(채점 글을 고친 뒤), 만든 사람 노트북의 Claude(Sonnet)로 문제마다 같은 말을 5번씩 채점했어요. 모범 답안 50판 중 49판이 100점(한 판 95점), 막연한 한 줄은 0~28점, 통째로 붙여넣기(상황 설명과 자료를 붙이고 “이대로 해 줘”)는 14~59점이었어요. 다시 풀 때 나오는 쌍둥이 문제도 모범 답안 50판이 모두 100점, 막연한 한 줄은 0~28점이었어요. 스터디카페는 찍은 사진 5장에 한마디씩 달고 견주게 하면 100점, 동작을 모두 글로 적으면 80점, 사진만 붙이면 62~66점이었어요. 내 API 키(Opus 5.5)·내 Claude 계정으로 채점하면 숫자가 조금 다를 수 있어요.</p></section>
+        <p class="fine">2026년 11월 15일 저녁(채점 글을 고친 뒤), 만든 사람 노트북의 Claude(Sonnet)로 문제마다 같은 말을 5번씩 채점했어요. 모범 답안 50판 중 49판이 100점(한 판 95점), 막연한 한 줄은 0~28점, 통째로 붙여넣기(상황 설명과 자료를 붙이고 “이대로 해 줘”)는 14~59점이었어요. 다시 풀 때 나오는 쌍둥이 문제도 모범 답안 50판이 모두 100점, 막연한 한 줄은 0~28점이었어요. 스터디카페는 찍은 사진 5장에 한마디씩 달고 견주게 하면 100점, 동작을 모두 글로 적으면 80점, 사진만 붙이면 62~66점이었어요. 11월 16일에 더한 짧은 판 6개는 모범 답안 30판이 모두 100점, 지난번에 보낸 말은 0~30점이었어요(표에서 '막연한 한 줄' 칸). 내 API 키(Opus 5.5)나 내 Claude 계정으로 채점하면 숫자가 조금 다를 수 있어요.</p></section>
       <section class="panel"><h2>한계</h2>
         <ul class="steps">
           <li>결과는 예상이에요. 실제 Claude가 그대로 만든다는 보장은 없어요.</li>
           <li>AI가 채점해서 같은 말도 판마다 몇 점씩 다를 수 있어요.</li>
-          <li>문제는 10개예요. 대학생·취준생이 자주 맡기는 일 위주예요.</li>
+          <li>긴 문제 10개와 짧은 판 6개예요. 대학생과 취준생이 자주 맡기는 일 위주예요.</li>
           <li id="cnt">써 본 사람은 판 수로만 세요. 익명이라 누구나 늘릴 수 있는 숫자예요.</li>
         </ul>
         <p class="fine">학습 효과·채점 신뢰도·시장을 직접 시험한 기록: <a href="${SITE}review/" target="_blank" rel="noopener">프롬프트 연습 평가</a></p></section>
     </div>`;
   doneCount().then(n => { const el = $("#cnt"); if (el && n != null) el.textContent = `지금까지 채점까지 간 판: ${n}번 (2026년 11월부터, 문제 번호만 익명으로 셈. 누구나 늘릴 수 있는 숫자예요)`; });
+}
+
+/* ── 잘 쓰는 법 ── 원칙마다 이렇게 보내면 → 이렇게 쓰면 더 좋아요, 연습해 볼 문제 */
+const tipProblems = id => P.filter(p => p.tip === id || p.items.some(it => it.tip === id));
+function tipCard(t) {
+  const ps = tipProblems(t.id);
+  return `<article class="tip" id="t-${t.id}">
+      <h3>${esc(t.h)}</h3>
+      <p class="tw">${esc(t.why)}</p>
+      <div class="pair">
+        <div class="ba"><span>이렇게 보내면</span><p class="msg">${esc(t.bad)}</p></div>
+        <div class="ba good"><span>이렇게 쓰면 더 좋아요</span><p class="msg">${esc(t.good)}</p></div>
+      </div>
+      <p class="fine src">${t.src.map(k => GUIDE_SRC[k].url ? `<a href="${GUIDE_SRC[k].url}" target="_blank" rel="noopener">${esc(GUIDE_SRC[k].name)}</a>` : esc(GUIDE_SRC[k].name)).join(", ")}${ps.length ? `<span class="tp">연습해 보기: ${ps.map(p => `<a href="#/${p.id}">${esc(p.title)}</a>`).join(", ")}</span>` : ""}</p>
+    </article>`;
+}
+function showGuide(id) {
+  document.title = "잘 쓰는 법 · 프롬프트 연습";
+  drawSide();
+  $("#main").innerHTML = `
+    <div class="canvas guide">
+      <header class="title"><div><h1>잘 쓰는 법</h1><p>Claude에게 일을 맡길 때 이렇게 써 주면 결과가 더 좋아요. Anthropic 공식 가이드, 인스타에서 배운 것, 이 연습의 채점 기록에서 골랐어요.</p></div></header>
+      <nav class="gnav">${TIP_GROUPS.map(([g, name]) => `<a href="#/guide/${TIPS.find(t => t.g === g).id}">${name}<b class="num">${TIPS.filter(t => t.g === g).length}</b></a>`).join("")}</nav>
+      ${TIP_GROUPS.map(([g, name]) => `<section class="panel tips"><h2>${name}</h2>${TIPS.filter(t => t.g === g).map(tipCard).join("")}</section>`).join("")}
+    </div>`;
+  const el = id && $("#t-" + id);
+  if (el) { el.scrollIntoView({ block: "start" }); el.classList.add("on"); }
+  else $("#main").scrollTop = 0;
+}
+// 기다리는 동안 보여 줄 원칙 하나: 이 문제와 이어진 원칙 중에서 돌아가며
+function waitTip(p, n) {
+  const ids = [...new Set([p?.tip, ...(p?.items || []).map(it => it.tip)].filter(Boolean))]; // 짧은 판은 그 판의 원칙부터
+  const pool = ids.length ? ids.map(tipOf) : TIPS;
+  const t = pool[(n || 0) % pool.length];
+  return `<div class="wtip"><span>기다리는 동안</span><b>${esc(t.h)}</b><p class="msg">${esc(t.good)}</p><a href="#/guide/${t.id}">잘 쓰는 법에서 보기</a></div>`;
 }
 
 function showAbout() {
@@ -768,43 +823,49 @@ function showHome() {
   document.title = "프롬프트 연습";
   drawSide();
   const rows = P.map(p => ({ p, best: store.get("pp:best:" + p.id), a: attempt(p) }));
+  const quick = rows.filter(r => r.p.quick), long = rows.filter(r => !r.p.quick);
   const done = rows.filter(r => r.best != null);
   const avg = done.length ? Math.round(done.reduce((s, r) => s + r.best, 0) / done.length) : null;
   const grown = rows.map(r => hist(r.p)).filter(h => h.length > 1).map(h => Math.max(...h.map(x => x.s)) - h[0].s);
   const gain = grown.length ? Math.round(grown.reduce((a, b) => a + b, 0) / grown.length) : null;
-  const next = rows.find(r => r.best == null) || rows[0];
+  const nextOf = list => list.find(r => r.best == null) || list[0];
+  const nq = nextOf(quick), nl = nextOf(long);
   const seen = store.get("pp:tut");
+  const doneOf = list => list.filter(r => r.best != null).length;
+  // 문제 목록: 최고 점수를 막대로
+  const table = list => `<table class="list">
+      <thead><tr><th>문제</th><th class="hide-s">배우는 것</th><th class="num">최고 점수</th></tr></thead>
+      <tbody>${list.map(({ p, best, a }) => `
+        <tr data-id="${p.id}" tabindex="0"><td><a href="#/${p.id}">${esc(p.title)}</a>${a.turns.length && !a.graded ? `<span class="pill">푸는 중</span>` : ""}<div class="sub show-s">${esc(p.type)}</div></td>
+          <td class="hide-s sub">${esc(p.type)}</td>
+          <td class="num score${best == null ? " none" : best === 100 ? " full" : ""}"><span class="bar"><i style="width:${best ?? 0}%"></i></span>${best ?? "–"}</td></tr>`).join("")}</tbody>
+    </table>`;
   $("#main").innerHTML = `
     <div class="canvas home">
       <header class="title">
         <div><h1>프롬프트 연습</h1>
           <p>Claude에게 일을 맡기는 말을 써 보고, 그 말로 나올 결과를 보내기 전에 미리 봐요.</p></div>
-        <div class="acts"><a class="btn ghost" href="#/tutorial">하는 법</a></div>
+        <div class="acts"><a class="btn ghost" href="#/guide">잘 쓰는 법</a><a class="btn ghost" href="#/tutorial">하는 법</a></div>
       </header>
       <div class="doors">
         <a class="door mine-door" href="#/mine">
           <span class="dk">내 일로</span>
           <b>지금 시키려던 말을 넣어 보세요</b>
-          <p>이대로 보내면 나올 결과와 Claude가 짐작으로 채울 곳을 보여 줘요. 답하면 고친 말의 결과가 옆에 나란히 나와요.</p>
+          <p>보내기 전에 결과를 미리 보고, 내 뜻과 다른 곳을 찾아 고친 말과 나란히 견줘요.</p>
           <span class="go">${mines().length ? `지난 일 ${mines().length}개, 새로 넣기` : "넣어 보기"}</span></a>
-        <a class="door" href="${seen ? `#/${next.p.id}` : "#/tutorial"}">
-          <span class="dk">문제로</span>
-          <b>${done.length ? `${P.length}문제 중 ${done.length}개 풀었어요` : `숨은 사정이 있는 ${P.length}문제`}</b>
-          <p>나만 아는 사정을 Claude에게 전해 100점 만점으로 채점받아요. 막연한 한 줄로 보냈을 때와 결과를 나란히 견줘요.</p>
-          <span class="go">${!seen ? "하는 법부터 보기" : done.length ? `이어서: ${esc(next.p.title)}` : `첫 문제: ${esc(next.p.title)}`}</span></a>
+        <a class="door" href="#/${nq.p.id}">
+          <span class="dk">짧은 판, 1분</span>
+          <b>엉망으로 나온 결과를 한 번에 살려요</b>
+          <p>지난번 말과 결과를 보고, 한 번만 고쳐 보내요. 원칙 하나씩 익혀요.</p>
+          <span class="go">${doneOf(quick) ? `${quick.length}개 중 ${doneOf(quick)}개, 이어서` : `시작: ${esc(nq.p.title)}`}</span></a>
+        <a class="door" href="${seen ? `#/${nl.p.id}` : "#/tutorial"}">
+          <span class="dk">긴 문제, 10분</span>
+          <b>숨은 사정을 Claude에게 전해요</b>
+          <p>자료를 만져 보고 세 번까지 보내요. 100점 만점으로 채점받아요.</p>
+          <span class="go">${!seen ? "하는 법부터 보기" : doneOf(long) ? `${long.length}개 중 ${doneOf(long)}개, 이어서` : `시작: ${esc(nl.p.title)}`}</span></a>
       </div>
-      <section class="panel">
-        <h2>문제</h2>
-        <table class="list">
-          <thead><tr><th>문제</th><th class="hide-s">종류</th><th class="num">보낸 말</th><th class="num hide-s">첫 점수</th><th class="num">최고 점수</th></tr></thead>
-          <tbody>${rows.map(({ p, best, a }) => `
-            <tr data-id="${p.id}" tabindex="0"><td><a href="#/${p.id}">${esc(p.title)}</a>${a.turns.length && !a.graded ? `<span class="pill">푸는 중</span>` : ""}<div class="sub show-s">${esc(p.type)}</div></td>
-              <td class="hide-s">${esc(p.type)}</td>
-              <td class="num${a.turns.length ? "" : " none"}">${a.turns.length ? `${a.turns.length} / ${MAX}` : "–"}</td>
-              <td class="num hide-s${hist(p).length ? "" : " none"}">${hist(p)[0]?.s ?? "–"}</td>
-              <td class="num score${best == null ? " none" : ""}">${best ?? "–"}</td></tr>`).join("")}</tbody>
-        </table>
-      </section>
+      <section class="panel"><h2>짧은 판</h2>${table(quick)}</section>
+      <section class="panel"><h2>긴 문제</h2>${table(long)}</section>
       <section class="panel grader">
         <h2>기록과 채점</h2>
         <div class="kpis">
@@ -849,6 +910,7 @@ function variant(p, v) {
 }
 const baseOf = p => P.find(x => x.id === p.id);
 async function materialHTML(p) {
+  if (!p.material) return ""; // 짧은 판은 자료가 없다
   const html = B ? B.materials[p.material] : await (await fetch(p.material)).text();
   return p.swap ? p.swap(html) : html;
 }
@@ -881,19 +943,25 @@ async function loadMaterial(frame, p) {
 
 /* ── 푸는 화면 ─────────────────────── */
 function showWork(p, a) {
-  const body = $("#body");
-  body.className = "work";
+  const body = $("#body"), max = p.max || MAX;
+  body.className = p.material ? "work" : "work solo";
+  const base = p.compare?.base;
+  // 짧은 판: 지난번에 보낸 말과 그 결과를 먼저 보여 주고, 한 번에 고쳐 보내게 한다
+  const before = p.quick && base ? `<div class="turn before"><div class="lab">지난번에 이렇게 보냈더니</div>
+      <div class="me"><div class="msg">${esc(base.msg)}</div></div>
+      <div class="res"><div class="lab">이렇게 나왔어요</div>${resHTML(base)}</div></div>`
+    : base ? `<p class="basel">막연하게 “${esc(base.msg)}”라고만 보내면 <b class="num">${base.score}점</b>이에요. 얼마나 넘는지 보세요.</p>` : "";
   body.innerHTML = `
-    <section class="panel view">
+    ${p.material ? `<section class="panel view">
       <div class="bar"><h2>자료</h2><span>${esc(p.materialHint || "")}</span>${p.materialHint ? `<button class="btn ghost reload">처음 상태로</button>` : ""}${p.capture ? `<button class="btn snap" title="3초 뒤에 찍혀요. 그동안 마우스를 올려 둘 수 있어요">화면 찍기</button>` : ""}</div>
       <iframe title="자료"></iframe>
-    </section>
+    </section>` : ""}
     <section class="panel chat">
-      <div class="thread"><p class="brief">${esc(p.brief)}</p>${p.compare ? `<p class="basel">막연하게 “${esc(p.compare.base.msg)}”라고만 보내면 <b class="num">${p.compare.base.score}점</b>이에요. 얼마나 넘는지 보세요.</p>` : ""}<div class="turns"></div></div>
+      <div class="thread"><p class="brief">${esc(p.brief)}</p>${before}<div class="turns"></div></div>
       <div class="compose"></div>
     </section>`;
   const frame = $("iframe", body);
-  loadMaterial(frame, p);
+  if (frame) loadMaterial(frame, p);
   if (p.materialHint) $(".reload", body).onclick = () => { resetMaterial(p); loadMaterial(frame, p); };
 
   let busy = null, files = [], keep = "", error = "";
@@ -917,23 +985,25 @@ function showWork(p, a) {
   const turnHTML = (t, k) => `
     <div class="turn">
       <div class="me">${t.files?.length ? `<div class="att">${t.files.map(f => chip(p, f)).join("")}</div>` : ""}<div class="msg">${msgHTML(p, t)}</div>${pastedLen(t) ? `<div class="pnote">점선은 그대로 붙여넣은 글</div>` : ""}</div>
-      ${t.result ? `<div class="res"><div class="lab">결과 예상 ${k + 1}</div>${t.changed ? `<p class="chg">${esc(t.changed)}</p>` : ""}${t.reply ? `<p class="rep"><b>Claude</b>${esc(t.reply)}</p>` : ""}${t.result.length ? `<ul>${t.result.map(l => `<li>${esc(l)}</li>`).join("")}</ul>` : ""}${exButton(t, k)}</div>`
-        : `<div class="res wait"><div class="lab">결과 예상하는 중 <span class="sec"></span></div>${AI.kind === "claude" && !store.get("pp:asked") ? `<p class="hint">Claude 사용을 허락하는 창이 뜨면 허용을 눌러 주세요.</p>` : ""}</div>`}
+      ${t.result ? `<div class="res"><div class="lab">결과 예상 ${k + 1}</div>${t.changed ? `<p class="chg">${esc(t.changed)}</p>` : ""}${t.reply ? `<p class="rep"><b>Claude</b>${esc(t.reply)}</p>` : ""}${t.result.length ? `<ul>${t.result.map(l => `<li>${esc(l)}</li>`).join("")}</ul>` : ""}${exBlock(p, t, k)}</div>`
+        : `<div class="res wait"><div class="lab">결과 예상하는 중 <span class="sec"></span></div>${AI.kind === "claude" && !store.get("pp:asked") ? `<p class="hint">Claude 사용을 허락하는 창이 뜨면 허용을 눌러 주세요.</p>` : ""}${waitTip(p, k)}</div>`}
     </div>`;
 
-  function drawTurns() {
+  function drawTurns(stay) {
+    if (!turnsEl.isConnected) return;
+    const y = thread.scrollTop;
     turnsEl.innerHTML = a.turns.map(turnHTML).join("") + (busy ? turnHTML(busy, a.turns.length) : "");
-    $$(".exb", turnsEl).forEach(b => b.onclick = () => openExample(p, a, +b.dataset.k, b));
-    thread.scrollTop = thread.scrollHeight;
+    wireEx(turnsEl, p, a, () => drawTurns(true));
+    thread.scrollTop = stay ? y : thread.scrollHeight;
   }
 
-  function slots() { return `<div class="slots" aria-label="보낸 말 ${a.turns.length} / ${MAX}">${[1, 2, 3].map(n => `<i class="${n <= a.turns.length ? "used" : ""}"></i>`).join("")}<span class="num">${a.turns.length} / ${MAX}</span></div>`; }
+  function slots() { return `<div class="slots" aria-label="보낸 말 ${a.turns.length} / ${max}">${Array.from({ length: max }, (_, i) => `<i class="${i < a.turns.length ? "used" : ""}"></i>`).join("")}<span class="num">${a.turns.length} / ${max}</span></div>`; }
 
   // 다시 그리기 전에 쓰던 글을 챙긴다
   const grab = () => { const t = $("textarea", compose); if (t && !t.disabled) keep = t.value; };
   function drawCompose() {
     const self = !AI.kind;
-    if (!self && a.turns.length >= MAX && !busy) {
+    if (!self && a.turns.length >= max && !busy) {
       compose.innerHTML = `<div class="tools">${slots()}<button class="btn primary send">채점 보기</button></div>`;
       $(".send", compose).onclick = finish;
       return;
@@ -975,6 +1045,7 @@ function showWork(p, a) {
       store.set("pp:asked", 1);
       a.turns.push(t);
       saveAttempt(p, a); files = [];
+      if (p.preview) makeExample(p, a, a.turns.length - 1, () => drawTurns(true));
     } catch (e) { error = e.message; keep = msg; }
     clearInterval(tick);
     busy = null; drawTurns(); drawCompose();
@@ -991,7 +1062,7 @@ function showWork(p, a) {
 
   function finish() {
     const items = a.turns[a.turns.length - 1].items, s = total(p, items), best = store.get("pp:best:" + p.id);
-    a.graded = true; a.score = s; saveAttempt(p, a);
+    a.graded = true; a.score = s; a.fresh = { best, last: hist(p).slice(-1)[0]?.s ?? null }; saveAttempt(p, a);
     if (best == null || s > best) store.set("pp:best:" + p.id, s);
     store.set("pp:hist:" + p.id, [...hist(p), { s, n: a.turns.length, at: Date.now() }]);
     countDone(p);
@@ -1030,63 +1101,89 @@ function marked(p, t, marks) {
 
 /* ── 채점 화면 ─────────────────────── */
 function showMark(p, a) {
-  const body = $("#body"), next = P[P.findIndex(x => x.id === p.id) + 1];
+  const body = $("#body"), at = P.findIndex(x => x.id === p.id);
+  const next = P.slice(at + 1).find(x => !!x.quick === !!p.quick);
   const items = a.self ? p.items.map((it, k) => ({ id: it.id, level: a.levels?.[k] ?? 0, quote: "", why: "" }))
     : a.turns[a.turns.length - 1].items;
-  const s = total(p, items);
+  const s = total(p, items), c = p.compare;
   const marks = p.items.map((it, k) => ({ q: (items.find(x => x.id === it.id) || {}).quote || "", n: k + 1 })).filter(m => m.q);
+  const opened = new Set($$("details[data-k]", body).filter(d => d.open).map(d => d.dataset.k)); // 다시 그려도 펼친 칸은 그대로
+  const isOpen = (k, dflt) => opened.size ? opened.has(k) : dflt;
   body.className = "mark";
-  const h = a.self ? [] : hist(p);
-  $("#acts").innerHTML = `${a.self ? "" : `<button class="btn share">결과 공유</button>`}<button class="btn again">다시 풀기</button>${next ? `<a class="btn primary" href="#/${next.id}">다음 문제</a>` : ""}`;
+  const h = a.self ? [] : hist(p), fresh = a.fresh;
+  const got = it => ptsOf(it, lvOf(items.find(y => y.id === it.id) || {}));
+  const full = p.items.filter(it => got(it) === it.points).length;
+  const lost = [...p.items].sort((x, y) => (y.points - got(y)) - (x.points - got(x)))[0];
+  const lastS = fresh ? fresh.last : h.length > 1 ? h[h.length - 2].s : null;
+  const chips = a.self ? [] : [
+    c && [`${p.quick ? "지난번 말" : "막연한 한 줄"}보다 ${s - c.base.score >= 0 ? "+" : ""}${s - c.base.score}점`, s > c.base.score],
+    lastS != null && [`지난번보다 ${s - lastS >= 0 ? "+" : ""}${s - lastS}점`, s > lastS],
+    fresh && s === 100 && (fresh.best ?? -1) < 100 && ["처음으로 100점", true],
+    fresh && fresh.best != null && s > fresh.best && s < 100 && ["최고 점수", true],
+  ].filter(Boolean);
+  const bi = a.review?.turns?.findIndex(r => r?.better) ?? -1;
+  $("#acts").innerHTML = `${a.self ? "" : `<button class="btn share">결과 공유</button>`}<button class="btn again">다시 풀기</button>${next ? `<a class="btn primary" href="#/${next.id}">다음 ${p.quick ? "짧은 판" : "문제"}</a>` : ""}`;
+  const fold = (k, title, sum, inner, dflt) => `<details class="panel sect" data-k="${k}"${isOpen(k, dflt) ? " open" : ""}><summary><h2>${title}</h2>${sum ? `<span>${sum}</span>` : ""}</summary>${inner}</details>`;
+  const last = a.turns[a.turns.length - 1];
   body.innerHTML = `
-    <section class="panel sum">
-      <div class="big"><b class="num">${s}</b><span>/ 100</span></div>
-      <div class="over">${a.self ? `<p>항목마다 내 말이 그만큼 전했는지 점수를 눌러 매겨요. 아래 모범 답안과 견줘 보세요.</p>`
-        : a.review ? `<p>${esc(plain(p, a.review.overall))}</p>` : `<p class="wait" id="over">${a.reviewError ? `${esc(a.reviewError)} <button class="btn ghost" id="rev">다시 받기</button>` : "Claude가 보낸 말을 돌아보는 중이에요"}</p>`}
+    <section class="panel hero">
+      <div class="score"><b class="num" id="score">${fresh ? 0 : s}</b><span>/ 100</span></div>
+      <div class="hi">
+        ${chips.length ? `<div class="chips">${chips.map(([t, up]) => `<span class="${up ? "up" : ""}">${t}</span>`).join("")}</div>` : ""}
+        ${a.self ? `<p>항목마다 내 말이 그만큼 전했는지 아래에서 점수를 눌러 매겨요. 모범 답안과 견줘 보세요.</p>`
+          : a.review ? `<p>${esc(plain(p, a.review.overall))}</p>` : `<p class="wait">${a.reviewError ? `${esc(a.reviewError)} <button class="btn ghost" id="rev">다시 받기</button>` : "Claude가 보낸 말을 돌아보는 중이에요"}</p>`}
         ${h.length > 1 ? `<p class="trail">이 문제 기록 <span class="num">${h.slice(-6).map(x => x.s).join(" → ")}</span></p>` : ""}
-        <p class="meta">보낸 말 ${a.turns.length}번 · 채점 ${a.self ? "스스로" : a.by === "laptop" ? "이 노트북의 Claude" : a.by === "claude" ? "내 Claude 계정" : a.by === "key" ? "내 API 키" : "Claude"}</p></div>
+        <p class="meta">보낸 말 ${a.turns.length}번, 채점 ${a.self ? "스스로" : a.by === "laptop" ? "이 노트북의 Claude" : a.by === "claude" ? "내 Claude 계정" : a.by === "key" ? "내 API 키" : "Claude"}</p>
+      </div>
     </section>
-    ${compareHTML(p, a, s)}
-    <section class="panel">
-      <h2>항목별 점수</h2>
+    ${a.self ? "" : `<section class="panel nextup">
+      <h2>다음엔 이렇게 써 보세요</h2>
+      ${!a.review ? `<p class="wait">${a.reviewError ? "돌아보기를 받지 못했어요." : "고친 말을 만드는 중이에요"}</p>`
+        : bi >= 0 ? `<p class="fine">${a.turns.length > 1 ? `${bi + 1}번째로 보낸 말을 ` : "보낸 말을 "}그때 알던 것만으로 고쳤어요</p><div class="msg bettermsg">${rich(p, a.review.turns[bi].better)}</div>`
+        : `<p>고칠 데가 없어요. 이대로 쓰면 돼요.</p>`}
+      ${lost && got(lost) < lost.points && lost.tip ? `<p class="lost">가장 많이 잃은 곳은 <b>${esc(lost.label.split(":")[0])}</b>(${got(lost) - lost.points}점)이에요. <a href="#/guide/${lost.tip}">잘 쓰는 법: ${esc(tipOf(lost.tip).h)}</a></p>` : ""}
+    </section>`}
+    ${fold("ledger", "항목별 점수", `${p.items.length}개 중 ${full}개 다 맞힘`, `
       <table class="ledger">
         <thead><tr><th>항목</th><th class="num">점수</th></tr></thead>
         <tbody>${p.items.map((it, k) => {
-          const x = items.find(y => y.id === it.id) || {}, lv = lvOf(x), got = ptsOf(it, lv);
+          const x = items.find(y => y.id === it.id) || {}, lv = lvOf(x), g = ptsOf(it, lv);
           return `<tr><td><div class="lab"><sup>${k + 1}</sup>${esc(it.label)}</div>
               <div class="why">${a.self ? esc(it.met) : esc(x.why)}</div>
+              ${!a.self && g < it.points && it.tip ? `<a class="tipl" href="#/guide/${it.tip}">잘 쓰는 법: ${esc(tipOf(it.tip).h)}</a>` : ""}
               ${a.self ? `<div class="pick" role="group" aria-label="${esc(it.label)} 점수">${[0, 1, 2, 3, 4].map(l => `<button data-k="${k}" data-l="${l}" class="num${l === lv ? " on" : ""}" aria-pressed="${l === lv}">${ptsOf(it, l)}</button>`).join("")}</div>` : ""}</td>
-            <td class="num pts"><b>${got}</b><span> / ${it.points}</span><i class="meter"><i style="width:${lv * 25}%"></i></i></td></tr>`;
+            <td class="num pts"><b>${g}</b><span> / ${it.points}</span><i class="meter"><i style="width:${lv * 25}%"></i></i></td></tr>`;
         }).join("")}</tbody>
         <tfoot><tr><td>합계</td><td class="num pts"><b>${s}</b><span> / 100</span></td></tr></tfoot>
-      </table>
-    </section>
-    <section class="panel">
-      <h2>보낸 말 돌아보기</h2>
-      ${a.turns.map((t, k) => {
+      </table>`, !!a.self)}
+    ${c ? fold("vs", p.quick ? "지난번 말과 견주기" : "막연한 한 줄과 견주기", a.self ? `${c.base.score}점 → 모범 답안 ${c.model.score}점` : `${c.base.score}점 → 내 말 ${s}점`, compareHTML(p, a, s, last), false) : ""}
+    ${a.self ? "" : fold("back", "보낸 말 돌아보기", `${a.turns.length}번 보냄`, a.turns.map((t, k) => {
         const r = a.review?.turns?.[k];
         return `<div class="back">
-          <div class="mine"><div class="n">${k + 1}번째로 보낸 말${pastedLen(t) ? ` · 그대로 붙여넣은 글 ${pastedLen(t)}자` : ""}</div>${marked(p, t, marks)}${a.self ? "" : exButton(t, k)}</div>
-          <div class="coach">${a.self ? "" : r ? `
+          <div class="mine"><div class="n">${k + 1}번째로 보낸 말${pastedLen(t) ? `, 그대로 붙여넣은 글 ${pastedLen(t)}자` : ""}</div>${marked(p, t, marks)}${exBlock(p, t, k)}</div>
+          <div class="coach">${r ? `
             ${r.good ? `<p><b>잘한 점</b>${esc(plain(p, r.good))}</p>` : ""}${r.weak ? `<p><b>아쉬운 점</b>${esc(plain(p, r.weak))}</p>` : ""}
             ${r.better ? `<div class="better"><b>더 좋게 고친 말</b><div class="msg">${rich(p, r.better)}</div></div>` : `<p><b>더 좋게 고친 말</b>고칠 데가 없어요.</p>`}`
             : `<p class="wait">${a.reviewError ? "돌아보기를 받지 못했어요." : "돌아보는 중"}</p>`}</div>
         </div>`;
-      }).join("")}
-    </section>
-    <section class="panel">
-      <h2>모범 답안</h2>
+      }).join(""), false)}
+    ${fold("model", "모범 답안", "", `
       <table class="model">
         <tbody>${p.model.lines.map(l => `<tr><td class="tx">${rich(p, l.text)}</td>
           <td class="why${l.items.length ? "" : " plain"}">${l.items.map(id => p.items.findIndex(x => x.id === id) + 1).sort((x, y) => x - y).map(n => `<sup>${n}</sup>`).join("")}${esc(l.why)}</td></tr>`).join("")}</tbody>
       </table>
-      <div class="follow"><h3>이어서 보내는 말의 예</h3><p>${esc(p.model.followup)}</p></div>
-    </section>`;
-  $$(".exb", body).forEach(b => b.onclick = () => openExample(p, a, +b.dataset.k, b));
+      ${p.model.followup ? `<div class="follow"><h3>이어서 보내는 말의 예</h3><p>${esc(p.model.followup)}</p></div>` : ""}`, !!a.self)}`;
+  wireEx(body, p, a, () => refreshMark(p, a));
+  if (fresh) { // 채점 직후 한 번만: 점수가 0부터 올라간다
+    delete a.fresh; saveAttempt(p, a);
+    const el = $("#score"), t0 = performance.now();
+    const step = now => { const k = Math.max(0, Math.min(1, (now - t0) / 700)); el.textContent = Math.round(s * (1 - (1 - k) ** 3)); if (k < 1 && el.isConnected) requestAnimationFrame(step); };
+    requestAnimationFrame(step);
+  }
   const sh = $(".share");
   if (sh) sh.onclick = async () => {
     const first = h.length > 1 ? ` (첫 판 ${h[0].s}점)` : "";
-    const text = `프롬프트 연습 · ${p.title} ${s}점${first}\nAI에게 일을 맡기는 말 연습: ${SITE}`;
+    const text = `프롬프트 연습, ${p.title} ${s}점${first}\nAI에게 일을 맡기는 말 연습: ${SITE}`;
     try {
       if (navigator.share && matchMedia("(pointer: coarse)").matches) await navigator.share({ text });
       else { await navigator.clipboard.writeText(text); sh.textContent = "복사했어요"; setTimeout(() => sh.textContent = "결과 공유", 1600); }
@@ -1106,16 +1203,13 @@ function showMark(p, a) {
 }
 
 // 막연한 한 줄로 보냈을 때(미리 만들어 둔 결과)와 내 말의 마지막 결과를 나란히. 스스로 채점이면 모범 답안대로 보낸 결과와
-function compareHTML(p, a, s) {
+function compareHTML(p, a, s, last) {
   const c = p.compare;
-  if (!c) return "";
-  const last = a.turns[a.turns.length - 1];
   const right = a.self ? { lab: "모범 답안대로 보내면", score: c.model.score, t: c.model } : { lab: "내 말로 보내면", score: s, t: last };
-  const col = (lab, score, t, q) => `<div class="col"><div class="hd"><span>${lab}</span><b class="num">${score}<small>점</small></b></div>${q ? `<p class="said msg">${esc(q)}</p>` : ""}<div class="out">${resHTML(t)}</div></div>`;
-  return `<section class="panel vs">
-      <h2>막연한 한 줄과 견주기</h2>
-      <div class="cols">${col("막연한 한 줄로 보내면", c.base.score, c.base, c.base.msg)}${col(right.lab, right.score, right.t)}</div>
-    </section>`;
+  const col = (lab, score, t, q, pv) => `<div class="col"><div class="hd"><span>${lab}</span><b class="num">${score}<small>점</small></b></div>${q ? `<div class="said">${q}</div>` : ""}<div class="out">${resHTML(t)}</div>${pv || ""}</div>`;
+  const baseQ = `${(c.base.files || []).length ? `<div class="att">${c.base.files.map(f => chip(p, f)).join("")}</div>` : ""}<p class="msg">${esc(c.base.msg)}</p>`;
+  const pv = !a.self && pageOf(last) ? `<div class="pv"><iframe sandbox="allow-scripts allow-forms" title="내 말로 만든 화면" data-pv="${a.turns.length - 1}"></iframe></div>` : "";
+  return `<div class="vs"><div class="cols">${col(p.quick ? "지난번 말로 보내면" : "막연한 한 줄로 보내면", c.base.score, c.base, baseQ)}${col(right.lab, right.score, right.t, "", pv)}</div></div>`;
 }
 
 async function getReview(p, a) {
@@ -1147,7 +1241,7 @@ const STEPS = [
   { h: "자료를 직접 만져 봐요", t: "왼쪽은 따라 만들 자료예요. Claude는 이 화면을 못 봐요. 마우스를 올리고 눌러 보며, 멈춘 사진에는 안 담기는 동작을 찾아요." },
   { h: "사진을 붙여요", t: "첨부를 누르고 '첫 화면 사진'을 고르면 입력칸 위에 붙어요. 사진은 색과 배치를 정확히 전하지만, 움직임은 하나도 전하지 못해요. 실제 Claude에서는 캡처한 사진을 끌어다 놓거나 붙여 넣으면 돼요." },
   { h: "사진에 없는 것을 말로 써요", t: "무엇을 만들지 첫 줄에 밝히고, 사진에 안 보이는 동작을 한 줄에 하나씩 써요. '남은 4개'처럼 예를 하나 들면 그대로 맞혀요." },
-  { h: "보내면 결과 예상이 와요", t: "실제로 만들지는 않고, 이 말을 받은 Claude가 만들 결과를 미리 보여 줘요. 무엇이 빠졌는지는 알려 주지 않아요. 그건 내가 찾을 몫이에요. '예시 결과 만들기'를 누르면 그 결과물을 실제로 만들어 보여 줘요." },
+  { h: "보내면 결과 예상이 와요", t: "실제로 만들지는 않고, 이 말을 받은 Claude가 만들 결과를 미리 보여 줘요. 무엇이 빠졌는지는 알려 주지 않아요. 그건 내가 찾을 몫이에요. 웹 페이지를 만드는 문제는 그 화면을 실제로 만들어 결과 아래에 바로 띄워 줘요." },
   { h: "자료와 견줘 봐요", t: "결과와 자료를 나란히 놓고 다른 곳을 찾아요. 자료에서는 장바구니를 누르면 픽업 시간을 고르는데, 결과에는 담은 빵 목록이 펼쳐져요." },
   { h: "이어서 말해요", t: "처음부터 다시 쓰지 말고 바꿀 것만 말해요. '나머지는 그대로'를 붙이면 잘된 부분이 흔들리지 않아요. 보내기는 모두 세 번까지예요." },
   { h: "채점을 봐요", t: "숨은 항목마다 배점이 달라서 73점처럼 나와요. 보낸 말마다 잘한 점, 아쉬운 점, 그때 알던 것만으로 고친 '더 좋은 말'도 받아요. 채점은 Claude가 해요. claude.ai에서 열면 내 Claude 계정이 채점해요." },
