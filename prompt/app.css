@@ -345,6 +345,62 @@ th.num, td.num { text-align: right; padding-right: 0; padding-left: 12px; white-
 .s-cur { position: absolute; left: 0; top: 0; width: 20px; height: 24px; z-index: 9; fill: #141414; stroke: #fff; stroke-width: 1.4; margin: -2px 0 0 -2px; transition: none; }
 .s-cur.down { filter: drop-shadow(0 0 0 #fff); scale: .85; }
 
+/* ── 첫 화면 두 입구 ── */
+.doors { display: grid; grid-template-columns: 1.15fr 1fr; gap: var(--gap); }
+.door { display: flex; flex-direction: column; gap: 6px; padding: 24px 26px 22px; border-radius: var(--radius-card); border: 1px solid var(--border); background: var(--surface); text-decoration: none; transition: transform .15s, border-color .15s; }
+.door:hover { border-color: var(--control); transform: translateY(-2px); }
+.door .dk { font-size: 13px; color: var(--muted); }
+.door b { font-size: 21px; font-weight: 500; line-height: 1.35; }
+.door p { margin: 0; color: var(--muted); max-width: 30em; }
+.door .go { margin-top: auto; padding-top: 14px; font-weight: 500; }
+.door .go::after { content: " →"; }
+.mine-door { background: var(--primary); border-color: var(--primary); color: var(--on-primary); }
+.mine-door:hover { border-color: var(--primary); }
+.mine-door .dk, .mine-door p { color: var(--on-primary); opacity: .72; }
+.grader h2 { margin-bottom: 16px; }
+
+/* ── 나란히 견주기 ── */
+.basel { margin: -8px 0 18px; font-size: 14px; color: var(--muted); }
+.basel b { color: var(--hue); font-weight: 700; }
+.vs .cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0; }
+.vs .col { padding: 0 24px; min-width: 0; }
+.vs .col:first-child { padding-left: 0; }
+.vs .col + .col { border-left: 1px solid var(--border); padding-right: 0; }
+.vs .hd { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 8px; font-size: 13px; color: var(--muted); }
+.vs .hd b { font-size: 26px; font-weight: 700; color: var(--text); line-height: 1.1; }
+.vs .col + .col .hd b { color: var(--hue); }
+.vs .hd b small { font-size: 13px; font-weight: 400; color: var(--muted); margin-left: 2px; }
+.vs .hd .btn { height: 28px; font-size: 13px; }
+.vs .said { margin: 0 0 12px; padding: 9px 13px; background: var(--bubble); border-radius: 10px; font-size: 14px; }
+.vs .said mark { background: none; color: inherit; text-decoration: underline 2px var(--text); text-underline-offset: 4px; }
+.vs .lab { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+.vs .chg { margin: 0 0 6px; font-weight: 500; font-size: 14px; }
+.vs .out { font-size: 14px; }
+.vs .out .rep { margin: 0 0 8px; padding-left: 10px; border-left: 2px solid var(--border); }
+.vs .out .rep b { display: block; font-size: 12px; font-weight: 500; color: var(--muted); }
+.vs .out ul { margin: 0; padding-left: 18px; }
+.vs .out li { margin: 3px 0; }
+.vs .out li.new { color: var(--hue); }
+.vs .key { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 16px; }
+.vs .key mark { background: none; color: var(--text); text-decoration: underline 2px var(--text); text-underline-offset: 4px; margin-right: 4px; }
+.vs .newk { display: inline-block; width: 10px; height: 10px; border-radius: 2px; background: var(--hue); margin-right: 6px; vertical-align: -1px; }
+
+/* ── 내 일로 연습 ── */
+.task textarea { width: 100%; min-height: 150px; max-height: 50vh; resize: vertical; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-control); background: var(--raised); color: var(--text); font: 15px/1.6 var(--font); }
+.task textarea:focus { outline: 2px solid var(--hue); outline-offset: 1px; }
+.task .tools { margin-top: 10px; }
+.task .tools .btn:last-child { margin-left: auto; }
+.task > .wait { margin: 0; padding: 0 4px; }
+.fillcol h2 { margin-bottom: 2px; }
+.fillcol .fine { margin: 0 0 12px; }
+.gaps { display: flex; flex-direction: column; gap: 14px; }
+.gap { display: flex; flex-direction: column; gap: 2px; }
+.gap b { font-weight: 500; }
+.gap span { font-size: 13px; color: var(--muted); }
+.gap input { margin-top: 4px; height: 38px; padding: 0 12px; border: 1px solid var(--border); border-radius: var(--radius-control); background: var(--raised); color: var(--text); font: inherit; min-width: 0; }
+.gap input:focus { outline: 2px solid var(--hue); outline-offset: 1px; }
+.edit textarea { min-height: 110px; }
+
 /* ── 휴대폰·좁은 창 ── */
 @media (max-width: 1100px) {
   #app { display: block; height: auto; }
@@ -375,6 +431,11 @@ th.num, td.num { text-align: right; padding-right: 0; padding-left: 12px; white-
   .show-s { display: block; }
   .sum { grid-template-columns: 1fr; }
   .back { grid-template-columns: 1fr; gap: 12px; }
+  .doors { grid-template-columns: 1fr; }
+  .door { padding: 20px; }
+  .vs .cols { grid-template-columns: 1fr; }
+  .vs .col { padding: 0; }
+  .vs .col + .col { border-left: 0; border-top: 1px solid var(--border); margin-top: 18px; padding-top: 18px; }
   .model tr, .model td { display: block; width: auto !important; border: 0; padding: 0; }
   .model tr { padding: 10px 0; border-bottom: 1px solid var(--rule); }
   .model td.why { margin-top: 2px; }
