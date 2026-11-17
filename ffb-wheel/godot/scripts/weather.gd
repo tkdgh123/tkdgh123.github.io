@@ -93,6 +93,21 @@ func _particles(n: int, life: float, ext: Vector3, v0: float, v1: float, grav: V
 	add_child(p)
 	return p
 
+# 악천후 감속 (도로교통법 시행규칙 제19조 제2항): 비에 젖은 길 20% 감속, 가시거리 100m 이내(안개), 얼어붙은 길, 눈 20mm 이상 50% 감속.
+# 이 도시의 눈은 길이 하얗게 덮인 정도라 50%로 봄
+func speed_factor() -> float:
+	var k := 1.0
+	if kind == "rain":
+		k = 0.8
+	if kind == "snow" or fog:
+		k = 0.5
+	return k
+
+func factor_text() -> String:
+	if fog:
+		return "안개 -50%"
+	return {"rain": "비 -20%", "snow": "눈 -50%"}.get(kind, "")
+
 # 노면 마찰: 마른 길 1, 젖은 길 0.7, 눈길 0.35
 func grip() -> float:
 	return 0.35 if kind == "snow" else 0.7 if kind == "rain" else 1.0

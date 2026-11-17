@@ -15,6 +15,7 @@ var t := 0.0
 var lat := 0.0
 var rng := RandomNumberGenerator.new()
 var stop_wait := 0.0
+var antic := false     # 미리 보는 운전자: 세워 둔 큰 차, 길가의 사람이 보이면 시속 18km로
 var stop_seg = null
 
 func _init(m, r := 0.8, seed := 1) -> void:
@@ -168,6 +169,14 @@ func drive(dt: float) -> Dictionary:
 			car.set_sig(1)
 		if sr > w.s0 - 50:
 			change_lane(0)
+	if antic:
+		for id in ["child", "jay"]:
+			if main.events.act.has(id):
+				var st: Dictionary = main.events.act[id]
+				var o: Node3D = st.van if id == "child" else st.who
+				var ro: Vector2 = main.events._rel(o.position.x, o.position.z)
+				if ro.x > -2 and ro.x < 50 and absf(ro.y) < 12:
+					want = minf(want, 5.0)
 	var fake := {"x": car.x, "z": car.z, "kind": "car", "stuck": 0.0}
 	var gap: float = _city()._gap(fake, path, null, false, lat)
 	for who: Node3D in main.events.people(): # 길에 들어선 사람은 미리 봄 (내 길 옆 4.5m 안)

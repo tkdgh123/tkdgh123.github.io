@@ -32,6 +32,12 @@ var minimap: MiniMap
 var glare: TextureRect
 var big_l: Label
 var mirror: TextureRect
+var lim_sign: LimitSign
+var lim_note: Label
+var gap_l: Label
+var rec_l: Label
+var allow_btn := {}
+var snaps := []
 var log := []            # 시험에서 읽음: 알림과 결과
 
 class FfbBar extends Control: # 핸들 힘: 가운데 0, 왼쪽(-) 오른쪽(+)으로 막대
@@ -44,6 +50,35 @@ class FfbBar extends Control: # 핸들 힘: 가운데 0, 왼쪽(-) 오른쪽(+)�
 		var x1 := w / 2 - v * w / 2 # + = 핸들을 왼쪽으로 미는 힘 → 막대가 왼쪽으로
 		draw_rect(Rect2(minf(x0, x1), h * 0.2, absf(x1 - x0), h * 0.6), Color(0.62, 0.7, 1.0))
 		draw_line(Vector2(x0, 0), Vector2(x0, h), Color(0.9, 0.9, 0.88), 1.5)
+
+class LimitSign extends Control: # 지금 지켜야 할 제한 속도 (날씨 감속까지 계산한 값)
+	var n := 0
+	var over := false
+	func _draw() -> void:
+		var r := size.y / 2
+		var c := size / 2
+		draw_circle(c, r, Color(0.97, 0.97, 0.97))
+		draw_arc(c, r - 3, 0, TAU, 40, Color(0.82, 0.13, 0.13) if not over else Color(1, 0.55, 0.1), 5.0, true)
+		var f := Kit.font()
+		var t := str(n)
+		var w := f.get_string_size(t, HORIZONTAL_ALIGNMENT_LEFT, -1, 17).x
+		draw_string(f, Vector2(c.x - w / 2, c.y + 6), t, HORIZONTAL_ALIGNMENT_LEFT, -1, 17, Color(0.07, 0.07, 0.07))
+
+class SnapView extends Control: # 단서가 나타난 순간 사진 + 봤어야 할 곳 동그라미
+	var tex: Texture2D
+	var mark := Vector2(0.5, 0.5)
+	var t := 0.0
+	func _process(dt: float) -> void:
+		t += dt
+		queue_redraw()
+	func _draw() -> void:
+		if tex == null:
+			return
+		draw_texture_rect(tex, Rect2(Vector2.ZERO, size), false)
+		var p := mark * size
+		var r := 16.0 + 3.0 * sin(t * 5.0)
+		draw_arc(p, r, 0, TAU, 32, Color(0.95, 0.15, 0.1), 3.5, true)
+		draw_arc(p, r + 5, 0, TAU, 32, Color(1, 1, 1, 0.7), 1.5, true)
 
 class MiniMap extends Control: # 도시: 내 차 가운데, 진행 방향이 위
 	var lines := []
@@ -129,6 +164,15 @@ func _ready() -> void:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 16)
 	dash.add_child(row)
+	var lv := VBoxContainer.new()
+	lv.add_theme_constant_override("separation", 0)
+	row.add_child(lv)
+	lim_sign = LimitSign.new()
+	lim_sign.custom_minimum_size = Vector2(40, 40)
+	lim_sign.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	lv.add_child(lim_sign)
+	lim_note = _lab(lv, "", 11, Color(1, 0.75, 0.3))
+	lim_note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	spd_l = _lab(row, "0", 34, PAPER)
 	spd_l.custom_minimum_size.x = 62
 	spd_l.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
@@ -146,6 +190,8 @@ func _ready() -> void:
 	sig_r = _lab(row, "▶", 20, Color(0.35, 0.35, 0.33))
 	for k in ["hz", "lt", "slip"]:
 		ic[k] = _lab(row, {"hz": "비상등", "lt": "전조등", "slip": "미끄럼"}[k], 14, Color(0.35, 0.35, 0.33))
+	gap_l = _lab(row, "", 14, Color(0.7, 0.7, 0.68))
+	gap_l.custom_minimum_size.x = 92
 	var fv := VBoxContainer.new()
 	fv.add_theme_constant_override("separation", 0)
 	row.add_child(fv)
@@ -284,16 +330,30 @@ func _build_panel() -> void:
 	var outer := VBoxContainer.new()
 	outer.add_theme_constant_override("separation", 10)
 	pc.add_child(outer)
+	var cols := HBoxContainer.new() # 왼쪽: 날씨, 상황, 반응 여유 / 오른쪽: 연습 기록 (늘 보이게)
+	cols.add_theme_constant_override("separation", 24)
+	outer.add_child(cols)
 	var sc := ScrollContainer.new()
 	sc.custom_minimum_size = Vector2(860, 590)
 	sc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	outer.add_child(sc)
+	cols.add_child(sc)
+	var rc := VBoxContainer.new()
+	rc.custom_minimum_size = Vector2(290, 0)
+	rc.add_theme_constant_override("separation", 6)
+	cols.add_child(rc)
+	_lab(rc, "연습 기록", 20, INK)
+	rec_l = _lab(rc, "", 14, INK)
+	rec_l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	rec_l.custom_minimum_size.x = 290
+	var rtip := _lab(rc, "위험했던 때: 부딪히거나 비키지 못한 횟수. 미리 줄임: 큰 차나 길가 사람을 보고 위험이 나타나기 전에 속도를 줄인 비율. 연구에서 실제 도로 실력과 이어진 건 이 '미리 보기'예요. 반응: 처음 몇 번 → 최근 몇 번.", 12, MUTED)
+	rtip.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	rtip.custom_minimum_size.x = 290
 	var v := VBoxContainer.new()
 	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	v.add_theme_constant_override("separation", 7)
 	sc.add_child(v)
 	_lab(v, "날씨와 상황", 34, INK)
-	var sub := _lab(v, "도로에 나가기 전에 비, 눈, 밤길과 당황하기 쉬운 일을 연습해요. 켜 둔 상황은 달리다 보면 알맞은 때 저절로 일어나고, 숫자 키로 바로 일으킬 수도 있어요.", 15, MUTED)
+	var sub := _lab(v, "비, 눈, 밤길과 당황하기 쉬운 일을 연습해요. 켜 둔 상황은 달리다 보면 저절로 일어나요(숫자 키로 바로도). 결과는 위험이 나타나기 전에 미리 속도를 줄였는지를 가장 먼저 봐요.", 15, MUTED)
 	sub.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	sub.custom_minimum_size.x = 820
 	# 날씨
@@ -351,6 +411,25 @@ func _build_panel() -> void:
 		b.pressed.connect(func() -> void: _fire("trigger", id))
 		gr.add_child(b)
 		i += 1
+	# 반응 여유
+	_lab(v, "상황이 일어나는 거리 (반응 여유)", 20, INK)
+	var ar := HBoxContainer.new()
+	ar.add_theme_constant_override("separation", 8)
+	v.add_child(ar)
+	var ag := ButtonGroup.new()
+	for e in [[1.5, "넉넉히 1.5초 (처음, 고령)"], [1.0, "보통 1.0초"], [0.7, "빠듯하게 0.7초"]]:
+		var b := Button.new()
+		b.text = e[1]
+		b.toggle_mode = true
+		b.button_group = ag
+		b.custom_minimum_size = Vector2(0, 38)
+		b.add_theme_font_size_override("font_size", 14)
+		b.toggled.connect(_on_allow_btn.bind(e[0]))
+		ar.add_child(b)
+		allow_btn[e[0]] = b
+	var atip := _lab(v, "위험이 보인 뒤 이만큼 안에 브레이크를 세게 밟으면 멈출 수 있는 거리에서 일어나요. 익숙해지면 한 단계씩 줄여요.", 13, MUTED)
+	atip.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	atip.custom_minimum_size.x = 820
 	# 조작 (아래에 늘 보임)
 	outer.add_child(HSeparator.new())
 	simple_c = _check(outer, "간단 조작 (WASD, 기어 없음)")
@@ -367,6 +446,17 @@ func _build_panel() -> void:
 	go.add_theme_color_override("font_hover_color", PAPER)
 	go.pressed.connect(func() -> void: _fire("close"))
 	outer.add_child(go)
+
+func _on_allow_btn(on: bool, a: float) -> void:
+	if on:
+		_fire("allow", a)
+
+func set_allow(a: float) -> void: # 묶음 단추는 코드로 누르면 다른 단추가 안 풀려서 모두 직접 정함
+	for k in allow_btn:
+		allow_btn[k].set_pressed_no_signal(absf(k - a) < 0.01)
+
+func set_record_text(t: String) -> void:
+	rec_l.text = t
 
 func _on_weather_btn(on: bool, k: String) -> void:
 	if on:
@@ -398,7 +488,8 @@ func set_simple(on: bool) -> void:
 		else "↑ 가속   ↓ 브레이크   ← → 핸들   P R N D 기어   Q E 방향지시등   H 비상등   Space 주차 브레이크   F 전조등   C 시점")
 
 func set_weather_ui(kind: String, fog: bool, night: bool) -> void:
-	wbtn[kind].set_pressed_no_signal(true)
+	for k in wbtn:
+		wbtn[k].set_pressed_no_signal(k == kind)
 	fog_c.set_pressed_no_signal(fog)
 	night_c.set_pressed_no_signal(night)
 
@@ -418,18 +509,36 @@ func toast(txt: String, kind := "info") -> void:
 		last.queue_free()
 	get_tree().create_timer(3.2).timeout.connect(_free_later.bind(pc))
 
-func add_result(title: String, lines: Array, good: bool) -> void:
-	log.append({"result": title, "lines": lines, "good": good})
+const ORANGE := Color(0.82, 0.45, 0.05)
+
+# level: "ok" 안전하게 지남 / "warn" 지나긴 했지만 미리 줄이지 않음 / "bad" 위험했음. 칭찬 대신 결과를 말함 (과신을 키우지 않게)
+func add_result(title: String, lines: Array, level: String, snap = null) -> void:
+	log.append({"result": title, "lines": lines, "good": level == "ok", "level": level})
+	var col: Color = BLUE if level == "ok" else ORANGE if level == "warn" else RED
 	var pc := PanelContainer.new()
 	var st := _box(Color(0.949, 0.945, 0.925, 0.96), 12)
-	st.border_color = BLUE if good else RED
+	st.border_color = col
 	st.border_width_left = 6
 	pc.add_theme_stylebox_override("panel", st)
 	var v := VBoxContainer.new()
 	v.add_theme_constant_override("separation", 2)
 	pc.add_child(v)
-	var h := _lab(v, ("%s  잘했어요" if good else "%s  다시 연습해요") % title, 17, BLUE if good else RED)
+	var head: String = {"ok": "안전하게 지났어요", "warn": "다음엔 미리 줄여요", "bad": "위험했어요"}.get(level, "")
+	var h := _lab(v, "%s  %s" % [title, head], 17, col)
 	h.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	if snap != null and snap.get("tex") != null:
+		var sv := SnapView.new()
+		sv.tex = snap.tex
+		sv.mark = snap.mark
+		sv.custom_minimum_size = Vector2(336, 189)
+		sv.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		v.add_child(sv)
+		var cap := _lab(v, "이때 동그라미를 봤어야 해요: " + String(snap.text), 13, MUTED)
+		cap.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		for n in snaps: # 사진은 가장 새 카드에만
+			if is_instance_valid(n):
+				n.queue_free()
+		snaps = [sv]
 	for s: String in lines:
 		var l := _lab(v, s, 14, INK)
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -465,6 +574,16 @@ func update(s: Dictionary) -> void:
 	ic.slip.add_theme_color_override("font_color", Color(1.0, 0.7, 0.2) if s.slip and s.blink else dim)
 	ffb_bar.v = s.ffb
 	ffb_bar.queue_redraw()
+	lim_sign.n = int(s.lim)
+	lim_sign.over = s.over
+	lim_sign.queue_redraw()
+	lim_note.text = s.lim_note
+	spd_l.add_theme_color_override("font_color", Color(1, 0.6, 0.2) if s.over else PAPER)
+	if s.gap > 0:
+		gap_l.text = "앞차 %.1f초" % s.gap
+		gap_l.add_theme_color_override("font_color", Color(1, 0.45, 0.35) if s.gap < s.gap_need else Color(0.6, 0.85, 0.65))
+	else:
+		gap_l.text = ""
 	minimap.me = Vector3(s.x, s.z, s.yaw)
 	minimap.cars = s.cars
 	minimap.marks = s.marks

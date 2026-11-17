@@ -39,7 +39,18 @@ var mirror_cam: Camera3D
 var mirror_tick := false
 var frame_slow := 0.0
 var adapt_wait := 6.0      # 시작, 날씨 바꾼 직후엔 셰이더를 만드느라 끊기니 재지 않음
-var hits := []            # 시험에서 읽음: 부딪힌 것
+var hits := []
+var allow := 1.5           # 반응 여유 (초): 상황이 일어나는 거리
+var record := []           # 연습 기록 (user://practice.json)
+var save_ok := true
+var drive_t := 0.0         # 이번에 운전한 시간 (쉬라는 알림)
+var sess := {"over": 0, "follow": 0.0, "short": 0.0}
+var over_t := 0.0
+var over_said := -99.0
+var gap_s := -1.0
+var gap_need := 2.0
+var eff_lim := 30.0
+var lim_t := 0.0            # 시험에서 읽음: 부딪힌 것
 
 func _ready() -> void:
 	city = City.new()
@@ -86,7 +97,11 @@ func _ready() -> void:
 		"trigger": func(id: String) -> void: _trigger(id),
 		"simple": func(on: bool) -> void: set_simple(on),
 		"close": func() -> void: set_paused(false),
+		"allow": func(a: float) -> void: _set_allow(a),
 	}
+	save_ok = not OS.get_cmdline_user_args().has("mute") # 시험 중엔 기록을 남기지 않음
+	_load_record()
+	hud.set_allow(allow)
 	set_simple(true)
 	set_paused(true)
 	hud.mirror.texture = mv.get_texture()
@@ -119,6 +134,84 @@ func set_simple(on: bool) -> void: # 간단 조작: 기어, 시동, 주차 브�
 func set_paused(on: bool) -> void:
 	paused = on
 	hud.show_panel(on)
+	if on:
+		hud.set_record_text(record_summary())
+
+func _set_allow(a: float) -> void:
+	allow = a
+	_save_record()
+
+# ───────── 연습 기록: 상황마다 횟수, 안전하게 지난 비율, 미리 줄인 비율, 반응 시간이 처음보다 나아졌는지 ─────────
+func _load_record() -> void:
+	if not FileAccess.file_exists("user://practice.json"):
+		return
+	var d = JSON.parse_string(FileAccess.get_file_as_string("user://practice.json"))
+	if d is Dictionary:
+		record = d.get("rec", [])
+		allow = float(d.get("allow", 1.5))
+
+func _save_record() -> void:
+	if not save_ok:
+		return
+	var f := FileAccess.open("user://practice.json", FileAccess.WRITE)
+	if f:
+		f.store_string(JSON.stringify({"allow": allow, "rec": record}))
+
+func add_record(id: String, level: String, react: float, antic) -> void:
+	record.append({"t": int(Time.get_unix_time_from_system()), "id": id, "lv": level, "re": snappedf(react, 0.01), "an": antic, "w": weather.label(), "al": allow})
+	_save_record()
+
+func record_summary() -> String:
+	var lines := []
+	var now := int(Time.get_unix_time_from_system())
+	var today := 0
+	for r: Dictionary in record:
+		if now - int(r.t) < 12 * 3600:
+			today += 1
+	if record.is_empty():
+		lines.append("아직 기록이 없어요. 상황을 켜고 달려 보세요.")
+	else:
+		lines.append("모두 %d번 (오늘 %d번)" % [record.size(), today])
+	for e: Dictionary in Events.LIST:
+		var rs := record.filter(func(r): return r.id == e.id)
+		if rs.is_empty():
+			continue
+		var bad := rs.filter(func(r): return r.lv == "bad").size()
+		var t := "%s  %d번, 위험했던 때 %d번" % [e.name, rs.size(), bad]
+		var an := rs.filter(func(r): return r.an != null)
+		if not an.is_empty():
+			t += ", 미리 줄임 %d%%" % int(100.0 * an.filter(func(r): return r.an == true).size() / an.size())
+		var re := rs.filter(func(r): return float(r.re) > 0.0)
+		if re.size() >= 4: # 처음 몇 번과 최근 몇 번의 반응 시간
+			var k := mini(5, re.size() / 2)
+			var a := 0.0
+			var b := 0.0
+			for i in k:
+				a += float(re[i].re)
+				b += float(re[re.size() - 1 - i].re)
+			t += ", 반응 %.1f초 → %.1f초" % [a / k, b / k]
+		lines.append(t)
+	lines.append("이번 연습 %d분, 날씨 기준 과속 %d번, 앞차를 너무 가까이 따라간 시간 %d%%" % [int(drive_t / 60), sess.over, int(100.0 * sess.short / maxf(1.0, sess.follow))])
+	return "
+".join(lines)
+
+# 단서가 나타난 순간 사진 + 봤어야 할 곳 (화면 좌표 0~1)
+func snapshot(p: Vector3, text: String):
+	if DisplayServer.get_name() == "headless" or cam.is_position_behind(p):
+		return null
+	var img := get_viewport().get_texture().get_image()
+	if img == null or img.is_empty():
+		return null
+	var vr := get_viewport().get_visible_rect().size
+	var m := cam.unproject_position(p) * Vector2(img.get_width(), img.get_height()) / vr
+	var cw := int(img.get_width() * 0.4)
+	var ch := int(cw * 9.0 / 16.0)
+	var cx := clampi(int(m.x), cw / 2, img.get_width() - cw / 2)
+	var cy := clampi(int(m.y - ch * 0.1), int(img.get_height() * 0.13) + ch / 2, int(img.get_height() * 0.9) - ch / 2) # 뒷거울과 계기판은 빼고
+	var rect := Rect2i(cx - cw / 2, cy - ch / 2, cw, ch)
+	var part := img.get_region(rect)
+	part.resize(384, 216, Image.INTERPOLATE_BILINEAR)
+	return {"tex": ImageTexture.create_from_image(part), "mark": (m - Vector2(rect.position)) / Vector2(rect.size), "text": text}
 
 func _trigger(id: String) -> void:
 	set_paused(false)
@@ -332,10 +425,54 @@ func sim_step(dt: float) -> void:
 	_collide()
 	city.tick(dt, sim_t, car)
 	events.update(dt, sim_t)
+	_rules(dt)
 	sim_t += dt
 	crash_t -= dt
 	splash_t -= dt
 	roll += (clampf(-car.v * car.yaw_rate * 0.012, -0.06, 0.06) - roll) * minf(1.0, dt * 6)
+
+# 날씨 기준 제한 속도, 앞차와의 거리(초), 오래 하면 쉬라는 알림
+func _rules(dt: float) -> void:
+	drive_t += dt
+	if int(drive_t / 1200.0) != int((drive_t - dt) / 1200.0):
+		hud.flash("%d분 연습했어요" % int(round(drive_t / 60.0)), 2.5)
+		hud.toast("어지럽거나 눈이 피곤하면 잠깐 쉬었다 해요", "info")
+	lim_t -= dt
+	if lim_t <= 0:
+		lim_t = 0.1
+		var m := car.at(1.35, 0)
+		var q = city.road_at(m.x, m.z)
+		if q != null:
+			var base: float = q.r.T.lim
+			if is_same(q.r, city.school) and q.s > city.school.zone[0] and q.s < city.school.zone[1]:
+				base = 30.0
+			eff_lim = base * weather.speed_factor()
+		# 앞차: 같은 차로에서 60m 안
+		gap_s = -1.0
+		gap_need = 2.0 if weather.kind == "clear" and not weather.fog else 4.0
+		var v := absf(car.v)
+		if v > 3.0:
+			var best := 60.0
+			for c: Dictionary in city.ai:
+				var rel: Vector2 = events._rel(c.x, c.z)
+				var f: float = rel.x - (2.7 if c.kind == "amb" else 2.25)
+				if f > 0 and f < best and absf(rel.y) < 1.6 and cos(c.yaw - car.yaw) > 0.8:
+					best = f
+			if best < 60.0:
+				gap_s = best / v
+				sess.follow += 0.1
+				if gap_s < gap_need:
+					sess.short += 0.1
+	var kmh := absf(car.v) * 3.6
+	if kmh > eff_lim + 3:
+		over_t += dt
+		if over_t > 2.0 and sim_t - over_said > 20.0:
+			over_said = sim_t
+			sess.over += 1
+			var why := weather.factor_text()
+			hud.toast(("%s: 제한 속도를 줄여야 해요. 지금은 시속 %dkm" % [why, int(eff_lim)]) if why != "" else "제한 속도 시속 %dkm를 넘었어요" % int(eff_lim), "warn")
+	else:
+		over_t = 0.0
 
 func _collide() -> void:
 	var cb := car.box()
@@ -399,7 +536,8 @@ func _collide() -> void:
 			hud.toast("사람과 부딪혔어요", "warn")
 			hits.append(["사람", snappedf(who.position.x, 0.1), snappedf(who.position.z, 0.1)])
 			if not events.hit_person(who):
-				hud.add_result("보행자", ["건너던 사람과 부딪혔어요", "횡단보도 앞에선 사람이 없어도 속도를 줄이기"], false)
+				hud.add_result("보행자", ["건너던 사람과 부딪혔어요", "횡단보도 앞, 우회전할 때는 사람이 건너는지 먼저 보기"], "bad")
+				add_record("ped", "bad", -1.0, null)
 
 # ───────── 그리기 ─────────
 func _process(dt: float) -> void:
@@ -431,7 +569,8 @@ func _process(dt: float) -> void:
 		marks.append([Vector2(events.act.amb.c.x, events.act.amb.c.z), Color(0.85, 0.12, 0.1)])
 	hud.update({"weather": weather.label(), "n_on": n_on, "kmh": absf(car.v) * 3.6, "gear": car.gear, "simple": simple, "sig": car.sig, "blink": blink,
 		"hazard": car.hazard, "lights": car.lights, "slip": car.understeer > 0.15 or absf(car.slip) > 0.06 or car.wheelspin, "ffb": car.ffb,
-		"x": car.x, "z": car.z, "yaw": car.yaw, "cars": cars, "marks": marks})
+		"x": car.x, "z": car.z, "yaw": car.yaw, "cars": cars, "marks": marks,
+		"lim": eff_lim, "lim_note": weather.factor_text(), "over": absf(car.v) * 3.6 > eff_lim + 3, "gap": gap_s, "gap_need": gap_need})
 	if hud.minimap.lines.is_empty():
 		hud.minimap.lines = city.map_lines
 

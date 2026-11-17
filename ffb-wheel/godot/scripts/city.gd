@@ -845,13 +845,14 @@ func spawn_ai(col: Color, seg = null, s := -1.0, v := 4.0, kind := "car") -> Dic
 		var ss: float = s if s >= 0 else 5 + rng.randf() * maxf(1.0, sg.L - 10)
 		var p := pos_at(sg, ss)
 		var ok := true
-		if seg == null:
-			for o: Dictionary in ai:
-				if Vector2(o.x - p.x, o.z - p.z).length() < 14:
-					ok = false
-			if Vector2(p.x + 120, p.z + 150).length() < 30:
+		for o: Dictionary in ai: # 다른 차와 겹치게 놓으면 서로를 앞차로 보고 영영 서 있음
+			if Vector2(o.x - p.x, o.z - p.z).length() < (14.0 if seg == null else 7.0):
 				ok = false
+		if seg == null and Vector2(p.x + 120, p.z + 150).length() < 30:
+			ok = false
 		if not ok:
+			if seg != null:
+				return {}
 			continue
 		var mesh: Node3D = _amb_mesh() if kind == "amb" else Kit.car_mesh(self, col)
 		c = {"seg": sg, "s": ss, "v": v, "x": p.x, "z": p.z, "yaw": p.yaw, "pi": p.i, "mesh": mesh, "stopT": 0.0, "stuck": 0.0, "move": null, "con": null, "brake": false,
@@ -913,18 +914,18 @@ func _gap(c: Dictionary, path: Array, player, only_player: bool, lat: float) -> 
 	if not only_player and c.kind != "amb":
 		for o: Dictionary in ai:
 			if not is_same(o, c) and absf(o.x - c.x) < 46 and absf(o.z - c.z) < 46:
-				cand.append([o.x, o.z, 2.3 if o.kind != "amb" else 2.7, 1.6])
+				cand.append([o.x, o.z, 2.3 if o.kind != "amb" else 2.7, 1.6, true])
 	if player != null and absf(player.x - c.x) < 50 and absf(player.z - c.z) < 50:
 		for f in [-0.6, 1.35, 3.3]:
 			var m: Dictionary = player.at(f, 0)
-			cand.append([m.x, m.z, 2.3 if f == 1.35 else 0.35, 1.7])
+			cand.append([m.x, m.z, 2.3 if f == 1.35 else 0.35, 1.7, true])
 	if not only_player:
 		for p: Dictionary in peds:
 			if p.walking and absf(p.x - c.x) < 46 and absf(p.z - c.z) < 46:
-				cand.append([p.x, p.z, 0.3, 1.6])
+				cand.append([p.x, p.z, 0.3, 1.6, false])
 	for e: Dictionary in extra_obs:
 		if absf(e.x - c.x) < 46 and absf(e.z - c.z) < 46:
-			cand.append([e.x, e.z, e.get("half", 0.3), e.get("lat", 1.6)])
+			cand.append([e.x, e.z, e.get("half", 0.3), e.get("lat", 1.6), false])
 	if cand.is_empty():
 		return 1e9
 	var best := 1e9
@@ -945,6 +946,8 @@ func _gap(c: Dictionary, path: Array, player, only_player: bool, lat: float) -> 
 			for o: Array in cand:
 				if absf(o[0] - qx) > 3 or absf(o[1] - qz) > 3:
 					continue
+				if o[4] and d < 2.6: # 차는 내 앞범퍼보다 앞에 있을 때만 (옆, 뒤의 차는 앞차가 아님)
+					continue
 				if Vector2(o[0] - qx, o[1] - qz).length() < o[3]:
 					best = minf(best, d - o[2] - 2.3)
 			if best < 1e9:
@@ -961,6 +964,10 @@ func tick(dt: float, t: float, player) -> void:
 	acc = 0.0
 
 func _tick_ai(dt: float, t: float, player) -> void:
+	if player != null: # 돌발 상황 때문에 생긴 차는 멀어지면 지움 (다른 차 수가 늘지 않게)
+		for c: Dictionary in ai.duplicate():
+			if c.get("temp", false) and c.age > 15 and not c.has("cut") and c.force <= 0 and Vector2(c.x - player.x, c.z - player.z).length() > 140:
+				remove_ai(c)
 	var amb_list := []
 	for c: Dictionary in ai:
 		if c.kind == "amb":
@@ -1034,15 +1041,18 @@ func _tick_ai(dt: float, t: float, player) -> void:
 				want_v = minf(want_v, 0.0 if c.v < 3 else c.v - 2.0)
 				lat_target = 1.0
 		# 구급차가 운전자 차 뒤에 오면: 큰길에서 운전자가 오른쪽 차로면 왼쪽 차로로, 1차로 길에선 운전자가 오른쪽 가장자리로 붙어 천천히 가면 중앙선을 넘어 앞지름
+		# 4초 넘게 막혔는데 앞의 운전자 차도 멈춰 있으면 (앞이 막혀 못 비키는 경우) 그대로 비켜 지나감
 		if amb and player != null and not on_con:
 			var pl = lane_of(player.x, player.z, player.yaw)
+			c.blocked = c.get("blocked", 0.0) + dt if c.v < 1.0 else 0.0
 			if pl != null and is_same(pl.seg.r, seg.r) and pl.seg.dir == seg.dir:
 				var ahead: float = pl.s - c.s
+				var stuck_behind: bool = c.blocked > 4.0 and absf(player.v) < 1.0
 				if ahead > -10 and ahead < 45:
 					if seg.r.T.n == 2:
-						if pl.k == 1 and seg.k == 1 and c.lc == null:
-							_lane_change(c, 0, 1.4)
-					elif (pl.off - seg.r.T.lw * 0.5 > 0.45 and absf(player.v) < 7.0) or (c.lat < -1.0 and ahead > -6):
+						if pl.k == seg.k and c.lc == null and (pl.k == 1 or stuck_behind):
+							_lane_change(c, 1 - seg.k, 1.4)
+					elif (pl.off - seg.r.T.lw * 0.5 > 0.45 and absf(player.v) < 7.0) or (c.lat < -1.0 and ahead > -12) or stuck_behind: # 12m 넘게 앞선 뒤에 차로로 돌아옴
 						lat_target = -2.4
 		var gap := _gap(c, path, player, c.stuck > 10 or amb, c.lat)
 		if stop_d < 1e8:

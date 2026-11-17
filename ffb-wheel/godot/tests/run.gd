@@ -53,7 +53,7 @@ func results() -> Array:
 	var out := []
 	for e: Dictionary in main.hud.log:
 		if e.has("result"):
-			out.append("%s %s: %s" % ["O" if e.good else "X", e.result, " / ".join(e.lines)])
+			out.append("%s %s: %s" % [{"ok": "O", "warn": "△", "bad": "X"}.get(e.get("level", ""), "?"), e.result, " / ".join(e.lines)])
 	return out
 
 func crashes() -> int:
@@ -114,6 +114,22 @@ func _run() -> void:
 		# 눈길에서 아이: 멀리서 일어나니 반응만 빠르면 멈춤
 		var r3: Dictionary = await situation("child", 31, 0.7, "snow")
 		print("SIT snow child ", r3)
+	if case in ["all", "antic"]:
+		# 미리 보는 운전자와 아닌 운전자: 같은 상황(아이, 무단횡단)을 여러 번
+		for an in [true, false]:
+			for id in ["child", "jay"]:
+				for seed in [41, 42, 43, 44]:
+					var setup := func(b: Bot) -> void: b.antic = an
+					var r: Dictionary = await situation(id, seed, 0.8, "clear", setup)
+					print("ANTIC %s %s seed %d → %s hits %s" % ["미리봄" if an else "그냥", id, seed, r.res, r.hits])
+	if case in ["all", "rules"]:
+		for kind in ["rain", "snow"]:
+			fresh(6, 0.8, kind)
+			main.sess = {"over": 0, "follow": 0.0, "short": 0.0}
+			await sim(60.0)
+			print("RULES %s: 제한 %.0f, 과속 알림 %d, 따라간 %.0f초 중 가까움 %.0f초, 알림 %s" % [kind, main.eff_lim, main.sess.over, main.sess.follow, main.sess.short, main.hud.log.filter(func(e): return e.has("toast")).map(func(e): return e.toast).slice(0, 3)])
+		print("SUMMARY
+", main.record_summary())
 	if case in ["all", "amb"]:
 		var main_r := road("Ja", "C")
 		var ring_r := road("Ns", "Kc")
