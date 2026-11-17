@@ -30,6 +30,9 @@ button { font: inherit; color: inherit; cursor: pointer }
 .dash .gear span { padding: 1px 5px; color: #6d6c67 } .dash .gear span.on { color: #fff; background: var(--blue) }
 .dash .rpm { width: 70px; height: 6px; background: #3a3a38; position: relative } .dash .rpm i { position: absolute; inset: 0 auto 0 0; background: #9fb4ff } .dash .rpm::after { content: ""; position: absolute; left: 61.5%; top: -3px; bottom: -3px; width: 1.5px; background: #e0452b }
 .dash .ic { display: flex; gap: 9px } .dash .ic span { color: #57564f } .dash .ic span.on { color: #f2b417 } .dash .ic span.red.on { color: #ff6b5e } .dash .ic span.blue.on { color: #8fb0ff } .dash .ic span.green.on { color: #6fdc8c }
+.nav { position: fixed; z-index: 10; left: var(--m); top: 108px; display: flex; gap: 12px; align-items: center; padding: 10px 16px 10px 12px; background: var(--blue); color: #fff }
+.nav b { font: 700 34px/1 var(--sans); width: 38px; text-align: center } .nav > span { display: grid } .nav .mono { font-size: 13px; opacity: .8 } #navT { font: 700 17px var(--sans) }
+.dash .lim { display: none; width: 30px; height: 30px; border-radius: 50%; border: 3.5px solid #e0452b; background: #fff; color: #151514; font: 700 12px/23px var(--sans); text-align: center } .dash .lim.on { display: inline-block }
 #alarm { position: fixed; z-index: 11; left: 50%; top: 46%; transform: translate(-50%, -50%); padding: 14px 26px; background: #d6261c; color: #fff; font: 800 32px var(--sans); letter-spacing: .1em; display: none }
 #alarm.on { display: block; animation: blink .5s steps(1) infinite }
 @keyframes blink { 50% { opacity: .25 } }
@@ -53,7 +56,7 @@ button { font: inherit; color: inherit; cursor: pointer }
 .res ol { margin: 18px 0; padding-left: 20px; columns: 2; column-gap: 32px; font-size: 15px } .res li { break-inside: avoid; margin-bottom: 4px } .res li b { font: 500 13px var(--mono); margin-right: 6px; color: #b8322a }
 .row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px }
 .btn { min-height: 44px; padding: 0 18px; border: 1.5px solid var(--ink); background: none; font-weight: 700 } .btn.main { background: var(--blue); border-color: var(--blue); color: #fff }
-@media (max-width: 760px) { .modes { grid-template-columns: 1fr } .keys { grid-template-columns: 1fr 1fr } #map { width: 110px; height: 110px; top: 104px } .dash { gap: 10px; padding: 8px 12px } .dash .ic { display: none } .res ol { columns: 1 } }
+@media (max-width: 760px) { .say { top: 226px; font-size: 16px } .nav { top: 104px } .modes { grid-template-columns: 1fr } .keys { grid-template-columns: 1fr 1fr } #map { width: 110px; height: 110px; top: 104px } .dash { gap: 10px; padding: 8px 12px } .dash .ic { display: none } .res ol { columns: 1 } }
 </style>
 </head>
 <body>
@@ -64,8 +67,9 @@ button { font: inherit; color: inherit; cursor: pointer }
 <div class="say" id="say"></div>
 <div class="toasts" id="toasts"></div>
 <div id="alarm">돌발</div>
+<div class="nav" id="nav" hidden><b id="navA"></b><span><span id="navD" class="mono"></span><span id="navT"></span></span></div>
 <div class="dash mono" id="dash" hidden>
-  <span class="spd" id="dSpd">0<small>km/h</small></span>
+  <span class="lim" id="dLim"></span><span class="spd" id="dSpd">0<small>km/h</small></span>
   <span class="gear" id="dGear"><span>P</span><span>R</span><span>N</span><span>D</span></span>
   <span class="rpm" title="엔진 회전수 (빨간 선 4,000)"><i id="dRpm"></i></span>
   <span class="ic"><span id="iL">◀</span><span id="iR">▶</span><span id="iHz" class="red">⚠</span><span id="iPb" class="red">P!</span><span id="iBelt" class="red">벨트</span><span id="iLt" class="green">등</span><span id="iWp" class="blue">와이퍼</span></span>
@@ -76,8 +80,8 @@ button { font: inherit; color: inherit; cursor: pointer }
     <p class="sub">2종 보통(자동) 기준. 지금은 키보드로, 다음엔 레이싱 휠로.</p>
     <div class="modes">
       <button class="mode" type="button" data-mode="course"><span class="n">01</span><h2>장내기능시험</h2><p>경사로, 직각주차, 신호교차로, 가속, 돌발. 80점 넘으면 합격.</p></button>
-      <button class="mode" type="button" data-mode="road" disabled><span class="n">02</span><h2>도로주행시험</h2><p>내비 안내를 따라 시내를 돎. 70점 넘으면 합격. 만드는 중.</p></button>
-      <button class="mode" type="button" data-mode="city" disabled><span class="n">03</span><h2>도시 주행</h2><p>같은 도시를 길 안내 없이 자유롭게. 만드는 중.</p></button>
+      <button class="mode" type="button" data-mode="road"><span class="n">02</span><h2>도로주행시험</h2><p>길 안내를 따라 시내 1.2km. 차로 변경, 신호, 어린이 보호구역. 70점 넘으면 합격.</p></button>
+      <button class="mode" type="button" data-mode="city"><span class="n">03</span><h2>도시 주행</h2><p>같은 도시를 길 안내 없이 자유롭게. 다른 차와 보행자가 다님.</p></button>
     </div>
     <div class="opts"><button class="tog" id="tScore" type="button" aria-pressed="true"><i></i>채점</button><button class="tog" id="tSound" type="button" aria-pressed="true"><i></i>소리, 음성 안내</button></div>
     <div class="keys">
@@ -101,6 +105,7 @@ button { font: inherit; color: inherit; cursor: pointer }
 import * as THREE from "three";
 import { CAR, newCar, stepCar, shift, setSig, wheelsOf, front, carBox, obbHit } from "./car.js";
 import { buildCourse } from "./course.js";
+import { buildCity } from "./city.js";
 const $ = id => document.getElementById(id);
 const cl = (x, a, b) => Math.min(b, Math.max(a, x));
 const Q = new URLSearchParams(location.search);
@@ -179,12 +184,15 @@ function say(txt) {
 function toast(txt, info) { const p = document.createElement("p"); p.textContent = txt; if (info) p.className = "info"; $("toasts").prepend(p); setTimeout(() => p.remove(), 2800); while ($("toasts").children.length > 5) $("toasts").lastChild.remove(); }
 
 /* ───────── 입력: 키보드 → { steer, thr, brk }. 레이싱 휠을 붙이면 이 한 곳만 바꾸면 됨 ───────── */
-const K = {}, inp = { steer: 0, thr: 0, brk: 0 };
+const K = {}, inp = { steer: 0, thr: 0, brk: 0 }, hold = { u: 0, d: 0 };
 function readKeys(dt, kmh) {
   const t = (K.ArrowLeft ? 1 : 0) - (K.ArrowRight ? 1 : 0), lim = Math.max(.3, 1 - Math.max(0, kmh - 15) / 70); // 키보드만: 빠를수록 덜 꺾임
   if (t) inp.steer = cl(inp.steer + t * dt * (inp.steer * t < 0 ? 3.4 : 1.7), -lim, lim); else inp.steer -= Math.sign(inp.steer) * Math.min(Math.abs(inp.steer), dt * 2.2);
-  inp.thr = K.ArrowUp ? Math.min(1, inp.thr + dt * .9) : Math.max(0, inp.thr - dt * 3);
-  inp.brk = K.ArrowDown ? Math.min(1, inp.brk + dt * 1.6) : Math.max(0, inp.brk - dt * 5);
+  // 가속, 브레이크: 누르면 먼저 보통 세기(가속 절반, 제동 0.45G 안팎)까지, 1초 넘게 누르고 있으면 끝까지 (급출발, 급제동 감점을 키보드로도 피할 수 있게)
+  hold.u = K.ArrowUp ? hold.u + dt : 0; hold.d = K.ArrowDown ? hold.d + dt : 0;
+  const tu = hold.u > 1 ? Math.min(1, .5 + (hold.u - 1) * .5) : .5, td = hold.d > 1 ? Math.min(1, .5 + (hold.d - 1) * .5) : .5;
+  inp.thr = K.ArrowUp ? Math.min(tu, inp.thr + dt * .9) : Math.max(0, inp.thr - dt * 3);
+  inp.brk = K.ArrowDown ? Math.min(td, inp.brk + dt * 1.6) : Math.max(0, inp.brk - dt * 5);
 }
 function control(code) { // 운전대 주변 장치
   if (!car || paused()) return;
@@ -210,13 +218,15 @@ addEventListener("keyup", e => K[e.code] = false);
 addEventListener("blur", () => { for (const k in K) K[k] = false; });
 
 /* ───────── 한 판 ───────── */
-let M = null, car = null, ex = null, view = 0, simT = 0, mode = null, shake = 0;
-const MODES = { course: buildCourse };
+let M = null, car = null, ex = null, view = 0, simT = 0, mode = null, shake = 0, lastFail = "", lastFailT = -9;
+const MODES = { course: buildCourse, road: s => buildCity(s), city: s => buildCity(s, { free: true }) };
 const ctx = {
   say, beep,
   deduct(item, pts, why) { if (!scoring || !ex || ex.E.done) return; ex.E.pts = (ex.E.pts ?? 100) - pts; (ex.E.log ||= []).push({ item, pts, why }); toast(`−${pts} ${item}: ${why}`); tone(330, .15, .05, "triangle");
-    if (ex.E.pts < (M.pass ?? 80)) { ex.E.done = true; say("불합격입니다"); setTimeout(showResult, 1400); } }, // 합격 점수 아래로 떨어지면 그 자리에서 끝
-  fail(why) { if (!scoring || !ex || ex.E.done) return; ex.E.dq = why; ex.E.done = true; say("실격입니다"); setTimeout(showResult, 1400); },
+    if (!M.free && ex.E.pts < (M.pass ?? 80)) { ex.E.done = true; say("불합격입니다"); setTimeout(showResult, 1400); } }, // 합격 점수 아래로 떨어지면 그 자리에서 끝
+  fail(why) { if (!scoring || !ex || ex.E.done) return;
+    if (M.free) { if (lastFail !== why || simT - lastFailT > 5) { toast(`실격감: ${why}`); tone(200, .3, .06, "sawtooth"); (ex.E.log ||= []).push({ item: "실격감", pts: 0, why }); } lastFail = why; lastFailT = simT; return; } // 도시 주행은 알려 주기만
+    ex.E.dq = why; ex.E.done = true; say("실격입니다"); setTimeout(showResult, 1400); },
   finish() { say(scoring ? "시험이 끝났습니다" : "코스를 다 돌았어요"); setTimeout(showResult, 1200); },
 };
 function start(m) {
@@ -260,6 +270,10 @@ function simStep(dt, botInp) {
   const cb = carBox(c);
   for (const b of M.boxes) { if (Math.abs(b.x - cb.x) > 8 || Math.abs(b.z - cb.z) > 8) continue; const p = obbHit(cb, b);
     if (p) { c.x += p.x; c.z += p.z; cb.x += p.x; cb.z += p.z; if (Math.abs(c.v) > .3) { shake = Math.min(1, Math.abs(c.v) / 6); beep("bump"); if (crashT <= 0) { ctx.fail("물체에 부딪힘 (사고)"); crashT = 1; } } c.v = 0; } }
+  if (M.tick) { M.tick(dt, simT, c); for (const b of M.cars) { const p = obbHit(cb, b); if (p) { c.x += p.x; c.z += p.z; cb.x += p.x; cb.z += p.z; c.v = 0;
+      const behind = (b.x - cb.x) * Math.sin(c.yaw) + (b.z - cb.z) * Math.cos(c.yaw) < -2; // 뒤차가 와서 받은 건 운전자 잘못이 아님
+      if (behind) { if (crashT <= 0) { toast("뒤차가 부딪혔어요", 1); crashT = 1; } b.ai.v = 0; continue; }
+      if (crashT <= 0) { b.ai.v = 0; shake = .6; beep("bump"); ctx.fail("다른 차와 부딪힘 (사고)"); crashT = 1; } b.ai.v = 0; } } }
   crashT -= dt;
   const hits = []; for (const w of wheelsOf(c)) for (const h of M.lines.hits(w, .1)) if (!hits.includes(h)) hits.push(h);
   simT += dt;
@@ -307,6 +321,8 @@ function render(dt) {
   $("hPts").innerHTML = scoring ? `<b>${Math.max(0, ex.E.pts)}</b>점` : "채점 끔";
   $("hTime").textContent = h.limit ? `${fmt(h.time)} / ${fmt(h.limit)}` : "";
   $("alarm").classList.toggle("on", !!ex.alarm);
+  const nv = h.nav; $("nav").hidden = !nv; if (nv) { $("navA").textContent = { s: "↑", l: "↰", r: "↱", end: "◎" }[nv.turn]; $("navD").textContent = nv.turn === "end" ? "목적지" : `${Math.round(nv.dist)}m`; $("navT").textContent = nv.text; }
+  $("dLim").classList.toggle("on", !!h.lim); $("dLim").textContent = h.lim || "";
   if (sayT > 0 && (sayT -= dt) <= 0) $("say").classList.remove("on");
   drawMap();
 }
@@ -314,6 +330,14 @@ const mc = $("map"), mg = mc.getContext("2d");
 function drawMap() {
   const s = mc.clientWidth, dp = Math.min(devicePixelRatio, 2); if (!s) return; if (mc.width !== s * dp) mc.width = mc.height = s * dp;
   mg.setTransform(dp, 0, 0, dp, 0, 0); mg.clearRect(0, 0, s, s);
+  if (M.mapZoom) { // 도시: 내 차 가운데, 진행 방향이 위
+    const k = s / 2 / 120; mg.save(); mg.beginPath(); mg.rect(0, 0, s, s); mg.clip(); mg.translate(s / 2, s / 2); mg.rotate(car.yaw - Math.PI); mg.scale(k, k); mg.translate(-car.x, -car.z);
+    mg.lineCap = mg.lineJoin = "round"; mg.strokeStyle = "#c9c6bc"; mg.lineWidth = 9;
+    for (const L of M.mapLines) { mg.beginPath(); L.forEach((p, i) => i ? mg.lineTo(p.x, p.z) : mg.moveTo(p.x, p.z)); mg.stroke(); }
+    const np = ex.nextPoint?.(); if (np) { mg.fillStyle = "#2b44a6"; mg.beginPath(); mg.arc(np[0], np[1], 9, 0, 7); mg.fill(); }
+    mg.fillStyle = "#8f8f8c"; for (const b of M.cars) { mg.beginPath(); mg.arc(b.x, b.z, 3, 0, 7); mg.fill(); }
+    mg.restore(); mg.fillStyle = "#e0452b"; mg.beginPath(); mg.moveTo(s / 2, s / 2 - 7); mg.lineTo(s / 2 + 5, s / 2 + 5); mg.lineTo(s / 2, s / 2 + 2); mg.lineTo(s / 2 - 5, s / 2 + 5); mg.closePath(); mg.fill(); return;
+  }
   const [x0, z0, x1, z1] = M.bounds, k = (s - 14) / Math.max(x1 - x0, z1 - z0), ox = (s - (x1 - x0) * k) / 2, oz = (s - (z1 - z0) * k) / 2, P = (x, z) => [ox + (x - x0) * k, oz + (z - z0) * k];
   mg.lineWidth = 3.2; mg.lineCap = mg.lineJoin = "round"; mg.strokeStyle = "#3e3f44"; mg.beginPath();
   M.route.forEach((p, i) => { const [x, y] = P(p.x, p.z); i ? mg.lineTo(x, y) : mg.moveTo(x, y); }); mg.stroke();
