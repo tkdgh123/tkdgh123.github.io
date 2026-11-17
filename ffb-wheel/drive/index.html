@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>운전면허 시뮬레이션 · 창공설 레이싱 휠</title>
+<link rel="stylesheet" href="../../web-motion/apply/apply.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js"}}</script>
+<style>
+/* 그랑프리(web-motion/move/drive.html)의 차·3인칭 화면·계기판 결을 그대로, 맵만 운전면허 시험장과 도시로 */
+[hidden] { display: none !important }
+body { height: 100svh; overflow: hidden; background: #f2f1ec; user-select: none; -webkit-user-select: none }
+#gl { position: fixed; inset: 0; width: 100%; height: 100%; display: block }
+button { font: inherit; color: inherit; cursor: pointer }
+.top button { background: none; border: 0; padding: 0; text-decoration: none }
+.top button:hover { text-decoration: underline 1px; text-underline-offset: 4px }
+.top button[aria-pressed="false"] { opacity: .55 }
+.hud { position: fixed; z-index: 10; left: var(--m); top: 58px; display: flex; gap: 12px; align-items: center; padding: 8px 14px; background: rgb(21 21 20 / .86); color: var(--on-dark); white-space: nowrap }
+.hud .task { padding: 2px 8px; background: var(--blue); color: #fff; font-weight: 500 }
+.hud .pts b { font-weight: 500; color: #fff } .hud .soft { color: var(--on-dark-soft) }
+#map { position: fixed; z-index: 10; right: var(--m); top: 58px; width: 170px; height: 170px; background: rgb(242 241 236 / .88) }
+.say { position: fixed; z-index: 12; left: 50%; top: 104px; transform: translate(-50%, -10px); padding: 10px 18px; background: #f2f1ec; color: var(--ink); font: 700 clamp(17px, 2vw, 22px) var(--sans); box-shadow: 0 8px 24px -12px rgb(0 0 0 / .5); opacity: 0; transition: opacity .25s, transform .25s; pointer-events: none; white-space: nowrap }
+.say.on { opacity: 1; transform: translate(-50%, 0) }
+.toasts { position: fixed; z-index: 12; left: var(--m); top: 110px; display: grid; gap: 6px; pointer-events: none }
+.toasts p { padding: 6px 10px; background: #b8322a; color: #fff; font: 500 13px var(--mono); animation: tin .25s ease-out }
+.toasts p.info { background: rgb(21 21 20 / .86) }
+@keyframes tin { from { transform: translateX(-12px); opacity: 0 } }
+.dash { position: fixed; z-index: 10; left: 50%; bottom: clamp(12px, 3vh, 28px); transform: translateX(-50%); display: flex; gap: 16px; align-items: center; padding: 10px 18px; background: rgb(21 21 20 / .9); color: var(--on-dark); white-space: nowrap }
+.dash .spd { font: 300 34px/1 var(--serif); min-width: 58px; text-align: right } .dash .spd small { font: 500 11px var(--mono); color: var(--on-dark-soft); margin-left: 4px }
+.dash .gear span { padding: 1px 5px; color: #6d6c67 } .dash .gear span.on { color: #fff; background: var(--blue) }
+.dash .rpm { width: 70px; height: 6px; background: #3a3a38; position: relative } .dash .rpm i { position: absolute; inset: 0 auto 0 0; background: #9fb4ff } .dash .rpm::after { content: ""; position: absolute; left: 61.5%; top: -3px; bottom: -3px; width: 1.5px; background: #e0452b }
+.dash .ic { display: flex; gap: 9px } .dash .ic span { color: #57564f } .dash .ic span.on { color: #f2b417 } .dash .ic span.red.on { color: #ff6b5e } .dash .ic span.blue.on { color: #8fb0ff } .dash .ic span.green.on { color: #6fdc8c }
+#alarm { position: fixed; z-index: 11; left: 50%; top: 46%; transform: translate(-50%, -50%); padding: 14px 26px; background: #d6261c; color: #fff; font: 800 32px var(--sans); letter-spacing: .1em; display: none }
+#alarm.on { display: block; animation: blink .5s steps(1) infinite }
+@keyframes blink { 50% { opacity: .25 } }
+.sheet { position: fixed; z-index: 30; inset: 0; display: grid; place-items: center; padding: 70px var(--m) 24px; background: rgb(242 241 236 / .9); overflow: auto }
+.sheet[hidden] { display: none }
+.sheet .in { width: min(980px, 100%) }
+.sheet h1 { font-size: clamp(34px, 5vw, 62px); margin: 0 0 6px } .sheet .sub { color: var(--muted); margin-bottom: 26px }
+.modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px }
+.mode { position: relative; display: grid; align-content: start; gap: 8px; min-height: 170px; padding: 18px; border: 1.5px solid var(--ink); background: #f2f1ec; text-align: left; transition: background-color .2s, color .2s }
+.mode:hover, .mode:focus-visible { background: var(--ink); color: var(--on-dark) }
+.mode .n { font: 500 12px var(--mono); color: var(--muted) } .mode:hover .n { color: var(--on-dark-soft) }
+.mode h2 { font-size: 30px; margin: 4px 0 2px } .mode p { font-size: 14px; line-height: 1.5 }
+.mode[disabled] { opacity: .45; cursor: default } .mode[disabled]:hover { background: #f2f1ec; color: var(--ink) }
+.opts { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 18px 0 8px }
+.tog { display: inline-flex; align-items: center; gap: 10px; min-height: 40px; padding: 0 14px; border: 1.5px solid var(--rule); background: none; font-weight: 600 }
+.tog i { width: 30px; height: 16px; border-radius: 9px; background: var(--rule); position: relative; transition: background-color .2s } .tog i::after { content: ""; position: absolute; left: 2px; top: 2px; width: 12px; height: 12px; border-radius: 50%; background: #fff; transition: transform .2s }
+.tog[aria-pressed="true"] i { background: var(--blue) } .tog[aria-pressed="true"] i::after { transform: translateX(14px) }
+.keys { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px 18px; margin-top: 18px; font-size: 14px; color: var(--muted) }
+.keys b { display: inline-block; min-width: 26px; padding: 1px 6px; margin-right: 6px; border: 1.5px solid var(--rule); text-align: center; font: 500 12px var(--mono); color: var(--ink) }
+.res .big { font: 300 clamp(70px, 10vw, 120px)/1 var(--serif); margin: 6px 0 } .res .verdict { font: 700 22px var(--sans) } .res .verdict.fail { color: #b8322a } .res .verdict.pass { color: var(--blue) }
+.res ol { margin: 18px 0; padding-left: 20px; columns: 2; column-gap: 32px; font-size: 15px } .res li { break-inside: avoid; margin-bottom: 4px } .res li b { font: 500 13px var(--mono); margin-right: 6px; color: #b8322a }
+.row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px }
+.btn { min-height: 44px; padding: 0 18px; border: 1.5px solid var(--ink); background: none; font-weight: 700 } .btn.main { background: var(--blue); border-color: var(--blue); color: #fff }
+@media (max-width: 760px) { .modes { grid-template-columns: 1fr } .keys { grid-template-columns: 1fr 1fr } #map { width: 110px; height: 110px; top: 104px } .dash { gap: 10px; padding: 8px 12px } .dash .ic { display: none } .res ol { columns: 1 } }
+</style>
+</head>
+<body>
+<nav class="top mono" style="z-index:31"><a href="../?t=drive" id="up">← 창공설 레이싱 휠</a><span class="right"><span id="mName"></span><button id="bScore" type="button" aria-pressed="true">채점 켬</button><button id="bSound" type="button" aria-pressed="true">소리 켬</button><button id="bMenu" type="button">처음으로</button></span></nav>
+<canvas id="gl"></canvas>
+<div class="hud mono" id="hud" hidden><span class="task" id="hTask"></span><span class="pts" id="hPts"></span><span class="soft" id="hTime"></span></div>
+<canvas id="map" hidden></canvas>
+<div class="say" id="say"></div>
+<div class="toasts" id="toasts"></div>
+<div id="alarm">돌발</div>
+<div class="dash mono" id="dash" hidden>
+  <span class="spd" id="dSpd">0<small>km/h</small></span>
+  <span class="gear" id="dGear"><span>P</span><span>R</span><span>N</span><span>D</span></span>
+  <span class="rpm" title="엔진 회전수 (빨간 선 4,000)"><i id="dRpm"></i></span>
+  <span class="ic"><span id="iL">◀</span><span id="iR">▶</span><span id="iHz" class="red">⚠</span><span id="iPb" class="red">P!</span><span id="iBelt" class="red">벨트</span><span id="iLt" class="green">등</span><span id="iWp" class="blue">와이퍼</span></span>
+</div>
+<section class="sheet" id="menu">
+  <div class="in">
+    <h1>운전면허 <b>시뮬레이션</b></h1>
+    <p class="sub">2종 보통(자동) 기준. 지금은 키보드로, 다음엔 레이싱 휠로.</p>
+    <div class="modes">
+      <button class="mode" type="button" data-mode="course"><span class="n">01</span><h2>장내기능시험</h2><p>경사로, 직각주차, 신호교차로, 가속, 돌발. 80점 넘으면 합격.</p></button>
+      <button class="mode" type="button" data-mode="road" disabled><span class="n">02</span><h2>도로주행시험</h2><p>내비 안내를 따라 시내를 돎. 70점 넘으면 합격. 만드는 중.</p></button>
+      <button class="mode" type="button" data-mode="city" disabled><span class="n">03</span><h2>도시 주행</h2><p>같은 도시를 길 안내 없이 자유롭게. 만드는 중.</p></button>
+    </div>
+    <div class="opts"><button class="tog" id="tScore" type="button" aria-pressed="true"><i></i>채점</button><button class="tog" id="tSound" type="button" aria-pressed="true"><i></i>소리, 음성 안내</button></div>
+    <div class="keys">
+      <span><b>↑</b>가속</span><span><b>↓</b>브레이크</span><span><b>←</b><b>→</b>핸들</span><span><b>P</b><b>R</b><b>N</b><b>D</b>기어</span>
+      <span><b>Q</b><b>E</b>방향지시등</span><span><b>H</b>비상등</span><span><b>Space</b>주차 브레이크</span><span><b>B</b>안전띠</span>
+      <span><b>F</b>전조등</span><span><b>W</b>와이퍼</span><span><b>I</b>시동</span><span><b>C</b>시점</span>
+    </div>
+  </div>
+</section>
+<section class="sheet res" id="res" hidden>
+  <div class="in">
+    <p class="mono" id="rName"></p>
+    <p class="big" id="rPts"></p>
+    <p class="verdict" id="rVerdict"></p>
+    <ol id="rLog"></ol>
+    <div class="row"><button class="btn main" id="rAgain" type="button">다시 하기</button><button class="btn" id="rMenu" type="button">처음으로</button></div>
+  </div>
+</section>
+
+<script type="module">
+import * as THREE from "three";
+import { CAR, newCar, stepCar, shift, setSig, wheelsOf, front, carBox, obbHit } from "./car.js";
+import { buildCourse } from "./course.js";
+const $ = id => document.getElementById(id);
+const cl = (x, a, b) => Math.min(b, Math.max(a, x));
+const Q = new URLSearchParams(location.search);
+if (window.top !== window) $("up").style.visibility = "hidden"; // 레이싱 휠 페이지 칸 안에서는 위로 가는 줄이 필요 없음
+const store = (k, v) => { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch { return null; } };
+let scoring = store("drive-score") !== "0", sound = store("drive-sound") !== "0" && !Q.has("mute");
+
+/* ───────── 화면 ───────── */
+const renderer = new THREE.WebGLRenderer({ canvas: $("gl"), antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+const camera = new THREE.PerspectiveCamera(60, 1, .05, 600);
+function resize() { renderer.setSize(innerWidth, innerHeight, false); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); }
+addEventListener("resize", resize); resize();
+let scene, map, sun;
+function newScene() {
+  if (scene) scene.traverse(o => { o.geometry?.dispose(); [].concat(o.material || []).forEach(m => { m.map?.dispose(); m.dispose(); }); });
+  scene = new THREE.Scene(); scene.background = new THREE.Color(0xf2f1ec); scene.fog = new THREE.Fog(0xf2f1ec, 90, 260);
+  scene.add(new THREE.HemisphereLight(0xffffff, 0xd9d4c6, 1.7));
+  sun = new THREE.DirectionalLight(0xffffff, 1.6); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
+  Object.assign(sun.shadow.camera, { left: -45, right: 45, top: 45, bottom: -45, near: 1, far: 120 }); sun.shadow.bias = -.0006; scene.add(sun, sun.target);
+}
+
+/* ───────── 차 (그랑프리 파란 차를 실제 크기로) ───────── */
+const std = c => new THREE.MeshStandardMaterial({ color: c, roughness: .55 });
+const lamp = (c, k = .25) => ({ on: new THREE.MeshBasicMaterial({ color: c }), off: new THREE.MeshStandardMaterial({ color: new THREE.Color(c).multiplyScalar(k), roughness: .4 }) });
+const LMP = { head: lamp(0xfff6d8, .6), brake: lamp(0xff2a1a), turn: lamp(0xffa21a), rev: lamp(0xffffff, .5) };
+let carG, wheelsM, steerHubs, wheelM, lamps, cab, outside;
+function buildCar() {
+  carG = new THREE.Group(); const body = new THREE.Group(); body.position.z = 1.35; carG.add(body);
+  const add = (geo, m, x, y, z, p = body) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = true; p.add(o); return o; };
+  add(new THREE.BoxGeometry(1.8, .55, 4.6), std(0x2b44a6), 0, .62, 0);
+  cab = add(new THREE.BoxGeometry(1.58, .52, 2.2), std(0xf2f1ec), 0, 1.15, -.25);
+  const roof = add(new THREE.BoxGeometry(.3, .02, 2.2), std(0x151514), 0, 1.42, -.25);
+  add(new THREE.BoxGeometry(1.8, .12, .2), std(0xf2f1ec), 0, .66, 2.32);
+  const topper = add(new THREE.BoxGeometry(.9, .2, .34), std(0xe8b42a), 0, 1.52, -.3); // 지붕 위 시험차 표시등
+  outside = [cab, roof, topper];
+  lamps = { head: [], brake: [], turnL: [], turnR: [], rev: [] };
+  const L = (k, list, x, y, z, w = .32, h = .12) => { const m = add(new THREE.BoxGeometry(w, h, .04), LMP[k].off, x, y, z); m.userData.k = k; list.push(m); };
+  for (const s of [-1, 1]) { L("head", lamps.head, s * .58, .72, 2.31); L("brake", lamps.brake, s * .62, .78, -2.31); L("rev", lamps.rev, s * .32, .78, -2.31, .14, .08);
+    L("turn", s > 0 ? lamps.turnL : lamps.turnR, s * .82, .72, 2.31, .14, .1); L("turn", s > 0 ? lamps.turnL : lamps.turnR, s * .86, .78, -2.31, .1, .12); }
+  // 운전석 안 (운전석 시점에서만 보이는 계기판·핸들)
+  add(new THREE.BoxGeometry(1.6, .14, .5), std(0x1d1e22), 0, .88, .9);
+  wheelM = new THREE.Group(); wheelM.position.set(.37, .9, .5); wheelM.rotation.x = -.35; body.add(wheelM);
+  wheelM.add(new THREE.Mesh(new THREE.TorusGeometry(.18, .022, 10, 36), std(0x151514)));
+  for (const a of [0, 2.1, -2.1]) { const sp = new THREE.Mesh(new THREE.BoxGeometry(.03, .19, .02), std(0x2a2b30)); sp.position.set(Math.sin(a) * .095, -Math.cos(a) * .095, 0); sp.rotation.z = a; wheelM.add(sp); }
+  wheelM.add(new THREE.Mesh(new THREE.CylinderGeometry(.05, .05, .04, 16).rotateX(Math.PI / 2), std(0x2b44a6)));
+  const wg = new THREE.CylinderGeometry(.31, .31, .22, 18); wg.rotateZ(Math.PI / 2);
+  wheelsM = []; steerHubs = [];
+  for (const [x, z] of [[CAR.TR / 2, 0], [-CAR.TR / 2, 0], [CAR.TR / 2, CAR.WB], [-CAR.TR / 2, CAR.WB]]) {
+    const hub = new THREE.Group(); hub.position.set(x, .31, z); carG.add(hub);
+    const w = add(wg, std(0x151514), 0, 0, 0, hub); add(new THREE.BoxGeometry(.24, .1, .1), std(0x8f8b80), 0, 0, 0, w); wheelsM.push(w); if (z > 0) steerHubs.push(hub); }
+  scene.add(carG);
+}
+function drawCar(c, t) {
+  carG.position.set(c.x, c.y + c.lift, c.z); carG.rotation.set(-c.pitch, c.yaw, c.roll, "YXZ");
+  wheelsM.forEach(w => w.rotation.x = c.spin); steerHubs.forEach(h => h.rotation.y = c.steer);
+  wheelM.rotation.z = -c.inSteer * 7.85; // 핸들 한쪽 끝까지 1.25바퀴
+  const blink = Math.floor(t * 2.6) % 2 === 0;
+  const set = (list, on) => list.forEach(m => m.material = on ? LMP[m.userData.k].on : LMP[m.userData.k].off);
+  set(lamps.head, c.lights > 0); set(lamps.brake, c.brk > .05 && c.engine); set(lamps.rev, c.gear === "R" && c.engine);
+  set(lamps.turnL, blink && (c.sig === 1 || c.hazard)); set(lamps.turnR, blink && (c.sig === 2 || c.hazard));
+  return blink;
+}
+
+/* ───────── 소리 · 음성 ───────── */
+let ac = null;
+function tone(f, d, v = .06, type = "sine", at = 0) {
+  if (!sound) return; try { ac = ac || new AudioContext(); const o = ac.createOscillator(), g = ac.createGain(), t0 = ac.currentTime + at; o.type = type; o.frequency.value = f; g.gain.setValueAtTime(v, t0); g.gain.exponentialRampToValueAtTime(.0001, t0 + d); o.connect(g).connect(ac.destination); o.start(t0); o.stop(t0 + d + .02); } catch {}
+}
+const beep = k => k === "ok" ? (tone(880, .18), tone(1320, .25, .05, "sine", .16)) : k === "alarm" ? [0, .35, .7, 1.05].forEach(a => tone(1040, .25, .08, "square", a)) : tone(240, .2, .06, "sawtooth");
+let sayT = 0, voice = null;
+function say(txt) {
+  $("say").textContent = txt; $("say").classList.add("on"); sayT = 3.2;
+  if (sound && "speechSynthesis" in window) { try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(txt); u.lang = "ko-KR"; voice = voice || speechSynthesis.getVoices().find(v => v.lang.startsWith("ko")); if (voice) u.voice = voice; u.rate = 1.05; speechSynthesis.speak(u); } catch {} }
+}
+function toast(txt, info) { const p = document.createElement("p"); p.textContent = txt; if (info) p.className = "info"; $("toasts").prepend(p); setTimeout(() => p.remove(), 2800); while ($("toasts").children.length > 5) $("toasts").lastChild.remove(); }
+
+/* ───────── 입력: 키보드 → { steer, thr, brk }. 레이싱 휠을 붙이면 이 한 곳만 바꾸면 됨 ───────── */
+const K = {}, inp = { steer: 0, thr: 0, brk: 0 };
+function readKeys(dt, kmh) {
+  const t = (K.ArrowLeft ? 1 : 0) - (K.ArrowRight ? 1 : 0), lim = Math.max(.3, 1 - Math.max(0, kmh - 15) / 70); // 키보드만: 빠를수록 덜 꺾임
+  if (t) inp.steer = cl(inp.steer + t * dt * (inp.steer * t < 0 ? 3.4 : 1.7), -lim, lim); else inp.steer -= Math.sign(inp.steer) * Math.min(Math.abs(inp.steer), dt * 2.2);
+  inp.thr = K.ArrowUp ? Math.min(1, inp.thr + dt * .9) : Math.max(0, inp.thr - dt * 3);
+  inp.brk = K.ArrowDown ? Math.min(1, inp.brk + dt * 1.6) : Math.max(0, inp.brk - dt * 5);
+}
+function control(code) { // 운전대 주변 장치
+  if (!car || paused()) return;
+  const c = car;
+  if ("PRND".includes(code.slice(-1)) && code.startsWith("Key") && code.length === 4) { const g = code.slice(-1); if (!shift(c, g)) toast(Math.abs(c.v) > .4 ? "멈춘 뒤 기어를 바꾸세요" : "브레이크를 밟고 기어를 바꾸세요", 1); }
+  else if (code === "KeyQ") setSig(c, 1); else if (code === "KeyE") setSig(c, 2);
+  else if (code === "KeyH") c.hazard = !c.hazard;
+  else if (code === "Space") c.pb = !c.pb;
+  else if (code === "KeyB") c.belt = !c.belt;
+  else if (code === "KeyF") c.lights = (c.lights + 1) % 3;
+  else if (code === "KeyW") c.wiper = !c.wiper;
+  else if (code === "KeyI") { if (c.engine && Math.abs(c.v) < .1) c.engine = false; else if (!c.engine) c.engine = true; }
+  else if (code === "KeyC") view = (view + 1) % 3;
+}
+const paused = () => !$("menu").hidden || !$("res").hidden;
+addEventListener("keydown", e => {
+  if (e.code === "Escape") { if (car && $("res").hidden) $("menu").hidden = !$("menu").hidden; return; }
+  if (/Arrow|Space/.test(e.code)) e.preventDefault();
+  if (!K[e.code] && !e.repeat) control(e.code);
+  K[e.code] = true;
+});
+addEventListener("keyup", e => K[e.code] = false);
+addEventListener("blur", () => { for (const k in K) K[k] = false; });
+
+/* ───────── 한 판 ───────── */
+let M = null, car = null, ex = null, view = 0, simT = 0, mode = null, shake = 0;
+const MODES = { course: buildCourse };
+const ctx = {
+  say, beep,
+  deduct(item, pts, why) { if (!scoring || !ex || ex.E.done) return; ex.E.pts = (ex.E.pts ?? 100) - pts; (ex.E.log ||= []).push({ item, pts, why }); toast(`−${pts} ${item}: ${why}`); tone(330, .15, .05, "triangle");
+    if (ex.E.pts < (M.pass ?? 80)) { ex.E.done = true; say("불합격입니다"); setTimeout(showResult, 1400); } }, // 합격 점수 아래로 떨어지면 그 자리에서 끝
+  fail(why) { if (!scoring || !ex || ex.E.done) return; ex.E.dq = why; ex.E.done = true; say("실격입니다"); setTimeout(showResult, 1400); },
+  finish() { say(scoring ? "시험이 끝났습니다" : "코스를 다 돌았어요"); setTimeout(showResult, 1200); },
+};
+function start(m) {
+  mode = m; newScene(); M = MODES[m](scene); buildCar();
+  car = Object.assign(newCar(M.start.x, M.start.z, M.start.yaw), { lift: 0, roll: 0, inSteer: 0 });
+  ex = M.exam(ctx); ex.E.pts = 100; ex.E.log = [];
+  simT = Math.random() * 40; first = true; inp.steer = inp.thr = inp.brk = 0;
+  $("mName").textContent = M.name; ["hud", "map", "dash"].forEach(id => $(id).hidden = false);
+  $("menu").hidden = true; $("res").hidden = true; $("toasts").innerHTML = "";
+}
+function openMenu() { $("menu").hidden = false; $("res").hidden = true; }
+function showResult() {
+  if (!ex || !$("res").hidden) return;
+  const E = ex.E, pass = M.pass ?? 80;
+  $("rName").textContent = M.name + (scoring ? "" : " · 채점 꺼짐");
+  $("rPts").textContent = scoring ? (E.dq ? "실격" : `${Math.max(0, E.pts)}점`) : "완주";
+  const v = $("rVerdict"); v.className = "verdict " + (!scoring ? "" : E.dq || E.pts < pass ? "fail" : "pass");
+  v.textContent = !scoring ? `걸린 시간 ${fmt(E.run + E.wait)}` : E.dq ? E.dq : E.pts >= pass ? `합격 (${pass}점 이상)` : `불합격 (${pass}점 미만)`;
+  $("rLog").innerHTML = (E.log || []).map(l => `<li><b>−${l.pts}</b>${l.item}: ${l.why}</li>`).join("");
+  $("rLog").hidden = !E.log?.length; if (scoring && !E.dq && !E.log?.length) v.textContent += ", 감점 없음";
+  $("res").hidden = false;
+}
+const fmt = s => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
+document.querySelectorAll(".mode").forEach(b => b.onclick = () => start(b.dataset.mode));
+$("rAgain").onclick = () => start(mode); $("rMenu").onclick = openMenu; $("bMenu").onclick = openMenu;
+function setScoring(v) { scoring = v; store("drive-score", v ? "1" : "0"); for (const b of [$("bScore"), $("tScore")]) b.setAttribute("aria-pressed", v); $("bScore").textContent = v ? "채점 켬" : "채점 끔"; }
+function setSound(v) { sound = v; store("drive-sound", v ? "1" : "0"); for (const b of [$("bSound"), $("tSound")]) b.setAttribute("aria-pressed", v); $("bSound").textContent = v ? "소리 켬" : "소리 끔"; if (!v) try { speechSynthesis.cancel(); } catch {} }
+$("bScore").onclick = $("tScore").onclick = () => setScoring(!scoring);
+$("bSound").onclick = $("tSound").onclick = () => setSound(!sound);
+setScoring(scoring); setSound(sound);
+
+/* ───────── 한 걸음 (물리 120번/초) ───────── */
+const DT = 1 / 120;
+let crashT = 0;
+function simStep(dt, botInp) {
+  const c = car, kmh = Math.abs(c.v) * 3.6;
+  if (botInp) Object.assign(inp, botInp); else readKeys(dt, kmh);
+  c.inSteer = inp.steer;
+  stepCar(c, inp, dt, M.hgt);
+  // 부딪힘: 차 상자 ↔ 물체 상자
+  const cb = carBox(c);
+  for (const b of M.boxes) { if (Math.abs(b.x - cb.x) > 8 || Math.abs(b.z - cb.z) > 8) continue; const p = obbHit(cb, b);
+    if (p) { c.x += p.x; c.z += p.z; cb.x += p.x; cb.z += p.z; if (Math.abs(c.v) > .3) { shake = Math.min(1, Math.abs(c.v) / 6); beep("bump"); if (crashT <= 0) { ctx.fail("물체에 부딪힘 (사고)"); crashT = 1; } } c.v = 0; } }
+  crashT -= dt;
+  const hits = []; for (const w of wheelsOf(c)) for (const h of M.lines.hits(w, .1)) if (!hits.includes(h)) hits.push(h);
+  simT += dt;
+  ex.update(dt, c, simT, hits);
+  c.roll += (cl(-c.v * c.yawRate * .012, -.06, .06) - c.roll) * Math.min(1, dt * 6);
+  return hits;
+}
+
+/* ───────── 그리기 ───────── */
+const camPos = new THREE.Vector3(), look = new THREE.Vector3(); let first = true, last = performance.now(), blinkWas = false;
+function frame(now) {
+  requestAnimationFrame(frame);
+  const dt = Math.min(.05, (now - last) / 1000); last = now;
+  if (!car) { renderer.render(scene, camera); return; }
+  if (!paused() && !window.__hold) { let n = Math.round(dt / DT); while (n-- > 0) simStep(DT); }
+  render(dt);
+}
+function render(dt) {
+  const c = car, t = simT;
+  const blink = drawCar(c, t); if (blink !== blinkWas && (c.sig || c.hazard)) tone(blink ? 1800 : 1500, .03, .03, "square"); blinkWas = blink;
+  for (const s of M.sig) s.h.set(ex.light(s.grp, simT));
+  // 시점: 0 뒤 3인칭 · 1 운전석 · 2 위
+  const fx = Math.sin(c.yaw), fz = Math.cos(c.yaw), mid = new THREE.Vector3(c.x + fx * 1.35, c.y, c.z + fz * 1.35);
+  let want, wantL; camera.up.set(0, 1, 0); outside.forEach(o => o.visible = view !== 1);
+  if (view === 0) { want = new THREE.Vector3(c.x - fx * 6.4, c.y + 3.1, c.z - fz * 6.4); wantL = new THREE.Vector3(c.x + fx * 9, c.y + .6, c.z + fz * 9); }
+  else if (view === 1) { want = carG.localToWorld(new THREE.Vector3(.37, 1.28, 1.1)); wantL = carG.localToWorld(new THREE.Vector3(.37, 1.05, 9)); }
+  else { want = mid.clone().add(new THREE.Vector3(0, 24, 0)); wantL = mid; camera.up.set(fx, 0, fz); }
+  if (first || view === 1) { camPos.copy(want); look.copy(wantL); first = false; } else { camPos.lerp(want, 1 - Math.exp(-dt * 8)); look.lerp(wantL, 1 - Math.exp(-dt * 10)); }
+  camera.position.copy(camPos); shake *= Math.exp(-dt * 6); if (shake > .01) camera.position.add(new THREE.Vector3(Math.random() - .5, Math.random() - .5, 0).multiplyScalar(shake * .3));
+  camera.lookAt(look);
+  const fov = view === 1 ? 68 : view === 2 ? 48 : (camera.aspect < 1 ? 74 : 58);
+  if (camera.fov !== fov) { camera.fov = fov; camera.updateProjectionMatrix(); }
+  sun.position.set(c.x + 18, 40, c.z + 14); sun.target.position.set(c.x, 0, c.z);
+  renderer.render(scene, camera);
+  // 계기판
+  const kmh = Math.abs(c.v) * 3.6;
+  $("dSpd").firstChild.nodeValue = Math.round(kmh);
+  [...$("dGear").children].forEach(s => s.classList.toggle("on", s.textContent === c.gear));
+  $("dRpm").style.width = Math.min(100, c.rpm / 6500 * 100) + "%";
+  const on = (id, v) => $(id).classList.toggle("on", !!v);
+  on("iL", blink && (c.sig === 1 || c.hazard)); on("iR", blink && (c.sig === 2 || c.hazard)); on("iHz", c.hazard); on("iPb", c.pb); on("iBelt", !c.belt); on("iLt", c.lights); on("iWp", c.wiper);
+  $("iLt").textContent = c.lights === 2 ? "상향" : "등";
+  const h = ex.hud();
+  $("hTask").textContent = h.task; $("hTask").hidden = !h.task;
+  $("hPts").innerHTML = scoring ? `<b>${Math.max(0, ex.E.pts)}</b>점` : "채점 끔";
+  $("hTime").textContent = h.limit ? `${fmt(h.time)} / ${fmt(h.limit)}` : "";
+  $("alarm").classList.toggle("on", !!ex.alarm);
+  if (sayT > 0 && (sayT -= dt) <= 0) $("say").classList.remove("on");
+  drawMap();
+}
+const mc = $("map"), mg = mc.getContext("2d");
+function drawMap() {
+  const s = mc.clientWidth, dp = Math.min(devicePixelRatio, 2); if (!s) return; if (mc.width !== s * dp) mc.width = mc.height = s * dp;
+  mg.setTransform(dp, 0, 0, dp, 0, 0); mg.clearRect(0, 0, s, s);
+  const [x0, z0, x1, z1] = M.bounds, k = (s - 14) / Math.max(x1 - x0, z1 - z0), ox = (s - (x1 - x0) * k) / 2, oz = (s - (z1 - z0) * k) / 2, P = (x, z) => [ox + (x - x0) * k, oz + (z - z0) * k];
+  mg.lineWidth = 3.2; mg.lineCap = mg.lineJoin = "round"; mg.strokeStyle = "#3e3f44"; mg.beginPath();
+  M.route.forEach((p, i) => { const [x, y] = P(p.x, p.z); i ? mg.lineTo(x, y) : mg.moveTo(x, y); }); mg.stroke();
+  const np = ex.nextPoint?.(); if (np) { const [x, y] = P(np[0], np[1]); mg.fillStyle = "#2b44a6"; mg.beginPath(); mg.arc(x, y, 4.5, 0, 7); mg.fill(); }
+  const [x, y] = P(car.x, car.z); mg.save(); mg.translate(x, y); mg.rotate(Math.PI - car.yaw); mg.fillStyle = "#e0452b";
+  mg.beginPath(); mg.moveTo(0, -6); mg.lineTo(4.5, 4.5); mg.lineTo(0, 2); mg.lineTo(-4.5, 4.5); mg.closePath(); mg.fill(); mg.restore();
+}
+newScene(); { M = buildCourse(scene); camera.position.set(-60, 30, 40); camera.lookAt(-10, 0, -40); renderer.render(scene, camera); }
+requestAnimationFrame(frame);
+if (Q.get("mode") && MODES[Q.get("mode")]) start(Q.get("mode"));
+
+// 시험 봇·화면 확인용: 시간을 직접 넘김
+window.__sim = { keys: K, get car() { return car; }, get ex() { return ex; }, get M() { return M; }, get simT() { return simT; }, start, simStep, render: () => render(1 / 60), control, setScoring, front, wheelsOf, CAR, set view(v) { view = v; } };
+</script>
+<script src="../../hub/back.js" data-cat="make" defer></script>
+</body>
+</html>
