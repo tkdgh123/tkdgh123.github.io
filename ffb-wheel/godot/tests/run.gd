@@ -1,0 +1,158 @@
+# 시험: godot --headless --path . -s res://tests/run.gd -- mute case=all
+# 봇이 달리면서 상황을 일으키고, 결과 카드(잘했어요/다시 연습해요)와 부딪힘을 모아 출력
+extends SceneTree
+
+var main
+var args := {}
+var bot_ref: Bot
+
+func _initialize() -> void:
+	for a: String in OS.get_cmdline_user_args():
+		var kv := a.split("=")
+		args[kv[0]] = kv[1] if kv.size() > 1 else "1"
+	main = load("res://main.tscn").instantiate()
+	root.add_child(main)
+	_run.call_deferred()
+
+func sim(secs: float) -> void:
+	for i in int(secs * 120):
+		main.sim_step(1.0 / 120.0)
+		if i % 240 == 0:
+			await process_frame
+
+func fresh(seed: int, react: float, kind := "clear", fog := false, night := false) -> Bot:
+	main.city.rng.seed = seed
+	var b := Bot.new(main, react, seed)
+	bot_ref = b # Callable은 RefCounted를 붙잡지 않음
+	main.bot = b.drive
+	main.set_weather(kind, fog, night)
+	for id in main.events.on:
+		main.events.set_on(id, false)
+	main.events.gap_t = 999.0
+	main.hud.log.clear()
+	main.hits.clear()
+	return b
+
+func place(seg: Dictionary, s: float) -> void: # 운전자 차를 차로 위에 놓음
+	var p: Dictionary = main.city.pos_at(seg, s)
+	var c: Car = main.car
+	c.x = p.x - sin(p.yaw) * 1.35
+	c.z = p.z - cos(p.yaw) * 1.35
+	c.yaw = p.yaw
+	c.th = p.yaw
+	c.v = 0.0
+	c.gear = "D"
+
+func road(a: String, b: String) -> Dictionary:
+	for r: Dictionary in main.city.roads:
+		if r.a == a and r.b == b:
+			return r
+	return {}
+
+func results() -> Array:
+	var out := []
+	for e: Dictionary in main.hud.log:
+		if e.has("result"):
+			out.append("%s %s: %s" % ["O" if e.good else "X", e.result, " / ".join(e.lines)])
+	return out
+
+func crashes() -> int:
+	var n := 0
+	for e: Dictionary in main.hud.log:
+		if e.has("toast") and (e.toast.contains("부딪혔어요") and not e.toast.contains("뒤차")):
+			n += 1
+	return n
+
+# 상황 하나: 알맞은 곳에서 일으키고 끝날 때까지
+func situation(id: String, seed: int, react: float, kind := "clear", setup := Callable()) -> Dictionary:
+	var b := fresh(seed, react, kind)
+	if setup.is_valid():
+		setup.call(b)
+	var started := false
+	var tries := 0
+	while not started and tries < 90:
+		await sim(1.0)
+		tries += 1
+		started = main.events.trigger(id, false)
+	var t0: float = main.sim_t
+	if started:
+		var guard := 0
+		while main.events.act.has(id) and guard < 90:
+			await sim(1.0)
+			guard += 1
+		await sim(2.0)
+	return {"id": id, "seed": seed, "react": react, "kind": kind, "started": started, "after": snappedf(t0, 0.1), "res": results(), "hits": main.hits.duplicate()}
+
+func _run() -> void:
+	await process_frame
+	var case: String = args.get("case", "all")
+	var t_start := Time.get_ticks_msec()
+	if case in ["all", "drive"]:
+		for kind in ["clear", "rain", "snow"]:
+			fresh(3, 0.8, kind)
+			var c: Car = main.car
+			var dist := 0.0
+			var px := c.x
+			var pz := c.z
+			for i in 90:
+				await sim(1.0)
+				dist += Vector2(c.x - px, c.z - pz).length()
+				px = c.x
+				pz = c.z
+			var moving := 0
+			for a: Dictionary in main.city.ai:
+				if a.v > 0.5:
+					moving += 1
+			print("DRIVE %s: 90초 %.0fm, 부딪힘 %d, 다른 차 움직임 %d/%d, 결과 %s" % [kind, dist, crashes(), moving, main.city.ai.size(), results()])
+	if case in ["all", "sit"]:
+		for id in ["child", "jay", "brake", "cut"]:
+			for seed in [11, 12, 13]:
+				var r: Dictionary = await situation(id, seed, 0.7)
+				print("SIT good-react ", r)
+			var r2: Dictionary = await situation(id, 21, 3.0)
+			print("SIT slow-react ", r2)
+		# 눈길에서 아이: 멀리서 일어나니 반응만 빠르면 멈춤
+		var r3: Dictionary = await situation("child", 31, 0.7, "snow")
+		print("SIT snow child ", r3)
+	if case in ["all", "amb"]:
+		var main_r := road("Ja", "C")
+		var ring_r := road("Ns", "Kc")
+		for spec in [[main_r, 1, true], [main_r, 0, true], [main_r, 0, false], [ring_r, 0, true], [ring_r, 0, false]]:
+			var setup := func(b: Bot) -> void:
+				place(main.city.lane(spec[0], 1, spec[1]), 30.0)
+				b.yield_amb = spec[2]
+				b.seg = {}
+			var r: Dictionary = await situation("amb", 5, 0.8, "clear", setup)
+			print("AMB road %s lane %d yield %s → %s" % [spec[0].type, spec[1], spec[2], r])
+	if case in ["all", "static"]:
+		# 공사 구간: 바깥 차로에서 다가감
+		var b := fresh(7, 0.8)
+		main.events.set_on("work", true)
+		place(main.city.lane(road("Nw", "Ja"), 1, 1), 60.0)
+		b.seg = {}
+		await sim(40.0)
+		print("WORK → ", results(), " hits ", main.hits)
+		main.events.set_on("work", false)
+		# 빙판: 눈 오는 날 순환로 굽은 곳 앞에서
+		for kind in ["clear", "snow"]:
+			b = fresh(8, 0.8, kind)
+			main.events.set_on("ice", true)
+			var rr := road("Ka", "Nw")
+			place(main.city.lane(rr, 1, 0), 30.0)
+			b.seg = {}
+			b.speed_k = 1.0
+			await sim(30.0)
+			print("ICE %s → %s crash %d" % [kind, results(), crashes()])
+			main.events.set_on("ice", false)
+		# 뒤차 경적: 큰길을 시속 10km 안팎으로 기어가면 뒤에 다른 차가 붙음
+		b = fresh(9, 0.8)
+		main.events.set_on("honk", true)
+		var rd := road("Nw", "Ja")
+		place(main.city.lane(rd, 1, 1), 16.0)
+		b.seg = {}
+		b.speed_k = 0.22
+		main.city.spawn_ai(Color.WHITE, main.city.lane(rd, 1, 1), 1.0, 8.0)
+		await sim(30.0)
+		print("HONK → ", results(), " toasts ", main.hud.log.filter(func(e): return e.has("toast")).map(func(e): return e.toast))
+	print("TIME %.1fs" % ((Time.get_ticks_msec() - t_start) / 1000.0))
+	quit()
