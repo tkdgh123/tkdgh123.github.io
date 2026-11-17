@@ -345,7 +345,7 @@ function roadExam(ctx, M) {
     const dir = q ? (Math.cos(c.yaw - q.yaw) > 0 ? 1 : -1) : 0;
     E.t = (E.t || 0) + dt;
     // 시작: 안전띠 → 출발 (가장자리에서 왼쪽 방향지시등 켜고 차로로)
-    if (R.startPhase === 0) { if (!R.saidBelt) { say("안전띠를 매세요"); R.saidBelt = 1; } if (c.belt) { R.startPhase = 1; say("출발하세요. 앞에서 좌회전입니다"); } return; }
+    if (R.startPhase === 0) { if (c.belt) { R.startPhase = 1; say("출발하세요. 앞에서 좌회전입니다"); } else if (!R.saidBelt) { say("안전띠를 매세요"); R.saidBelt = 1; } return; } // 간단 조작은 안전띠를 맨 채로 시작
     if (R.startPhase === 1) { R.st = (R.st || 0) + dt;
       if (R.sigAtStart === undefined && Math.abs(c.v) > .3) R.sigAtStart = c.sig === 1;
       const off = q ? q.off * dir : 0;
@@ -362,16 +362,16 @@ function roadExam(ctx, M) {
     if (!c.belt && Math.abs(c.v) > .3) fail("안전띠를 매지 않음");
     if (c.pb && c.v > .3) { R.pbDist += c.v * dt; if (R.pbDist > 3 && !R.pbP) { deduct("주차 브레이크", 10, "주차 브레이크를 풀지 않고 출발"); R.pbP = 1; } }
     // 급제동, 급출발 (세 번이면 실격)
-    if (c.acc < -6.2 && c.v > 1) R.hardT += dt; else R.hardT = 0;
+    if (c.acc < -6.2 && c.v > 1 && !c.auto) R.hardT += dt; else R.hardT = 0; // 간단 조작은 키가 켜고 끄기뿐이라 급조작을 보지 않음
     if (R.hardT > .25 && !R.hardOn) { R.hardOn = 1; E.hard++; deduct("급브레이크", 7, "차가 크게 흔들릴 만큼 세게 멈춤"); if (E.hard >= 3) fail("급조작을 세 번 넘게 함"); } else if (R.hardT === 0) R.hardOn = 0;
-    if (c.acc > 2.9 && kmh < 15) R.jerkT += dt; else R.jerkT = 0;
+    if (c.acc > 2.9 && kmh < 15 && !c.auto) R.jerkT += dt; else R.jerkT = 0;
     if (R.jerkT > .4 && !R.jerkOn) { R.jerkOn = 1; E.hard++; deduct("급출발", 7, "가속 페달을 세게 밟아 급하게 출발"); if (E.hard >= 3) fail("급조작을 세 번 넘게 함"); } else if (R.jerkT === 0) R.jerkOn = 0;
     // 멈춰 있을 때: 10초 넘으면 N, 브레이크 밟기, 초록불에 20초 안에 출발
     if (c.v === 0 && R.moved) {
       R.stopT += dt; const fl = R.stopFlags;
       const atEnd = q && q.r === M.alley && q.s > M.END.s0 - 4 && q.s < M.END.s1 + 6;
       if (!atEnd) {
-        if (R.stopT > 10 && c.gear === "D" && !fl.n) { deduct("정지 중 기어", 5, "10초 넘게 서 있는데 기어를 N에 두지 않음"); fl.n = 1; }
+        if (R.stopT > 10 && c.gear === "D" && !c.auto && !fl.n) { deduct("정지 중 기어", 5, "10초 넘게 서 있는데 기어를 N에 두지 않음"); fl.n = 1; }
         if (c.gear === "N" && c.brk < .1 && !c.pb) { fl.nb = (fl.nb || 0) + dt; if (fl.nb > 1.5 && !fl.nbp) { deduct("정지 때 미제동", 5, "멈춰 있는 동안 브레이크를 밟지 않음"); fl.nbp = 1; } }
         const ap = R.approach, L = ap && ap.n.sig ? M.light(ap.n, ap.arm, t) : null, blocked = M.ai.some(o => { const dx = o.x - mid.x, dz = o.z - mid.z, f = dx * Math.sin(c.yaw) + dz * Math.cos(c.yaw); return f > 0 && f < 14 && Math.abs(dx * Math.cos(c.yaw) - dz * Math.sin(c.yaw)) < 2; });
         if (!blocked && (!L || L.g)) { fl.go = (fl.go || 0) + dt; if (fl.go > 20 && !fl.gop) { deduct("20초 내 미출발", 10, "출발해야 할 때 20초 안에 출발하지 않음"); fl.gop = 1; } } else fl.go = 0;
@@ -452,8 +452,8 @@ function roadExam(ctx, M) {
     if (nav && nav.turn !== "end") { const k = `${step}:${nav.dist > 120 ? "far" : nav.dist > 40 ? "mid" : "near"}`; if (k !== saidFor && nav.dist < 300) { saidFor = k; if (nav.dist > 40) say(`${Math.round(nav.dist / 10) * 10}m 앞 ${nav.text}입니다`); else say(`${TURN[nav.turn]}하세요`); } }
     // 끝: 목적지 칸에 멈추면 주차 브레이크, P, 시동 끄기
     if (!M.free && step >= plan.length && q && q.r === M.alley && dir === -1 && q.s > M.END.s0 - 3 && q.s < M.END.s1 + 2) {
-      if (c.v === 0) { R.endT += dt; if (R.endT > 1 && !R.endSaid) { R.endSaid = 1; say("도착했습니다. 주차 브레이크를 걸고, 기어를 P에 두고, 시동을 끄세요"); } }
-      if (R.endSaid && (!c.engine || R.endT > 20)) { if (!c.pb) deduct("종료", 5, "주차 브레이크를 걸지 않음"); if (c.gear !== "P") deduct("종료", 5, "기어를 P에 두지 않음"); if (c.engine) deduct("종료", 5, "시동을 끄지 않음"); E.done = true; ctx.finish(); }
+      if (c.v === 0) { R.endT += dt; if (R.endT > 1 && !R.endSaid) { R.endSaid = 1; if (!c.auto) say("도착했습니다. 주차 브레이크를 걸고, 기어를 P에 두고, 시동을 끄세요"); } }
+      if (R.endSaid && (c.auto || !c.engine || R.endT > 20)) { if (!c.auto) { if (!c.pb) deduct("종료", 5, "주차 브레이크를 걸지 않음"); if (c.gear !== "P") deduct("종료", 5, "기어를 P에 두지 않음"); if (c.engine) deduct("종료", 5, "시동을 끄지 않음"); } E.done = true; ctx.finish(); } // 간단 조작은 멈추면 끝
     }
   }
   return {

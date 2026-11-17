@@ -1,6 +1,7 @@
 // 시험용 차 한 대의 움직임. 뒷바퀴 축 가운데를 기준으로 한 자전거 모델 + 자동변속기(P R N D).
 // three.js 없이 숫자만 다뤄서 시험 봇도 같은 함수로 돈다.
 // 입력은 늘 { steer: -1~1 (왼쪽 +), thr: 0~1, brk: 0~1 } 하나. 지금은 키보드가 채우고, 나중에 레이싱 휠이 같은 칸을 채운다.
+// c.auto = 간단 조작: 기어는 화면 쪽이 D, R만 고르고, 기어감 없이 밟을 때만 가며, 멈추면 그 자리에 선다.
 export const CAR = { L: 4.6, W: 1.8, H: 1.45, WB: 2.7, TR: 1.56, RO: 0.95, FO: 0.95, DMAX: 0.62 }; // 아반떼 크기, 최소 회전 반경(바깥 앞바퀴) 약 5.3m
 export const G = 9.8;
 const UP = [0, 15, 30, 45, 62, 80], UPT = [0, 25, 30, 30, 30, 30], KR = [0, 105, 62, 44, 34, 28, 23]; // 자동 변속: 올리는 속도(km/h, 밟을수록 늦게), 단마다 km/h당 RPM
@@ -33,16 +34,17 @@ export function stepCar(c, inp, dt, hgt) {
   let drive = 0;
   if (c.engine && (c.gear === "D" || c.gear === "R")) {
     const dir = c.gear === "D" ? 1 : -1, vd = Math.max(0, c.v * dir);
-    const creep = 1.0 * Math.max(0, 1 - vd / 2.2); // 발을 떼면 시속 7~8km로 기어감
-    drive = dir * (creep + inp.thr * 3.0 * Math.max(0, 1 - vd / (dir > 0 ? 50 : 5)));
+    const creep = c.auto ? 0 : 1.0 * Math.max(0, 1 - vd / 2.2); // 발을 떼면 시속 7~8km로 기어감 (간단 조작은 밟을 때만 감)
+    drive = dir * (creep + inp.thr * (c.auto ? 4.5 : 3.0) * Math.max(0, 1 - vd / (dir > 0 ? 50 : c.auto ? 2.8 : 5))); // 간단 조작은 앞으로 더 힘차게(시속 50km까지 약 4초), 뒤로는 시속 10km 안쪽
   }
   const push = drive - G * Math.sin(c.pitch);
-  const hold = inp.brk * 9 + (c.pb ? 2.6 : 0) + (c.gear === "P" ? 30 : 0) + 0.12; // 브레이크·주차 브레이크·구름 저항이 버틸 수 있는 힘
+  const hold = inp.brk * 9 + (c.pb ? 2.6 : 0) + (c.gear === "P" ? 30 : 0) + 0.12 + (c.auto && !inp.thr ? 0.6 : 0); // 브레이크, 주차 브레이크, 구름 저항이 버틸 수 있는 힘 (간단 조작은 발을 떼면 서서히 멈춤)
+  const keep = c.auto && push * (c.gear === "R" ? -1 : 1) < 0; // 간단 조작: 멈춘 차는 경사에서도 뒤로 밀리지 않음
   const v0 = c.v;
-  if (Math.abs(c.v) < 0.03) c.v = Math.abs(push) <= hold ? 0 : c.v + (push - Math.sign(push) * hold) * dt;
+  if (Math.abs(c.v) < 0.03) c.v = Math.abs(push) <= hold || keep ? 0 : c.v + (push - Math.sign(push) * hold) * dt;
   else {
     const s = Math.sign(c.v), nv = c.v + (push - s * (hold + 0.0004 * c.v * c.v)) * dt;
-    c.v = Math.sign(nv) !== s && Math.abs(push) <= hold ? 0 : nv;
+    c.v = Math.sign(nv) !== s && (Math.abs(push) <= hold || keep) ? 0 : nv;
   }
   c.acc = (c.v - v0) / dt;
   c.yawRate = c.v * Math.tan(c.steer) / CAR.WB;

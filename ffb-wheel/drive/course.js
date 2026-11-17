@@ -183,7 +183,7 @@ function exam(ctx, sig, route) {
       const accelZone = F.x > 55 && F.z < -25 && F.z > -83;
       if (kmh > 20.5 && !accelZone) { if (!E.fast) deduct("지정속도", 3, "시속 20km 넘음"); E.fast = 1; } else if (kmh < 19) E.fast = 0;
       // 시동: 4000RPM 넘게 돌리거나 꺼짐
-      if (c.rpm >= 4000) { if (!E.rev) deduct("시동 유지", 5, "엔진 4,000RPM 넘음"); E.rev = 1; } else if (c.rpm < 3500) E.rev = 0;
+      if (c.rpm >= 4000 && !c.auto) { if (!E.rev) deduct("시동 유지", 5, "엔진 4,000RPM 넘음"); E.rev = 1; } else if (c.rpm < 3500) E.rev = 0; // 간단 조작은 기어가 없으니 회전수도 보지 않음
       if (!c.engine && !E.off) { deduct("시동 유지", 5, "시동 꺼짐"); E.off = 1; } else if (c.engine) E.off = 0;
       if (!c.belt && Math.abs(c.v) > .3) fail("안전띠를 매지 않음");
       if (c.pb && c.v > .3) { E.pbDist += c.v * dt; if (E.pbDist > 3) fail("주차 브레이크를 풀지 않고 달림"); } else if (!c.pb) E.pbDist = 0;
@@ -191,13 +191,17 @@ function exam(ctx, sig, route) {
     E.t += dt;
 
     if (task === "pre") {
-      const [txt, ok, item] = steps[si];
-      if (said !== si) { say(txt); said = si; sT = 0; }
-      sT += dt;
-      if (sT > 1.2 && ok(c)) { si++; sT = 0; }
-      else if (item && sT > 8.2) { if (!penal.has(item)) { deduct("기본 조작", 5, item); penal.add(item); } si++; }
-      if (si >= steps.length) { next(); say("출발하세요"); }
+      if (c.auto) next(); // 간단 조작: 안전띠, 기본 조작 없이 바로 출발
+      else {
+        const [txt, ok, item] = steps[si];
+        if (said !== si) { say(txt); said = si; sT = 0; }
+        sT += dt;
+        if (sT > 1.2 && ok(c)) { si++; sT = 0; }
+        else if (item && sT > 8.2) { if (!penal.has(item)) { deduct("기본 조작", 5, item); penal.add(item); } si++; }
+        if (si >= steps.length) next();
+      }
     } else if (task === "start") {
+      if (!S.t) say("출발하세요");
       S.t = (S.t || 0) + dt;
       if (S.sig === undefined && c.v > .3) S.sig = c.sig === 1;
       if (!S.crossed && F.x > START_X) { S.crossed = 1; if (!S.sig && c.sig !== 1) deduct("방향지시등", 5, "출발할 때 왼쪽 방향지시등을 켜지 않음"); }
@@ -254,7 +258,7 @@ function exam(ctx, sig, route) {
         const rw = [Wh[0], Wh[1]];
         if (!S.ok && rw.every(w => w.z > PK.conf - .175 && w.x > PK.gx0 && w.x < PK.gx1)) { S.ok = 1; say("확인되었습니다"); beep("ok"); }
         if (S.ok && c.pb) S.pbOn = 1; if (S.pbOn && !c.pb) S.pbOff = 1;
-        if (Wh.every(w => !inC(w))) { if (!S.ok) fail("확인선을 밟지 않고 직각주차 코스를 나옴"); else if (!S.pbOff) deduct("직각주차", 10, "주차 브레이크를 걸었다 풀지 않음"); next(); }
+        if (Wh.every(w => !inC(w))) { if (!S.ok) fail("확인선을 밟지 않고 직각주차 코스를 나옴"); else if (!S.pbOff && !c.auto) deduct("직각주차", 10, "주차 브레이크를 걸었다 풀지 않음"); next(); }
       }
     } else if (task === "right") {
       const near = F.z > -46 && F.z < -24 && Math.abs(F.x) < 12;
