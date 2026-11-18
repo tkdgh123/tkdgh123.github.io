@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>일필휘지 평가 기록</title>
-<meta name="description" content="일필휘지를 스팀의 최근 게임·예전 비슷한 게임과 견주어 냉정하게 매긴 점수를 날짜마다 쌓는 기록">
+<meta name="description" content="일필휘지를 스팀의 최근 게임, 예전 비슷한 게임과 견주어 냉정하게 매긴 점수를 날짜마다 쌓는 기록">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=East+Sea+Dokdo&family=Yeon+Sung&family=Gowun+Dodum&display=swap">
@@ -24,16 +24,22 @@ h1 { margin: 40px 0 6px; font: 400 clamp(72px, 12vw, 160px)/.92 var(--brush) }
 .board { overflow-x: auto; -webkit-overflow-scrolling: touch }
 .board table { border-collapse: collapse; min-width: 560px; width: 100% }
 .board th { font: 400 22px var(--say); color: var(--ink-2); text-align: left; padding: 0 18px 10px 0; white-space: nowrap }
-.board td { border-top: 2px solid rgba(21, 21, 26, .14); padding: 12px 18px 12px 0; vertical-align: middle }
+.board td { border-top: 2px solid rgba(21, 21, 26, .14); padding: 12px 14px 12px 0; vertical-align: middle }
 .board td:first-child { font: 400 32px/1 var(--brush); white-space: nowrap }
-.score { display: flex; align-items: center; gap: 12px; min-width: 190px }
-.score b { font: 400 40px/1 var(--brush); width: 1.2em; text-align: right }
+.score { display: flex; align-items: center; gap: 8px; min-width: 104px }
+.score b { font: 400 36px/1 var(--brush); width: 1.2em; text-align: right }
 .bar { flex: 1; height: 10px; background: var(--paper-2); border-radius: 2px; overflow: hidden }
 .bar i { display: block; height: 100%; background: var(--ink) }
 .bar.low i { background: var(--seal) }
-.why { font-size: 15px; color: var(--ink-2); line-height: 1.5 }
+.why { font-size: 15px; color: var(--ink-2); line-height: 1.5; min-width: 15em }
 .board tfoot td { font: 400 30px var(--brush) }
 .why-m { display: none }
+.sheet { margin-top: 8px }
+.sheet td:first-child { font-size: 27px; white-space: normal }
+.sheet .grp td { font: 400 24px var(--say); color: var(--seal); border-top: 0; padding: 30px 0 6px }
+.sheet .grp span { color: var(--ink-2); font-size: 20px; margin-left: 8px }
+.sheet .score b { font-size: 34px }
+.sheet .score em { font: 15px var(--read); color: var(--ink-2); white-space: nowrap; margin-left: 4px }
 
 article { margin-top: 120px }
 .date { font: 400 clamp(64px, 9vw, 110px)/1 var(--brush); color: var(--seal); margin: 0 }
@@ -84,10 +90,50 @@ ol.next b { font-weight: 400; font-family: var(--say); font-size: 21px }
     </table>
   </div>
 
+  <article id="d1119">
+    <p class="date">11.19</p>
+    <p class="verdict">100점 만점에 64점. 가장 낮던 "쓰러진 뒤"부터 고쳤어요</p>
+    <p class="how">이번에는 16항목 100점으로 잘게 매겼어요(위 표는 같은 평가를 예전 열 줄 잣대로 옮긴 것). 근거는 22맵 화면 88장, 큰 귀신 12마리와 표지, 이야기 장면을 찍어 본 것, 입력과 설정과 쓰러짐 흐름 코드, 11월 13일 뒤 플레이 기록 23판이에요. Codex에게 결론 없이 재료만 주고 따로 매기게 한 점수는 61점이고, 가장 낮게 본 세 곳(실패 비용, 그리기의 쓰임, 편의)이 같았어요.</p>
+
+    <h3>100점 채점표</h3>
+    <div class="board sheet">
+      <table>
+        <thead><tr><th>항목</th><th>점수</th><th>근거</th></tr></thead>
+        <tbody id="sheet1119"></tbody>
+      </table>
+    </div>
+
+    <h3>이번에 바뀐 것</h3>
+    <ol class="hard">
+      <li><b>마른 자리에서 이어 그리기</b><p>맵마다 길의 30%, 60%, 큰 귀신 바로 앞에서 그때까지의 그림이 말라요. 쓰러지면 화공이 마지막 마른 자리에 나그네를 다시 그려 줘요. 인장 셋과 먹은 새로 차고 큰 귀신은 처음부터 다시 나와요. 다친 횟수는 이어져서 이어 그린 판은 신품이 안 나오고, "매섭게"에서는 꺼져요. 화면에는 위쪽 진행 줄의 작은 눈금으로만 보여요.</p></li>
+      <li><b>쓰러진 뒤 바로 다시</b><p>전에는 쓰러짐, 먹 번짐, 돌려 보기를 지나 클릭 두 번을 해야 해서 4~6초가 걸렸어요. 이제 쓰러지기 시작하고 0.5초 뒤부터 클릭이나 Space로 곧장 다시 서요(재 보니 2.1초). R은 언제나 맵 처음부터예요.</p></li>
+      <li><b>이야기 넘기기</b><p>장면은 한 줄씩만 넘길 수 있었고 깬 맵을 다시 해도 매번 나왔어요. 클릭이나 Space를 누르고 있으면 아래 띠 위로 붉은 줄이 차오르고, 다 차면 장면을 끝까지 넘겨요. 넘겨도 남을 사람은 제자리에 남아요.</p></li>
+      <li><b>작은 것들</b><p>Esc 화면 조작 줄에 빠져 있던 우클릭(붓 바꾸기)과 휠(굵기)을 넣었어요. 언 강과 연잎 맵은 다시 선 뒤 첫 걸음을 떼기 전까지 발밑이 꺼지지 않아요.</p></li>
+    </ol>
+    <figure><img class="strip" src="img/1119_dry.webp" alt="봄 맵 위쪽 진행 줄에 마른 자리 눈금 셋이 있고, 첫 눈금이 붉게 바뀐 모습" loading="lazy"><figcaption>위쪽 진행 줄의 눈금이 마른 자리예요. 지나면 붉어져요.</figcaption></figure>
+
+    <h3>다른 게임과 견주면</h3>
+    <ul class="good">
+      <li>Max: The Curse of Brotherhood<small>"체크포인트가 너그럽고 죽으면 아주 빨리 다시 시작한다"는 평을 받았어요. 일필휘지는 이번에야 생겼어요. 같은 글이 "창의력으로 푸는 게 아니라 정해진 답을 실행한다"고도 했는데, 점선 밑그림 장치가 같은 길로 갈 수 있어요.</small></li>
+      <li>Drawn to Life<small>15분 공들인 그림과 15초 만에 칠한 그림이 게임 안에서 차이가 없다는 불평. 일필휘지는 쓰인 획으로 품계를 매겨 이 점은 앞서요.</small></li>
+      <li>Inkulinati<small>자주 부른 것은 비싸지는 "지루함" 규칙이 여러 수를 섞어 쓰게 한다는 평. 일필휘지의 "짧은 연타는 먹 두 배"가 같은 방향이에요.</small></li>
+    </ul>
+
+    <h3>아직 남은 것</h3>
+    <ul class="good">
+      <li>새 장치 뒤의 사람 기록<small>짙은 귀신, 마지막은 가두기, 이어 그리기 모두 사람이 해 본 판이 없어요</small></li>
+      <li>소리<small>효과음 여섯 개, 큰 귀신 북 하나</small></li>
+      <li>세로 맵 돌계단<small>연사모종과 죽서루만 새까만 덩어리로 보여요</small></li>
+      <li>조작 넓히기<small>키 바꾸기, 게임패드, 붉은색을 못 가리는 사람용 색</small></li>
+    </ul>
+
+    <p class="src">견준 자료(문장을 직접 열어 확인한 것만): <a href="https://www.gamesasylum.com/2018/01/07/max-the-curse-of-brotherhood/">Max: The Curse of Brotherhood (Games Asylum)</a>, <a href="https://greybob.flyingomelette.com/reviews/drawntolife.html">Drawn to Life</a>, <a href="https://www.thesixthaxis.com/2024/02/27/inkulinati-review/">Inkulinati (TheSixthAxis, 2024)</a>, <a href="https://gameaccessibilityguidelines.com/basic/">Game Accessibility Guidelines</a></p>
+  </article>
+
   <article id="d1113a">
     <p class="date">11.13 1시</p>
     <p class="verdict">디자인만 따로 봤어요. 땅이 무늬보다 먹 덩어리로 먼저 읽히고, 글씨가 나무 위에서도 읽혀요</p>
-    <p class="how">Codex에게 화면 14장을 주고 디자인 70%·나머지 30%로 매기게 했어요. 7.1 → 고친 뒤 7.5(디자인만 7.3 → 7.7). 위 표와 잣대가 달라 표에는 넣지 않았어요.</p>
+    <p class="how">Codex에게 화면 14장을 주고 디자인 70%, 나머지 30%로 매기게 했어요. 7.1 → 고친 뒤 7.5(디자인만 7.3 → 7.7). 위 표와 잣대가 달라 표에는 넣지 않았어요.</p>
 
     <h3>이번에 바뀐 것</h3>
     <ol class="hard">
@@ -100,7 +146,7 @@ ol.next b { font-weight: 400; font-family: var(--say); font-size: 21px }
 
     <h3>남은 것</h3>
     <ul class="good">
-      <li>나무 잔가지·해송<small>생성된 무늬처럼 보인다는 지적(Codex·상점 첫인상) — 틀을 깬 새 디자인을 찾는 중</small></li>
+      <li>나무 잔가지, 해송<small>생성된 무늬처럼 보인다는 지적(Codex, 상점 첫인상) — 틀을 깬 새 디자인을 찾는 중</small></li>
       <li>밤 등불 빛<small>등불 사이 어둠을 건너는 것이 놀이라 그대로 둠</small></li>
     </ul>
   </article>
@@ -112,7 +158,7 @@ ol.next b { font-weight: 400; font-family: var(--say); font-size: 21px }
 
     <h3>이번에 바뀐 것</h3>
     <ol class="hard">
-      <li><b>표식 곁 사람</b><p>맵 끝에서 말을 걸 사람이 플레이 중에 먼저 보여요. 소상야우·어촌낙조의 매인 배 곁에 뱃사공, 연사모종 일주문 앞에 스님, 청간정 정자와 죽서루 누각에 선비가 작게 서 있어요.</p></li>
+      <li><b>표식 곁 사람</b><p>맵 끝에서 말을 걸 사람이 플레이 중에 먼저 보여요. 소상야우, 어촌낙조의 매인 배 곁에 뱃사공, 연사모종 일주문 앞에 스님, 청간정 정자와 죽서루 누각에 선비가 작게 서 있어요.</p></li>
       <li><b>고증</b><p>연사모종 아래 문이 일본 신사 문처럼 보여 기와지붕 일주문으로 바꿨어요. 대사의 근대어(저수지→방죽)와 번역투를 고치고, 실제 죽서루는 폭포가 아니라 오십천 벼랑이라 선비의 말을 바꿨어요.</p></li>
       <li><b>재미봇이 짚은 곳</b><p>보스 바로 앞에 귀신이 몰려 같은 자리에서 20번 맞던 곳에 쉼을 두고, 돌기둥귀는 친 뒤 물러나 쉬어요. 먹이 모자라 오래 서 있던 총석정 틈을 좁히고, 시작이 빈 청간정에 귀신을 앞당겼어요.</p></li>
       <li><b>붓이 보이는 그림</b><p>게이머 평가에서 "붓으로 다리를 긋는 장면이 한 장도 없다"는 말을 듣고, 굵게 그은 다리를 건너고 빠른 획으로 베는 화면을 기획서 맨 위에 넣었어요.</p></li>
@@ -120,9 +166,9 @@ ol.next b { font-weight: 400; font-family: var(--say); font-size: 21px }
 
     <h3>아직 8점에 못 미치는 까닭</h3>
     <ul class="good">
-      <li>사람의 플레이 기록이 없다<small>베기와 가두기를 골라 쓰는지, 총석정·청간정에서 막히는지</small></li>
-      <li>귀신 이름 셋<small>그림자 무사·우산귀·눈치귀가 일본풍·현대어로 읽힐 수 있어 고를 일이 남음</small></li>
-      <li>소리를 들어 본 사람이 없다<small>날씨 소리 크기·되풀이 피로</small></li>
+      <li>사람의 플레이 기록이 없다<small>베기와 가두기를 골라 쓰는지, 총석정, 청간정에서 막히는지</small></li>
+      <li>귀신 이름 셋<small>그림자 무사, 우산귀, 눈치귀가 일본풍, 현대어로 읽힐 수 있어 고를 일이 남음</small></li>
+      <li>소리를 들어 본 사람이 없다<small>날씨 소리 크기, 되풀이 피로</small></li>
       <li>조작은 그대로<small>마우스 필수, 게임패드 없음</small></li>
     </ul>
   </article>
@@ -134,10 +180,10 @@ ol.next b { font-weight: 400; font-family: var(--say); font-size: 21px }
 
     <h3>이번에 바뀐 것</h3>
     <ol class="hard">
-      <li><b>소나무와 돌기둥</b><p>둥근 먹 덩이 같던 나무가 바다 쪽으로 굽은 해송이 되었어요. 납작한 솔잎 층이 얹히고, 눈 오는 맵은 솔잎 위에 눈이 남아요. 총석정 기둥은 막대그래프 같던 회색 판에서 기둥마다 짙기·모서리·마디 금이 다른 육각 기둥으로 바뀌었어요.</p></li>
-      <li><b>가두기에 이유가 생김</b><p>귀신 하나를 가두면 둘레 귀신이 잠깐 잿빛으로 멎어요(먹 울림). 2·3장에도 베어지지 않는 안개귀를 무리 한가운데에 두어, 가운데를 가두고 둘레를 한 획에 베는 장면이 나오게 했어요.</p></li>
-      <li><b>반복 없애기</b><p>위로 오르는 맵 두 장(연사모종·죽서루)은 같은 돌 무늬가 여섯 번 복사돼 있었어요. 넓은 계단 → 좁은 지그재그 → 점프보다 높은 돌 → 섞기로 다시 놓고, 죽서루에는 폭포 가운데 바위를 뛰어 건너는 쉼을 넣었어요. 삼일포 연잎도 너비·높이를 섞어 복사를 없앴어요.</p></li>
-      <li><b>소리</b><p>날씨 소리 파일이 하나도 없어 바깥 소리가 비어 있었어요. 파도·봄비·폭우·가을바람·강물·눈바람·폭포·밤 호수를 받아 섞어 맵 15가지에 깔았고, 2장은 강, 3장은 바다, 월송정은 고향 곡이 흘러요.</p></li>
+      <li><b>소나무와 돌기둥</b><p>둥근 먹 덩이 같던 나무가 바다 쪽으로 굽은 해송이 되었어요. 납작한 솔잎 층이 얹히고, 눈 오는 맵은 솔잎 위에 눈이 남아요. 총석정 기둥은 막대그래프 같던 회색 판에서 기둥마다 짙기, 모서리, 마디 금이 다른 육각 기둥으로 바뀌었어요.</p></li>
+      <li><b>가두기에 이유가 생김</b><p>귀신 하나를 가두면 둘레 귀신이 잠깐 잿빛으로 멎어요(먹 울림). 2, 3장에도 베어지지 않는 안개귀를 무리 한가운데에 두어, 가운데를 가두고 둘레를 한 획에 베는 장면이 나오게 했어요.</p></li>
+      <li><b>반복 없애기</b><p>위로 오르는 맵 두 장(연사모종, 죽서루)은 같은 돌 무늬가 여섯 번 복사돼 있었어요. 넓은 계단 → 좁은 지그재그 → 점프보다 높은 돌 → 섞기로 다시 놓고, 죽서루에는 폭포 가운데 바위를 뛰어 건너는 쉼을 넣었어요. 삼일포 연잎도 너비, 높이를 섞어 복사를 없앴어요.</p></li>
+      <li><b>소리</b><p>날씨 소리 파일이 하나도 없어 바깥 소리가 비어 있었어요. 파도, 봄비, 폭우, 가을바람, 강물, 눈바람, 폭포, 밤 호수를 받아 섞어 맵 15가지에 깔았고, 2장은 강, 3장은 바다, 월송정은 고향 곡이 흘러요.</p></li>
       <li><b>이야기</b><p>평사낙안에서 어머니가 "네가 크면, 네 눈으로 보렴" 하던 말이 월송정에서 "이제 네 눈으로 보는구나"로 돌아와요. 등불 들고 징검돌을 건너던 색시, 눈덩이 둑, 한 걸음 늦던 그림자처럼 맵에서 한 일이 장면에 나와요. 산시청람 할머니, 경포대 주모가 따로 생기고, 원포귀범 뱃사공이 "댁 얼굴이 그 젊은이를 꼭 닮았구려" 하고 단서를 줘요.</p></li>
     </ol>
 
@@ -145,7 +191,7 @@ ol.next b { font-weight: 400; font-family: var(--say); font-size: 21px }
     <ul class="good">
       <li>사람의 플레이 기록이 없다<small>베기와 가두기를 실제로 골라 쓰는지, 처음 10분을 통과하는지</small></li>
       <li>월송정 보스전<small>봇이 같은 자리에서 20번 맞아요</small></li>
-      <li>소리를 들어 본 사람이 없다<small>날씨 소리 크기·되풀이 피로</small></li>
+      <li>소리를 들어 본 사람이 없다<small>날씨 소리 크기, 되풀이 피로</small></li>
       <li>조작은 그대로<small>마우스 필수, 게임패드 없음</small></li>
     </ul>
   </article>
@@ -158,17 +204,17 @@ ol.next b { font-weight: 400; font-family: var(--say); font-size: 21px }
     <h3>이번에 바뀐 것</h3>
     <ol class="hard">
       <li><b>맵마다 기승전결</b><p>맵 하나에 생각 하나를 소개 → 키우기 → 비틀기 → 섞기 순서로. 총석정은 다리 대신 비탈로 솟은 기둥을 오르고, 낙산일출은 썰물 때만 드러나는 징검돌을 기다렸다 달려 건너요. 귀신은 같은 순서로 돌리지 않고 손으로 놓았어요(같은 순서 반복 15맵 → 1맵).</p></li>
-      <li><b>맵마다 다른 얼굴</b><p>먼 그림이 강·바다 수평선·주상절리 기둥·솔숲으로 갈리고, 청간정 고개의 정자는 안개가 걷히며 드러나요. 월송정 끝에는 달빛 바다가, 낙산일출에는 바다에서 떠오르는 해가 있어요.</p></li>
-      <li><b>이야기를 다시 씀</b><p>화공의 어머니 고향이 길 끝 바닷가예요. 비워 둔 마지막 한 폭이 어머니가 말하던 바다가 되고, 1장에서 바다를 그려 달라던 아이가 마지막에 다시 와요. 그림 없이 픽셀 인물(옅은 먹빛의 젊은 어머니·어린 화공)이 연기해요.</p></li>
+      <li><b>맵마다 다른 얼굴</b><p>먼 그림이 강, 바다 수평선, 주상절리 기둥, 솔숲으로 갈리고, 청간정 고개의 정자는 안개가 걷히며 드러나요. 월송정 끝에는 달빛 바다가, 낙산일출에는 바다에서 떠오르는 해가 있어요.</p></li>
+      <li><b>이야기를 다시 씀</b><p>화공의 어머니 고향이 길 끝 바닷가예요. 비워 둔 마지막 한 폭이 어머니가 말하던 바다가 되고, 1장에서 바다를 그려 달라던 아이가 마지막에 다시 와요. 그림 없이 픽셀 인물(옅은 먹빛의 젊은 어머니, 어린 화공)이 연기해요.</p></li>
       <li><b>처음 화면</b><p>표지가 픽셀 장면이 되었어요: 떨리는 손의 화공이 먹을 떨궈 나그네를 그려 내고, 나그네가 병풍 속으로 걸어 들어가요. 화첩에서도 그 나그네가 다음 맵 곁에 서 있어요.</p></li>
       <li><b>초반 난이도와 손맛</b><p>1장이 2장보다 빽빽하던 귀신을 줄이고 쉬는 구간을 두었어요. 짧은 획 연타는 붓이 말라 먹이 두 배로 들고, 한 획에 셋을 베면 먹이 고이는 여운이 남아요.</p></li>
     </ol>
 
     <h3>아직 8점에 못 미치는 까닭</h3>
     <ul class="good">
-      <li>사람의 플레이 기록이 없다<small>봄·여름 초반, 낙산일출 썰물 길이 실제로 어떤지 모름</small></li>
-      <li>보스 몇이 너무 짧다<small>청간정·망양정은 봇 기준 6~7초</small></li>
-      <li>이야기 장면의 움직임<small>컷 모음처럼 보이지 않게 걷기·등장을 더</small></li>
+      <li>사람의 플레이 기록이 없다<small>봄, 여름 초반, 낙산일출 썰물 길이 실제로 어떤지 모름</small></li>
+      <li>보스 몇이 너무 짧다<small>청간정, 망양정은 봇 기준 6~7초</small></li>
+      <li>이야기 장면의 움직임<small>컷 모음처럼 보이지 않게 걷기, 등장을 더</small></li>
       <li>소리는 그대로<small>곡 4개, 날씨 소리 없음</small></li>
     </ul>
   </article>
@@ -176,15 +222,15 @@ ol.next b { font-weight: 400; font-family: var(--say); font-size: 21px }
   <article id="d1112">
     <p class="date">11.12 0시</p>
     <p class="verdict">예쁘지만 금방 질리는 게임이 될 가능성이 커요</p>
-    <p class="how">그림 정체성은 진짜 강점이지만 재미의 핵심이 아직 사람에게 검증되지 않았어요. 근거: 맵 22장 파일 수치, 사용자 플레이 기록 146판, 맵 3장 화면, 스팀 상점 페이지와 리뷰·비평 글. Codex에게 따로 맡긴 평가도 "지금 빌드로는 출시를 권하기 어렵다"였어요.</p>
+    <p class="how">그림 정체성은 진짜 강점이지만 재미의 핵심이 아직 사람에게 검증되지 않았어요. 근거: 맵 22장 파일 수치, 사용자 플레이 기록 146판, 맵 3장 화면, 스팀 상점 페이지와 리뷰, 비평 글. Codex에게 따로 맡긴 평가도 "지금 빌드로는 출시를 권하기 어렵다"였어요.</p>
 
     <h3>가장 냉정한 다섯 가지</h3>
     <ol class="hard">
-      <li><b>반복이 숫자로 보여요</b><p>맵 22장 중 14장이 귀신 5~7종을 같은 순서로 80~95칸마다 돌려 놓았어요. 총석정은 기러기·먹귀·우산귀·붓털귀·먹귀가 끝까지 6바퀴 돌아요. 땅도 같은 언덕 하나를 5~7번 복사한 맵이 많아요. 먹으로 발판을 긋던 Sumioni(메타크리틱 57)와 그림이 극찬받던 Muramasa가 바로 이 반복으로 깎였어요.</p></li>
-      <li><b>그리기 게임인데 베기 게임으로 굴러가요</b><p>처치의 95%가 베기, 얇은 획 70%, 1분에 27~52획. 이 게임만의 동사인 다리·벽·봉인보다 빠른 연타가 통해요. 오카미·크레용 피직스가 한 시간 뒤 장난감처럼 느껴진 까닭과 같아요.</p></li>
-      <li><b>밖의 사람이 0명이에요</b><p>기록 146판이 모두 만든 사람 한 명의 판이고, 그런데도 봄 클리어 17%·여름 0%예요. 봇 시험 통과는 고장 나지 않았다는 뜻이지 재밌다는 뜻이 아니에요.</p></li>
-      <li><b>넓히기만 하고 깊게 다듬지 않았어요</b><p>귀신 17종 넘게, 큰 귀신 11종, 맵 22장이 있지만 맵 하나를 끝까지 손으로 다듬은 적이 없어요. 수묵풍으로 성공한 Nine Sols·Realm of Ink는 둘 다 전투가 깊었어요.</p></li>
-      <li><b>시장은 차가워요</b><p>최근 2년 사이 그려서 길을 내고 그려서 싸우는 게임 중 흥행작을 찾지 못했어요(성공은 퍼즐인 Draw 정도). 한국 전통 소재 인디는 리뷰가 두 자릿수에 머물고, 스팀 게임의 절반은 1,000장도 못 팔아요. 게임패드가 없어 스팀덱 인증도 어렵고, 그림·음악에 AI를 써서 스팀의 AI 사용 고지 대상이에요.</p></li>
+      <li><b>반복이 숫자로 보여요</b><p>맵 22장 중 14장이 귀신 5~7종을 같은 순서로 80~95칸마다 돌려 놓았어요. 총석정은 기러기, 먹귀, 우산귀, 붓털귀, 먹귀가 끝까지 6바퀴 돌아요. 땅도 같은 언덕 하나를 5~7번 복사한 맵이 많아요. 먹으로 발판을 긋던 Sumioni(메타크리틱 57)와 그림이 극찬받던 Muramasa가 바로 이 반복으로 깎였어요.</p></li>
+      <li><b>그리기 게임인데 베기 게임으로 굴러가요</b><p>처치의 95%가 베기, 얇은 획 70%, 1분에 27~52획. 이 게임만의 동사인 다리, 벽, 봉인보다 빠른 연타가 통해요. 오카미, 크레용 피직스가 한 시간 뒤 장난감처럼 느껴진 까닭과 같아요.</p></li>
+      <li><b>밖의 사람이 0명이에요</b><p>기록 146판이 모두 만든 사람 한 명의 판이고, 그런데도 봄 클리어 17%, 여름 0%예요. 봇 시험 통과는 고장 나지 않았다는 뜻이지 재밌다는 뜻이 아니에요.</p></li>
+      <li><b>넓히기만 하고 깊게 다듬지 않았어요</b><p>귀신 17종 넘게, 큰 귀신 11종, 맵 22장이 있지만 맵 하나를 끝까지 손으로 다듬은 적이 없어요. 수묵풍으로 성공한 Nine Sols, Realm of Ink는 둘 다 전투가 깊었어요.</p></li>
+      <li><b>시장은 차가워요</b><p>최근 2년 사이 그려서 길을 내고 그려서 싸우는 게임 중 흥행작을 찾지 못했어요(성공은 퍼즐인 Draw 정도). 한국 전통 소재 인디는 리뷰가 두 자릿수에 머물고, 스팀 게임의 절반은 1,000장도 못 팔아요. 게임패드가 없어 스팀덱 인증도 어렵고, 그림, 음악에 AI를 써서 스팀의 AI 사용 고지 대상이에요.</p></li>
     </ol>
     <figure>
       <img class="strip" src="img/1112_pillars_strip.webp" alt="총석정 맵 전체 모습: 비슷한 높이의 네모 기둥이 같은 간격으로 늘어서 막대그래프처럼 보인다" width="2100" height="135" loading="lazy">
@@ -196,7 +242,7 @@ ol.next b { font-weight: 400; font-family: var(--say); font-size: 21px }
       <li>멈추지 않는 그리기<small>오카미의 가장 큰 불만(그릴 때 화면이 멈춤)과 Sumioni의 불만(멈춰 서서 먹 채우기)을 둘 다 피했어요.</small></li>
       <li>남는 획<small>쓰인 획으로 품계를 매기고, 깬 맵의 획이 화첩 그림에 스며요. 더 나은 해법에 보상하라는 교훈을 이미 하고 있어요.</small></li>
       <li>세계관 안의 이유<small>왜 먹이 귀신이 되는지, 왜 길 끝이 비어 있는지가 이야기와 맞물려요.</small></li>
-      <li>그림 정체성<small>종이·먹·인주 세 가지로 끝까지 일관돼요. 스크린샷 한 장으로 기억에 남아요.</small></li>
+      <li>그림 정체성<small>종이, 먹, 인주 세 가지로 끝까지 일관돼요. 스크린샷 한 장으로 기억에 남아요.</small></li>
     </ul>
 
     <h3>이 평가 뒤에 하는 일</h3>
@@ -208,29 +254,56 @@ ol.next b { font-weight: 400; font-family: var(--say); font-size: 21px }
       <li><b>git 백업과 코드 나누기</b> 게임 폴더에 git 기준점을 만들었어요(11.12).</li>
     </ol>
 
-    <p class="src">출처: <a href="https://www.metacritic.com/game/sumioni-demon-arts/">Sumioni 메타크리틱</a> · <a href="https://www.gamingnexus.com/Article/3458/Sumioni-Demon-Arts">Gaming Nexus</a> · <a href="https://gameinformer.com/games/muramasa_rebirth/b/playstation_vita/archive/2013/06/25/muramasa-rebirth-review">Muramasa (Game Informer)</a> · <a href="https://www.gamesradar.com/crayon-physics-deluxe-review/">Crayon Physics (GamesRadar)</a> · <a href="https://www.nintendolife.com/reviews/wiiu/kirby_and_the_rainbow_curse">Rainbow Curse (Nintendo Life)</a> · <a href="https://store.steampowered.com/app/2473980/Draw/">Draw</a> · <a href="https://store.steampowered.com/app/3886770/Draw_Sword/">Draw Sword</a> · <a href="https://store.steampowered.com/app/2597080/Realm_of_Ink/">Realm of Ink</a> · <a href="https://store.steampowered.com/app/1809540/Nine_Sols/">Nine Sols</a> · <a href="https://store.steampowered.com/app/1925860/Seonbi__Scholar_of_Joseon/">선비</a> · <a href="https://www.engadget.com/2015-03-17-super-mario-3d-world-design.html">마리오 3D 월드 4단계 설계</a> · <a href="https://www.techm.kr/news/articleView.html?idxno=147475">산나비 비버롹스 2025</a> · <a href="https://www.steampageanalyzer.com/blog/average-steam-game-sales">스팀 판매 추정</a> · <a href="https://www.steamdeck.com/en/verified">Steam Deck Verified</a></p>
+    <p class="src">출처: <a href="https://www.metacritic.com/game/sumioni-demon-arts/">Sumioni 메타크리틱</a>, <a href="https://www.gamingnexus.com/Article/3458/Sumioni-Demon-Arts">Gaming Nexus</a>, <a href="https://gameinformer.com/games/muramasa_rebirth/b/playstation_vita/archive/2013/06/25/muramasa-rebirth-review">Muramasa (Game Informer)</a>, <a href="https://www.gamesradar.com/crayon-physics-deluxe-review/">Crayon Physics (GamesRadar)</a>, <a href="https://www.nintendolife.com/reviews/wiiu/kirby_and_the_rainbow_curse">Rainbow Curse (Nintendo Life)</a>, <a href="https://store.steampowered.com/app/2473980/Draw/">Draw</a>, <a href="https://store.steampowered.com/app/3886770/Draw_Sword/">Draw Sword</a>, <a href="https://store.steampowered.com/app/2597080/Realm_of_Ink/">Realm of Ink</a>, <a href="https://store.steampowered.com/app/1809540/Nine_Sols/">Nine Sols</a>, <a href="https://store.steampowered.com/app/1925860/Seonbi__Scholar_of_Joseon/">선비</a>, <a href="https://www.engadget.com/2015-03-17-super-mario-3d-world-design.html">마리오 3D 월드 4단계 설계</a>, <a href="https://www.techm.kr/news/articleView.html?idxno=147475">산나비 비버롹스 2025</a>, <a href="https://www.steampageanalyzer.com/blog/average-steam-game-sales">스팀 판매 추정</a>, <a href="https://www.steamdeck.com/en/verified">Steam Deck Verified</a></p>
   </article>
 </main>
 <script>
-// 관점 · 근거 · 날짜별 점수(10점 만점). 새 평가는 날짜를 DATES에, 점수를 각 줄 끝에 더한다.
-const DATES = ["11.12 0시", "11.12 3시", "11.12 5시", "11.12 7시"];
+// 관점, 근거, 날짜별 점수(10점 만점). 새 평가는 날짜를 DATES에, 점수를 각 줄 끝에 더한다.
+const DATES = ["11.12 0시", "11.12 3시", "11.12 5시", "11.12 7시", "11.19"];
 const ROWS = [
-  ["그림·정체성", "해송·육각 기둥에 더해, 일본 신사 문처럼 보이던 연사모종 문을 기와지붕 일주문으로. 상점 첫인상 평가(ChatGPT)에서 미술 8.5", [8, 8.5, 9, 9]],
-  ["발상", "가두면 둘레 귀신이 멎는 먹 울림. 붓으로 다리를 긋는 장면을 기획서 맨 위에 보이게", [7, 7, 7.5, 7.5]],
-  ["핵심 재미", "재미봇은 여전히 베기 95~99%(봇은 붉은 원 귀신만 가둠). 사람이 해 보기 전이라 그대로", [4, 5, 5.5, 5.5]],
-  ["맵·반복", "재미봇 220판으로 고친 맵을 다시 5판씩: 삼일포 복사 경고는 사라짐, 총석정·청간정 피격 경고는 남음", [3, 6, 7, 7]],
-  ["조작", "바뀐 것 없음, 게임패드 없음", [5, 5, 5, 5]],
-  ["난이도", "보스 앞 쉼, 돌기둥귀가 친 뒤 물러나 쉼(월송정 피격 20→13). 총석정은 아직 봇이 6~11번 쓰러질 판", [4, 5, 5.5, 5.5]],
-  ["이야기", "맵 끝에서 만날 사람이 플레이 중 표식 곁에 미리 서 있음, 고증·말투 검토(Gemini)로 근대어·번역투·죽서루 지형 고침", [6, 7.5, 8, 8.5]],
-  ["소리", "날씨 소리 15가지 크기를 곡보다 7~8dB 아래로 맞춤. 사람이 들어 보기 전", [4, 4, 6, 6]],
-  ["시장성", "상점 그림 6장만 본 게이머 평가(ChatGPT) 7.2·위시리스트 '예', 지적대로 다리 긋기·베기 화면을 만듦", [3, 4, 4.5, 5]],
-  ["개발 지속성", "표식 곁 사람 시험 7/7, 세로 맵 뛰어 보기 시험, 다른 AI 셋(Codex·ChatGPT·Gemini)으로 다른 관점 평가. main.gd는 여전히 큼", [4, 5.5, 6.5, 7]],
+  ["그림, 정체성", "22맵 화면 88장을 다시 찍어 봤어요. 먹과 인주만으로 맵마다 다른 얼굴. 세로 맵 두 장의 돌계단은 새까만 덩어리라 다른 맵보다 거칠고, 이야기 사람과 나그네의 등신이 달라요", [8, 8.5, 9, 9, 8.5]],
+  ["발상", "글씨로 쓰는 나무, 틀린 그림을 고치러 가는 이야기, 따라 그려야 진짜가 되는 밑그림 장치, 쓰러지면 화공이 마른 자리에 다시 그려 주는 이어 그리기", [7, 7, 7.5, 7.5, 8]],
+  ["핵심 재미", "기록상 처치 304번 중 베기 286번. 짙은 귀신과 마지막은 가두기를 넣은 뒤의 사람 기록은 한 판뿐이라 그대로", [4, 5, 5.5, 5.5, 5.5]],
+  ["맵, 반복", "22맵 실루엣이 모두 다르고 맵마다 긋기 장치가 있어요. 공통 장치가 많다는 숙제는 그대로", [3, 6, 7, 7, 7]],
+  ["조작", "쓰러진 뒤 바로 다시(재 보니 2.1초), 이야기 넘기기, Esc 조작 줄에 우클릭과 휠. 게임패드와 키 바꾸기는 없음", [5, 5, 5, 5, 5.5]],
+  ["난이도", "마른 자리에서 이어 그리기로 실패 비용이 줄었어요(22맵 시험 595개 통과). 사람 손으로는 확인 전이고, 그 전 기록은 망양정 7판 0승", [4, 5, 5.5, 5.5, 6]],
+  ["이야기", "해학으로 다시 쓴 판. 뱃삯, 허풍 같은 되받기가 살아 있고, 맵 끝에서만 전해지는 점은 그대로", [6, 7.5, 8, 8.5, 8]],
+  ["소리", "곡 7, 날씨 소리 16. 효과음은 여섯 개뿐이고 큰 귀신 북이 모두 같아요(코드로 세어 봄)", [4, 4, 6, 6, 5]],
+  ["시장성", "외부 플레이어 0명, 게임패드 없음 그대로", [3, 4, 4.5, 5, 5]],
+  ["개발 지속성", "자동 시험이 600개를 넘고 git 기록이 쌓였어요. main.gd는 11.12의 5,700줄에서 19,000줄로 커졌어요", [4, 5.5, 6.5, 7, 6]],
 ];
 const last = DATES.length - 1;
 document.querySelector(".board thead tr").innerHTML = "<th>관점</th>" + DATES.map(d => `<th>${d}</th>`).join("") + "<th>근거 (최근)</th>";
 document.getElementById("scores").innerHTML = ROWS.map(([name, why, s]) =>
   `<tr><td>${name}<small class="why-m">${why}</small></td>${s.map(v => `<td><div class="score"><b>${v}</b><span class="bar${v <= 4 ? " low" : ""}"><i style="width:${v * 10}%"></i></span></div></td>`).join("")}<td class="why">${why}</td></tr>`).join("");
 document.querySelector(".board tfoot tr").innerHTML = "<td>평균</td>" + DATES.map((d, i) => `<td>${(ROWS.reduce((a, r) => a + r[2][i], 0) / ROWS.length).toFixed(1)}</td>`).join("") + "<td></td>";
+
+// 11.19: 100점 채점표(묶음, 항목, 배점, 점수, 근거)
+const SHEET1119 = [
+  ["핵심 놀이", [
+    ["발상, 정체성", 8, 7, "플레이어가 붓이고, 귀신은 잘못 그린 먹이고, 길 끝은 못 그린 빈 폭. 요소마다 세계관 안의 이유가 있어요"],
+    ["조작, 손맛", 8, 5, "점프 여유, 타격 멈춤, 화면 울림은 있어요. 왼손 이동에 오른손 붓, 붓 두 종류와 굵기까지 얹혀 손이 바빠요"],
+    ["그리기의 쓰임", 8, 4.5, "다리, 비탈, 지붕, 둑은 잘 돼요. 싸움은 기록상 처치 304번 중 베기 286번이고, 새 장치를 넣은 뒤의 사람 기록은 한 판뿐"],
+    ["귀신과 싸움", 6, 4, "23종 모두 공략이 다르게 설계됐지만 실제로는 대부분 한 칼에 끝나요"],
+    ["큰 귀신", 5, 3.5, "13마리 모두 푸는 법이 다르고 등장 띠에 한 줄 실마리가 있어요. 맵 장치와 묶기는 여덟 곳 중 총석정 시제품 하나"],
+    ["맵, 장치", 5, 3.5, "22맵 실루엣이 다 달라요. 공통 장치가 많고, 세로 맵 두 장의 돌계단은 다른 맵보다 거칠어요"]]],
+  ["흐름, 편의", [
+    ["처음 10분", 5, 3, "말 없는 표지는 좋아요. 붓 익히기 한 장에 배울 것이 13가지"],
+    ["난이도, 실패 비용", 5, 2, "인장 셋에 맵이 2~3분인데 중간 이어 하기가 없었어요. 망양정 7판 0승, 봄 17%"],
+    ["편의 기능", 5, 2.5, "음량, 전체 화면, 난이도, 언어, 흔들림 끄기는 있었어요. 이야기 통째 넘기기, 쓰러진 뒤 바로 다시, 키 바꾸기, 게임패드가 없었어요"],
+    ["다시 할 이유", 5, 3.5, "품계와 먹 그릇, 빈 낙관, 내 획이 화첩에 스밈, 병풍 맵이 내 획으로 짜임"]]],
+  ["보이고 들리는 것", [
+    ["그림, 화면", 10, 8.5, "가장 큰 강점. 먹과 인주만으로 맵마다 다른 얼굴"],
+    ["움직임, 연출", 6, 4.5, "나그네 몸짓, 바닥마다 다른 쓰러짐, 병풍 접기. 큰 귀신 11마리는 아직 그린 장면이 아니에요"],
+    ["소리", 5, 2.5, "곡 7, 날씨 소리 16은 있어요. 효과음은 여섯 개뿐이고 큰 귀신 북이 모두 같아요"],
+    ["이야기", 4, 3.2, "해학 결이 살아 있고 뱃삯, 허풍 같은 되받기가 있어요. 맵 끝에서만 전해져요"]]],
+  ["바깥 조건", [
+    ["안정성, 유지", 5, 3, "자동 시험이 600개를 넘어요. main.gd가 한 파일 19,000줄, 가장 느린 자리 19.7ms"],
+    ["사람 검증, 시장성", 10, 3.5, "외부 플레이어 0명, 게임패드 없음. 화면 한 장의 힘은 커요"]]],
+];
+document.getElementById("sheet1119").innerHTML = SHEET1119.map(([group, items]) =>
+  `<tr class="grp"><td colspan="3">${group} <span>${+items.reduce((a, r) => a + r[2], 0).toFixed(1)} / ${items.reduce((a, r) => a + r[1], 0)}</span></td></tr>` +
+  items.map(([name, max, got, why]) => `<tr><td>${name}<small class="why-m">${why}</small></td><td><div class="score"><b>${got}</b><span class="bar${got / max <= 0.5 ? " low" : ""}"><i style="width:${got / max * 100}%"></i></span><em>/ ${max}</em></div></td><td class="why">${why}</td></tr>`).join("")).join("");
 </script>
 <script src="../../hub/back.js" data-cat="game" defer></script>
 </body>
