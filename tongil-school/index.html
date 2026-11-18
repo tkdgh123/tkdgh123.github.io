@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>통일스쿨 준비 — 창업실</title>
+<meta name="description" content="숭실평화통일스쿨 둘째 날, 셋째 날 활동 준비. 토론 두 개, 북한문화토크콘서트, 최종성과발표회.">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@200..800&display=swap">
+<style>
+:root {
+  --paper: #f3f2ee; --ink: #141413; --muted: #5d5c57; --rule: #cbc8bf; --blue: #1f3fa8; --mark: #b3261e; --say: #e6e9f3;
+  --m: clamp(16px, 4vw, 56px);
+  --serif: "Hahmlet", "Noto Serif KR", serif;
+  --sans: "Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif;
+}
+* { box-sizing: border-box }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 16.5px/1.75 var(--sans); word-break: keep-all; -webkit-font-smoothing: antialiased }
+a { color: inherit }
+h1, h2, h3, p { margin: 0 }
+.wrap { max-width: 860px; margin: 0 auto; padding: 0 var(--m) }
+.bar { padding-block: 22px; color: var(--muted); font-size: 14px }
+
+.hero { padding-block: clamp(28px, 6vh, 72px) 28px }
+.hero .k { color: var(--muted); font-size: 14.5px }
+.hero h1 { margin-top: 10px; font: 300 clamp(40px, 8vw, 84px)/1.05 var(--serif); letter-spacing: -.03em }
+.hero h1 b { font-weight: 650 }
+.hero .lead { margin-top: 18px; font-size: 17px; max-width: 34em }
+
+.jump { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; display: flex; background: var(--paper); border-block: 1.5px solid var(--ink); overflow-x: auto; scrollbar-width: none }
+.jump::-webkit-scrollbar { display: none }
+.jump a { flex: 0 0 auto; padding: 11px 14px; text-decoration: none; font-weight: 650; font-size: 15px; white-space: nowrap }
+.jump a:first-child { padding-left: 0 }
+.jump a:hover, .jump a.on { color: var(--blue) }
+
+section { padding-block: 44px 36px; scroll-margin-top: 48px }
+section + section { border-top: 1.5px solid var(--ink) }
+.when { color: var(--muted); font-size: 14.5px }
+h2 { margin-top: 6px; font: 500 clamp(26px, 4.4vw, 38px)/1.2 var(--serif); letter-spacing: -.02em }
+.what { margin-top: 10px; font-size: 17px; max-width: 36em }
+h3 { margin-top: 30px; padding-bottom: 6px; border-bottom: 1px solid var(--ink); font: 650 16px/1.5 var(--sans) }
+
+ul.l { margin: 0; padding: 0; list-style: none }
+ul.l > li { padding: 11px 0; border-bottom: 1px solid var(--rule) }
+ul.l b { font-weight: 650 }
+.sub { display: block; color: var(--muted); font-size: 15px; margin-top: 2px }
+.sub i { font-style: normal; font-weight: 650; color: var(--ink); margin-right: 8px }
+.pts { font: 650 15px/1 var(--sans); color: var(--mark); margin-right: 8px }
+
+.do { margin: 0; padding: 14px 0 0 1.3em }
+.do li { margin: 6px 0 }
+.do li::marker { color: var(--mark) }
+
+.say { margin-top: 12px; padding: 14px 16px; background: var(--say); border-radius: 6px; font: 400 17px/1.7 var(--serif) }
+.say + .say { margin-top: 8px }
+
+.num { display: grid; grid-template-columns: 6.2em 1fr; gap: 6px 16px; padding: 14px 0; border-bottom: 1px solid var(--rule); align-items: baseline }
+.num .v { font: 300 clamp(30px, 6vw, 40px)/1 var(--serif); letter-spacing: -.02em }
+.num .s { color: var(--muted); font-size: 14px; display: block; margin-top: 4px }
+
+
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px }
+.two p { padding: 8px 0 }
+.two .h { font-weight: 650; font-size: 14.5px; color: var(--muted) }
+.q { margin-top: 22px; font: 500 18px/1.5 var(--serif) }
+
+.note { margin-top: 14px; color: var(--muted); font-size: 15px }
+
+footer { padding-block: 36px 64px; border-top: 1.5px solid var(--ink); color: var(--muted); font-size: 14px }
+footer ul { margin: 8px 0 0; padding-left: 1.1em }
+footer li { margin: 3px 0 }
+
+@media (max-width: 600px) {
+  .num { grid-template-columns: 1fr; gap: 2px }
+  .two { grid-template-columns: 1fr }
+  .two p + p { border-top: 1px dashed var(--rule) }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="bar">2026.11.18</div>
+  <header class="hero">
+    <p class="k">숭실평화통일스쿨 8차, AI소프트웨어학부</p>
+    <h1>통일스쿨 <b>둘째 날</b>부터</h1>
+    <p class="lead">남은 활동에 30점이 걸려 있어요. 토론, 토크콘서트, 발표회를 차례로 준비해요.</p>
+  </header>
+
+  <nav class="jump">
+    <a href="#score">점수</a><a href="#nums">숫자</a><a href="#reboot">리부팅</a><a href="#flip">뒤집어 보기</a><a href="#talk">토크콘서트</a><a href="#final">발표회</a>
+  </nav>
+
+  <section id="score">
+    <p class="when">50점 중 40점 넘으면 통과</p>
+    <h2>점수는 이렇게 매겨요</h2>
+    <ul class="l" style="margin-top:18px">
+      <li><span class="pts">10</span><b>한반도 리부팅</b> 목요일<span class="sub">담당 교수님이 참여 적극성과 남 배려를 봐요. 조마다 최대 2점까지 차이 나요.</span></li>
+      <li><span class="pts">10</span><b>북한문화토크콘서트</b> 목요일<span class="sub">같은 방식이에요.</span></li>
+      <li><span class="pts">10</span><b>최종성과발표회</b> 금요일<span class="sub">심사 교수님 점수 반, 조장과 부조장 점수 반. 1부, 2부 등수마다 +2점부터 -2점까지 더하고 빼요.</span></li>
+      <li><span class="pts">9</span><b>생활 규정</b><span class="sub">강의 시작 뒤에 들어가면 한 번에 1점씩 빠져요.</span></li>
+      <li><span class="pts">11</span><b>통일맨</b> 첫날<span class="sub">큐카드 도장 1개에 1점. 이미 끝났어요.</span></li>
+    </ul>
+    <h3>그래서 할 일</h3>
+    <ol class="do">
+      <li>토론마다 앞부분에 한 번은 먼저 말하기</li>
+      <li>앞사람 말을 받아서 시작하기. "○○님 말에 이어서 말하면"</li>
+      <li>아직 말 안 한 조원에게 "○○님은 어떻게 생각해요?" 묻기</li>
+      <li>강의 시작 전에 자리에 앉기</li>
+    </ol>
+  </section>
+
+  <section id="nums">
+    <p class="when">토론 근거로 쓸 최신 숫자</p>
+    <h2>요즘 사람들 생각</h2>
+    <div class="num"><span class="v">39.0%</span><p>통일이 필요하다<span class="s">서울대 통일평화연구원 2026 통일의식조사, 9월 발표. 지난해 41.1%</span></p></div>
+    <div class="num"><span class="v">25.2%</span><p>20대 중 통일이 필요하다<span class="s">같은 조사. 2030은 절반 넘게 "지금대로가 좋다"거나 "관심 없다"</span></p></div>
+    <div class="num"><span class="v">31.5%</span><p>통일보다 지금대로가 좋다<span class="s">같은 조사. 2007년 조사 시작 뒤 가장 높아요</span></p></div>
+    <div class="num"><span class="v">66.9%</span><p>전쟁 없이 공존하면 통일은 필요 없다<span class="s">통일연구원 2026 통일의식조사, 9월 발표. "북한에 관심 없다"는 70.3%</span></p></div>
+    <p class="note">두 조사는 묻는 방식이 달라서 '통일 필요' 숫자도 달라요(서울대 39.0%, 통일연구원 48.2%). 말할 땐 어느 조사인지 같이 말해요.</p>
+
+    <h3>남북 상황, 이번 달 기준</h3>
+    <ul class="l">
+      <li><b>북한</b> 2023년 말부터 남북을 '적대적인 두 국가'로 부르고, 한국을 '제1의 적대국'으로 정했어요. 11월 4일 김여정 담화에서도 한미훈련 같은 적대 행위가 멈추기 전엔 대화하지 않겠다고 했어요.</li>
+      <li><b>우리 정부</b> 공식 대북정책은 '한반도 평화공존'이에요. 통일부가 말하는 '평화적 두 국가'는 그걸 이루는 전략이고, 북한을 법적으로 나라로 인정하는 건 아니라고 설명했어요(5월).</li>
+      <li><b>대화</b> 남북 대화는 7년째 끊겨 있어요. 정부가 10월 23일 군사회담을 제안했어요.</li>
+      <li><b>정부 통일방안</b> 1994년 민족공동체통일방안. 화해협력, 남북연합, 통일국가 3단계로 가요.</li>
+    </ul>
+  </section>
+
+  <section id="reboot">
+    <p class="when">목요일, 스쿨 토론의 장</p>
+    <h2>한반도 리부팅! 내가 원하는 통일?</h2>
+    <p class="what">어떤 통일을 원하는지 각자 입장을 내는 시간이에요. 진행 방식은 공개된 자료가 없어서 현장 안내를 따라요.</p>
+    <h3>고를 수 있는 입장</h3>
+    <ul class="l">
+      <li><b>평화공존 먼저</b><span class="sub"><i>근거</i>국민 다수가 원하고, 북한도 지금은 대화를 거부해요</span><span class="sub"><i>반론</i>그러다 분단이 영영 굳으면?</span></li>
+      <li><b>단계적 통일</b><span class="sub"><i>근거</i>정부 3단계 방안. 갑작스러운 혼란과 비용을 줄여요</span><span class="sub"><i>반론</i>30년 넘게 첫 단계에 머물러 있어요</span></li>
+      <li><b>빠른 통일</b><span class="sub"><i>근거</i>이산가족 1세대가 줄고 있고, 북한 주민 인권 문제가 급해요</span><span class="sub"><i>반론</i>비용과 혼란은 누가 감당해요?</span></li>
+      <li><b>통일 안 해도 됨</b><span class="sub"><i>근거</i>80년 넘게 따로 살았고, 20대 절반 가까이 필요 없다고 봐요</span><span class="sub"><i>반론</i>전쟁 위험과 북한 주민 인권은 그대로예요</span></li>
+    </ul>
+    <h3>말할 문장 예시, 입장은 골라서</h3>
+    <p class="say">저는 평화공존을 먼저 하고 그다음에 천천히 통일로 가는 게 맞다고 생각해요. 지금 북한이 대화 자체를 거부하고 있어서, 당장 통일을 말하기보다 서로 부딪히지 않는 규칙부터 만드는 게 현실적이라고 봐요.</p>
+    <p class="say">다만 공존이 분단을 그대로 굳히면 안 된다고 생각해요. 그래서 대학생 교류처럼 사람끼리 오가는 일은 계속 늘려야 한다고 봐요.</p>
+    <p class="say">AI 전공 입장에서 보면, 남북 말 차이를 이어 주는 번역 기술 같은 게 교류 문턱을 낮출 수 있다고 생각해요.</p>
+  </section>
+
+  <section id="flip">
+    <p class="when">목요일, 조별 자유 토론</p>
+    <h2>통일, 뒤집어 보기</h2>
+    <p class="what">당연하게 여기던 통일 생각을 뒤집어 보는 시간이에요. 꺼낼 만한 질문과 양쪽 근거예요.</p>
+
+    <p class="q">같은 민족이면 꼭 통일해야 할까?</p>
+    <div class="two">
+      <p><span class="h">그렇다</span><br>분단 전까지 역사를 같이 썼고, 헤어진 가족이 아직 있어요.</p>
+      <p><span class="h">아니다</span><br>80년 넘게 따로 살아 말과 생활이 달라졌어요. 민족만으로는 20대를 설득하기 어려워요.</p>
+    </div>
+
+    <p class="q">통일 비용이 너무 크지 않을까?</p>
+    <div class="two">
+      <p><span class="h">크다</span><br>북한 지역 생활 수준을 끌어올리는 데 오랫동안 큰돈이 들어요.</p>
+      <p><span class="h">분단 비용도 있다</span><br>국방비, 전쟁 위험, 막힌 대륙 길도 해마다 치르는 값이에요.</p>
+    </div>
+
+    <p class="q">북한은 하나의 나라일까?</p>
+    <div class="two">
+      <p><span class="h">그렇다</span><br>1991년 남북이 유엔에 같이 가입했어요. 서울대 2026 조사에서 81.8%가 남북을 별개 국가로 봤어요.</p>
+      <p><span class="h">아니다</span><br>헌법 3조는 영토를 한반도 전체로 정해요. 남북기본합의서는 남북을 통일로 가는 과정의 특수관계로 봐요.</p>
+    </div>
+
+    <p class="q">통일에 관심 없는 게 문제일까?</p>
+    <div class="two">
+      <p><span class="h">문제다</span><br>관심이 없으면 중요한 결정이 소수에게 넘어가요.</p>
+      <p><span class="h">자연스럽다</span><br>내 삶과 얽힌 일이 생겨야 관심도 생겨요. 그런 접점을 만드는 게 먼저예요.</p>
+    </div>
+
+    <h3>자유 토론에서</h3>
+    <ol class="do">
+      <li>반대할 땐 "그 말도 맞는데, 이런 경우는 어떨까요?"처럼 질문으로 꺼내기</li>
+      <li>조에서 나온 좋은 말을 적어 두기. 그대로 발표회 재료가 돼요</li>
+    </ol>
+  </section>
+
+  <section id="talk">
+    <p class="when">목요일, 층간 소음 "윗집 북한과 아랫집 남한의 층간 소음 극복 프로젝트"</p>
+    <h2>북한문화토크콘서트</h2>
+    <p class="what">북한 사회문화 이야기를 듣고 묻는 시간이에요. 질문을 한 번은 하는 게 좋아요.</p>
+    <h3>북한에서 온 분께 물어볼 것</h3>
+    <ul class="l">
+      <li>북한에서 컴퓨터나 휴대폰은 어떻게 쓰셨어요? 남한에 와서 처음 쓰기 어려웠던 앱이 있었나요?</li>
+      <li>남한 대학생과 지내면서 층간 소음처럼 서로 부딪혔던 일이 있었나요?</li>
+      <li>같은 말인데 뜻이 달라서 오해가 생긴 적이 있나요?</li>
+      <li>남한 청년이 북한에 대해 가장 많이 잘못 알고 있는 건 뭐라고 보세요?</li>
+      <li>같은 또래로서 지금 저희가 할 수 있는 일이 있다면 뭘까요?</li>
+    </ul>
+    <h3>묻지 않을 것</h3>
+    <p class="what" style="margin-top:12px">북한을 떠난 과정, 북에 남은 가족, 정치 입장은 본인이 먼저 꺼내기 전엔 캐묻지 않아요. 남 배려 점수와도 바로 이어져요.</p>
+  </section>
+
+  <section id="final">
+    <p class="when">목요일 밤, 금요일 아침 준비회의 → 금요일 1부, 2부</p>
+    <h2>최종성과발표회</h2>
+    <p class="what">조별로 준비해서 발표해요. 주제와 시간은 준비회의 안내를 따르고, 주제를 골라야 하면 아래에서 꺼내요.</p>
+    <h3>주제 아이디어</h3>
+    <ul class="l">
+      <li><b>남북 말 통역 앱</b><span class="sub">북한말 '밤을 패다'는 '밤을 새우다'예요. 이렇게 같은 말 다른 뜻을 이어 주는 앱을 기획하고, 쓰는 장면을 그림 두세 장으로 보여 줘요. AI소프트웨어학부 조라서 살리기 좋아요.</span></li>
+      <li><b>윗집 아랫집 규칙</b><span class="sub">남북을 이웃으로 보고 같이 사는 규칙 세 개를 정해요. 토크콘서트 이야기를 그대로 가져올 수 있어요.</span></li>
+      <li><b>2046년 우리의 하루</b><span class="sub">20년 뒤 공존이나 통일을 이룬 한반도에서 개발자로 사는 하루를 이야기로 보여 줘요.</span></li>
+    </ul>
+    <h3>짜임</h3>
+    <ol class="do">
+      <li>문제: 지금 어떤 벽이 있는지, 위 숫자 하나로</li>
+      <li>우리 생각: 토론에서 조원들이 한 말</li>
+      <li>제안: 우리가 만들 것이나 바꿀 것</li>
+      <li>마무리 한 줄, 받을 질문 두 개 미리 준비</li>
+    </ol>
+  </section>
+
+  <footer>
+    자료
+    <ul>
+      <li>LMS 한반도평화와통일 OT 자료(일정, 평가 방법)</li>
+      <li><a href="https://www.hankookilbo.com/news/article/A2026092817360001439">한국일보 2026.9.28, 서울대 통일평화연구원 2026 통일의식조사</a></li>
+      <li><a href="https://www.kyosu.net/news/articleView.html?idxno=210725">교수신문, 같은 조사의 별개 국가 인식</a></li>
+      <li><a href="https://www.fnnews.com/news/202609301001115101">파이낸셜뉴스 2026.9.30, 통일연구원 2026 통일의식조사</a></li>
+      <li><a href="https://www.news1.kr/nk/inter-korean/6171700">뉴스1 2026.5.20, 통일부의 평화적 두 국가 설명</a></li>
+      <li><a href="https://www.fnnews.com/news/202611051447237933">파이낸셜뉴스 2026.11.5, 김여정 담화와 통일부</a></li>
+    </ul>
+  </footer>
+</div>
+<script>
+const links = [...document.querySelectorAll('.jump a')];
+const io = new IntersectionObserver(es => es.forEach(e => {
+  if (e.isIntersecting) links.forEach(a => a.classList.toggle('on', a.hash === '#' + e.target.id));
+}), { rootMargin: '-45% 0px -50% 0px' });
+document.querySelectorAll('section').forEach(s => io.observe(s));
+</script>
+<script src="../hub/back.js" data-cat="study" defer></script>
+</body>
+</html>
