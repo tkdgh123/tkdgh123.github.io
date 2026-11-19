@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>북한 해커 팟캐스트 대본 — 창업실</title>
+<meta name="description" content="숭실평화통일스쿨 최종성과발표회 1부. 통일 5년 차 2036년을 가정한 가상 팟캐스트 「선 넘는 이야기」의 날것 질문 27개와 6분 순서.">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@200..800&display=swap">
+<style>
+:root {
+  --paper: #f3f2ee; --ink: #141413; --muted: #5d5c57; --rule: #cbc8bf; --blue: #1f3fa8; --mark: #b3261e;
+  --m: clamp(16px, 4vw, 56px);
+  --serif: "Hahmlet", "Noto Serif KR", serif;
+  --sans: "Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif;
+}
+* { box-sizing: border-box }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 16.5px/1.75 var(--sans); word-break: keep-all; -webkit-font-smoothing: antialiased }
+a { color: inherit; text-underline-offset: 3px }
+h1, h2, h3, p { margin: 0 }
+.wrap { max-width: 860px; margin: 0 auto; padding: 0 var(--m) }
+.bar { padding-block: 22px; color: var(--muted); font-size: 14px }
+
+.hero { padding-block: clamp(28px, 6vh, 72px) 28px }
+.hero .k { color: var(--muted); font-size: 14.5px }
+.hero h1 { margin-top: 10px; font: 300 clamp(40px, 8vw, 84px)/1.05 var(--serif); letter-spacing: -.03em }
+.hero h1 b { font-weight: 650 }
+.hero .lead { margin-top: 18px; font-size: 17px; max-width: 34em }
+
+.jump { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; display: flex; background: var(--paper); border-block: 1.5px solid var(--ink); overflow-x: auto; scrollbar-width: none }
+.jump::-webkit-scrollbar { display: none }
+.jump a { flex: 0 0 auto; padding: 11px 14px; text-decoration: none; font-weight: 650; font-size: 15px; white-space: nowrap }
+.jump a:first-child { padding-left: 0 }
+.jump a:hover, .jump a.on { color: var(--blue) }
+
+section { padding-block: 44px 36px; scroll-margin-top: 48px }
+section + section { border-top: 1.5px solid var(--ink) }
+h2 { font: 500 clamp(26px, 4.4vw, 38px)/1.2 var(--serif); letter-spacing: -.02em }
+.what { margin-top: 10px; font-size: 17px; max-width: 36em }
+.p { margin-top: 12px }
+h3 { margin-top: 30px; padding-bottom: 6px; border-bottom: 1px solid var(--ink); font: 650 16px/1.5 var(--sans) }
+h3.t { margin-top: 40px; padding: 0; border: 0; font: 500 22px/1.3 var(--serif) }
+
+ul.l { margin: 0; padding: 0; list-style: none }
+ul.l > li { padding: 11px 0; border-bottom: 1px solid var(--rule) }
+b { font-weight: 650 }
+.chk label { display: flex; gap: 10px; cursor: pointer }
+.chk input { flex: none; width: 17px; height: 17px; margin: 6px 0 0; accent-color: var(--blue) }
+
+.do { margin: 0; padding: 14px 0 0 1.6em }
+.do li { margin: 6px 0 }
+.do li::marker, .qa > li::marker { color: var(--mark); font-weight: 650 }
+
+.qa { margin: 0; padding: 0 0 0 1.7em }
+.qa > li { padding: 14px 0; border-bottom: 1px solid var(--rule) }
+.q { font: 500 18px/1.5 var(--serif) }
+.a { margin-top: 6px }
+
+.tw { overflow-x: auto }
+table { width: 100%; margin-top: 16px; border-collapse: collapse; font-size: 15.5px }
+th, td { padding: 9px 14px 9px 0; border-bottom: 1px solid var(--rule); text-align: left; vertical-align: top }
+th { border-bottom-color: var(--ink); font-weight: 650 }
+#about td:nth-child(2) { white-space: nowrap }
+
+details { margin-top: 18px }
+summary { padding: 10px 0; border-block: 1px solid var(--ink); font-weight: 650; cursor: pointer }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="bar"><a href="../">통일스쿨 준비</a>, 2026.11.19</div>
+  <header class="hero">
+    <p class="k">숭실평화통일스쿨 8차, 최종성과발표회 1부 통일알레스</p>
+    <h1>북한 해커 <b>팟캐스트</b></h1>
+    <p class="lead">통일 5년 차 2036년을 가정한 가상 팟캐스트 「선 넘는 이야기」의 대본입니다. 날것 질문 27개와 6분에 넣을 순서를 담았습니다.</p>
+  </header>
+
+  <nav class="jump"><a href="#about">개요</a><a href="#q">날것 질문</a><a href="#order">6분 순서</a><a href="#corner">코너</a><a href="#mc">사회자 멘트</a><a href="#tone">톤</a><a href="#old">예전 후보</a><a href="#src">출처</a><a href="#check">체크리스트</a></nav>
+
+  <section id="about">
+    <h2>발표 개요</h2>
+    <p class="what">통일 5년 차인 2036년을 가정한 가상 팟캐스트 「선 넘는 이야기」로, 낭독 기준 약 6분 분량입니다. 등장인물과 설정은 가상이고, 대사에 나오는 수치는 모두 실제 자료입니다.</p>
+    <p class="p">주제는 "미사일이 되던 코드가 방패가 될 수 있는가"입니다. 북한 해커의 양성 과정과 실제 해킹 규모를 짚고, 통일 후 이 인력을 어떻게 볼지를 20살 대학생의 질문으로 따집니다.</p>
+    <div class="tw"><table><tr><th>역할</th><th>이름</th><th>맡은 일</th></tr><tr><td>사회자 1</td><td>김○민</td><td>진행, 오프닝과 마무리</td></tr><tr><td>사회자 2</td><td>홍○조</td><td>진행, 질문과 반응</td></tr><tr><td>전직 북한 해커(가상 인물)</td><td>박○현</td><td>양성 과정과 당시 활동 증언</td></tr><tr><td>IT 전공자</td><td>윤○민</td><td>실제 자료와 수치 해설</td></tr><tr><td>방청객(20살 대학생)</td><td>김창식</td><td>비판적 질문</td></tr></table></div>
+  </section>
+
+  <section id="q">
+    <h2>날것 질문</h2>
+    <p class="what">진짜 궁금했던 걸 그대로 묻는 날것 질문으로 다시 썼습니다. 질문은 짧고 솔직하게 묻고, 대답은 끝까지 진지하게 받습니다. 전부 넣으면 6분을 넘기니 아래 '6분에 넣을 순서'대로 고르면 됩니다. 박○현의 대사는 가상 인물의 말이고, 수치와 사례는 출처가 있는 것만 썼습니다. 욕설과 비속어는 없습니다.</p>
+    <p class="p">질문은 20살이 진짜 궁금해서 묻는 말투로 하고, 대답은 무표정한 존댓말로 받습니다. 굵은 글씨가 질문이고 그 아래가 예상 반응입니다. 번호는 27번까지 이어집니다.</p>
+    <h3>박○현에게: 돈</h3>
+    <ol class="qa"><li><p class="q">"2조 원 훔쳤잖아요. 그래서 본인 통장엔 얼마 들어왔어요?"</p><p class="a">박○현이 "0원입니다. 전부 나라로 갔습니다. 해외에 나가 일한 사람들은 번 돈의 최대 90%를 나라에 냈습니다"라고 답합니다. 윤○민이 "2조 원은 2025년 바이비트에서 빠져나간 15억 달러입니다. FBI가 북한 소행으로 지목했습니다"라고 짚습니다.</p></li><li><p class="q">"솔직히 조금 빼돌린 적 없어요? 0.1개만이라도?"</p><p class="a">박○현이 "있었으면 지금 여기 못 앉아 있습니다. 인터넷은 감시받으면서 썼고, 5분마다 지문을 찍었습니다"라고 답합니다. 홍○조가 "저는 회사에서 유튜브 보는데요"라고 하면 박○현이 2초 동안 쳐다봅니다.</p></li><li><p class="q">"비트코인 지금 사요, 말아요?"</p><p class="a">박○현이 2초 정적 뒤에 "저는 사 본 적이 없습니다. 가져온 적만 있습니다"라고 답합니다. 김○민이 "투자 권유가 아닙니다"라고 급히 정리합니다.</p></li><li><p class="q">"통일되고 월급은 올랐어요, 내렸어요?"</p><p class="a">박○현이 "만지는 돈은 2조 원에서 300만 원으로 내렸습니다. 대신 전부 제 통장으로 들어옵니다"라고 답합니다.</p></li><li><p class="q">"이력서에 전 직장은 뭐라고 썼어요?"</p><p class="a">박○현이 "해외 영업, 실적 2조 원이라고 썼습니다"라고 하면, 윤○민이 "그건 실적이 아니라 피해액입니다"라고 바로잡습니다. 1번과 금액 농담이 겹치니 둘 중 하나만 씁니다.</p></li></ol>
+    <h3>박○현에게: 일</h3>
+    <ol class="qa" start="6"><li><p class="q">"해커도 출퇴근해요? 지각하면 어떻게 돼요?"</p><p class="a">박○현이 "출근했습니다. 지각하면 매주 여는 생활총화에서 사람들 앞에 서서 제 잘못을 말했습니다"라고 답합니다. 홍○조가 "저희 월요일 회의 같은 거네요"라고 하면 박○현이 "월요일 회의는 남 탓을 하지 않습니까. 거기는 제 탓을 합니다"라고 받습니다.</p></li><li><p class="q">"영화 보면 검은 화면에 초록 글씨 막 올라가잖아요. 진짜 그래요?"</p><p class="a">박○현이 "아닙니다. 하루 종일 메일을 썼습니다. 제일 많이 쓴 문장은 '첨부 파일 확인 부탁드립니다'입니다"라고 답합니다. 윤○민이 "그걸 여는 순간 뚫립니다"라고 덧붙입니다.</p></li><li><p class="q">"남쪽 사람들 비밀번호 중에 제일 많았던 게 뭐예요?"</p><p class="a">박○현이 "생일입니다. 그다음이 생일에 느낌표입니다"라고 답하면, 윤○민이 슬쩍 노트북을 덮습니다.</p></li><li><p class="q">"해킹하다가 제일 민망했던 실수가 뭐예요?"</p><p class="a">박○현이 "제 일은 아니고, 다들 아는 일이 있습니다. 2016년 방글라데시 중앙은행 때 'foundation'을 'fandation'으로 잘못 써서 다섯 번째 송금이 걸렸습니다"라고 답합니다. 윤○민이 "그 전에 네 번은 성공해서 8,100만 달러가 빠져나갔고, 미국 법무부가 2018년에 북한 해커를 기소했습니다"라고 짚으면, 박○현이 "그 뒤로 맞춤법 검사를 두 번씩 했습니다"라고 받습니다.</p></li><li><p class="q">"FBI가 더 무서웠어요, 상사가 더 무서웠어요?"</p><p class="a">박○현이 "FBI는 저를 못 찾았습니다. 상사는 옆자리였습니다"라고 답합니다.</p></li><li><p class="q">"퇴사하고 싶었던 적 있어요?"</p><p class="a">박○현이 "있었습니다. 다만 거기는 퇴사가 없었습니다"라고 답합니다. 아무도 웃지 않고 2초 정적을 둡니다. 방청객 질문으로 넘어가는 다리로 씁니다.</p></li></ol>
+    <h3>박○현에게: 통일 뒤</h3>
+    <ol class="qa" start="12"><li><p class="q">"지금 회사에서 해킹 사고 나면 다들 누구부터 쳐다봐요?"</p><p class="a">박○현이 "저를 봅니다. 지난번에는 제가 휴가였는데도 봤습니다"라고 답합니다.</p></li><li><p class="q">"보안 교육에서 '모르는 메일은 열지 마세요' 나오면 무슨 생각 해요?"</p><p class="a">박○현이 "예시로 나온 메일이 낯이 익었습니다. 제가 쓰던 문장이었습니다"라고 답합니다. 7번과 메일 농담이 겹치니 둘 중 하나만 씁니다.</p></li><li><p class="q">"통일되고 제일 어려웠던 게 뭐예요?"</p><p class="a">박○현이 "본인인증입니다. 은행을 뚫는 것보다 은행 앱 하나 까는 게 어려웠습니다. 보안 프로그램을 다섯 개째 깔다가 포기했습니다"라고 답합니다.</p></li><li><p class="q">"평양냉면은 솔직히 어디가 더 맛있어요?"</p><p class="a">박○현이 "맛은 말하지 않겠습니다. 다만 2만 원을 내고 한 시간 줄을 서는 건 아직 이해하지 못했습니다"라고 답합니다.</p></li><li><p class="q">"평양 집값은 어때요? 지금이라도 사 둬야 돼요?"</p><p class="a">박○현이 "통일되고 남쪽 분들한테 제일 많이 들은 말이 그겁니다. '반갑습니다'보다 '거기 얼마예요'를 먼저 들었습니다"라고 답합니다. 김○민이 "그래서 얼마예요?"라고 다시 묻습니다.</p></li></ol>
+    <h3>윤○민에게</h3>
+    <ol class="qa" start="17"><li><p class="q">"솔직히 박○현 씨보다 코딩 못하죠?"</p><p class="a">윤○민이 "인터넷만 안 끊기면 제가 이깁니다"라고 하고, 박○현이 "끊기면요?"라고 묻자 "기권하겠습니다"라고 답합니다.</p></li><li><p class="q">"코딩은 이제 AI가 다 하는데 전공은 왜 해요?"</p><p class="a">윤○민이 "저도 과제는 AI랑 합니다"라고 하면, 박○현이 "저희는 이력서를 AI로 만들었습니다. 면접은 다른 사람이 대신 봤습니다"라고 받습니다. 윤○민이 "실제로 보고된 수법입니다. 생성형 AI로 가짜 신원을 만들고 면접에 대리로 응시했습니다"라고 덧붙입니다.</p></li><li><p class="q">"북한이 한 해에 20억 달러 가져갈 때 전공자들은 뭐 했어요?"</p><p class="a">윤○민이 "과제 했습니다. 저한테는 마감이 더 무서웠습니다"라고 답한 뒤 "2025년 한 해에만 20억 달러, 전 세계에서 사라진 가상자산의 59%입니다"라고 수치를 말합니다.</p></li><li><p class="q">"박○현 씨가 옆자리로 온 첫날 제일 먼저 뭐 했어요?"</p><p class="a">윤○민이 "비밀번호를 바꿨습니다"라고 답하고, 박○현이 "알고 있습니다"라고 받습니다.</p></li><li><p class="q">"월급에서 통일세 빠져나가는 거 보면 솔직히 아깝죠?"</p><p class="a">윤○민이 "아깝습니다"라고 바로 답하고, 2초 뒤에 "그런데 예전에는 전 세계에서 한 해 20억 달러가 해킹으로 빠져나갔습니다. 지금은 박○현 씨가 그걸 막고 있으니 본전은 찾는 중입니다"라고 덧붙입니다.</p></li></ol>
+    <h3>둘에게 같이</h3>
+    <ol class="qa" start="22"><li><p class="q">"통일 전에 둘이 온라인에서 마주친 적 없어요? 한 명은 뚫고 한 명은 뚫리고."</p><p class="a">윤○민이 "1학년 때 게임 계정이 한 번…"이라고 하면, 박○현이 시선을 피하며 "게임 계정은 저희 팀 일이 아닙니다"라고 답합니다.</p></li><li><p class="q">"같이 일해 보니까 서로 제일 놀란 게 뭐예요?"</p><p class="a">윤○민이 "점심시간에도 자리를 안 떠났습니다. 나가도 된다고 석 달을 말했습니다"라고 하고, 박○현이 "모르는 걸 모른다고 말해도 아무 일이 없었습니다"라고 답합니다. 웃음 없이 받는 대사라서 분위기를 가라앉힐 때 씁니다.</p></li></ol>
+    <h3>방청객 김창식이 던질 질문</h3>
+    <ol class="qa" start="24"><li><p class="q">"통일 5년 차인데 저는 왜 아직 군대 가요?"</p><p class="a">홍○조가 "그건 국방부에 물어보세요. 다음 질문"이라고 자릅니다. 웃음으로 들어가는 첫 질문입니다.</p></li><li><p class="q">"북쪽 출신 동기들이 학점 다 쓸어가면 저는 어떡해요?"</p><p class="a">박○현이 "금성학원은 어릴 때 뽑혀서 김일성종합대학, 김책공업종합대학까지 올라간 학생들입니다. 이기려고 하지 말고 같은 조를 하십시오"라고 답합니다. 양성 과정을 한 줄로 알려 주는 질문입니다.</p></li><li><p class="q">"통일 안 됐으면 지금 이 시간에도 어디 해킹하고 계셨겠네요?"</p><p class="a">박○현이 "네. 지금쯤 출근했을 시간입니다"라고 답합니다. 윤○민이 "유엔 전문가패널은 2024년 보고서에서 북한이 대량살상무기 개발 돈의 40%를 해킹으로 댐다고 봤습니다. 그 코드가 미사일이 되고 있었던 겁니다"라고 짚습니다. 예전 질문 "통일이 되지 않았다면 그 기술은 지금도 미사일에 쓰이고 있을 텐데"를 짧게 바꾼 것입니다.</p></li><li><p class="q">"시켜서 했다고 하면 다 끝나는 거예요? 그 돈 잃은 사람한테 미안하다고 한 적은 있어요?"</p><p class="a">박○현이 긴 정적 뒤에 "없습니다. 화면에는 숫자만 보였고 사람은 안 보였습니다. 그래서 지금은 막는 일을 합니다. 그걸로 갚아지는지는 저도 모르겠습니다"라고 답합니다. 여기서 분위기를 한 번 가라앉힌 뒤 공통점 찾기로 넘어갑니다. 예전 질문 "명령이었다면 책임은 어디까지 물어야 합니까?"를 날것으로 바꾼 것입니다.</p></li></ol>
+  </section>
+
+  <section id="order">
+    <h2>6분에 넣을 순서</h2>
+    <p class="what">질문 여섯 개와 방청객 질문 세 개를 넣은 순서입니다. 타이머로 재서 넘치면 3번, 그다음 12번 순서로 뺍니다.</p>
+    <ol class="do"><li>가짜 협찬 광고와 게스트 소개</li><li>6번 출퇴근과 지각: 생활총화로 조직 생활을 보여 줍니다</li><li>1번 통장: 윤○민이 바이비트 15억 달러를 짚습니다</li><li>3번 비트코인: 짧게 웃고 넘어갑니다</li><li>12번 누구부터 쳐다봐요: 통일 뒤의 편견을 건드립니다</li><li>18번 AI와 전공: 윤○민 차례이고 실제 수법을 알려 줍니다</li><li>11번 퇴사: 정적으로 분위기를 바꿉니다</li><li>방청객 김창식의 24번, 26번, 27번</li><li>공통점 찾기와 마무리 멘트</li></ol>
+  </section>
+
+  <section id="corner">
+    <h2>남북 신경전 코너</h2>
+    <p class="what">질문 대신 짧은 코너로 넣을 수 있는 아이디어입니다. 하나만 골라 40초 안쪽으로 쓰면 됩니다.</p>
+    <ul class="l"><li><b>칭찬 대결</b>: 사회자가 서로 칭찬을 하나씩 하라고 시킵니다. 박○현이 "윤○민 씨는 참 솔직합니다. 비밀번호도 솔직하게 이름에 생일을 붙였습디다"라고 하고, 윤○민이 "박○현 씨는 성실합니다. 남의 회사 일까지 해주셨으니까요"라고 받습니다.</li><li><b>균형 게임</b>: 사회자가 "인터넷 없이 코딩하기와 매일 아침 회의하기 중에 하나만 고르라"고 합니다. 두 사람이 동시에 서로 다른 답을 외치고 서로를 이해하지 못한다는 표정으로 봅니다.</li><li><b>공통점 찾기</b>: 신경전 끝에 사회자가 "두 분의 공통점은 없습니까?"라고 묻습니다. 둘이 동시에 "돌아가는 코드는 건드리지 않습니다"라고 말하고 악수합니다. 사회자가 "이것이 첫 남북 합의 사항입니다"라고 정리하면 마무리로 넘어가기 좋습니다.</li></ul>
+  </section>
+
+  <section id="mc">
+    <h2>사회자 멘트</h2>
+    <ul class="l"><li>가짜 협찬 광고: "이 방송은 '이중 인증'의 협찬으로 보내드립니다. 오늘 손님이 가장 싫어하는 기능이죠." 박○현이 말없이 고개를 끄덕입니다.</li><li>게스트 소개: "경력 15년, 다만 전 직장에 경력 확인 전화를 걸 수 없는 분입니다."</li><li>신경전이 붙었을 때: 김○민은 윤○민 편, 홍○조는 박○현 편을 들며 "방금 그 말씀은 도발로 봐도 됩니까?"라고 부추깁니다.</li><li>마무리: "다음 주에는 비밀번호를 바꾸고 찾아뵙겠습니다."</li></ul>
+  </section>
+
+  <section id="tone">
+    <h2>톤과 연출</h2>
+    <p class="what">질문은 날것으로 묻고, 대답은 끝까지 진지하게 받는 것이 핵심입니다. 진짜 있을 법한 사람이 진짜 궁금했던 걸 묻는 페이크 다큐 느낌으로 가고, 욕설이나 비속어는 쓰지 않습니다. 솔직한 질문과 무표정한 존댓말 대답의 차이에서 웃음이 나옵니다.</p>
+    <ul class="l"><li>묻는 사람은 묻고 나서 웃거나 사과하지 않습니다. 진짜 궁금한 얼굴로 답을 기다립니다.</li><li>출연자는 자기 대사에 웃지 않습니다. 웃긴 말일수록 무표정으로 합니다.</li><li>받아치기 전에 2초씩 정적을 둡니다. 상대를 천천히 쳐다보는 시간이 웃음 포인트가 됩니다.</li><li>놀리는 대상은 코딩 습관과 직장 문화로 한정합니다. 북한 사람의 말투나 생활 형편은 웃음거리로 삼지 않습니다.</li><li>박○현은 억양을 흉내 내지 않고 또박또박한 존댓말로 말합니다.</li><li>피해 금액은 정확히 말하고, 웃음은 그 뒤의 반응에서 만듭니다.</li><li>앞의 4분은 유쾌하게 가고, 방청객 질문에서 한 번 분위기를 가라앉힌 뒤 공통점 찾기로 다시 웃으며 끝냅니다.</li></ul>
+  </section>
+
+  <section id="old">
+    <h2>예전 후보 질문</h2>
+    <p class="what">위 날것 질문에 살린 것은 고쳐서 옮겼고, 아래는 참고용으로 남긴 예전 후보입니다. 전 직장 농담과 비밀번호 농담이 여러 번 나오니 고를 때 하나씩만 씁니다.</p>
+    <details><summary>예전 후보 펼치기</summary>
+    <h3 class="t">질문만 추린 목록</h3>
+    <p class="p">대답은 비워 둔 질문 10개입니다. 처음 27개 가운데 남겨 두신 것입니다.</p>
+    <h3>박○현에게: 일과 돈</h3>
+    <ol class="do"><li>해커도 출퇴근해요? 지각하면 어떻게 돼요?</li><li>해커도 야근해요? 야근 수당은 나와요?</li><li>2조 원을 가져왔는데 회식은 했어요?</li><li>실적이 제일 좋았던 달에 받은 게 뭐예요?</li><li>해커들끼리도 실적 순위가 있어요?</li><li>해킹하다가 제일 민망했던 실수가 뭐예요?</li></ol>
+    <h3>박○현에게: 남한과 통일</h3>
+    <ol class="do" start="7"><li>남한 사이트를 구경하다가 제일 이해가 안 됐던 게 뭐예요?</li><li>지금 회사 면접에서 "전 직장에서 뭐 하셨어요?" 하면 뭐라고 해요?</li><li>옛날 동료들이랑 단체 대화방 있어요? 무슨 얘기 해요?</li></ol>
+    <h3>둘에게 같이</h3>
+    <ol class="do" start="10"><li>상대방한테 하나만 배울 수 있다면 뭘 배울래요?</li></ol>
+    <h3 class="t">통일 이후 상황 질문</h3>
+    <p class="p">통일된 뒤의 직장과 일상을 가정한 질문 23개입니다. 남겨두신 질문처럼 직장인이면 공감할 구체적인 상황으로 잡았습니다.</p>
+    <h3>박○현에게: 새 직장</h3>
+    <ol class="do"><li>지금 회사 동료들은 전 직장을 알아요? 알고 나서도 점심은 같이 먹어요?</li><li>회사에서 보안 교육 들을 때 무슨 생각 해요? "모르는 메일은 열지 마세요" 같은 거요.</li><li>옛날에 털었던 회사에서 스카우트 제안이 온 적 있어요?</li><li>회사에서 해킹 사고가 나면 다들 누구부터 쳐다봐요?</li><li>연차를 처음 써봤을 때 뭐 했어요? 예전에는 휴가가 있었어요?</li><li>퇴사하고 싶을 때 있어요? 예전 직장은 퇴사가 됐어요?</li><li>월급 명세서에서 통일세가 빠져나가는 걸 보면 무슨 생각이 들어요?</li></ol>
+    <h3>박○현에게: 통일 뒤의 일상</h3>
+    <ol class="do" start="8"><li>통일되고 남쪽 사람들한테 제일 많이 받는 부탁이 뭐예요?</li><li>예전 상사한테 요즘도 연락이 와요? 뭐라고 와요?</li><li>금성학원 동창회를 하면 다들 지금 무슨 일을 하고 있어요?</li><li>부모님께는 지금 하는 일을 뭐라고 설명했어요? 예전에 하던 일은요?</li><li>통일 전에 화면으로만 보던 남한 회사에 실제로 가보니까 어땠어요?</li><li>본인 이름을 검색해 본 적 있어요? 뭐가 나와요?</li><li>서울에서 평양까지 기차로 다니게 됐는데, 고향에 가면 제일 먼저 가는 데가 어디예요?</li></ol>
+    <h3>윤○민에게: 북쪽 동료가 생긴 뒤</h3>
+    <ol class="do" start="15"><li>박○현 씨가 옆자리로 온 첫날 제일 먼저 한 일이 뭐예요?</li><li>평양 지사로 발령이 나면 갈 거예요?</li><li>통일되고 채용 공고에 새로 생긴 조건이 있어요?</li><li>북쪽 출신 개발자랑 일하면서 말이 안 통했던 순간이 있어요?</li></ol>
+    <h3>둘에게 같이</h3>
+    <ol class="do" start="19"><li>통일되고 처음 만난 날 서로 첫인상이 어땠어요?</li><li>둘이 같이 야근하면 누가 먼저 집에 가요?</li><li>통일 전에 둘이 온라인에서 마주친 적은 없을까요? 한 명은 털고 한 명은 털리는 쪽으로요.</li></ol>
+    <h3>방청객 김창식이 던질 질문</h3>
+    <ol class="do" start="22"><li>저도 곧 취업 준비를 해야 하는데, 박○현 씨는 자기소개서에 지원 동기를 뭐라고 썼어요?</li><li>통일되고 북쪽 출신 동기들이 학점을 다 쓸어가면 저는 어떡해요?</li></ol>
+    <p class="p">아래는 예상 반응까지 적어 둔 이전 질문입니다.</p>
+    <h3 class="t">전직 해커 박○현에게</h3>
+    <ol class="do"><li>"남한 개발자들 코드를 많이 보셨을 텐데, 실력이 어떻습니까?" 박○현이 "주석에 '나중에 고침'이라고 적혀 있는데, 3년째 안 고쳤습디다"라고 답하고, 윤○민이 "그건 제 코드 아닙니다" 하며 시선을 피합니다.</li><li>"윤○민 씨 노트북은 뚫는 데 얼마나 걸립니까?" 박○현이 윤○민을 한 번 쳐다보고 "비밀번호가 생일이면 3초입니다"라고 답하면, 윤○민이 슬쩍 노트북을 덮습니다.</li><li>"통일되고 가장 충격받은 개발 문화는 뭡니까?" 박○현이 "과제를 AI한테 시킵디다. 우리는 가짜 이력서 만들 때만 썼는데"라고 하고, 윤○민이 "그래서 저희가 과제를 빨리 내는 겁니다"라고 받습니다.</li><li>"해커 시절과 지금 직장 중에 어디가 더 힘듭니까?" 박○현이 "거기는 목표 금액이 있었고, 여기는 월요일 회의가 있습니다"라고 답합니다.</li><li>"통일되고 제일 먼저 한 일이 뭡니까?" 박○현이 "제 이름으로 회원가입을 했습니다. 본인인증이 그렇게 어려운 줄 몰랐습니다"라고 답합니다.</li><li>"이력서에 전 직장 경력은 뭐라고 쓰십니까?" 박○현이 "해외 영업, 실적 2조 원이라고 썼습니다"라고 하면, 윤○민이 "그건 실적이 아니라 피해액입니다"라고 바로잡습니다. 여기서 2조 원은 바이비트에서 빠져나간 15억 달러를 가리킵니다.</li><li>"통일되고 본인이 당한 적은 없습니까?" 박○현이 "'택배 주소를 확인하세요'라는 문자가 왔습니다. 눌렀습니다. 제가"라고 답합니다. 해커도 속는다는 반전으로 웃음을 만듭니다.</li><li>"지금까지 뚫기 가장 어려웠던 건 뭡니까?" 박○현이 "남한 사이트의 보안 프로그램 설치입니다. 다섯 개를 깔다가 저도 포기했습니다"라고 답합니다.</li><li>"코드에 오류가 나면 해커도 당황합니까?" 박○현이 "당황은 남한 개발자가 합니다. 우리는 보고서를 씁니다"라고 답합니다.</li></ol>
+    <h3 class="t">남한 IT 전공자 윤○민에게</h3>
+    <ol class="do"><li>"박○현 씨와 코딩 대결을 하면 이길 자신 있습니까?" 윤○민이 "인터넷만 끊지 않으면 자신 있습니다"라고 하고, 박○현이 "끊으면요?"라고 묻자 "기권하겠습니다"라고 답합니다.</li><li>"북한이 한 해에 20억 달러를 훔쳤다는데, 전공자로서 드는 생각은요?" 윤○민이 "저는 등록금도 못 버는데, 같은 코딩이 맞나 싶습니다"라고 답합니다. 수치의 근거는 <a href="https://www.heraldk.com/article/2025121818242458145">헤럴드경제 보도</a>입니다.</li><li>"팀플 조원으로 박○현 씨를 받으시겠습니까?" 윤○민이 "받습니다. 대신 제 계정 비밀번호는 안 알려줍니다"라고 답하고, 박○현이 "안 알려줘도 됩니다"라고 받습니다.</li><li>"어릴 때 해커가 되고 싶었던 적은 없습니까?" 윤○민이 "영화를 보고 검은 후드티를 샀습니다. 그게 전부입니다"라고 답합니다.</li><li>"전공자라고 하면 부모님이 컴퓨터를 고쳐 달라고 하십니까?" 윤○민이 "프린터까지 고칩니다"라고 하면, 박○현이 "우리 어머니도 그럽니다. 그건 이미 통일됐습디다"라고 받습니다.</li><li>"본인이 가장 최근에 해킹당한 건 뭡니까?" 윤○민이 "배달 앱 계정입니다. 범인은 동생이었습니다"라고 답합니다.</li></ol>
+    <h3 class="t">두 사람 모두에게 (방청객 김창식용)</h3>
+    <ul class="l"><li>명령이었다면 책임은 어디까지 물어야 합니까?</li><li>북한 출신 개발자가 들어오면 제 또래의 취업 경쟁은 더 심해지지 않습니까?</li><li>통일 안 됐으면 그 기술은 지금도 미사일 만드는 데 쓰이고 있겠네요. 그게 통일해야 하는 이유가 됩니까?</li></ul>
+    </details>
+  </section>
+
+  <section id="src">
+    <h2>출처</h2>
+    <p class="what">발표 자료 마지막 슬라이드에 아래 출처를 그대로 넣으면 됩니다.</p>
+    <div class="tw"><table><tr><th>대사에 쓴 사실</th><th>출처</th></tr><tr><td>바이비트 15억 달러 해킹, FBI의 북한 지목, 미 국가정보국의 "매년 최소 10억 달러" 평가</td><td><a href="https://bloomingbit.io/feed/news/123181">블루밍비트 보도</a></td></tr><tr><td>2025년 북한 탈취액 20억 달러(전 세계의 59%), 누적 67억 5천만 달러</td><td><a href="https://www.heraldk.com/article/2025121818242458145">헤럴드경제, 체이널리시스 보고서 보도</a></td></tr><tr><td>금성학원에서 어린 학생을 선발해 김일성종합대학·김책공업종합대학으로 진학</td><td><a href="https://ofac.treasury.gov/media/923801/download">미국 재무부 북한 IT 근로자 주의보</a></td></tr><tr><td>생성형 AI로 가짜 신원 제작, 면접 대리 응시</td><td><a href="https://www.koreancenter.or.kr/news/articleView.html?idxno=1429298">연합뉴스, MSMT 보고서 보도</a></td></tr><tr><td>20대 통일 필요 25.2%, 불필요 44.8%</td><td><a href="https://www.segye.com/newsView/20261007516833">세계일보, 서울대 2026 통일의식조사 보도</a></td></tr></table></div>
+    <p class="p">새 대본에서 추가로 쓴 사실의 출처입니다.</p>
+    <ul class="l"><li>감시 아래 인터넷 사용, 5분마다 지문 인증: <a href="https://www.rfa.org/korean/in_focus/nk_nuclear_talks/nkinternet-12202023084534.html">자유아시아방송, 북한 인터넷 보고서 보도</a></li><li>매주 여는 생활총화와 자기비판: <a href="https://rfa.org/english/news/korea/nk-self-criticism-03182019142135.html">자유아시아방송 보도</a>, <a href="https://cloud.uniedu.go.kr/uniedu/atchfile/down/F000121091.pdf">통일교육원 청소년 통일사전</a></li><li>해킹으로 대량살상무기 개발 재원의 40%를 충당(유엔 전문가패널, 2024년 3월): <a href="https://nsp.nanet.go.kr/trend/latest/detail.do?latestTrendControlNo=TREN0000001909&amp;listChk=list">국회도서관 요약</a></li><li>2016년 방글라데시 중앙은행 해킹에서 오타 'fandation' 때문에 다섯 번째 송금이 걸림: <a href="https://www.wfae.org/2016-03-11/bangladesh-central-bank-heist-noticed-because-of-spelling-error">NPR 보도</a></li><li>방글라데시 중앙은행 8,100만 달러 유출과 2018년 미국 법무부의 북한 해커 기소: <a href="https://www.hankookilbo.com/news/article/201809070846074392">한국일보 보도</a></li><li>해외 근로자 임금의 최대 90%를 북한 정부가 징수: <a href="https://ofac.treasury.gov/system/files/126/20220516_dprk_it_worker_advisory_Korean.pdf">미국 국무부, 재무부, FBI 주의보 한국어본(2022년 5월)</a></li></ul>
+  </section>
+
+  <section id="check">
+    <h2>체크리스트</h2>
+    <p class="what">안내문 기준으로 제출 전에 확인할 항목입니다.</p>
+    <ul class="l chk"><li><label><input type="checkbox"><span>타이머로 리허설해 호명부터 퇴장까지 9분 이내, 무대 발표 5분 이상인지 확인</span></label></li><li><label><input type="checkbox"><span>첫 슬라이드에 참여자 5명의 이름과 역할 표기</span></label></li><li><label><input type="checkbox"><span>개인별 준비 내용(자료 검색, PPT 제작, 발표 등) 표기</span></label></li><li><label><input type="checkbox"><span>AI 활용 부분 표시: 대본 초안 작성과 자료 검색에 AI 사용</span></label></li><li><label><input type="checkbox"><span>마지막에 조원 기념사진 2장 이상 첨부</span></label></li><li><label><input type="checkbox"><span>출처 슬라이드 첨부</span></label></li><li><label><input type="checkbox"><span>파일명을 "○조 팀명_1부 자료_작품명" 형식으로 작성</span></label></li><li><label><input type="checkbox"><span>2박 3일 동안 배운 내용을 대사에 한두 군데 반영</span></label></li></ul>
+  </section>
+</div>
+<script>
+const links = [...document.querySelectorAll('.jump a')];
+const io = new IntersectionObserver(es => es.forEach(e => {
+  if (e.isIntersecting) links.forEach(a => a.classList.toggle('on', a.hash === '#' + e.target.id));
+}), { rootMargin: '-45% 0px -50% 0px' });
+document.querySelectorAll('section').forEach(s => io.observe(s));
+</script>
+<script src="../../hub/back.js" data-cat="study" defer></script>
+</body>
+</html>
