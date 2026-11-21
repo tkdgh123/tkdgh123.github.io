@@ -8,6 +8,8 @@ const GUIDE_SRC = {
   owen: { name: "인스타 릴스 lazy_owen '콘텐츠 원칙'", url: "https://www.instagram.com/reel/Dfwcpyiz_Nj/" },
   think: { name: "인스타 릴스 aisenselab, 공식 Opus 5.5 가이드로 확인", url: "https://www.instagram.com/reel/Dfogy2JJxz_/" },
   toris: { name: "인스타 릴스 toris.kr, 공식 Opus 5.5 가이드로 확인", url: "https://www.instagram.com/reel/DfwK0g0HFt1/" },
+  cc: { name: "Anthropic 공식 안내: Claude Code Best practices", url: "https://code.claude.com/docs/en/best-practices" },
+  pickit: { name: "인스타 릴스 pickit_.official, 공식 Claude Code 안내로 확인", url: "https://www.instagram.com/reel/DfzIwrZP_M-/" },
   here: { name: "이 연습의 채점 기록" },
 };
 const TIP_GROUPS = [["first", "첫 말에"], ["next", "결과를 받은 뒤"], ["case", "이럴 땐"]];
@@ -87,6 +89,11 @@ const TIPS = [
     bad: "학교 앞에 탕후루 가게 내려는데, 이 아이디어 어때?",
     good: "학교 앞 탕후루 가게, 예산 300만 원, 12월 개업이야. 이게 망할 이유를 가장 센 것부터 세 개 먼저 쓰고, 그다음 그래도 할 만한지 한 줄로 판단해 줘.",
     src: ["court"] },
+  { id: "interview", g: "case", h: "원하는 게 아직 흐릿하면 나한테 먼저 물어보게 해요",
+    why: "뭘 원하는지 다 정하지 못한 채 시키면 Claude가 빈 곳을 짐작으로 채우고, 다시 시킬 일이 생겨요. 공식 Claude Code 안내서는 이럴 때 '나를 인터뷰해 줘'라고 시키라고 해요. Claude가 아직 안 정한 것만 골라 묻고, 답이 모이면 그걸로 만들어요. 이미 다 정한 일에는 필요 없어요.",
+    bad: "동아리 홍보 포스터 문구 써 줘.",
+    good: "동아리 홍보 포스터 문구가 필요한데 뭘 넣을지 아직 못 정했어. 문구를 쓸 수 있을 때까지 나한테 하나씩 물어봐 줘. 다 모이면 그때 써 줘.",
+    src: ["cc", "pickit"] },
   { id: "principle", g: "case", h: "따라 할 단계보다 원칙과 좋은 결과의 모습을 줘요",
     why: "'1. 훅 2. 번호 목록 3. 끝맺음'처럼 단계만 주면 겉모양만 베껴요. 왜 그렇게 하는지와 좋은 결과가 어떤 모습인지를 주면 처음 보는 경우에도 맞게 판단해요. 공식 가이드도 규칙만보다 이유를 줄 때 Claude가 넓혀 적용한다고 해요.",
     bad: "릴스 대본 써 줘. 1. 훅 2. 본론 셋 3. 댓글 유도.",
