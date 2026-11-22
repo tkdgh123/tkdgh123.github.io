@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>봉사일지</title>
+<meta name="description" content="섬김의리더십 봉사활동 실습일지: 과목 서식 그대로 고쳐 쓰고 PDF로 저장">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+:root{
+  --paper:#eef1ed;--ink:#1d2420;--muted:#5d6760;--line:#cfd6cc;--go:#14704f;--go-ink:#fff;--warn:#b5481f;--edit:#fff8d6;
+  --sans:"Pretendard",-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#141816;--ink:#e6ebe7;--muted:#a3ada6;--line:#2d3530;--go:#4cc493;--go-ink:#0d1a14;--warn:#f08a5d;color-scheme:dark}}
+:root[data-theme="dark"]{--paper:#141816;--ink:#e6ebe7;--muted:#a3ada6;--line:#2d3530;--go:#4cc493;--go-ink:#0d1a14;--warn:#f08a5d;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 15px/1.6 var(--sans);word-break:keep-all;overflow-wrap:break-word;
+  padding:24px max(16px,env(safe-area-inset-right,0px)) 80px max(16px,env(safe-area-inset-left,0px))}
+.wrap{max-width:860px;margin:0 auto}
+h1{font-size:26px;margin:8px 0 4px}
+.lead{color:var(--muted);margin:0 0 18px}
+.todo{border-left:3px solid var(--warn);padding:10px 14px;margin:0 0 28px;background:color-mix(in srgb,var(--warn) 8%,transparent);border-radius:0 6px 6px 0}
+.todo b{color:var(--warn)}
+.todo ul{margin:6px 0 0;padding-left:18px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:34px 0 10px}
+.bar h2{font-size:18px;margin:0 auto 0 0}
+button{font:600 14px var(--sans);border:1px solid var(--line);background:transparent;color:var(--ink);padding:8px 14px;border-radius:6px;cursor:pointer}
+button.main{background:var(--go);border-color:var(--go);color:var(--go-ink)}
+.count{font-size:14px;color:var(--muted)}
+.count.low{color:var(--warn);font-weight:600}
+.scroll{overflow-x:auto}
+/* 서식 한 장: 과목 docx(A4, 좌우 여백 3cm)와 같은 칸 */
+.sheet{background:#fff;color:#000;width:100%;min-width:620px;padding:40px 44px;font-family:"Malgun Gothic","맑은 고딕",var(--sans);font-size:10pt;line-height:160%;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.sheet h3{text-align:center;font-size:18pt;letter-spacing:.3em;margin:0 0 14px}
+.sheet .date{text-align:right;margin:0 0 6px}
+table{width:100%;border-collapse:collapse;table-layout:fixed}
+th,td{border:1px solid #000;padding:5px 7px;vertical-align:middle}
+th{background:#f2f2f2;font-weight:600;text-align:center}
+td.body{vertical-align:top;height:430px;text-align:justify}
+[contenteditable]{outline:none;background:var(--edit);border-radius:2px;white-space:pre-wrap}
+[contenteditable]:focus{box-shadow:0 0 0 2px #e0b400 inset}
+[contenteditable]:empty::before{content:attr(data-hint);color:#b5481f}
+.cnt{white-space:nowrap}
+@media print{
+  @page{size:A4;margin:20mm 0}
+  body{background:#fff;padding:0}
+  .wrap>*:not(.sheetbox),.sheetbox:not(.on),.bar,.todo{display:none!important}
+  .sheet{box-shadow:none;min-width:0;padding:0 30mm}
+  [contenteditable]{background:none}
+  [contenteditable]:empty::before{content:""}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>봉사일지</h1>
+  <p class="lead">노란 칸을 눌러 고치면 이 기기에 바로 저장돼요. 다 고치면 'PDF로 저장'을 눌러 12주차 칸에 올려요.</p>
+  <div class="todo">
+    <b>확인할 것</b>
+    <ul>
+      <li>12주차(11.16~11.22) 일지 칸 마감: <b>11월 22일 23:59</b></li>
+      <li><b>봉사활동계획서는 아직 안 낸 걸로</b> 나와요. 2주차 칸에 기관마다 따로, 총 18시간 적어서 내야 해요.</li>
+      <li>빨간 글씨 칸: 내 연락처(이 페이지는 공개라 비워 뒀어요), 기관장</li>
+      <li>댄스스포츠대회는 오전(9~13시)으로 적었어요. 오후였으면 14:00-18:00으로 고쳐요.</li>
+    </ul>
+  </div>
+
+  <div class="sheetbox" id="s1">
+    <div class="bar"><h2>11월 21일 이중언어 발표회</h2><span class="count"></span><button data-reset>처음 글로</button><button class="main" data-print>PDF로 저장</button></div>
+    <div class="scroll"><div class="sheet">
+      <h3>봉사활동 실습일지</h3>
+      <p class="date">작성일 : <span contenteditable data-k="date">2026년 11월 22일</span></p>
+      <table>
+        <colgroup><col style="width:14%"><col style="width:14%"><col style="width:24%"><col style="width:10%"><col style="width:14%"><col style="width:24%"></colgroup>
+        <tr><th rowspan="3">인적사항</th><th>성 명</th><td colspan="4" contenteditable data-k="name">김창식</td></tr>
+        <tr><th>소 속</th><td colspan="4" contenteditable data-k="dept">AI소프트웨어학부 1학년</td></tr>
+        <tr><th>연락처</th><td colspan="4" contenteditable data-k="tel" data-hint="내 번호 010-"></td></tr>
+        <tr><th rowspan="3">봉사활동기관</th><th>기관명</th><td colspan="2" contenteditable data-k="org">영등포구가족센터</td><th>기관장</th><td contenteditable data-k="boss" data-hint="모르면 비워 둬요"></td></tr>
+        <tr><th>담당자 성명</th><td colspan="2" contenteditable data-k="who">왕서현</td><th>연락처</th><td contenteditable data-k="whotel">02-846-5432</td></tr>
+        <tr><th>봉사분야</th><td colspan="2" contenteditable data-k="field">시설봉사(각종 행사 보조)</td><th>프로그램명</th><td contenteditable data-k="prog">이중언어 발표회 행사 보조</td></tr>
+        <tr><th colspan="2">봉사일시</th><th>봉사시간</th><th colspan="3">봉사활동 내용</th></tr>
+        <tr><td colspan="2" contenteditable data-k="when">2026. 11. 21. 12:00-17:00</td><td contenteditable data-k="hours">5시간</td><td colspan="3" contenteditable data-k="what">이중언어 발표회 행사 보조(풍선 불기, 의자 설치, 1부 입장 안내, 1부와 2부 사이 강당 출입 통제, 아이들 무대 이동 통제, 만족도 조사 안내, 의상과 장식 반납 받기, 정리)</td></tr>
+        <tr><th colspan="6">실습 소감</th></tr>
+        <tr><td colspan="6" class="body"><span contenteditable data-k="essay">이번 봉사는 내가 처음으로 참여한 봉사활동이었다. 본 행사가 시작되기 전에 먼저 모여서 졸업 사진 촬영에 쓸 풍선을 불고, 학부모와 아이들이 앉을 의자를 설치한 뒤 각자 맡을 역할을 설명 받았다. 내가 맡은 일은 1부에 들어오는 사람들을 안내하고, 1부가 끝나고 2부로 넘어갈 때 강당을 나가는 사람과 들어오려는 사람이 엉키지 않게 통제하는 것이었다.
+1부는 중국어반과 베트남어반 유아들의 무대였는데, 아이들이 1년 동안 학원에서 배운 중국어와 베트남어로 자기소개를 하고 그 언어로 장기자랑도 했다. 아이들이 순서마다 무대에 올라갔다가 내려와야 해서 이동을 계속 챙겨야 했고, 객석이 너무 소란스러워지지 않게 막는 것도 내 일이었다. 첫 봉사라 나도 아직 적응하는 중이었는데 아이들이 생각보다 훨씬 소란스러워서 솔직히 많이 힘들었다. 그래도 누군가 길을 잡아 주지 않으면 아이들이 순서를 놓치거나 무대 앞이 뒤엉킬 것 같아서 더 신경을 쓰게 되었다. 2부는 중국어 초급반과 초급 독서반의 무대였는데 1부보다 조용해서 따로 할 일은 많지 않았고 1부 때와 비슷하게 안내와 통제를 했다.
+행사가 끝날 때는 나가는 분들께 만족도 조사를 부탁드리고, 아이들이 입었던 옷과 장식을 다시 반납받은 뒤 정리를 하고 돌아왔다. 무대에 서는 사람은 아이들이었지만 의자를 놓고 길을 비워 두는 사람이 있어야 행사가 순서대로 흘러간다는 것을 직접 해 보면서 알게 되었다. 첫 봉사였는데 집에서 쉬는 것보다 100만 배는 유익한 시간이었다고 생각한다.</span> <span class="cnt"></span></td></tr>
+      </table>
+    </div></div>
+  </div>
+
+  <div class="sheetbox" id="s2">
+    <div class="bar"><h2>11월 22일 댄스스포츠대회</h2><span class="count"></span><button data-reset>처음 글로</button><button class="main" data-print>PDF로 저장</button></div>
+    <div class="scroll"><div class="sheet">
+      <h3>봉사활동 실습일지</h3>
+      <p class="date">작성일 : <span contenteditable data-k="date">2026년 11월 22일</span></p>
+      <table>
+        <colgroup><col style="width:14%"><col style="width:14%"><col style="width:24%"><col style="width:10%"><col style="width:14%"><col style="width:24%"></colgroup>
+        <tr><th rowspan="3">인적사항</th><th>성 명</th><td colspan="4" contenteditable data-k="name">김창식</td></tr>
+        <tr><th>소 속</th><td colspan="4" contenteditable data-k="dept">AI소프트웨어학부 1학년</td></tr>
+        <tr><th>연락처</th><td colspan="4" contenteditable data-k="tel" data-hint="내 번호 010-"></td></tr>
+        <tr><th rowspan="3">봉사활동기관</th><th>기관명</th><td colspan="2" contenteditable data-k="org">강남구체육회</td><th>기관장</th><td contenteditable data-k="boss" data-hint="모르면 비워 둬요"></td></tr>
+        <tr><th>담당자 성명</th><td colspan="2" contenteditable data-k="who">김상훈</td><th>연락처</th><td contenteditable data-k="whotel">02-3462-7330</td></tr>
+        <tr><th>봉사분야</th><td colspan="2" contenteditable data-k="field">문화, 체육, 예술, 관광</td><th>프로그램명</th><td contenteditable data-k="prog">제12회 강남구청장배 댄스스포츠대회 진행보조 및 대회정리(오전)</td></tr>
+        <tr><th colspan="2">봉사일시</th><th>봉사시간</th><th colspan="3">봉사활동 내용</th></tr>
+        <tr><td colspan="2" contenteditable data-k="when">2026. 11. 22. 09:00-13:00</td><td contenteditable data-k="hours">4시간</td><td colspan="3" contenteditable data-k="what">댄스스포츠대회 진행 보조(의자 운반, 참가자와 심사위원 심사 종이 분류, 책상과 차단봉 설치, 참가자 간식 운반, 결승 무대 조명 켜고 끄기)</td></tr>
+        <tr><th colspan="6">실습 소감</th></tr>
+        <tr><td colspan="6" class="body"><span contenteditable data-k="essay">이번 봉사는 강남구청장배 댄스스포츠대회의 진행을 돕는 일이었다. 대회가 시작되기 전에 의자를 나르고, 참가자들과 심사위원들이 쓸 심사 종이를 분류하고, 책상과 차단봉을 설치했다. 참가자들을 위한 간식도 날랐는데, 대회는 선수와 심사위원만 있으면 열리는 줄 알았지만 막상 준비해 보니 의자 하나, 종이 한 장까지 누군가 미리 챙겨 두어야 대회가 시작될 수 있다는 것을 느꼈다.
+대회는 예선과 결승으로 나뉘어 있었는데, 나는 결승 참가자들의 노래가 시작되면 조명을 켜고 무대가 끝나면 다시 조명을 끄는 역할을 맡았다. 조명을 제때 맞추려면 노래가 언제 시작하고 끝나는지 계속 지켜봐야 해서 자연스럽게 무대를 집중해서 보게 되었다. 내가 켜고 끄는 조명에 맞춰 선수들의 무대가 시작되고 끝난다고 생각하니 작은 역할이어도 책임감이 생겼고, 혹시 타이밍을 놓칠까 봐 끝까지 긴장하면서 자리를 지켰다.
+처음에는 댄스스포츠대회라고 해서 어떤 춤이 나올지 몰랐는데, 탱고 계열의 춤을 추는 사람들의 대회였던 것으로 기억한다. 외국에서만 보던 춤을 바로 앞에서 보니 굉장히 생소하고 신기했고, 한복과 전통 국악에 그 계열의 춤을 섞은 퓨전 무대도 기억에 남는다. 이번 봉사를 하면서 무대 위의 사람들이 춤에만 집중할 수 있는 것은 눈에 띄지 않는 곳에서 준비하고 진행을 돕는 사람들이 있기 때문이라고 생각한다.</span> <span class="cnt"></span></td></tr>
+      </table>
+    </div></div>
+  </div>
+</div>
+<script>
+const KEY = "vol-diary-1122";
+const START = {};
+let saved = {};
+try { saved = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) {}
+const len = s => s.replace(/\n/g, "").length;  // 공백 포함, 줄바꿈 뺌
+function count(box) {
+  const n = len(box.querySelector('[data-k="essay"]').innerText.trim());
+  box.querySelector(".cnt").textContent = `(공백 포함 ${n}자)`;
+  const c = box.querySelector(".count");
+  c.textContent = n < 300 ? `${n}자, 300자 넘겨야 해요` : `${n}자`;
+  c.classList.toggle("low", n < 300);
+}
+function save() {
+  try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) {}
+}
+document.querySelectorAll(".sheetbox").forEach(box => {
+  box.querySelectorAll("[data-k]").forEach(el => {
+    const k = box.id + "." + el.dataset.k;
+    START[k] = el.innerText;
+    if (k in saved) el.innerText = saved[k];
+    el.addEventListener("input", () => {
+      if (!el.innerText.trim()) el.textContent = "";
+      saved[k] = el.innerText; save(); count(box);
+    });
+    el.addEventListener("paste", e => { e.preventDefault(); document.execCommand("insertText", false, e.clipboardData.getData("text/plain")); });
+  });
+  count(box);
+  box.querySelector("[data-reset]").onclick = function () {
+    if (this.dataset.sure !== "1") { this.dataset.sure = "1"; this.textContent = "한 번 더 누르면 되돌려요"; return; }
+    box.querySelectorAll("[data-k]").forEach(el => { const k = box.id + "." + el.dataset.k; el.innerText = START[k]; delete saved[k]; });
+    save(); count(box); this.dataset.sure = ""; this.textContent = "처음 글로";
+  };
+  box.querySelector("[data-print]").onclick = () => {
+    document.querySelectorAll(".sheetbox").forEach(b => b.classList.toggle("on", b === box));
+    const t = document.title;
+    document.title = "봉사일지_" + box.querySelector("h2").textContent.replace(/\s+/g, "_");
+    print();
+    document.title = t;
+  };
+});
+</script>
+<script src="../hub/back.js" data-cat="study" defer></script>
+</body>
+</html>
