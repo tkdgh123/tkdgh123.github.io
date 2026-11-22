@@ -49,8 +49,8 @@ main{max-width:var(--wrap);margin:0 auto;padding:0 var(--gut) 96px}
 .grp-h .to-cmp{margin-left:auto;font-size:14px;font-weight:600;text-decoration:underline;text-underline-offset:4px}
 .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:28px 14px}
 .tile{display:block;text-align:left;width:100%}
-.ph{position:relative;aspect-ratio:3/4;background:var(--tile);overflow:hidden}
-.ph img{width:100%;height:100%;object-fit:cover;mix-blend-mode:multiply}
+.ph{position:relative;aspect-ratio:3/4;background:#fff;overflow:hidden}
+.ph img{width:100%;height:100%;object-fit:cover}
 .tile .ph img{transition:transform .35s cubic-bezier(.2,.7,.2,1)}
 .tile:hover .ph img{transform:scale(1.035)}
 .tile b{display:block;margin-top:10px;font-size:16px;font-weight:700;letter-spacing:-.03em}
@@ -76,7 +76,7 @@ main{max-width:var(--wrap);margin:0 auto;padding:0 var(--gut) 96px}
 .row{border-top:1px solid var(--line);padding-top:14px}
 .row h3{margin:0 0 4px;font-size:13px;color:var(--sub);font-weight:600}
 .row p{margin:0;font-size:15px}
-.pair{display:flex;gap:8px;flex-wrap:wrap}
+.pair{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start}
 .pair button{width:64px;text-align:left;font-size:12px;line-height:1.3}
 .pair .ph{margin-bottom:5px}
 .acts{display:flex;gap:10px;flex-wrap:wrap;margin-top:auto;padding-top:6px}
@@ -133,6 +133,22 @@ main{max-width:var(--wrap);margin:0 auto;padding:0 var(--gut) 96px}
 .fb p{margin:0;font-size:15px}
 .fb .btn{margin-top:14px}
 .end h2{margin-bottom:6px}
+#rd-in{width:100%;font:inherit;font-size:16px;padding:14px;border:1px solid var(--line);resize:vertical;margin-bottom:8px}
+#rd-in:focus{outline:2px solid var(--ink);outline-offset:-1px}
+.rd{padding:22px 0;border-bottom:1px solid var(--line)}
+.rd-name b{background:var(--ink);color:#fff;font-weight:700;padding:0 4px;margin:0 1px}
+.rd .grid{grid-template-columns:repeat(6,minmax(0,1fr));gap:14px 10px}
+.rd .tile b{font-size:14px}
+@media (max-width:860px){.rd .grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.tap{position:relative;width:min(560px,100%,calc(68vh * var(--r)));margin:0 auto;cursor:crosshair;overflow:hidden;background:var(--tile)}
+.tap img{width:100%;height:100%;object-fit:cover}
+.tap .box{position:absolute;border:3px solid var(--ok);box-shadow:0 0 0 2px #fff}
+.tap .hit{position:absolute;width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 1.5px rgba(0,0,0,.5)}
+.tap .hit.ok{background:var(--ok)}.tap .hit.no{background:var(--no)}
+.credit{margin:8px auto 0;max-width:560px;font-size:12px;color:var(--faint)}
+.credit a{color:inherit}
+.fb.one{grid-template-columns:1fr}
+.lnk{font-weight:700;text-decoration:underline;text-underline-offset:4px}
 .pname{margin:0 0 6px;font-size:clamp(20px,3.2vw,26px);font-weight:700;letter-spacing:-.04em;line-height:1.35}
 .pname mark{background:var(--ink);color:#fff;padding:0 5px}
 .whole{margin-top:26px}
@@ -170,6 +186,7 @@ main{max-width:var(--wrap);margin:0 auto;padding:0 var(--gut) 96px}
     <a href="#book" data-v="book">도감</a>
     <a href="#cmp" data-v="cmp">비교</a>
     <a href="#quiz" data-v="quiz">퀴즈</a>
+    <a href="#read" data-v="read">읽기</a>
   </nav>
   <div class="prog"><span class="pl">외운 카드 </span><span class="ps">외움 </span><b id="prog-n">0</b>/<span id="prog-t">0</span></div>
 </div></header>
@@ -178,6 +195,7 @@ main{max-width:var(--wrap);margin:0 auto;padding:0 var(--gut) 96px}
   <section id="v-book"></section>
   <section id="v-cmp" hidden></section>
   <section id="v-quiz" hidden></section>
+  <section id="v-read" hidden></section>
 </main>
 
 <div class="sheet" id="sheet" hidden>
@@ -192,7 +210,7 @@ main{max-width:var(--wrap);margin:0 auto;padding:0 var(--gut) 96px}
 
 <script>
 const KEY = "ot-gongbu-v1";
-let U = [], G = [], C = [], N = [], byId = {};
+let U = [], G = [], C = [], N = [], P = [], R = {}, byId = {};
 let st = { seen: {}, stat: {} };
 try { st = Object.assign(st, JSON.parse(localStorage.getItem(KEY) || "{}")); } catch (e) {}
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} window.otPush?.(); };
@@ -247,7 +265,7 @@ function openCard(id) {
     <p class="en">${esc(c.en)}${c.alias ? `<span>흔히 ${esc(c.alias)}</span>` : ""}</p>
     ${c.hex ? `<p class="sw"><i style="background:${c.hex}"></i>${c.hex} 정도</p>` : ""}
     <p class="say">${esc(c.say)}</p>
-    <div class="row"><h3>여기를 보면 알아요</h3><p>${esc(c.look)}</p></div>
+    ${c.say.startsWith(c.look) ? "" : `<div class="row"><h3>여기를 보면 알아요</h3><p>${esc(c.look)}</p></div>`}
     <div class="row"><h3>자주 보이는 곳</h3><p>${esc(c.where)}</p></div>
     ${c.src ? `<div class="row"><h3>출처</h3><p><a href="${esc(c.src.url)}" target="_blank" rel="noopener">${esc(c.src.name)}</a> <span style="color:var(--faint)">${esc(c.src.date)}</span></p></div>` : ""}
     ${mates.length ? `<div class="row"><h3>헷갈리는 짝</h3><div class="pair">${mates.map(m => `<button data-card="${m.id}"><div class="ph"><img src="img/${m.id}.webp" alt="" width="600" height="800" loading="lazy"></div>${esc(m.ko)}</button>`).join("")}</div></div>` : ""}
@@ -310,20 +328,29 @@ function nameSet() {
 }
 function startQuiz(only, scope) {
   scope = scope || "";
-  const list = scope === "name" && !only ? nameSet() : shuffle(pickSet(only, scope === "name" ? "" : scope));
+  const list = scope === "photo" ? shuffle(P.slice()).slice(0, 10).map(p => ({ photo: p }))
+    : scope === "name" && !only ? nameSet() : shuffle(pickSet(only, scope === "name" ? "" : scope));
   Q = { scope, list, i: 0, right: 0, wrong: [], done: false }; quiz();
 }
 function quiz() {
   const el = $("#v-quiz");
-  const nav = unitNav("quiz", Q.scope, true).replace("</nav>", N.length ? `<a href="#quiz/name" aria-current="${Q.scope === "name"}">상품명 풀기</a></nav>` : "</nav>");
+  const nav = unitNav("quiz", Q.scope, true).replace("</nav>", (N.length ? `<a href="#quiz/name" aria-current="${Q.scope === "name"}">상품명 풀기</a>` : "") + (P.length ? `<a href="#quiz/photo" aria-current="${Q.scope === "photo"}">사진에서 찾기</a>` : "") + "</nav>");
   if (Q.i >= Q.list.length) {
     el.innerHTML = nav + `<div class="qz end"><h2>${Q.list.length}문제 중 ${Q.right}개 맞혔어요</h2>
       <p class="score">외운 카드 ${C.filter(c => learned(c.id)).length}/${C.length}. 세 번 연속 맞히면 외운 카드가 돼요.</p>
-      ${Q.wrong.length ? `<div class="grid">${Q.wrong.map(id => tile(byId[id])).join("")}</div>` : ""}
-      <div class="acts">${Q.wrong.length ? `<button class="btn solid" id="q-again-wrong">틀린 것만 다시</button>` : ""}<button class="btn${Q.wrong.length ? "" : " solid"}" id="q-again">새로 10문제</button></div></div>`;
+      ${Q.wrong.filter(Boolean).length ? `<div class="grid">${Q.wrong.filter(Boolean).map(id => tile(byId[id])).join("")}</div>` : ""}
+      <div class="acts">${Q.wrong.filter(Boolean).length ? `<button class="btn solid" id="q-again-wrong">틀린 것만 다시</button>` : ""}<button class="btn${Q.wrong.length ? "" : " solid"}" id="q-again">새로 10문제</button></div></div>`;
     return;
   }
   const q = Q.list[Q.i], c = byId[q.id];
+  if (q.photo) {
+    const p = q.photo;
+    el.innerHTML = nav + `<div class="qz"><div class="qz-top"><span>${Q.i + 1} / ${Q.list.length}</span><div class="bar"><i style="width:${Q.i / Q.list.length * 100}%"></i></div></div>
+      <h2>사진에서 ${esc(p.ko)}${batchim(p.ko) ? "을" : "를"} 눌러 보세요</h2>
+      <div class="tap" id="tap" style="aspect-ratio:${p.w}/${p.h};--r:${p.w / p.h}"><img src="fp/${p.id}.webp" alt="" width="${p.w}" height="${p.h}"></div>
+      <p class="credit">사진 <a href="https://fashionpedia.github.io/home/" target="_blank" rel="noopener">Fashionpedia</a>, CC BY 4.0</p><div id="fb"></div></div>`;
+    Q.done = false; return;
+  }
   const head = `<div class="qz-top"><span>${Q.i + 1} / ${Q.list.length}</span><div class="bar"><i style="width:${Q.i / Q.list.length * 100}%"></i></div></div>`;
   if (q.type === "pic") {
     el.innerHTML = nav + `<div class="qz">${head}<h2>이 사진은 무엇일까요?</h2><div class="q-img">${ph(c, false, false)}</div>
@@ -337,6 +364,20 @@ function quiz() {
       <div class="ops pics" id="ops">${q.ops.map((o, k) => `<button class="op pic" data-op="${o}" aria-label="${k + 1}번 사진">${ph(byId[o], false, false)}<kbd>${k + 1}</kbd></button>`).join("")}</div><div id="fb"></div></div>`;
   }
   Q.done = false;
+}
+function tapAnswer(e) {
+  if (!Q || Q.done) return;
+  const q = Q.list[Q.i], p = q.photo, el = $("#tap"), r = el.getBoundingClientRect();
+  const x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height, b = p.box, m = 0.03;
+  const ok = x >= b[0] - m && x <= b[2] + m && y >= b[1] - m && y <= b[3] + m;
+  Q.done = true; if (ok) Q.right++; else Q.wrong.push(null);
+  el.insertAdjacentHTML("beforeend", `<i class="hit ${ok ? "ok" : "no"}" style="left:${x * 100}%;top:${y * 100}%"></i><i class="box" style="left:${b[0] * 100}%;top:${b[1] * 100}%;width:${(b[2] - b[0]) * 100}%;height:${(b[3] - b[1]) * 100}%"></i>`);
+  const c = p.card && byId[p.card];
+  $("#fb").innerHTML = `<div class="fb one"><div><p class="r ${ok ? "ok" : "no"}">${ok ? "맞았어요" : `${esc(p.ko)}${batchim(p.ko) ? "은" : "는"} 네모 친 곳이에요`}</p>
+    ${c ? `<p><button class="lnk" data-card="${c.id}">${esc(c.ko)} 카드 보기</button></p>` : ""}
+    <button class="btn solid" id="q-next">${Q.i + 1 < Q.list.length ? "다음" : "결과 보기"}</button></div></div>`;
+  $("#q-next").focus({ preventScroll: true });
+  $("#fb").scrollIntoView({ block: "nearest", behavior: "smooth" });
 }
 function answer(o) {
   if (!Q || Q.done) return;
@@ -361,12 +402,66 @@ function answer(o) {
   $("#fb").scrollIntoView({ block: "nearest", behavior: "smooth" });
 }
 
+/* 상품명 읽기: 띄어 쓴 두세 낱말이 붙여서 한 말이면 그 말로("후드 집업"), 아니면 낱말 안에서 가장 긴 말부터 찾아 카드로 잇는다.
+   한 글자 말은 낱말 전체가 그 말일 때만("울", "울30%"는 되고 "울터치"는 안 됨). */
+const RKEY = "ot-read-v1";
+function parse(line) {
+  const out = [], found = [];
+  const parts = [...line.matchAll(/[^\s\[\]()\/,·+&-]+|[\s\[\]()\/,·+&-]+/g)].map(m => m[0]);
+  const isSep = w => /^[\s\[\]()\/,·+&-]+$/.test(w);
+  const add = (t, html) => { if (!found.includes(R[t])) found.push(R[t]); out.push(html); };
+  for (let k = 0; k < parts.length; k++) {
+    const w = parts[k];
+    if (isSep(w)) { out.push(esc(w)); continue; }
+    let joined = false;
+    for (const n of [3, 2]) {
+      const span = parts.slice(k, k + 2 * n - 1);
+      if (span.length < 2 * n - 1 || span.some((x, j) => j % 2 ? !/^\s+$/.test(x) : isSep(x))) continue;
+      const t = span.filter((x, j) => j % 2 === 0).join("");
+      if (R[t]) { add(t, `<b>${esc(span.join(""))}</b>`); k += 2 * n - 2; joined = true; break; }
+    }
+    if (joined) continue;
+    let i = 0, html = "";
+    while (i < w.length) {
+      let hit = null;
+      for (let L = Math.min(8, w.length - i); L >= 1; L--) {
+        const t = w.slice(i, i + L);
+        if (!R[t]) continue;
+        if (L === 1 && !(i === 0 && /^[0-9%]*$/.test(w.slice(1)))) continue;
+        hit = t; break;
+      }
+      if (hit) { html += `<b>${esc(hit)}</b>`; if (!found.includes(R[hit])) found.push(R[hit]); i += hit.length; }
+      else { html += esc(w[i]); i++; }
+    }
+    out.push(html);
+  }
+  return { html: out.join(""), ids: found };
+}
+function readView() {
+  let saved = ""; try { saved = localStorage.getItem(RKEY) || ""; } catch (e) {}
+  $("#v-read").innerHTML = `<div class="lead"><h1>상품명 읽기</h1></div>
+    <p class="cmp-say">쇼핑몰 상품명을 한 줄에 하나씩 붙여 넣으면 아는 말을 카드로 풀어 줘요. 쓴 글은 이 기기에만 남아요.</p>
+    <textarea id="rd-in" rows="4" placeholder="예) 세미오버핏 골덴 투웨이 지퍼 블루종 브라운">${esc(saved)}</textarea>
+    <div id="rd-out"></div>`;
+  readRender();
+}
+function readRender() {
+  const v = $("#rd-in").value;
+  try { localStorage.setItem(RKEY, v); } catch (e) {}
+  $("#rd-out").innerHTML = v.split(/\r?\n/).map(x => x.trim()).filter(Boolean).slice(0, 30).map(line => {
+    const r = parse(line);
+    return `<section class="rd"><p class="pname rd-name">${r.html}</p>${r.ids.length ? `<div class="grid">${r.ids.map(id => tile(byId[id])).join("")}</div>` : `<p class="cmp-say">아직 카드에 없는 말만 있어요.</p>`}</section>`;
+  }).join("");
+}
+document.addEventListener("input", e => { if (e.target.id === "rd-in") readRender(); });
+
 /* 화면 전환 */
 let view = "book";
 function refresh() {
   const arg = location.hash.split("/")[1];
   if (view === "book") book(arg);
   else if (view === "cmp") cmp(arg);
+  else if (view === "read" && $("#rd-in")) readRender();
   prog();
 }
 function route() {
@@ -374,11 +469,12 @@ function route() {
   const [v, arg] = h.split("/");
   if (v === "card") { openCard(arg); return; }
   closeCard();
-  view = ["book", "cmp", "quiz"].includes(v) ? v : "book";
-  for (const s of ["book", "cmp", "quiz"]) $("#v-" + s).hidden = s !== view;
+  view = ["book", "cmp", "quiz", "read"].includes(v) ? v : "book";
+  for (const s of ["book", "cmp", "quiz", "read"]) $("#v-" + s).hidden = s !== view;
   document.querySelectorAll(".tabs a").forEach(a => a.dataset.v === view ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"));
-  if (view === "quiz") {
-    const scope = U.some(x => x.u == arg) || (arg === "name" && N.length) ? arg : "";
+  if (view === "read") { if (!$("#rd-in")) readView(); else readRender(); prog(); }
+  else if (view === "quiz") {
+    const scope = U.some(x => x.u == arg) || (arg === "name" && N.length) || (arg === "photo" && P.length) ? arg : "";
     if (!Q || Q.scope !== scope) startQuiz(null, scope); else quiz();
     prog();
   } else refresh();
@@ -386,6 +482,7 @@ function route() {
 }
 
 document.addEventListener("click", e => {
+  const tp = e.target.closest("#tap"); if (tp) return tapAnswer(e);
   if (e.target.closest("#sync-in")) return window.otLogin?.();
   if (e.target.closest("#sync-out")) return window.otLogout?.();
   const t = e.target.closest("[data-card],[data-op],#q-next,#q-again,#q-again-wrong,#c-x,#c-prev,#c-next");
@@ -394,7 +491,7 @@ document.addEventListener("click", e => {
   if (t.dataset.card) return show(t.dataset.card);
   if (t.id === "q-next") { Q.i++; quiz(); window.scrollTo(0, 0); return; }
   if (t.id === "q-again") return startQuiz(null, Q.scope);
-  if (t.id === "q-again-wrong") return startQuiz([...new Set(Q.wrong)], Q.scope);
+  if (t.id === "q-again-wrong") return startQuiz([...new Set(Q.wrong.filter(Boolean))], Q.scope);
   if (t.id === "c-x") return history.back();
   if (t.id === "c-prev") return step(-1);
   if (t.id === "c-next") return step(1);
@@ -414,7 +511,7 @@ document.addEventListener("keydown", e => {
 window.addEventListener("hashchange", route);
 
 fetch("cards.json").then(r => r.json()).then(d => {
-  G = d.groups; C = d.cards; N = d.names || []; byId = Object.fromEntries(C.map(c => [c.id, c]));
+  G = d.groups; C = d.cards; N = d.names || []; P = d.photos || []; R = d.read || {}; byId = Object.fromEntries(C.map(c => [c.id, c]));
   U = d.units.filter(x => C.some(c => c.u == x.u));
   if (location.hash.startsWith("#card/")) { const id = location.hash.split("/")[1]; history.replaceState(null, "", "#book"); route(); location.hash = "#card/" + id; }
   else route();
