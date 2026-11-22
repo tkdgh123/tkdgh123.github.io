@@ -31,13 +31,15 @@ img{display:block;max-width:100%}
 .prog{margin-left:auto;font-size:13px;color:var(--sub);white-space:nowrap}
 .prog b{color:var(--ink);font-weight:700}
 .prog .ps{display:none}
+.sync{margin:14px 0 0;font-size:14px;color:var(--sub)}
+.sync button{font-weight:700;color:var(--ink);text-decoration:underline;text-underline-offset:4px}
 body.sheet-open #cu-home{display:none}
 @media (hover:none){.op kbd{display:none}.op.pic kbd{display:block;color:transparent;height:6px;padding:0}}
 
 main{max-width:var(--wrap);margin:0 auto;padding:0 var(--gut) 96px}
 
 /* 도감 */
-.lead{padding:44px 0 8px}
+.lead{padding:28px 0 8px}
 .lead h1{margin:0;font-size:clamp(34px,6.4vw,64px);line-height:1.05;font-weight:800;letter-spacing:-.05em}
 .lead h1 span{color:var(--faint);font-weight:300}
 .grp{padding-top:44px}
@@ -85,8 +87,16 @@ main{max-width:var(--wrap);margin:0 auto;padding:0 var(--gut) 96px}
 .nav{position:absolute;top:50%;z-index:2;width:44px;height:44px;margin-top:-22px;display:grid;place-items:center;background:rgba(255,255,255,.9)}
 .nav.prev{left:8px}.nav.next{left:calc(50% - 52px)}
 
+.useg{display:flex;gap:6px 20px;flex-wrap:wrap;padding-top:26px;font-size:14px}
+.useg a{color:var(--faint);text-decoration:none;font-weight:600;padding:4px 0;border-bottom:2px solid transparent}
+.useg a[aria-current="true"]{color:var(--ink);border-color:var(--ink)}
+.en span{margin-left:10px;color:var(--sub)}
+.sw{display:flex;align-items:center;gap:10px;margin:-4px 0 0;font-size:13px;color:var(--sub)}
+.sw i{width:30px;height:30px;border:1px solid rgba(0,0,0,.14)}
+.tile small i{display:inline-block;width:11px;height:11px;margin-right:6px;border:1px solid rgba(0,0,0,.15)}
+.cmp figcaption b i{display:inline-block;width:14px;height:14px;margin-right:7px;vertical-align:-1px;border:1px solid rgba(0,0,0,.15)}
 /* 비교 */
-.seg{display:flex;gap:6px 22px;flex-wrap:wrap;padding:36px 0 22px;border-bottom:1px solid var(--line);margin-bottom:26px}
+.seg{display:flex;gap:6px 22px;flex-wrap:wrap;padding:20px 0 20px;border-bottom:1px solid var(--line);margin-bottom:26px}
 .seg a{font-size:17px;font-weight:700;color:var(--faint);text-decoration:none;letter-spacing:-.03em}
 .seg a[aria-current="true"]{color:var(--ink)}
 .cmp-say{margin:0 0 18px;color:var(--sub);font-size:15px}
@@ -99,7 +109,7 @@ main{max-width:var(--wrap);margin:0 auto;padding:0 var(--gut) 96px}
 .cmp button{display:block;width:100%;text-align:left}
 
 /* 퀴즈 */
-.qz{max-width:760px;margin:0 auto;padding-top:34px}
+.qz{max-width:760px;margin:0 auto;padding-top:24px}
 .qz-top{display:flex;align-items:center;gap:14px;font-size:14px;color:var(--sub);margin-bottom:22px}
 .bar{flex:1;height:3px;background:var(--line)}
 .bar i{display:block;height:100%;background:var(--ink);transition:width .3s}
@@ -123,6 +133,12 @@ main{max-width:var(--wrap);margin:0 auto;padding:0 var(--gut) 96px}
 .fb p{margin:0;font-size:15px}
 .fb .btn{margin-top:14px}
 .end h2{margin-bottom:6px}
+.pname{margin:0 0 6px;font-size:clamp(20px,3.2vw,26px);font-weight:700;letter-spacing:-.04em;line-height:1.35}
+.pname mark{background:var(--ink);color:#fff;padding:0 5px}
+.whole{margin-top:26px}
+.whole h3{margin:0 0 12px;font-size:15px;color:var(--sub);font-weight:600}
+.strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.strip figure{margin:0}.strip figcaption{font-size:13px;font-weight:700;margin-top:6px}
 .end .score{font-size:15px;color:var(--sub);margin:0 0 26px}
 .end .grid{margin-bottom:28px}
 
@@ -176,33 +192,41 @@ main{max-width:var(--wrap);margin:0 auto;padding:0 var(--gut) 96px}
 
 <script>
 const KEY = "ot-gongbu-v1";
-let G = [], C = [], byId = {};
+let U = [], G = [], C = [], N = [], byId = {};
 let st = { seen: {}, stat: {} };
 try { st = Object.assign(st, JSON.parse(localStorage.getItem(KEY) || "{}")); } catch (e) {}
-const save = () => { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} };
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} window.otPush?.(); };
+/* 로그인 뒤 서버 기록과 합칠 때 부름 */
+window.ot = { get: () => st, set: x => { st = x; try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} if (!C.length) return; if ($("#sheet").hidden && view !== "quiz") refresh(); prog(); } };
 const learned = id => (st.stat[id]?.s || 0) >= 3;
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
-const ph = (c, spot) => `<div class="ph"><img src="img/${c.id}.webp" alt="${esc(c.ko)}" width="600" height="800" loading="lazy">${spot ? `<i class="spot" style="left:${c.spot[0] * 100}%;top:${c.spot[1] * 100}%"></i>` : ""}</div>`;
-const gName = id => G.find(g => g.id === id).name;
+const spotEl = c => c.spot ? `<i class="spot" style="left:${c.spot[0] * 100}%;top:${c.spot[1] * 100}%"></i>` : "";
+const ph = (c, spot, lazy = true) => `<div class="ph"><img src="img/${c.id}.webp" alt="${esc(c.ko)}" width="600" height="800"${lazy ? ' loading="lazy"' : ""}>${spot ? spotEl(c) : ""}</div>`;
+const gOf = id => G.find(g => g.id === id);
+const uName = u => U.find(x => x.u == u)?.name || "";
 const batchim = w => { const k = w.charCodeAt(w.length - 1) - 0xac00; return k >= 0 && k < 11172 && k % 28 !== 0; };
 const eun = w => w + (batchim(w) ? "은" : "는");
 const ieyo = w => w + (batchim(w) ? "이에요" : "예요");
+const unitNav = (base, cur, all) => `<nav class="useg" aria-label="단원">${all ? `<a href="#${base}" aria-current="${!cur}">전체</a>` : ""}${U.map(x => `<a href="#${base}/${x.u}" aria-current="${x.u == cur}">${esc(x.name)}</a>`).join("")}</nav>`;
 
+const syncBtn = () => window.otUser === undefined ? "" : window.otUser === "err" ? `<p class="sync">지금은 기록을 서버에 저장하지 못해요. 이 기기에는 그대로 남아요. <button id="sync-out">로그아웃</button></p>` : window.otUser ? `<p class="sync">폰과 노트북 기록이 이어져 있어요 <button id="sync-out">로그아웃</button></p>` : `<p class="sync"><button id="sync-in">구글로 로그인해서 폰과 노트북 기록 잇기</button></p>`;
 function prog() {
   $("#prog-n").textContent = C.filter(c => learned(c.id)).length;
   $("#prog-t").textContent = C.length;
 }
 function tile(c) {
   const m = learned(c.id) ? `<i class="mark">외움</i>` : st.seen[c.id] ? `<i class="mark seen">봄</i>` : "";
-  return `<button class="tile" data-card="${c.id}"><div class="ph"><img src="img/${c.id}.webp" alt="" width="600" height="800" loading="lazy">${m}</div><b>${esc(c.ko)}</b><small>${esc(c.en)}</small></button>`;
+  return `<button class="tile" data-card="${c.id}"><div class="ph"><img src="img/${c.id}.webp" alt="" width="600" height="800" loading="lazy">${m}</div><b>${esc(c.ko)}</b><small>${c.hex ? `<i style="background:${c.hex}"></i>` : ""}${esc(c.en)}</small></button>`;
 }
 
 /* 도감 */
-function book() {
-  $("#v-book").innerHTML = `<div class="lead"><h1>목둘레와 소매 <span>${C.length}장</span></h1></div>` +
-    G.map(g => `<section class="grp"><div class="grp-h"><h2>${esc(g.name)}</h2><p>${esc(g.say)}</p><a class="to-cmp" href="#cmp/${g.id}">나란히 보기</a></div>
+function book(u) {
+  u = U.some(x => x.u == u) ? +u : U[0].u;
+  const gs = G.filter(g => g.u == u);
+  $("#v-book").innerHTML = unitNav("book", u) + `<div class="lead"><h1>${esc(uName(u))} <span>${C.filter(c => c.u == u).length}장</span></h1>${syncBtn()}</div>` +
+    gs.map(g => `<section class="grp"><div class="grp-h"><h2>${esc(g.name)}</h2><p>${esc(g.say)}</p><a class="to-cmp" href="#cmp/${g.id}">나란히 보기</a></div>
       <div class="grid">${C.filter(c => c.g === g.id).map(tile).join("")}</div></section>`).join("");
 }
 
@@ -214,17 +238,19 @@ function openCard(id) {
   if ($("#sheet").hidden) lastFocus = document.activeElement;
   cur = id;
   st.seen[id] = 1; save();
-  const mates = C.filter(x => x.g === c.g && x.id !== c.id);
+  const mates = C.filter(x => x.g === c.g && x.id !== c.id).slice(0, 6);
   const q = encodeURIComponent(c.ko);
-  $("#c-ph").outerHTML = `<div class="ph" id="c-ph"><img src="img/${c.id}.webp" alt="${esc(c.ko)} 사진" width="600" height="800"><i class="spot" style="left:${c.spot[0] * 100}%;top:${c.spot[1] * 100}%"></i></div>`;
+  $("#c-ph").outerHTML = `<div class="ph" id="c-ph"><img src="img/${c.id}.webp" alt="${esc(c.ko)} 사진" width="600" height="800">${spotEl(c)}</div>`;
   $("#c-tx").innerHTML = `
-    <div class="card-g">${esc(gName(c.g))}</div>
+    <div class="card-g">${esc(uName(c.u))}, ${esc(gOf(c.g).name)}</div>
     <h2 id="c-name">${esc(c.ko)}</h2>
-    <p class="en">${esc(c.en)}${c.alias ? ` · ${esc(c.alias)}` : ""}</p>
+    <p class="en">${esc(c.en)}${c.alias ? `<span>흔히 ${esc(c.alias)}</span>` : ""}</p>
+    ${c.hex ? `<p class="sw"><i style="background:${c.hex}"></i>${c.hex} 정도</p>` : ""}
     <p class="say">${esc(c.say)}</p>
     <div class="row"><h3>여기를 보면 알아요</h3><p>${esc(c.look)}</p></div>
     <div class="row"><h3>자주 보이는 곳</h3><p>${esc(c.where)}</p></div>
-    <div class="row"><h3>헷갈리는 짝</h3><div class="pair">${mates.map(m => `<button data-card="${m.id}"><div class="ph"><img src="img/${m.id}.webp" alt="" width="600" height="800"></div>${esc(m.ko)}</button>`).join("")}</div></div>
+    ${c.src ? `<div class="row"><h3>출처</h3><p><a href="${esc(c.src.url)}" target="_blank" rel="noopener">${esc(c.src.name)}</a> <span style="color:var(--faint)">${esc(c.src.date)}</span></p></div>` : ""}
+    ${mates.length ? `<div class="row"><h3>헷갈리는 짝</h3><div class="pair">${mates.map(m => `<button data-card="${m.id}"><div class="ph"><img src="img/${m.id}.webp" alt="" width="600" height="800" loading="lazy"></div>${esc(m.ko)}</button>`).join("")}</div></div>` : ""}
     <div class="acts"><a class="btn solid" href="#cmp/${c.g}">나란히 비교</a><a class="btn" href="https://www.musinsa.com/search/goods?keyword=${q}" target="_blank" rel="noopener">무신사에서 실제 상품</a></div>`;
   $("#sheet").hidden = false;
   document.body.style.overflow = "hidden";
@@ -251,32 +277,47 @@ function step(d) {
 }
 
 /* 비교 */
-function cmp(gid) {
-  const g = G.find(x => x.id === gid) || G[0];
+function cmp(arg) {
+  let g = gOf(arg);
+  if (!g) { const u = U.some(x => x.u == arg) ? +arg : U[0].u; g = G.find(x => x.u == u); }
   const list = C.filter(c => c.g === g.id);
-  $("#v-cmp").innerHTML = `<nav class="seg" aria-label="묶음">${G.map(x => `<a href="#cmp/${x.id}" aria-current="${x.id === g.id}">${esc(x.name)}</a>`).join("")}</nav>
-    <p class="cmp-say">${esc(g.say)}. 점이 찍힌 곳이 서로 다른 자리예요.</p>
-    <div class="cmp${list.length === 3 ? " n3" : ""}">${list.map(c => `<figure><button data-card="${c.id}">${ph(c, true)}</button><figcaption><b>${esc(c.ko)}</b><span>${esc(c.look)}</span></figcaption></figure>`).join("")}</div>`;
+  const spots = list.some(c => c.spot);
+  $("#v-cmp").innerHTML = unitNav("cmp", g.u) + `<nav class="seg" aria-label="묶음">${G.filter(x => x.u == g.u).map(x => `<a href="#cmp/${x.id}" aria-current="${x.id === g.id}">${esc(x.name)}</a>`).join("")}</nav>
+    <p class="cmp-say">${esc(g.say)}.${spots ? " 동그라미 친 곳이 서로 다른 자리예요." : ""}</p>
+    <div class="cmp${list.length === 3 ? " n3" : ""}">${list.map(c => `<figure><button data-card="${c.id}">${ph(c, true)}</button><figcaption><b>${c.hex ? `<i style="background:${c.hex}"></i>` : ""}${esc(c.ko)}</b><span>${esc(c.look)}</span></figcaption></figure>`).join("")}</div>`;
 }
 
 /* 퀴즈 */
 let Q = null;
-function pickSet(only) {
-  const pool = only ? only.map(id => byId[id]) : C.slice();
+function pickSet(only, scope) {
+  const pool = only ? only.map(id => byId[id]) : C.filter(c => !scope || c.u == scope);
   const w = c => (learned(c.id) ? 0 : 2) + (st.stat[c.id]?.w || 0) * 0.5 + (st.seen[c.id] ? 0 : 0.5) + Math.random() * 1.5;
   return pool.sort((a, b) => w(b) - w(a)).slice(0, 10).map(c => {
     const same = shuffle(C.filter(x => x.g === c.g && x.id !== c.id));
-    const other = shuffle(C.filter(x => x.g !== c.g));
-    const ops = shuffle([c, ...same.concat(other).slice(0, 3)]);
+    const unit = shuffle(C.filter(x => x.u === c.u && x.g !== c.g));
+    const other = shuffle(C.filter(x => x.u !== c.u));
+    const ops = shuffle([c, ...same.slice(0, 3).concat(unit, other).slice(0, 3)]);
     return { id: c.id, type: Math.random() < 0.5 ? "pic" : "name", ops: ops.map(o => o.id) };
   });
 }
-function startQuiz(only) { Q = { list: shuffle(pickSet(only)), i: 0, right: 0, wrong: [], done: false }; quiz(); }
+function nameSet() {
+  return shuffle(N.slice()).slice(0, 4).flatMap(n => n.parts.map((p, k) => {
+    const c = byId[p.id];
+    const same = shuffle(C.filter(x => x.g === c.g && x.id !== c.id));
+    const unit = shuffle(C.filter(x => x.u === c.u && x.g !== c.g));
+    return { id: c.id, type: "name", t: n.t, w: p.w, k, last: k === n.parts.length - 1 ? n.parts.map(x => x.id) : null, ops: shuffle([c, ...same.slice(0, 3).concat(unit).slice(0, 3)]).map(o => o.id) };
+  }));
+}
+function startQuiz(only, scope) {
+  scope = scope || "";
+  const list = scope === "name" && !only ? nameSet() : shuffle(pickSet(only, scope === "name" ? "" : scope));
+  Q = { scope, list, i: 0, right: 0, wrong: [], done: false }; quiz();
+}
 function quiz() {
-  if (!Q) return startQuiz();
   const el = $("#v-quiz");
+  const nav = unitNav("quiz", Q.scope, true).replace("</nav>", N.length ? `<a href="#quiz/name" aria-current="${Q.scope === "name"}">상품명 풀기</a></nav>` : "</nav>");
   if (Q.i >= Q.list.length) {
-    el.innerHTML = `<div class="qz end"><h2>${Q.list.length}문제 중 ${Q.right}개 맞혔어요</h2>
+    el.innerHTML = nav + `<div class="qz end"><h2>${Q.list.length}문제 중 ${Q.right}개 맞혔어요</h2>
       <p class="score">외운 카드 ${C.filter(c => learned(c.id)).length}/${C.length}. 세 번 연속 맞히면 외운 카드가 돼요.</p>
       ${Q.wrong.length ? `<div class="grid">${Q.wrong.map(id => tile(byId[id])).join("")}</div>` : ""}
       <div class="acts">${Q.wrong.length ? `<button class="btn solid" id="q-again-wrong">틀린 것만 다시</button>` : ""}<button class="btn${Q.wrong.length ? "" : " solid"}" id="q-again">새로 10문제</button></div></div>`;
@@ -285,11 +326,15 @@ function quiz() {
   const q = Q.list[Q.i], c = byId[q.id];
   const head = `<div class="qz-top"><span>${Q.i + 1} / ${Q.list.length}</span><div class="bar"><i style="width:${Q.i / Q.list.length * 100}%"></i></div></div>`;
   if (q.type === "pic") {
-    el.innerHTML = `<div class="qz">${head}<h2>이 사진은 무엇일까요?</h2><div class="q-img">${ph(c, false)}</div>
+    el.innerHTML = nav + `<div class="qz">${head}<h2>이 사진은 무엇일까요?</h2><div class="q-img">${ph(c, false, false)}</div>
       <div class="ops" id="ops">${q.ops.map((o, k) => `<button class="op" data-op="${o}"><kbd>${k + 1}</kbd>${esc(byId[o].ko)}</button>`).join("")}</div><div id="fb"></div></div>`;
+  } else if (q.t) {
+    const at = q.t.indexOf(q.w);
+    el.innerHTML = nav + `<div class="qz">${head}<p class="pname">${esc(q.t.slice(0, at))}<mark>${esc(q.w)}</mark>${esc(q.t.slice(at + q.w.length))}</p><h2>칠한 말은 어느 것일까요?</h2>
+      <div class="ops pics" id="ops">${q.ops.map((o, k) => `<button class="op pic" data-op="${o}" aria-label="${k + 1}번 사진">${ph(byId[o], false, false)}<kbd>${k + 1}</kbd></button>`).join("")}</div><div id="fb"></div></div>`;
   } else {
-    el.innerHTML = `<div class="qz">${head}<h2>${esc(eun(c.ko))} 어느 것일까요?</h2>
-      <div class="ops pics" id="ops">${q.ops.map((o, k) => `<button class="op pic" data-op="${o}" aria-label="${k + 1}번 사진">${ph(byId[o], false)}<kbd>${k + 1}</kbd></button>`).join("")}</div><div id="fb"></div></div>`;
+    el.innerHTML = nav + `<div class="qz">${head}<h2>${esc(eun(c.ko))} 어느 것일까요?</h2>
+      <div class="ops pics" id="ops">${q.ops.map((o, k) => `<button class="op pic" data-op="${o}" aria-label="${k + 1}번 사진">${ph(byId[o], false, false)}<kbd>${k + 1}</kbd></button>`).join("")}</div><div id="fb"></div></div>`;
   }
   Q.done = false;
 }
@@ -307,10 +352,11 @@ function answer(o) {
     b.disabled = true;
   });
   const wrongName = !ok && q.type === "name" ? ` 고른 사진은 ${esc(ieyo(byId[o].ko))}.` : "";
-  $("#fb").innerHTML = `<div class="fb"><div>${ph(c, true)}</div><div>
+  $("#fb").innerHTML = `<div class="fb"><div>${ph(c, true, false)}</div><div>
     <p class="r ${ok ? "ok" : "no"}">${ok ? "맞았어요" : `정답은 ${esc(c.ko)}`}</p>
     <p>${esc(c.say)}${wrongName}</p><p style="color:var(--sub);margin-top:6px">${esc(c.look)}</p>
-    <button class="btn solid" id="q-next">${Q.i + 1 < Q.list.length ? "다음" : "결과 보기"}</button></div></div>`;
+    <button class="btn solid" id="q-next">${Q.i + 1 < Q.list.length ? "다음" : "결과 보기"}</button></div></div>
+    ${q.last ? `<div class="whole"><h3>그러니까 '${esc(q.t)}'${batchim(q.t) ? "은" : "는"}</h3><div class="strip">${q.last.map(id => `<figure>${ph(byId[id], true, false)}<figcaption>${esc(byId[id].ko)}</figcaption></figure>`).join("")}</div></div>` : ""}`;
   $("#q-next").focus({ preventScroll: true });
   $("#fb").scrollIntoView({ block: "nearest", behavior: "smooth" });
 }
@@ -318,8 +364,9 @@ function answer(o) {
 /* 화면 전환 */
 let view = "book";
 function refresh() {
-  if (view === "book") book();
-  else if (view === "cmp") cmp(location.hash.split("/")[1]);
+  const arg = location.hash.split("/")[1];
+  if (view === "book") book(arg);
+  else if (view === "cmp") cmp(arg);
   prog();
 }
 function route() {
@@ -330,18 +377,24 @@ function route() {
   view = ["book", "cmp", "quiz"].includes(v) ? v : "book";
   for (const s of ["book", "cmp", "quiz"]) $("#v-" + s).hidden = s !== view;
   document.querySelectorAll(".tabs a").forEach(a => a.dataset.v === view ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"));
-  if (view === "quiz") { quiz(); prog(); } else refresh();
+  if (view === "quiz") {
+    const scope = U.some(x => x.u == arg) || (arg === "name" && N.length) ? arg : "";
+    if (!Q || Q.scope !== scope) startQuiz(null, scope); else quiz();
+    prog();
+  } else refresh();
   window.scrollTo(0, 0);
 }
 
 document.addEventListener("click", e => {
+  if (e.target.closest("#sync-in")) return window.otLogin?.();
+  if (e.target.closest("#sync-out")) return window.otLogout?.();
   const t = e.target.closest("[data-card],[data-op],#q-next,#q-again,#q-again-wrong,#c-x,#c-prev,#c-next");
   if (!t) { if (e.target.id === "sheet") history.back(); return; }
   if (t.dataset.op) return answer(t.dataset.op);
   if (t.dataset.card) return show(t.dataset.card);
   if (t.id === "q-next") { Q.i++; quiz(); window.scrollTo(0, 0); return; }
-  if (t.id === "q-again") return startQuiz();
-  if (t.id === "q-again-wrong") return startQuiz([...new Set(Q.wrong)]);
+  if (t.id === "q-again") return startQuiz(null, Q.scope);
+  if (t.id === "q-again-wrong") return startQuiz([...new Set(Q.wrong)], Q.scope);
   if (t.id === "c-x") return history.back();
   if (t.id === "c-prev") return step(-1);
   if (t.id === "c-next") return step(1);
@@ -361,9 +414,46 @@ document.addEventListener("keydown", e => {
 window.addEventListener("hashchange", route);
 
 fetch("cards.json").then(r => r.json()).then(d => {
-  G = d.groups; C = d.cards; byId = Object.fromEntries(C.map(c => [c.id, c]));
+  G = d.groups; C = d.cards; N = d.names || []; byId = Object.fromEntries(C.map(c => [c.id, c]));
+  U = d.units.filter(x => C.some(c => c.u == x.u));
   if (location.hash.startsWith("#card/")) { const id = location.hash.split("/")[1]; history.replaceState(null, "", "#book"); route(); location.hash = "#card/" + id; }
   else route();
+});
+</script>
+<script type="module">
+// 폰과 노트북 기록 잇기: 구글 로그인 + Firestore otgongbu/{uid} (규칙: 본인만 읽고 씀). 로그인 안 하면 이 기기에만 저장.
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, connectAuthEmulator } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, connectFirestoreEmulator, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-lite.js";
+const app = initializeApp({ apiKey: "AIzaSyAIAE7UPt3jRirq331QOqhhRwoyiF9spGM", authDomain: "changupsil-board.firebaseapp.com", projectId: "changupsil-board", appId: "1:828479047713:web:1ae9a15c3952e41e2ebb60" });
+const auth = getAuth(app), db = getFirestore(app);
+if (location.hostname === "127.0.0.1" && location.search.includes("emu")) {
+  connectAuthEmulator(auth, "http://127.0.0.1:9099", { disableWarnings: true });
+  connectFirestoreEmulator(db, "127.0.0.1", 8080);
+}
+const merge = (a, b) => {
+  const seen = { ...a.seen, ...b.seen }, stat = { ...a.stat };
+  for (const [k, v] of Object.entries(b.stat || {})) { const x = stat[k] || { s: 0, w: 0 }; stat[k] = { s: Math.max(x.s || 0, v.s || 0), w: Math.max(x.w || 0, v.w || 0) }; }
+  return { seen, stat };
+};
+let uid = null, timer = 0;
+const send = () => { clearTimeout(timer); timer = 0; if (!uid) return; const s = window.ot.get(); setDoc(doc(db, "otgongbu", uid), { seen: s.seen, stat: s.stat, at: serverTimestamp() }).catch(() => {}); };
+const push = () => { if (!uid) return; clearTimeout(timer); timer = setTimeout(send, 1500); };
+document.addEventListener("visibilitychange", () => { if (document.hidden && timer) send(); });
+window.otLogin = () => signInWithPopup(auth, new GoogleAuthProvider()).catch(() => {});
+window.otLogout = () => signOut(auth);
+onAuthStateChanged(auth, async u => {
+  uid = u?.uid || null;
+  window.otUser = !!u;
+  if (u) {
+    try {
+      const snap = await getDoc(doc(db, "otgongbu", u.uid));
+      const both = merge(window.ot.get(), snap.exists() ? snap.data() : { seen: {}, stat: {} });
+      window.ot.set(both);
+      window.otPush = push; push();
+    } catch (e) { window.otUser = "err"; window.otPush = null; }
+  } else { window.otPush = null; }
+  if (window.ot) window.ot.set(window.ot.get());
 });
 </script>
 <script src="../hub/back.js" data-cat="study" defer></script>
