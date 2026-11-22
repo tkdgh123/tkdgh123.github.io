@@ -33,7 +33,7 @@ img{display:block;max-width:100%}
 .prog .ps{display:none}
 .sync{margin:14px 0 0;font-size:14px;color:var(--sub)}
 .sync button{font-weight:700;color:var(--ink);text-decoration:underline;text-underline-offset:4px}
-body.sheet-open #cu-home{display:none}
+body.sheet-open #cu-home,body.no-home #cu-home{display:none}
 @media (hover:none){.op kbd{display:none}.op.pic kbd{display:block;color:transparent;height:6px;padding:0}}
 
 main{max-width:var(--wrap);margin:0 auto;padding:0 var(--gut) 96px}
@@ -336,6 +336,7 @@ function quiz() {
   const el = $("#v-quiz");
   const nav = unitNav("quiz", Q.scope, true).replace("</nav>", (N.length ? `<a href="#quiz/name" aria-current="${Q.scope === "name"}">상품명 풀기</a>` : "") + (P.length ? `<a href="#quiz/photo" aria-current="${Q.scope === "photo"}">사진에서 찾기</a>` : "") + "</nav>");
   if (Q.i >= Q.list.length) {
+    document.body.classList.remove("no-home");
     el.innerHTML = nav + `<div class="qz end"><h2>${Q.list.length}문제 중 ${Q.right}개 맞혔어요</h2>
       <p class="score">외운 카드 ${C.filter(c => learned(c.id)).length}/${C.length}. 세 번 연속 맞히면 외운 카드가 돼요.</p>
       ${Q.wrong.filter(Boolean).length ? `<div class="grid">${Q.wrong.filter(Boolean).map(id => tile(byId[id])).join("")}</div>` : ""}
@@ -343,6 +344,7 @@ function quiz() {
     return;
   }
   const q = Q.list[Q.i], c = byId[q.id];
+  document.body.classList.toggle("no-home", !!q.photo);
   if (q.photo) {
     const p = q.photo;
     el.innerHTML = nav + `<div class="qz"><div class="qz-top"><span>${Q.i + 1} / ${Q.list.length}</span><div class="bar"><i style="width:${Q.i / Q.list.length * 100}%"></i></div></div>
@@ -377,7 +379,7 @@ function tapAnswer(e) {
     ${c ? `<p><button class="lnk" data-card="${c.id}">${esc(c.ko)} 카드 보기</button></p>` : ""}
     <button class="btn solid" id="q-next">${Q.i + 1 < Q.list.length ? "다음" : "결과 보기"}</button></div></div>`;
   $("#q-next").focus({ preventScroll: true });
-  $("#fb").scrollIntoView({ block: "nearest", behavior: "smooth" });
+  $("#fb").scrollIntoView({ block: "nearest" });
 }
 function answer(o) {
   if (!Q || Q.done) return;
@@ -399,7 +401,7 @@ function answer(o) {
     <button class="btn solid" id="q-next">${Q.i + 1 < Q.list.length ? "다음" : "결과 보기"}</button></div></div>
     ${q.last ? `<div class="whole"><h3>그러니까 '${esc(q.t)}'${batchim(q.t) ? "은" : "는"}</h3><div class="strip">${q.last.map(id => `<figure>${ph(byId[id], true, false)}<figcaption>${esc(byId[id].ko)}</figcaption></figure>`).join("")}</div></div>` : ""}`;
   $("#q-next").focus({ preventScroll: true });
-  $("#fb").scrollIntoView({ block: "nearest", behavior: "smooth" });
+  $("#fb").scrollIntoView({ block: "nearest" });
 }
 
 /* 상품명 읽기: 띄어 쓴 두세 낱말이 붙여서 한 말이면 그 말로("후드 집업"), 아니면 낱말 안에서 가장 긴 말부터 찾아 카드로 잇는다.
@@ -469,6 +471,7 @@ function route() {
   const [v, arg] = h.split("/");
   if (v === "card") { openCard(arg); return; }
   closeCard();
+  document.body.classList.remove("no-home");
   view = ["book", "cmp", "quiz", "read"].includes(v) ? v : "book";
   for (const s of ["book", "cmp", "quiz", "read"]) $("#v-" + s).hidden = s !== view;
   document.querySelectorAll(".tabs a").forEach(a => a.dataset.v === view ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"));
@@ -489,7 +492,7 @@ document.addEventListener("click", e => {
   if (!t) { if (e.target.id === "sheet") history.back(); return; }
   if (t.dataset.op) return answer(t.dataset.op);
   if (t.dataset.card) return show(t.dataset.card);
-  if (t.id === "q-next") { Q.i++; quiz(); window.scrollTo(0, 0); return; }
+  if (t.id === "q-next") { Q.i++; quiz(); window.scrollTo({ top: 0, behavior: "instant" }); return; }
   if (t.id === "q-again") return startQuiz(null, Q.scope);
   if (t.id === "q-again-wrong") return startQuiz([...new Set(Q.wrong.filter(Boolean))], Q.scope);
   if (t.id === "c-x") return history.back();
