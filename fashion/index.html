@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>옷 공부</title>
+<meta name="description" content="옷 사진을 보면서 목둘레, 깃, 소매 이름을 익히는 카드와 퀴즈">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+:root{
+  --ink:#121212; --sub:#5f5f5c; --faint:#9a9a96; --line:#e6e6e3;
+  --paper:#ffffff; --tile:#f1f1ee; --ok:#17784a; --no:#c4302b;
+  --wrap:1180px; --gut:max(16px,4vw);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 16px/1.55 "Pretendard Variable",Pretendard,system-ui,"Malgun Gothic",sans-serif;letter-spacing:-.01em}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+a{color:inherit}
+img{display:block;max-width:100%}
+[hidden]{display:none!important}
+:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+
+/* 머리 */
+.top{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.94);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top,0px)}
+.top-in{max-width:var(--wrap);margin:0 auto;padding:0 var(--gut);height:56px;display:flex;align-items:center;gap:28px}
+.brand{font-weight:800;font-size:19px;letter-spacing:-.04em;text-decoration:none;white-space:nowrap}
+.tabs{display:flex;gap:22px;height:100%}
+.tabs a{display:flex;align-items:center;height:100%;text-decoration:none;color:var(--faint);font-weight:600;font-size:15px;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tabs a[aria-current="page"]{color:var(--ink);border-color:var(--ink)}
+.prog{margin-left:auto;font-size:13px;color:var(--sub);white-space:nowrap}
+.prog b{color:var(--ink);font-weight:700}
+.prog .ps{display:none}
+body.sheet-open #cu-home{display:none}
+@media (hover:none){.op kbd{display:none}.op.pic kbd{display:block;color:transparent;height:6px;padding:0}}
+
+main{max-width:var(--wrap);margin:0 auto;padding:0 var(--gut) 96px}
+
+/* 도감 */
+.lead{padding:44px 0 8px}
+.lead h1{margin:0;font-size:clamp(34px,6.4vw,64px);line-height:1.05;font-weight:800;letter-spacing:-.05em}
+.lead h1 span{color:var(--faint);font-weight:300}
+.grp{padding-top:44px}
+.grp-h{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin:0 0 16px}
+.grp-h h2{margin:0;font-size:22px;font-weight:800;letter-spacing:-.04em}
+.grp-h p{margin:0;font-size:14px;color:var(--sub)}
+.grp-h .to-cmp{margin-left:auto;font-size:14px;font-weight:600;text-decoration:underline;text-underline-offset:4px}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:28px 14px}
+.tile{display:block;text-align:left;width:100%}
+.ph{position:relative;aspect-ratio:3/4;background:var(--tile);overflow:hidden}
+.ph img{width:100%;height:100%;object-fit:cover;mix-blend-mode:multiply}
+.tile .ph img{transition:transform .35s cubic-bezier(.2,.7,.2,1)}
+.tile:hover .ph img{transform:scale(1.035)}
+.tile b{display:block;margin-top:10px;font-size:16px;font-weight:700;letter-spacing:-.03em}
+.tile small{display:block;font-size:12px;color:var(--faint)}
+.mark{position:absolute;left:8px;top:8px;font-size:11px;font-weight:700;padding:3px 6px;background:var(--ink);color:#fff;letter-spacing:0}
+.mark.seen{background:#fff;color:var(--sub)}
+
+/* 점 */
+.spot{position:absolute;width:13%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1.5px rgba(0,0,0,.55),inset 0 0 0 1.5px rgba(0,0,0,.55);pointer-events:none;min-width:30px}
+.spot::before{content:"";position:absolute;inset:-3px;border-radius:50%;border:2px solid rgba(255,255,255,.9);animation:ping 2s ease-out infinite}
+@keyframes ping{from{transform:scale(1);opacity:.9}to{transform:scale(1.45);opacity:0}}
+@media (prefers-reduced-motion:reduce){.spot::before{animation:none;opacity:0}.tile .ph img{transition:none}}
+
+/* 카드 */
+.sheet{position:fixed;inset:0;z-index:50;background:rgba(18,18,18,.45);display:flex;align-items:center;justify-content:center;padding:24px}
+.card{position:relative;background:#fff;width:min(980px,100%);max-height:calc(100dvh - 48px);overflow:auto;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.card .ph{aspect-ratio:3/4}
+.card-tx{padding:36px 36px 32px;display:flex;flex-direction:column;gap:18px}
+.card-g{font-size:13px;color:var(--sub);font-weight:600}
+.card h2{margin:-8px 0 0;font-size:clamp(34px,4.6vw,48px);line-height:1.1;font-weight:800;letter-spacing:-.05em}
+.card .en{margin:-12px 0 0;font-size:13px;color:var(--faint)}
+.card .say{margin:0;font-size:18px;line-height:1.6;letter-spacing:-.02em}
+.row{border-top:1px solid var(--line);padding-top:14px}
+.row h3{margin:0 0 4px;font-size:13px;color:var(--sub);font-weight:600}
+.row p{margin:0;font-size:15px}
+.pair{display:flex;gap:8px;flex-wrap:wrap}
+.pair button{width:64px;text-align:left;font-size:12px;line-height:1.3}
+.pair .ph{margin-bottom:5px}
+.acts{display:flex;gap:10px;flex-wrap:wrap;margin-top:auto;padding-top:6px}
+.btn{display:inline-flex;align-items:center;justify-content:center;height:46px;padding:0 18px;font-size:15px;font-weight:700;border:1px solid var(--ink);text-decoration:none;white-space:nowrap}
+.btn.solid{background:var(--ink);color:#fff}
+.x{position:absolute;right:10px;top:10px;z-index:2;width:40px;height:40px;display:grid;place-items:center;background:#fff}
+.x svg,.nav svg{width:20px;height:20px}
+.nav{position:absolute;top:50%;z-index:2;width:44px;height:44px;margin-top:-22px;display:grid;place-items:center;background:rgba(255,255,255,.9)}
+.nav.prev{left:8px}.nav.next{left:calc(50% - 52px)}
+
+/* 비교 */
+.seg{display:flex;gap:6px 22px;flex-wrap:wrap;padding:36px 0 22px;border-bottom:1px solid var(--line);margin-bottom:26px}
+.seg a{font-size:17px;font-weight:700;color:var(--faint);text-decoration:none;letter-spacing:-.03em}
+.seg a[aria-current="true"]{color:var(--ink)}
+.cmp-say{margin:0 0 18px;color:var(--sub);font-size:15px}
+.cmp{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.cmp.n3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.cmp figure{margin:0}
+.cmp figcaption{padding-top:10px}
+.cmp figcaption b{display:block;font-size:18px;font-weight:800;letter-spacing:-.04em}
+.cmp figcaption span{display:block;font-size:14px;color:var(--sub);margin-top:2px}
+.cmp button{display:block;width:100%;text-align:left}
+
+/* 퀴즈 */
+.qz{max-width:760px;margin:0 auto;padding-top:34px}
+.qz-top{display:flex;align-items:center;gap:14px;font-size:14px;color:var(--sub);margin-bottom:22px}
+.bar{flex:1;height:3px;background:var(--line)}
+.bar i{display:block;height:100%;background:var(--ink);transition:width .3s}
+.qz h2{margin:0 0 20px;font-size:clamp(26px,4.4vw,38px);line-height:1.15;font-weight:800;letter-spacing:-.05em}
+.qz .q-img{width:min(340px,72%);margin:0 auto 22px}
+.ops{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.op{min-height:58px;padding:12px 14px;border:1px solid var(--line);text-align:left;font-size:17px;font-weight:700;letter-spacing:-.03em;display:flex;align-items:center;gap:10px;transition:border-color .15s,background-color .15s}
+.op:hover{border-color:var(--ink)}
+.op kbd{font:600 12px/1 "Pretendard Variable",sans-serif;color:var(--faint);width:14px}
+.ops.pics{grid-template-columns:repeat(4,minmax(0,1fr))}
+.op.pic{padding:0;border:2px solid transparent;display:block;min-height:0}
+.op.pic:hover{border-color:var(--ink)}
+.op.pic kbd{display:block;padding:6px 2px 2px;width:auto}
+.op.ok{border-color:var(--ok);background:#eef7f2}
+.op.no{border-color:var(--no);background:#fbefee}
+.op.pic.ok,.op.pic.no{background:none}
+.ops.done .op{cursor:default}
+.fb{margin-top:20px;padding:18px 0 0;border-top:2px solid var(--ink);display:grid;grid-template-columns:110px 1fr;gap:16px;align-items:start}
+.fb .r{margin:0 0 4px;font-size:20px;font-weight:800;letter-spacing:-.04em}
+.fb .r.ok{color:var(--ok)}.fb .r.no{color:var(--no)}
+.fb p{margin:0;font-size:15px}
+.fb .btn{margin-top:14px}
+.end h2{margin-bottom:6px}
+.end .score{font-size:15px;color:var(--sub);margin:0 0 26px}
+.end .grid{margin-bottom:28px}
+
+@media (max-width:860px){
+  .sheet{padding:0;align-items:stretch}
+  .card{grid-template-columns:1fr;max-height:none;height:100dvh}
+  .card .ph{aspect-ratio:auto;height:min(62vh,133vw)}
+  .card .ph img{object-fit:contain}
+  .card-tx{padding:24px var(--gut) calc(28px + env(safe-area-inset-bottom,0px))}
+  .nav.next{left:auto;right:8px}
+  .cmp,.cmp.n3{grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 12px}
+}
+@media (max-width:560px){
+  .top-in{gap:18px}
+  .tabs{gap:16px}
+  .prog .pl{display:none}
+  .prog .ps{display:inline}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 12px}
+  .ops.pics{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .op{font-size:16px}
+  .fb{grid-template-columns:84px 1fr}
+}
+</style>
+</head>
+<body>
+<header class="top"><div class="top-in">
+  <a class="brand" href="#book">옷 공부</a>
+  <nav class="tabs" aria-label="화면">
+    <a href="#book" data-v="book">도감</a>
+    <a href="#cmp" data-v="cmp">비교</a>
+    <a href="#quiz" data-v="quiz">퀴즈</a>
+  </nav>
+  <div class="prog"><span class="pl">외운 카드 </span><span class="ps">외움 </span><b id="prog-n">0</b>/<span id="prog-t">0</span></div>
+</div></header>
+
+<main>
+  <section id="v-book"></section>
+  <section id="v-cmp" hidden></section>
+  <section id="v-quiz" hidden></section>
+</main>
+
+<div class="sheet" id="sheet" hidden>
+  <article class="card" role="dialog" aria-modal="true" aria-labelledby="c-name">
+    <button class="x" id="c-x" aria-label="닫기"><svg viewBox="0 0 20 20"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.8" fill="none"/></svg></button>
+    <div class="ph" id="c-ph"></div>
+    <button class="nav prev" id="c-prev" aria-label="이전 카드"><svg viewBox="0 0 20 20"><path d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="1.8" fill="none"/></svg></button>
+    <button class="nav next" id="c-next" aria-label="다음 카드"><svg viewBox="0 0 20 20"><path d="M8 4l6 6-6 6" stroke="currentColor" stroke-width="1.8" fill="none"/></svg></button>
+    <div class="card-tx" id="c-tx"></div>
+  </article>
+</div>
+
+<script>
+const KEY = "ot-gongbu-v1";
+let G = [], C = [], byId = {};
+let st = { seen: {}, stat: {} };
+try { st = Object.assign(st, JSON.parse(localStorage.getItem(KEY) || "{}")); } catch (e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} };
+const learned = id => (st.stat[id]?.s || 0) >= 3;
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const ph = (c, spot) => `<div class="ph"><img src="img/${c.id}.webp" alt="${esc(c.ko)}" width="600" height="800" loading="lazy">${spot ? `<i class="spot" style="left:${c.spot[0] * 100}%;top:${c.spot[1] * 100}%"></i>` : ""}</div>`;
+const gName = id => G.find(g => g.id === id).name;
+const batchim = w => { const k = w.charCodeAt(w.length - 1) - 0xac00; return k >= 0 && k < 11172 && k % 28 !== 0; };
+const eun = w => w + (batchim(w) ? "은" : "는");
+const ieyo = w => w + (batchim(w) ? "이에요" : "예요");
+
+function prog() {
+  $("#prog-n").textContent = C.filter(c => learned(c.id)).length;
+  $("#prog-t").textContent = C.length;
+}
+function tile(c) {
+  const m = learned(c.id) ? `<i class="mark">외움</i>` : st.seen[c.id] ? `<i class="mark seen">봄</i>` : "";
+  return `<button class="tile" data-card="${c.id}"><div class="ph"><img src="img/${c.id}.webp" alt="" width="600" height="800" loading="lazy">${m}</div><b>${esc(c.ko)}</b><small>${esc(c.en)}</small></button>`;
+}
+
+/* 도감 */
+function book() {
+  $("#v-book").innerHTML = `<div class="lead"><h1>목둘레와 소매 <span>${C.length}장</span></h1></div>` +
+    G.map(g => `<section class="grp"><div class="grp-h"><h2>${esc(g.name)}</h2><p>${esc(g.say)}</p><a class="to-cmp" href="#cmp/${g.id}">나란히 보기</a></div>
+      <div class="grid">${C.filter(c => c.g === g.id).map(tile).join("")}</div></section>`).join("");
+}
+
+/* 카드 */
+let cur = null, lastFocus = null;
+function openCard(id) {
+  const c = byId[id]; if (!c) return;
+  if (!$("#sheet").hidden && cur === id) return;
+  if ($("#sheet").hidden) lastFocus = document.activeElement;
+  cur = id;
+  st.seen[id] = 1; save();
+  const mates = C.filter(x => x.g === c.g && x.id !== c.id);
+  const q = encodeURIComponent(c.ko);
+  $("#c-ph").outerHTML = `<div class="ph" id="c-ph"><img src="img/${c.id}.webp" alt="${esc(c.ko)} 사진" width="600" height="800"><i class="spot" style="left:${c.spot[0] * 100}%;top:${c.spot[1] * 100}%"></i></div>`;
+  $("#c-tx").innerHTML = `
+    <div class="card-g">${esc(gName(c.g))}</div>
+    <h2 id="c-name">${esc(c.ko)}</h2>
+    <p class="en">${esc(c.en)}${c.alias ? ` · ${esc(c.alias)}` : ""}</p>
+    <p class="say">${esc(c.say)}</p>
+    <div class="row"><h3>여기를 보면 알아요</h3><p>${esc(c.look)}</p></div>
+    <div class="row"><h3>자주 보이는 곳</h3><p>${esc(c.where)}</p></div>
+    <div class="row"><h3>헷갈리는 짝</h3><div class="pair">${mates.map(m => `<button data-card="${m.id}"><div class="ph"><img src="img/${m.id}.webp" alt="" width="600" height="800"></div>${esc(m.ko)}</button>`).join("")}</div></div>
+    <div class="acts"><a class="btn solid" href="#cmp/${c.g}">나란히 비교</a><a class="btn" href="https://www.musinsa.com/search/goods?keyword=${q}" target="_blank" rel="noopener">무신사에서 실제 상품</a></div>`;
+  $("#sheet").hidden = false;
+  document.body.style.overflow = "hidden";
+  document.body.classList.add("sheet-open");
+  $(".card").scrollTop = 0;
+  $("#c-x").focus({ preventScroll: true });
+}
+function closeCard() {
+  if ($("#sheet").hidden) return;
+  $("#sheet").hidden = true; cur = null;
+  document.body.style.overflow = "";
+  document.body.classList.remove("sheet-open");
+  refresh();
+  lastFocus?.focus?.({ preventScroll: true });
+}
+function show(id) {
+  if ($("#sheet").hidden) { location.hash = "#card/" + id; return; }
+  history.replaceState(null, "", "#card/" + id);
+  openCard(id);
+}
+function step(d) {
+  const i = C.findIndex(c => c.id === cur);
+  show(C[(i + d + C.length) % C.length].id);
+}
+
+/* 비교 */
+function cmp(gid) {
+  const g = G.find(x => x.id === gid) || G[0];
+  const list = C.filter(c => c.g === g.id);
+  $("#v-cmp").innerHTML = `<nav class="seg" aria-label="묶음">${G.map(x => `<a href="#cmp/${x.id}" aria-current="${x.id === g.id}">${esc(x.name)}</a>`).join("")}</nav>
+    <p class="cmp-say">${esc(g.say)}. 점이 찍힌 곳이 서로 다른 자리예요.</p>
+    <div class="cmp${list.length === 3 ? " n3" : ""}">${list.map(c => `<figure><button data-card="${c.id}">${ph(c, true)}</button><figcaption><b>${esc(c.ko)}</b><span>${esc(c.look)}</span></figcaption></figure>`).join("")}</div>`;
+}
+
+/* 퀴즈 */
+let Q = null;
+function pickSet(only) {
+  const pool = only ? only.map(id => byId[id]) : C.slice();
+  const w = c => (learned(c.id) ? 0 : 2) + (st.stat[c.id]?.w || 0) * 0.5 + (st.seen[c.id] ? 0 : 0.5) + Math.random() * 1.5;
+  return pool.sort((a, b) => w(b) - w(a)).slice(0, 10).map(c => {
+    const same = shuffle(C.filter(x => x.g === c.g && x.id !== c.id));
+    const other = shuffle(C.filter(x => x.g !== c.g));
+    const ops = shuffle([c, ...same.concat(other).slice(0, 3)]);
+    return { id: c.id, type: Math.random() < 0.5 ? "pic" : "name", ops: ops.map(o => o.id) };
+  });
+}
+function startQuiz(only) { Q = { list: shuffle(pickSet(only)), i: 0, right: 0, wrong: [], done: false }; quiz(); }
+function quiz() {
+  if (!Q) return startQuiz();
+  const el = $("#v-quiz");
+  if (Q.i >= Q.list.length) {
+    el.innerHTML = `<div class="qz end"><h2>${Q.list.length}문제 중 ${Q.right}개 맞혔어요</h2>
+      <p class="score">외운 카드 ${C.filter(c => learned(c.id)).length}/${C.length}. 세 번 연속 맞히면 외운 카드가 돼요.</p>
+      ${Q.wrong.length ? `<div class="grid">${Q.wrong.map(id => tile(byId[id])).join("")}</div>` : ""}
+      <div class="acts">${Q.wrong.length ? `<button class="btn solid" id="q-again-wrong">틀린 것만 다시</button>` : ""}<button class="btn${Q.wrong.length ? "" : " solid"}" id="q-again">새로 10문제</button></div></div>`;
+    return;
+  }
+  const q = Q.list[Q.i], c = byId[q.id];
+  const head = `<div class="qz-top"><span>${Q.i + 1} / ${Q.list.length}</span><div class="bar"><i style="width:${Q.i / Q.list.length * 100}%"></i></div></div>`;
+  if (q.type === "pic") {
+    el.innerHTML = `<div class="qz">${head}<h2>이 사진은 무엇일까요?</h2><div class="q-img">${ph(c, false)}</div>
+      <div class="ops" id="ops">${q.ops.map((o, k) => `<button class="op" data-op="${o}"><kbd>${k + 1}</kbd>${esc(byId[o].ko)}</button>`).join("")}</div><div id="fb"></div></div>`;
+  } else {
+    el.innerHTML = `<div class="qz">${head}<h2>${esc(eun(c.ko))} 어느 것일까요?</h2>
+      <div class="ops pics" id="ops">${q.ops.map((o, k) => `<button class="op pic" data-op="${o}" aria-label="${k + 1}번 사진">${ph(byId[o], false)}<kbd>${k + 1}</kbd></button>`).join("")}</div><div id="fb"></div></div>`;
+  }
+  Q.done = false;
+}
+function answer(o) {
+  if (!Q || Q.done) return;
+  Q.done = true;
+  const q = Q.list[Q.i], c = byId[q.id], ok = o === q.id;
+  const s = st.stat[q.id] || (st.stat[q.id] = { s: 0, w: 0 });
+  if (ok) { s.s++; Q.right++; } else { s.s = 0; s.w++; Q.wrong.push(q.id); }
+  st.seen[q.id] = 1; save(); prog();
+  const ops = $("#ops"); ops.classList.add("done");
+  ops.querySelectorAll(".op").forEach(b => {
+    if (b.dataset.op === q.id) b.classList.add("ok");
+    else if (b.dataset.op === o) b.classList.add("no");
+    b.disabled = true;
+  });
+  const wrongName = !ok && q.type === "name" ? ` 고른 사진은 ${esc(ieyo(byId[o].ko))}.` : "";
+  $("#fb").innerHTML = `<div class="fb"><div>${ph(c, true)}</div><div>
+    <p class="r ${ok ? "ok" : "no"}">${ok ? "맞았어요" : `정답은 ${esc(c.ko)}`}</p>
+    <p>${esc(c.say)}${wrongName}</p><p style="color:var(--sub);margin-top:6px">${esc(c.look)}</p>
+    <button class="btn solid" id="q-next">${Q.i + 1 < Q.list.length ? "다음" : "결과 보기"}</button></div></div>`;
+  $("#q-next").focus({ preventScroll: true });
+  $("#fb").scrollIntoView({ block: "nearest", behavior: "smooth" });
+}
+
+/* 화면 전환 */
+let view = "book";
+function refresh() {
+  if (view === "book") book();
+  else if (view === "cmp") cmp(location.hash.split("/")[1]);
+  prog();
+}
+function route() {
+  const h = location.hash.slice(1) || "book";
+  const [v, arg] = h.split("/");
+  if (v === "card") { openCard(arg); return; }
+  closeCard();
+  view = ["book", "cmp", "quiz"].includes(v) ? v : "book";
+  for (const s of ["book", "cmp", "quiz"]) $("#v-" + s).hidden = s !== view;
+  document.querySelectorAll(".tabs a").forEach(a => a.dataset.v === view ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"));
+  if (view === "quiz") { quiz(); prog(); } else refresh();
+  window.scrollTo(0, 0);
+}
+
+document.addEventListener("click", e => {
+  const t = e.target.closest("[data-card],[data-op],#q-next,#q-again,#q-again-wrong,#c-x,#c-prev,#c-next");
+  if (!t) { if (e.target.id === "sheet") history.back(); return; }
+  if (t.dataset.op) return answer(t.dataset.op);
+  if (t.dataset.card) return show(t.dataset.card);
+  if (t.id === "q-next") { Q.i++; quiz(); window.scrollTo(0, 0); return; }
+  if (t.id === "q-again") return startQuiz();
+  if (t.id === "q-again-wrong") return startQuiz([...new Set(Q.wrong)]);
+  if (t.id === "c-x") return history.back();
+  if (t.id === "c-prev") return step(-1);
+  if (t.id === "c-next") return step(1);
+});
+document.addEventListener("keydown", e => {
+  if (!$("#sheet").hidden) {
+    if (e.key === "Escape") history.back();
+    if (e.key === "ArrowLeft") step(-1);
+    if (e.key === "ArrowRight") step(1);
+    return;
+  }
+  if (view === "quiz" && Q) {
+    const n = Number(e.key);
+    if (n >= 1 && n <= 4 && !Q.done) { const b = $("#ops")?.children[n - 1]; b && answer(b.dataset.op); }
+  }
+});
+window.addEventListener("hashchange", route);
+
+fetch("cards.json").then(r => r.json()).then(d => {
+  G = d.groups; C = d.cards; byId = Object.fromEntries(C.map(c => [c.id, c]));
+  if (location.hash.startsWith("#card/")) { const id = location.hash.split("/")[1]; history.replaceState(null, "", "#book"); route(); location.hash = "#card/" + id; }
+  else route();
+});
+</script>
+<script src="../hub/back.js" data-cat="study" defer></script>
+</body>
+</html>
