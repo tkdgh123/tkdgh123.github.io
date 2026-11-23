@@ -28,13 +28,12 @@ img{display:block;max-width:100%}
 .tabs{display:flex;gap:22px;height:100%}
 .tabs a{display:flex;align-items:center;height:100%;text-decoration:none;color:var(--faint);font-weight:600;font-size:15px;border-bottom:2px solid transparent;margin-bottom:-1px}
 .tabs a[aria-current="page"]{color:var(--ink);border-color:var(--ink)}
-.prog{margin-left:auto;font-size:13px;color:var(--sub);white-space:nowrap}
-.prog b{color:var(--ink);font-weight:700}
-.prog .ps{display:none}
-.sync{margin:14px 0 0;font-size:14px;color:var(--sub)}
-.sync button{font-weight:700;color:var(--ink);text-decoration:underline;text-underline-offset:4px}
+.stat{margin:12px 0 0;font-size:15px;color:var(--sub)}
+.stat b{color:var(--ink);font-weight:700}
+.sync{margin:6px 0 0;font-size:13px;color:var(--faint)}
+.sync button{font-weight:600;color:var(--sub);text-decoration:underline;text-underline-offset:3px}
 body.sheet-open #cu-home,body.no-home #cu-home{display:none}
-@media (hover:none){.op kbd{display:none}.op.pic kbd{display:block;color:transparent;height:6px;padding:0}}
+@media (hover:none){.op kbd,.op.pic kbd{display:none}}
 
 main{max-width:var(--wrap);margin:0 auto;padding:0 var(--gut) 96px}
 
@@ -54,9 +53,9 @@ main{max-width:var(--wrap);margin:0 auto;padding:0 var(--gut) 96px}
 .tile .ph img{transition:transform .35s cubic-bezier(.2,.7,.2,1)}
 .tile:hover .ph img{transform:scale(1.035)}
 .tile b{display:block;margin-top:10px;font-size:16px;font-weight:700;letter-spacing:-.03em}
-.tile small{display:block;font-size:12px;color:var(--faint)}
-.mark{position:absolute;left:8px;top:8px;font-size:11px;font-weight:700;padding:3px 6px;background:var(--ink);color:#fff;letter-spacing:0}
-.mark.seen{background:#fff;color:var(--sub)}
+.tile b .dot{display:inline-block;width:12px;height:12px;margin-right:7px;vertical-align:-1px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15)}
+.mark{position:absolute;left:8px;top:8px;font-size:11px;font-weight:700;padding:3px 7px;background:var(--ok);color:#fff;letter-spacing:0;font-style:normal}
+.mark.seen{background:rgba(255,255,255,.92);color:var(--sub);box-shadow:inset 0 0 0 1px var(--line)}
 
 /* 점 */
 .spot{position:absolute;width:13%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1.5px rgba(0,0,0,.55),inset 0 0 0 1.5px rgba(0,0,0,.55);pointer-events:none;min-width:30px}
@@ -107,6 +106,8 @@ main{max-width:var(--wrap);margin:0 auto;padding:0 var(--gut) 96px}
 .seg{display:flex;gap:6px 22px;flex-wrap:wrap;padding:20px 0 20px;border-bottom:1px solid var(--line);margin-bottom:26px}
 .seg a{font-size:17px;font-weight:700;color:var(--faint);text-decoration:none;letter-spacing:-.03em}
 .seg a[aria-current="true"]{color:var(--ink)}
+.seg.qunit{padding:12px 0 14px;margin-bottom:20px;gap:6px 18px}
+.seg.qunit a{font-size:14px;font-weight:600}
 .cmp-say{margin:0 0 18px;color:var(--sub);font-size:15px}
 .cmp{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
 .cmp.n3{grid-template-columns:repeat(3,minmax(0,1fr))}
@@ -130,7 +131,8 @@ main{max-width:var(--wrap);margin:0 auto;padding:0 var(--gut) 96px}
 .ops.pics{grid-template-columns:repeat(4,minmax(0,1fr))}
 .op.pic{padding:0;border:2px solid transparent;display:block;min-height:0}
 .op.pic:hover{border-color:var(--ink)}
-.op.pic kbd{display:block;padding:6px 2px 2px;width:auto}
+.op.pic{position:relative}
+.op.pic kbd{position:absolute;left:8px;top:8px;padding:3px 6px;width:auto;background:rgba(255,255,255,.9);color:var(--sub);font-size:11px}
 .op.ok{border-color:var(--ok);background:#eef7f2}
 .op.no{border-color:var(--no);background:#fbefee}
 .op.pic.ok,.op.pic.no{background:none}
@@ -178,8 +180,6 @@ main{max-width:var(--wrap);margin:0 auto;padding:0 var(--gut) 96px}
 @media (max-width:560px){
   .top-in{gap:18px}
   .tabs{gap:16px}
-  .prog .pl{display:none}
-  .prog .ps{display:inline}
   .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 12px}
   .ops.pics{grid-template-columns:repeat(2,minmax(0,1fr))}
   .op{font-size:16px}
@@ -197,7 +197,6 @@ main{max-width:var(--wrap);margin:0 auto;padding:0 var(--gut) 96px}
     <a href="#read" data-v="read">읽기</a>
     <a href="plan.html">계획</a>
   </nav>
-  <div class="prog"><span class="pl">외운 카드 </span><span class="ps">외움 </span><b id="prog-n">0</b>/<span id="prog-t">0</span></div>
 </div></header>
 
 <main>
@@ -244,21 +243,22 @@ const eun = w => w + (batchim(w) ? "은" : "는");
 const ieyo = w => w + (batchim(w) ? "이에요" : "예요");
 const unitNav = (base, cur, all) => `<nav class="useg" aria-label="단원">${all ? `<a href="#${base}" aria-current="${!cur}">전체</a>` : ""}${U.map(x => `<a href="#${base}/${x.u}" aria-current="${x.u == cur}">${esc(x.name)}</a>`).join("")}</nav>`;
 
-const syncBtn = () => window.otUser === undefined ? "" : window.otUser === "err" ? `<p class="sync">지금은 기록을 서버에 저장하지 못해요. 이 기기에는 그대로 남아요. <button id="sync-out">로그아웃</button></p>` : window.otUser ? `<p class="sync">폰과 노트북 기록이 이어져 있어요 <button id="sync-out">로그아웃</button></p>` : `<p class="sync"><button id="sync-in">구글로 로그인해서 폰과 노트북 기록 잇기</button></p>`;
+const syncBtn = () => window.otUser === undefined ? "" : window.otUser === "err" ? `<p class="sync">지금은 기록을 서버에 저장하지 못해요. 이 기기에는 그대로 남아요. <button id="sync-out">로그아웃</button></p>` : window.otUser ? `<p class="sync">폰과 노트북 기록이 이어져 있어요 <button id="sync-out">로그아웃</button></p>` : `<p class="sync">폰과 노트북에서 기록을 이어 보려면 <button id="sync-in">구글 로그인</button></p>`;
 function prog() {
-  $("#prog-n").textContent = C.filter(c => learned(c.id)).length;
-  $("#prog-t").textContent = C.length;
+  const el = $("#prog"); if (!el) return;
+  const seen = C.filter(c => st.seen[c.id]).length, done = C.filter(c => learned(c.id)).length;
+  el.innerHTML = `전체 ${C.length}장 가운데 <b>${seen}</b>장 봤고 <b>${done}</b>장 외웠어요`;
 }
 function tile(c) {
-  const m = learned(c.id) ? `<i class="mark">외움</i>` : st.seen[c.id] ? `<i class="mark seen">봄</i>` : "";
-  return `<button class="tile" data-card="${c.id}"><div class="ph"><img src="img/${c.id}.webp" alt="" width="600" height="800" loading="lazy">${m}</div><b>${esc(c.ko)}</b><small>${c.hex ? `<i style="background:${c.hex}"></i>` : ""}${esc(c.en)}</small></button>`;
+  const m = learned(c.id) ? `<i class="mark">외웠어요</i>` : st.seen[c.id] ? `<i class="mark seen">봤어요</i>` : "";
+  return `<button class="tile" data-card="${c.id}"><div class="ph"><img src="img/${c.id}.webp" alt="" width="600" height="800" loading="lazy">${m}</div><b>${c.hex ? `<i class="dot" style="background:${c.hex}"></i>` : ""}${esc(c.ko)}</b></button>`;
 }
 
 /* 도감 */
 function book(u) {
   u = U.some(x => x.u == u) ? +u : U[0].u;
   const gs = G.filter(g => g.u == u);
-  $("#v-book").innerHTML = unitNav("book", u) + `<div class="lead"><h1>${esc(uName(u))} <span>${C.filter(c => c.u == u).length}장</span></h1>${syncBtn()}</div>` +
+  $("#v-book").innerHTML = unitNav("book", u) + `<div class="lead"><h1>${esc(uName(u))} <span>${C.filter(c => c.u == u).length}장</span></h1><p class="stat" id="prog"></p>${syncBtn()}</div>` +
     gs.map(g => `<section class="grp"><div class="grp-h"><h2>${esc(g.name)}</h2><p>${esc(g.say)}</p><a class="to-cmp" href="#cmp/${g.id}">나란히 보기</a></div>
       <div class="grid">${C.filter(c => c.g === g.id).map(tile).join("")}</div></section>`).join("");
 }
@@ -284,7 +284,7 @@ function openCard(id) {
     <h2 id="c-name">${esc(c.ko)}</h2>
     <p class="en">${esc(c.en)}</p>
     ${names(c)}
-    ${c.hex ? `<p class="sw"><i style="background:${c.hex}"></i>${c.hex} 정도${c.measured ? ", 쇼핑몰 실제 옷에서 잰 색" : ""}</p>` : ""}
+    ${c.hex ? `<p class="sw"><i style="background:${c.hex}"></i>${c.measured ? "쇼핑몰 실제 옷에서 잰 색" : "이 색 정도"}</p>` : ""}
     <p class="say">${esc(c.say)}</p>
     ${c.say.startsWith(c.look) ? "" : `<div class="row"><h3>여기를 보면 알아요</h3><p>${esc(c.look)}</p></div>`}
     ${c.diff ? `<div class="row nd"><h3>이름끼리 뜻이 ${c.same === "다름" ? "달라요" : "조금 달라요"}</h3><p>${esc(c.diff)}</p></div>` : ""}
@@ -360,7 +360,10 @@ function startQuiz(only, scope) {
 }
 function quiz() {
   const el = $("#v-quiz");
-  const nav = unitNav("quiz", Q.scope, true).replace("</nav>", (dueIds().length || Q.scope === "review" ? `<a href="#quiz/review" aria-current="${Q.scope === "review"}">복습 ${dueIds().length}</a>` : "") + (N.length ? `<a href="#quiz/name" aria-current="${Q.scope === "name"}">상품명 풀기</a>` : "") + (C.some(c => c.spot) ? `<a href="#quiz/part" aria-current="${Q.scope === "part"}">부분 누르기</a>` : "") + (P.length ? `<a href="#quiz/photo" aria-current="${Q.scope === "photo"}">사진에서 찾기</a>` : "") + "</nav>");
+  const mode = ["name", "part", "photo", "review"].includes(Q.scope) ? Q.scope : "";
+  const modes = [["", "이름 맞히기", 1], ["review", `복습 ${dueIds().length}`, dueIds().length || mode === "review"], ["name", "상품명 풀기", N.length], ["part", "부분 누르기", C.some(c => c.spot)], ["photo", "사진에서 찾기", P.length]];
+  const nav = `<nav class="useg qmode" aria-label="문제 종류">${modes.filter(m => m[2]).map(([k, label]) => `<a href="#quiz${k ? "/" + k : ""}" aria-current="${k === mode}">${label}</a>`).join("")}</nav>` +
+    (mode ? "" : `<nav class="seg qunit" aria-label="단원">${[["", "전체"], ...U.map(x => [String(x.u), x.name])].map(([k, label]) => `<a href="#quiz${k ? "/" + k : ""}" aria-current="${String(Q.scope) === k}">${esc(label)}</a>`).join("")}</nav>`);
   if (Q.i >= Q.list.length) {
     document.body.classList.remove("no-home");
     el.innerHTML = nav + `<div class="qz end"><h2>${Q.list.length}문제 중 ${Q.right}개 맞혔어요</h2>

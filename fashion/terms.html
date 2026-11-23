@@ -170,7 +170,7 @@ function draw() {
   $("#out").innerHTML = groups.map(g => `<section class="grp"><h2>${esc(g.k)}</h2><div class="list">${g.items.map(t => {
     const sub = t.title && t.title !== t.shop ? t.shop : "";
     const other = (t.casual || []).filter(c => c !== name(t)).slice(0, 3).join(", ");
-    return `<button class="t" data-t="${t.id}"><span class="tn">${esc(name(t))}${sub ? `<small>${esc(sub)}</small>` : other ? `<small>${esc(other)}</small>` : ""}</span><span class="tm">${esc(t.meaning)}</span><span class="badges"><span class="pr ${t.priority}">${t.priority === "A" ? "자주" : ""}</span>${dfBadge(t)}</span></button>`;
+    return `<button class="t" data-t="${t.id}"><span class="tn">${esc(name(t))}${sub ? `<small>${esc(sub)}</small>` : other ? `<small>${esc(other)}</small>` : ""}</span><span class="tm">${esc(t.meaning)}</span><span class="badges">${dfBadge(t)}</span></button>`;
   }).join("")}</div></section>`).join("");
 }
 function open(id, push = true) {
