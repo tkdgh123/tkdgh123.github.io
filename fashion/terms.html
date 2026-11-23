@@ -46,6 +46,13 @@ main{max-width:var(--wrap);margin:0 auto;padding:0 var(--gut) 96px}
 .seg button{padding:7px 12px;font-size:14px;color:var(--sub)}
 .seg button+button{border-left:1px solid var(--line)}
 .seg button[aria-pressed="true"]{background:var(--ink);color:#fff}
+.qbtn{font-size:14px;font-weight:700;padding:8px 14px;background:var(--ink);color:#fff}
+.qo{display:grid;gap:8px;margin:18px 0 0}
+.qo button{border:1px solid var(--line);padding:12px 14px;font-size:15px;line-height:1.5}
+.qo button:hover{border-color:var(--ink)}
+.qo button.ok{border-color:#17784a;background:#eaf5ef}
+.qo button.no{border-color:#c4302b;background:#fbecec}
+.qnext{margin-top:16px;font-weight:700;padding:10px 18px;background:var(--ink);color:#fff}
 .n{margin-left:auto;font-size:14px;color:var(--sub);font-variant-numeric:tabular-nums}
 
 .grp{padding-top:30px}
@@ -119,6 +126,7 @@ dd{margin:0}
     <input id="q" type="search" placeholder="이름으로 찾기: 가디건, 시보리, 야상" aria-label="이름으로 찾기" autocomplete="off">
     <div class="seg" id="pr" role="group" aria-label="중요도"><button data-v="" aria-pressed="true">전체</button><button data-v="A" aria-pressed="false">자주 보는 말</button></div>
     <div class="seg" id="df" role="group" aria-label="뜻"><button data-v="" aria-pressed="true">전체</button><button data-v="x" aria-pressed="false">이름끼리 뜻이 다른 것</button></div>
+    <button class="qbtn" id="qstart">뜻 맞히기 10문제</button>
     <span class="n" id="n"></span>
   </div>
   <div id="out"></div>
@@ -183,12 +191,48 @@ function open(id, push = true) {
   $("#pane").hidden = false; $("#scrim").hidden = false; document.body.classList.add("sheet-open"); $("#pane").scrollTop = 0;
   if (push) history.replaceState(null, "", "#t/" + id);
 }
+/* 뜻 맞히기: 그림이 아직 없는 용어도 이름과 뜻으로 익히기. 지금 고른 단원과 거르기 안에서 냄 */
+let QZ = null;
+const shuf = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+function qStart() {
+  const pool = D.filter(hit);
+  if (pool.length < 4) return;
+  QZ = { list: shuf(pool.slice()).slice(0, 10).map(t => {
+    const near = shuf(D.filter(x => x.id !== t.id && x.unit === t.unit && x.meaning !== t.meaning)).slice(0, 3);
+    return { t, ask: Math.random() < 0.5 ? "name" : "mean", ops: shuf([t, ...near]) };
+  }), i: 0, right: 0 };
+  qShow();
+}
+function qShow() {
+  const pane = $("#pane");
+  if (QZ.i >= QZ.list.length) {
+    pane.innerHTML = `<button class="x" id="x">닫기</button><div class="pu">뜻 맞히기</div><h2>${QZ.list.length}문제 중 ${QZ.right}개</h2><p class="say">틀린 말은 목록에서 눌러 차이와 근거를 다시 볼 수 있어요.</p><button class="qnext" id="qagain">새로 10문제</button>`;
+  } else {
+    const q = QZ.list[QZ.i];
+    pane.innerHTML = `<button class="x" id="x">닫기</button><div class="pu">뜻 맞히기 ${QZ.i + 1} / ${QZ.list.length}</div>
+      <h2>${q.ask === "name" ? esc(name(q.t)) : "이 뜻의 이름은?"}</h2>${q.ask === "mean" ? `<p class="say">${esc(q.t.meaning)}</p>` : ""}
+      <div class="qo">${q.ops.map(o => `<button data-qo="${o.id}">${esc(q.ask === "name" ? o.meaning : name(o))}</button>`).join("")}</div><div id="qfb"></div>`;
+  }
+  pane.hidden = false; $("#scrim").hidden = false; document.body.classList.add("sheet-open"); pane.scrollTop = 0;
+}
+function qAnswer(id) {
+  const q = QZ.list[QZ.i]; if (q.done) return; q.done = true;
+  const ok = id === q.t.id; if (ok) QZ.right++;
+  document.querySelectorAll("[data-qo]").forEach(b => { if (b.dataset.qo === q.t.id) b.classList.add("ok"); else if (b.dataset.qo === id) b.classList.add("no"); });
+  const other = (q.t.casual || []).slice(0, 3).join(", ");
+  const bat = s => { const c = (s || "").charCodeAt(s.length - 1); return c >= 0xAC00 && c <= 0xD7A3 && (c - 0xAC00) % 28 > 0; };
+  const lastO = (q.t.casual || []).slice(0, 3).at(-1) || "";
+  $("#qfb").innerHTML = `<p class="say">${ok ? "맞았어요." : `정답은 ${esc(name(q.t))}${bat(name(q.t)) ? "이에요" : "예요"}.`} ${other ? `편한 말로 ${esc(other)}${bat(lastO) ? "이라고도" : "라고도"} 해요.` : ""}</p><button class="qnext" id="qnext">${QZ.i + 1 < QZ.list.length ? "다음" : "결과 보기"}</button>`;
+}
 function close() { $("#pane").hidden = true; $("#scrim").hidden = true; document.body.classList.remove("sheet-open"); history.replaceState(null, "", location.pathname); }
 document.addEventListener("click", e => {
   const u = e.target.closest("[data-u]");
   if (u) { S.u = +u.dataset.u; document.querySelectorAll("[data-u]").forEach(b => b.setAttribute("aria-pressed", b === u)); draw(); return; }
   const sb = e.target.closest(".seg button");
   if (sb) { S[sb.parentElement.id] = sb.dataset.v; sb.parentElement.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", b === sb)); draw(); return; }
+  if (e.target.id === "qstart" || e.target.id === "qagain") { qStart(); return; }
+  const qo = e.target.closest("[data-qo]"); if (qo) { qAnswer(qo.dataset.qo); return; }
+  if (e.target.id === "qnext") { QZ.i++; qShow(); return; }
   const t = e.target.closest("[data-t]"); if (t) { open(t.dataset.t); return; }
   if (e.target.closest("#x") || e.target.id === "scrim") close();
 });

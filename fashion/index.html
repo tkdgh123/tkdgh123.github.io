@@ -288,7 +288,7 @@ function openCard(id) {
     <p class="say">${esc(c.say)}</p>
     ${c.say.startsWith(c.look) ? "" : `<div class="row"><h3>여기를 보면 알아요</h3><p>${esc(c.look)}</p></div>`}
     ${c.diff ? `<div class="row nd"><h3>이름끼리 뜻이 ${c.same === "다름" ? "달라요" : "조금 달라요"}</h3><p>${esc(c.diff)}</p></div>` : ""}
-    <div class="row"><h3>자주 보이는 곳</h3><p>${esc(c.where)}</p></div>
+    ${c.where ? `<div class="row"><h3>자주 보이는 곳</h3><p>${esc(c.where)}</p></div>` : ""}
     ${c.tip ? `<div class="row"><h3>이렇게 입어요</h3><p>${esc(c.tip)}</p>${c.codi?.length ? `<ul class="lk">${c.codi.map(x => `<li><a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.t)}</a><span>${x.pin ? "핀터레스트" : "무신사"}</span></li>`).join("")}</ul>` : ""}</div>` : ""}
     ${c.real?.length ? `<div class="row"><h3>이 색 실제 옷</h3><ul class="lk">${c.real.map(x => `<li><a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.t)}</a><span>무신사</span></li>`).join("")}</ul></div>` : ""}
     ${c.src ? `<div class="row"><h3>출처</h3><p><a href="${esc(c.src.url)}" target="_blank" rel="noopener">${esc(c.src.name)}</a> <span style="color:var(--faint)">${esc(c.src.date)}</span></p></div>` : ""}
@@ -325,7 +325,7 @@ function cmp(arg) {
   const list = C.filter(c => c.g === g.id);
   const spots = list.some(c => c.spot);
   $("#v-cmp").innerHTML = unitNav("cmp", g.u) + `<nav class="seg" aria-label="묶음">${G.filter(x => x.u == g.u).map(x => `<a href="#cmp/${x.id}" aria-current="${x.id === g.id}">${esc(x.name)}</a>`).join("")}</nav>
-    <p class="cmp-say">${esc(g.say)}.${spots ? " 동그라미 친 곳이 서로 다른 자리예요." : ""}</p>
+    <p class="cmp-say">${g.say ? esc(g.say) + "." : ""}${spots ? " 동그라미 친 곳이 서로 다른 자리예요." : ""}</p>
     <div class="cmp${list.length === 3 ? " n3" : ""}">${list.map(c => `<figure><button data-card="${c.id}">${ph(c, true)}</button><figcaption><b>${c.hex ? `<i style="background:${c.hex}"></i>` : ""}${esc(c.ko)}</b><span>${esc(c.look)}</span></figcaption></figure>`).join("")}</div>`;
 }
 
