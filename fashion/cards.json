@@ -2537,6 +2537,502 @@
    ]
   },
   {
+   "id": "burntbrown",
+   "u": 5,
+   "g": "browns",
+   "ko": "번트 브라운",
+   "en": "Burnt brown",
+   "say": "탄 듯한 어두운 갈색이에요.",
+   "look": "붉은 기가 도는 어두운 갈색",
+   "where": "",
+   "tip": "번트 브라운은 사진이 적어 겉옷에 검정 소품을 맞춘 사진만 찾았어요.",
+   "real": [
+    {
+     "t": "자켓, 노운",
+     "url": "https://www.musinsa.com/products/7542389"
+    },
+    {
+     "t": "자켓, 엘무드",
+     "url": "https://www.musinsa.com/products/7034033"
+    },
+    {
+     "t": "니트, 쿠어",
+     "url": "https://www.musinsa.com/products/3833444"
+    },
+    {
+     "t": "셔츠, 쿠어 우먼",
+     "url": "https://www.musinsa.com/products/7130492"
+    }
+   ],
+   "codi": [
+    {
+     "t": "번트 브라운 가죽 재킷, 짙은 코트를 어깨에 걸침",
+     "url": "https://www.musinsa.com/products/7034033"
+    },
+    {
+     "t": "번트 브라운 블루종, 검정 장갑",
+     "url": "https://www.musinsa.com/products/7542389"
+    }
+   ],
+   "hex": "#60534E",
+   "measured": 1,
+   "shop": "번트 브라운",
+   "pro": "번트 브라운",
+   "casual": [
+    "번트"
+   ]
+  },
+  {
+   "id": "cocoabrown",
+   "u": 5,
+   "g": "browns",
+   "ko": "코코아",
+   "en": "Cocoa brown",
+   "say": "붉은 기 도는 갈색이에요.",
+   "look": "붉은 기가 도는 짙은 갈색",
+   "where": "",
+   "tip": "코코아 상의에는 베이지나 크림 바지를 맞춘 사진이 있어요.",
+   "real": [
+    {
+     "t": "후드, 나이스웨더",
+     "url": "https://www.musinsa.com/products/6062688"
+    },
+    {
+     "t": "팬츠, 가까이 유니언즈",
+     "url": "https://www.musinsa.com/products/5717935"
+    },
+    {
+     "t": "팬츠, 넨스",
+     "url": "https://www.musinsa.com/products/1843266"
+    },
+    {
+     "t": "후드, 소버먼트",
+     "url": "https://www.musinsa.com/products/2768542"
+    },
+    {
+     "t": "후드집업, 엠오오",
+     "url": "https://www.musinsa.com/products/3539660"
+    },
+    {
+     "t": "니트, 더그린랩",
+     "url": "https://www.musinsa.com/products/4326294"
+    }
+   ],
+   "codi": [
+    {
+     "t": "코코아 니트 크루넥, 베이지 팬츠",
+     "url": "https://www.musinsa.com/products/6495781"
+    },
+    {
+     "t": "코코아 터틀넥 니트, 회색 하의",
+     "url": "https://www.musinsa.com/products/1223337"
+    },
+    {
+     "t": "코코아 줄무늬 니트, 크림 팬츠",
+     "url": "https://www.musinsa.com/products/3086548"
+    }
+   ],
+   "hex": "#A0897E",
+   "measured": 1,
+   "shop": "코코아",
+   "pro": "코코아",
+   "casual": [
+    "코코아 브라운"
+   ]
+  },
+  {
+   "id": "espressobrown",
+   "u": 5,
+   "g": "browns",
+   "ko": "에스프레소",
+   "en": "Espresso brown",
+   "say": "아주 진한 갈색이에요.",
+   "look": "검정에 가까운 아주 짙은 갈색",
+   "where": "",
+   "tip": "에스프레소 상의에는 베이지 바지처럼 밝은 하의를 맞춘 사진이 있어요.",
+   "real": [
+    {
+     "t": "니트, 헤이스트",
+     "url": "https://www.musinsa.com/products/5879206"
+    },
+    {
+     "t": "팬츠, 헤이스트",
+     "url": "https://www.musinsa.com/products/5836337"
+    },
+    {
+     "t": "팬츠, 매너스 골프",
+     "url": "https://www.musinsa.com/products/7455091"
+    },
+    {
+     "t": "티셔츠, 고요웨어",
+     "url": "https://www.musinsa.com/products/7614000"
+    },
+    {
+     "t": "티셔츠, 고요웨어",
+     "url": "https://www.musinsa.com/products/6032080"
+    }
+   ],
+   "codi": [
+    {
+     "t": "에스프레소 해링턴 재킷, 흰 상의, 베이지 바지",
+     "url": "https://www.musinsa.com/products/7753901"
+    },
+    {
+     "t": "에스프레소 퍼 니트를 어깨에 두름, 청록 쇼츠",
+     "url": "https://www.musinsa.com/products/7049770"
+    }
+   ],
+   "hex": "#443836",
+   "measured": 1,
+   "shop": "에스프레소",
+   "pro": "에스프레소",
+   "casual": [
+    "에스프레소 브라운"
+   ]
+  },
+  {
+   "id": "khakibeige",
+   "u": 5,
+   "g": "browns",
+   "ko": "카키 베이지",
+   "en": "Khaki beige",
+   "say": "올리브 기가 섞인 베이지예요.",
+   "look": "초록 기가 살짝 도는 베이지",
+   "where": "",
+   "tip": "카키 베이지 바지에는 회색이나 검정 상의를 맞춘 사진이 보여요.",
+   "real": [
+    {
+     "t": "셔츠, 아르마니 익스체인지",
+     "url": "https://www.musinsa.com/products/6953826"
+    },
+    {
+     "t": "자켓, 아르마니 익스체인지",
+     "url": "https://www.musinsa.com/products/6952464"
+    },
+    {
+     "t": "점퍼, 슈퍼서브",
+     "url": "https://www.musinsa.com/products/4795552"
+    },
+    {
+     "t": "팬츠, 어퍼스트로피 콤마",
+     "url": "https://www.musinsa.com/products/4152880"
+    },
+    {
+     "t": "베스트, 해브오프듀티",
+     "url": "https://www.musinsa.com/products/4368208"
+    },
+    {
+     "t": "슬랙스, 미치코런던 코시노",
+     "url": "https://www.musinsa.com/products/5416381"
+    }
+   ],
+   "codi": [
+    {
+     "t": "카키 베이지 와이드 슬랙스, 회색 니트, 검정 신발",
+     "url": "https://www.musinsa.com/products/4368563"
+    },
+    {
+     "t": "카키 베이지 와이드 슬랙스, 검정 긴팔, 벨트",
+     "url": "https://www.musinsa.com/products/5538292"
+    },
+    {
+     "t": "카키 베이지 트렌치 코트",
+     "url": "https://www.musinsa.com/products/4953996"
+    }
+   ],
+   "hex": "#B1A895",
+   "measured": 1,
+   "shop": "카키 베이지",
+   "pro": "카키 베이지",
+   "casual": []
+  },
+  {
+   "id": "mocha",
+   "u": 5,
+   "g": "browns",
+   "ko": "모카",
+   "en": "Mocha",
+   "say": "커피에 우유를 섞은 듯한 중간 갈색이에요.",
+   "look": "회색이 약간 섞인 부드러운 갈색",
+   "where": "",
+   "tip": "모카 니트에는 네이비 바지나 흰 바지, 베이지 바지를 맞춘 사진이 보여요.",
+   "real": [
+    {
+     "t": "니트, 쿠어",
+     "url": "https://www.musinsa.com/products/7380628"
+    },
+    {
+     "t": "가디건, 비트 앤 사일런스",
+     "url": "https://www.musinsa.com/products/5648861"
+    },
+    {
+     "t": "셔츠, 브라운야드",
+     "url": "https://www.musinsa.com/products/7341793"
+    },
+    {
+     "t": "팬츠, 이올로",
+     "url": "https://www.musinsa.com/products/2259546"
+    },
+    {
+     "t": "자켓, 디미트리블랙",
+     "url": "https://www.musinsa.com/products/5367969"
+    },
+    {
+     "t": "맨투맨, 브라운야드",
+     "url": "https://www.musinsa.com/products/5513187"
+    }
+   ],
+   "codi": [
+    {
+     "t": "모카 립 터틀넥 니트, 베이지 팬츠",
+     "url": "https://www.musinsa.com/products/2100429"
+    },
+    {
+     "t": "모카 버튼넥 니트, 네이비 팬츠",
+     "url": "https://www.musinsa.com/products/7692153"
+    },
+    {
+     "t": "모카브라운 터틀넥, 흰 팬츠, 벨트",
+     "url": "https://www.musinsa.com/products/4682860"
+    }
+   ],
+   "hex": "#887B70",
+   "measured": 1,
+   "shop": "모카",
+   "pro": "모카",
+   "casual": [
+    "모카 브라운",
+    "모카 베이지"
+   ]
+  },
+  {
+   "id": "rust",
+   "u": 5,
+   "g": "browns",
+   "ko": "러스트",
+   "en": "Rust",
+   "say": "녹슨 쇠처럼 붉은 기가 도는 주황빛 갈색이에요.",
+   "look": "붉고 탁한 주황 갈색",
+   "where": "",
+   "tip": "러스트 옷에는 베이지나 크림 바지를 맞춘 사진이 보여요.",
+   "real": [
+    {
+     "t": "셔츠, 이즈",
+     "url": "https://www.musinsa.com/products/1751547"
+    },
+    {
+     "t": "맨투맨, 온한스",
+     "url": "https://www.musinsa.com/products/5370796"
+    },
+    {
+     "t": "팬츠, 컨템포러리 어카운츠",
+     "url": "https://www.musinsa.com/products/3982202"
+    },
+    {
+     "t": "티셔츠, 룰라쿨라",
+     "url": "https://www.musinsa.com/products/4199170"
+    },
+    {
+     "t": "티셔츠, 펜필드",
+     "url": "https://www.musinsa.com/products/6061351"
+    },
+    {
+     "t": "티셔츠, 컨템포러리 어카운츠",
+     "url": "https://www.musinsa.com/products/3982194"
+    }
+   ],
+   "codi": [
+    {
+     "t": "러스트 스웻셔츠, 베이지 팬츠",
+     "url": "https://www.musinsa.com/products/5370796"
+    },
+    {
+     "t": "러스트 낙하산 팬츠, 검정 부츠",
+     "url": "https://www.musinsa.com/products/3982202"
+    },
+    {
+     "t": "러스트 반팔 셔츠, 크림 팬츠",
+     "url": "https://www.musinsa.com/products/1751547"
+    }
+   ],
+   "hex": "#CC7C5D",
+   "measured": 1,
+   "shop": "러스트",
+   "pro": "러스트",
+   "casual": [
+    "러스트 레드"
+   ]
+  },
+  {
+   "id": "stone",
+   "u": 5,
+   "g": "browns",
+   "ko": "스톤",
+   "en": "Stone",
+   "say": "돌 빛 회색 섞은 베이지예요.",
+   "look": "돌처럼 회색이 섞인 베이지",
+   "where": "",
+   "tip": "스톤 베이지 하의에는 남색이나 초록 상의를 맞춘 사진이 보여요.",
+   "real": [
+    {
+     "t": "셔츠, 워크온바디오프",
+     "url": "https://www.musinsa.com/products/5006118"
+    },
+    {
+     "t": "팬츠, 브라운야드",
+     "url": "https://www.musinsa.com/products/6059546"
+    },
+    {
+     "t": "셔츠, 후브스",
+     "url": "https://www.musinsa.com/products/6023809"
+    },
+    {
+     "t": "가디건, 페레그린",
+     "url": "https://www.musinsa.com/products/3194459"
+    },
+    {
+     "t": "니트, 브라운야드",
+     "url": "https://www.musinsa.com/products/6316357"
+    },
+    {
+     "t": "점퍼, 트렌치런던",
+     "url": "https://www.musinsa.com/products/2112120"
+    }
+   ],
+   "codi": [
+    {
+     "t": "스톤 베이지 쇼츠, 감색 니트를 허리에 묶음, 갈색 로퍼",
+     "url": "https://www.musinsa.com/products/6040699"
+    },
+    {
+     "t": "스톤 베이지 플리츠 팬츠, 초록 티, 갈색 신발",
+     "url": "https://www.musinsa.com/products/6040740"
+    },
+    {
+     "t": "스톤 워시드 베이지 풀오버, 청바지",
+     "url": "https://www.musinsa.com/products/4754450"
+    }
+   ],
+   "hex": "#B8B2AC",
+   "measured": 1,
+   "shop": "스톤",
+   "pro": "스톤",
+   "casual": [
+    "스톤 화이트",
+    "스톤 브라운"
+   ]
+  },
+  {
+   "id": "taupe",
+   "u": 5,
+   "g": "browns",
+   "ko": "토프",
+   "en": "Taupe",
+   "say": "회색 섞인 갈색이에요.",
+   "look": "회색이 섞여 탁한 갈색",
+   "where": "",
+   "tip": "토프 바지에는 흰 상의나 파란 상의를 맞춘 사진이 있어요.",
+   "real": [
+    {
+     "t": "맨투맨, 로얄라이프",
+     "url": "https://www.musinsa.com/products/2707900"
+    },
+    {
+     "t": "팬츠, 혜영킴",
+     "url": "https://www.musinsa.com/products/4168815"
+    },
+    {
+     "t": "자켓, 후브스",
+     "url": "https://www.musinsa.com/products/5992259"
+    },
+    {
+     "t": "니트, 무신사 스탠다드",
+     "url": "https://www.musinsa.com/products/5215598"
+    },
+    {
+     "t": "셔츠, 아르마니 익스체인지",
+     "url": "https://www.musinsa.com/products/7290747"
+    },
+    {
+     "t": "팬츠, 무신사 스탠다드",
+     "url": "https://www.musinsa.com/products/6820599"
+    }
+   ],
+   "codi": [
+    {
+     "t": "토프 니트 폴로, 검정 턱 팬츠",
+     "url": "https://www.musinsa.com/products/4644622"
+    },
+    {
+     "t": "토프 와이드 팬츠, 파란 후드 집업, 갈색 신발",
+     "url": "https://www.musinsa.com/products/6317606"
+    },
+    {
+     "t": "토프 와이드 팬츠, 흰 상의, 검정 신발",
+     "url": "https://www.musinsa.com/products/5755337"
+    }
+   ],
+   "hex": "#7A7064",
+   "measured": 1,
+   "shop": "토프",
+   "pro": "토프",
+   "casual": [
+    "토프 브라운"
+   ]
+  },
+  {
+   "id": "warmbeige",
+   "u": 5,
+   "g": "browns",
+   "ko": "웜 베이지",
+   "en": "Warm beige",
+   "say": "노랑 기가 도는 따뜻한 베이지예요.",
+   "look": "노랑과 주황 기가 도는 베이지",
+   "where": "",
+   "tip": "웜 베이지 상의에는 검정이나 회색, 짙은 청바지를 맞춘 사진이 보여요.",
+   "real": [
+    {
+     "t": "후드, 오즈이즈",
+     "url": "https://www.musinsa.com/products/5810608"
+    },
+    {
+     "t": "티셔츠, 오즈이즈",
+     "url": "https://www.musinsa.com/products/5810593"
+    },
+    {
+     "t": "니트, 글로우노트",
+     "url": "https://www.musinsa.com/products/5837873"
+    },
+    {
+     "t": "맨투맨, 오즈이즈",
+     "url": "https://www.musinsa.com/products/5810605"
+    },
+    {
+     "t": "팬츠, 오즈이즈",
+     "url": "https://www.musinsa.com/products/5810629"
+    }
+   ],
+   "codi": [
+    {
+     "t": "웜 베이지 후드, 검정 팬츠",
+     "url": "https://www.musinsa.com/products/5810608"
+    },
+    {
+     "t": "웜 베이지 후드, 회색 줄무늬 팬츠",
+     "url": "https://www.musinsa.com/products/5810593"
+    },
+    {
+     "t": "웜 베이지 니트, 짙은 청바지",
+     "url": "https://www.musinsa.com/products/5837873"
+    }
+   ],
+   "hex": "#E8D4C9",
+   "measured": 1,
+   "shop": "웜 베이지",
+   "pro": "웜 베이지",
+   "casual": []
+  },
+  {
    "id": "khaki",
    "u": 5,
    "g": "greens",
@@ -2904,6 +3400,121 @@
    "casual": []
   },
   {
+   "id": "lime",
+   "u": 5,
+   "g": "greens",
+   "ko": "라임",
+   "en": "Lime",
+   "say": "노란 기가 도는 아주 밝은 연두예요. 형광에 가까워요.",
+   "look": "쨍한 노란 연두",
+   "where": "",
+   "tip": "라임 상의에는 청바지나 흰 하의를 맞춘 사진이 보여요.",
+   "real": [
+    {
+     "t": "니트, 리",
+     "url": "https://www.musinsa.com/products/3941435"
+    },
+    {
+     "t": "셔츠, 쿠어",
+     "url": "https://www.musinsa.com/products/4094989"
+    },
+    {
+     "t": "팬츠, 노아",
+     "url": "https://www.musinsa.com/products/6216847"
+    },
+    {
+     "t": "맨투맨, 행아웃",
+     "url": "https://www.musinsa.com/products/5016643"
+    },
+    {
+     "t": "맨투맨, 디바인디스턴스",
+     "url": "https://www.musinsa.com/products/3124071"
+    },
+    {
+     "t": "자켓, 키르시",
+     "url": "https://www.musinsa.com/products/7460070"
+    }
+   ],
+   "codi": [
+    {
+     "t": "라임 터틀넥, 청바지, 회색 비니",
+     "url": "https://www.musinsa.com/products/4339959"
+    },
+    {
+     "t": "라임 크롭 상의와 같은 색 쇼츠, 흰 부츠",
+     "url": "https://www.musinsa.com/products/2010622"
+    },
+    {
+     "t": "라임 브이넥 상의, 흰 스커트",
+     "url": "https://www.musinsa.com/products/1100034"
+    }
+   ],
+   "hex": "#D5E58B",
+   "measured": 1,
+   "shop": "라임",
+   "pro": "라임",
+   "casual": []
+  },
+  {
+   "id": "olivedrab",
+   "u": 5,
+   "g": "greens",
+   "ko": "올리브 드랩",
+   "en": "Olive drab",
+   "say": "군복처럼 갈색 기가 섞인 어두운 올리브색이에요. 국방색이라고도 해요.",
+   "look": "갈색이 섞인 짙은 올리브",
+   "where": "",
+   "tip": "올리브 드랩 상의에는 어두운 바지나 청바지를 맞춘 사진이 보여요.",
+   "real": [
+    {
+     "t": "맨투맨, 소프트굿즈",
+     "url": "https://www.musinsa.com/products/5692757"
+    },
+    {
+     "t": "팬츠, 소프트굿즈",
+     "url": "https://www.musinsa.com/products/5692980"
+    },
+    {
+     "t": "자켓, 쿠어",
+     "url": "https://www.musinsa.com/products/3833510"
+    },
+    {
+     "t": "티셔츠, 소프트굿즈",
+     "url": "https://www.musinsa.com/products/5691006"
+    },
+    {
+     "t": "팬츠, 소프트굿즈",
+     "url": "https://www.musinsa.com/products/5692401"
+    },
+    {
+     "t": "니트, 032씨",
+     "url": "https://www.musinsa.com/products/4364855"
+    }
+   ],
+   "codi": [
+    {
+     "t": "올리브 드랩 멀티 포켓 셔츠, 같은 색 팬츠",
+     "url": "https://www.musinsa.com/products/3956120"
+    },
+    {
+     "t": "올리브 니트 스웨터, 어두운 바지",
+     "url": "https://www.musinsa.com/products/4364855"
+    },
+    {
+     "t": "올리브 플리스 집업, 청바지",
+     "url": "https://www.musinsa.com/products/7429879"
+    }
+   ],
+   "hex": "#766B59",
+   "measured": 1,
+   "shop": "올리브 드랩",
+   "pro": "올리브 드랩",
+   "casual": [
+    "드랩",
+    "국방색"
+   ]
+  },
+  {
    "id": "skyblue",
    "u": 5,
    "g": "blues",
@@ -3269,6 +3880,239 @@
    ]
   },
   {
+   "id": "babyblue",
+   "u": 5,
+   "g": "blues",
+   "ko": "베이비 블루",
+   "en": "Baby blue",
+   "say": "아기 옷 같은 아주 연한 하늘색이에요.",
+   "look": "흰색이 많이 섞인 연한 하늘색",
+   "where": "",
+   "tip": "베이비 블루 상의에는 청바지나 남색 바지를 맞춘 사진이 보여요.",
+   "real": [
+    {
+     "t": "맨투맨, 나이스웨더",
+     "url": "https://www.musinsa.com/products/5848728"
+    },
+    {
+     "t": "후드, 데오스테이트",
+     "url": "https://www.musinsa.com/products/5440934"
+    },
+    {
+     "t": "티셔츠, 토마스모어",
+     "url": "https://www.musinsa.com/products/6175688"
+    },
+    {
+     "t": "티셔츠, 토마스모어",
+     "url": "https://www.musinsa.com/products/5410608"
+    },
+    {
+     "t": "셔츠, 레 벤자민",
+     "url": "https://www.musinsa.com/products/5378231"
+    },
+    {
+     "t": "가디건, 주느세콰",
+     "url": "https://www.musinsa.com/products/7418902"
+    }
+   ],
+   "codi": [
+    {
+     "t": "베이비 블루 스웨트셔츠, 청바지",
+     "url": "https://www.musinsa.com/products/5554638"
+    },
+    {
+     "t": "베이비 블루 가디건, 회색 스커트",
+     "url": "https://www.musinsa.com/products/7418902"
+    },
+    {
+     "t": "베이비 블루 후드 점퍼, 네이비 팬츠",
+     "url": "https://www.musinsa.com/products/6290160"
+    }
+   ],
+   "hex": "#ADC3D4",
+   "measured": 1,
+   "shop": "베이비 블루",
+   "pro": "베이비 블루",
+   "casual": [
+    "연한 파랑",
+    "파우더 블루"
+   ]
+  },
+  {
+   "id": "dustyblue",
+   "u": 5,
+   "g": "blues",
+   "ko": "더스티 블루",
+   "en": "Dusty blue",
+   "say": "회색이 섞여 탁하고 차분한 파랑이에요.",
+   "look": "먼지 낀 듯 흐린 파랑",
+   "where": "",
+   "tip": "더스티 블루 상의에는 카키나 회색 바지를 맞춘 사진이 있어요.",
+   "real": [
+    {
+     "t": "셔츠, 커버낫",
+     "url": "https://www.musinsa.com/products/6032549"
+    },
+    {
+     "t": "셔츠, 해브해드",
+     "url": "https://www.musinsa.com/products/5997312"
+    },
+    {
+     "t": "맨투맨, 무신사 스탠다드",
+     "url": "https://www.musinsa.com/products/4352383"
+    },
+    {
+     "t": "맨투맨, 커버낫",
+     "url": "https://www.musinsa.com/products/5944842"
+    },
+    {
+     "t": "패딩, 트릴리온",
+     "url": "https://www.musinsa.com/products/6970690"
+    },
+    {
+     "t": "니트, 999휴머니티",
+     "url": "https://www.musinsa.com/products/7078934"
+    }
+   ],
+   "codi": [
+    {
+     "t": "더스티 블루 니트에 같은 색 스카프, 카키 팬츠, 벨트",
+     "url": "https://www.musinsa.com/products/4791440"
+    },
+    {
+     "t": "더스티 블루 집업 니트, 회색 팬츠",
+     "url": "https://www.musinsa.com/products/7273345"
+    },
+    {
+     "t": "더스티 블루 후드집업, 짙은 회색 팬츠",
+     "url": "https://www.musinsa.com/products/7649271"
+    }
+   ],
+   "hex": "#929FB3",
+   "measured": 1,
+   "shop": "더스티 블루",
+   "pro": "더스티 블루",
+   "casual": [
+    "스모크 블루"
+   ]
+  },
+  {
+   "id": "midnightblue",
+   "u": 5,
+   "g": "blues",
+   "ko": "미드나잇",
+   "en": "Midnight blue",
+   "say": "한밤처럼 아주 어두운 남색이에요.",
+   "look": "검정에 가까운 짙은 남색",
+   "where": "",
+   "tip": "미드나잇 상의에는 회색이나 베이지처럼 밝은 하의를 맞춘 사진이 있어요.",
+   "real": [
+    {
+     "t": "니트, 프로드셔츠",
+     "url": "https://www.musinsa.com/products/3243294"
+    },
+    {
+     "t": "니트, 건지 울른스",
+     "url": "https://www.musinsa.com/products/7585845"
+    },
+    {
+     "t": "자켓, 벨렌슈타인",
+     "url": "https://www.musinsa.com/products/4635393"
+    },
+    {
+     "t": "후드, 돈애스크마이플랜",
+     "url": "https://www.musinsa.com/products/5829118"
+    },
+    {
+     "t": "점퍼, 벨렌슈타인",
+     "url": "https://www.musinsa.com/products/4635406"
+    },
+    {
+     "t": "니트, 무신사 스탠다드",
+     "url": "https://www.musinsa.com/products/2100419"
+    }
+   ],
+   "codi": [
+    {
+     "t": "미드나잇 네이비 하프집 니트, 회색 팬츠",
+     "url": "https://www.musinsa.com/products/2921819"
+    },
+    {
+     "t": "네이비 니트 집업, 연보라 팬츠",
+     "url": "https://www.musinsa.com/products/4276364"
+    },
+    {
+     "t": "미드나잇 네이비 터틀넥, 베이지 스커트",
+     "url": "https://www.musinsa.com/products/5728798"
+    }
+   ],
+   "hex": "#272B38",
+   "measured": 1,
+   "shop": "미드나잇",
+   "pro": "미드나잇",
+   "casual": [
+    "미드나잇 블루",
+    "잉크",
+    "잉크 네이비"
+   ]
+  },
+  {
+   "id": "royalblue",
+   "u": 5,
+   "g": "blues",
+   "ko": "로열 블루",
+   "en": "Royal blue",
+   "say": "보랏빛이 살짝 도는 선명한 파랑이에요.",
+   "look": "쨍한 진한 파랑",
+   "where": "",
+   "tip": "로얄 블루 상의에는 베이지 바지나 검정 겉옷을 맞춘 사진이 보여요.",
+   "real": [
+    {
+     "t": "니트, 999휴머니티",
+     "url": "https://www.musinsa.com/products/4392579"
+    },
+    {
+     "t": "니트, 토마스모어",
+     "url": "https://www.musinsa.com/products/7473337"
+    },
+    {
+     "t": "니트, 쿠어",
+     "url": "https://www.musinsa.com/products/5022415"
+    },
+    {
+     "t": "후드, 캠버 스포츠웨어",
+     "url": "https://www.musinsa.com/products/5988361"
+    },
+    {
+     "t": "팬츠, 캠버 스포츠웨어",
+     "url": "https://www.musinsa.com/products/5988396"
+    },
+    {
+     "t": "셔츠, 엠포리오 아르마니 언더웨어",
+     "url": "https://www.musinsa.com/products/5032835"
+    }
+   ],
+   "codi": [
+    {
+     "t": "로얄 블루 니트, 베이지 와이드 팬츠",
+     "url": "https://www.musinsa.com/products/4274346"
+    },
+    {
+     "t": "로얄 블루 터틀넥, 검정 재킷",
+     "url": "https://www.musinsa.com/products/2154436"
+    },
+    {
+     "t": "로얄 블루 후디, 어두운 하의",
+     "url": "https://www.musinsa.com/products/5932030"
+    }
+   ],
+   "hex": "#4164B3",
+   "measured": 1,
+   "shop": "로열 블루",
+   "pro": "로열 블루",
+   "casual": []
+  },
+  {
    "id": "lightgray",
    "u": 5,
    "g": "monos",
@@ -3486,6 +4330,340 @@
     "검정",
     "검은색"
    ]
+  },
+  {
+   "id": "ashgray",
+   "u": 5,
+   "g": "monos",
+   "ko": "애쉬",
+   "en": "Ash gray",
+   "say": "재 빛 회색이에요.",
+   "look": "재처럼 푸석한 회색",
+   "where": "",
+   "tip": "애쉬 그레이 상의에는 청바지나 갈색 바지를 맞춘 사진이 보여요.",
+   "real": [
+    {
+     "t": "니트, 블랙크러쉬",
+     "url": "https://www.musinsa.com/products/7230906"
+    },
+    {
+     "t": "팬츠, 리복",
+     "url": "https://www.musinsa.com/products/5873724"
+    },
+    {
+     "t": "팬츠, 람블라",
+     "url": "https://www.musinsa.com/products/5634163"
+    },
+    {
+     "t": "맨투맨, 모우트",
+     "url": "https://www.musinsa.com/products/7051149"
+    },
+    {
+     "t": "자켓, 무신사 스탠다드 우먼",
+     "url": "https://www.musinsa.com/products/6860195"
+    }
+   ],
+   "codi": [
+    {
+     "t": "애쉬그레이 플리스 후디 집업, 청바지",
+     "url": "https://www.musinsa.com/products/7321293"
+    },
+    {
+     "t": "애쉬그레이 스웨트셔츠, 갈색 팬츠",
+     "url": "https://www.musinsa.com/products/4446641"
+    },
+    {
+     "t": "애쉬 회색 푸퍼 점퍼, 연보라 팬츠",
+     "url": "https://www.musinsa.com/products/4223489"
+    }
+   ],
+   "hex": "#B3B4B9",
+   "measured": 1,
+   "shop": "애쉬",
+   "pro": "애쉬",
+   "casual": [
+    "애쉬 그레이"
+   ]
+  },
+  {
+   "id": "coolgray",
+   "u": 5,
+   "g": "monos",
+   "ko": "쿨 그레이",
+   "en": "Cool gray",
+   "say": "파랑이 섞인 차가운 회색이에요.",
+   "look": "푸른 기가 도는 회색",
+   "where": "",
+   "tip": "쿨 그레이에는 검정이나 베이지를 맞춘 사진이 보여요.",
+   "real": [
+    {
+     "t": "자켓, 모더먼트",
+     "url": "https://www.musinsa.com/products/4356475"
+    },
+    {
+     "t": "맨투맨, 돌핀웨이브어패럴",
+     "url": "https://www.musinsa.com/products/2805616"
+    },
+    {
+     "t": "맨투맨, 돌핀웨이브어패럴",
+     "url": "https://www.musinsa.com/products/2802017"
+    },
+    {
+     "t": "가디건, 월스와일 무브먼트",
+     "url": "https://www.musinsa.com/products/3534615"
+    },
+    {
+     "t": "팬츠, 그랜디오시티",
+     "url": "https://www.musinsa.com/products/5251505"
+    }
+   ],
+   "codi": [
+    {
+     "t": "쿨그레이 와이드 팬츠, 베이지 티",
+     "url": "https://www.musinsa.com/products/6593128"
+    },
+    {
+     "t": "쿨 그레이 후드 집업, 검정 스커트",
+     "url": "https://www.musinsa.com/products/4647382"
+    },
+    {
+     "t": "쿨그레이 니트와 같은 색 와이드 팬츠",
+     "url": "https://www.musinsa.com/products/2154134"
+    }
+   ],
+   "hex": "#DBDDE7",
+   "measured": 1,
+   "shop": "쿨 그레이",
+   "pro": "쿨 그레이",
+   "casual": []
+  },
+  {
+   "id": "greige",
+   "u": 5,
+   "g": "monos",
+   "ko": "그레이지",
+   "en": "Greige",
+   "say": "회색과 베이지의 중간이에요.",
+   "look": "회색과 베이지가 섞인 색",
+   "where": "",
+   "tip": "그레이지 바지에는 검정 상의나 파란 상의를 맞춘 사진이 보여요.",
+   "real": [
+    {
+     "t": "맨투맨, 벤",
+     "url": "https://www.musinsa.com/products/4318752"
+    },
+    {
+     "t": "팬츠, 와기",
+     "url": "https://www.musinsa.com/products/3390368"
+    },
+    {
+     "t": "팬츠, 벤",
+     "url": "https://www.musinsa.com/products/4318831"
+    },
+    {
+     "t": "자켓, 비베르데",
+     "url": "https://www.musinsa.com/products/6355120"
+    },
+    {
+     "t": "맨투맨, 예일",
+     "url": "https://www.musinsa.com/products/4309951"
+    },
+    {
+     "t": "팬츠, 마르글로",
+     "url": "https://www.musinsa.com/products/7661686"
+    }
+   ],
+   "codi": [
+    {
+     "t": "그레이지 벌룬 팬츠, 파란 상의, 흰 스니커즈",
+     "url": "https://www.musinsa.com/products/4352565"
+    },
+    {
+     "t": "그레이지 슬랙스, 검정 티, 샌들",
+     "url": "https://www.musinsa.com/products/5735907"
+    },
+    {
+     "t": "그레이지 와이드 팬츠, 회색 가디건",
+     "url": "https://www.musinsa.com/products/6476953"
+    }
+   ],
+   "hex": "#C3BAAF",
+   "measured": 1,
+   "shop": "그레이지",
+   "pro": "그레이지",
+   "casual": []
+  },
+  {
+   "id": "middlegray",
+   "u": 5,
+   "g": "monos",
+   "ko": "미들 그레이",
+   "en": "Middle gray",
+   "say": "중간 회색이에요.",
+   "look": "티, 니트",
+   "where": "",
+   "tip": "회색 니트에는 흰 티를 받치거나 베이지 바지를 맞춘 사진이 보여요.",
+   "real": [
+    {
+     "t": "니트, 무신사 스탠다드",
+     "url": "https://www.musinsa.com/products/3481826"
+    },
+    {
+     "t": "니트, 무신사 스탠다드",
+     "url": "https://www.musinsa.com/products/4644556"
+    },
+    {
+     "t": "가디건, 무신사 스탠다드",
+     "url": "https://www.musinsa.com/products/2100440"
+    },
+    {
+     "t": "니트, 무신사 스탠다드",
+     "url": "https://www.musinsa.com/products/6660440"
+    },
+    {
+     "t": "니트, 무신사 스탠다드",
+     "url": "https://www.musinsa.com/products/1628942"
+    },
+    {
+     "t": "티셔츠, 러닉스",
+     "url": "https://www.musinsa.com/products/4494224"
+    }
+   ],
+   "codi": [
+    {
+     "t": "중간 회색 가디건, 흰 티, 짙은 팬츠",
+     "url": "https://www.musinsa.com/products/2100440"
+    },
+    {
+     "t": "회색 가디건, 베이지 팬츠",
+     "url": "https://www.musinsa.com/products/4644570"
+    },
+    {
+     "t": "회색 니트 베스트, 흰 긴팔, 검정 팬츠",
+     "url": "https://www.musinsa.com/products/2100449"
+    }
+   ],
+   "hex": "#6F6F6F",
+   "measured": 1,
+   "shop": "미들 그레이",
+   "pro": "미들 그레이",
+   "casual": [
+    "미디엄 그레이"
+   ]
+  },
+  {
+   "id": "smoke",
+   "u": 5,
+   "g": "monos",
+   "ko": "스모크",
+   "en": "Smoke",
+   "say": "연기가 낀 듯 회색이 섞여 흐린 색이에요.",
+   "look": "뿌옇게 탁한 색",
+   "where": "",
+   "tip": "스모크 회색에는 흰 티나 검정 상의를 맞춘 사진이 보여요.",
+   "real": [
+    {
+     "t": "셔츠, 레테르코모",
+     "url": "https://www.musinsa.com/products/6077692"
+    },
+    {
+     "t": "팬츠, 곤니치와봉쥬르",
+     "url": "https://www.musinsa.com/products/7713255"
+    },
+    {
+     "t": "후드집업, 곤니치와봉쥬르",
+     "url": "https://www.musinsa.com/products/6069203"
+    },
+    {
+     "t": "팬츠, 파브레가",
+     "url": "https://www.musinsa.com/products/5286619"
+    },
+    {
+     "t": "팬츠, 트립르센스",
+     "url": "https://www.musinsa.com/products/6609945"
+    },
+    {
+     "t": "니트, 아이러니포르노 화이트라인",
+     "url": "https://www.musinsa.com/products/3955403"
+    }
+   ],
+   "codi": [
+    {
+     "t": "스모크 롤넥 니트",
+     "url": "https://www.musinsa.com/products/4479839"
+    },
+    {
+     "t": "스모크 계열 연한 회색 트랙 재킷, 흰 티",
+     "url": "https://www.musinsa.com/products/7366245"
+    },
+    {
+     "t": "회색 카고 팬츠, 검정 상의",
+     "url": "https://www.musinsa.com/products/5078665"
+    }
+   ],
+   "hex": "#AFAFAB",
+   "measured": 1,
+   "shop": "스모크",
+   "pro": "스모크",
+   "casual": [
+    "스모키"
+   ]
+  },
+  {
+   "id": "warmgray",
+   "u": 5,
+   "g": "monos",
+   "ko": "웜 그레이",
+   "en": "Warm gray",
+   "say": "베이지가 섞인 따뜻한 회색이에요.",
+   "look": "노란 기가 도는 회색",
+   "where": "",
+   "tip": "웜 그레이 상의에는 청바지나 검정 바지를 맞춘 사진이 보여요.",
+   "real": [
+    {
+     "t": "니트, 아르마니 익스체인지",
+     "url": "https://www.musinsa.com/products/7390471"
+    },
+    {
+     "t": "니트, 무신사 스탠다드",
+     "url": "https://www.musinsa.com/products/4644558"
+    },
+    {
+     "t": "셔츠, 밀로 아카이브",
+     "url": "https://www.musinsa.com/products/5506356"
+    },
+    {
+     "t": "맨투맨, 벤",
+     "url": "https://www.musinsa.com/products/4315202"
+    },
+    {
+     "t": "팬츠, 파브레가",
+     "url": "https://www.musinsa.com/products/5873654"
+    },
+    {
+     "t": "셔츠, 무신사 스탠다드",
+     "url": "https://www.musinsa.com/products/4696013"
+    }
+   ],
+   "codi": [
+    {
+     "t": "웜 그레이 후드 집업 니트, 흰 티, 청바지",
+     "url": "https://www.musinsa.com/products/4443935"
+    },
+    {
+     "t": "웜 그레이 집업 니트, 검정 티, 청바지",
+     "url": "https://www.musinsa.com/products/4644563"
+    },
+    {
+     "t": "웜 그레이 셔츠를 열어 입음, 흰 이너, 검정 팬츠",
+     "url": "https://www.musinsa.com/products/4696019"
+    }
+   ],
+   "hex": "#ACA59D",
+   "measured": 1,
+   "shop": "웜 그레이",
+   "pro": "웜 그레이",
+   "casual": []
   },
   {
    "id": "red",
@@ -3985,6 +5163,683 @@
    "pro": "라벤더",
    "casual": [
     "연보라"
+   ]
+  },
+  {
+   "id": "brickred",
+   "u": 5,
+   "g": "warms",
+   "ko": "브릭",
+   "en": "Brick red",
+   "say": "붉은 벽돌 같은 갈색 기가 도는 붉은색이에요.",
+   "look": "탁하고 갈색이 도는 빨강",
+   "where": "",
+   "tip": "브릭 상의에는 검정 바지나 회색, 카키 바지를 맞춘 사진이 보여요.",
+   "real": [
+    {
+     "t": "맨투맨, 디스커스 애슬레틱",
+     "url": "https://www.musinsa.com/products/3529423"
+    },
+    {
+     "t": "맨투맨, 디스커스 애슬레틱",
+     "url": "https://www.musinsa.com/products/3540426"
+    },
+    {
+     "t": "후드집업, 팔렛",
+     "url": "https://www.musinsa.com/products/3779294"
+    },
+    {
+     "t": "자켓, 텐 패스트 세븐",
+     "url": "https://www.musinsa.com/products/4416358"
+    },
+    {
+     "t": "팬츠, 벤들스",
+     "url": "https://www.musinsa.com/products/1959274"
+    },
+    {
+     "t": "니트, 리메인세컨드",
+     "url": "https://www.musinsa.com/products/4274149"
+    }
+   ],
+   "codi": [
+    {
+     "t": "브릭 스웨트셔츠, 검정 청바지",
+     "url": "https://www.musinsa.com/products/4494435"
+    },
+    {
+     "t": "브릭 계열 셔츠, 회색 와이드 팬츠, 벨트",
+     "url": "https://www.musinsa.com/products/4736448"
+    },
+    {
+     "t": "브릭 스웨트셔츠, 카키 팬츠",
+     "url": "https://www.musinsa.com/products/2825961"
+    }
+   ],
+   "hex": "#995044",
+   "measured": 1,
+   "shop": "브릭",
+   "pro": "브릭",
+   "casual": [
+    "브릭 레드",
+    "벽돌색"
+   ]
+  },
+  {
+   "id": "burntorange",
+   "u": 5,
+   "g": "warms",
+   "ko": "번트 오렌지",
+   "en": "Burnt orange",
+   "say": "붉은 기가 도는 짙은 주황이에요.",
+   "look": "벽돌과 주황 사이의 짙은 주황",
+   "where": "",
+   "tip": "번트 오렌지는 흰 이너나 베이지 소품을 맞춘 사진이 보여요.",
+   "real": [
+    {
+     "t": "후드, 캠버 스포츠웨어",
+     "url": "https://www.musinsa.com/products/5988365"
+    },
+    {
+     "t": "가디건, 건지 울른스",
+     "url": "https://www.musinsa.com/products/2864799"
+    },
+    {
+     "t": "팬츠, 캠버 스포츠웨어",
+     "url": "https://www.musinsa.com/products/5988397"
+    },
+    {
+     "t": "티셔츠, 캠버 스포츠웨어",
+     "url": "https://www.musinsa.com/products/5999177"
+    },
+    {
+     "t": "팬츠, 고요웨어",
+     "url": "https://www.musinsa.com/products/4071276"
+    },
+    {
+     "t": "니트, 건지 울른스",
+     "url": "https://www.musinsa.com/products/7253205"
+    }
+   ],
+   "codi": [
+    {
+     "t": "번트 오렌지 후드 윈드브레이커, 흰 이너",
+     "url": "https://www.musinsa.com/products/7038164"
+    },
+    {
+     "t": "번트 오렌지 레깅스, 베이지 양말",
+     "url": "https://www.musinsa.com/products/3449629"
+    }
+   ],
+   "hex": "#D85D37",
+   "measured": 1,
+   "shop": "번트 오렌지",
+   "pro": "번트 오렌지",
+   "casual": []
+  },
+  {
+   "id": "butteryellow",
+   "u": 5,
+   "g": "warms",
+   "ko": "버터",
+   "en": "Butter yellow",
+   "say": "연한 노랑이에요.",
+   "look": "버터처럼 연하고 따뜻한 노랑",
+   "where": "",
+   "tip": "버터 상의에는 청바지나 갈색 바지를 맞춘 사진이 보여요.",
+   "real": [
+    {
+     "t": "셔츠, 커넥트킨록",
+     "url": "https://www.musinsa.com/products/4077623"
+    },
+    {
+     "t": "셔츠, 스탠즈",
+     "url": "https://www.musinsa.com/products/5021405"
+    },
+    {
+     "t": "팬츠, 페이지시시",
+     "url": "https://www.musinsa.com/products/7489704"
+    },
+    {
+     "t": "점퍼, 아워몬드",
+     "url": "https://www.musinsa.com/products/5231805"
+    },
+    {
+     "t": "자켓, 이스케이프프롬",
+     "url": "https://www.musinsa.com/products/7303407"
+    },
+    {
+     "t": "니트, 모우트",
+     "url": "https://www.musinsa.com/products/6462668"
+    }
+   ],
+   "codi": [
+    {
+     "t": "버터 크림 브이넥 니트, 흰 티, 갈색 팬츠",
+     "url": "https://www.musinsa.com/products/6341388"
+    },
+    {
+     "t": "버터 크림 라운드 니트, 청바지",
+     "url": "https://www.musinsa.com/products/6341386"
+    },
+    {
+     "t": "버터 가디건(갈색 테두리), 청바지",
+     "url": "https://www.musinsa.com/products/5571119"
+    }
+   ],
+   "hex": "#F5ECCD",
+   "measured": 1,
+   "shop": "버터",
+   "pro": "버터",
+   "casual": [
+    "버터 크림",
+    "버터 옐로우"
+   ]
+  },
+  {
+   "id": "cherryred",
+   "u": 5,
+   "g": "warms",
+   "ko": "체리",
+   "en": "Cherry red",
+   "say": "잘 익은 체리처럼 짙고 선명한 붉은색이에요.",
+   "look": "진하게 윤나는 빨강",
+   "where": "",
+   "tip": "체리 레드 상의에는 어두운 하의를 맞춘 사진이 보여요.",
+   "real": [
+    {
+     "t": "니트, 빅 락 캔디 마운티니어링",
+     "url": "https://www.musinsa.com/products/6433627"
+    },
+    {
+     "t": "티셔츠, 잼커빙",
+     "url": "https://www.musinsa.com/products/7694808"
+    },
+    {
+     "t": "후드, 비트윈에이앤비",
+     "url": "https://www.musinsa.com/products/7556159"
+    },
+    {
+     "t": "가디건, 키르시",
+     "url": "https://www.musinsa.com/products/7439155"
+    },
+    {
+     "t": "후드집업, 노컨텐츠",
+     "url": "https://www.musinsa.com/products/6052617"
+    },
+    {
+     "t": "자켓, 스포츠챔버",
+     "url": "https://www.musinsa.com/products/7491202"
+    }
+   ],
+   "codi": [
+    {
+     "t": "체리 레드 케이블 니트, 어두운 바지",
+     "url": "https://www.musinsa.com/products/5650298"
+    },
+    {
+     "t": "체리 레드 집업 후드, 노랑 이너, 흰 스커트",
+     "url": "https://www.musinsa.com/products/6052617"
+    },
+    {
+     "t": "체리 레드 페어아일 가디건, 어두운 스커트",
+     "url": "https://www.musinsa.com/products/7439155"
+    }
+   ],
+   "hex": "#D84E4D",
+   "measured": 1,
+   "shop": "체리",
+   "pro": "체리",
+   "casual": [
+    "체리 레드"
+   ]
+  },
+  {
+   "id": "dustypink",
+   "u": 5,
+   "g": "warms",
+   "ko": "더스티 핑크",
+   "en": "Dusty pink",
+   "say": "회색이 섞인 차분한 분홍이에요.",
+   "look": "회색이 섞여 탁한 분홍",
+   "where": "",
+   "tip": "더스티 핑크 상의에는 청바지나 어두운 바지를 맞춘 사진이 보여요.",
+   "real": [
+    {
+     "t": "셔츠, 팔렛",
+     "url": "https://www.musinsa.com/products/4387927"
+    },
+    {
+     "t": "자켓, 파르티멘토",
+     "url": "https://www.musinsa.com/products/6426735"
+    },
+    {
+     "t": "후드집업, 어비험즈",
+     "url": "https://www.musinsa.com/products/5692183"
+    },
+    {
+     "t": "맨투맨, 어비험즈",
+     "url": "https://www.musinsa.com/products/7858370"
+    },
+    {
+     "t": "맨투맨, 어비험즈",
+     "url": "https://www.musinsa.com/products/7192676"
+    },
+    {
+     "t": "니트, 엠엠아이씨",
+     "url": "https://www.musinsa.com/products/3116104"
+    }
+   ],
+   "codi": [
+    {
+     "t": "더스티 핑크 크루넥 니트, 청바지",
+     "url": "https://www.musinsa.com/products/6960983"
+    },
+    {
+     "t": "더스티 핑크 셔츠 재킷, 짙은 팬츠",
+     "url": "https://www.musinsa.com/products/7205011"
+    },
+    {
+     "t": "더스티 핑크 팬츠, 흰 상의",
+     "url": "https://www.musinsa.com/products/4469190"
+    }
+   ],
+   "hex": "#DAA8AC",
+   "measured": 1,
+   "shop": "더스티 핑크",
+   "pro": "더스티 핑크",
+   "casual": []
+  },
+  {
+   "id": "hotpink",
+   "u": 5,
+   "g": "warms",
+   "ko": "핫핑크",
+   "en": "Hot pink",
+   "say": "진하고 쨍한 분홍이에요.",
+   "look": "형광에 가까운 진한 분홍",
+   "where": "",
+   "tip": "핫핑크 니트에는 흰 바지나 청바지를 맞춘 사진이 보여요.",
+   "real": [
+    {
+     "t": "맨투맨, 하이스쿨디스코",
+     "url": "https://www.musinsa.com/products/4781396"
+    },
+    {
+     "t": "후드집업, 파인드칠린",
+     "url": "https://www.musinsa.com/products/5220091"
+    },
+    {
+     "t": "티셔츠, 피지컬 디파트먼트",
+     "url": "https://www.musinsa.com/products/3938340"
+    },
+    {
+     "t": "팬츠, 코드그라피",
+     "url": "https://www.musinsa.com/products/5149507"
+    },
+    {
+     "t": "팬츠, 로맨틱스",
+     "url": "https://www.musinsa.com/products/4481087"
+    },
+    {
+     "t": "니트, 클레이스",
+     "url": "https://www.musinsa.com/products/5444179"
+    }
+   ],
+   "codi": [
+    {
+     "t": "핫핑크 울 니트, 흰 와이드 팬츠",
+     "url": "https://www.musinsa.com/products/5893511"
+    },
+    {
+     "t": "핫핑크 집업 니트, 청바지",
+     "url": "https://www.musinsa.com/products/5438425"
+    },
+    {
+     "t": "핫핑크 브이넥 니트, 짙은 청바지",
+     "url": "https://www.musinsa.com/products/5445010"
+    }
+   ],
+   "hex": "#E44375",
+   "measured": 1,
+   "shop": "핫핑크",
+   "pro": "핫핑크",
+   "casual": []
+  },
+  {
+   "id": "lemonyellow",
+   "u": 5,
+   "g": "warms",
+   "ko": "레몬",
+   "en": "Lemon yellow",
+   "say": "레몬 껍질처럼 밝고 선명한 노랑이에요.",
+   "look": "초록 기가 살짝 도는 쨍한 노랑",
+   "where": "",
+   "tip": "레몬 상의에는 청바지나 남색 바지를 맞춘 사진이 보여요.",
+   "real": [
+    {
+     "t": "니트, 이올로",
+     "url": "https://www.musinsa.com/products/3971916"
+    },
+    {
+     "t": "맨투맨, 리",
+     "url": "https://www.musinsa.com/products/5922756"
+    },
+    {
+     "t": "니트, 팔렛",
+     "url": "https://www.musinsa.com/products/3864886"
+    },
+    {
+     "t": "자켓, 매든",
+     "url": "https://www.musinsa.com/products/6919752"
+    },
+    {
+     "t": "가디건, 캉골",
+     "url": "https://www.musinsa.com/products/4756439"
+    },
+    {
+     "t": "셔츠, 리",
+     "url": "https://www.musinsa.com/products/5946362"
+    }
+   ],
+   "codi": [
+    {
+     "t": "레몬 니트 상의, 네이비 와이드 팬츠",
+     "url": "https://www.musinsa.com/products/1976697"
+    },
+    {
+     "t": "레몬 가디건, 청바지",
+     "url": "https://www.musinsa.com/products/6035697"
+    },
+    {
+     "t": "레몬 니트 베스트, 흰 티, 카키 팬츠",
+     "url": "https://www.musinsa.com/products/3998290"
+    }
+   ],
+   "hex": "#F1E5A7",
+   "measured": 1,
+   "shop": "레몬",
+   "pro": "레몬",
+   "casual": [
+    "레몬 옐로우"
+   ]
+  },
+  {
+   "id": "lilac",
+   "u": 5,
+   "g": "warms",
+   "ko": "라일락",
+   "en": "Lilac",
+   "say": "분홍 기가 살짝 도는 연한 보라예요.",
+   "look": "연한 분홍 보라",
+   "where": "",
+   "tip": "라일락 옷에는 흰색이나 파랑 계열을 맞춘 사진이 보여요.",
+   "real": [
+    {
+     "t": "니트, 마욜",
+     "url": "https://www.musinsa.com/products/3100109"
+    },
+    {
+     "t": "자켓, 디젤",
+     "url": "https://www.musinsa.com/products/6658684"
+    },
+    {
+     "t": "가디건, 탈리타",
+     "url": "https://www.musinsa.com/products/6421485"
+    },
+    {
+     "t": "슬랙스, 메이크어토스트",
+     "url": "https://www.musinsa.com/products/2538345"
+    },
+    {
+     "t": "니트, 시에클",
+     "url": "https://www.musinsa.com/products/4478509"
+    }
+   ],
+   "codi": [
+    {
+     "t": "라일락 니트, 파란 셔츠, 짙은 팬츠",
+     "url": "https://www.musinsa.com/products/4478509"
+    },
+    {
+     "t": "라일락 슬랙스, 흰 상의",
+     "url": "https://www.musinsa.com/products/2538345"
+    },
+    {
+     "t": "라일락 가디건과 탱크톱, 흰 팬츠",
+     "url": "https://www.musinsa.com/products/5980468"
+    }
+   ],
+   "hex": "#D6C3D2",
+   "measured": 1,
+   "shop": "라일락",
+   "pro": "라일락",
+   "casual": []
+  },
+  {
+   "id": "maroon",
+   "u": 5,
+   "g": "warms",
+   "ko": "마룬",
+   "en": "Maroon",
+   "say": "갈색이 섞인 어두운 붉은색이에요.",
+   "look": "갈색이 섞인 어두운 붉은색",
+   "where": "",
+   "tip": "마룬 상의에는 검정이나 어두운 하의를 맞춘 사진이 보여요.",
+   "real": [
+    {
+     "t": "셔츠, 프레드페리",
+     "url": "https://www.musinsa.com/products/6029968"
+    },
+    {
+     "t": "팬츠, 소루",
+     "url": "https://www.musinsa.com/products/7563467"
+    },
+    {
+     "t": "티셔츠, 페달레",
+     "url": "https://www.musinsa.com/products/4232927"
+    },
+    {
+     "t": "티셔츠, 와이쓰리",
+     "url": "https://www.musinsa.com/products/6195133"
+    },
+    {
+     "t": "자켓, 아디다스",
+     "url": "https://www.musinsa.com/products/6046413"
+    }
+   ],
+   "codi": [
+    {
+     "t": "마룬 봄버 재킷, 어두운 레이스 스커트",
+     "url": "https://www.musinsa.com/products/6046413"
+    },
+    {
+     "t": "마룬 반팔 티셔츠, 검정 반바지",
+     "url": "https://www.musinsa.com/products/6195133"
+    },
+    {
+     "t": "마룬 랩 가디건과 같은 색 쇼츠",
+     "url": "https://www.musinsa.com/products/7790083"
+    }
+   ],
+   "hex": "#69333A",
+   "measured": 1,
+   "shop": "마룬",
+   "pro": "마룬",
+   "casual": []
+  },
+  {
+   "id": "peach",
+   "u": 5,
+   "g": "warms",
+   "ko": "피치",
+   "en": "Peach",
+   "say": "복숭아 속살 같은 연한 주황빛 분홍이에요.",
+   "look": "살구색에 가까운 연한 주황 분홍",
+   "where": "",
+   "tip": "피치 상의에는 흰 바지나 남색 하의를 맞춘 사진이 보여요.",
+   "real": [
+    {
+     "t": "맨투맨, 리",
+     "url": "https://www.musinsa.com/products/3778217"
+    },
+    {
+     "t": "티셔츠, 랑가주망",
+     "url": "https://www.musinsa.com/products/2545617"
+    },
+    {
+     "t": "팬츠, 커버낫",
+     "url": "https://www.musinsa.com/products/3830342"
+    },
+    {
+     "t": "후드, 팔렛",
+     "url": "https://www.musinsa.com/products/2725479"
+    },
+    {
+     "t": "티셔츠, 피에스쇼퍼",
+     "url": "https://www.musinsa.com/products/4099477"
+    },
+    {
+     "t": "셔츠, 에이에이유",
+     "url": "https://www.musinsa.com/products/5735749"
+    }
+   ],
+   "codi": [
+    {
+     "t": "피치 비대칭 셔츠, 흰 팬츠",
+     "url": "https://www.musinsa.com/products/5735749"
+    },
+    {
+     "t": "피치 니트와 같은 색 팬츠",
+     "url": "https://www.musinsa.com/products/5186077"
+    },
+    {
+     "t": "피치 스웨트셔츠, 남색 스커트",
+     "url": "https://www.musinsa.com/products/3470155"
+    }
+   ],
+   "hex": "#F8B190",
+   "measured": 1,
+   "shop": "피치",
+   "pro": "피치",
+   "casual": [
+    "피치 핑크"
+   ]
+  },
+  {
+   "id": "plum",
+   "u": 5,
+   "g": "warms",
+   "ko": "플럼",
+   "en": "Plum",
+   "say": "자두색 같은 진한 보라예요.",
+   "look": "자두 껍질 같은 진한 보라",
+   "where": "",
+   "tip": "플럼 옷에는 흰 상의나 짙은 회색, 검정 계열을 맞춘 사진이 보여요.",
+   "real": [
+    {
+     "t": "니트, 까이에",
+     "url": "https://www.musinsa.com/products/7572972"
+    },
+    {
+     "t": "맨투맨, 올벗원",
+     "url": "https://www.musinsa.com/products/5796317"
+    },
+    {
+     "t": "셔츠, 프레드페리",
+     "url": "https://www.musinsa.com/products/7072029"
+    },
+    {
+     "t": "맨투맨, 1993스튜디오",
+     "url": "https://www.musinsa.com/products/3835140"
+    },
+    {
+     "t": "팬츠, 무신사 스탠다드 우먼",
+     "url": "https://www.musinsa.com/products/6501125"
+    },
+    {
+     "t": "팬츠, 가니송",
+     "url": "https://www.musinsa.com/products/5437990"
+    }
+   ],
+   "codi": [
+    {
+     "t": "플럼 코듀로이 와이드 팬츠, 짙은 회색 상의",
+     "url": "https://www.musinsa.com/products/6501125"
+    },
+    {
+     "t": "플럼 코듀로이 팬츠, 흰 상의, 갈색 부츠",
+     "url": "https://www.musinsa.com/products/5437990"
+    },
+    {
+     "t": "플럼 헨리넥 니트, 검정 청바지",
+     "url": "https://www.musinsa.com/products/6341396"
+    }
+   ],
+   "hex": "#644853",
+   "measured": 1,
+   "shop": "플럼",
+   "pro": "플럼",
+   "casual": [
+    "진보라"
+   ]
+  },
+  {
+   "id": "salmon",
+   "u": 5,
+   "g": "warms",
+   "ko": "살몬",
+   "en": "Salmon",
+   "say": "주황이 섞인 분홍이에요.",
+   "look": "주황 기가 도는 분홍",
+   "where": "",
+   "tip": "살몬 상의에는 검정이나 베이지 하의를 맞춘 사진이 보여요.",
+   "real": [
+    {
+     "t": "티셔츠, 예일",
+     "url": "https://www.musinsa.com/products/5007098"
+    },
+    {
+     "t": "팬츠, 일템포셀렉샵",
+     "url": "https://www.musinsa.com/products/2253255"
+    },
+    {
+     "t": "팬츠, 에드워드맥스",
+     "url": "https://www.musinsa.com/products/6442393"
+    },
+    {
+     "t": "자켓, 팔렛",
+     "url": "https://www.musinsa.com/products/3864904"
+    },
+    {
+     "t": "셔츠, 키르시",
+     "url": "https://www.musinsa.com/products/6361394"
+    },
+    {
+     "t": "니트, 인스턴트펑크",
+     "url": "https://www.musinsa.com/products/4786756"
+    }
+   ],
+   "codi": [
+    {
+     "t": "살몬 오프숄더 니트, 검정 팬츠",
+     "url": "https://www.musinsa.com/products/4786756"
+    },
+    {
+     "t": "살몬 가디건, 베이지 스커트",
+     "url": "https://www.musinsa.com/products/7266456"
+    },
+    {
+     "t": "살몬 오프숄더 가디건, 청바지 계열 하의",
+     "url": "https://www.musinsa.com/products/5995576"
+    }
+   ],
+   "hex": "#EAB6AE",
+   "measured": 1,
+   "shop": "살몬",
+   "pro": "살몬",
+   "casual": [
+    "연어색",
+    "인디언 핑크"
    ]
   }
  ],
@@ -5144,6 +6999,24 @@
   "초콜릿": "chocolate",
   "초코": "chocolate",
   "진갈색": "chocolate",
+  "번트브라운": "burntbrown",
+  "번트": "burntbrown",
+  "코코아": "cocoabrown",
+  "코코아브라운": "cocoabrown",
+  "에스프레소": "espressobrown",
+  "에스프레소브라운": "espressobrown",
+  "카키베이지": "khakibeige",
+  "모카": "mocha",
+  "모카브라운": "mocha",
+  "모카베이지": "mocha",
+  "러스트": "rust",
+  "러스트레드": "rust",
+  "스톤": "stone",
+  "스톤화이트": "stone",
+  "스톤브라운": "stone",
+  "토프": "taupe",
+  "토프브라운": "taupe",
+  "웜베이지": "warmbeige",
   "다크카키": "khaki",
   "라이트카키": "khaki",
   "진카키": "khaki",
@@ -5155,6 +7028,10 @@
   "포레스트그린": "forest",
   "짙은초록": "forest",
   "진녹색": "forest",
+  "라임": "lime",
+  "올리브드랩": "olivedrab",
+  "드랩": "olivedrab",
+  "국방색": "olivedrab",
   "하늘색": "skyblue",
   "소라색": "skyblue",
   "코발트블루": "cobalt",
@@ -5164,6 +7041,16 @@
   "남색": "navy",
   "곤색": "navy",
   "인디고블루": "indigo",
+  "베이비블루": "babyblue",
+  "연한파랑": "babyblue",
+  "파우더블루": "babyblue",
+  "더스티블루": "dustyblue",
+  "스모크블루": "dustyblue",
+  "미드나잇": "midnightblue",
+  "미드나잇블루": "midnightblue",
+  "잉크": "midnightblue",
+  "잉크네이비": "midnightblue",
+  "로열블루": "royalblue",
   "라이트그레이": "lightgray",
   "연회색": "lightgray",
   "연한회색": "lightgray",
@@ -5171,6 +7058,15 @@
   "차콜그레이": "charcoal",
   "검정": "black",
   "검은색": "black",
+  "애쉬": "ashgray",
+  "애쉬그레이": "ashgray",
+  "쿨그레이": "coolgray",
+  "그레이지": "greige",
+  "미들그레이": "middlegray",
+  "미디엄그레이": "middlegray",
+  "스모크": "smoke",
+  "스모키": "smoke",
+  "웜그레이": "warmgray",
   "빨강": "red",
   "빨간색": "red",
   "와인색": "burgundy",
@@ -5183,6 +7079,28 @@
   "산호색": "coral",
   "베이비핑크": "babypink",
   "연분홍": "babypink",
-  "연보라": "lavender"
+  "연보라": "lavender",
+  "브릭": "brickred",
+  "브릭레드": "brickred",
+  "벽돌색": "brickred",
+  "번트오렌지": "burntorange",
+  "버터": "butteryellow",
+  "버터크림": "butteryellow",
+  "버터옐로우": "butteryellow",
+  "체리": "cherryred",
+  "체리레드": "cherryred",
+  "더스티핑크": "dustypink",
+  "핫핑크": "hotpink",
+  "레몬": "lemonyellow",
+  "레몬옐로우": "lemonyellow",
+  "라일락": "lilac",
+  "마룬": "maroon",
+  "피치": "peach",
+  "피치핑크": "peach",
+  "플럼": "plum",
+  "진보라": "plum",
+  "살몬": "salmon",
+  "연어색": "salmon",
+  "인디언핑크": "salmon"
  }
 }
