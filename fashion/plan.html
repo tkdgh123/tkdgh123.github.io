@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>옷 공부 계획</title>
+<meta name="description" content="옷 공부에 앞으로 올라올 카드와 목표">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+:root{
+  --ink:#121212; --sub:#5f5f5c; --faint:#9a9a96; --line:#e6e6e3;
+  --paper:#ffffff; --tile:#f1f1ee;
+  --wrap:1180px; --gut:max(16px,4vw);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 16px/1.55 "Pretendard Variable",Pretendard,system-ui,"Malgun Gothic",sans-serif;letter-spacing:-.01em}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+
+.top{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.94);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top,0px)}
+.top-in{max-width:var(--wrap);margin:0 auto;padding:0 var(--gut);height:56px;display:flex;align-items:center;gap:28px}
+.brand{font-weight:800;font-size:19px;letter-spacing:-.04em;text-decoration:none;white-space:nowrap}
+.tabs{display:flex;gap:22px;height:100%}
+.tabs a{display:flex;align-items:center;height:100%;text-decoration:none;color:var(--faint);font-weight:600;font-size:15px;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.tabs a[aria-current="page"]{color:var(--ink);border-color:var(--ink)}
+
+main{max-width:var(--wrap);margin:0 auto;padding:0 var(--gut) 96px}
+.lead{padding:28px 0 0}
+.lead h1{margin:0;font-size:clamp(34px,6.4vw,64px);line-height:1.05;font-weight:800;letter-spacing:-.05em}
+.lead h1 span{color:var(--faint);font-weight:300}
+.goal{margin:22px 0 0;max-width:40em;font-size:clamp(18px,2.2vw,22px);line-height:1.6;letter-spacing:-.025em}
+
+h2{margin:0;font-size:22px;font-weight:800;letter-spacing:-.04em}
+.sec{padding-top:56px}
+.sec>p{margin:8px 0 0;color:var(--sub);font-size:15px;max-width:44em}
+
+.can{list-style:none;margin:20px 0 0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.can li{background:var(--tile);padding:18px 18px 20px;font-size:16px;line-height:1.5;letter-spacing:-.02em}
+.can b{display:block;font-size:13px;color:var(--sub);font-weight:600;margin-bottom:8px}
+
+.bars{margin:22px 0 0;display:grid;gap:10px}
+.bar{display:grid;grid-template-columns:9em minmax(0,1fr) 5.5em;align-items:center;gap:14px;text-decoration:none}
+.bar span{font-weight:700;font-size:15px}
+.bar i{display:block;height:10px;background:var(--tile);position:relative;overflow:hidden}
+.bar i::after{content:"";position:absolute;inset:0;width:var(--p);background:var(--ink)}
+.bar em{font-style:normal;font-size:14px;color:var(--sub);text-align:right;font-variant-numeric:tabular-nums}
+.bar:hover span{text-decoration:underline;text-underline-offset:4px}
+
+.order{margin:20px 0 0;padding:0;list-style:none;counter-reset:o;display:grid;gap:0;border-top:1px solid var(--line)}
+.order li{counter-increment:o;display:grid;grid-template-columns:2.2em minmax(0,1fr) auto;gap:10px;padding:12px 0;border-bottom:1px solid var(--line);font-size:15px}
+.order li::before{content:counter(o);color:var(--faint);font-variant-numeric:tabular-nums}
+.order em{font-style:normal;color:var(--sub);font-variant-numeric:tabular-nums}
+
+.adds{margin:20px 0 0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.adds li{border:1px solid var(--line);padding:18px 20px}
+.adds b{display:block;font-size:17px;letter-spacing:-.03em;margin-bottom:6px}
+.adds p{margin:0;font-size:15px;color:var(--sub)}
+
+.unit{padding-top:44px;scroll-margin-top:72px}
+.unit-h{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin:0 0 6px}
+.unit-h p{margin:0;font-size:14px;color:var(--sub)}
+.grp{display:grid;grid-template-columns:11em minmax(0,1fr);gap:4px 18px;padding:14px 0;border-bottom:1px solid var(--line)}
+.grp h3{margin:0;font-size:15px;font-weight:700;letter-spacing:-.03em}
+.grp h3 small{display:block;font-size:12px;font-weight:500;color:var(--faint)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips a,.chips span{font-size:14px;padding:4px 9px;line-height:1.4;text-decoration:none}
+.chips a{background:var(--ink);color:#fff}
+.chips a:hover{background:#3a3a38}
+.chips span{background:var(--tile);color:var(--sub)}
+.key{display:flex;gap:16px;margin:14px 0 0;font-size:13px;color:var(--sub);flex-wrap:wrap}
+.key i{display:inline-block;width:12px;height:12px;vertical-align:-1px;margin-right:6px}
+
+@media (max-width:860px){
+  .can{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .adds{grid-template-columns:1fr}
+}
+@media (max-width:560px){
+  .top-in{gap:16px}
+  .tabs{gap:14px}
+  .bar{grid-template-columns:6.5em minmax(0,1fr) 4.8em;gap:10px}
+  .bar span{font-size:14px}
+  .grp{grid-template-columns:1fr}
+  .can li{padding:14px 14px 16px;font-size:15px}
+}
+</style>
+</head>
+<body>
+<header class="top"><div class="top-in">
+  <a class="brand" href="./#book">옷 공부</a>
+  <nav class="tabs" aria-label="화면">
+    <a href="./#book">도감</a>
+    <a href="./#cmp">비교</a>
+    <a href="./#quiz">퀴즈</a>
+    <a href="./#read">읽기</a>
+    <a href="plan.html" aria-current="page">계획</a>
+  </nav>
+</div></header>
+
+<main>
+  <div class="lead">
+    <h1>카드 <b id="n-up">81</b>장 <span>/ <b id="n-all">306</b>장</span></h1>
+    <p class="goal">쇼핑몰 상품명 한 줄을 읽으면 그 옷이 머릿속에 그려지고, 길에서 본 옷을 이름으로 부를 수 있게 되는 게 목표예요.</p>
+  </div>
+
+  <section class="sec">
+    <h2>다 하면 할 수 있는 것</h2>
+    <ul class="can">
+      <li><b>사진을 보고</b>아이템, 부분, 색, 재질 이름을 말해요</li>
+      <li><b>상품명을 읽고</b>"세미오버 드롭숄더 케이블 니트, 울 30%"가 어떤 옷인지 그려요</li>
+      <li><b>차림을 보고</b>고프코어, 올드머니 같은 스타일과 몇 년대 유행인지 구분해요</li>
+      <li><b>내 옷을 살 때</b>찾는 옷을 검색어로 정확히 쳐요</li>
+    </ul>
+  </section>
+
+  <section class="sec">
+    <h2>단원마다 올라간 카드</h2>
+    <div class="bars" id="bars"></div>
+  </section>
+
+  <section class="sec">
+    <h2>그림 그리는 순서</h2>
+    <p>Gemini가 하루에 50장쯤 그려 줘서 남은 그림은 닷새쯤 걸려요. 그림이 오는 대로 묶음째 올려요.</p>
+    <ol class="order" id="order"></ol>
+  </section>
+
+  <section class="sec">
+    <h2>화면에 더 넣을 것</h2>
+    <ul class="adds">
+      <li><b>몇 년대 퀴즈</b><p>차림 그림을 보고 1920년대부터 2020년대까지 시대를 고르는 문제예요. 7, 8단원 그림이 오면 넣어요.</p></li>
+      <li><b>사진에서 그 부분 누르기</b><p>지금은 실제 거리 사진 31장으로만 내요. 2, 3단원 카드에 점 자리를 적어서 "턱 주름을 눌러 보세요" 같은 문제를 늘려요.</p></li>
+      <li><b>상품명 풀기 20문제</b><p>카드가 다 있는 상품명 <span id="n-names">2</span>개만 지금 나와요. 카드가 올라오는 대로 20개까지 늘어나요.</p></li>
+      <li><b>날짜 맞춘 복습</b><p>틀린 카드를 1일, 3일, 7일 뒤에 다시 내요. 지금은 틀린 카드가 더 자주 나오기만 해요.</p></li>
+    </ul>
+  </section>
+
+  <section class="sec">
+    <h2>단원별 카드 이름</h2>
+    <div class="key"><span><i style="background:var(--ink)"></i>올라감, 누르면 카드</span><span><i style="background:var(--tile)"></i>그림 준비 중</span></div>
+    <div id="units"></div>
+  </section>
+</main>
+
+<script>
+const U = ["아이템", "작은 부분", "핏과 길이", "색과 무늬", "재질", "스타일", "옛 유행", "요즘 유행"];
+const SAY = {1: "학교에 입고 올 법한 옷부터", 2: "같은 옷에서 한 곳만 바꿔 비교", 3: "같은 옷에서 핏과 기장만 바꿔 비교", 4: "같은 니트에서 색만, 같은 셔츠에서 무늬만", 5: "상품 설명 '소재' 칸에 나오는 말", 6: "차림 이름", 7: "세계와 한국, 10년 단위", 8: "2026 가을겨울"};
+const G = [{"u":1,"id":"tops","name":"티와 스웨트","c":[["tee","반팔 티셔츠"],["longsleeve","긴팔 티셔츠"],["sweatshirt","맨투맨"],["hoodie","후드티"],["zipup","후드집업"],["tank","민소매 티"],["croptee","크롭 티"],["rugby","럭비 셔츠"],["jersey","축구 저지"]]},{"u":1,"id":"shirts","name":"셔츠","c":[["oxford","옥스퍼드 셔츠"],["denimshirt","데님 셔츠"],["flannel","플란넬 셔츠"],["aloha","하와이안 셔츠"],["stripeshirt","스트라이프 셔츠"],["overshirt","오버셔츠"],["western","웨스턴 셔츠"]]},{"u":1,"id":"knits","name":"니트","c":[["cable","케이블 니트"],["vest","니트 베스트"],["cardigan","카디건"],["knitpolo","니트 폴로"]]},{"u":1,"id":"light","name":"가벼운 아우터","c":[["blouson","블루종"],["ma1","MA-1 봄버"],["coach","코치 재킷"],["varsity","바시티 재킷"],["trucker","트러커 재킷"],["chore","초어 재킷"],["track","트랙 재킷"],["windbreaker","바람막이"],["anorak","아노락"],["m65","M-65 필드 재킷"],["rider","라이더 재킷"],["blazer","블레이저"]]},{"u":1,"id":"winter","name":"겨울 아우터","c":[["puffer","숏패딩"],["longpuffer","롱패딩"],["lightdown","경량 패딩"],["downvest","패딩 조끼"],["fleece","플리스"],["duffle","더플코트"],["peacoat","피코트"],["balmacaan","발마칸 코트"],["chester","체스터필드 코트"],["trench","트렌치 코트"],["shearling","무스탕"],["quilted","퀼팅 재킷"]]},{"u":1,"id":"pants","name":"바지","c":[["jeans","청바지"],["slacks","슬랙스"],["chino","치노 팬츠"],["cargo","카고 팬츠"],["jogger","조거 팬츠"],["trackpants","트랙 팬츠"],["shorts","반바지"],["carpenter","카펜터 팬츠"],["corduroypants","코듀로이 팬츠"],["parachute","파라슈트 팬츠"]]},{"u":1,"id":"skirts","name":"치마와 원피스","c":[["pleatskirt","플리츠 스커트"],["denimskirt","데님 스커트"],["longskirt","롱스커트"],["shirtdress","셔츠 원피스"],["knitdress","니트 원피스"]]},{"u":1,"id":"shoes","name":"신발","c":[["lowtop","로우탑 스니커즈"],["hightop","하이탑 스니커즈"],["canvas","캔버스화"],["runner","러닝화"],["chunky","청키 스니커즈"],["loafer","로퍼"],["derby","더비 슈즈"],["chelsea","첼시 부츠"],["workboots","워커"],["mule","뮬"],["sportsandal","스포츠 샌들"],["clog","클로그"],["boatshoes","보트 슈즈"]]},{"u":1,"id":"bags","name":"가방","c":[["backpack","백팩"],["messenger","메신저백"],["tote","토트백"],["ecobag","에코백"],["crossbody","크로스백"],["sling","슬링백"],["waistbag","웨이스트백"],["duffel","더플백"],["shoulderbag","숄더백"]]},{"u":1,"id":"hats","name":"모자","c":[["ballcap","볼캡"],["bucket","버킷햇"],["beanie","비니"],["beret","베레모"],["flatcap","헌팅캡"],["truckercap","트러커 캡"],["campcap","캠프캡"]]},{"u":1,"id":"acc","name":"소품","c":[["muffler","머플러"],["necktie","넥타이"],["belt","벨트"],["glasses","뿔테 안경"],["socks","크루 삭스"]]},{"u":2,"id":"neck","name":"둥근 목, 높은 목","c":[["crew","크루넥"],["vneck","브이넥"],["mock","모크넥"],["turtle","터틀넥"]]},{"u":2,"id":"open","name":"앞이 트인 목","c":[["henley","헨리넥"],["qzip","쿼터집"],["hood","후드"],["shawl","숄칼라"]]},{"u":2,"id":"collar","name":"셔츠 깃","c":[["buttondown","버튼다운 칼라"],["opencollar","오픈 칼라"],["band","밴드 칼라"],["polo","폴로 칼라"]]},{"u":2,"id":"shoulder","name":"어깨선","c":[["setin","셋인 소매"],["raglan","래글런 소매"],["drop","드롭숄더"]]},{"u":2,"id":"cuff","name":"소매 끝","c":[["ribcuff","립 소매단"],["cuffs","셔츠 커프스"],["rolltab","롤업 탭"],["thumbhole","엄지 구멍"]]},{"u":2,"id":"closure","name":"여밈","c":[["zipper","지퍼"],["twoway","투웨이 지퍼"],["snap","똑딱이 단추"],["toggle","토글"],["velcro","벨크로"],["drawcord","조임끈과 스토퍼"],["hidden","숨은 단추"],["double","더블 브레스티드"]]},{"u":2,"id":"pocket","name":"주머니","c":[["patchpocket","패치 포켓"],["flappocket","플랩 포켓"],["weltpocket","웰트 포켓"],["kangaroo","캥거루 포켓"],["cargopocket","카고 포켓"],["slant","사선 주머니"],["coinpocket","동전 주머니"],["zippocket","지퍼 주머니"]]},{"u":2,"id":"lapel","name":"재킷 깃","c":[["notch","노치 라펠"],["peak","피크 라펠"],["stand","스탠드 칼라"]]},{"u":2,"id":"pantsparts","name":"바지 부분","c":[["beltloop","벨트 고리"],["pleat","턱 주름"],["crease","다림 주름"],["elastic","밴딩 허리"],["turnup","턴업"],["rivet","리벳"],["buttonfly","버튼 플라이"]]},{"u":2,"id":"details","name":"그 밖의 디테일","c":[["yoke","요크"],["boxpleat","등 주름"],["slit","옆트임"],["shirttail","라운드 밑단"],["epaulet","견장"],["elbowpatch","엘보 패치"],["contrast","대비 박음질"]]},{"u":3,"id":"topfit","name":"상의 핏","c":[["regular","레귤러핏"],["slim","슬림핏"],["semiover","세미오버핏"],["oversized","오버핏"],["boxy","박시핏"],["cropped","크롭 기장"],["longline","롱 기장"]]},{"u":3,"id":"pantsfit","name":"바지 핏","c":[["straight","스트레이트"],["skinny","스키니"],["slimfit","슬림"],["tapered","테이퍼드"],["wide","와이드"],["bootcut","부츠컷"],["barrel","배럴"],["balloon","벌룬"]]},{"u":3,"id":"rise","name":"허리 높이","c":[["highrise","하이웨이스트"],["midrise","미드라이즈"],["lowrise","로우라이즈"]]},{"u":3,"id":"length","name":"바지 길이","c":[["fulllength","풀 기장"],["ankle","앵클 기장"],["cropped_pants","크롭 기장"],["bermuda","버뮤다 기장"],["short_short","숏 기장"]]},{"u":4,"id":"whites","name":"흰색 계열","c":[["purewhite","퓨어 화이트"],["offwhite","오프화이트"],["ivory","아이보리"],["cream","크림"],["ecru","에크루"],["clouddancer","클라우드 댄서"]]},{"u":4,"id":"browns","name":"베이지와 갈색","c":[["oatmeal","오트밀"],["beige","베이지"],["sand","샌드"],["camel","카멜"],["tan","탄"],["brown","브라운"],["chocolate","초콜릿"]]},{"u":4,"id":"greens","name":"초록과 카키","c":[["khaki","카키"],["olive","올리브"],["sage","세이지"],["forest","포레스트 그린"],["mint","민트"]]},{"u":4,"id":"blues","name":"파랑","c":[["skyblue","스카이 블루"],["cobalt","코발트 블루"],["teal","틸"],["navy","네이비"],["indigo","인디고"]]},{"u":4,"id":"monos","name":"무채색","c":[["lightgray","라이트 그레이"],["charcoal","차콜"],["black","블랙"]]},{"u":4,"id":"warms","name":"빨강, 노랑, 분홍, 보라","c":[["red","레드"],["burgundy","버건디"],["terracotta","테라코타"],["mustard","머스타드"],["coral","코랄"],["babypink","베이비 핑크"],["lavender","라벤더"]]},{"u":4,"id":"combos","name":"색 조합","c":[["tonetone","톤온톤"],["toneintone","톤인톤"],["monotone","모노톤"],["pointcolor","포인트 컬러"]]},{"u":4,"id":"patterns","name":"무늬","c":[["stripe","스트라이프"],["pinstripe","핀스트라이프"],["gingham","깅엄 체크"],["glen","글렌 체크"],["tartan","타탄 체크"],["houndstooth","하운드투스"],["herringbone","헤링본"],["buffalo","버팔로 체크"],["argyle","아가일"],["fairisle","페어아일"],["nordic","노르딕"],["dot","도트"],["paisley","페이즐리"],["camo","카모"],["floral","플로럴"],["cowichan","코위찬"]]},{"u":5,"id":"fibers","name":"섬유","c":[["cotton","면"],["wool","울"],["cashmere","캐시미어"],["linen","린넨"],["silk","실크"],["polyester","폴리에스터"],["nylon","나일론"],["rayon","레이온"],["acrylic","아크릴"],["mohair","모헤어"]]},{"u":5,"id":"knitweave","name":"니트 짜임","c":[["jersey_k","저지"],["rib","골지"],["waffle","와플"],["pique","피케"],["cable_k","케이블 짜임"],["boucle","부클레"],["terry","쭈리"],["brushed","기모"]]},{"u":5,"id":"wovens","name":"짠 원단","c":[["denim","데님"],["selvedge","셀비지 데님"],["rawdenim","생지 데님"],["corduroy","코듀로이"],["twill","트윌"],["oxfordcloth","옥스퍼드"],["poplin","포플린"],["chambray","샴브레이"],["flannelcloth","플란넬"],["tweed","트위드"],["melton","멜톤"],["seersucker","시어서커"],["ripstop","립스탑"]]},{"u":5,"id":"special","name":"특별한 소재","c":[["boa","보아 플리스"],["shearling_m","시어링"],["suede","스웨이드"],["leather","레더"],["fauxleather","인조 가죽"],["fur","퍼"],["velvet","벨벳"],["satin","새틴"],["waterproof","방수 원단"],["blend","혼방"]]},{"u":6,"id":"calm","name":"차분한 스타일","c":[["minimal","미니멀"],["kkuankku","꾸안꾸"],["normcore","놈코어"],["dandy","댄디"],["oldmoney","올드머니"]]},{"u":6,"id":"school","name":"학생과 클래식","c":[["preppy","프레피"],["poetcore","포엣 코어"],["vintage","빈티지"]]},{"u":6,"id":"street","name":"스트릿과 Y2K","c":[["street","스트릿"],["cityboy","시티보이"],["y2k","Y2K"],["grunge","그런지"],["athleisure","애슬레저"]]},{"u":6,"id":"outdoor","name":"아웃도어와 작업복","c":[["gorpcore","고프코어"],["granola","그래놀라 코어"],["amekaji","아메카지"],["workwear","워크웨어"],["military","밀리터리"],["blokecore","블록코어"],["techwear","테크웨어"]]},{"u":7,"id":"world","name":"세계의 옛 유행","c":[["w1920","1920년대 플래퍼"],["w1950","1950년대 뉴룩"],["w1960","1960년대 미니"],["w1970","1970년대 히피"],["w1980","1980년대 파워 숄더"],["w1990","1990년대 그런지"]]},{"u":7,"id":"korea","name":"한국의 옛 유행","c":[["k1970","1970년대 청바지와 장발"],["k1980","1980년대 교복 자율화"],["k1990","1990년대 X세대 힙합"],["k2000","2000년대 스키니와 동대문"],["k2010","2010년대 패딩과 스트릿"],["k2020","2020년대 초반 Y2K와 고프코어"]]},{"u":8,"id":"fw26","name":"2026 가을겨울","c":[["paradox","패러독스 드레싱"],["yeticore","예티 코어"],["bambicore","밤비 코어"],["re2016","2016년 재소환"],["futurevintage","퓨처 빈티지 니트"],["checkin","체크 열풍"],["niptuck","닙턱 테일러링"],["weatherman","웨더맨"],["barreltrend","배럴 팬츠"],["cordvelvet","코듀로이와 벨벳"],["redpoint","레드 포인트"],["chocoecru","초콜릿과 에크루"]]}];
+const ORDER = [[2, "작은 부분", "여밈, 주머니, 재킷 깃, 바지 부분"], [3, "핏과 길이", "상의 핏, 바지 핏, 허리 높이, 기장"], [1, "아이템", "아우터, 바지, 치마, 신발, 가방, 모자, 소품"], [5, "재질", "섬유, 니트 짜임, 원단, 특별한 소재"], [4, "색과 무늬", "색 조합, 무늬"], [6, "스타일", ""], [8, "요즘 유행", ""], [7, "옛 유행", ""]];
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]));
+
+function draw(up, names) {
+  const all = G.flatMap(g => g.c), has = id => up.has(id);
+  const cnt = u => { const c = G.filter(g => g.u === u).flatMap(g => g.c); return [c.filter(x => has(x[0])).length, c.length]; };
+  document.getElementById("n-up").textContent = all.filter(x => has(x[0])).length;
+  document.getElementById("n-all").textContent = all.length;
+  if (names != null) document.getElementById("n-names").textContent = names;
+  document.getElementById("bars").innerHTML = U.map((n, i) => { const [a, b] = cnt(i + 1); return `<a class="bar" href="#u${i + 1}"><span>${i + 1}. ${n}</span><i style="--p:${a / b * 100}%"></i><em>${a} / ${b}</em></a>`; }).join("");
+  document.getElementById("order").innerHTML = ORDER.map(([u, n, d]) => { const [a, b] = cnt(u); return `<li><span>${n}${d ? ` <small style="color:var(--faint)">${d}</small>` : ""}</span><em>남은 ${b - a}장</em></li>`; }).join("");
+  document.getElementById("units").innerHTML = U.map((n, i) => `<section class="unit" id="u${i + 1}"><div class="unit-h"><h2>${i + 1}. ${n}</h2><p>${SAY[i + 1]}</p></div>` +
+    G.filter(g => g.u === i + 1).map(g => `<div class="grp"><h3>${esc(g.name)}<small>${g.c.filter(x => has(x[0])).length} / ${g.c.length}</small></h3><div class="chips">${g.c.map(([id, ko]) => has(id) ? `<a href="./#card/${id}">${esc(ko)}</a>` : `<span>${esc(ko)}</span>`).join("")}</div></div>`).join("") + `</section>`).join("");
+}
+draw(new Set(["tee", "longsleeve", "sweatshirt", "hoodie", "zipup", "tank", "croptee", "rugby", "jersey", "oxford", "denimshirt", "flannel", "aloha", "stripeshirt", "overshirt", "western", "cable", "vest", "cardigan", "knitpolo", "blouson", "ma1", "coach", "varsity", "trucker", "chore", "track", "windbreaker", "anorak", "crew", "vneck", "mock", "turtle", "henley", "qzip", "hood", "shawl", "buttondown", "opencollar", "band", "polo", "setin", "raglan", "drop", "ribcuff", "cuffs", "rolltab", "thumbhole", "purewhite", "offwhite", "ivory", "cream", "ecru", "clouddancer", "oatmeal", "beige", "sand", "camel", "tan", "brown", "chocolate", "khaki", "olive", "sage", "forest", "mint", "skyblue", "cobalt", "teal", "navy", "indigo", "lightgray", "charcoal", "black", "red", "burgundy", "terracotta", "mustard", "coral", "babypink", "lavender"]), null);
+fetch("cards.json", {cache: "no-cache"}).then(r => r.json()).then(d => draw(new Set(d.cards.map(c => c.id)), d.names.length)).catch(() => {});
+</script>
+<script src="../hub/back.js" data-cat="study" defer></script>
+</body>
+</html>
