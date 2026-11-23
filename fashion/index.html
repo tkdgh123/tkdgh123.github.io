@@ -226,6 +226,12 @@ const save = () => { try { localStorage.setItem(KEY, JSON.stringify(st)); } catc
 /* 로그인 뒤 서버 기록과 합칠 때 부름 */
 window.ot = { get: () => st, set: x => { st = x; try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} if (!C.length) return; if ($("#sheet").hidden && view !== "quiz") refresh(); prog(); } };
 const learned = id => (st.stat[id]?.s || 0) >= 3;
+const DAY = 86400000;
+const isDue = id => { const s = st.stat[id]; return !!(s && s.due && s.due <= Date.now()); };
+const dueIds = () => C.filter(c => isDue(c.id)).map(c => c.id);
+// 같은 카드는 틀리면 1일 뒤, 맞히면 연속 횟수에 따라 3일, 7일, 21일 뒤에 다시
+const nextDue = s => Date.now() + DAY * [1, 3, 7, 21][Math.min(s.s, 3)];
+const partList = () => C.filter(c => c.spot).map(c => ({ card: c.id, ko: c.ko, src: `img/${c.id}.webp`, w: 600, h: 800, box: [c.spot[0] - 0.1, c.spot[1] - 0.075, c.spot[0] + 0.1, c.spot[1] + 0.075] }));
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
@@ -327,7 +333,7 @@ function cmp(arg) {
 let Q = null;
 function pickSet(only, scope) {
   const pool = only ? only.map(id => byId[id]) : C.filter(c => !scope || c.u == scope);
-  const w = c => (learned(c.id) ? 0 : 2) + (st.stat[c.id]?.w || 0) * 0.5 + (st.seen[c.id] ? 0 : 0.5) + Math.random() * 1.5;
+  const w = c => (isDue(c.id) ? 6 : 0) + (learned(c.id) ? 0 : 2) + (st.stat[c.id]?.w || 0) * 0.5 + (st.seen[c.id] ? 0 : 0.5) + Math.random() * 1.5;
   return pool.sort((a, b) => w(b) - w(a)).slice(0, 10).map(c => {
     const same = shuffle(C.filter(x => x.g === c.g && x.id !== c.id));
     const unit = shuffle(C.filter(x => x.u === c.u && x.g !== c.g));
@@ -346,17 +352,19 @@ function nameSet() {
 }
 function startQuiz(only, scope) {
   scope = scope || "";
+  if (scope === "review" && !only) only = shuffle(dueIds()).slice(0, 10);
   const list = scope === "photo" ? shuffle(P.slice()).slice(0, 10).map(p => ({ photo: p }))
-    : scope === "name" && !only ? nameSet() : shuffle(pickSet(only, scope === "name" ? "" : scope));
+    : scope === "part" ? shuffle(partList()).slice(0, 10).map(p => ({ photo: p }))
+    : scope === "name" && !only ? nameSet() : shuffle(pickSet(only, scope === "name" || scope === "review" ? "" : scope));
   Q = { scope, list, i: 0, right: 0, wrong: [], done: false }; quiz();
 }
 function quiz() {
   const el = $("#v-quiz");
-  const nav = unitNav("quiz", Q.scope, true).replace("</nav>", (N.length ? `<a href="#quiz/name" aria-current="${Q.scope === "name"}">상품명 풀기</a>` : "") + (P.length ? `<a href="#quiz/photo" aria-current="${Q.scope === "photo"}">사진에서 찾기</a>` : "") + "</nav>");
+  const nav = unitNav("quiz", Q.scope, true).replace("</nav>", (dueIds().length || Q.scope === "review" ? `<a href="#quiz/review" aria-current="${Q.scope === "review"}">복습 ${dueIds().length}</a>` : "") + (N.length ? `<a href="#quiz/name" aria-current="${Q.scope === "name"}">상품명 풀기</a>` : "") + (C.some(c => c.spot) ? `<a href="#quiz/part" aria-current="${Q.scope === "part"}">부분 누르기</a>` : "") + (P.length ? `<a href="#quiz/photo" aria-current="${Q.scope === "photo"}">사진에서 찾기</a>` : "") + "</nav>");
   if (Q.i >= Q.list.length) {
     document.body.classList.remove("no-home");
     el.innerHTML = nav + `<div class="qz end"><h2>${Q.list.length}문제 중 ${Q.right}개 맞혔어요</h2>
-      <p class="score">외운 카드 ${C.filter(c => learned(c.id)).length}/${C.length}. 세 번 연속 맞히면 외운 카드가 돼요.</p>
+      <p class="score">외운 카드 ${C.filter(c => learned(c.id)).length}/${C.length}. 세 번 연속 맞히면 외운 카드가 돼요. 틀린 카드는 내일, 맞힌 카드는 3일, 7일 뒤 '복습'에 다시 나와요.</p>
       ${Q.wrong.filter(Boolean).length ? `<div class="grid">${Q.wrong.filter(Boolean).map(id => tile(byId[id])).join("")}</div>` : ""}
       <div class="acts">${Q.wrong.filter(Boolean).length ? `<button class="btn solid" id="q-again-wrong">틀린 것만 다시</button>` : ""}<button class="btn${Q.wrong.length ? "" : " solid"}" id="q-again">새로 10문제</button></div></div>`;
     return;
@@ -367,8 +375,8 @@ function quiz() {
     const p = q.photo;
     el.innerHTML = nav + `<div class="qz"><div class="qz-top"><span>${Q.i + 1} / ${Q.list.length}</span><div class="bar"><i style="width:${Q.i / Q.list.length * 100}%"></i></div></div>
       <h2>사진에서 ${esc(p.ko)}${batchim(p.ko) ? "을" : "를"} 눌러 보세요</h2>
-      <div class="tap" id="tap" style="aspect-ratio:${p.w}/${p.h};--r:${p.w / p.h}"><img src="fp/${p.id}.webp" alt="" width="${p.w}" height="${p.h}"></div>
-      <p class="credit">사진 <a href="https://fashionpedia.github.io/home/" target="_blank" rel="noopener">Fashionpedia</a>, CC BY 4.0</p><div id="fb"></div></div>`;
+      <div class="tap" id="tap" style="aspect-ratio:${p.w}/${p.h};--r:${p.w / p.h}"><img src="${p.src || `fp/${p.id}.webp`}" alt="" width="${p.w}" height="${p.h}"></div>
+      ${p.src ? "" : `<p class="credit">사진 <a href="https://fashionpedia.github.io/home/" target="_blank" rel="noopener">Fashionpedia</a>, CC BY 4.0</p>`}<div id="fb"></div></div>`;
     Q.done = false; return;
   }
   const head = `<div class="qz-top"><span>${Q.i + 1} / ${Q.list.length}</span><div class="bar"><i style="width:${Q.i / Q.list.length * 100}%"></i></div></div>`;
@@ -405,6 +413,7 @@ function answer(o) {
   const q = Q.list[Q.i], c = byId[q.id], ok = o === q.id;
   const s = st.stat[q.id] || (st.stat[q.id] = { s: 0, w: 0 });
   if (ok) { s.s++; Q.right++; } else { s.s = 0; s.w++; Q.wrong.push(q.id); }
+  s.due = ok ? nextDue(s) : Date.now() + DAY;
   st.seen[q.id] = 1; save(); prog();
   const ops = $("#ops"); ops.classList.add("done");
   ops.querySelectorAll(".op").forEach(b => {
@@ -495,7 +504,7 @@ function route() {
   document.querySelectorAll(".tabs a").forEach(a => a.dataset.v === view ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"));
   if (view === "read") { if (!$("#rd-in")) readView(); else readRender(); prog(); }
   else if (view === "quiz") {
-    const scope = U.some(x => x.u == arg) || (arg === "name" && N.length) || (arg === "photo" && P.length) ? arg : "";
+    const scope = U.some(x => x.u == arg) || (arg === "name" && N.length) || (arg === "photo" && P.length) || arg === "part" || arg === "review" ? arg : "";
     if (!Q || Q.scope !== scope) startQuiz(null, scope); else quiz();
     prog();
   } else refresh();
@@ -551,7 +560,7 @@ if (location.hostname === "127.0.0.1" && location.search.includes("emu")) {
 }
 const merge = (a, b) => {
   const seen = { ...a.seen, ...b.seen }, stat = { ...a.stat };
-  for (const [k, v] of Object.entries(b.stat || {})) { const x = stat[k] || { s: 0, w: 0 }; stat[k] = { s: Math.max(x.s || 0, v.s || 0), w: Math.max(x.w || 0, v.w || 0) }; }
+  for (const [k, v] of Object.entries(b.stat || {})) { const x = stat[k] || { s: 0, w: 0 }; stat[k] = { s: Math.max(x.s || 0, v.s || 0), w: Math.max(x.w || 0, v.w || 0) }; const dd = Math.max(x.due || 0, v.due || 0); if (dd) stat[k].due = dd; }
   return { seen, stat };
 };
 let uid = null, timer = 0;
