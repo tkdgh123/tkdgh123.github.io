@@ -73,6 +73,10 @@ main{max-width:var(--wrap);margin:0 auto;padding:0 var(--gut) 96px}
 .card h2{margin:-8px 0 0;font-size:clamp(34px,4.6vw,48px);line-height:1.1;font-weight:800;letter-spacing:-.05em}
 .card .en{margin:-12px 0 0;font-size:13px;color:var(--faint)}
 .card .say{margin:0;font-size:18px;line-height:1.6;letter-spacing:-.02em}
+.lk{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:6px}
+.lk li{display:flex;justify-content:space-between;gap:10px;font-size:15px}
+.lk a{text-underline-offset:3px}
+.lk span{flex:none;font-size:12px;color:var(--faint)}
 .row{border-top:1px solid var(--line);padding-top:14px}
 .row h3{margin:0 0 4px;font-size:13px;color:var(--sub);font-weight:600}
 .row p{margin:0;font-size:15px}
@@ -264,10 +268,12 @@ function openCard(id) {
     <div class="card-g">${esc(uName(c.u))}, ${esc(gOf(c.g).name)}</div>
     <h2 id="c-name">${esc(c.ko)}</h2>
     <p class="en">${esc(c.en)}${c.alias ? `<span>흔히 ${esc(c.alias)}</span>` : ""}</p>
-    ${c.hex ? `<p class="sw"><i style="background:${c.hex}"></i>${c.hex} 정도</p>` : ""}
+    ${c.hex ? `<p class="sw"><i style="background:${c.hex}"></i>${c.hex} 정도${c.measured ? ", 쇼핑몰 실제 옷에서 잰 색" : ""}</p>` : ""}
     <p class="say">${esc(c.say)}</p>
     ${c.say.startsWith(c.look) ? "" : `<div class="row"><h3>여기를 보면 알아요</h3><p>${esc(c.look)}</p></div>`}
     <div class="row"><h3>자주 보이는 곳</h3><p>${esc(c.where)}</p></div>
+    ${c.tip ? `<div class="row"><h3>이렇게 입어요</h3><p>${esc(c.tip)}</p>${c.codi?.length ? `<ul class="lk">${c.codi.map(x => `<li><a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.t)}</a><span>${x.pin ? "핀터레스트" : "무신사"}</span></li>`).join("")}</ul>` : ""}</div>` : ""}
+    ${c.real?.length ? `<div class="row"><h3>이 색 실제 옷</h3><ul class="lk">${c.real.map(x => `<li><a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.t)}</a><span>무신사</span></li>`).join("")}</ul></div>` : ""}
     ${c.src ? `<div class="row"><h3>출처</h3><p><a href="${esc(c.src.url)}" target="_blank" rel="noopener">${esc(c.src.name)}</a> <span style="color:var(--faint)">${esc(c.src.date)}</span></p></div>` : ""}
     ${mates.length ? `<div class="row"><h3>헷갈리는 짝</h3><div class="pair">${mates.map(m => `<button data-card="${m.id}"><div class="ph"><img src="img/${m.id}.webp" alt="" width="600" height="800" loading="lazy"></div>${esc(m.ko)}</button>`).join("")}</div></div>` : ""}
     <div class="acts"><a class="btn solid" href="#cmp/${c.g}">나란히 비교</a><a class="btn" href="https://www.musinsa.com/search/goods?keyword=${q}" target="_blank" rel="noopener">무신사에서 실제 상품</a></div>`;

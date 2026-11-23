@@ -1110,7 +1110,63 @@
    "say": "파란 기가 살짝 도는 새하얀 흰색이에요.",
    "look": "파란 기가 살짝 도는 새하얀 흰색",
    "where": "셔츠, 티셔츠",
-   "hex": "#FFFFFF"
+   "hex": "#FFFFFF",
+   "tip": "흰색 위아래보다 한쪽을 검정이나 짙은 회색으로 눌러 주는 조합이 사진 3장에서 반복돼요.",
+   "real": [
+    {
+     "t": "니트, 안토메",
+     "url": "https://www.musinsa.com/products/6254863"
+    },
+    {
+     "t": "셔츠, 올유니",
+     "url": "https://www.musinsa.com/products/7304141"
+    },
+    {
+     "t": "셔츠, 더밀루이",
+     "url": "https://www.musinsa.com/products/6732112"
+    },
+    {
+     "t": "맨투맨, 시오 이아이피",
+     "url": "https://www.musinsa.com/products/6445989"
+    },
+    {
+     "t": "팬츠, 샤인온유",
+     "url": "https://www.musinsa.com/products/6496262"
+    },
+    {
+     "t": "패딩, 노스페이스",
+     "url": "https://www.musinsa.com/products/7700754"
+    }
+   ],
+   "codi": [
+    {
+     "t": "화이트 와이드 팬츠, 검정 민소매 탑, 검정 메시 플랫슈즈",
+     "url": "https://www.musinsa.com/products/6392729"
+    },
+    {
+     "t": "화이트 셔츠를 앞을 열고 입고 안에 흰 티, 짙은 회색 바지",
+     "url": "https://www.musinsa.com/products/6602206"
+    },
+    {
+     "t": "화이트 V넥 니트, 검정 하의",
+     "url": "https://www.musinsa.com/products/6254863"
+    },
+    {
+     "t": "흰 린넨 셔츠(앞 열어 입음), 흰 민소매, 흰 린넨 와이드 팬츠, 검정 슬리퍼, 손목시계",
+     "url": "https://www.pinterest.com/pin/1039064945289325062/",
+     "pin": 1
+    },
+    {
+     "t": "큰 흰 셔츠(옆트임, 길이 김), 검정 와이드 팬츠, 검정 슬리퍼, 검정 뿔테 안경",
+     "url": "https://www.pinterest.com/pin/423619908712023306/",
+     "pin": 1
+    },
+    {
+     "t": "큰 흰 셔츠, 물 빠진 회청 와이드 데님, 흰색 은색 스니커즈, 손에 든 흰 모자, 검정 선글라스",
+     "url": "https://www.pinterest.com/pin/31736372368010896/",
+     "pin": 1
+    }
+   ]
   },
   {
    "id": "offwhite",
@@ -1121,7 +1177,63 @@
    "say": "하얀색에서 아주 조금 누그러진 흰색이에요.",
    "look": "하얀색에서 아주 조금 누그러진 흰색",
    "where": "니트, 셔츠, 미니멀",
-   "hex": "#F4F2EC"
+   "hex": "#F4F2EC",
+   "tip": "오프화이트는 짙은 청바지나 검정 스커트로 아래를 진하게 받쳐요.",
+   "real": [
+    {
+     "t": "니트, 소루",
+     "url": "https://www.musinsa.com/products/3553738"
+    },
+    {
+     "t": "니트, 피파 1904",
+     "url": "https://www.musinsa.com/products/3889083"
+    },
+    {
+     "t": "셔츠, 아틀리에 델디오",
+     "url": "https://www.musinsa.com/products/7624009"
+    },
+    {
+     "t": "팬츠, 디아도라",
+     "url": "https://www.musinsa.com/products/4469727"
+    },
+    {
+     "t": "재킷, 디아도라",
+     "url": "https://www.musinsa.com/products/4469751"
+    },
+    {
+     "t": "맨투맨, 데밀",
+     "url": "https://www.musinsa.com/products/4417831"
+    }
+   ],
+   "codi": [
+    {
+     "t": "오프화이트 반팔 하이넥 니트, 검정 벨벳 스커트",
+     "url": "https://www.musinsa.com/products/3758990"
+    },
+    {
+     "t": "오프화이트 맨투맨, 짙은 청바지",
+     "url": "https://www.musinsa.com/products/5340805"
+    },
+    {
+     "t": "흰 긴팔 상의, 연회색 워싱 팬츠, 흰 뾰족 구두",
+     "url": "https://www.musinsa.com/products/7706372"
+    },
+    {
+     "t": "오프화이트 니트 조끼, 흰 반팔 티, 같은 톤 아이보리 턱 팬츠, 흰 스니커즈, 팔에 건 카키 재킷",
+     "url": "https://www.pinterest.com/pin/720505640416605072/",
+     "pin": 1
+    },
+    {
+     "t": "오프화이트 오버핏 상의, 같은 계열 와이드 턱 팬츠, 금색 플랫슈즈",
+     "url": "https://www.pinterest.com/pin/774830310904426584/",
+     "pin": 1
+    },
+    {
+     "t": "회색 니트, 안에 흰 셔츠 옷깃, 오프화이트 배기 팬츠, 베이지 신발, 회색 비니",
+     "url": "https://www.pinterest.com/pin/717479784421233771/",
+     "pin": 1
+    }
+   ]
   },
   {
    "id": "ivory",
@@ -1132,7 +1244,63 @@
    "say": "노란 기가 살짝 도는 따뜻한 흰색이에요.",
    "look": "노란 기가 살짝 도는 따뜻한 흰색",
    "where": "니트, 코트, 꾸안꾸",
-   "hex": "#F1EBD8"
+   "hex": "#F1EBD8",
+   "tip": "아이보리 상의는 인디고 청바지와 맞춰요.",
+   "real": [
+    {
+     "t": "니트, 리",
+     "url": "https://www.musinsa.com/products/5327306"
+    },
+    {
+     "t": "니트, 리",
+     "url": "https://www.musinsa.com/products/3879904"
+    },
+    {
+     "t": "맨투맨, 언탭트 스튜디오",
+     "url": "https://www.musinsa.com/products/3627743"
+    },
+    {
+     "t": "재킷, 마뗑킴",
+     "url": "https://www.musinsa.com/products/7542007"
+    },
+    {
+     "t": "코트, 비바셔스",
+     "url": "https://www.musinsa.com/products/7602195"
+    },
+    {
+     "t": "코트, 로제프란츠",
+     "url": "https://www.musinsa.com/products/7443404"
+    }
+   ],
+   "codi": [
+    {
+     "t": "아이보리 롱 코트, 베이지 와이드 팬츠, 검정 미니 가방, 검정 플랫슈즈",
+     "url": "https://www.musinsa.com/products/7602195"
+    },
+    {
+     "t": "아이보리 니트, 짙은 회색 와이드 팬츠, 갈색 숄더백",
+     "url": "https://www.musinsa.com/products/7504949"
+    },
+    {
+     "t": "아이보리 V넥 니트, 회색 털 비니, 보라색 하의",
+     "url": "https://www.musinsa.com/products/7049929"
+    },
+    {
+     "t": "아이보리 모헤어 터틀넥 니트, 크림색 와이드 팬츠, 검정 뾰족 앞코 슈즈",
+     "url": "https://www.pinterest.com/pin/835769643387055420/",
+     "pin": 1
+    },
+    {
+     "t": "연아이보리 하이넥 니트, 같은 색 니트 스커트, 검정 앵클부츠, 아이보리 클러치",
+     "url": "https://www.pinterest.com/pin/743868063449252846/",
+     "pin": 1
+    },
+    {
+     "t": "아이보리 케이블 니트, 크림색 와이드 팬츠, 검정 벨트, 아이보리 아디다스 스타일 스니커즈",
+     "url": "https://www.pinterest.com/pin/427208714667912231/",
+     "pin": 1
+    }
+   ]
   },
   {
    "id": "cream",
@@ -1143,7 +1311,63 @@
    "say": "아이보리보다 노란 기가 더 진한 흰색이에요.",
    "look": "아이보리보다 노란 기가 더 진한 흰색",
    "where": "니트, 카디건",
-   "hex": "#F2E4C2"
+   "hex": "#F2E4C2",
+   "tip": "크림 니트에는 네이비 팬츠나 베이지 팬츠를 맞춘 사진이 많고, 안에 하늘색 셔츠를 겹치면 색이 살아요.",
+   "real": [
+    {
+     "t": "니트, 유니폼브릿지",
+     "url": "https://www.musinsa.com/products/4290250"
+    },
+    {
+     "t": "니트, 유앤엘씨",
+     "url": "https://www.musinsa.com/products/2773593"
+    },
+    {
+     "t": "니트, 키뮤어",
+     "url": "https://www.musinsa.com/products/3162672"
+    },
+    {
+     "t": "니트, 유니폼브릿지",
+     "url": "https://www.musinsa.com/products/4488741"
+    },
+    {
+     "t": "가디건, 코드그라피",
+     "url": "https://www.musinsa.com/products/5597790"
+    },
+    {
+     "t": "셔츠, 무신사 스탠다드",
+     "url": "https://www.musinsa.com/products/2106511"
+    }
+   ],
+   "codi": [
+    {
+     "t": "크림 케이블 니트, 네이비 팬츠",
+     "url": "https://www.musinsa.com/products/5587877"
+    },
+    {
+     "t": "크림 골지 니트, 베이지 팬츠",
+     "url": "https://www.musinsa.com/products/7659091"
+    },
+    {
+     "t": "연한 크림 케이블 니트 안에 하늘색 셔츠, 네이비 팬츠, 흰 신발, 네이비 캡",
+     "url": "https://www.musinsa.com/products/5332671"
+    },
+    {
+     "t": "크림색 크루넥 니트, 안에 흰 셔츠 옷깃, 같은 톤 와이드 팬츠, 검정 미니 백, 검정 뿔테 안경",
+     "url": "https://www.pinterest.com/pin/1065734699333911071/",
+     "pin": 1
+    },
+    {
+     "t": "크림색 케이블 니트, 안에 흰 셔츠 단, 회갈색 와이드 팬츠, 흰 에코백, 반스 스타일 스니커즈",
+     "url": "https://www.pinterest.com/pin/970666525922251547/",
+     "pin": 1
+    },
+    {
+     "t": "크림색 모헤어 니트, 같은 톤 턱 팬츠, 갈색 가죽 토트백, 검정 뾰족 슈즈",
+     "url": "https://www.pinterest.com/pin/579838520813719252/",
+     "pin": 1
+    }
+   ]
   },
   {
    "id": "ecru",
@@ -1154,7 +1378,63 @@
    "say": "표백하지 않은 실 같은, 회색 기가 섞인 연한 베이지예요.",
    "look": "표백하지 않은 실 같은, 회색 기가 섞인 연한 베이지",
    "where": "니트, 데님, 내추럴",
-   "hex": "#E6DCC7"
+   "hex": "#E6DCC7",
+   "tip": "에크루 니트는 청바지나 갈색 바지로 아래를 진하게 받쳐요.",
+   "real": [
+    {
+     "t": "니트, 아웃스탠딩",
+     "url": "https://www.musinsa.com/products/5936068"
+    },
+    {
+     "t": "니트, 페레그린",
+     "url": "https://www.musinsa.com/products/3635515"
+    },
+    {
+     "t": "맨투맨, 커버낫 우먼",
+     "url": "https://www.musinsa.com/products/4142654"
+    },
+    {
+     "t": "팬츠, 필로그램",
+     "url": "https://www.musinsa.com/products/2215919"
+    },
+    {
+     "t": "재킷, 커버낫",
+     "url": "https://www.musinsa.com/products/3086666"
+    },
+    {
+     "t": "셔츠, 브라운야드",
+     "url": "https://www.musinsa.com/products/7408528"
+    }
+   ],
+   "codi": [
+    {
+     "t": "에크루 케이블 니트(방울 장식), 청바지",
+     "url": "https://www.musinsa.com/products/7363474"
+    },
+    {
+     "t": "크림 니트(검정 테두리와 로고), 카멜 베이지 바지, 회색 털 비니",
+     "url": "https://www.musinsa.com/products/4399293"
+    },
+    {
+     "t": "크림 셔츠, 갈색 워싱 바지, 검정 숄더백",
+     "url": "https://www.musinsa.com/products/4401807"
+    },
+    {
+     "t": "에크루 배기 치노 팬츠, 남색 카디건, 안에 흰 티, 남색 볼캡, 붉은 끈 스니커즈",
+     "url": "https://www.pinterest.com/pin/765400899192586487/",
+     "pin": 1
+    },
+    {
+     "t": "노란 모헤어 니트, 에크루 와이드 팬츠, 갈색 가죽 토트백, 흰 스니커즈",
+     "url": "https://www.pinterest.com/pin/736127501619402078/",
+     "pin": 1
+    },
+    {
+     "t": "회베이지 셔츠, 아이보리 턱 테이퍼드 팬츠, 갈색 가죽 미니 크로스백, 붉은 양말, 갈색 로퍼",
+     "url": "https://www.pinterest.com/pin/879116789732504714/",
+     "pin": 1
+    }
+   ]
   },
   {
    "id": "clouddancer",
@@ -1165,7 +1445,36 @@
    "say": "팬톤이 2026년 올해의 색으로 고른 부드러운 흰색이에요.",
    "look": "팬톤이 2026년 올해의 색으로 고른 부드러운 흰색",
    "where": "2026년 유행 색",
-   "hex": "#F0EEE9"
+   "hex": "#F0EEE9",
+   "tip": "클라우드 댄서는 후드와 팬츠를 같은 색으로 맞춘 세트 사진이 보여요.",
+   "real": [
+    {
+     "t": "팬츠, 소버래인",
+     "url": "https://www.musinsa.com/products/7671302"
+    },
+    {
+     "t": "팬츠, 매고렌 서울",
+     "url": "https://www.musinsa.com/products/6027967"
+    },
+    {
+     "t": "후드 집업, 매고렌 서울",
+     "url": "https://www.musinsa.com/products/6027972"
+    },
+    {
+     "t": "크롭탑, 레이나모라",
+     "url": "https://www.musinsa.com/products/2117434"
+    }
+   ],
+   "codi": [
+    {
+     "t": "흰 후드 집업(등에 금색 자수), 같은 색 와이드 스웨트 팬츠(뒷모습)",
+     "url": "https://www.musinsa.com/products/6027972"
+    },
+    {
+     "t": "흰 반팔 크롭탑, 크림색 레깅스",
+     "url": "https://www.musinsa.com/products/2117434"
+    }
+   ]
   },
   {
    "id": "oatmeal",
@@ -1176,7 +1485,63 @@
    "say": "귀리처럼 잔점이 섞인 회색빛 베이지예요.",
    "look": "귀리처럼 잔점이 섞인 회색빛 베이지",
    "where": "니트, 스웨트, 꾸안꾸",
-   "hex": "#DCD2BF"
+   "hex": "#DCD2BF",
+   "tip": "청바지 파랑, 갈색, 검정 소품과 잘 맞아요. 위아래를 오트밀로 맞추면 신발이나 가방만 진한 색으로 해요.",
+   "real": [
+    {
+     "t": "니트, 니티드",
+     "url": "https://www.musinsa.com/products/5507292"
+    },
+    {
+     "t": "니트, 디미트리블랙",
+     "url": "https://www.musinsa.com/products/3539913"
+    },
+    {
+     "t": "셔츠, 렌세",
+     "url": "https://www.musinsa.com/products/7534285"
+    },
+    {
+     "t": "맨투맨, 마리떼 프랑소와 저버",
+     "url": "https://www.musinsa.com/products/5617483"
+    },
+    {
+     "t": "팬츠, 제로",
+     "url": "https://www.musinsa.com/products/1736619"
+    },
+    {
+     "t": "코트, 플모",
+     "url": "https://www.musinsa.com/products/7392694"
+    }
+   ],
+   "codi": [
+    {
+     "t": "오트밀 반집업 니트, 중청 스트레이트 청바지, 검정 숄더백",
+     "url": "https://www.musinsa.com/products/7410115"
+    },
+    {
+     "t": "오트밀 셔츠, 카키 그레이 부츠컷 바지, 갈색 벨트, 검정 구두",
+     "url": "https://www.musinsa.com/products/5915498"
+    },
+    {
+     "t": "오트밀 맨투맨과 같은 색 스웨트 팬츠, 검정 슬립온",
+     "url": "https://www.musinsa.com/products/5400107"
+    },
+    {
+     "t": "오트밀 크루넥 니트, 연청 와이드 데님, 흰 스니커즈, 검정 백팩",
+     "url": "https://www.pinterest.com/pin/1134977543668049697/",
+     "pin": 1
+    },
+    {
+     "t": "아이보리 케이블 니트, 크림색 와이드 팬츠, 검정 로퍼, 검정 숄더백",
+     "url": "https://www.pinterest.com/pin/661888476531191552/",
+     "pin": 1
+    },
+    {
+     "t": "오트밀 케이블 니트, 안에 체크 셔츠 깃과 소매, 버건디 팬츠",
+     "url": "https://www.pinterest.com/pin/700591285816920357/",
+     "pin": 1
+    }
+   ]
   },
   {
    "id": "beige",
@@ -1187,7 +1552,63 @@
    "say": "밝은 모래빛 기본 베이지예요.",
    "look": "밝은 모래빛 기본 베이지",
    "where": "치노, 트렌치, 니트",
-   "hex": "#D9C7A7"
+   "hex": "#D9C7A7",
+   "tip": "네이비와 베이지를 같이 입으면 좋다고 했어요.",
+   "real": [
+    {
+     "t": "니트, 마뗑킴",
+     "url": "https://www.musinsa.com/products/7541843"
+    },
+    {
+     "t": "맨투맨, 코닥",
+     "url": "https://www.musinsa.com/products/4488196"
+    },
+    {
+     "t": "맨투맨, 리",
+     "url": "https://www.musinsa.com/products/5922708"
+    },
+    {
+     "t": "가디건, 폴로 랄프 로렌",
+     "url": "https://www.musinsa.com/products/7018793"
+    },
+    {
+     "t": "팬츠, 에이지오디",
+     "url": "https://www.musinsa.com/products/3467426"
+    },
+    {
+     "t": "재킷, 플레이스 스튜디오",
+     "url": "https://www.musinsa.com/products/7010709"
+    }
+   ],
+   "codi": [
+    {
+     "t": "베이지 니트, 검정 와이드 하의, 검정 가죽 숄더백",
+     "url": "https://www.musinsa.com/products/7437927"
+    },
+    {
+     "t": "베이지 갈색 하프집업 리브 니트, 안에 흰 티, 아이보리 팬츠",
+     "url": "https://www.musinsa.com/products/7188875"
+    },
+    {
+     "t": "카키 베이지 카고 팬츠, 검정 후드와 회색 이너, 검정 두툼한 신발",
+     "url": "https://www.musinsa.com/products/3467426"
+    },
+    {
+     "t": "베이지 오버핏 셔츠 재킷, 안에 먼지 분홍색 셔츠, 회갈색 와이드 팬츠, 검정 부츠",
+     "url": "https://www.pinterest.com/pin/805862927056458548/",
+     "pin": 1
+    },
+    {
+     "t": "베이지 짧은 집업 재킷, 후드, 베이지 와이드 팬츠, 월렛 체인, 갈색 신발",
+     "url": "https://www.pinterest.com/pin/967851776181609797/",
+     "pin": 1
+    },
+    {
+     "t": "베이지 린넨 재킷, 안에 흰 티, 카키베이지 와이드 치노 팬츠(밑단 접음), 흰 스니커즈, 검정 볼캡(뒤로 씀)",
+     "url": "https://www.pinterest.com/pin/494129390361518790/",
+     "pin": 1
+    }
+   ]
   },
   {
    "id": "sand",
@@ -1198,7 +1619,64 @@
    "say": "베이지보다 진한 모래색이에요.",
    "look": "베이지보다 진한 모래색",
    "where": "치노, 카고, 고프코어",
-   "hex": "#CDB78F"
+   "hex": "#D5CCBA",
+   "tip": "샌드는 청바지나 카키 바지 같은 가까운 톤과 맞춘 사진이 보여요.",
+   "real": [
+    {
+     "t": "니트, 쿠어",
+     "url": "https://www.musinsa.com/products/1548457"
+    },
+    {
+     "t": "니트, 프로드셔츠",
+     "url": "https://www.musinsa.com/products/2502912"
+    },
+    {
+     "t": "맨투맨, 라임라잇 어패럴",
+     "url": "https://www.musinsa.com/products/4548439"
+    },
+    {
+     "t": "맨투맨, 더바이닐하우스",
+     "url": "https://www.musinsa.com/products/3819359"
+    },
+    {
+     "t": "셔츠, 준바이준케이",
+     "url": "https://www.musinsa.com/products/2952722"
+    },
+    {
+     "t": "팬츠, 무신사 스탠다드",
+     "url": "https://www.musinsa.com/products/3758201"
+    }
+   ],
+   "codi": [
+    {
+     "t": "샌드 모헤어 니트, 청바지",
+     "url": "https://www.musinsa.com/products/4605219"
+    },
+    {
+     "t": "샌드 카키 면바지, 흰 티, 검정 로퍼",
+     "url": "https://www.musinsa.com/products/3758201"
+    },
+    {
+     "t": "연한 카키 블루종(갈색 깃), 베이지 이너, 카키 워싱 바지",
+     "url": "https://www.musinsa.com/products/4300486"
+    },
+    {
+     "t": "샌드 와이드 턱 팬츠, 흰 상의, 어깨에 두른 회베이지 니트, 갈색 벨트백, 샌들",
+     "url": "https://www.pinterest.com/pin/989243874389845299/",
+     "pin": 1
+    },
+    {
+     "t": "흰 반팔 니트, 샌드 하이웨이스트 와이드 팬츠, 베이지 미니백, 흰 샌들, 아이스 음료",
+     "url": "https://www.pinterest.com/pin/1103311608734935593/",
+     "pin": 1
+    },
+    {
+     "t": "베이지 립 니트, 샌드 슬림 풀렝스 팬츠(밑단 트임), 뱀무늬 펌프스, 베이지 바구니 클러치",
+     "url": "https://www.pinterest.com/pin/441563938464485940/",
+     "pin": 1
+    }
+   ],
+   "measured": 1
   },
   {
    "id": "camel",
@@ -1209,7 +1687,64 @@
    "say": "낙타털 같은 노란 기 도는 갈색이에요.",
    "look": "낙타털 같은 노란 기 도는 갈색",
    "where": "코트, 니트, 올드머니",
-   "hex": "#B98A55"
+   "hex": "#AD7A5B",
+   "tip": "네이비나 버건디 차림에 카멜 가방, 신발, 벨트를 더하면 고급스러워진다고 했어요.",
+   "real": [
+    {
+     "t": "니트, 플라드주르",
+     "url": "https://www.musinsa.com/products/4647944"
+    },
+    {
+     "t": "니트, 베르노",
+     "url": "https://www.musinsa.com/products/3224677"
+    },
+    {
+     "t": "폴로 니트, 페라로 밀라노",
+     "url": "https://www.musinsa.com/products/4885903"
+    },
+    {
+     "t": "가디건, 유니폼브릿지",
+     "url": "https://www.musinsa.com/products/5393541"
+    },
+    {
+     "t": "코트, 드헤베",
+     "url": "https://www.musinsa.com/products/4535526"
+    },
+    {
+     "t": "재킷, 르니나",
+     "url": "https://www.musinsa.com/products/7527120"
+    }
+   ],
+   "codi": [
+    {
+     "t": "카멜 니트, 안에 하늘색 셔츠, 갈색 플리츠 스커트",
+     "url": "https://www.musinsa.com/products/4539193"
+    },
+    {
+     "t": "카멜 케이블 가디건, 흰 셔츠, 청바지, 검정 벨트",
+     "url": "https://www.musinsa.com/products/5393541"
+    },
+    {
+     "t": "카멜 V넥 니트, 흰 터틀넥, 아이보리 숄더백",
+     "url": "https://www.musinsa.com/products/7587012"
+    },
+    {
+     "t": "카멜 롱 코트, 검정 터틀넥, 검정 와이드 팬츠, 암갈색 가죽 토트백, 컨버스 스니커즈",
+     "url": "https://www.pinterest.com/pin/814940495055692225/",
+     "pin": 1
+    },
+    {
+     "t": "카멜 롱 코트(벨트 풀어 입음), 검정 터틀넥, 베이지 와이드 팬츠, 회색 스니커즈",
+     "url": "https://www.pinterest.com/pin/452119250094367215/",
+     "pin": 1
+    },
+    {
+     "t": "카멜 더블 롱 코트, 카멜 터틀넥 니트, 베이지 슬랙스, 갈색 로퍼, 카멜 머플러",
+     "url": "https://www.pinterest.com/pin/329536897757924530/",
+     "pin": 1
+    }
+   ],
+   "measured": 1
   },
   {
    "id": "tan",
@@ -1220,7 +1755,64 @@
    "say": "햇볕에 그을린 듯한 밝은 갈색이에요.",
    "look": "햇볕에 그을린 듯한 밝은 갈색",
    "where": "가죽, 부츠, 벨트",
-   "hex": "#A9784A"
+   "hex": "#C3B19D",
+   "tip": "탄 상의는 검정 팬츠와 맞춘 사진이 2장 보여요.",
+   "real": [
+    {
+     "t": "가디건 재킷, 디오디",
+     "url": "https://www.musinsa.com/products/4904141"
+    },
+    {
+     "t": "셔츠, 디오디",
+     "url": "https://www.musinsa.com/products/4425102"
+    },
+    {
+     "t": "셔츠, 디오디",
+     "url": "https://www.musinsa.com/products/5082373"
+    },
+    {
+     "t": "폴로, 디오디",
+     "url": "https://www.musinsa.com/products/4945170"
+    },
+    {
+     "t": "맨투맨, 하울 서플라이",
+     "url": "https://www.musinsa.com/products/2510909"
+    },
+    {
+     "t": "플리스 재킷, 디오디",
+     "url": "https://www.musinsa.com/products/4467450"
+    }
+   ],
+   "codi": [
+    {
+     "t": "탄 가디건 재킷, 같은 색 이너, 연회색 카고 팬츠",
+     "url": "https://www.musinsa.com/products/4904141"
+    },
+    {
+     "t": "탄 셔츠, 같은 색 캡, 검정 팬츠",
+     "url": "https://www.musinsa.com/products/4425102"
+    },
+    {
+     "t": "탄 하프집업 상의, 안에 흰 이너, 검정 팬츠, 검정 장갑, 베이지 귀마개 모자",
+     "url": "https://www.musinsa.com/products/4458196"
+    },
+    {
+     "t": "남색 후드 티, 안에 흰 티, 탄색 초와이드 치노 팬츠, 갈색 신발, 남색 헌팅캡",
+     "url": "https://www.pinterest.com/pin/1039064945271806349/",
+     "pin": 1
+    },
+    {
+     "t": "검정 짧은 재킷, 안에 연베이지 상의, 탄색 와이드 치노 팬츠, 검정 로퍼, 검정 선글라스",
+     "url": "https://www.pinterest.com/pin/579838520809178357/",
+     "pin": 1
+    },
+    {
+     "t": "격자무늬 플란넬 셔츠, 흰 티, 탄색 코듀로이 와이드 팬츠, 주황 비니, 갈색 신발",
+     "url": "https://www.pinterest.com/pin/833377106072843501/",
+     "pin": 1
+    }
+   ],
+   "measured": 1
   },
   {
    "id": "brown",
@@ -1231,7 +1823,63 @@
    "say": "기본 갈색이에요.",
    "look": "기본 갈색",
    "where": "코듀로이, 레더, 포엣 코어",
-   "hex": "#6B4A33"
+   "hex": "#6B4A33",
+   "tip": "브라운 니트는 베이지 바지나 청바지, 브라운 바지는 흰 패딩과 맞춘 사진이 있어요.",
+   "real": [
+    {
+     "t": "셔츠, 트릴리온",
+     "url": "https://www.musinsa.com/products/4757834"
+    },
+    {
+     "t": "셔츠, 에즈카톤",
+     "url": "https://www.musinsa.com/products/4845180"
+    },
+    {
+     "t": "코트, 무드인사이드",
+     "url": "https://www.musinsa.com/products/7633106"
+    },
+    {
+     "t": "코트, 247시리즈",
+     "url": "https://www.musinsa.com/products/7463278"
+    },
+    {
+     "t": "맨투맨, 엘라모",
+     "url": "https://www.musinsa.com/products/5419531"
+    },
+    {
+     "t": "팬츠, 놈브레",
+     "url": "https://www.musinsa.com/products/6193410"
+    }
+   ],
+   "codi": [
+    {
+     "t": "브라운 니트, 베이지 면바지, 갈색 가죽 벨트",
+     "url": "https://www.musinsa.com/products/5839801"
+    },
+    {
+     "t": "브라운 V넥 니트, 청바지, 검정 가방",
+     "url": "https://www.musinsa.com/products/7493901"
+    },
+    {
+     "t": "흰 숏패딩, 브라운 기모 바지, 베이지 부츠",
+     "url": "https://www.musinsa.com/products/7670626"
+    },
+    {
+     "t": "브라운 오버핏 블레이저, 같은 갈색 미니스커트, 흰 하이넥 이너, 짙은 갈색 타이츠, 갈색 로퍼, 갈색 가죽 토트백",
+     "url": "https://www.pinterest.com/pin/602004675233098414/",
+     "pin": 1
+    },
+    {
+     "t": "갈색 니트 카디건, 안에 흰 상의, 갈색 와이드 팬츠, 회색 스니커즈, 갈색 숄더백",
+     "url": "https://www.pinterest.com/pin/824862488040530711/",
+     "pin": 1
+    },
+    {
+     "t": "남색 니트, 안에 흰 티, 갈색 코듀로이 와이드 팬츠, 갈색 신발",
+     "url": "https://www.pinterest.com/pin/579838520814093818/",
+     "pin": 1
+    }
+   ]
   },
   {
    "id": "chocolate",
@@ -1242,7 +1890,63 @@
    "say": "아주 진한 갈색. 2026 가을겨울 바탕색이에요.",
    "look": "아주 진한 갈색",
    "where": "레더 재킷, 니트, 2026 F/W",
-   "hex": "#45301F"
+   "hex": "#45301F",
+   "tip": "초콜릿 아우터 안에 파란 셔츠나 회색 플리스를 넣은 사진이 보여요.",
+   "real": [
+    {
+     "t": "맨투맨, 로어즈",
+     "url": "https://www.musinsa.com/products/5632139"
+    },
+    {
+     "t": "니트, 빈트릴",
+     "url": "https://www.musinsa.com/products/5527574"
+    },
+    {
+     "t": "재킷, 푸마",
+     "url": "https://www.musinsa.com/products/7165984"
+    },
+    {
+     "t": "팬츠, 내셔널지오그래픽",
+     "url": "https://www.musinsa.com/products/7738404"
+    },
+    {
+     "t": "코트, 나우",
+     "url": "https://www.musinsa.com/products/7169406"
+    },
+    {
+     "t": "셔츠, 구보",
+     "url": "https://www.musinsa.com/products/2888094"
+    }
+   ],
+   "codi": [
+    {
+     "t": "초콜릿 더플코트, 안에 파란 셔츠, 검정 바지, 갈색 보트슈즈",
+     "url": "https://www.musinsa.com/products/4469286"
+    },
+    {
+     "t": "초콜릿 숏패딩, 안에 회색 플리스 집업, 회색 바지",
+     "url": "https://www.musinsa.com/products/7417588"
+    },
+    {
+     "t": "초콜릿 롱 패딩 코트, 흰 티와 검정 이너, 같은 색 바지, 검정 신발",
+     "url": "https://www.musinsa.com/products/7169406"
+    },
+    {
+     "t": "초콜릿 브라운 니트, 안에 연분홍 셔츠, 같은 갈색 센터 프레스 와이드 팬츠, 갈색 신발",
+     "url": "https://www.pinterest.com/pin/637611259769537681/",
+     "pin": 1
+    },
+    {
+     "t": "회갈색 브이넥 니트, 안에 흰 상의, 초콜릿색 코듀로이 와이드 팬츠, 흰 스니커즈, 흰 에코백",
+     "url": "https://www.pinterest.com/pin/856246947941390784/",
+     "pin": 1
+    },
+    {
+     "t": "검정 반팔 티, 초콜릿색 와이드 턱 팬츠, 검정 벨트, 검정 로퍼, 검정 핸드백",
+     "url": "https://www.pinterest.com/pin/964755551441137655/",
+     "pin": 1
+    }
+   ]
   },
   {
    "id": "khaki",
@@ -1253,7 +1957,64 @@
    "say": "누런 기 도는 군복 초록. 한국에선 초록 쪽, 영어권에선 베이지 쪽을 뜻하기도 해요.",
    "look": "누런 기 도는 군복 초록",
    "where": "카고, 필드 재킷, 밀리터리",
-   "hex": "#8E8A5C"
+   "hex": "#534F3B",
+   "tip": "진청 데님, 흰색, 회색, 검정이 무난해요. 버건디처럼 짙은 색과 같이 입으면 가을 느낌이 나요.",
+   "real": [
+    {
+     "t": "니트, 트릴리온",
+     "url": "https://www.musinsa.com/products/3640811"
+    },
+    {
+     "t": "니트, 쿠어",
+     "url": "https://www.musinsa.com/products/5350611"
+    },
+    {
+     "t": "셔츠, 퍼스텝",
+     "url": "https://www.musinsa.com/products/7407898"
+    },
+    {
+     "t": "맨투맨, 트릴리온",
+     "url": "https://www.musinsa.com/products/5276012"
+    },
+    {
+     "t": "팬츠, 버던트",
+     "url": "https://www.musinsa.com/products/5319994"
+    },
+    {
+     "t": "재킷, 더바이닐하우스",
+     "url": "https://www.musinsa.com/products/7466707"
+    }
+   ],
+   "codi": [
+    {
+     "t": "카키 니트, 흰 티를 목에 살짝, 진청 청바지",
+     "url": "https://www.musinsa.com/products/5215631"
+    },
+    {
+     "t": "카키 헨리넥 니트, 흰 티, 진청 청바지, 갈색 벨트",
+     "url": "https://www.musinsa.com/products/7333389"
+    },
+    {
+     "t": "카키 패딩 재킷, 회색 후드티, 검정 비니, 검정 바지",
+     "url": "https://www.musinsa.com/products/7666705"
+    },
+    {
+     "t": "카키 롱 코트, 흰 티, 회색 와이드 팬츠, 노란 스니커즈, 검정 비니와 크로스백",
+     "url": "https://www.pinterest.com/pin/586171707766581863/",
+     "pin": 1
+    },
+    {
+     "t": "올리브 롱 코트, 주황 니트, 흰 티, 베이지 치노, 주황 스니커즈, 캡",
+     "url": "https://www.pinterest.com/pin/1108448527024607509/",
+     "pin": 1
+    },
+    {
+     "t": "카키 그린 로고 스웨트셔츠, 흰 티 밑단, 베이지 카고 와이드 팬츠, 갈색 신발, 에코백",
+     "url": "https://www.pinterest.com/pin/799600108871778211/",
+     "pin": 1
+    }
+   ],
+   "measured": 1
   },
   {
    "id": "olive",
@@ -1264,7 +2025,64 @@
    "say": "올리브 열매 같은 어두운 노란 초록이에요.",
    "look": "올리브 열매 같은 어두운 노란 초록",
    "where": "MA-1, 카고, 워크웨어",
-   "hex": "#6B6A3A"
+   "hex": "#5A584B",
+   "tip": "올리브 그린은 네이비와 카멜을 같이 입고, 쿨톤이면 네이비를 곁들이면 얼굴빛이 산다고 했어요.",
+   "real": [
+    {
+     "t": "니트, 애습",
+     "url": "https://www.musinsa.com/products/4464083"
+    },
+    {
+     "t": "니트, 에스피오나지",
+     "url": "https://www.musinsa.com/products/4429225"
+    },
+    {
+     "t": "셔츠, 에스피오나지",
+     "url": "https://www.musinsa.com/products/4480350"
+    },
+    {
+     "t": "재킷, 파르티멘토",
+     "url": "https://www.musinsa.com/products/7528134"
+    },
+    {
+     "t": "가디건, 후브스",
+     "url": "https://www.musinsa.com/products/5997845"
+    },
+    {
+     "t": "팬츠, 아웃스탠딩",
+     "url": "https://www.musinsa.com/products/5312365"
+    }
+   ],
+   "codi": [
+    {
+     "t": "올리브 와플 니트, 안에 흰 티, 베이지 바지",
+     "url": "https://www.musinsa.com/products/7550962"
+    },
+    {
+     "t": "올리브 맨투맨, 안에 흰 티, 청바지",
+     "url": "https://www.musinsa.com/products/7347650"
+    },
+    {
+     "t": "올리브 와이드 팬츠, 위에 데님 재킷, 검정 양말과 신발",
+     "url": "https://www.musinsa.com/products/4768139"
+    },
+    {
+     "t": "올리브 코듀로이 재킷, 같은 색 와이드 팬츠, 남색 터틀넥, 검정 구두, 안경",
+     "url": "https://www.pinterest.com/pin/579838520814243709/",
+     "pin": 1
+    },
+    {
+     "t": "회색 니트, 올리브 카고 와이드 팬츠(밑단 접음), 검정 뉴발란스 스타일 스니커즈, 회색 비니",
+     "url": "https://www.pinterest.com/pin/404479610282400354/",
+     "pin": 1
+    },
+    {
+     "t": "베이지 재킷, 올리브 와이드 카고 팬츠, 연두색 술 머플러, 노란 신발, 흰 컵",
+     "url": "https://www.pinterest.com/pin/699183910933935973/",
+     "pin": 1
+    }
+   ],
+   "measured": 1
   },
   {
    "id": "sage",
@@ -1275,7 +2093,64 @@
    "say": "회색이 섞인 연한 초록이에요.",
    "look": "회색이 섞인 연한 초록",
    "where": "니트, 셔츠, 내추럴",
-   "hex": "#A3AE8F"
+   "hex": "#AEBCB1",
+   "tip": "세이지는 검정 이너나 갈색 하의로 어두운 색을 한 곳 더한 사진이 보여요.",
+   "real": [
+    {
+     "t": "니트, 곤니치와봉쥬르",
+     "url": "https://www.musinsa.com/products/3548781"
+    },
+    {
+     "t": "니트, 내셔널지오그래픽",
+     "url": "https://www.musinsa.com/products/7108270"
+    },
+    {
+     "t": "후드, 유니폼브릿지",
+     "url": "https://www.musinsa.com/products/7020946"
+    },
+    {
+     "t": "재킷, 브렌슨",
+     "url": "https://www.musinsa.com/products/7333397"
+    },
+    {
+     "t": "재킷, 글랙",
+     "url": "https://www.musinsa.com/products/5470471"
+    },
+    {
+     "t": "팬츠, 스컬프터",
+     "url": "https://www.musinsa.com/products/6930802"
+    }
+   ],
+   "codi": [
+    {
+     "t": "세이지 보트넥 니트, 갈색 가죽 스커트, 검정 벨트",
+     "url": "https://www.musinsa.com/products/7074597"
+    },
+    {
+     "t": "연한 세이지 시어 셔츠, 검정 튜브탑 니트, 카키 바지",
+     "url": "https://www.musinsa.com/products/7448660"
+    },
+    {
+     "t": "세이지 블루그린 봄버, 안에 검정 이너, 체크 스커트",
+     "url": "https://www.musinsa.com/products/5470471"
+    },
+    {
+     "t": "회녹색 브이넥 니트, 안에 흰 티, 세이지 그린 랩 와이드 팬츠, 베이지 플랫, 회색 토트백",
+     "url": "https://www.pinterest.com/pin/890516526371365839/",
+     "pin": 1
+    },
+    {
+     "t": "세이지 그린 니트, 안에 남색 이너, 아이보리 와이드 팬츠, 검정 벨트, 갈색 숄더백",
+     "url": "https://www.pinterest.com/pin/825355069243675774/",
+     "pin": 1
+    },
+    {
+     "t": "먼지색 하늘색 롱 코트, 회베이지 터틀넥 니트, 세이지 그린 레이스 스커트, 베이지 부츠, 털 달린 버킷백",
+     "url": "https://www.pinterest.com/pin/395613148522026512/",
+     "pin": 1
+    }
+   ],
+   "measured": 1
   },
   {
    "id": "forest",
@@ -1286,7 +2161,63 @@
    "say": "숲처럼 깊은 진초록이에요.",
    "look": "숲처럼 깊은 진초록",
    "where": "니트, 럭비 셔츠, 프레피",
-   "hex": "#2F4A35"
+   "hex": "#2F4A35",
+   "tip": "진한 초록은 안에 노란 기가 도는 셔츠나 흰 바지를 맞춘 사진이 보여요.",
+   "real": [
+    {
+     "t": "니트, 프리즘웍스",
+     "url": "https://www.musinsa.com/products/5310807"
+    },
+    {
+     "t": "니트, 블론드나인",
+     "url": "https://www.musinsa.com/products/3258360"
+    },
+    {
+     "t": "셔츠, 논타입",
+     "url": "https://www.musinsa.com/products/5352407"
+    },
+    {
+     "t": "가디건, 프리즘웍스",
+     "url": "https://www.musinsa.com/products/3863343"
+    },
+    {
+     "t": "팬츠, 테일러 스튜디오",
+     "url": "https://www.musinsa.com/products/5016333"
+    },
+    {
+     "t": "맨투맨, 라우디",
+     "url": "https://www.musinsa.com/products/4311220"
+    }
+   ],
+   "codi": [
+    {
+     "t": "포레스트 그린 사파리 재킷(갈색 깃), 안에 카키 노란 셔츠, 청바지",
+     "url": "https://www.musinsa.com/products/3870084"
+    },
+    {
+     "t": "초록 줄무늬 폴로 니트, 흰 바지",
+     "url": "https://www.musinsa.com/products/4923566"
+    },
+    {
+     "t": "초록 니트 조끼, 안에 줄무늬 티, 베이지 양털 재킷, 꽃무늬 스커트",
+     "url": "https://www.musinsa.com/products/5640617"
+    },
+    {
+     "t": "포레스트 그린 퍼프소매 블라우스, 같은 색 롱 스커트, 검정 앵클부츠, 흰 가방",
+     "url": "https://www.pinterest.com/pin/849491548456911381/",
+     "pin": 1
+    },
+    {
+     "t": "포레스트 그린 오버핏 니트, 안에 흰 티, 남색 와이드 팬츠, 은색 플랫슈즈, 갈색 가죽 클러치",
+     "url": "https://www.pinterest.com/pin/4594727283516308032/",
+     "pin": 1
+    },
+    {
+     "t": "포레스트 그린 카디건(금색 단추), 안에 체크 셔츠, 회색 플리츠 스커트, 검정 베레모, 검정 크로스백",
+     "url": "https://www.pinterest.com/pin/833377106071218912/",
+     "pin": 1
+    }
+   ]
   },
   {
    "id": "mint",
@@ -1297,7 +2228,63 @@
    "say": "박하처럼 밝고 시원한 초록이에요.",
    "look": "박하처럼 밝고 시원한 초록",
    "where": "여름 셔츠, 걸리시",
-   "hex": "#BFE3D0"
+   "hex": "#BFE3D0",
+   "tip": "컬러가 부담스러우면 민트 티에 그레이 가디건처럼 포인트 색을 안쪽에 조금만 둬요.",
+   "real": [
+    {
+     "t": "니트, 애드호크",
+     "url": "https://www.musinsa.com/products/2894464"
+    },
+    {
+     "t": "니트 조끼, 코이세이오 038",
+     "url": "https://www.musinsa.com/products/6667749"
+    },
+    {
+     "t": "셔츠, 디바인디스턴스",
+     "url": "https://www.musinsa.com/products/3920163"
+    },
+    {
+     "t": "반바지, 디아도라",
+     "url": "https://www.musinsa.com/products/5979610"
+    },
+    {
+     "t": "코트, 대중소",
+     "url": "https://www.musinsa.com/products/1185179"
+    },
+    {
+     "t": "팬츠, 워브먼트",
+     "url": "https://www.musinsa.com/products/3406619"
+    }
+   ],
+   "codi": [
+    {
+     "t": "연한 민트 와이드 팬츠, 검정 크롭 재킷, 검정 탑, 검정 플랫슈즈",
+     "url": "https://www.musinsa.com/products/3406619"
+    },
+    {
+     "t": "민트 플레어 팬츠, 검정 니트 탑, 검정 양말과 신발",
+     "url": "https://www.musinsa.com/products/4824439"
+    },
+    {
+     "t": "연한 민트 더플코트, 회색 헤어밴드, 검정 안경, 회색 니트 반바지",
+     "url": "https://www.musinsa.com/products/7395550"
+    },
+    {
+     "t": "민트색 크롭 오버핏 스웨트셔츠, 같은 계열 민트 플리츠 롱 스커트, 짚으로 짠 둥근 가방",
+     "url": "https://www.pinterest.com/pin/336995984621118246/",
+     "pin": 1
+    },
+    {
+     "t": "민트색 브이넥 니트, 검정 카고 와이드 팬츠, 검정 백팩 끈",
+     "url": "https://www.pinterest.com/pin/643592603022995499/",
+     "pin": 1
+    },
+    {
+     "t": "민트색 라운드 니트(소매 단추), 흑백 줄무늬 플레어 스커트, 흰 가방, 청록색 펌프스",
+     "url": "https://www.pinterest.com/pin/40954677848646485/",
+     "pin": 1
+    }
+   ]
   },
   {
    "id": "skyblue",
@@ -1308,7 +2295,63 @@
    "say": "맑은 하늘 같은 연한 파랑이에요.",
    "look": "맑은 하늘 같은 연한 파랑",
    "where": "셔츠, 니트",
-   "hex": "#A9CBE6"
+   "hex": "#A9CBE6",
+   "tip": "네이비에 하늘색과 화이트를 맞추는 게 기본이고, 네이비에 하늘색과 청바지도 좋다고 했어요.",
+   "real": [
+    {
+     "t": "맨투맨, 크리틱",
+     "url": "https://www.musinsa.com/products/4296185"
+    },
+    {
+     "t": "맨투맨, 팔렛",
+     "url": "https://www.musinsa.com/products/3435169"
+    },
+    {
+     "t": "맨투맨, 바켄",
+     "url": "https://www.musinsa.com/products/4734238"
+    },
+    {
+     "t": "코트, 코엣",
+     "url": "https://www.musinsa.com/products/7729397"
+    },
+    {
+     "t": "니트, 러브이즈트루",
+     "url": "https://www.musinsa.com/products/1586586"
+    },
+    {
+     "t": "후드 집업, 노이아고",
+     "url": "https://www.musinsa.com/products/5593070"
+    }
+   ],
+   "codi": [
+    {
+     "t": "하늘색 부클 니트, 베이지 와이드 팬츠",
+     "url": "https://www.musinsa.com/products/5671210"
+    },
+    {
+     "t": "하늘색 맨투맨, 네이비 팬츠, 네이비 야구 모자",
+     "url": "https://www.musinsa.com/products/7600036"
+    },
+    {
+     "t": "하늘색 카디건, 물방울무늬 스커트, 은색 팔찌, 망사 스타킹",
+     "url": "https://www.musinsa.com/products/5403923"
+    },
+    {
+     "t": "연하늘색 오버핏 셔츠, 안에 흰 티, 검정 와이드 팬츠, 검정 뉴욕 로고 볼캡, 검정 가방",
+     "url": "https://www.pinterest.com/pin/915708536734269491/",
+     "pin": 1
+    },
+    {
+     "t": "하늘색 오버핏 셔츠, 어깨에 걸친 검정 니트, 갈색 와이드 팬츠(밑단 접음), 검정 로퍼, 검정 토트백",
+     "url": "https://www.pinterest.com/pin/938930222289767782/",
+     "pin": 1
+    },
+    {
+     "t": "밝은 하늘색 오버핏 셔츠, 검정 와이드 팬츠, 검정 슬리퍼",
+     "url": "https://www.pinterest.com/pin/803400021042073411/",
+     "pin": 1
+    }
+   ]
   },
   {
    "id": "cobalt",
@@ -1319,7 +2362,64 @@
    "say": "선명하고 진한 파랑. 2026 가을겨울 포인트 색이에요.",
    "look": "선명하고 진한 파랑",
    "where": "니트, 초어 재킷, 포인트",
-   "hex": "#1F4FBF"
+   "hex": "#314481",
+   "tip": "코발트는 흰색이나 아이보리 하의와 맞춘 사진이 2장 보여요.",
+   "real": [
+    {
+     "t": "니트, 블론드나인",
+     "url": "https://www.musinsa.com/products/3443384"
+    },
+    {
+     "t": "후드 니트, 밀로 아카이브",
+     "url": "https://www.musinsa.com/products/7329993"
+    },
+    {
+     "t": "가디건, 프리즘웍스",
+     "url": "https://www.musinsa.com/products/7054620"
+    },
+    {
+     "t": "가디건, 인템포무드",
+     "url": "https://www.musinsa.com/products/2792859"
+    },
+    {
+     "t": "맨투맨, 헬로 선라이즈",
+     "url": "https://www.musinsa.com/products/4735647"
+    },
+    {
+     "t": "팬츠, 미니멀프로젝트",
+     "url": "https://www.musinsa.com/products/7605115"
+    }
+   ],
+   "codi": [
+    {
+     "t": "코발트 V넥 니트, 안에 흰 셔츠, 흰 바지",
+     "url": "https://www.musinsa.com/products/4628169"
+    },
+    {
+     "t": "코발트 니트, 검정 스커트",
+     "url": "https://www.musinsa.com/products/7429341"
+    },
+    {
+     "t": "코발트 맨투맨, 아이보리 팬츠, 갈색 비니",
+     "url": "https://www.musinsa.com/products/4735647"
+    },
+    {
+     "t": "코발트 블루 니트, 회색 와이드 팬츠, 노란 스니커즈, 코발트 볼캡, 검정 퀼팅 크로스백",
+     "url": "https://www.pinterest.com/pin/781867185352063504/",
+     "pin": 1
+    },
+    {
+     "t": "코발트 블루 니트, 안에 흰 티, 회색 와이드 슬랙스, 갈색 반스 스타일 스니커즈, 검정 토트백",
+     "url": "https://www.pinterest.com/pin/807833251960890092/",
+     "pin": 1
+    },
+    {
+     "t": "코발트 블루 롱 원피스, 노란 라피아 토트백, 흰 스니커즈(형광 포인트), 선글라스",
+     "url": "https://www.pinterest.com/pin/129619295567842047/",
+     "pin": 1
+    }
+   ],
+   "measured": 1
   },
   {
    "id": "teal",
@@ -1330,7 +2430,54 @@
    "say": "파랑과 초록 사이의 깊은 청록. 2026년 WGSN 올해의 색(트랜스포머티브 틸)과 같은 계열이에요.",
    "look": "파랑과 초록 사이의 깊은 청록",
    "where": "니트, 스웨이드, 포인트",
-   "hex": "#1F6F72"
+   "hex": "#607076",
+   "tip": "틸은 검정이나 회색 하의와 맞춘 사진이 3장 모두에서 보여요.",
+   "real": [
+    {
+     "t": "니트, 러프사이드",
+     "url": "https://www.musinsa.com/products/7048277"
+    },
+    {
+     "t": "폴로 니트, 비슬로우",
+     "url": "https://www.musinsa.com/products/4964583"
+    },
+    {
+     "t": "맨투맨, 미카엘1991",
+     "url": "https://www.musinsa.com/products/7860066"
+    },
+    {
+     "t": "재킷, 퓨처랩",
+     "url": "https://www.musinsa.com/products/4035467"
+    },
+    {
+     "t": "패딩, 디스이즈네버댓",
+     "url": "https://www.musinsa.com/products/4491792"
+    },
+    {
+     "t": "가디건, 레인지",
+     "url": "https://www.musinsa.com/products/7606065"
+    }
+   ],
+   "codi": [
+    {
+     "t": "틸 블루 카디건, 안에 검정 이너, 검정 긴 하의",
+     "url": "https://www.musinsa.com/products/7606065"
+    },
+    {
+     "t": "틸 블루 맨투맨, 안에 흰 이너, 회청색 바지",
+     "url": "https://www.musinsa.com/products/7129287"
+    },
+    {
+     "t": "틸 플리스 후드 집업, 회색 비니, 연회색 기모 바지",
+     "url": "https://www.musinsa.com/products/7530323"
+    },
+    {
+     "t": "청록색 나일론 블루종, 안에 데님 재킷 겹침, 남색 이너, 회청색 와이드 팬츠",
+     "url": "https://www.pinterest.com/pin/527273068892418102/",
+     "pin": 1
+    }
+   ],
+   "measured": 1
   },
   {
    "id": "navy",
@@ -1341,7 +2488,63 @@
    "say": "검정에 가까운 짙은 남색이에요.",
    "look": "검정에 가까운 짙은 남색",
    "where": "블레이저, 맨투맨, 프레피",
-   "hex": "#1E2A44"
+   "hex": "#1E2A44",
+   "tip": "연청 데님, 회색, 갈색 가방과 잘 맞아요. 검정과 같이 입으면 네이비가 묻혀서 회색이나 흰색을 한 곳 넣어요.",
+   "real": [
+    {
+     "t": "니트, 니티드",
+     "url": "https://www.musinsa.com/products/606066"
+    },
+    {
+     "t": "니트, 프리즘웍스",
+     "url": "https://www.musinsa.com/products/4422936"
+    },
+    {
+     "t": "맨투맨, 트릴리온",
+     "url": "https://www.musinsa.com/products/5276013"
+    },
+    {
+     "t": "맨투맨, 카고브로스 포 우먼",
+     "url": "https://www.musinsa.com/products/7725992"
+    },
+    {
+     "t": "팬츠, 브론슨",
+     "url": "https://www.musinsa.com/products/6980483"
+    },
+    {
+     "t": "재킷, 토마스모어",
+     "url": "https://www.musinsa.com/products/7473292"
+    }
+   ],
+   "codi": [
+    {
+     "t": "네이비 니트, 연청 청바지, 갈색 숄더백",
+     "url": "https://www.musinsa.com/products/5468258"
+    },
+    {
+     "t": "네이비 더플코트, 회색 와이드 바지, 회색 운동화",
+     "url": "https://www.musinsa.com/products/7618987"
+    },
+    {
+     "t": "네이비 재킷, 회색 후드, 아이보리 머플러, 검정 바지",
+     "url": "https://www.musinsa.com/products/7554190"
+    },
+    {
+     "t": "네이비 케이블 가디건, 안에 하늘색 셔츠 깃과 소매, 베이지 턱 팬츠, 종이 쇼핑백",
+     "url": "https://www.pinterest.com/pin/833728949818661105/",
+     "pin": 1
+    },
+    {
+     "t": "네이비 니트 조끼, 하늘색 셔츠, 청바지, 검정 마스크",
+     "url": "https://www.pinterest.com/pin/1077275173347221355/",
+     "pin": 1
+    },
+    {
+     "t": "네이비 롱 코트, 흰 셔츠 깃, 검정 와이드 슬랙스",
+     "url": "https://www.pinterest.com/pin/855965472924826077/",
+     "pin": 1
+    }
+   ]
   },
   {
    "id": "indigo",
@@ -1352,7 +2555,64 @@
    "say": "생지 청바지 같은 보랏빛 도는 진한 파랑이에요.",
    "look": "생지 청바지 같은 보랏빛 도는 진한 파랑",
    "where": "데님, 워크웨어",
-   "hex": "#2E3A6B"
+   "hex": "#596173",
+   "tip": "인디고 청바지는 베이지, 아이보리, 그레이, 블랙, 셔츠, 브라운 신발과 맞추고 네이비 상의는 피하라고 했어요.",
+   "real": [
+    {
+     "t": "가디건, 밀로 아카이브",
+     "url": "https://www.musinsa.com/products/5424776"
+    },
+    {
+     "t": "니트, 밀로 아카이브",
+     "url": "https://www.musinsa.com/products/4774175"
+    },
+    {
+     "t": "맨투맨, 버던트",
+     "url": "https://www.musinsa.com/products/5320204"
+    },
+    {
+     "t": "셔츠, 브론슨",
+     "url": "https://www.musinsa.com/products/5689284"
+    },
+    {
+     "t": "재킷, 코드그라피",
+     "url": "https://www.musinsa.com/products/3044161"
+    },
+    {
+     "t": "팬츠, 후어",
+     "url": "https://www.musinsa.com/products/5367152"
+    }
+   ],
+   "codi": [
+    {
+     "t": "인디고 폴로 니트, 안에 하늘색 터틀넥, 체크 플리츠 스커트, 검정 니삭스",
+     "url": "https://www.musinsa.com/products/4560810"
+    },
+    {
+     "t": "워싱 인디고 맨투맨, 검정 하의",
+     "url": "https://www.musinsa.com/products/3583944"
+    },
+    {
+     "t": "인디고 데님 셔츠, 안에 흰 티, 검정 하의",
+     "url": "https://www.musinsa.com/products/1556564"
+    },
+    {
+     "t": "인디고 데님 트러커 재킷, 같은 색 데님 팬츠, 안에 흰 티, 카키 햇, 노란 워커 부츠",
+     "url": "https://www.pinterest.com/pin/4606408474902985792/",
+     "pin": 1
+    },
+    {
+     "t": "갈색 짧은 재킷, 짙은 인디고 와이드 데님 팬츠(밑단 길게), 갈색 구두, 검정 선글라스",
+     "url": "https://www.pinterest.com/pin/4600286359237970688/",
+     "pin": 1
+    },
+    {
+     "t": "인디고 데님 재킷, 안에 남색 티, 남색 슬랙스, 흰 양말 샌들, 패턴 버킷햇",
+     "url": "https://www.pinterest.com/pin/674062269275672202/",
+     "pin": 1
+    }
+   ],
+   "measured": 1
   },
   {
    "id": "lightgray",
@@ -1364,7 +2624,63 @@
    "say": "흰 실과 검은 실이 섞인 듯한 밝은 회색이에요.",
    "look": "흰 실과 검은 실이 섞인 듯한 밝은 회색",
    "where": "스웨트, 니트",
-   "hex": "#C9C9C6"
+   "hex": "#C9C9C6",
+   "tip": "라이트 그레이 아우터는 검정 이너와 바지, 또는 연청 청바지와 맞춘 사진이 보여요.",
+   "real": [
+    {
+     "t": "가디건, 마뗑킴",
+     "url": "https://www.musinsa.com/products/7541916"
+    },
+    {
+     "t": "맨투맨, 코드그라피",
+     "url": "https://www.musinsa.com/products/4313420"
+    },
+    {
+     "t": "플리스 재킷, 시에라디자인",
+     "url": "https://www.musinsa.com/products/7505855"
+    },
+    {
+     "t": "패딩, 시에라디자인",
+     "url": "https://www.musinsa.com/products/7381091"
+    },
+    {
+     "t": "롱 패딩, 아이더",
+     "url": "https://www.musinsa.com/products/7660961"
+    },
+    {
+     "t": "코트, 이아",
+     "url": "https://www.musinsa.com/products/3663042"
+    }
+   ],
+   "codi": [
+    {
+     "t": "연그레이 스탠드칼라 코트, 연청 와이드 청바지, 검정 플랫슈즈",
+     "url": "https://www.musinsa.com/products/3663042"
+    },
+    {
+     "t": "연그레이 하프집업 맨투맨, 베이지 플리츠 스커트",
+     "url": "https://www.musinsa.com/products/2392455"
+    },
+    {
+     "t": "연그레이 숏 코트, 안에 검정 이너, 검정 팬츠",
+     "url": "https://www.musinsa.com/products/3661018"
+    },
+    {
+     "t": "라이트 그레이 짧은 집업 재킷, 같은 색 와이드 팬츠, 안에 흰 티, 검정 크로스백, 흰 스니커즈",
+     "url": "https://www.pinterest.com/pin/4592123638094261504/",
+     "pin": 1
+    },
+    {
+     "t": "라이트 그레이 비대칭 트임 니트, 안에 흰 티, 회색 핀스트라이프 와이드 팬츠, 검정 로퍼, 검정 숄더백",
+     "url": "https://www.pinterest.com/pin/4598456783189755456/",
+     "pin": 1
+    },
+    {
+     "t": "라이트 그레이 터틀넥 니트, 회갈색 슬랙스, 검정 크로스백, 회색 볼륨 스니커즈",
+     "url": "https://www.pinterest.com/pin/856176579146838356/",
+     "pin": 1
+    }
+   ]
   },
   {
    "id": "charcoal",
@@ -1375,7 +2691,63 @@
    "say": "숯처럼 검정에 가까운 짙은 회색이에요.",
    "look": "숯처럼 검정에 가까운 짙은 회색",
    "where": "슬랙스, 코트, 니트",
-   "hex": "#3E3F42"
+   "hex": "#3E3F42",
+   "tip": "차콜 상의는 회색 스커트나 카키 바지, 검정 부츠와 맞춘 사진이 보여요.",
+   "real": [
+    {
+     "t": "니트, 247시리즈",
+     "url": "https://www.musinsa.com/products/7400280"
+    },
+    {
+     "t": "맨투맨, 뉴발란스",
+     "url": "https://www.musinsa.com/products/7740566"
+    },
+    {
+     "t": "팬츠, 베트랙트",
+     "url": "https://www.musinsa.com/products/7394625"
+    },
+    {
+     "t": "코트, 247시리즈",
+     "url": "https://www.musinsa.com/products/7463285"
+    },
+    {
+     "t": "상의, 하츠코시",
+     "url": "https://www.musinsa.com/products/7564496"
+    },
+    {
+     "t": "코트, 틸아이다이",
+     "url": "https://www.musinsa.com/products/7534213"
+    }
+   ],
+   "codi": [
+    {
+     "t": "차콜 그레이 니트, 회색 미들 스커트, 검정 벨트, 검정 가방, 베이지 코트를 팔에 걸침",
+     "url": "https://www.musinsa.com/products/7539635"
+    },
+    {
+     "t": "회색 코트, 검정 스타킹과 롱부츠, 검정 가방",
+     "url": "https://www.musinsa.com/products/7534213"
+    },
+    {
+     "t": "차콜 니트(초록 그래픽), 카키 카고 바지",
+     "url": "https://www.musinsa.com/products/7694522"
+    },
+    {
+     "t": "차콜 회색 라운드 니트, 같은 색 와이드 팬츠, 올리브색 숄더백, 자주색 삼바 스타일 스니커즈",
+     "url": "https://www.pinterest.com/pin/798755683955617996/",
+     "pin": 1
+    },
+    {
+     "t": "차콜 회색 폴로 니트, 안에 흰 셔츠와 넥타이, 회색 와이드 슬랙스, 검정 토트백, 검정 뾰족 슈즈",
+     "url": "https://www.pinterest.com/pin/572238696422887999/",
+     "pin": 1
+    },
+    {
+     "t": "회색 크루넥 니트, 안에 흰 셔츠 옷깃, 차콜 와이드 팬츠, 검정 벨트, 검정 신발",
+     "url": "https://www.pinterest.com/pin/699324648432046838/",
+     "pin": 1
+    }
+   ]
   },
   {
    "id": "black",
@@ -1386,7 +2758,48 @@
    "say": "검정이에요.",
    "look": "검정",
    "where": "모든 차림",
-   "hex": "#141414"
+   "hex": "#141414",
+   "tip": "검정 상의는 흰 팬츠나 안에 받친 흰 티와 맞춘 사진이 보여요.",
+   "real": [
+    {
+     "t": "니트, 슈퍼서브",
+     "url": "https://www.musinsa.com/products/7060264"
+    },
+    {
+     "t": "셔츠, 플레이스 스튜디오",
+     "url": "https://www.musinsa.com/products/4761289"
+    },
+    {
+     "t": "맨투맨, 폴러스터프",
+     "url": "https://www.musinsa.com/products/5745105"
+    },
+    {
+     "t": "가디건, 굿라이프웍스",
+     "url": "https://www.musinsa.com/products/2194649"
+    },
+    {
+     "t": "재킷, 바켄",
+     "url": "https://www.musinsa.com/products/5946420"
+    },
+    {
+     "t": "팬츠, 티엔지티",
+     "url": "https://www.musinsa.com/products/7655711"
+    }
+   ],
+   "codi": [
+    {
+     "t": "검정 V넥 니트, 안에 흰 이너, 흰 와이드 팬츠",
+     "url": "https://www.musinsa.com/products/6046344"
+    },
+    {
+     "t": "검정 스웨이드 블루종, 안에 흰 티, 검정 바지, 검정 벨트, 안경",
+     "url": "https://www.musinsa.com/products/7618811"
+    },
+    {
+     "t": "검정 누빔 점퍼, 안에 회색 이너, 갈색 팬츠",
+     "url": "https://www.musinsa.com/products/7604472"
+    }
+   ]
   },
   {
    "id": "red",
@@ -1397,7 +2810,48 @@
    "say": "선명한 빨강. 2026년 붉은 말의 해 포인트 색이에요.",
    "look": "선명한 빨강",
    "where": "니트, 레더, 2026 포인트",
-   "hex": "#C1272D"
+   "hex": "#C1272D",
+   "tip": "빨강은 회색 하의나 검정 데님과 맞춘 사진이 3장 모두에서 보여요.",
+   "real": [
+    {
+     "t": "맨투맨, 미드나잇12에이엠",
+     "url": "https://www.musinsa.com/products/5696842"
+    },
+    {
+     "t": "하프집업 맨투맨, 펜필드",
+     "url": "https://www.musinsa.com/products/6019490"
+    },
+    {
+     "t": "후드, 라임라잇 어패럴",
+     "url": "https://www.musinsa.com/products/6961054"
+    },
+    {
+     "t": "후드, 랑가주망",
+     "url": "https://www.musinsa.com/products/4448275"
+    },
+    {
+     "t": "코트, 엔조 블루스",
+     "url": "https://www.musinsa.com/products/5495577"
+    },
+    {
+     "t": "하프집업 니트, 로라로라",
+     "url": "https://www.musinsa.com/products/7070988"
+    }
+   ],
+   "codi": [
+    {
+     "t": "레드 하프집업 니트, 회색 울 반바지",
+     "url": "https://www.musinsa.com/products/7070988"
+    },
+    {
+     "t": "레드 V넥 니트, 안에 흰 티, 검정 데님",
+     "url": "https://www.musinsa.com/products/6000442"
+    },
+    {
+     "t": "레드 롱 코트, 회색 카고 팬츠, 회색 신발",
+     "url": "https://www.musinsa.com/products/5495577"
+    }
+   ]
   },
   {
    "id": "burgundy",
@@ -1409,7 +2863,54 @@
    "say": "와인처럼 검붉은 색이에요.",
    "look": "와인처럼 검붉은 색",
    "where": "니트, 로퍼, 2026 F/W",
-   "hex": "#6D1F2F"
+   "hex": "#512C2C",
+   "tip": "베이지와 흰색 바지가 제일 많이 보여요. 안에 회색이나 흰 티를 겹치면 덜 무거워요.",
+   "real": [
+    {
+     "t": "니트, 폴리그램",
+     "url": "https://www.musinsa.com/products/7538712"
+    },
+    {
+     "t": "니트, 아날로그무드",
+     "url": "https://www.musinsa.com/products/5808857"
+    },
+    {
+     "t": "셔츠, 티엔지티",
+     "url": "https://www.musinsa.com/products/7157014"
+    },
+    {
+     "t": "가디건, 후러브스아트",
+     "url": "https://www.musinsa.com/products/5601519"
+    },
+    {
+     "t": "재킷, 디스이즈네버댓",
+     "url": "https://www.musinsa.com/products/4813661"
+    },
+    {
+     "t": "팬츠, 모즈모즈",
+     "url": "https://www.musinsa.com/products/7152523"
+    }
+   ],
+   "codi": [
+    {
+     "t": "버건디 헨리넥 니트, 회색 티, 베이지 치노 바지",
+     "url": "https://www.musinsa.com/products/7188995"
+    },
+    {
+     "t": "버건디 니트, 흰 바지, 검정 볼캡",
+     "url": "https://www.musinsa.com/products/5362030"
+    },
+    {
+     "t": "버건디 카라 맨투맨, 흰 와이드 데님, 검정 벨트, 검정 숄더백",
+     "url": "https://www.musinsa.com/products/5332681"
+    },
+    {
+     "t": "버건디 케이블 니트, 검정 와이드 슬랙스, 검정 벨트, 검정 구두",
+     "url": "https://www.pinterest.com/pin/1050816525582660686/",
+     "pin": 1
+    }
+   ],
+   "measured": 1
   },
   {
    "id": "terracotta",
@@ -1420,7 +2921,49 @@
    "say": "구운 흙 같은 주황빛 갈색이에요.",
    "look": "구운 흙 같은 주황빛 갈색",
    "where": "니트, 셔츠, 내추럴",
-   "hex": "#B5603F"
+   "hex": "#B07761",
+   "tip": "테라코타는 카키 바지, 회색 팬츠, 검정 팬츠와 맞춘 사진이 보여요.",
+   "real": [
+    {
+     "t": "티셔츠, 케이투",
+     "url": "https://www.musinsa.com/products/7312059"
+    },
+    {
+     "t": "티셔츠, 액트러닝",
+     "url": "https://www.musinsa.com/products/6778337"
+    },
+    {
+     "t": "탱크 탑, 캠퍼랩",
+     "url": "https://www.musinsa.com/products/4835685"
+    },
+    {
+     "t": "반바지, 액트러닝",
+     "url": "https://www.musinsa.com/products/6778327"
+    },
+    {
+     "t": "재킷, 케이투",
+     "url": "https://www.musinsa.com/products/7516039"
+    },
+    {
+     "t": "팬츠, 케이투",
+     "url": "https://www.musinsa.com/products/7278643"
+    }
+   ],
+   "codi": [
+    {
+     "t": "테라코타 탱크 탑, 카키 카고 팬츠",
+     "url": "https://www.musinsa.com/products/4166810"
+    },
+    {
+     "t": "테라코타 스냅 플리스, 안에 체크 셔츠, 회색 팬츠, 베이지 비니",
+     "url": "https://www.musinsa.com/products/7436407"
+    },
+    {
+     "t": "테라코타 반팔 셔츠, 안에 흰 이너, 검정 팬츠",
+     "url": "https://www.musinsa.com/products/6400997"
+    }
+   ],
+   "measured": 1
   },
   {
    "id": "mustard",
@@ -1431,7 +2974,49 @@
    "say": "겨자 같은 탁한 노랑이에요.",
    "look": "겨자 같은 탁한 노랑",
    "where": "니트, 비니, 포인트",
-   "hex": "#C9A227"
+   "hex": "#D4B467",
+   "tip": "머스타드는 갈색 스커트나 흰 팬츠, 청바지와 맞춘 사진이 보여요.",
+   "real": [
+    {
+     "t": "니트, 슈페리어",
+     "url": "https://www.musinsa.com/products/4477954"
+    },
+    {
+     "t": "니트, 다이아몬드 레이라",
+     "url": "https://www.musinsa.com/products/2227406"
+    },
+    {
+     "t": "니트, 예스아이씨",
+     "url": "https://www.musinsa.com/products/4405939"
+    },
+    {
+     "t": "셔츠, 왓더퍽",
+     "url": "https://www.musinsa.com/products/3886468"
+    },
+    {
+     "t": "코트, 런던트레디션",
+     "url": "https://www.musinsa.com/products/5609364"
+    },
+    {
+     "t": "반바지, 유니폼브릿지",
+     "url": "https://www.musinsa.com/products/6313357"
+    }
+   ],
+   "codi": [
+    {
+     "t": "머스타드 니트, 카멜 브라운 롱스커트",
+     "url": "https://www.musinsa.com/products/1311835"
+    },
+    {
+     "t": "머스타드 니트, 흰 팬츠",
+     "url": "https://www.musinsa.com/products/1626496"
+    },
+    {
+     "t": "머스타드 경량 패딩, 청바지, 검정 캡",
+     "url": "https://www.musinsa.com/products/5425136"
+    }
+   ],
+   "measured": 1
   },
   {
    "id": "coral",
@@ -1442,7 +3027,48 @@
    "say": "산호 같은 주황빛 분홍이에요.",
    "look": "산호 같은 주황빛 분홍",
    "where": "여름 셔츠, 걸리시",
-   "hex": "#EE8C77"
+   "hex": "#EE8C77",
+   "tip": "코랄은 베이지 팬츠나 흑백 체크 스커트와 맞춘 사진이 보여요.",
+   "real": [
+    {
+     "t": "니트, 비바스튜디오",
+     "url": "https://www.musinsa.com/products/2330065"
+    },
+    {
+     "t": "니트 조끼, 리",
+     "url": "https://www.musinsa.com/products/3134516"
+    },
+    {
+     "t": "폴로 니트, 소루",
+     "url": "https://www.musinsa.com/products/4123315"
+    },
+    {
+     "t": "맨투맨, 유니폼브릿지",
+     "url": "https://www.musinsa.com/products/3905153"
+    },
+    {
+     "t": "반바지, 그라미치",
+     "url": "https://www.musinsa.com/products/4921854"
+    },
+    {
+     "t": "재킷, 디아도라",
+     "url": "https://www.musinsa.com/products/5561218"
+    }
+   ],
+   "codi": [
+    {
+     "t": "코랄 니트, 베이지 팬츠, 검정 벨트",
+     "url": "https://www.musinsa.com/products/4029563"
+    },
+    {
+     "t": "코랄 반팔 니트, 같은 계열 스카프, 베이지 하의",
+     "url": "https://www.musinsa.com/products/7158441"
+    },
+    {
+     "t": "핑크 코랄 니트, 체크 스커트, 분홍 헤어밴드",
+     "url": "https://www.musinsa.com/products/1333759"
+    }
+   ]
   },
   {
    "id": "babypink",
@@ -1453,7 +3079,48 @@
    "say": "아주 연한 분홍이에요.",
    "look": "아주 연한 분홍",
    "where": "니트, 걸리시",
-   "hex": "#F2C9D3"
+   "hex": "#F2C9D3",
+   "tip": "베이비 핑크는 갈색 바지, 파란 가방, 검정 헤어밴드처럼 진한 색 하나를 더한 사진이 보여요.",
+   "real": [
+    {
+     "t": "니트, 조거쉬",
+     "url": "https://www.musinsa.com/products/3926819"
+    },
+    {
+     "t": "니트, 스윙셋",
+     "url": "https://www.musinsa.com/products/5941570"
+    },
+    {
+     "t": "가디건, 닉앤니콜",
+     "url": "https://www.musinsa.com/products/7694184"
+    },
+    {
+     "t": "재킷, 트위디아",
+     "url": "https://www.musinsa.com/products/5834404"
+    },
+    {
+     "t": "맨투맨, 시월107",
+     "url": "https://www.musinsa.com/products/6237988"
+    },
+    {
+     "t": "팬츠, 헤더먼트",
+     "url": "https://www.musinsa.com/products/7402208"
+    }
+   ],
+   "codi": [
+    {
+     "t": "연분홍 V넥 니트, 브라운 코듀로이 와이드 팬츠",
+     "url": "https://www.musinsa.com/products/5419566"
+    },
+    {
+     "t": "연분홍 헨리넥 니트, 줄무늬 비니, 파란 미니 크로스백, 베이지 스커트",
+     "url": "https://www.musinsa.com/products/7640322"
+    },
+    {
+     "t": "연분홍 반팔 셔츠, 줄무늬 탑, 연한 줄무늬 드로스트링 팬츠, 검정 헤어밴드",
+     "url": "https://www.musinsa.com/products/5190335"
+    }
+   ]
   },
   {
    "id": "lavender",
@@ -1464,7 +3131,48 @@
    "say": "회색이 섞인 연한 보라예요.",
    "look": "회색이 섞인 연한 보라",
    "where": "니트, 셔츠",
-   "hex": "#C3B5DD"
+   "hex": "#C3B5DD",
+   "tip": "라벤더는 검정 스커트와 검정 가방으로 어두운 색을 맞춘 사진이 3장 모두에서 보여요.",
+   "real": [
+    {
+     "t": "니트, 키르시",
+     "url": "https://www.musinsa.com/products/3494341"
+    },
+    {
+     "t": "셔츠, 인스턴트펑크",
+     "url": "https://www.musinsa.com/products/2621881"
+    },
+    {
+     "t": "셔츠, 로우그",
+     "url": "https://www.musinsa.com/products/6566215"
+    },
+    {
+     "t": "맨투맨, 리트리버클럽",
+     "url": "https://www.musinsa.com/products/2992701"
+    },
+    {
+     "t": "반바지, 푸마",
+     "url": "https://www.musinsa.com/products/6711040"
+    },
+    {
+     "t": "코트, 오프닝선샤인",
+     "url": "https://www.musinsa.com/products/3641677"
+    }
+   ],
+   "codi": [
+    {
+     "t": "라벤더 맨투맨, 검정 플리츠 스커트, 검정 숄더백, 검정 캡",
+     "url": "https://www.musinsa.com/products/7627220"
+    },
+    {
+     "t": "연한 라벤더 맨투맨, 안에 흰 셔츠, 검정 스커트",
+     "url": "https://www.musinsa.com/products/4142652"
+    },
+    {
+     "t": "라벤더 케이블 니트, 검정 미니스커트, 와인색 호보백",
+     "url": "https://www.musinsa.com/products/5736871"
+    }
+   ]
   }
  ],
  "names": [
