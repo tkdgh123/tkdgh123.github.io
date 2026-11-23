@@ -186,6 +186,15 @@ button.pc:hover span{text-decoration:underline;text-underline-offset:3px}
 .tap .hit.ok{background:var(--ok)}.tap .hit.no{background:var(--no)}
 .credit{margin:8px auto 0;max-width:560px;font-size:12px;color:var(--faint)}
 .credit a{color:inherit}
+/* 실제 사진 */
+.rph{position:relative;aspect-ratio:3/4;overflow:hidden;background:var(--tile)}
+.rph img{width:100%;height:100%;object-fit:cover}
+.rph .rb{position:absolute;border:3px solid #ffd400;box-shadow:0 0 0 2px rgba(0,0,0,.55)}
+.qz .q-img.real{width:min(380px,82%)}
+.rcard{display:flex;align-items:center;gap:14px;margin:-4px 0 18px}
+.rcard .ph{width:76px;flex:none}
+.rcard b{font-size:20px;letter-spacing:-.03em}
+.credit.many{text-align:left}
 .fb.one{grid-template-columns:1fr}
 .lnk{font-weight:700;text-decoration:underline;text-underline-offset:4px}
 .pname{margin:0 0 6px;font-size:clamp(20px,3.2vw,26px);font-weight:700;letter-spacing:-.04em;line-height:1.35}
@@ -194,6 +203,12 @@ button.pc:hover span{text-decoration:underline;text-underline-offset:3px}
 .whole h3{margin:0 0 12px;font-size:15px;color:var(--sub);font-weight:600}
 .strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
 .strip figure{margin:0}.strip figcaption{font-size:13px;font-weight:700;margin-top:6px}
+.strip figcaption small{display:block;font-size:12px;font-weight:600;color:var(--faint)}
+.ops.chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+.op.chip{min-height:54px;font-size:clamp(18px,2.6vw,22px)}
+.ops.two{grid-template-columns:1fr}
+.ops.two .op{min-height:64px;font-size:17px}
+.rule-fb h3{margin:0 0 4px;font-size:18px;font-weight:800;letter-spacing:-.03em}
 .end .score{font-size:15px;color:var(--sub);margin:0 0 26px}
 .end .grid{margin-bottom:28px}
 
@@ -249,7 +264,7 @@ button.pc:hover span{text-decoration:underline;text-underline-offset:3px}
 
 <script>
 const KEY = "ot-gongbu-v1";
-let U = [], G = [], C = [], N = [], P = [], R = {}, byId = {}, K = { f: [], r: [] };
+let U = [], G = [], C = [], N = [], P = [], R = {}, byId = {}, K = { f: [], r: [] }, RP = [];
 let st = { seen: {}, stat: {} };
 try { st = Object.assign(st, JSON.parse(localStorage.getItem(KEY) || "{}")); } catch (e) {}
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} window.otPush?.(); };
@@ -372,26 +387,50 @@ function pickSet(only, scope) {
     return { id: c.id, type: Math.random() < 0.5 ? "pic" : "name", ops: ops.map(o => o.id) };
   });
 }
-function nameSet() {
-  return shuffle(N.slice()).slice(0, 4).flatMap(n => n.parts.map((p, k) => {
-    const c = byId[p.id];
-    const same = shuffle(C.filter(x => x.g === c.g && x.id !== c.id));
-    const unit = shuffle(C.filter(x => x.u === c.u && x.g !== c.g));
-    return { id: c.id, type: "name", t: n.t, w: p.w, k, last: k === n.parts.length - 1 ? n.parts.map(x => x.id) : null, ops: shuffle([c, ...same.slice(0, 3).concat(unit).slice(0, 3)]).map(o => o.id) };
-  }));
+// 상품명 뜯어보기: 상품명 속 낱말이 무엇(옷 종류, 핏, 색 등)을 알려 주는지 고르게 한다
+function kind(c) {
+  const g = gOf(c.g)?.name || "";
+  return { 1: "옷 종류", 3: "여미는 방법", 4: "핏이나 기장", 5: "색", 6: "무늬", 7: "재질" }[c.u] || (/목|깃/.test(g) ? "목이나 깃" : /어깨|소매/.test(g) ? "어깨나 소매" : /주머니/.test(g) ? "주머니" : /바지/.test(g) ? "바지 부분" : "작은 부분");
 }
+function nameSet() {
+  return shuffle(N.slice()).slice(0, 10).map(n => {
+    const ks = n.parts.map(p => kind(byId[p.id]));
+    const cand = n.parts.filter((p, i) => ks.filter(k => k === ks[i]).length === 1);
+    const p = cand[Math.floor(Math.random() * cand.length)];
+    return { id: p.id, type: "parse", t: n.t, parts: n.parts, ask: kind(byId[p.id]), last: n.parts.map(x => x.id) };
+  });
+}
+// 코디 규칙: 같은 규칙의 좋은 예와 피할 예 가운데 맞는 쪽 고르기
+const ruleSet = () => shuffle(K.r.slice()).slice(0, 10).map(r => ({ type: "rule", r, ops: shuffle(["do", "dont"]) }));
+// 실제 사진(Fashionpedia): 네모 친 옷이나 부분 이름 맞히기, 또는 이 옷이 들어간 사진 고르기
+const rph = (p, box = true) => `<div class="rph"><img src="fq/${p.id}.webp" alt="" width="600" height="800">${box ? `<i class="rb" style="left:${p.box[0] * 100}%;top:${p.box[1] * 100}%;width:${(p.box[2] - p.box[0]) * 100}%;height:${(p.box[3] - p.box[1]) * 100}%"></i>` : ""}</div>`;
+const WEAR = new Set(["재킷", "코트", "윗옷", "바지"]);
+function realSet() {
+  const fams = {}; RP.forEach(p => (fams[p.fam] = fams[p.fam] || new Set()).add(p.card));
+  return shuffle(RP.slice()).filter(p => fams[p.fam].size >= 2).slice(0, 10).map(p => {
+    const sib = shuffle([...fams[p.fam]].filter(id => id !== p.card));
+    const others = sib.flatMap(id => shuffle(RP.filter(x => x.card === id)).slice(0, 1));
+    if (Math.random() < 0.5 && others.length >= 2) return { id: p.card, type: "rpick", ans: p.id, ops: shuffle([p, ...others.slice(0, 3)]), box: !WEAR.has(p.fam) };
+    const g = byId[p.card].g, near = c => c.u === byId[p.card].u && !fams[p.fam].has(c.id);
+    const unit = [...shuffle(C.filter(c => near(c) && c.g === g)), ...shuffle(C.filter(c => near(c) && c.g !== g))].map(c => c.id);
+    return { id: p.card, type: "rbox", photo2: p, wear: WEAR.has(p.fam), ops: shuffle([p.card, ...sib.slice(0, 3).concat(unit).slice(0, 3)]) };
+  });
+}
+const credit = ps => `<p class="credit${ps.length > 1 ? " many" : ""}">사진 ${ps.map((p, k) => `<a href="${esc(p.src)}" target="_blank" rel="noopener">${ps.length > 1 ? k + 1 + "번 " : ""}Flickr</a> ${esc(p.lic)}`).join(", ")}. 옷 표시 <a href="https://fashionpedia.github.io/home/" target="_blank" rel="noopener">Fashionpedia</a> CC BY 4.0</p>`;
 function startQuiz(only, scope) {
   scope = scope || "";
   if (scope === "review" && !only) only = shuffle(dueIds()).slice(0, 10);
   const list = scope === "photo" ? shuffle(P.slice()).slice(0, 10).map(p => ({ photo: p }))
     : scope === "part" ? shuffle(partList()).slice(0, 10).map(p => ({ photo: p }))
-    : scope === "name" && !only ? nameSet() : shuffle(pickSet(only, scope === "name" || scope === "review" ? "" : scope));
+    : scope === "name" && !only ? nameSet()
+    : scope === "rule" ? ruleSet()
+    : scope === "real" ? realSet() : shuffle(pickSet(only, scope === "name" || scope === "review" ? "" : scope));
   Q = { scope, list, i: 0, right: 0, wrong: [], done: false }; quiz();
 }
 function quiz() {
   const el = $("#v-quiz");
-  const mode = ["name", "part", "photo", "review"].includes(Q.scope) ? Q.scope : "";
-  const modes = [["", "이름 맞히기", 1], ["review", `복습 ${dueIds().length}`, dueIds().length || mode === "review"], ["name", "상품명 풀기", N.length], ["part", "부분 누르기", C.some(c => c.spot)], ["photo", "사진에서 찾기", P.length]];
+  const mode = ["name", "rule", "real", "part", "photo", "review"].includes(Q.scope) ? Q.scope : "";
+  const modes = [["", "이름 맞히기", 1], ["review", `복습 ${dueIds().length}`, dueIds().length || mode === "review"], ["name", "상품명 뜯어보기", N.length], ["rule", "코디 규칙", K.r.length], ["real", "실제 사진", RP.length], ["part", "부분 누르기", C.some(c => c.spot)], ["photo", "사진에서 찾기", P.length]];
   const nav = `<nav class="useg qmode" aria-label="문제 종류">${modes.filter(m => m[2]).map(([k, label]) => `<a href="#quiz${k ? "/" + k : ""}" aria-current="${k === mode}">${label}</a>`).join("")}</nav>` +
     (mode ? "" : `<nav class="seg qunit" aria-label="단원">${[["", "전체"], ...U.map(x => [String(x.u), x.name])].map(([k, label]) => `<a href="#quiz${k ? "/" + k : ""}" aria-current="${String(Q.scope) === k}">${esc(label)}</a>`).join("")}</nav>`);
   if (Q.i >= Q.list.length) {
@@ -416,15 +455,47 @@ function quiz() {
   if (q.type === "pic") {
     el.innerHTML = nav + `<div class="qz">${head}<h2>이 사진은 무엇일까요?</h2><div class="q-img">${ph(c, false, false)}</div>
       <div class="ops" id="ops">${q.ops.map((o, k) => `<button class="op" data-op="${o}"><kbd>${k + 1}</kbd>${esc(byId[o].ko)}</button>`).join("")}</div><div id="fb"></div></div>`;
-  } else if (q.t) {
-    const at = q.t.indexOf(q.w);
-    el.innerHTML = nav + `<div class="qz">${head}<p class="pname">${esc(q.t.slice(0, at))}<mark>${esc(q.w)}</mark>${esc(q.t.slice(at + q.w.length))}</p><h2>칠한 말은 어느 것일까요?</h2>
-      <div class="ops pics" id="ops">${q.ops.map((o, k) => `<button class="op pic" data-op="${o}" aria-label="${k + 1}번 사진">${ph(byId[o], false, false)}<kbd>${k + 1}</kbd></button>`).join("")}</div><div id="fb"></div></div>`;
+  } else if (q.type === "parse") {
+    el.innerHTML = nav + `<div class="qz">${head}<h2>이 상품명에서 ${esc(q.ask)}${batchim(q.ask) ? "을" : "를"} 알려 주는 말을 눌러 보세요</h2>
+      <div class="ops chips" id="ops">${q.parts.map(p => `<button class="op chip" data-op="${p.id}">${esc(p.w)}</button>`).join("")}</div><div id="fb"></div></div>`;
+  } else if (q.type === "rbox") {
+    el.innerHTML = nav + `<div class="qz">${head}<h2>노란 네모 친 ${q.wear ? "옷은" : "곳은"} 무엇일까요?</h2><div class="q-img real">${rph(q.photo2)}</div>
+      <div class="ops" id="ops">${q.ops.map((o, k) => `<button class="op" data-op="${o}"><kbd>${k + 1}</kbd>${esc(byId[o].ko)}</button>`).join("")}</div>${credit([q.photo2])}<div id="fb"></div></div>`;
+  } else if (q.type === "rpick") {
+    el.innerHTML = nav + `<div class="qz">${head}<h2>${esc(byId[q.id].ko)}${batchim(byId[q.id].ko) ? "이" : "가"} 있는 사진은 어느 것일까요?</h2><div class="rcard">${ph(byId[q.id], false, false)}<b>${esc(byId[q.id].ko)}</b></div>
+      <div class="ops pics" id="ops">${q.ops.map((p, k) => `<button class="op pic" data-op="${p.id}" aria-label="${k + 1}번 사진">${rph(p, q.box)}<kbd>${k + 1}</kbd></button>`).join("")}</div>${credit(q.ops)}<div id="fb"></div></div>`;
+  } else if (q.type === "rule") {
+    el.innerHTML = nav + `<div class="qz">${head}<h2>기본 규칙에 맞는 쪽은 어느 것일까요?</h2>
+      <div class="ops two" id="ops">${q.ops.map((o, k) => `<button class="op" data-op="${o}"><kbd>${k + 1}</kbd>${esc(q.r[o])}</button>`).join("")}</div><div id="fb"></div></div>`;
   } else {
     el.innerHTML = nav + `<div class="qz">${head}<h2>${esc(eun(c.ko))} 어느 것일까요?</h2>
       <div class="ops pics" id="ops">${q.ops.map((o, k) => `<button class="op pic" data-op="${o}" aria-label="${k + 1}번 사진">${ph(byId[o], false, false)}<kbd>${k + 1}</kbd></button>`).join("")}</div><div id="fb"></div></div>`;
   }
   Q.done = false;
+}
+function pickAnswer(o) {
+  const q = Q.list[Q.i], c = byId[q.id], ok = o === q.ans;
+  const s = st.stat[q.id] || (st.stat[q.id] = { s: 0, w: 0 });
+  if (ok) { s.s++; Q.right++; } else { s.s = 0; s.w++; Q.wrong.push(q.id); }
+  s.due = ok ? nextDue(s) : Date.now() + DAY; st.seen[q.id] = 1; save(); prog();
+  $("#ops").classList.add("done");
+  $("#ops").querySelectorAll(".op").forEach(b => { if (b.dataset.op === q.ans) b.classList.add("ok"); else if (b.dataset.op === o) b.classList.add("no"); b.disabled = true; });
+  const picked = q.ops.find(p => p.id === o);
+  $("#fb").innerHTML = `<div class="fb"><div>${ph(c, true, false)}</div><div><p class="r ${ok ? "ok" : "no"}">${ok ? "맞았어요" : `${q.ops.findIndex(p => p.id === q.ans) + 1}번 사진이에요`}</p>
+    <p>${esc(c.look)}</p>${ok ? "" : `<p style="color:var(--sub);margin-top:6px">고른 사진은 ${esc(ieyo(byId[picked.card].ko))}.</p>`}
+    <button class="btn solid" id="q-next">${Q.i + 1 < Q.list.length ? "다음" : "결과 보기"}</button></div></div>`;
+  $("#q-next").focus({ preventScroll: true });
+  $("#fb").scrollIntoView({ block: "nearest" });
+}
+function ruleAnswer(o) {
+  const q = Q.list[Q.i], ok = o === "do";
+  if (ok) Q.right++; else Q.wrong.push(null);
+  $("#ops").classList.add("done");
+  $("#ops").querySelectorAll(".op").forEach(b => { b.classList.add(b.dataset.op === "do" ? "ok" : b.dataset.op === o ? "no" : "dim"); b.disabled = true; });
+  $("#fb").innerHTML = `<div class="fb one rule-fb"><div><p class="r ${ok ? "ok" : "no"}">${ok ? "맞았어요" : "반대예요"}</p><h3>${esc(q.r.name)}</h3><p>${esc(q.r.say)}</p>
+    <button class="btn solid" id="q-next">${Q.i + 1 < Q.list.length ? "다음" : "결과 보기"}</button></div></div>`;
+  $("#q-next").focus({ preventScroll: true });
+  $("#fb").scrollIntoView({ block: "nearest" });
 }
 function tapAnswer(e) {
   if (!Q || Q.done) return;
@@ -443,6 +514,8 @@ function tapAnswer(e) {
 function answer(o) {
   if (!Q || Q.done) return;
   Q.done = true;
+  if (Q.list[Q.i].type === "rule") return ruleAnswer(o);
+  if (Q.list[Q.i].type === "rpick") return pickAnswer(o);
   const q = Q.list[Q.i], c = byId[q.id], ok = o === q.id;
   const s = st.stat[q.id] || (st.stat[q.id] = { s: 0, w: 0 });
   if (ok) { s.s++; Q.right++; } else { s.s = 0; s.w++; Q.wrong.push(q.id); }
@@ -454,12 +527,12 @@ function answer(o) {
     else if (b.dataset.op === o) b.classList.add("no");
     b.disabled = true;
   });
-  const wrongName = !ok && q.type === "name" ? ` 고른 사진은 ${esc(ieyo(byId[o].ko))}.` : "";
+  const wrongName = ok ? "" : q.type === "name" ? ` 고른 사진은 ${esc(ieyo(byId[o].ko))}.` : q.type === "parse" ? ` 고른 '${esc(byId[o].ko)}'${batchim(byId[o].ko) ? "은" : "는"} ${esc(ieyo(kind(byId[o])))}.` : "";
   $("#fb").innerHTML = `<div class="fb"><div>${ph(c, true, false)}</div><div>
     <p class="r ${ok ? "ok" : "no"}">${ok ? "맞았어요" : `정답은 ${esc(c.ko)}`}</p>
     <p>${esc(c.say)}${wrongName}</p><p style="color:var(--sub);margin-top:6px">${esc(c.look)}</p>
     <button class="btn solid" id="q-next">${Q.i + 1 < Q.list.length ? "다음" : "결과 보기"}</button></div></div>
-    ${q.last ? `<div class="whole"><h3>그러니까 '${esc(q.t)}'${batchim(q.t) ? "은" : "는"}</h3><div class="strip">${q.last.map(id => `<figure>${ph(byId[id], true, false)}<figcaption>${esc(byId[id].ko)}</figcaption></figure>`).join("")}</div></div>` : ""}`;
+    ${q.last ? `<div class="whole"><h3>그러니까 '${esc(q.t)}'${batchim(q.t) ? "은" : "는"}</h3><div class="strip">${q.last.map(id => `<figure>${ph(byId[id], true, false)}<figcaption>${esc(byId[id].ko)}<small>${esc(kind(byId[id]))}</small></figcaption></figure>`).join("")}</div></div>` : ""}`;
   $("#q-next").focus({ preventScroll: true });
   $("#fb").scrollIntoView({ block: "nearest" });
 }
@@ -587,7 +660,7 @@ function route() {
   document.querySelectorAll(".tabs a").forEach(a => a.dataset.v === view ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"));
   if (view === "read") { if (!$("#rd-in")) readView(); else readRender(); prog(); }
   else if (view === "quiz") {
-    const scope = U.some(x => x.u == arg) || (arg === "name" && N.length) || (arg === "photo" && P.length) || arg === "part" || arg === "review" ? arg : "";
+    const scope = U.some(x => x.u == arg) || (arg === "name" && N.length) || (arg === "rule" && K.r.length) || (arg === "real" && RP.length) || (arg === "photo" && P.length) || arg === "part" || arg === "review" ? arg : "";
     if (!Q || Q.scope !== scope) startQuiz(null, scope); else quiz();
     prog();
   } else refresh();
@@ -624,7 +697,7 @@ document.addEventListener("keydown", e => {
 window.addEventListener("hashchange", route);
 
 fetch("cards.json").then(r => r.json()).then(d => {
-  G = d.groups; C = d.cards; N = d.names || []; P = d.photos || []; R = d.read || {}; K = d.codi || K; byId = Object.fromEntries(C.map(c => [c.id, c]));
+  G = d.groups; C = d.cards; N = d.names || []; P = d.photos || []; R = d.read || {}; K = d.codi || K; RP = d.real || []; byId = Object.fromEntries(C.map(c => [c.id, c]));
   U = d.units.filter(x => C.some(c => c.u == x.u));
   if (location.hash.startsWith("#card/")) { const id = location.hash.split("/")[1]; history.replaceState(null, "", "#book"); route(); location.hash = "#card/" + id; }
   else route();
