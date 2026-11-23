@@ -118,12 +118,20 @@ main{max-width:var(--wrap);margin:0 auto;padding:0 var(--gut) 96px}
 .cmp button{display:block;width:100%;text-align:left}
 
 /* 퀴즈 */
-.qz{max-width:760px;margin:0 auto;padding-top:24px}
-.qz-top{display:flex;align-items:center;gap:14px;font-size:14px;color:var(--sub);margin-bottom:22px}
+.qz{max-width:980px;margin:0 auto;padding-top:14px}
+.qz-top{display:flex;align-items:center;gap:14px;font-size:14px;color:var(--sub);margin-bottom:14px}
+.qz-top .combo{font-weight:800;color:var(--ok);animation:pop .35s cubic-bezier(.2,.9,.3,1.4)}
+@keyframes pop{from{transform:scale(1.5)}to{transform:none}}
+.qz-top .today{font-size:13px;color:var(--faint)}
 .bar{flex:1;height:3px;background:var(--line)}
 .bar i{display:block;height:100%;background:var(--ink);transition:width .3s}
-.qz h2{margin:0 0 20px;font-size:clamp(26px,4.4vw,38px);line-height:1.15;font-weight:800;letter-spacing:-.05em}
-.qz .q-img{width:min(340px,72%);margin:0 auto 22px}
+.qz h2{margin:0 0 14px;font-size:clamp(21px,2.6vw,28px);line-height:1.2;font-weight:800;letter-spacing:-.04em}
+.qz.split{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,5fr);gap:0 36px;align-items:start}
+.qz.split .qz-top{grid-column:1/-1}
+.qz.split .q-img{width:100%;margin:0}
+.qz.split .ops{grid-template-columns:1fr}
+.ops.pics{max-width:820px}
+.qz .q-img{width:min(300px,64%,calc(40vh * .75));margin:0 auto 16px}
 .ops{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .op{min-height:58px;padding:12px 14px;border:1px solid var(--line);text-align:left;font-size:17px;font-weight:700;letter-spacing:-.03em;display:flex;align-items:center;gap:10px;transition:border-color .15s,background-color .15s}
 .op:hover{border-color:var(--ink)}
@@ -190,7 +198,14 @@ button.pc:hover span{text-decoration:underline;text-underline-offset:3px}
 .rph{position:relative;aspect-ratio:3/4;overflow:hidden;background:var(--tile)}
 .rph img{width:100%;height:100%;object-fit:cover}
 .rph .rb{position:absolute;border:3px solid #ffd400;box-shadow:0 0 0 2px rgba(0,0,0,.55)}
-.qz .q-img.real{width:min(380px,82%)}
+.qz .q-img.real{width:min(340px,72%,calc(44vh * .75))}
+.qmode{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;white-space:nowrap;padding-bottom:2px}
+.qmode::-webkit-scrollbar{display:none}
+.own-on{background:var(--ok);border-color:var(--ok);color:#fff}
+.pc .have{display:inline-block;margin-left:6px;font-size:11px;font-weight:700;color:var(--ok)}
+.kd .meta b{color:var(--ok)}
+.end .best{margin:4px 0 14px;font-size:15px;color:var(--sub)}
+@media (max-width:860px){.qz.split{display:block}.qz.split .q-img{width:min(280px,62%,calc(36vh * .75));margin:0 auto 14px}.qz.split .ops{grid-template-columns:1fr 1fr}}
 .rcard{display:flex;align-items:center;gap:14px;margin:-4px 0 18px}
 .rcard .ph{width:76px;flex:none}
 .rcard b{font-size:20px;letter-spacing:-.03em}
@@ -201,7 +216,7 @@ button.pc:hover span{text-decoration:underline;text-underline-offset:3px}
 .pname mark{background:var(--ink);color:#fff;padding:0 5px}
 .whole{margin-top:26px}
 .whole h3{margin:0 0 12px;font-size:15px;color:var(--sub);font-weight:600}
-.strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;max-width:620px}
 .strip figure{margin:0}.strip figcaption{font-size:13px;font-weight:700;margin-top:6px}
 .strip figcaption small{display:block;font-size:12px;font-weight:600;color:var(--faint)}
 .ops.chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
@@ -238,7 +253,7 @@ button.pc:hover span{text-decoration:underline;text-underline-offset:3px}
     <a href="#book" data-v="book">도감</a>
     <a href="#cmp" data-v="cmp">비교</a>
     <a href="#codi" data-v="codi">코디</a>
-    <a href="#quiz" data-v="quiz">퀴즈</a>
+    <a href="#quiz/mix" data-v="quiz">퀴즈</a>
     <a href="#read" data-v="read">읽기</a>
     <a href="plan.html">계획</a>
   </nav>
@@ -315,6 +330,8 @@ function names(c) {
   const rows = [["쇼핑몰", sq(c.shop) !== sq(c.ko) ? c.shop : ""], ["정확한 이름", c.pro && sq(c.pro) !== sq(c.ko) && sq(c.pro) !== sq(c.shop) ? c.pro : ""], ["편한 말", (c.casual || []).join(", ")]].filter(r => r[1]);
   return rows.length ? `<dl class="nm">${rows.map(([k, v]) => `<dt>${k}</dt><dd>${esc(v)}</dd>`).join("")}</dl>` : "";
 }
+const owned = id => !!(st.own && st.own[id]);
+const ownBtn = id => `<button class="btn${owned(id) ? " own-on" : ""}" data-own="${id}">${owned(id) ? "내 옷장에 있어요" : "내 옷장에 넣기"}</button>`;
 function openCard(id) {
   const c = byId[id]; if (!c) return;
   if (!$("#sheet").hidden && cur === id) return;
@@ -338,7 +355,7 @@ function openCard(id) {
     ${c.real?.length ? `<div class="row"><h3>이 색 실제 옷</h3><ul class="lk">${c.real.map(x => `<li><a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.t)}</a><span>무신사</span></li>`).join("")}</ul></div>` : ""}
     ${c.src ? `<div class="row"><h3>출처</h3><p><a href="${esc(c.src.url)}" target="_blank" rel="noopener">${esc(c.src.name)}</a> <span style="color:var(--faint)">${esc(c.src.date)}</span></p></div>` : ""}
     ${mates.length ? `<div class="row"><h3>헷갈리는 짝</h3><div class="pair">${mates.map(m => `<button data-card="${m.id}"><div class="ph"><img src="img/${m.id}.webp" alt="" width="600" height="800" loading="lazy"></div>${esc(m.ko)}</button>`).join("")}</div></div>` : ""}
-    <div class="acts"><a class="btn solid" href="#cmp/${c.g}">나란히 비교</a><a class="btn" href="https://www.musinsa.com/search/goods?keyword=${q}" target="_blank" rel="noopener">무신사에서 실제 상품</a></div>`;
+    <div class="acts"><a class="btn solid" href="#cmp/${c.g}">나란히 비교</a>${c.u == 1 ? ownBtn(c.id) : ""}<a class="btn" href="https://www.musinsa.com/search/goods?keyword=${q}" target="_blank" rel="noopener">무신사에서 실제 상품</a></div>`;
   $("#sheet").hidden = false;
   document.body.style.overflow = "hidden";
   document.body.classList.add("sheet-open");
@@ -417,6 +434,27 @@ function realSet() {
   });
 }
 const credit = ps => `<p class="credit${ps.length > 1 ? " many" : ""}">사진 ${ps.map((p, k) => `<a href="${esc(p.src)}" target="_blank" rel="noopener">${ps.length > 1 ? k + 1 + "번 " : ""}Flickr</a> ${esc(p.lic)}`).join(", ")}. 옷 표시 <a href="https://fashionpedia.github.io/home/" target="_blank" rel="noopener">Fashionpedia</a> CC BY 4.0</p>`;
+// 섞어서: 한 판 안에서 문제 종류를 바꿔 가며
+function mixSet() {
+  const a = pickSet(null, ""), out = a.slice(0, 4);
+  if (N.length) out.push(...nameSet().slice(0, 2));
+  if (RP.length) out.push(...realSet().slice(0, 2));
+  if (K.r.length) out.push(...ruleSet().slice(0, 1));
+  if (C.some(c => c.spot)) out.push(...shuffle(partList()).slice(0, 1).map(p => ({ photo: p })));
+  return shuffle(out.concat(a.slice(4)).slice(0, 10));
+}
+// 맞히면 연속 수를 올리고, 오늘 푼 수와 며칠째인지 센다. 맞힌 문제는 잠깐 뒤 저절로 다음으로
+const dayKey = t => new Date(t).toLocaleDateString("sv");
+function tick(ok, auto) {
+  Q.combo = ok ? (Q.combo || 0) + 1 : 0; Q.best = Math.max(Q.best || 0, Q.combo);
+  const d = dayKey(Date.now()), y = dayKey(Date.now() - DAY);
+  if (!st.today || st.today.d !== d) { st.streak = st.today && st.today.d === y ? (st.streak || 1) + 1 : 1; st.today = { d, n: 0 }; }
+  st.today.n++; save();
+  const top = $(".qz-top");
+  if (top) { top.querySelector(".combo")?.remove(); const td = top.querySelector(".today"); if (td) td.textContent = todayTxt(); if (Q.combo >= 2) top.insertAdjacentHTML("beforeend", `<b class="combo">${Q.combo}연속</b>`); }
+  if (ok && auto) { const i = Q.i; setTimeout(() => { if (Q.i === i && Q.done && view === "quiz" && $("#sheet").hidden) { Q.i++; quiz(); window.scrollTo({ top: 0, behavior: "instant" }); } }, 1300); }
+}
+const todayTxt = () => st.today && st.today.d === dayKey(Date.now()) ? `오늘 ${st.today.n}문제${st.streak > 1 ? `, ${st.streak}일째` : ""}` : "";
 function startQuiz(only, scope) {
   scope = scope || "";
   if (scope === "review" && !only) only = shuffle(dueIds()).slice(0, 10);
@@ -424,18 +462,19 @@ function startQuiz(only, scope) {
     : scope === "part" ? shuffle(partList()).slice(0, 10).map(p => ({ photo: p }))
     : scope === "name" && !only ? nameSet()
     : scope === "rule" ? ruleSet()
-    : scope === "real" ? realSet() : shuffle(pickSet(only, scope === "name" || scope === "review" ? "" : scope));
+    : scope === "real" ? realSet()
+    : scope === "mix" ? mixSet() : shuffle(pickSet(only, scope === "name" || scope === "review" ? "" : scope));
   Q = { scope, list, i: 0, right: 0, wrong: [], done: false }; quiz();
 }
 function quiz() {
   const el = $("#v-quiz");
-  const mode = ["name", "rule", "real", "part", "photo", "review"].includes(Q.scope) ? Q.scope : "";
-  const modes = [["", "이름 맞히기", 1], ["review", `복습 ${dueIds().length}`, dueIds().length || mode === "review"], ["name", "상품명 뜯어보기", N.length], ["rule", "코디 규칙", K.r.length], ["real", "실제 사진", RP.length], ["part", "부분 누르기", C.some(c => c.spot)], ["photo", "사진에서 찾기", P.length]];
+  const mode = ["mix", "name", "rule", "real", "part", "photo", "review"].includes(Q.scope) ? Q.scope : "";
+  const modes = [["mix", "섞어서", 1], ["", "이름 맞히기", 1], ["review", `복습 ${dueIds().length}`, dueIds().length || mode === "review"], ["name", "상품명 뜯어보기", N.length], ["rule", "코디 규칙", K.r.length], ["real", "실제 사진", RP.length], ["part", "부분 누르기", C.some(c => c.spot)], ["photo", "사진에서 찾기", P.length]];
   const nav = `<nav class="useg qmode" aria-label="문제 종류">${modes.filter(m => m[2]).map(([k, label]) => `<a href="#quiz${k ? "/" + k : ""}" aria-current="${k === mode}">${label}</a>`).join("")}</nav>` +
     (mode ? "" : `<nav class="seg qunit" aria-label="단원">${[["", "전체"], ...U.map(x => [String(x.u), x.name])].map(([k, label]) => `<a href="#quiz${k ? "/" + k : ""}" aria-current="${String(Q.scope) === k}">${esc(label)}</a>`).join("")}</nav>`);
   if (Q.i >= Q.list.length) {
     document.body.classList.remove("no-home");
-    el.innerHTML = nav + `<div class="qz end"><h2>${Q.list.length}문제 중 ${Q.right}개 맞혔어요</h2>
+    el.innerHTML = nav + `<div class="qz end"><h2>${Q.list.length}문제 중 ${Q.right}개 맞혔어요</h2>${Q.best >= 2 || todayTxt() ? `<p class="best">${[Q.best >= 2 ? `최고 ${Q.best}연속` : "", todayTxt()].filter(Boolean).join(", ")}</p>` : ""}
       <p class="score">외운 카드 ${C.filter(c => learned(c.id)).length}/${C.length}. 세 번 연속 맞히면 외운 카드가 돼요. 틀린 카드는 내일, 맞힌 카드는 3일, 7일 뒤 '복습'에 다시 나와요.</p>
       ${Q.wrong.filter(Boolean).length ? `<div class="grid">${Q.wrong.filter(Boolean).map(id => tile(byId[id])).join("")}</div>` : ""}
       <div class="acts">${Q.wrong.filter(Boolean).length ? `<button class="btn solid" id="q-again-wrong">틀린 것만 다시</button>` : ""}<button class="btn${Q.wrong.length ? "" : " solid"}" id="q-again">새로 10문제</button></div></div>`;
@@ -451,16 +490,16 @@ function quiz() {
       ${p.src ? "" : `<p class="credit">사진 <a href="https://fashionpedia.github.io/home/" target="_blank" rel="noopener">Fashionpedia</a>, CC BY 4.0</p>`}<div id="fb"></div></div>`;
     Q.done = false; return;
   }
-  const head = `<div class="qz-top"><span>${Q.i + 1} / ${Q.list.length}</span><div class="bar"><i style="width:${Q.i / Q.list.length * 100}%"></i></div></div>`;
+  const head = `<div class="qz-top"><span>${Q.i + 1} / ${Q.list.length}</span><div class="bar"><i style="width:${Q.i / Q.list.length * 100}%"></i></div><span class="today">${todayTxt()}</span>${Q.combo >= 2 ? `<b class="combo">${Q.combo}연속</b>` : ""}</div>`;
   if (q.type === "pic") {
-    el.innerHTML = nav + `<div class="qz">${head}<h2>이 사진은 무엇일까요?</h2><div class="q-img">${ph(c, false, false)}</div>
-      <div class="ops" id="ops">${q.ops.map((o, k) => `<button class="op" data-op="${o}"><kbd>${k + 1}</kbd>${esc(byId[o].ko)}</button>`).join("")}</div><div id="fb"></div></div>`;
+    el.innerHTML = nav + `<div class="qz split">${head}<div class="q-img">${ph(c, false, false)}</div><div class="qa"><h2>이 사진은 무엇일까요?</h2>
+      <div class="ops" id="ops">${q.ops.map((o, k) => `<button class="op" data-op="${o}"><kbd>${k + 1}</kbd>${esc(byId[o].ko)}</button>`).join("")}</div><div id="fb"></div></div></div>`;
   } else if (q.type === "parse") {
     el.innerHTML = nav + `<div class="qz">${head}<h2>이 상품명에서 ${esc(q.ask)}${batchim(q.ask) ? "을" : "를"} 알려 주는 말을 눌러 보세요</h2>
       <div class="ops chips" id="ops">${q.parts.map(p => `<button class="op chip" data-op="${p.id}">${esc(p.w)}</button>`).join("")}</div><div id="fb"></div></div>`;
   } else if (q.type === "rbox") {
-    el.innerHTML = nav + `<div class="qz">${head}<h2>노란 네모 친 ${q.wear ? "옷은" : "곳은"} 무엇일까요?</h2><div class="q-img real">${rph(q.photo2)}</div>
-      <div class="ops" id="ops">${q.ops.map((o, k) => `<button class="op" data-op="${o}"><kbd>${k + 1}</kbd>${esc(byId[o].ko)}</button>`).join("")}</div>${credit([q.photo2])}<div id="fb"></div></div>`;
+    el.innerHTML = nav + `<div class="qz split">${head}<div class="q-img real">${rph(q.photo2)}${credit([q.photo2])}</div><div class="qa"><h2>노란 네모 친 ${q.wear ? "옷은" : "곳은"} 무엇일까요?</h2>
+      <div class="ops" id="ops">${q.ops.map((o, k) => `<button class="op" data-op="${o}"><kbd>${k + 1}</kbd>${esc(byId[o].ko)}</button>`).join("")}</div><div id="fb"></div></div></div>`;
   } else if (q.type === "rpick") {
     el.innerHTML = nav + `<div class="qz">${head}<h2>${esc(byId[q.id].ko)}${batchim(byId[q.id].ko) ? "이" : "가"} 있는 사진은 어느 것일까요?</h2><div class="rcard">${ph(byId[q.id], false, false)}<b>${esc(byId[q.id].ko)}</b></div>
       <div class="ops pics" id="ops">${q.ops.map((p, k) => `<button class="op pic" data-op="${p.id}" aria-label="${k + 1}번 사진">${rph(p, q.box)}<kbd>${k + 1}</kbd></button>`).join("")}</div>${credit(q.ops)}<div id="fb"></div></div>`;
@@ -477,7 +516,7 @@ function pickAnswer(o) {
   const q = Q.list[Q.i], c = byId[q.id], ok = o === q.ans;
   const s = st.stat[q.id] || (st.stat[q.id] = { s: 0, w: 0 });
   if (ok) { s.s++; Q.right++; } else { s.s = 0; s.w++; Q.wrong.push(q.id); }
-  s.due = ok ? nextDue(s) : Date.now() + DAY; st.seen[q.id] = 1; save(); prog();
+  s.due = ok ? nextDue(s) : Date.now() + DAY; st.seen[q.id] = 1; save(); prog(); tick(ok, true);
   $("#ops").classList.add("done");
   $("#ops").querySelectorAll(".op").forEach(b => { if (b.dataset.op === q.ans) b.classList.add("ok"); else if (b.dataset.op === o) b.classList.add("no"); b.disabled = true; });
   const picked = q.ops.find(p => p.id === o);
@@ -490,6 +529,7 @@ function pickAnswer(o) {
 function ruleAnswer(o) {
   const q = Q.list[Q.i], ok = o === "do";
   if (ok) Q.right++; else Q.wrong.push(null);
+  tick(ok, false);
   $("#ops").classList.add("done");
   $("#ops").querySelectorAll(".op").forEach(b => { b.classList.add(b.dataset.op === "do" ? "ok" : b.dataset.op === o ? "no" : "dim"); b.disabled = true; });
   $("#fb").innerHTML = `<div class="fb one rule-fb"><div><p class="r ${ok ? "ok" : "no"}">${ok ? "맞았어요" : "반대예요"}</p><h3>${esc(q.r.name)}</h3><p>${esc(q.r.say)}</p>
@@ -503,6 +543,7 @@ function tapAnswer(e) {
   const x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height, b = p.box, m = 0.03;
   const ok = x >= b[0] - m && x <= b[2] + m && y >= b[1] - m && y <= b[3] + m;
   Q.done = true; if (ok) Q.right++; else Q.wrong.push(null);
+  tick(ok, true);
   el.insertAdjacentHTML("beforeend", `<i class="hit ${ok ? "ok" : "no"}" style="left:${x * 100}%;top:${y * 100}%"></i><i class="box" style="left:${b[0] * 100}%;top:${b[1] * 100}%;width:${(b[2] - b[0]) * 100}%;height:${(b[3] - b[1]) * 100}%"></i>`);
   const c = p.card && byId[p.card];
   $("#fb").innerHTML = `<div class="fb one"><div><p class="r ${ok ? "ok" : "no"}">${ok ? "맞았어요" : `${esc(p.ko)}${batchim(p.ko) ? "은" : "는"} 네모 친 곳이에요`}</p>
@@ -520,7 +561,7 @@ function answer(o) {
   const s = st.stat[q.id] || (st.stat[q.id] = { s: 0, w: 0 });
   if (ok) { s.s++; Q.right++; } else { s.s = 0; s.w++; Q.wrong.push(q.id); }
   s.due = ok ? nextDue(s) : Date.now() + DAY;
-  st.seen[q.id] = 1; save(); prog();
+  st.seen[q.id] = 1; save(); prog(); tick(ok, q.type !== "parse");
   const ops = $("#ops"); ops.classList.add("done");
   ops.querySelectorAll(".op").forEach(b => {
     if (b.dataset.op === q.id) b.classList.add("ok");
@@ -604,7 +645,7 @@ function colorHex(name) {
 }
 function piece(p, big) {
   const c = p.id && byId[p.id], hex = colorHex(p.color);
-  const label = `<span>${hex ? `<i style="background:${hex}"></i>` : ""}${esc([p.color, p.name].filter(Boolean).join(" "))}</span>`;
+  const label = `<span>${hex ? `<i style="background:${hex}"></i>` : ""}${esc([p.color, p.name].filter(Boolean).join(" "))}${c && owned(c.id) ? `<em class="have">있어요</em>` : ""}</span>`;
   if (!big) return c ? `<div class="ph"><img src="img/${c.id}.webp" alt="" width="600" height="800" loading="lazy"></div>` : `<div class="ph blank" style="--c:${hex || "#e4e4e0"}"><i></i><em>${esc(p.name)}</em></div>`;
   return c ? `<button class="pc" data-card="${c.id}"><small>${esc(p.role)}</small><div class="ph"><img src="img/${c.id}.webp" alt="${esc(c.ko)}" width="600" height="800" loading="lazy"></div>${label}</button>`
     : `<div class="pc"><small>${esc(p.role)}</small><div class="ph blank" style="--c:${hex || "#e4e4e0"}"><i></i><em>그림 준비 중</em></div>${label}</div>`;
@@ -632,11 +673,15 @@ function codi(arg) {
       <div class="rules">${K.r.map(r => `<section class="rule"><h2>${esc(r.name)}</h2><p>${esc(r.say)}</p><dl>${r.do ? `<dt class="ok">이렇게</dt><dd>${esc(r.do)}</dd>` : ""}${r.dont ? `<dt class="no">이건 피해요</dt><dd>${esc(r.dont)}</dd>` : ""}</dl></section>`).join("")}</div>`;
     return;
   }
+  const mine = arg === "mine" && st.own && Object.keys(st.own).length;
   const sc = scenes.includes(arg) ? arg : "";
-  const list = K.f.filter(f => !sc || f.scene.includes(sc));
+  const have = f => f.pieces.filter(p => p.id && owned(p.id)).length;
+  let list = K.f.filter(f => !sc || f.scene.includes(sc));
+  if (mine) list = list.filter(f => have(f)).sort((a, b) => (a.pieces.length - have(a)) - (b.pieces.length - have(b)));
   el.innerHTML = top + `<div class="lead"><h1>코디 <span>${list.length}가지</span></h1></div>
-    <nav class="seg" aria-label="상황">${["", ...scenes].map(s => `<a href="#codi${s ? "/" + encodeURIComponent(s) : ""}" aria-current="${s === sc}">${s || "전체"}</a>`).join("")}</nav>
-    <div class="kd-list">${list.map(f => `<a class="kd" href="#codi/f-${f.id}"><div class="kd-strip">${f.pieces.slice(0, 4).map(p => piece(p)).join("")}</div><h2>${esc(f.name)}</h2><div class="meta">${esc(kdMeta(f))}</div><p>${esc(f.why)}</p></a>`).join("")}</div>`;
+    <nav class="seg" aria-label="상황">${["", ...scenes].map(s => `<a href="#codi${s ? "/" + encodeURIComponent(s) : ""}" aria-current="${!mine && s === sc}">${s || "전체"}</a>`).join("")}<a href="#codi/mine" aria-current="${!!mine}">내 옷으로</a></nav>
+    ${arg === "mine" && !mine ? `<p class="cmp-say">도감에서 아이템 카드를 열고 '내 옷장에 넣기'를 누르면, 가진 옷으로 만들 수 있는 코디부터 보여 줘요.</p>` : mine ? `<p class="cmp-say">가진 옷이 많이 들어간 코디부터 보여 줘요.</p>` : ""}
+    <div class="kd-list">${list.map(f => `<a class="kd" href="#codi/f-${f.id}"><div class="kd-strip">${f.pieces.slice(0, 4).map(p => piece(p)).join("")}</div><h2>${esc(f.name)}</h2><div class="meta">${esc(kdMeta(f))}${st.own && have(f) ? `  |  <b>가진 옷 ${have(f)}/${f.pieces.length}</b>` : ""}</div><p>${esc(f.why)}</p></a>`).join("")}</div>`;
 }
 
 /* 화면 전환 */
@@ -660,7 +705,7 @@ function route() {
   document.querySelectorAll(".tabs a").forEach(a => a.dataset.v === view ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"));
   if (view === "read") { if (!$("#rd-in")) readView(); else readRender(); prog(); }
   else if (view === "quiz") {
-    const scope = U.some(x => x.u == arg) || (arg === "name" && N.length) || (arg === "rule" && K.r.length) || (arg === "real" && RP.length) || (arg === "photo" && P.length) || arg === "part" || arg === "review" ? arg : "";
+    const scope = U.some(x => x.u == arg) || (arg === "name" && N.length) || arg === "mix" || (arg === "rule" && K.r.length) || (arg === "real" && RP.length) || (arg === "photo" && P.length) || arg === "part" || arg === "review" ? arg : "";
     if (!Q || Q.scope !== scope) startQuiz(null, scope); else quiz();
     prog();
   } else refresh();
@@ -670,6 +715,8 @@ function route() {
 document.addEventListener("click", e => {
   const tp = e.target.closest("#tap"); if (tp) return tapAnswer(e);
   if (e.target.closest("#sync-in")) return window.otLogin?.();
+  const ow = e.target.closest("[data-own]");
+  if (ow) { st.own = st.own || {}; const id = ow.dataset.own; if (st.own[id]) delete st.own[id]; else st.own[id] = 1; save(); ow.outerHTML = ownBtn(id); return; }
   if (e.target.closest("#sync-out")) return window.otLogout?.();
   const t = e.target.closest("[data-card],[data-op],#q-next,#q-again,#q-again-wrong,#c-x,#c-prev,#c-next");
   if (!t) { if (e.target.id === "sheet") history.back(); return; }
@@ -689,6 +736,7 @@ document.addEventListener("keydown", e => {
     if (e.key === "ArrowRight") step(1);
     return;
   }
+  if (view === "quiz" && Q && Q.done && e.key === "Enter" && $("#q-next") && document.activeElement !== $("#q-next")) { $("#q-next").click(); return; }
   if (view === "quiz" && Q) {
     const n = Number(e.key);
     if (n >= 1 && n <= 4 && !Q.done) { const b = $("#ops")?.children[n - 1]; b && answer(b.dataset.op); }
@@ -717,10 +765,12 @@ if (location.hostname === "127.0.0.1" && location.search.includes("emu")) {
 const merge = (a, b) => {
   const seen = { ...a.seen, ...b.seen }, stat = { ...a.stat };
   for (const [k, v] of Object.entries(b.stat || {})) { const x = stat[k] || { s: 0, w: 0 }; stat[k] = { s: Math.max(x.s || 0, v.s || 0), w: Math.max(x.w || 0, v.w || 0) }; const dd = Math.max(x.due || 0, v.due || 0); if (dd) stat[k].due = dd; }
-  return { seen, stat };
+  const own = { ...a.own, ...b.own };
+  const today = [a.today, b.today].filter(Boolean).sort((x, y) => x.d < y.d ? 1 : x.d > y.d ? -1 : y.n - x.n)[0];
+  return { seen, stat, own, ...(today ? { today } : {}), streak: Math.max(a.streak || 0, b.streak || 0) };
 };
 let uid = null, timer = 0;
-const send = () => { clearTimeout(timer); timer = 0; if (!uid) return; const s = window.ot.get(); setDoc(doc(db, "otgongbu", uid), { seen: s.seen, stat: s.stat, at: serverTimestamp() }).catch(() => {}); };
+const send = () => { clearTimeout(timer); timer = 0; if (!uid) return; const s = window.ot.get(); setDoc(doc(db, "otgongbu", uid), { seen: s.seen, stat: s.stat, own: s.own || {}, today: s.today || null, streak: s.streak || 0, at: serverTimestamp() }).catch(() => {}); };
 const push = () => { if (!uid) return; clearTimeout(timer); timer = setTimeout(send, 1500); };
 document.addEventListener("visibilitychange", () => { if (document.hidden && timer) send(); });
 window.otLogin = () => signInWithPopup(auth, new GoogleAuthProvider()).catch(() => {});
