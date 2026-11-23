@@ -167,7 +167,7 @@ function draw() {
 }
 function open(id, push = true) {
   const t = byId[id]; if (!t) return;
-  const rows = [["쇼핑몰 이름", t.shop], ["정확한 이름", t.pro !== t.shop ? t.pro : ""], ["편한 말", (t.casual || []).join(", ")], ["영어", t.en]].filter(r => r[1]);
+  const rows = [["쇼핑몰 이름", t.shop], ["정확한 이름", (t.pro || "").replace(/\s/g, "") !== t.shop.replace(/\s/g, "") ? t.pro : ""], ["편한 말", (t.casual || []).join(", ")], ["영어", t.en]].filter(r => r[1]);
   const ev = (t.evidence || "").split(/;\s*/).map(s => s.trim()).filter(Boolean);
   const pairs = (t.confuse || []).filter(c => byId[c]);
   $("#pane").innerHTML = `<button class="x" id="x">닫기</button>

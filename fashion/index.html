@@ -73,6 +73,10 @@ main{max-width:var(--wrap);margin:0 auto;padding:0 var(--gut) 96px}
 .card h2{margin:-8px 0 0;font-size:clamp(34px,4.6vw,48px);line-height:1.1;font-weight:800;letter-spacing:-.05em}
 .card .en{margin:-12px 0 0;font-size:13px;color:var(--faint)}
 .card .say{margin:0;font-size:18px;line-height:1.6;letter-spacing:-.02em}
+.nm{margin:-4px 0 0;display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:14px}
+.nm dt{color:var(--faint)}
+.nm dd{margin:0}
+.nd h3{color:#b4441c}
 .lk{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:6px}
 .lk li{display:flex;justify-content:space-between;gap:10px;font-size:15px}
 .lk a{text-underline-offset:3px}
@@ -255,6 +259,11 @@ function book(u) {
 
 /* 카드 */
 let cur = null, lastFocus = null;
+function names(c) {
+  const sq = s => (s || "").replace(/\s/g, "");
+  const rows = [["쇼핑몰", sq(c.shop) !== sq(c.ko) ? c.shop : ""], ["정확한 이름", c.pro && sq(c.pro) !== sq(c.ko) && sq(c.pro) !== sq(c.shop) ? c.pro : ""], ["편한 말", (c.casual || []).join(", ")]].filter(r => r[1]);
+  return rows.length ? `<dl class="nm">${rows.map(([k, v]) => `<dt>${k}</dt><dd>${esc(v)}</dd>`).join("")}</dl>` : "";
+}
 function openCard(id) {
   const c = byId[id]; if (!c) return;
   if (!$("#sheet").hidden && cur === id) return;
@@ -267,10 +276,12 @@ function openCard(id) {
   $("#c-tx").innerHTML = `
     <div class="card-g">${esc(uName(c.u))}, ${esc(gOf(c.g).name)}</div>
     <h2 id="c-name">${esc(c.ko)}</h2>
-    <p class="en">${esc(c.en)}${c.alias ? `<span>흔히 ${esc(c.alias)}</span>` : ""}</p>
+    <p class="en">${esc(c.en)}</p>
+    ${names(c)}
     ${c.hex ? `<p class="sw"><i style="background:${c.hex}"></i>${c.hex} 정도${c.measured ? ", 쇼핑몰 실제 옷에서 잰 색" : ""}</p>` : ""}
     <p class="say">${esc(c.say)}</p>
     ${c.say.startsWith(c.look) ? "" : `<div class="row"><h3>여기를 보면 알아요</h3><p>${esc(c.look)}</p></div>`}
+    ${c.diff ? `<div class="row nd"><h3>이름끼리 뜻이 ${c.same === "다름" ? "달라요" : "조금 달라요"}</h3><p>${esc(c.diff)}</p></div>` : ""}
     <div class="row"><h3>자주 보이는 곳</h3><p>${esc(c.where)}</p></div>
     ${c.tip ? `<div class="row"><h3>이렇게 입어요</h3><p>${esc(c.tip)}</p>${c.codi?.length ? `<ul class="lk">${c.codi.map(x => `<li><a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.t)}</a><span>${x.pin ? "핀터레스트" : "무신사"}</span></li>`).join("")}</ul>` : ""}</div>` : ""}
     ${c.real?.length ? `<div class="row"><h3>이 색 실제 옷</h3><ul class="lk">${c.real.map(x => `<li><a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.t)}</a><span>무신사</span></li>`).join("")}</ul></div>` : ""}
