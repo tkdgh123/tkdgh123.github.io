@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>잠긴 페이지</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@250;600&display=swap">
+<style>
+:root { --paper: #f2f1ec; --ink: #151514; --muted: #5a5954; --rule: #c9c6bc; --blue: #2b44a6 }
+* { box-sizing: border-box }
+body { margin: 0; min-height: 100svh; display: grid; grid-template-rows: auto 1fr; background: var(--paper); color: var(--ink); font: 400 17px/1.6 "Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif }
+header { padding: 26px clamp(16px, 3.2vw, 52px) }
+header a { font: 600 22px/1 Hahmlet, serif; text-decoration: none; color: inherit }
+main { align-self: center; justify-self: center; width: min(100% - 32px, 420px); padding-bottom: 12vh }
+body:not(.ask) main { visibility: hidden }
+h1 { margin: 0 0 6px; font: 250 clamp(44px, 9vw, 72px)/1.05 Hahmlet, serif; letter-spacing: -.02em }
+h1 b { font-weight: 600 }
+.step { display: flex; gap: 6px; margin: 0 0 22px }
+.step i { flex: 1; height: 3px; background: var(--rule); transition: background .3s }
+.step i.on { background: var(--ink) }
+form { display: grid; gap: 14px }
+form[hidden] { display: none }
+label { color: var(--muted); font-size: 15px }
+input { font: inherit; padding: 14px 16px; border: 0; border-bottom: 2px solid var(--ink); background: transparent; outline: none; width: 100% }
+input:focus-visible { border-color: var(--blue) }
+button { font: 700 16px/1 inherit; min-height: 54px; border: 0; background: var(--blue); color: #fff; cursor: pointer }
+button:disabled { opacity: .5; cursor: default }
+button:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px }
+.dots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; user-select: none; -webkit-user-select: none }
+.dots button { aspect-ratio: 1; min-height: 0; background: transparent; display: grid; place-items: center; -webkit-tap-highlight-color: transparent }
+.dots button::after { content: ""; width: 22%; aspect-ratio: 1; border-radius: 50%; border: 2px solid var(--ink); transition: background .15s, transform .15s }
+.dots button.on::after { background: var(--ink); transform: scale(1.25) }
+.row { display: flex; justify-content: space-between; align-items: center }
+.link { min-height: 0; padding: 6px 0; background: none; color: var(--muted); font-weight: 400; text-decoration: underline }
+.ok { color: var(--blue); font-size: 15px; min-height: 1.6em; margin: 0 }
+#msg { min-height: 1.6em; margin: 0; color: #a3261d; font-size: 15px }
+.mask { -webkit-text-security: disc }  /* 비밀번호 칸은 윈도우에서 한글 입력이 꺼져서 글자 칸을 가린다 */
+.code { letter-spacing: .5em; font: 600 24px/1 ui-monospace, Consolas, monospace; text-align: center }
+</style>
+</head>
+<body>
+<header><a href="/">창업실</a></header>
+<main>
+  <h1>잠긴 <b>페이지</b></h1>
+  <div class="step" aria-hidden="true"><i></i><i></i><i></i></div>
+  <p class="ok" id="ok" aria-live="polite"></p>
+  <form id="s1">
+    <label for="pw">비밀번호</label>
+    <input id="pw" type="password" autocomplete="new-password" required autofocus>
+    <button>다음</button>
+  </form>
+  <form id="s2" hidden>
+    <label for="an" id="q"></label>
+    <input id="an" class="mask" autocomplete="off" autocapitalize="off" spellcheck="false" required>
+    <button>다음</button>
+  </form>
+  <form id="s3" hidden>
+    <div class="row"><label id="pl">점을 정해 둔 순서대로 누르세요</label><button type="button" class="link" id="clr">지우기</button></div>
+    <div class="dots" id="dots" role="group" aria-labelledby="pl"></div>
+    <button id="go" disabled>열기</button>
+  </form>
+  <form id="s4" hidden>
+    <label for="cd">처음 쓰는 기기예요. 등록된 휴대폰으로 보낸 6자리 숫자를 넣어 주세요. <span id="tm"></span></label>
+    <input id="cd" class="code" inputmode="numeric" maxlength="6" autocomplete="one-time-code" required>
+    <button id="cg">확인</button>
+  </form>
+  <p id="msg" role="alert"></p>
+</main>
+<!-- 점검용 임시 1단계: changup!2026 (배포 전에 지우기) -->
+<script src="/lock/gate.js"></script>
+</body>
+</html>
