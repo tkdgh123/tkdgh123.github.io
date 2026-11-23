@@ -55,6 +55,7 @@ h2{margin:0;font-size:22px;font-weight:800;letter-spacing:-.04em}
 .adds{margin:20px 0 0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
 .adds li{border:1px solid var(--line);padding:18px 20px}
 .adds b{display:block;font-size:17px;letter-spacing:-.03em;margin-bottom:6px}
+.adds em.dn{font-style:normal;font-size:12px;font-weight:700;color:#17784a;margin-left:6px;vertical-align:2px}
 .adds p{margin:0;font-size:15px;color:var(--sub)}
 
 .unit{padding-top:44px;scroll-margin-top:72px}
@@ -121,19 +122,20 @@ h2{margin:0;font-size:22px;font-weight:800;letter-spacing:-.04em}
 
   <section class="sec">
     <h2>그림 그리는 순서</h2>
-    <p>Gemini로 한 번에 15장씩 그려서 오는 대로 올려요. 자주 보는 말부터 그려요.</p>
+    <p>남은 그림 658장을 자주 보는 말 179장부터 그려요. Gemini로 한 번에 15장씩, 하루 50장쯤이라 2주쯤 걸려요. 사진 한 장으로 보여 줄 수 없는 66개(혼용률, 20수처럼 숫자로 읽는 말, 겉으로 구별이 안 되는 기능 소재)는 글 카드로 두고, 단색 33개는 그림 없이 색만 바꿔 만들어요.</p>
     <ol class="order" id="order"></ol>
   </section>
 
   <section class="sec">
-    <h2>화면에 더 넣을 것</h2>
+    <h2>화면 기능</h2>
     <ul class="adds">
-      <li><b>몇 년대 퀴즈</b><p>차림 그림을 보고 1920년대부터 2020년대까지 시대를 고르는 문제예요. 9, 10단원 그림이 오면 넣어요.</p></li>
-      <li><b>사진에서 그 부분 누르기</b><p>지금은 실제 거리 사진 31장으로만 내요. 2, 4단원 카드에 점 자리를 적어서 "턱 주름을 눌러 보세요" 같은 문제를 늘려요.</p></li>
-      <li><b>상품명 풀기 20문제</b><p>카드가 다 있는 상품명 <span id="n-names">2</span>개만 지금 나와요. 카드가 올라오는 대로 20개까지 늘어나요.</p></li>
-      <li><b>이름 세 칸</b><p>카드마다 쇼핑몰 이름, 정확한 이름, 편한 말을 나눠 적고, 뜻이 다르면 차이를 보여 줘요. 퀴즈는 편한 말로 답해도 맞아요.</p></li>
-      <li><b>실제 옷 색</b><p>색 카드를 실제 쇼핑몰 옷에서 잰 색으로 고치고, 색마다 실제 옷과 코디 방법을 붙여요.</p></li>
-      <li><b>날짜 맞춘 복습</b><p>틀린 카드를 1일, 3일, 7일 뒤에 다시 내요. 지금은 틀린 카드가 더 자주 나오기만 해요.</p></li>
+      <li><b>이름 세 칸 <em class="dn">넣었어요</em></b><p>카드마다 쇼핑몰 이름, 정확한 이름, 편한 말을 나눠 보여 주고, 뜻이 다르면 차이를 적어요. 읽기에서 편한 말로 찾아도 카드가 나와요.</p></li>
+      <li><b>날짜 맞춘 복습 <em class="dn">넣었어요</em></b><p>틀린 카드는 내일, 맞힌 카드는 3일, 7일, 21일 뒤에 퀴즈의 '복습'에 다시 나와요.</p></li>
+      <li><b>실제 옷 색 <em class="dn">넣었어요</em></b><p>12색을 무신사 실제 옷에서 잰 색으로 고쳤고, 색 카드마다 실제 옷과 코디 링크, 한 줄 팁을 붙였어요.</p></li>
+      <li><b>부분 누르기 <em class="dn">넣었어요</em></b><p>점 자리가 있는 그림 카드에서 "밴딩 허리를 눌러 보세요" 같은 문제를 내요. 2단원, 4단원 그림이 늘면 문제도 늘어요.</p></li>
+      <li><b>상품명 풀기 <em class="dn">23문제</em></b><p>카드가 다 있는 상품명만 나와요. 카드가 늘면 문제를 더 넣어요.</p></li>
+      <li><b>뜻 맞히기 <em class="dn">넣었어요</em></b><p>그림이 아직 없는 용어도 용어 사전에서 이름과 뜻으로 맞혀 볼 수 있어요.</p></li>
+      <li><b>몇 년대 퀴즈</b><p>차림 그림을 보고 시대를 고르는 문제예요. 9, 10단원 그림이 오면 넣어요.</p></li>
     </ul>
   </section>
 
