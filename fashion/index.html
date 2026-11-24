@@ -372,25 +372,188 @@ button.pc:hover span{text-decoration:underline;text-underline-offset:3px}
 .sz-t{border-collapse:collapse;margin-top:22px;width:100%;max-width:520px;font-size:15px}
 .sz-t th,.sz-t td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left}
 .src{font-size:13px;color:var(--faint);margin-top:16px}
+/* ===== 디자인 2판 (11-24) ===== */
+:root{--ink:#111;--sub:#4b4b48;--faint:#8a8a86;--line:#ebebe8;--tile:#f4f4f1;--tile2:#e9e9e5;--ok:#127a46;--no:#c8322d;--wrap:1280px;--gut:max(16px,3.2vw)}
+body{font-size:16px;line-height:1.6}
+.top{background:#fff;-webkit-backdrop-filter:none;backdrop-filter:none}
+.top-in{height:64px;gap:36px}
+.brand{font-size:20px}
+.tabs{gap:28px}
+.tabs a{font-size:16px;color:var(--faint)}
+.tabs a svg{display:none}
+.tabs a:hover{color:var(--ink)}
+.top-x{margin-left:auto;display:flex;gap:18px;flex:none}
+.top-x a{font-size:14px;font-weight:600;color:var(--sub);text-decoration:none}
+.top-x a:hover{color:var(--ink)}
+main{padding-bottom:120px}
+/* 하위 메뉴 줄 */
+.snav{display:flex;gap:6px;padding-top:20px;overflow-x:auto;scrollbar-width:none}
+.snav::-webkit-scrollbar{display:none}
+.snav a{flex:none;display:inline-flex;align-items:center;height:38px;padding:0 15px;background:var(--tile);color:var(--sub);font-size:15px;font-weight:600;text-decoration:none;transition:background-color .15s}
+.snav a:hover{background:var(--tile2);color:var(--ink)}
+.snav a[aria-current="true"]{background:var(--ink);color:#fff}
+/* 머리글 */
+.lead{padding:28px 0 4px}
+.lead h1{font-size:clamp(30px,3.4vw,44px);line-height:1.15;letter-spacing:-.045em}
+.lead h1 span{font-weight:400}
+.goal{font-size:16px;color:var(--sub);margin:8px 0 0}
+.sec-h{margin:56px 0 4px;font-size:24px;font-weight:800;letter-spacing:-.04em}
+.sec-p{margin:0 0 4px;color:var(--sub)}
+/* 화면 안 메뉴: 첫째 줄은 칩, 둘째 줄은 글자 */
+.useg{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;gap:0 24px;padding-top:24px;font-size:16px;box-shadow:inset 0 -2px 0 var(--tile)}
+.useg::-webkit-scrollbar{display:none}
+.useg a{flex:none;padding:6px 0 12px;color:var(--faint);border-bottom:2px solid transparent;font-weight:700}
+.useg a:hover{color:var(--ink)}
+.useg a[aria-current="true"]{color:var(--ink);border-color:var(--ink)}
+.seg{border-bottom:0;padding:18px 0 6px;margin-bottom:22px;gap:6px 22px}
+.seg a,.seg button{font-size:16px;color:var(--faint)}
+.seg a[aria-current="true"],.seg button[aria-current="true"]{color:var(--ink);text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:8px}
+.seg.qunit a{font-size:15px}
+.seg.sub a{font-size:15px}
+.seg .seg-gap{background:var(--tile2)}
+/* 도감 */
+.grp{padding-top:52px}
+.grp-h{margin-bottom:18px}
+.grp-h h2{font-size:24px}
+.grp-h p{font-size:15px;color:var(--sub)}
+.grp-h .to-cmp{display:inline-flex;align-items:center;height:34px;padding:0 12px;background:var(--tile);text-decoration:none;font-size:14px}
+.grp-h .to-cmp:hover{background:var(--tile2)}
+.grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:36px 18px}
+.ph{background:var(--tile)}
+.tile b{font-size:16px;margin-top:12px}
+.tile small{color:var(--sub);font-size:14px}
+.stat{font-size:15px}
+/* 단추 */
+.btn{height:48px;padding:0 20px;border:0;background:var(--tile);color:var(--ink);transition:background-color .15s,transform .1s}
+.btn:hover{background:var(--tile2)}
+.btn.solid{background:var(--ink);color:#fff}
+.btn.solid:hover{background:#333}
+.btn:active{transform:scale(.98)}
+.own-on{background:var(--ok)!important;color:#fff}
+/* 카드 창 */
+.sheet{background:rgba(17,17,17,.5)}
+.card-tx{padding:44px 40px 36px;gap:20px}
+.card-g{font-size:14px}
+.card .say{font-size:19px}
+.nm{font-size:15px}
+.nm dt{color:var(--sub)}
+.row{border-top:0;padding-top:0}
+.row h3{font-size:14px;color:var(--faint)}
+.row p{font-size:16px}
+.pair button{width:72px;font-size:13px}
+/* 비교 */
+.cmp{gap:18px}
+.cmp figcaption b{font-size:19px}
+.cmp figcaption span{font-size:15px}
+.cmp-say{font-size:16px}
+/* 퀴즈 */
+.qz{max-width:1040px;padding-top:18px}
+.qz-top{font-size:15px}
+.bar{height:4px;background:var(--tile2)}
+.qz h2{font-size:clamp(22px,2.6vw,30px)}
+.op{background:var(--tile);border:0;min-height:62px;padding:14px 18px;font-size:17px;transition:background-color .15s,transform .1s}
+.op:hover{background:var(--tile2);border:0}
+.op:active{transform:scale(.99)}
+.op kbd{color:var(--faint)}
+.op.ok{background:#dff1e6;color:var(--ok)}
+.op.no{background:#fbe6e4;color:var(--no)}
+.op.dim{opacity:.55}
+.op.pic{background:var(--tile);border:0;outline:3px solid transparent;outline-offset:-3px}
+.op.pic:hover{outline-color:var(--ink)}
+.op.pic.ok{outline-color:var(--ok)}.op.pic.no{outline-color:var(--no)}
+.op span small{font-size:13px;color:var(--sub)}
+.fb{border-top:0;background:var(--tile);padding:22px;margin-top:22px}
+.fb p{font-size:16px}
+.q-sym{border:0;background:var(--tile)}
+/* 코디, 재질, 규칙 */
+.kd-strip{padding:12px}
+.kd h2,.lkc b{font-size:19px}
+.kd p,.lk-say{font-size:15px}
+.lk-tags span{font-size:13px}
+.rules{gap:12px;max-width:none}
+.rule{border-top:0;background:var(--tile);padding:24px 26px}
+.rule h2{font-size:21px}
+.rule p,.rule dl{font-size:16px}
+.mt-blends{gap:12px;max-width:none}
+.blend{border-top:0;background:var(--tile);padding:24px 26px}
+.tag-label{border:0;background:#fff}
+.lk-filter select{border:0;background:var(--tile);height:42px;padding:0 12px;font-size:15px}
+.lk-pcs{border-top:0}
+.lk-pcs li{border-bottom:0;padding:8px 0}
+.mt-grid{gap:22px 14px}
+.mtc b{font-size:17px}
+.mtc span{font-size:14px}
+/* 시작 */
+.quick{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:24px}
+.quick a{display:flex;flex-direction:column;gap:6px;min-height:132px;padding:22px 22px 20px;background:var(--tile);text-decoration:none;transition:background-color .15s,transform .1s}
+.quick a:first-child{background:var(--ink);color:#fff}
+.quick a:first-child span{color:#cfcfcb}
+.quick a:hover{background:var(--tile2)}
+.quick a:first-child:hover{background:#2a2a2a}
+.quick a:active{transform:scale(.99)}
+.quick b{font-size:21px;letter-spacing:-.04em}
+.quick span{font-size:14px;color:var(--sub);margin-top:auto}
+.steps{gap:12px;margin-top:22px}
+.steps li{border-top:0;background:var(--tile);padding:24px 26px}
+.st-h b{color:var(--ink);font-size:26px}
+.st-h p{font-size:15px;color:var(--sub)}
+.st-h em{font-size:13px}
+.st-strip .ph{background:#fff}
+.st-more{display:none}
+.steps .btn:not(.solid),.rule .btn:not(.solid){background:#fff}
+.steps .btn:not(.solid):hover{background:var(--tile2)}
+/* 입고 관리 */
+.cl-i,.sy,.sz-c{border:0;background:var(--tile)}
+.cl{gap:12px}
+.cl-i{padding:20px 22px}
+.cl-i h3{font-size:18px}
+.cl-i p{font-size:16px}
+.cl-c{font-size:14px!important}
+.cl-d{font-size:15px!important}
+.sz-c input[type=number]{border:0;background:#fff;height:44px;font-size:17px}
+.tp-bands button{border:0;border-radius:0;background:var(--tile);height:36px;padding:0 12px;font-size:14px;color:var(--sub)}
+.tp-bands button:hover{background:var(--tile2);color:var(--ink)}
+.src{font-size:13px}
+#rd-in{border:0;background:var(--tile);padding:18px;font-size:17px}
+.rd{border-bottom:0}
+@media (max-width:860px){
+  body{padding-bottom:calc(64px + env(safe-area-inset-bottom,0px))}
+  .top-in{height:54px}
+  .tabs{position:fixed;left:0;right:0;bottom:0;z-index:40;height:calc(62px + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px);background:#fff;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0;overflow:visible}
+  .tabs a{flex-direction:column;justify-content:center;gap:3px;height:62px;margin:0;border:0;font-size:12px;font-weight:600}
+  .tabs a svg{display:block;width:23px;height:23px}
+  .tabs a[aria-current="page"]{color:var(--ink)}
+  .tabs a[aria-current="page"] svg path{stroke-width:2.3}
+  html body #cu-home{--lift:66px}
+  .quick{grid-template-columns:1fr 1fr;gap:8px}
+  .quick a{min-height:112px;padding:18px}
+  .quick b{font-size:18px}
+  .steps li,.rule,.blend{padding:20px}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:26px 12px}
+  .card-tx{padding:26px var(--gut) calc(30px + env(safe-area-inset-bottom,0px))}
+  .snav{padding-top:14px}
+  .useg{padding-top:16px}
+  .lead{padding-top:20px}
+}
+@media (max-width:560px){.top-x a:last-child{display:none}}
+@media (prefers-reduced-motion:reduce){.btn,.op,.quick a{transition:none}}
 </style>
 </head>
 <body>
 <header class="top"><div class="top-in">
-  <a class="brand" href="#book">옷 공부</a>
+  <a class="brand" href="#start">옷 공부</a>
   <nav class="tabs" aria-label="화면">
-    <a href="#start" data-v="start">시작</a>
-    <a href="#book" data-v="book">도감</a>
-    <a href="#mat" data-v="mat">재질</a>
-    <a href="#cmp" data-v="cmp">비교</a>
-    <a href="#codi" data-v="codi">코디</a>
-    <a href="#care" data-v="care">입고 관리</a>
-    <a href="#quiz/mix" data-v="quiz">퀴즈</a>
-    <a href="#read" data-v="read">읽기</a>
-    <a href="plan.html">계획</a>
+    <a href="#start" data-v="start"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-6 8 6v8a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>홈</span></a>
+    <a href="#book" data-v="book"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>도감</span></a>
+    <a href="#codi" data-v="codi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7a2 2 0 1 1 2-2M12 7v2L3 16h18l-9-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>코디</span></a>
+    <a href="#care" data-v="care"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14V5a2 2 0 0 1 4 0v9a4 4 0 1 1-4 0zM12 11v6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>입고 관리</span></a>
+    <a href="#quiz/mix" data-v="quiz"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5zM9 12l2 2 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>퀴즈</span></a>
   </nav>
+  <nav class="top-x" aria-label="더 보기"><a href="terms.html">용어 사전</a><a href="plan.html">계획</a></nav>
 </div></header>
 
 <main>
+  <nav class="snav" id="subnav" aria-label="이 묶음" hidden></nav>
   <section id="v-start" hidden></section>
   <section id="v-book"></section>
   <section id="v-mat" hidden></section>
@@ -1010,13 +1173,24 @@ function start() {
     : s.look ? LK.slice(0, 6).map(l => `<div class="ph"><img src="lk/${l.id}.webp" alt="" loading="lazy"></div>`).join("") || K.f.filter(f => f.shot).slice(0, 6).map(f => `<div class="ph"><img src="kp/${f.id}.webp" alt="" loading="lazy"></div>`).join("")
     : TR.filter(x => x.shot).slice(0, 6).map(x => `<div class="ph"><img src="tp/${x.id}.webp" alt="" loading="lazy"></div>`).join("");
   const done = s => s.ids ? s.ids.filter(id => byId[id] && seen(id)).length + " / " + s.ids.filter(id => byId[id]).length : "";
-  $("#v-start").innerHTML = `<div class="lead"><h1>처음이면 여기부터</h1><p class="goal">다섯 단계를 순서대로 하면 상품명과 라벨을 읽고, 집에 있는 옷으로 코디를 짤 수 있어요.</p></div>
+  const due = dueIds().length, tb = CARE && CARE.temps.find(b => (st.temp ?? 14) >= b.lo && (st.temp ?? 14) <= b.hi);
+  const quick = [
+    due ? ["#quiz/review", `복습 ${due}장`, "날짜가 된 카드를 다시 풀어요"] : ["#quiz/mix", "오늘 퀴즈", "이름, 상품명, 사진을 섞어 10문제"],
+    ["#care", tb ? `${st.temp ?? 14}도엔 뭘 입지` : "오늘 뭘 입지", tb ? tb.say.replace(/^[^,]*?(이면|에는|에서는)\s*/, "") : "기온을 고르면 맞는 옷이 나와요"],
+    ["#read", "상품명 읽기", "상품명을 붙여 넣으면 낱말마다 카드로"],
+    ["#codi", "실제 코디", `계절별 사진 ${LK.length}장`],
+  ];
+  $("#v-start").innerHTML = `<div class="lead"><h1>오늘 할 공부</h1>${todayTxt() ? `<p class="goal">${todayTxt()}</p>` : ""}</div>
+    <div class="quick">${quick.map(([h, t, d]) => `<a href="${h}"><b>${esc(t)}</b><span>${esc(d)}</span></a>`).join("")}</div>
+    <h2 class="sec-h">처음이면 이 순서로</h2><p class="sec-p">다섯 단계를 마치면 상품명과 라벨을 읽고, 집에 있는 옷으로 코디를 짤 수 있어요.</p>
     <ol class="steps">${steps.map((s, i) => `<li><div class="st-h"><b>${i + 1}</b><div><h2>${esc(s.n)}${s.ids ? ` ${s.ids.filter(id => byId[id]).length}장` : ""}</h2><p>${esc(s.d)}</p></div>${done(s) ? `<em>본 카드 ${done(s)}</em>` : ""}</div><div class="st-strip">${strip(s)}</div><div class="st-go">${s.go.map(([h, l], k) => `<a class="btn${k ? "" : " solid"}" href="${h}">${l}</a>`).join("")}</div></li>`).join("")}</ol>
     <p class="st-more"><a href="plan.html">기획</a><a href="refs.html">참고한 곳</a><a href="terms.html">용어 사전</a></p>`;
 }
 
 /* 화면 전환 */
 let view = "book";
+const GRP = { start: "start", read: "start", book: "book", cmp: "book", mat: "book", codi: "codi", care: "care", quiz: "quiz" };
+const SUBNAV = { start: [["#start", "시작"], ["#read", "상품명 읽기"], ["plan.html", "계획"], ["refs.html", "참고한 곳"]], book: [["#book", "카드 도감"], ["#cmp", "나란히 비교"], ["#mat", "재질"], ["terms.html", "용어 사전"]] };
 const VIEWS = ["start", "book", "mat", "cmp", "codi", "care", "quiz", "read"];
 /* 입고 관리: 기온, 사이즈, 세탁 기호, 관리, 쇼핑몰 말, 체형, 드레스 코드 (care.json) */
 let CARE = null;
@@ -1161,7 +1335,11 @@ function route() {
   const prev = view;
   view = VIEWS.includes(v) ? v : "start";
   for (const s of VIEWS) $("#v-" + s).hidden = s !== view;
-  document.querySelectorAll(".tabs a").forEach(a => a.dataset.v === view ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"));
+  const grp = GRP[view] || view;
+  document.querySelectorAll(".tabs a").forEach(a => a.dataset.v === grp ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"));
+  const sn = SUBNAV[grp], snEl = $("#subnav");
+  snEl.hidden = !sn;
+  if (sn) snEl.innerHTML = sn.map(([h, l]) => `<a href="${h}"${h === "#" + view ? ' aria-current="true"' : ""}>${l}</a>`).join("");
   document.querySelector('.tabs a[aria-current="page"]')?.scrollIntoView({ block: "nearest", inline: "nearest" });
   if (view === "read") { if (!$("#rd-in")) readView(); else readRender(); prog(); }
   else if (view === "quiz") {
