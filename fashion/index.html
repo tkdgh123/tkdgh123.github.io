@@ -560,6 +560,15 @@ main{padding-bottom:120px}
 .bl-pics{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
 .bl-pics a,.bl-pics figure{margin:0;width:92px;text-decoration:none;color:var(--sub);font-size:12px}
 .bl-pics img{display:block;width:92px;aspect-ratio:3/4;object-fit:cover;background:#fff;margin-bottom:5px}
+/* 한국 사람 코디 (퍼가기) */
+.kr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:36px 24px;padding-top:22px}
+.kr-c{display:grid;align-content:start;gap:14px}
+.kr-ig{container-type:inline-size;background:var(--tile)}
+.kr-ig iframe{display:block;width:100%;height:calc(125cqw + 190px);border:0}
+.kr-yt{aspect-ratio:16/9;background:var(--tile)}.kr-yt iframe{width:100%;height:100%;border:0}
+.kr-who{margin:0;font-size:15px}.kr-who a{font-size:13px;color:var(--sub);margin-left:4px}
+.kr-tx .kd-meta{margin:2px 0 0}.kr-tx .lk-point{margin:8px 0 0}
+@media (max-width:560px){.kr-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -599,7 +608,7 @@ main{padding-bottom:120px}
 
 <script>
 const KEY = "ot-gongbu-v1";
-let LK = [], TR = [], PR = [], MT = { materials: [], blends: [], label_rules: [], mixing: [] }, KS = { season: "", sex: "", item: "" };
+let LK = [], KR = [], TR = [], PR = [], MT = { materials: [], blends: [], label_rules: [], mixing: [] }, KS = { season: "", sex: "", item: "" };
 let U = [], G = [], C = [], N = [], F = [], R = {}, byId = {}, K = { f: [], r: [] }, RP = [];
 let st = { seen: {}, stat: {} };
 try { st = Object.assign(st, JSON.parse(localStorage.getItem(KEY) || "{}")); } catch (e) {}
@@ -1041,11 +1050,12 @@ const kdMeta = f => [f.style, f.season.join(", "), f.for === "모두" ? "" : f.f
 function codi(arg) {
   arg = decodeURIComponent(arg || "");
   const scenes = [...new Set(K.f.flatMap(f => f.scene))];
-  const tabs = [["", "실제 코디"], ["f", "코디 공식"], ["pair", "짝 맞추기"], ["trend", "요즘 유행"], ["rules", "기본 규칙"]];
-  const cur = arg.startsWith("l-") || (!arg && LK.length) ? "" : arg.startsWith("p-") || arg === "pair" ? "pair" : arg.startsWith("t-") || arg === "trend" ? "trend" : arg === "rules" ? "rules" : "f";
-  const top = `<nav class="useg" aria-label="코디">${tabs.filter(([k]) => k || LK.length).map(([k, l]) => `<a href="#codi${k ? "/" + k : ""}" aria-current="${k === cur}">${l}</a>`).join("")}</nav>`;
+  const tabs = [["", "실제 코디"], ["kr", "한국 사람 코디"], ["f", "코디 공식"], ["pair", "짝 맞추기"], ["trend", "요즘 유행"], ["rules", "기본 규칙"]];
+  const cur = arg.startsWith("l-") || (!arg && LK.length) ? "" : arg === "kr" ? "kr" : arg.startsWith("p-") || arg === "pair" ? "pair" : arg.startsWith("t-") || arg === "trend" ? "trend" : arg === "rules" ? "rules" : "f";
+  const top = `<nav class="useg" aria-label="코디">${tabs.filter(([k]) => k === "kr" ? KR.length : k || LK.length).map(([k, l]) => `<a href="#codi${k ? "/" + k : ""}" aria-current="${k === cur}">${l}</a>`).join("")}</nav>`;
   const el = $("#v-codi");
   if (cur === "" && LK.length) return lookView(arg, top, el);
+  if (cur === "kr") return krView(top, el);
   if (cur === "pair") return pairView(arg, top, el);
   if (cur === "trend") return trendView(arg, top, el);
   const f = arg.startsWith("f-") && K.f.find(x => x.id === arg.slice(2));
@@ -1086,6 +1096,15 @@ const credit2 = s => `<a class="cr" href="${esc(s.page)}" target="_blank" rel="n
 const srcLinks = us => (us || []).filter(Boolean).map((u, i) => `<a href="${esc(u)}" target="_blank" rel="noopener">출처 ${i + 1}</a>`).join(" ");
 const ruleShots = id => K.f.filter(f => f.shot && f.shot.yes && f.shot.yes.includes(id));
 
+/* 한국 사람 코디: 인스타그램, 유튜브 공식 퍼가기 + 옷 이름표 */
+function krView(top, el) {
+  const list = KR.filter(k => (!KS.season || k.season === KS.season) && (!KS.sex || k.for === KS.sex));
+  const frame = k => k.kind === "youtube"
+    ? `<div class="kr-yt"><iframe src="https://www.youtube-nocookie.com/embed/${esc(k.code)}${k.start ? "?start=" + k.start : ""}" loading="lazy" title="${esc(k.account)} 영상" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe></div>`
+    : `<div class="kr-ig"><iframe src="https://www.instagram.com/p/${esc(k.code)}/embed/" loading="lazy" title="${esc(k.account)} 인스타그램 게시물" scrolling="no"></iframe></div>`;
+  el.innerHTML = top + `<div class="lead"><h1>한국 사람 코디 <span>${list.length}가지</span></h1></div><p class="cmp-say">인스타그램과 유튜브 원래 게시물을 그대로 띄웠어요. 옷 이름과 설명은 따로 달았어요.</p>${seasonSeg(true)}
+    <div class="kr-grid">${list.map(k => `<article class="kr-c">${frame(k)}<div class="kr-tx"><p class="kr-who"><b>${esc(k.who)}</b> <a href="${esc(k.url)}" target="_blank" rel="noopener">${esc(k.account)}</a></p><p class="kd-meta">${esc([k.season, k.style, k.for === "여" ? "여자" : "남자", (k.scene || []).join(", ")].filter(Boolean).join("  |  "))}</p><p class="lk-point">${esc(k.point || "")}</p><ul class="lk-pcs">${k.pieces.map(pc => pieceRow(pc)).join("")}</ul></div></article>`).join("") || `<p class="cmp-say">이 조건에 맞는 코디가 아직 없어요.</p>`}</div>`;
+}
 /* 실제 코디: 계절별 실제 사진, 옷마다 이름표 */
 function lookView(arg, top, el) {
   const lk = arg.startsWith("l-") && LK.find(x => x.id === arg.slice(2));
@@ -1392,7 +1411,7 @@ window.addEventListener("hashchange", route);
 
 Promise.all([fetch("cards.json").then(r => r.json()), fetch("care.json").then(r => r.json()).catch(() => null)]).then(([d, cr]) => {
   CARE = cr;
-  G = d.groups; C = d.cards; N = d.names || []; F = d.find || []; LK = d.looks || []; TR = d.trend || []; PR = d.pair || []; MT = d.mat && d.mat.materials ? d.mat : MT; R = d.read || {}; K = d.codi || K; RP = d.real || []; byId = Object.fromEntries(C.map(c => [c.id, c]));
+  G = d.groups; C = d.cards; N = d.names || []; F = d.find || []; LK = d.looks || []; KR = d.kr || []; TR = d.trend || []; PR = d.pair || []; MT = d.mat && d.mat.materials ? d.mat : MT; R = d.read || {}; K = d.codi || K; RP = d.real || []; byId = Object.fromEntries(C.map(c => [c.id, c]));
   U = d.units.filter(x => C.some(c => c.u == x.u));
   if (location.hash.startsWith("#card/")) { const id = location.hash.split("/")[1]; history.replaceState(null, "", "#book"); route(); location.hash = "#card/" + id; }
   else route();
