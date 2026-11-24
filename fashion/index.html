@@ -127,7 +127,7 @@ main{max-width:var(--wrap);margin:0 auto;padding:0 var(--gut) 96px}
 .bar{flex:1;height:3px;background:var(--line)}
 .bar i{display:block;height:100%;background:var(--ink);transition:width .3s}
 .qz h2{margin:0 0 14px;font-size:clamp(21px,2.6vw,28px);line-height:1.2;font-weight:800;letter-spacing:-.04em}
-.qz.split{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,5fr);gap:0 36px;align-items:start}
+.qz.split{display:grid;grid-template-columns:min(44%,400px,calc((100dvh - 290px) * .75)) minmax(0,1fr);gap:0 40px;align-items:start}
 .qz.split .qz-top{grid-column:1/-1}
 .qz.split .q-img{width:100%;margin:0}
 .qz.split .ops{grid-template-columns:1fr}
@@ -335,16 +335,6 @@ button.pc:hover span{text-decoration:underline;text-underline-offset:3px}
 /* 입고 관리 */
 .goal{margin:10px 0 0;color:var(--sub);font-size:16px}
 .tp{padding-top:24px}
-.tp-l{display:block;font-size:14px;font-weight:700;color:var(--sub);margin-bottom:6px}
-#tp-r{width:100%;accent-color:var(--ink)}
-.tp-bands{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 22px}
-.tp-bands button{font-size:13px;padding:5px 10px;border:1px solid var(--line);border-radius:999px;color:var(--sub)}
-.tp-now{display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:start;margin-bottom:22px}
-.tp-deg{display:flex;align-items:baseline;gap:2px}
-.tp-deg b{font-size:clamp(56px,10vw,88px);font-weight:800;letter-spacing:-.05em;line-height:1}
-.tp-deg span{font-size:20px;color:var(--sub)}
-.tp-now h2{margin:4px 0 6px;font-size:22px;letter-spacing:-.03em}
-.tp-now p{margin:0}
 .cl{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;padding-top:20px}
 .cl-i{border:1px solid var(--line);padding:16px 18px}
 .cl-i h3{margin:0 0 4px;font-size:17px;letter-spacing:-.03em}
@@ -537,6 +527,39 @@ main{padding-bottom:120px}
 }
 @media (max-width:560px){.top-x a:last-child{display:none}}
 @media (prefers-reduced-motion:reduce){.btn,.op,.quick a{transition:none}}
+
+/* 퀴즈 3판 (11-24): 그림 틀 3:4 하나로, 문제와 주어진 말 구분 */
+.qz.split .q-img,.qz.split .q-vis{width:100%;margin:0}
+.q-img .ph,.q-img .rph,.q-vis .q-mat,.q-vis .q-sym,.q-img.kshot>img{aspect-ratio:3/4;width:100%;height:auto}
+.q-img.kshot>img{object-fit:contain;background:var(--tile)}
+.q-vis .q-mat img{width:100%;height:100%;object-fit:cover}
+.q-vis .q-sym{border:0;background:var(--tile)}
+.q-vis .q-sym .sym{width:52%;height:auto}
+.qz .q-kind{margin:0 0 10px;font-size:13px;font-weight:600;color:var(--faint);letter-spacing:.02em}
+.qz h2 .q-key{font-style:normal;box-shadow:inset 0 -.34em 0 #d9ecdf;padding:0 .06em}
+.q-clue{margin:2px 0 22px;padding:2px 0 4px 16px;border-left:3px solid var(--ok)}
+.q-clue b{display:block;font-size:12px;font-weight:700;color:var(--ok);letter-spacing:.08em;margin-bottom:6px}
+.q-clue p{margin:0;font-family:"Nanum Myeongjo","AppleMyungjo","Noto Serif KR","Batang",serif;font-size:18px;line-height:1.65;font-weight:500;color:#33332f;letter-spacing:-.01em}
+@media (max-width:860px){
+  .qz.split .q-img,.qz.split .q-vis{width:min(62%,calc(34dvh * .75));margin:0 auto 16px}
+  .q-clue{margin-bottom:18px}.q-clue p{font-size:16.5px}
+}
+/* 화면 넘김: 새 화면이 짧게 떠오르며 나타남 */
+@keyframes vin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes cin{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:none}}
+@keyframes fin{from{opacity:0}to{opacity:1}}
+.v-in{animation:vin .22s cubic-bezier(.2,.7,.2,1)}
+.qz{animation:vin .2s cubic-bezier(.2,.7,.2,1)}
+.fb{animation:vin .18s ease-out}
+.sheet:not([hidden]){animation:fin .16s ease-out}
+.sheet:not([hidden]) .card{animation:cin .22s cubic-bezier(.2,.7,.2,1)}
+@view-transition{navigation:auto}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.18s}
+@media (prefers-reduced-motion:reduce){.v-in,.qz,.fb,.sheet:not([hidden]),.sheet:not([hidden]) .card{animation:none}}
+/* 혼용률 예시 사진 */
+.bl-pics{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.bl-pics a,.bl-pics figure{margin:0;width:92px;text-decoration:none;color:var(--sub);font-size:12px}
+.bl-pics img{display:block;width:92px;aspect-ratio:3/4;object-fit:cover;background:#fff;margin-bottom:5px}
 </style>
 </head>
 <body>
@@ -763,7 +786,7 @@ function mixSet() {
   if (K.r.length) out.push(...ruleSet().slice(0, 1));
   if (C.some(c => c.spot)) out.push(...shuffle(partList()).slice(0, 1).map(p => ({ photo: p })));
   if (F.length) out.push(...findList().slice(0, 1));
-  if (CARE) out.push(tempSet()[0], careSet()[0]);
+  if (CARE) out.push(careSet()[0]);
   if (MT.materials.length) out.push(matSet()[0]);
   return shuffle(out.concat(a.slice(4)).slice(0, 10));
 }
@@ -787,14 +810,14 @@ function startQuiz(only, scope) {
     : scope === "name" && !only ? nameSet()
     : scope === "rule" ? ruleSet()
     : scope === "real" ? realSet()
-    : scope === "temp" ? tempSet() : scope === "care" ? careSet() : scope === "mat" ? matSet()
+    : scope === "care" ? careSet() : scope === "mat" ? matSet()
     : scope === "mix" ? mixSet() : shuffle(pickSet(only, scope === "name" || scope === "review" ? "" : scope));
   Q = { scope, list, i: 0, right: 0, wrong: [], done: false }; quiz();
 }
 function quiz() {
   const el = $("#v-quiz");
-  const mode = ["mix", "name", "rule", "real", "part", "photo", "review", "temp", "care", "mat"].includes(Q.scope) ? Q.scope : "";
-  const modes = [["mix", "섞어서", 1], ["", "이름 맞히기", 1], ["review", `복습 ${dueIds().length}`, dueIds().length || mode === "review"], ["name", "상품명 뜯어보기", N.length], ["rule", "코디 규칙", K.r.length], ["real", "실제 사진", RP.length], ["part", "부분 누르기", C.some(c => c.spot)], ["photo", "사진에서 찾기", F.length], ["temp", "기온 보고 입기", !!CARE], ["care", "세탁 기호", !!CARE], ["mat", "재질", MT.materials.length]];
+  const mode = ["mix", "name", "rule", "real", "part", "photo", "review", "care", "mat"].includes(Q.scope) ? Q.scope : "";
+  const modes = [["mix", "섞어서", 1], ["", "이름 맞히기", 1], ["review", `복습 ${dueIds().length}`, dueIds().length || mode === "review"], ["name", "상품명 뜯어보기", N.length], ["rule", "코디 규칙", K.r.length], ["real", "실제 사진", RP.length], ["part", "부분 누르기", C.some(c => c.spot)], ["photo", "사진에서 찾기", F.length], ["care", "세탁 기호", !!CARE], ["mat", "재질", MT.materials.length]];
   const nav = `<nav class="useg qmode" aria-label="문제 종류">${modes.filter(m => m[2]).map(([k, label]) => `<a href="#quiz${k ? "/" + k : ""}" aria-current="${k === mode}">${label}</a>`).join("")}</nav>` +
     (mode ? "" : `<nav class="seg qunit" aria-label="단원">${[["", "전체"], ...U.map(x => [String(x.u), x.name])].map(([k, label]) => `<a href="#quiz${k ? "/" + k : ""}" aria-current="${String(Q.scope) === k}">${esc(label)}</a>`).join("")}</nav>`);
   if (Q.i >= Q.list.length) {
@@ -810,7 +833,7 @@ function quiz() {
   if (q.find) {
     const p = q.find;
     el.innerHTML = nav + `<div class="qz"><div class="qz-top"><span>${Q.i + 1} / ${Q.list.length}</span><div class="bar"><i style="width:${Q.i / Q.list.length * 100}%"></i></div><span class="today">${todayTxt()}</span>${Q.combo >= 2 ? `<b class="combo">${Q.combo}연속</b>` : ""}</div>
-      <h2>사진에서 ${esc(q.ask)}${batchim(q.ask) ? "을" : "를"} 눌러 보세요</h2>
+      <h2>사진에서 <em class="q-key">${esc(q.ask)}</em>${batchim(q.ask) ? "을" : "를"} 눌러 보세요</h2>
       <div class="tap" id="tap" style="aspect-ratio:${p.w}/${p.h};--r:${p.w / p.h}"><img src="fp/${p.id}.webp" alt="" width="${p.w}" height="${p.h}"></div>
       <p class="credit">사진 <a href="${esc(p.src)}" target="_blank" rel="noopener">원본</a>, ${esc(p.lic)}. 옷 모양 <a href="https://fashionpedia.github.io/home/" target="_blank" rel="noopener">Fashionpedia</a>, CC BY 4.0</p><div id="fb"></div></div>`;
     Q.done = false; return;
@@ -818,7 +841,7 @@ function quiz() {
   if (q.photo) {
     const p = q.photo;
     el.innerHTML = nav + `<div class="qz"><div class="qz-top"><span>${Q.i + 1} / ${Q.list.length}</span><div class="bar"><i style="width:${Q.i / Q.list.length * 100}%"></i></div></div>
-      <h2>사진에서 ${esc(p.ko)}${batchim(p.ko) ? "을" : "를"} 눌러 보세요</h2>
+      <h2>사진에서 <em class="q-key">${esc(p.ko)}</em>${batchim(p.ko) ? "을" : "를"} 눌러 보세요</h2>
       <div class="tap" id="tap" style="aspect-ratio:${p.w}/${p.h};--r:${p.w / p.h}"><img src="${p.src || `fp/${p.id}.webp`}" alt="" width="${p.w}" height="${p.h}"></div>
       ${p.src ? "" : `<p class="credit">사진 <a href="https://fashionpedia.github.io/home/" target="_blank" rel="noopener">Fashionpedia</a>, CC BY 4.0</p>`}<div id="fb"></div></div>`;
     Q.done = false; return;
@@ -828,26 +851,26 @@ function quiz() {
     el.innerHTML = nav + `<div class="qz split">${head}<div class="q-img">${ph(c, false, false)}</div><div class="qa"><h2>이 사진은 무엇일까요?</h2>
       <div class="ops" id="ops">${q.ops.map((o, k) => `<button class="op" data-op="${o}"><kbd>${k + 1}</kbd>${esc(byId[o].ko)}</button>`).join("")}</div><div id="fb"></div></div></div>`;
   } else if (q.type === "parse") {
-    el.innerHTML = nav + `<div class="qz">${head}<h2>이 상품명에서 ${esc(q.ask)}${batchim(q.ask) ? "을" : "를"} 알려 주는 말을 눌러 보세요</h2>
+    el.innerHTML = nav + `<div class="qz">${head}<h2>이 상품명에서 <em class="q-key">${esc(q.ask)}</em>${batchim(q.ask) ? "을" : "를"} 알려 주는 말을 눌러 보세요</h2>
       <div class="ops chips" id="ops">${q.parts.map(p => `<button class="op chip" data-op="${p.id}">${esc(p.w)}</button>`).join("")}</div><div id="fb"></div></div>`;
   } else if (q.type === "rbox") {
     el.innerHTML = nav + `<div class="qz split">${head}<div class="q-img real">${rph(q.photo2)}${credit([q.photo2])}</div><div class="qa"><h2>노란 네모 친 ${q.wear ? "옷은" : "곳은"} 무엇일까요?</h2>
       <div class="ops" id="ops">${q.ops.map((o, k) => `<button class="op" data-op="${o}"><kbd>${k + 1}</kbd>${esc(byId[o].ko)}</button>`).join("")}</div><div id="fb"></div></div></div>`;
   } else if (q.type === "rpick") {
-    el.innerHTML = nav + `<div class="qz">${head}<h2>${esc(byId[q.id].ko)}${batchim(byId[q.id].ko) ? "이" : "가"} 있는 사진은 어느 것일까요?</h2><div class="rcard">${ph(byId[q.id], false, false)}<b>${esc(byId[q.id].ko)}</b></div>
+    el.innerHTML = nav + `<div class="qz">${head}<h2><em class="q-key">${esc(byId[q.id].ko)}</em>${batchim(byId[q.id].ko) ? "이" : "가"} 있는 사진은 어느 것일까요?</h2><div class="rcard">${ph(byId[q.id], false, false)}<b>${esc(byId[q.id].ko)}</b></div>
       <div class="ops pics" id="ops">${q.ops.map((p, k) => `<button class="op pic" data-op="${p.id}" aria-label="${k + 1}번 사진">${rph(p, q.box)}<kbd>${k + 1}</kbd></button>`).join("")}</div>${credit(q.ops)}<div id="fb"></div></div>`;
   } else if (q.type === "rphoto") {
     const by = Object.fromEntries(K.r.map(r => [r.id, r]));
     el.innerHTML = nav + `<div class="qz split">${head}${kshot(q.f)}<div class="qa"><h2>이 코디에서 볼 수 있는 규칙은 무엇일까요?</h2>
       <div class="ops two" id="ops">${q.ops.map((o, k) => `<button class="op" data-op="${o}"><kbd>${k + 1}</kbd><span>${esc(by[o].name)}<small></small></span></button>`).join("")}</div><div id="fb"></div></div></div>`;
   } else if (q.type === "tq") {
-    el.innerHTML = nav + `<div class="qz${q.vis ? " split" : ""}">${head}${q.vis ? `<div class="q-vis">${q.vis}</div>` : ""}<div class="qa">${q.kicker ? `<p class="q-rule">${esc(q.kicker)}</p>` : ""}<h2>${esc(q.h)}</h2>
+    el.innerHTML = nav + `<div class="qz${q.vis ? " split" : ""}">${head}${q.vis ? `<div class="q-vis">${q.vis}</div>` : ""}<div class="qa">${q.kicker ? `<p class="q-kind">${esc(q.kicker)}</p>` : ""}<h2>${esc(q.h)}</h2>${q.clue ? `<div class="q-clue"><b>${esc(q.clueL)}</b><p>${esc(q.clue)}</p></div>` : ""}
       <div class="ops two" id="ops">${q.ops.map((o, k) => `<button class="op" data-op="${o}"><kbd>${k + 1}</kbd><span>${esc(q.txt[o])}<small></small></span></button>`).join("")}</div><div id="fb"></div></div></div>`;
   } else if (q.type === "rule") {
-    el.innerHTML = nav + `<div class="qz${q.ex ? " split" : ""}">${head}${q.ex ? kshot(q.ex, "이 규칙을 지킨 실제 코디") : ""}<div class="qa"><p class="q-rule">${esc(q.r.name)}</p><h2>이 규칙에 맞는 예는 무엇일까요?</h2>
+    el.innerHTML = nav + `<div class="qz${q.ex ? " split" : ""}">${head}${q.ex ? kshot(q.ex, "이 규칙을 지킨 실제 코디") : ""}<div class="qa"><p class="q-kind">코디 규칙</p><h2>이 규칙에 맞는 예는 무엇일까요?</h2><div class="q-clue"><b>규칙</b><p>${esc(q.r.name)}</p></div>
       <div class="ops two" id="ops">${q.ops.map((o, k) => `<button class="op" data-op="${o}"><kbd>${k + 1}</kbd><span>${esc(q.txt[o])}<small></small></span></button>`).join("")}</div><div id="fb"></div></div></div>`;
   } else {
-    el.innerHTML = nav + `<div class="qz">${head}<h2>${esc(eun(c.ko))} 어느 것일까요?</h2>
+    el.innerHTML = nav + `<div class="qz">${head}<h2><em class="q-key">${esc(c.ko)}</em>${batchim(c.ko) ? "은" : "는"} 어느 것일까요?</h2>
       <div class="ops pics" id="ops">${q.ops.map((o, k) => `<button class="op pic" data-op="${o}" aria-label="${k + 1}번 사진">${ph(byId[o], false, false)}<kbd>${k + 1}</kbd></button>`).join("")}</div><div id="fb"></div></div>`;
   }
   Q.done = false;
@@ -1122,6 +1145,13 @@ function trendView(arg, top, el) {
 }
 
 /* 재질: 재질 카드, 혼용률 읽기, 섞어 입기 */
+const BLPIC = { cotton100: [["cotton"], ["tee", "oxford"]], cotton_spandex: [["cotton", "spandex"], ["skinny", "chino"]], cvc: [["cotton", "polyester"], ["tee", "sweatshirt"]], tc: [["polyester", "cotton"], ["oxford", "chore"]], tr: [["polyester"], ["slacks", "blazer"]], wool_poly: [["wool", "polyester"], ["balmacaan", "chester"]], wool80: [["melton", "wool"], ["peacoat", "chester"]], acrylic_wool: [["wool", "acrylic"], ["sweater", "muffler"]], nylon_spandex: [["nylon", "spandex"], []], cashmere10: [["wool", "cashmere"], ["sweater", "muffler"]], down8020: [["goosedown"], ["longpuffer", "lightdown"]] };
+function blPics(b) {
+  const [ms, cs] = BLPIC[b.id] || [[], []], M = Object.fromEntries(MT.materials.map(m => [m.id, m]));
+  const a = ms.filter(id => M[id] && M[id].shot).map(id => `<a href="#mat/m-${id}"><img src="mt/${id}.webp" alt="" loading="lazy">${esc(M[id].name)} 원단</a>`);
+  const c = cs.filter(id => byId[id]).map(id => `<a href="#card/${id}"><img src="img/${id}.webp" alt="" loading="lazy">${esc(byId[id].ko)}</a>`);
+  return a.length + c.length ? `<div class="bl-pics">${a.concat(c).join("")}</div>` : "";
+}
 function mats(arg) {
   arg = decodeURIComponent(arg || "");
   const el = $("#v-mat");
@@ -1142,7 +1172,7 @@ function mats(arg) {
   if (cur === "label") {
     el.innerHTML = top + `<div class="lead"><h1>혼용률 읽기</h1></div><p class="cmp-say">옷 안쪽 라벨에 적힌 섬유 비율로 옷의 느낌과 관리법을 미리 알 수 있어요.</p>
       <ol class="mt-rules">${MT.label_rules.map(r => `<li>${esc(r.rule || r)} <span class="src">${srcLinks(r.src)}</span></li>`).join("")}</ol>
-      <div class="mt-blends">${MT.blends.map(b => `<section class="blend"><div class="tag-label"><small>품질 표시</small><b>${esc(b.label)}</b></div><div><h2>${esc(b.name)}</h2><p>${esc(b.why)}</p><p class="gb"><span class="ok">좋은 점</span> ${esc((b.good || []).join(", "))}</p><p class="gb"><span class="no">아쉬운 점</span> ${esc((b.bad || []).join(", "))}</p><p class="rd">${esc(b.read)}</p><p class="src">${srcLinks(b.src)}</p></div></section>`).join("")}</div>`;
+      <div class="mt-blends">${MT.blends.map(b => `<section class="blend"><div class="tag-label"><small>품질 표시</small><b>${esc(b.label)}</b></div><div><h2>${esc(b.name)}</h2><p>${esc(b.why)}</p><p class="gb"><span class="ok">좋은 점</span> ${esc((b.good || []).join(", "))}</p><p class="gb"><span class="no">아쉬운 점</span> ${esc((b.bad || []).join(", "))}</p><p class="rd">${esc(b.read)}</p>${blPics(b)}<p class="src">${srcLinks(b.src)}</p></div></section>`).join("")}</div>`;
     return;
   }
   if (cur === "mix") {
@@ -1173,10 +1203,10 @@ function start() {
     : s.look ? LK.slice(0, 6).map(l => `<div class="ph"><img src="lk/${l.id}.webp" alt="" loading="lazy"></div>`).join("") || K.f.filter(f => f.shot).slice(0, 6).map(f => `<div class="ph"><img src="kp/${f.id}.webp" alt="" loading="lazy"></div>`).join("")
     : TR.filter(x => x.shot).slice(0, 6).map(x => `<div class="ph"><img src="tp/${x.id}.webp" alt="" loading="lazy"></div>`).join("");
   const done = s => s.ids ? s.ids.filter(id => byId[id] && seen(id)).length + " / " + s.ids.filter(id => byId[id]).length : "";
-  const due = dueIds().length, tb = CARE && CARE.temps.find(b => (st.temp ?? 14) >= b.lo && (st.temp ?? 14) <= b.hi);
+  const due = dueIds().length;
   const quick = [
     due ? ["#quiz/review", `복습 ${due}장`, "날짜가 된 카드를 다시 풀어요"] : ["#quiz/mix", "오늘 퀴즈", "이름, 상품명, 사진을 섞어 10문제"],
-    ["#care", tb ? `${st.temp ?? 14}도엔 뭘 입지` : "오늘 뭘 입지", tb ? tb.say.replace(/^[^,]*?(이면|에는|에서는)\s*/, "") : "기온을 고르면 맞는 옷이 나와요"],
+    ["#care/wash", "세탁 기호", "라벨 기호 26개와 퀴즈"],
     ["#read", "상품명 읽기", "상품명을 붙여 넣으면 낱말마다 카드로"],
     ["#codi", "실제 코디", `계절별 사진 ${LK.length}장`],
   ];
@@ -1192,9 +1222,9 @@ let view = "book";
 const GRP = { start: "start", read: "start", book: "book", cmp: "book", mat: "book", codi: "codi", care: "care", quiz: "quiz" };
 const SUBNAV = { start: [["#start", "시작"], ["#read", "상품명 읽기"], ["plan.html", "계획"], ["refs.html", "참고한 곳"]], book: [["#book", "카드 도감"], ["#cmp", "나란히 비교"], ["#mat", "재질"], ["terms.html", "용어 사전"]] };
 const VIEWS = ["start", "book", "mat", "cmp", "codi", "care", "quiz", "read"];
-/* 입고 관리: 기온, 사이즈, 세탁 기호, 관리, 쇼핑몰 말, 체형, 드레스 코드 (care.json) */
+/* 입고 관리: 사이즈, 세탁 기호, 관리, 쇼핑몰 말, 체형, 드레스 코드 (care.json) */
 let CARE = null;
-const CTABS = [["", "기온"], ["size", "사이즈"], ["wash", "세탁 기호"], ["keep", "옷 관리"], ["shop", "쇼핑몰 말"], ["body", "체형"], ["dress", "드레스 코드"]];
+const CTABS = [["", "사이즈"], ["wash", "세탁 기호"], ["keep", "옷 관리"], ["shop", "쇼핑몰 말"], ["body", "체형"], ["dress", "드레스 코드"]];
 const CGROUP = { keep: "옷 관리", shop: "쇼핑몰 말", body: "체형별 고르기", dress: "드레스 코드" };
 const SKIND = { wash: "물세탁", hand: "물세탁", bleach: "표백", tumble: "건조기", line: "자연 건조", iron: "다림질", dc: "드라이클리닝" };
 function sym(k, v) {
@@ -1225,29 +1255,17 @@ function sym(k, v) {
   }
   return `<svg class="sym" viewBox="0 0 48 48" aria-hidden="true">${g}${v === "x" ? X : ""}</svg>`;
 }
-const bandOf = t => CARE.temps.find(b => t >= b.lo && t <= b.hi);
 function careList(name) {
   const g = CARE.groups.find(x => x.name === name); if (!g) return "";
   return `<div class="cl">${g.items.map(it => `<section class="cl-i"><h3>${esc(it.n)}${it.p === "A" ? "" : `<small>${it.p === "B" ? "알아 두면 좋아요" : "더 깊이"}</small>`}</h3>${it.c.length ? `<p class="cl-c">${it.c.map(esc).join(", ")}</p>` : ""}<p>${esc(it.m)}</p>${it.d ? `<p class="cl-d">${esc(it.d)}</p>` : ""}</section>`).join("")}</div>`;
-}
-function tempBody(t) {
-  const b = bandOf(t);
-  return `<div class="tp-now"><div class="tp-deg"><b>${t}</b><span>도</span></div><div><h2>${esc(b.name)}</h2><p>${esc(b.say)}</p>${b.tip ? `<p class="cl-d">${esc(b.tip)}</p>` : ""}</div></div>
-    <div class="grid">${b.ids.filter(id => byId[id]).map(id => tile(byId[id])).join("")}</div>`;
 }
 function care(arg) {
   const el = $("#v-care");
   if (!CARE) { el.innerHTML = `<p class="cmp-say">불러오는 중이에요</p>`; return; }
   const cur = CTABS.some(t => t[0] === arg) ? arg : "";
-  const top = `<div class="lead"><h1>입고 관리</h1><p class="goal">오늘 날씨에 뭘 입을지, 어느 치수를 살지, 어떻게 빨지.</p></div><nav class="useg" aria-label="입고 관리">${CTABS.map(([k, l]) => `<a href="#care${k ? "/" + k : ""}" aria-current="${k === cur}">${l}</a>`).join("")}</nav>`;
+  const top = `<div class="lead"><h1>입고 관리</h1><p class="goal">어느 치수를 살지, 어떻게 빨고 둘지.</p></div><nav class="useg" aria-label="입고 관리">${CTABS.map(([k, l]) => `<a href="#care${k ? "/" + k : ""}" aria-current="${k === cur}">${l}</a>`).join("")}</nav>`;
   let body = "";
   if (!cur) {
-    const t = st.temp ?? 14;
-    body = `<div class="tp"><label class="tp-l" for="tp-r">낮 기온</label><input type="range" id="tp-r" min="-10" max="35" value="${t}" step="1">
-      <div class="tp-bands">${CARE.temps.slice().reverse().map(b => `<button data-temp="${Math.max(-10, Math.min(35, b.lo === -99 ? 0 : b.hi === 99 ? 30 : Math.round((b.lo + b.hi) / 2)))}">${esc(b.name)}</button>`).join("")}</div>
-      <div id="tp-b">${tempBody(t)}</div><p class="src">기준: <a href="${CARE.src[0][1]}" target="_blank" rel="noopener">${CARE.src[0][0]}</a>. 기상청 공식 표는 없어요. 바람이 세면 한 단계 따뜻하게, 일교차가 크면 벗기 쉬운 겉옷을 겹쳐요.</p>
-      <p><a class="btn" href="#quiz/temp">기온 퀴즈</a></p></div>`;
-  } else if (cur === "size") {
     body = `<div class="sz">
       <section class="sz-c"><h2>상의 호수</h2><label>가슴둘레 <input type="number" inputmode="decimal" id="sz-chest" placeholder="96"> cm</label><p class="sz-o" id="sz-chest-o">줄자로 겨드랑이 아래 가장 넓은 곳을 둘러 재요.</p></section>
       <section class="sz-c"><h2>바지 인치</h2><label>허리둘레 <input type="number" inputmode="decimal" id="sz-waist" placeholder="80"> cm</label><label class="sz-chk"><input type="checkbox" id="sz-half"> 쇼핑몰 실측(허리단면)으로 넣었어요</label><p class="sz-o" id="sz-waist-o">1인치는 2.54센티예요.</p></section>
@@ -1262,7 +1280,7 @@ function care(arg) {
       <p class="src">기준: ISO 3758, KS K 0021. 오래된 옷이나 수입 옷은 기호가 조금 다를 수 있어요.</p><p><a class="btn" href="#quiz/care">세탁 기호 퀴즈</a></p>`;
   } else body = careList(CGROUP[cur]);
   el.innerHTML = top + body;
-  if (cur === "size") szCalc();
+  if (!cur) szCalc();
 }
 function szCalc() {
   const v = id => parseFloat($("#" + id)?.value);
@@ -1272,22 +1290,8 @@ function szCalc() {
   if (foot) { const c = foot / 10, us = c - 18; $("#sz-foot-o").innerHTML = `남성 US <b>${us.toFixed(1).replace(".0", "")}</b>, UK <b>${(us - 1).toFixed(1).replace(".0", "")}</b>, EU <b>${Math.round(c + 15)}</b>. 여성 US는 1~1.5 더 커요.`; }
 }
 document.addEventListener("input", e => {
-  if (e.target.id === "tp-r") { st.temp = +e.target.value; $("#tp-b").innerHTML = tempBody(st.temp); try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (x) {} }
   if (e.target.closest(".sz")) szCalc();
 });
-document.addEventListener("click", e => {
-  const b = e.target.closest("[data-temp]"); if (!b) return;
-  const r = $("#tp-r"); r.value = b.dataset.temp; r.dispatchEvent(new Event("input", { bubbles: true }));
-});
-function tempSet() {
-  return shuffle(CARE.temps.slice()).slice(0, 10).map(b => {
-    const t = b.lo === -99 ? -3 + Math.floor(Math.random() * 7) : b.hi === 99 ? 28 + Math.floor(Math.random() * 6) : b.lo + Math.floor(Math.random() * (b.hi - b.lo + 1));
-    const others = shuffle(CARE.temps.filter(x => x !== b)).slice(0, 3);
-    const opt = x => x.ids.filter(id => byId[id]).slice(0, 4).map(id => byId[id].ko).join(", ");
-    const all = [b, ...others];
-    return { type: "tq", kicker: "기온 보고 입기", h: `낮 기온 ${t}도예요. 가장 알맞은 차림은?`, ans: b.name, ops: shuffle(all.map(x => x.name)), txt: Object.fromEntries(all.map(x => [x.name, opt(x)])), why: Object.fromEntries(all.map(x => [x.name, x.name + " 차림"])), ex: `<h3>${esc(b.name)}</h3><p>${esc(b.say)}</p>` };
-  });
-}
 function careSet() {
   return shuffle(CARE.syms.slice()).slice(0, 10).map(x => {
     const others = shuffle(CARE.syms.filter(y => y.ko !== x.ko && (y.k === x.k || Math.random() < .3))).slice(0, 3), all = [x, ...others];
@@ -1300,7 +1304,7 @@ function matSet() {
     const same = M.filter(x => x.id !== m.id && x.kind === m.kind), rest = M.filter(x => x.id !== m.id && x.kind !== m.kind);
     const all = [m, ...shuffle(same).concat(shuffle(rest)).slice(0, 3)];
     const photo = m.shot ? `<div class="q-mat"><img src="mt/${m.id}.webp" alt=""></div>` : "";
-    return { type: "tq", kicker: `재질, ${m.kind}`, vis: photo, h: photo ? `이 원단은 무엇일까요? 힌트: ${m.feel}` : `이 설명에 맞는 재질은? ${m.say.split(m.name).join("이것")}`, ans: m.id, ops: shuffle(all.map(x => x.id)), txt: Object.fromEntries(all.map(x => [x.id, x.name])), why: Object.fromEntries(all.map(x => [x.id, x.feel])), ex: `<h3>${esc(m.name)}</h3><p>${esc(m.say)}</p><p class="sub">${esc(m.tip || "")} <a href="#mat">재질 보기</a></p>` };
+    return { type: "tq", kicker: `재질 퀴즈, ${m.kind}`, vis: photo, h: photo ? "이 원단은 무엇일까요?" : "이 설명에 맞는 재질은 무엇일까요?", clueL: photo ? "힌트" : "설명", clue: photo ? m.feel : m.say.split(m.name).join("이것"), ans: m.id, ops: shuffle(all.map(x => x.id)), txt: Object.fromEntries(all.map(x => [x.id, x.name])), why: Object.fromEntries(all.map(x => [x.id, x.feel])), ex: `<h3>${esc(m.name)}</h3><p>${esc(m.say)}</p><p class="sub">${esc(m.tip || "")} <a href="#mat">재질 보기</a></p>` };
   });
 }
 function tqAnswer(o) {
@@ -1335,6 +1339,7 @@ function route() {
   const prev = view;
   view = VIEWS.includes(v) ? v : "start";
   for (const s of VIEWS) $("#v-" + s).hidden = s !== view;
+  if (prev !== view) { const ve = $("#v-" + view); ve.classList.remove("v-in"); void ve.offsetWidth; ve.classList.add("v-in"); }
   const grp = GRP[view] || view;
   document.querySelectorAll(".tabs a").forEach(a => a.dataset.v === grp ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"));
   const sn = SUBNAV[grp], snEl = $("#subnav");
@@ -1343,7 +1348,7 @@ function route() {
   document.querySelector('.tabs a[aria-current="page"]')?.scrollIntoView({ block: "nearest", inline: "nearest" });
   if (view === "read") { if (!$("#rd-in")) readView(); else readRender(); prog(); }
   else if (view === "quiz") {
-    const scope = U.some(x => x.u == arg) || (arg === "name" && N.length) || arg === "mix" || (arg === "rule" && K.r.length) || (arg === "real" && RP.length) || (arg === "photo" && F.length) || arg === "part" || arg === "review" || ((arg === "temp" || arg === "care") && CARE) || (arg === "mat" && MT.materials.length) ? arg : "";
+    const scope = U.some(x => x.u == arg) || (arg === "name" && N.length) || arg === "mix" || (arg === "rule" && K.r.length) || (arg === "real" && RP.length) || (arg === "photo" && F.length) || arg === "part" || arg === "review" || (arg === "care" && CARE) || (arg === "mat" && MT.materials.length) ? arg : "";
     if (!Q || Q.scope !== scope) startQuiz(null, scope); else quiz();
     prog();
   } else refresh();
