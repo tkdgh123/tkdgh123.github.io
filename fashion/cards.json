@@ -79,6 +79,12 @@
    "say": "통과 주머니로 갈리는 바지"
   },
   {
+   "id": "skirts",
+   "u": 1,
+   "name": "치마와 원피스",
+   "say": "다른 무드까지 넓혀 보기"
+  },
+  {
    "id": "shoes",
    "u": 1,
    "name": "신발",
@@ -205,9 +211,27 @@
    "say": "같은 니트에서 색만 바꿨어요"
   },
   {
+   "id": "korea",
+   "u": 9,
+   "name": "한국의 옛 유행",
+   "say": "우리나라 대학가 차림이 지나온 길. 사진은 재현 그림이에요"
+  },
+  {
+   "id": "n1-속옷과홈웨어",
+   "u": 1,
+   "name": "속옷과 홈웨어",
+   "say": ""
+  },
+  {
    "id": "n3-금속장식",
    "u": 3,
    "name": "금속 장식",
+   "say": ""
+  },
+  {
+   "id": "n2-여밈방식",
+   "u": 2,
+   "name": "여밈 방식",
    "say": ""
   },
   {
@@ -522,6 +546,73 @@
    "casual": [
     "카우보이 셔츠"
    ]
+  },
+  {
+   "id": "blouse",
+   "u": 1,
+   "g": "shirts",
+   "ko": "블라우스",
+   "en": "Blouse",
+   "say": "여성용 얇은 셔츠예요.",
+   "look": "소재가 얇고 리본, 프릴, 셔링",
+   "where": "",
+   "shop": "블라우스",
+   "pro": "블라우스",
+   "casual": [
+    "리본 블라우스",
+    "셔링 블라우스"
+   ]
+  },
+  {
+   "id": "casualshirt",
+   "u": 1,
+   "g": "shirts",
+   "ko": "남방",
+   "en": "Casual shirt",
+   "say": "넥타이 없이 입는 셔츠예요.",
+   "look": "깃과 단추 앞단이 있고 넥타이 없이 입는 얇은 셔츠",
+   "where": "",
+   "shop": "캐주얼 셔츠",
+   "pro": "캐주얼 셔츠",
+   "casual": [
+    "남방셔츠"
+   ],
+   "same": "일부",
+   "diff": "남방은 셔츠 중에서 캐주얼한 쪽을 부르는 한국 말이에요. 어원은 일본어 난반 설과 남쪽 지방 셔츠 설이 있고 확정되지 않았어요."
+  },
+  {
+   "id": "cubancollarshirt",
+   "u": 1,
+   "g": "shirts",
+   "ko": "쿠바 셔츠",
+   "en": "Cuban collar shirt",
+   "say": "짧은 소매에 넓은 오픈 칼라인 여름 셔츠예요.",
+   "look": "목 앞이 펼쳐진 넓은 칼라, 짧은 소매",
+   "where": "",
+   "shop": "쿠바 셔츠",
+   "pro": "쿠바 셔츠",
+   "casual": [
+    "리조트 셔츠",
+    "오픈 칼라 셔츠"
+   ]
+  },
+  {
+   "id": "dressshirt",
+   "u": 1,
+   "g": "shirts",
+   "ko": "와이셔츠",
+   "en": "Dress shirt",
+   "say": "정장 안에 넥타이와 함께 입는 칼라 있는 셔츠예요.",
+   "look": "칼라가 빳빳하고 커프스 단추",
+   "where": "",
+   "shop": "드레스 셔츠",
+   "pro": "드레스 셔츠",
+   "casual": [
+    "와이샤쓰",
+    "흰 셔츠"
+   ],
+   "same": "일부",
+   "diff": "와이셔츠는 정장 안에 넥타이와 입는 셔츠이고 남방은 넥타이 없이 입는 캐주얼 셔츠예요. 와이셔츠는 흰색만이 아니라 색 셔츠도 와이셔츠라고 해요."
   },
   {
    "id": "linenshirt",
@@ -1043,6 +1134,25 @@
    "diff": "잠바는 일본어 ジャンパー에서 온 말이에요. 외래어 표기법은 점퍼가 맞지만 이화여대 국어문화원은 관습으로 둘 다 인정해요. 영어 jumper는 영국에서 스웨터, 미국에서 소매 없는 원피스예요."
   },
   {
+   "id": "leatherjacket",
+   "u": 1,
+   "g": "light",
+   "ko": "레더 자켓",
+   "en": "Leather jacket",
+   "say": "가죽(양가죽, 소가죽 등)으로 만든 재킷 전체예요. 모양과 길이로 이름이 나뉘어요.",
+   "look": "매끈한 가죽 겉면, 스웨이드는 보풀 있는 면",
+   "where": "",
+   "shop": "레더 자켓",
+   "pro": "레더 재킷",
+   "casual": [
+    "가죽 자켓",
+    "가죽 재킷",
+    "가죽 잠바",
+    "램스킨 자켓",
+    "스웨이드 자켓"
+   ]
+  },
+  {
    "id": "shortjacket",
    "u": 1,
    "g": "light",
@@ -1479,6 +1589,21 @@
    ]
   },
   {
+   "id": "capripants",
+   "u": 1,
+   "g": "pants",
+   "ko": "카프리",
+   "en": "Capri pants",
+   "say": "장딴지 중간 길이 바지예요.",
+   "look": "종아리 중간에서 끝남",
+   "where": "",
+   "shop": "카프리",
+   "pro": "카프리",
+   "casual": [
+    "7부 바지"
+   ]
+  },
+  {
    "id": "culottes",
    "u": 1,
    "g": "pants",
@@ -1586,6 +1711,23 @@
    ]
   },
   {
+   "id": "pleatedpants",
+   "u": 1,
+   "g": "pants",
+   "ko": "플리츠 팬츠",
+   "en": "pleated trousers",
+   "say": "허리 아래에 접힌 주름이 있어 통이 넉넉한 바지예요.",
+   "look": "허리 아래 앞쪽에 접힌 선이 있어요.",
+   "where": "",
+   "shop": "플리츠 팬츠",
+   "pro": "플리츠 트라우저",
+   "casual": [
+    "원턱 팬츠",
+    "투턱 팬츠",
+    "주름 바지"
+   ]
+  },
+  {
    "id": "sweatpants",
    "u": 1,
    "g": "pants",
@@ -1616,6 +1758,53 @@
    "casual": [
     "나일론 팬츠",
     "윈드브레이커 팬츠"
+   ]
+  },
+  {
+   "id": "pleatskirt",
+   "u": 1,
+   "g": "skirts",
+   "ko": "플리츠 스커트",
+   "en": "Pleated skirt",
+   "say": "일정한 주름을 잡은 치마예요.",
+   "look": "위에서 아래로 접힌 칼주름",
+   "where": "프레피, 걸리시",
+   "shop": "플리츠 스커트",
+   "pro": "플리츠 스커트",
+   "casual": [
+    "주름 치마",
+    "주름 스커트"
+   ]
+  },
+  {
+   "id": "denimskirt",
+   "u": 1,
+   "g": "skirts",
+   "ko": "데님 스커트",
+   "en": "Denim skirt",
+   "say": "청바지 원단 치마예요.",
+   "look": "데님 결, 앞 주머니, 노란 박음질",
+   "where": "캐주얼, Y2K",
+   "shop": "데님 스커트",
+   "pro": "데님 스커트",
+   "casual": [
+    "청치마",
+    "청 스커트"
+   ]
+  },
+  {
+   "id": "mididress",
+   "u": 1,
+   "g": "skirts",
+   "ko": "미디 원피스",
+   "en": "midi dress",
+   "say": "종아리 중간까지 오는 원피스예요.",
+   "look": "기장이 무릎과 발목 사이예요.",
+   "where": "",
+   "shop": "미디 원피스",
+   "pro": "미디 드레스",
+   "casual": [
+    "무릎 아래 원피스"
    ]
   },
   {
@@ -1838,6 +2027,23 @@
    ]
   },
   {
+   "id": "sandal",
+   "u": 1,
+   "g": "shoes",
+   "ko": "샌들",
+   "en": "sandal",
+   "say": "발등과 발가락이 드러나는 여름 신발이에요.",
+   "look": "끈이나 밴드가 발을 잡아요.",
+   "where": "",
+   "shop": "샌들",
+   "pro": "샌들",
+   "casual": [
+    "여름 신발",
+    "스트랩 샌들",
+    "샌달"
+   ]
+  },
+  {
    "id": "ballcap",
    "u": 1,
    "g": "hats",
@@ -2034,6 +2240,22 @@
     "양말",
     "삭스",
     "목 양말"
+   ]
+  },
+  {
+   "id": "bra",
+   "u": 1,
+   "g": "n1-속옷과홈웨어",
+   "ko": "브라",
+   "en": "bra",
+   "say": "가슴을 받치는 속옷이에요.",
+   "look": "컵 모양 천과 어깨끈이 있어요.",
+   "where": "",
+   "shop": "브라",
+   "pro": "브래지어",
+   "casual": [
+    "브래지어",
+    "와이어 브라"
    ]
   },
   {
@@ -3018,6 +3240,28 @@
     "배색 스티치",
     "포인트 박음질"
    ]
+  },
+  {
+   "id": "buttonup",
+   "u": 2,
+   "g": "n2-여밈방식",
+   "ko": "버튼업",
+   "en": "Button-up (button front)",
+   "say": "앞을 단추로 채워 여닫는 옷이에요. 셔츠, 가디건, 재킷이 대표예요.",
+   "look": "앞중심에 위에서 아래로 단추와 단춧구멍이 이어져 있는지 봐요.",
+   "where": "",
+   "spot": [
+    0.5,
+    0.45
+   ],
+   "shop": "버튼업",
+   "pro": "단추 여밈",
+   "casual": [
+    "버튼 업",
+    "단추로 여미는"
+   ],
+   "same": "일부",
+   "diff": "버튼다운 칼라는 칼라 끝을 단추로 고정하고 버튼업은 앞을 단추로 여며요."
   },
   {
    "id": "lapel",
@@ -7741,6 +7985,26 @@
     "연어색",
     "인디언 핑크"
    ]
+  },
+  {
+   "id": "seotaiji",
+   "u": 9,
+   "g": "korea",
+   "ko": "서태지와 아이들 차림",
+   "en": "Seo Taiji style",
+   "say": "1992년 데뷔 때 큰 상의와 배기바지로 올랐고 1995년 컴백 무대에서 스톰 비니와 스노보드복, 오클리 선글라스, 배기바지를 입었어요.",
+   "look": "큰 상의, 통 넓은 배기바지, 비니, 스노보드복",
+   "where": "",
+   "shop": "서태지와 아이들 차림",
+   "pro": "서태지와 아이들 차림",
+   "casual": [
+    "서태지",
+    "통바지",
+    "배기바지",
+    "힙합바지"
+   ],
+   "same": "일부",
+   "diff": "기존 k1990 카드의 대표 장면이에요."
   }
  ],
  "names": [
@@ -9201,6 +9465,7 @@
   "퀼팅": "quilted",
   "카펜터": "carpenter",
   "파라슈트": "parachute",
+  "플리츠": "pleatskirt",
   "로퍼": "loafer",
   "더비": "derby",
   "첼시": "chelsea",
@@ -9305,6 +9570,19 @@
   "남방자켓": "overshirt",
   "웨스턴셔츠": "western",
   "카우보이셔츠": "western",
+  "블라우스": "blouse",
+  "리본블라우스": "blouse",
+  "셔링블라우스": "blouse",
+  "남방": "casualshirt",
+  "캐주얼셔츠": "casualshirt",
+  "남방셔츠": "casualshirt",
+  "쿠바셔츠": "cubancollarshirt",
+  "리조트셔츠": "cubancollarshirt",
+  "오픈칼라셔츠": "cubancollarshirt",
+  "와이셔츠": "dressshirt",
+  "드레스셔츠": "dressshirt",
+  "와이샤쓰": "dressshirt",
+  "흰셔츠": "dressshirt",
   "린넨셔츠": "linenshirt",
   "리넨셔츠": "linenshirt",
   "마셔츠": "linenshirt",
@@ -9421,6 +9699,13 @@
   "쟈켓": "jacket",
   "점퍼": "jumper",
   "잠바": "jumper",
+  "레더자켓": "leatherjacket",
+  "레더재킷": "leatherjacket",
+  "가죽자켓": "leatherjacket",
+  "가죽재킷": "leatherjacket",
+  "가죽잠바": "leatherjacket",
+  "램스킨자켓": "leatherjacket",
+  "스웨이드자켓": "leatherjacket",
   "숏자켓": "shortjacket",
   "숏재킷": "shortjacket",
   "크롭재킷": "shortjacket",
@@ -9501,6 +9786,8 @@
   "코르덴바지": "corduroypants",
   "파라슈트팬츠": "parachute",
   "낙하산바지": "parachute",
+  "카프리": "capripants",
+  "7부바지": "capripants",
   "큐롯": "culottes",
   "큐롯팬츠": "culottes",
   "데님반바지": "denimshorts",
@@ -9519,11 +9806,25 @@
   "일바지": "monpepants",
   "페인터팬츠": "painterpants",
   "더블니팬츠": "painterpants",
+  "플리츠팬츠": "pleatedpants",
+  "플리츠트라우저": "pleatedpants",
+  "원턱팬츠": "pleatedpants",
+  "투턱팬츠": "pleatedpants",
+  "주름바지": "pleatedpants",
   "스웨트팬츠": "sweatpants",
   "스웻팬츠": "sweatpants",
   "윈드팬츠": "windpants",
   "나일론팬츠": "windpants",
   "윈드브레이커팬츠": "windpants",
+  "플리츠스커트": "pleatskirt",
+  "주름치마": "pleatskirt",
+  "주름스커트": "pleatskirt",
+  "데님스커트": "denimskirt",
+  "청치마": "denimskirt",
+  "청스커트": "denimskirt",
+  "미디원피스": "mididress",
+  "미디드레스": "mididress",
+  "무릎아래원피스": "mididress",
   "운동화": "lowtop",
   "로우탑스니커즈": "lowtop",
   "스니커": "lowtop",
@@ -9559,6 +9860,9 @@
   "보트슈즈": "boatshoes",
   "데크슈즈": "boatshoes",
   "탑사이더": "boatshoes",
+  "샌들": "sandal",
+  "여름신발": "sandal",
+  "샌달": "sandal",
   "베이스볼캡": "ballcap",
   "야구모자": "ballcap",
   "캡": "ballcap",
@@ -9586,6 +9890,9 @@
   "양말": "socks",
   "삭스": "socks",
   "목양말": "socks",
+  "브라": "bra",
+  "브래지어": "bra",
+  "와이어브라": "bra",
   "반집업티": "halfzipsweat",
   "쿼터집풀오버": "halfzipsweat",
   "하프집업티": "halfzipsweat",
@@ -9710,7 +10017,6 @@
   "허리고리": "beltloop",
   "루프": "beltloop",
   "원턱,투턱": "pleat",
-  "플리츠": "pleat",
   "턱": "pleat",
   "원턱": "pleat",
   "투턱": "pleat",
@@ -9767,6 +10073,9 @@
   "스티치": "contrast",
   "배색스티치": "contrast",
   "포인트박음질": "contrast",
+  "버튼업": "buttonup",
+  "단추여밈": "buttonup",
+  "단추로여미는": "buttonup",
   "라펠": "lapel",
   "옷깃": "lapel",
   "앞깃": "lapel",
@@ -9978,7 +10287,11 @@
   "진보라": "plum",
   "살몬": "salmon",
   "연어색": "salmon",
-  "인디언핑크": "salmon"
+  "인디언핑크": "salmon",
+  "서태지와아이들차림": "seotaiji",
+  "서태지": "seotaiji",
+  "배기바지": "seotaiji",
+  "힙합바지": "seotaiji"
  },
  "codi": {
   "f": [
@@ -11336,7 +11649,7 @@
       "role": "상의",
       "name": "드레스 셔츠",
       "color": "흰색 또는 하늘색",
-      "id": null
+      "id": "dressshirt"
      },
      {
       "role": "하의",
@@ -11407,7 +11720,7 @@
       "role": "상의",
       "name": "흰 드레스 셔츠",
       "color": "흰색",
-      "id": null
+      "id": "dressshirt"
      },
      {
       "role": "하의",
@@ -15651,7 +15964,7 @@
      "name": "데이 크롭 스웨이드 자켓",
      "color": "기사에 색 언급 없음",
      "note": "랭킹 2위. 기장이 짧고 스탠드 칼라라 바지가 길어 보여요.",
-     "id": "jacket"
+     "id": "leatherjacket"
     },
     {
      "name": "무신사 스탠다드 신세틱 스웨이드 레이서 재킷",
@@ -16353,7 +16666,7 @@
      "name": "브라운 스웨이드 재킷",
      "color": "브라운, 카라멜",
      "note": "GQ Korea는 브라운, 캐멀, 카라멜이 가을과 어울린다고 했어요.",
-     "id": null
+     "id": "bra"
     },
     {
      "name": "갈색 발레 플랫이나 로퍼",
@@ -16451,7 +16764,7 @@
      "name": "브라운 더블 코트",
      "color": "브라운",
      "note": "맥시 기장으로 입어요.",
-     "id": null
+     "id": "bra"
     },
     {
      "name": "브이넥 니트",
@@ -17453,7 +17766,7 @@
       "color": "흰색",
       "why": "폴로 셔츠에 흰 바지를 맞추면 시원해 보여요.",
       "src": "https://www.esquirekorea.co.kr/article/1902673",
-      "id": null
+      "id": "pleatedpants"
      },
      {
       "name": "남색 슬랙스",
@@ -18225,7 +18538,7 @@
       "color": "검정",
       "why": "더운 날에 편해요.",
       "src": "",
-      "id": null
+      "id": "sandal"
      }
     ],
     "소품": [
@@ -19275,7 +19588,7 @@
    "socks": "플랫슈즈에는 얇은 양말이나 스타킹을 신어요.",
    "src": [],
    "socks_src": "",
-   "id": null
+   "id": "blouse"
   },
   {
    "base": "롱스커트",
@@ -19417,7 +19730,7 @@
       "color": "검정",
       "why": "여름에 가벼워요.",
       "src": "",
-      "id": null
+      "id": "sandal"
      }
     ],
     "소품": [
@@ -22183,7 +22496,7 @@
      "name": "셔츠",
      "color": "하늘색",
      "mat": "",
-     "id": null
+     "id": "casualshirt"
     },
     {
      "role": "하의",
@@ -22275,7 +22588,7 @@
      "name": "셔츠",
      "color": "검정",
      "mat": "",
-     "id": null
+     "id": "casualshirt"
     },
     {
      "role": "하의",
@@ -22360,7 +22673,7 @@
      "name": "롱 셔츠 걸치기",
      "color": "연한 베이지",
      "mat": "린넨",
-     "id": null
+     "id": "casualshirt"
     },
     {
      "role": "상의",
@@ -22413,7 +22726,7 @@
      "name": "오픈칼라 셔츠",
      "color": "흰색",
      "mat": "",
-     "id": null
+     "id": "casualshirt"
     },
     {
      "role": "하의",
@@ -22655,7 +22968,7 @@
      "name": "드레스 셔츠 소매 걷기",
      "color": "연회색",
      "mat": "",
-     "id": null
+     "id": "dressshirt"
     },
     {
      "role": "하의",
@@ -23089,7 +23402,7 @@
      "name": "프릴 블라우스형 가디건",
      "color": "흰색",
      "mat": "",
-     "id": "cardigan"
+     "id": "blouse"
     },
     {
      "role": "하의",
@@ -23128,7 +23441,7 @@
      "name": "리본 블라우스",
      "color": "연분홍",
      "mat": "시폰",
-     "id": null
+     "id": "blouse"
     },
     {
      "role": "아우터",
@@ -23333,7 +23646,7 @@
      "name": "도트 블라우스",
      "color": "검정 흰색",
      "mat": "",
-     "id": null
+     "id": "blouse"
     },
     {
      "role": "하의",
@@ -23372,7 +23685,7 @@
      "name": "오버핏 셔츠",
      "color": "흰색",
      "mat": "면",
-     "id": null
+     "id": "casualshirt"
     },
     {
      "role": "하의",
@@ -23510,7 +23823,7 @@
      "name": "긴팔 셔츠 소매 걷기",
      "color": "네이비",
      "mat": "린넨",
-     "id": "longsleeve"
+     "id": "casualshirt"
     },
     {
      "role": "하의",
@@ -23556,7 +23869,7 @@
      "name": "반팔 오픈 셔츠",
      "color": "흰색",
      "mat": "니트",
-     "id": "tee"
+     "id": "casualshirt"
     },
     {
      "role": "이너",
@@ -23910,7 +24223,7 @@
      "name": "린넨 셔츠 앞단추 풀기",
      "color": "흰색",
      "mat": "린넨",
-     "id": "linenshirt"
+     "id": "casualshirt"
     },
     {
      "role": "하의",
@@ -24253,7 +24566,7 @@
      "name": "린넨 셔츠 앞단추 풀기",
      "color": "흰색",
      "mat": "린넨",
-     "id": "linenshirt"
+     "id": "casualshirt"
     },
     {
      "role": "하의",
@@ -24292,7 +24605,7 @@
      "name": "긴팔 셔츠",
      "color": "하늘색",
      "mat": "면",
-     "id": "longsleeve"
+     "id": "casualshirt"
     },
     {
      "role": "이너",
@@ -24437,7 +24750,7 @@
      "name": "긴팔 셔츠 소매 걷기",
      "color": "와인 검정",
      "mat": "면",
-     "id": "longsleeve"
+     "id": "casualshirt"
     },
     {
      "role": "하의",
@@ -24698,7 +25011,7 @@
      "name": "오픈칼라 반팔 셔츠",
      "color": "오렌지",
      "mat": "",
-     "id": "shortsleeveshirt"
+     "id": "casualshirt"
     },
     {
      "role": "하의",
@@ -24783,7 +25096,7 @@
      "name": "오픈칼라 반팔 셔츠",
      "color": "연회색",
      "mat": "",
-     "id": "shortsleeveshirt"
+     "id": "casualshirt"
     },
     {
      "role": "하의",
@@ -24882,14 +25195,14 @@
      "name": "셔츠",
      "color": "연분홍",
      "mat": "면",
-     "id": null
+     "id": "dressshirt"
     },
     {
      "role": "하의",
      "name": "플리츠 스커트",
      "color": "흰색",
      "mat": "",
-     "id": null
+     "id": "pleatskirt"
     },
     {
      "role": "신발",
@@ -24935,7 +25248,7 @@
      "name": "스트라이프 반팔 블라우스",
      "color": "하늘색 흰색",
      "mat": "면",
-     "id": "tee"
+     "id": "blouse"
     },
     {
      "role": "하의",
@@ -25020,7 +25333,7 @@
      "name": "퍼프 소매 블라우스",
      "color": "흰색",
      "mat": "면",
-     "id": null
+     "id": "blouse"
     },
     {
      "role": "하의",
@@ -25059,7 +25372,7 @@
      "name": "프릴 블라우스",
      "color": "흰색",
      "mat": "면",
-     "id": null
+     "id": "blouse"
     },
     {
      "role": "하의",
@@ -25112,7 +25425,7 @@
      "name": "셔츠 앞자락 묶기",
      "color": "흰색",
      "mat": "면",
-     "id": null
+     "id": "casualshirt"
     },
     {
      "role": "하의",
@@ -25309,7 +25622,7 @@
      "name": "린넨 셔츠",
      "color": "흰색",
      "mat": "린넨",
-     "id": "linenshirt"
+     "id": "casualshirt"
     },
     {
      "role": "하의",
@@ -25347,7 +25660,7 @@
      "name": "레더 자켓",
      "color": "검정",
      "mat": "가죽",
-     "id": "jacket"
+     "id": "leatherjacket"
     },
     {
      "role": "이너",
@@ -25460,7 +25773,7 @@
      "name": "셔츠",
      "color": "남색",
      "mat": "",
-     "id": null
+     "id": "casualshirt"
     },
     {
      "role": "하의",
@@ -25602,7 +25915,7 @@
      "name": "레더 자켓",
      "color": "검정",
      "mat": "가죽",
-     "id": "jacket"
+     "id": "leatherjacket"
     },
     {
      "role": "상의",
@@ -26058,7 +26371,7 @@
      "name": "드레스 셔츠",
      "color": "흰색",
      "mat": "",
-     "id": null
+     "id": "dressshirt"
     },
     {
      "role": "하의",
@@ -26201,7 +26514,7 @@
      "name": "셔츠",
      "color": "흰색",
      "mat": "",
-     "id": null
+     "id": "dressshirt"
     },
     {
      "role": "하의",
@@ -26292,7 +26605,7 @@
      "name": "셔츠",
      "color": "흰색",
      "mat": "",
-     "id": null
+     "id": "casualshirt"
     },
     {
      "role": "하의",
@@ -26800,7 +27113,7 @@
      "name": "레더 자켓",
      "color": "검정",
      "mat": "가죽",
-     "id": "jacket"
+     "id": "leatherjacket"
     },
     {
      "role": "원피스",
@@ -26906,14 +27219,14 @@
      "name": "셔츠",
      "color": "하늘색",
      "mat": "",
-     "id": null
+     "id": "casualshirt"
     },
     {
      "role": "하의",
      "name": "플리츠 미니 스커트",
      "color": "남색",
      "mat": "",
-     "id": null
+     "id": "pleatskirt"
     },
     {
      "role": "신발",
@@ -27162,14 +27475,14 @@
      "name": "셔츠",
      "color": "흰색",
      "mat": "",
-     "id": null
+     "id": "blouse"
     },
     {
      "role": "하의",
      "name": "플리츠 미니 스커트",
      "color": "검정",
      "mat": "",
-     "id": null
+     "id": "pleatskirt"
     },
     {
      "role": "신발",
@@ -27222,7 +27535,7 @@
      "name": "플리츠 롱스커트",
      "color": "은회색",
      "mat": "새틴",
-     "id": null
+     "id": "pleatskirt"
     },
     {
      "role": "신발",
@@ -27984,7 +28297,7 @@
      "name": "가죽 점퍼",
      "color": "갈색",
      "mat": "가죽",
-     "id": "jumper"
+     "id": "leatherjacket"
     },
     {
      "role": "이너",
@@ -28795,7 +29108,7 @@
      "name": "셔츠",
      "color": "흰색",
      "mat": "",
-     "id": null
+     "id": "casualshirt"
     },
     {
      "role": "하의",
@@ -29099,7 +29412,7 @@
      "name": "캐주얼 셔츠",
      "color": "하늘색",
      "mat": "시스루",
-     "id": null
+     "id": "casualshirt"
     },
     {
      "role": "이너",
@@ -29146,7 +29459,7 @@
      "name": "캐주얼 셔츠",
      "color": "하늘색",
      "mat": "시스루",
-     "id": null
+     "id": "casualshirt"
     },
     {
      "role": "이너",
@@ -29272,7 +29585,7 @@
      "name": "캐주얼 셔츠",
      "color": "크림",
      "mat": "새틴",
-     "id": null
+     "id": "casualshirt"
     },
     {
      "role": "하의",
@@ -29345,7 +29658,7 @@
      "name": "블라우스",
      "color": "크림",
      "mat": "",
-     "id": null
+     "id": "blouse"
     },
     {
      "role": "하의",
@@ -29444,7 +29757,7 @@
      "name": "샌들",
      "color": "갈색",
      "mat": "",
-     "id": null
+     "id": "sandal"
     }
    ],
    "point": "빛이 도는 민트색 슬립 원피스에 청록 스카프를 목에 묶고 흰 양말을 신어서, 여름 한낮에도 가볍게 귀여워요.",
@@ -29469,7 +29782,7 @@
      "name": "레더 자켓",
      "color": "검정",
      "mat": "가죽",
-     "id": "jacket"
+     "id": "leatherjacket"
     },
     {
      "role": "상의",
@@ -29522,7 +29835,7 @@
      "name": "레더 자켓",
      "color": "검정",
      "mat": "가죽",
-     "id": "jacket"
+     "id": "leatherjacket"
     },
     {
      "role": "상의",
@@ -29569,7 +29882,7 @@
      "name": "캐주얼 셔츠",
      "color": "검정",
      "mat": "",
-     "id": null
+     "id": "casualshirt"
     },
     {
      "role": "하의",
@@ -29892,7 +30205,7 @@
      "name": "새틴 롱 원피스",
      "color": "브라운",
      "mat": "새틴",
-     "id": null
+     "id": "mididress"
     }
    ],
    "point": "광택 있는 새틴 브라운 롱 원피스는 몸에 붙다가 아래로 떨어져서 색이 깊고 차분해요."
@@ -30002,7 +30315,7 @@
      "name": "레더 자켓",
      "color": "블랙",
      "mat": "가죽",
-     "id": "jacket"
+     "id": "leatherjacket"
     },
     {
      "role": "하의",
@@ -30101,7 +30414,7 @@
      "name": "롱 원피스",
      "color": "블랙",
      "mat": "",
-     "id": null
+     "id": "mididress"
     },
     {
      "role": "가방",
@@ -30133,7 +30446,7 @@
      "name": "리본 블라우스",
      "color": "블랙",
      "mat": "",
-     "id": null
+     "id": "blouse"
     },
     {
      "role": "하의",
@@ -30257,7 +30570,7 @@
      "name": "셔츠",
      "color": "하늘색",
      "mat": "",
-     "id": null
+     "id": "casualshirt"
     },
     {
      "role": "상의",
@@ -31189,7 +31502,7 @@
      "name": "레더 자켓",
      "color": "블랙",
      "mat": "가죽",
-     "id": "jacket"
+     "id": "leatherjacket"
     },
     {
      "role": "상의",
@@ -31313,7 +31626,7 @@
      "name": "반팔 브이넥 탑",
      "color": "블랙",
      "mat": "",
-     "id": "tee"
+     "id": "blouse"
     },
     {
      "role": "하의",
