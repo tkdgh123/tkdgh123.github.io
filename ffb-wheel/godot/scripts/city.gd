@@ -16,6 +16,14 @@ const TYPES := {
 	"ring": {"hw": 3.5, "n": 1, "lw": 3.5, "center": "y", "lim": 40, "name": "순환로"},
 	"side": {"hw": 3.5, "n": 1, "lw": 3.5, "center": "y", "lim": 30, "name": "옆길"},
 	"alley": {"hw": 3.5, "n": 1, "lw": 3.5, "center": "", "lim": 30, "name": "이면도로"},
+	"dong": {"hw": 3.75, "n": 1, "lw": 3.75, "center": "y", "lim": 30, "name": "동네길"},
+}
+# 지도: 같은 길 그물 위에 동네를 다르게 꾸밈. 숭실대입구는 남북 큰길이 왕복 2차로 동네길이고, 길 밖은 언덕
+const THEMES := {
+	"gangnam": {"name": "강남역", "desc": "강남대로와 테헤란로가 만나는 사거리. 유리 빌딩, 간판 많은 상가, 버스와 택시가 많아요.",
+		"ew": "테헤란로", "ns": "강남대로", "station": "강남", "line": "2", "line_col": "#00a84d", "dest": {"N": "신논현", "S": "양재", "E": "역삼", "W": "서초"}},
+	"ssu": {"name": "숭실대입구", "desc": "상도로와 숭실대 정문. 언덕 위 빌라, 좁은 동네길, 대학가 가게, 마을버스가 다녀요.",
+		"ew": "상도로", "ns": "", "station": "숭실대입구", "line": "7", "line_col": "#747f00", "dest": {"N": "상도동", "S": "숭실대", "E": "상도역", "W": "봉천"}},
 }
 const NODES := {"C": [0, 0, "sig"], "Nn": [0, -200, "sig"], "Ns": [0, 200, "sig"], "Nw": [-240, 0, "sig"], "Ne": [240, 0, "sig"], "Ja": [-120, 0, "sig"], "Jb": [0, -100, "sig"], "Jc": [120, 0, "sig"], "Jd": [0, 100, "sig"],
 	"Ka": [-120, -200, "S"], "Kb": [240, -100, "W"], "Kc": [120, 200, "N"], "Kd": [240, 100, "W"], "X": [120, 100, "NS"]}
@@ -35,9 +43,20 @@ const C_RED := Color("#9c4a40")
 const CARCOL := [Color("#f2f1ec"), Color("#d9d6cc"), Color("#8f8f8c"), Color("#2a2b30"), Color("#6c7a99"), Color("#2b44a6"), Color("#a33a2c"), Color("#e4e2da")]
 const PCOL := [Color("#2b44a6"), Color("#a33a2c"), Color("#3c6b3a"), Color("#8f8b80"), Color("#e8b42a"), Color("#2a2b30")]
 
+var theme := "gangnam"
+var T: Dictionary          # 지금 지도 (THEMES 한 칸)
+var dress: Dress
+var bgrid := {}            # 부딪히는 물체 찾기 격자 (16m 칸)
+var walkers := []          # 보도를 걷는 사람
+var sign_mats := []        # 간판 재질 (밤에 빛남)
+var hydrant_mm: MultiMesh
+var fence_mm: MultiMesh
+var tower: Node3D
+var ped_heads := []        # 보행자 신호등 [횡단보도, 빨강, 초록]
+var ped_t := 0.0
 var nodes := {}
 var roads := []
-var boxes := []          # 부딪히는 물체 {x, z, hw, hl, r}
+var boxes := []          # 부딪히는 물체 {x, z, hw, hl, r, kind(bld 건물, lamp, tree, sign, ...), node}
 var parked := []
 var crossings := []
 var ai := []
@@ -71,6 +90,7 @@ var rng := RandomNumberGenerator.new()
 # ───────── 짓기 ─────────
 func build() -> void:
 	rng.seed = 20261118
+	T = THEMES[theme]
 	ground_mat = ShaderMaterial.new()
 	ground_mat.shader = load("res://shaders/ground.gdshader")
 	bld_mat = ShaderMaterial.new()
@@ -100,7 +120,10 @@ func build() -> void:
 				Kit.path_line(pts, s[1])
 			else:
 				Kit.path_arc(pts, s[1], s[2])
-		var r := {"id": rid, "a": spec[0], "b": spec[1], "d0": d, "d1": _dir_of(pts[-1].yaw), "T": TYPES[spec[2]], "type": spec[2], "pts": pts, "L": pts[-1].s}
+		var ty: String = spec[2]
+		if theme == "ssu" and ty == "main" and d in ["N", "S"]:
+			ty = "dong"
+		var r := {"id": rid, "a": spec[0], "b": spec[1], "d0": d, "d1": _dir_of(pts[-1].yaw), "T": TYPES[ty], "type": ty, "pts": pts, "L": pts[-1].s}
 		A.arms[d] = r
 		B.arms[OPP[r.d1]] = r
 		roads.append(r)
@@ -140,7 +163,7 @@ func build() -> void:
 			var cp := Kit.cut(P, a, b)
 			if cp.size() > 1:
 				fl.band(cp, sd * T.hw, sd * (T.hw + 0.25), C_CURB, 0.13, 0.0)
-				fl.band(cp, sd * (T.hw + 0.25), sd * (T.hw + 2.6), C_CURB.darkened(0.06), 0.12, 0.0) # 보도
+				fl.band(cp, sd * (T.hw + 0.25), sd * (T.hw + 2.6), C_CURB.darkened(0.06), 0.12, 4.0) # 보도 (보도블록)
 	# 교차로 모퉁이
 	for id in nodes:
 		var n: Dictionary = nodes[id]
@@ -184,7 +207,7 @@ func build() -> void:
 				var s := stop_at(n, d) + 3
 				var sp := _q(n, v, p, s, hw + 0.9)
 				Kit.sign_post(self, "stop", "", sp.x, sp.z, YAW[d])
-				boxes.append({"x": sp.x, "z": sp.z, "hw": 0.1, "hl": 0.1, "r": 0.0})
+				add_box({"x": sp.x, "z": sp.z, "hw": 0.1, "hl": 0.1, "r": 0.0, "kind": "sign", "node": Kit.LAST_SIGN})
 				var tp := _q(n, v, p, s + 3, hw / 2)
 				Kit.floor_text(self, "정지", tp.x, tp.z, YAW[OPP[d]], 2.4)
 	# 신호 계획: 네 갈래 = 남북 직진 → 남북 좌회전 → 동서 직진 → 동서 좌회전. 세 갈래 = 큰길 직진 → 옆길로 좌회전 → 옆길. 각 뒤에 노랑 3초, 전부 빨강 2초
@@ -225,7 +248,7 @@ func build() -> void:
 			var w: float = n.arms[d].T.n * n.arms[d].T.lw
 			var x: float = n.x + fv.x * (far + 1.5) + rv.x * (w + 1.6)
 			var z: float = n.z + fv.y * (far + 1.5) + rv.y * (w + 1.6)
-			boxes.append({"x": x, "z": z, "hw": 0.15, "hl": 0.15, "r": 0.0})
+			add_box({"x": x, "z": z, "hw": 0.15, "hl": 0.15, "r": 0.0, "kind": "pole"})
 			n.heads.append({"d": d, "lamps": Kit.signal_head(self, x, z, YAW[h] + PI, w + 1.6)})
 	# 어린이 보호구역 (옆길 Jd→X, 학교 앞)
 	for r: Dictionary in roads:
@@ -245,7 +268,7 @@ func build() -> void:
 		var face: float = school.pts[0].yaw + (PI if pair[1] > 0 else 0.0)
 		Kit.sign_post(self, "kids", "", q.x, q.z, face, 2.6)
 		Kit.sign_post(self, "max", "30", q.x, q.z, face, 1.8, 0.62)
-		boxes.append({"x": q.x, "z": q.z, "hw": 0.1, "hl": 0.1, "r": 0.0})
+		add_box({"x": q.x, "z": q.z, "hw": 0.1, "hl": 0.1, "r": 0.0, "kind": "sign", "node": Kit.LAST_SIGN})
 	var mid: Dictionary = Kit.cut(school.pts, 60, 61)[0]
 	var mv := Vector2(sin(mid.yaw), cos(mid.yaw))
 	var mp := Vector2(cos(mid.yaw), -sin(mid.yaw))
@@ -256,11 +279,11 @@ func build() -> void:
 	for s in [22, 31, 63, 72, 115, 124, 150, 168]:
 		var q: Dictionary = Kit.cut(alley.pts, s, s + 1)[0]
 		var o := Kit.off_pt(q, 2.35)
-		var m := Kit.car_mesh(self, CARCOL[(s * 7) % CARCOL.size()])
+		var m := Models.car(self, CARCOL[(s * 7) % CARCOL.size()], "suv" if s % 3 == 0 else "sedan")
 		m.position = Vector3(o.x, 0, o.z)
 		m.rotation.y = q.yaw
-		var b := {"x": o.x, "z": o.z, "hw": 0.9, "hl": 2.25, "r": q.yaw}
-		boxes.append(b)
+		var b := {"x": o.x, "z": o.z, "hw": 0.9, "hl": 2.3, "r": q.yaw, "kind": "parked", "node": m}
+		add_box(b)
 		parked.append(b)
 	var sp0 := Kit.off_pt(Kit.cut(alley.pts, 46, 47)[0], 2.35)
 	start = {"x": sp0.x, "z": sp0.z - Car.WB / 2, "yaw": 0.0}
@@ -272,9 +295,9 @@ func build() -> void:
 			if not grid.has(k):
 				grid[k] = []
 			grid[k].append([r, i])
-	_dress(fl)
-	# 땅
-	fl.quad({"x": -450.0, "z": -450.0}, {"x": 450.0, "z": -450.0}, {"x": 450.0, "z": 450.0}, {"x": -450.0, "z": 450.0}, C_GROUND, 0.0, 0.0)
+	_lane_arrows(fl)
+	dress = Dress.new()
+	dress.build(self, fl) # 건물, 간판, 가로수, 가로등, 거리 사물, 땅과 산
 	add_child(fl.mesh(ground_mat))
 	_weather_spots()
 	# 차로 그래프와 다른 차, 보행자
@@ -285,10 +308,10 @@ func build() -> void:
 			for k in r.T.n:
 				all_lanes.append(lane(r, dir, k))
 	for i in 22:
-		spawn_ai(CARCOL[i % CARCOL.size()])
+		spawn_ai(CARCOL[i % CARCOL.size()], null, -1.0, 4.0, "car", MODELS[theme][i % MODELS[theme].size()])
 	for cr: Dictionary in crossings:
 		for k in (2 if cr.kids else 1):
-			var m := Kit.person(self, PCOL[(peds.size() * 5) % PCOL.size()], 0.75 if cr.kids else 1.0)
+			var m := Models.person(self, PCOL[(peds.size() * 5) % PCOL.size()], 0.75 if cr.kids else 1.0, peds.size() % 3 == 0)
 			var side := 0 if rng.randf() < 0.5 else 1
 			var e: Dictionary = cr.ends[side]
 			m.position = Vector3(e.x, 0, e.z)
@@ -381,151 +404,64 @@ func _near_node(x: float, z: float, pad: float) -> bool:
 			return true
 	return false
 
-# ───────── 건물, 나무, 표지, 가로등 ─────────
-func _dress(_fl: Kit.Flat) -> void:
-	var blds := []
-	var r2 := RandomNumberGenerator.new()
-	r2.seed = 5
-	var rnd := func() -> float: return r2.randf()
-	var add_bld := func(x: float, z: float, w: float, d: float, h: float, col: Color) -> void:
-		blds.append([x, z, w, d, h, col])
-		boxes.append({"x": x, "z": z, "hw": w / 2, "hl": d / 2, "r": 0.0})
-	add_bld.call(-148.0, -150.0, 24.0, 50.0, 9.0, Color("#f2f1ec"))
-	_label(-135.9, 7.0, -150.0, PI / 2, "운전면허시험장", 16.0, Color("#2b44a6"))
-	add_bld.call(60.0, 132.0, 50.0, 22.0, 11.0, Color("#e8e2d2"))
-	_label(60.0, 9.0, 120.9, PI, "초등학교", 12.0, Color("#3c6b3a"))
-	var BCOL := [Color("#f2f1ec"), Color("#e4e2da"), Color("#d9d6cc"), Color("#c9c6bc"), Color("#b8bcc6"), Color("#9aa6bf"), Color("#e8e2d2")]
-	for i in 900:
-		var x: float = -300 + rnd.call() * 600
-		var z: float = -260 + rnd.call() * 520
-		var w: float = 10 + rnd.call() * 14
-		var d: float = 10 + rnd.call() * 14
-		var inside := absf(x) < 248 and absf(z) < 208
-		var h: float = 6 + rnd.call() * (40.0 if absf(x) < 130 and absf(z) < 110 else 18.0) if inside else 8 + rnd.call() * 30
-		var pad := maxf(w, d) / 2 + 5
-		if _near_road(x, z, pad) or _near_road(x + w / 2, z + d / 2, 5) or _near_road(x - w / 2, z - d / 2, 5) or _near_road(x + w / 2, z - d / 2, 5) or _near_road(x - w / 2, z + d / 2, 5) or _near_node(x, z, pad):
-			continue
-		var hit := false
-		for b: Dictionary in boxes:
-			if absf(b.x - x) < b.hw + w / 2 + 3 and absf(b.z - z) < b.hl + d / 2 + 3:
-				hit = true
-				break
-		if hit:
-			continue
-		add_bld.call(x, z, w, d, h, BCOL[int(rnd.call() * BCOL.size()) % BCOL.size()])
-	var mm := MultiMesh.new()
-	mm.transform_format = MultiMesh.TRANSFORM_3D
-	mm.use_colors = true
-	mm.mesh = BoxMesh.new()
-	mm.instance_count = blds.size()
-	for i in blds.size():
-		var b: Array = blds[i]
-		mm.set_instance_transform(i, Transform3D(Basis.from_scale(Vector3(b[2], b[4], b[3])), Vector3(b[0], b[4] / 2, b[1])))
-		mm.set_instance_color(i, b[5])
-	var mmi := MultiMeshInstance3D.new()
-	mmi.multimesh = mm
-	mmi.material_override = bld_mat
-	add_child(mmi)
-	# 큰길 가로수
-	var trees := []
-	for r: Dictionary in roads:
-		if r.type != "main":
-			continue
-		var s: float = r.s0 + 12
-		while s < r.s1 - 12:
-			for sdd in [-1, 1]:
-				var q := Kit.off_pt(Kit.cut(r.pts, s, s + 1)[0], sdd * (r.T.hw + 1.6))
-				if _near_node(q.x, q.z, 2):
-					continue
-				trees.append(Vector3(q.x, 0, q.z))
-				boxes.append({"x": q.x, "z": q.z, "hw": 0.25, "hl": 0.25, "r": 0.0})
-			s += 16
-	var tm := MultiMesh.new()
-	tm.transform_format = MultiMesh.TRANSFORM_3D
-	var trunk := CylinderMesh.new()
-	trunk.top_radius = 0.14
-	trunk.bottom_radius = 0.18
-	trunk.height = 2.2
-	trunk.radial_segments = 7
-	trunk.material = Kit.mat(Color("#6b5a48"), 0.9)
-	tm.mesh = trunk
-	tm.instance_count = trees.size()
-	var lm := MultiMesh.new()
-	lm.transform_format = MultiMesh.TRANSFORM_3D
-	lm.use_colors = true
-	var leaf := SphereMesh.new()
-	leaf.radius = 1.6
-	leaf.height = 2.9
-	leaf.radial_segments = 7
-	leaf.rings = 4
-	lm.mesh = leaf
-	lm.instance_count = trees.size()
-	for i in trees.size():
-		tm.set_instance_transform(i, Transform3D(Basis(), trees[i] + Vector3(0, 1.1, 0)))
-		lm.set_instance_transform(i, Transform3D(Basis(Vector3.UP, i * 1.7), trees[i] + Vector3(0, 3.3, 0)))
-		lm.set_instance_color(i, Color("#4d5b3f") if i % 2 == 0 else Color("#667552"))
-	var tmi := MultiMeshInstance3D.new()
-	tmi.multimesh = tm
-	add_child(tmi)
-	var lmi := MultiMeshInstance3D.new()
-	lmi.multimesh = lm
-	lmi.material_override = leaf_mat
-	add_child(lmi)
-	# 제한 속도 표지 (길 시작마다)
-	for r: Dictionary in roads:
-		if is_same(r, school):
-			continue
-		for e in [[r.s0 + 8, 1, r.pts[0].yaw + PI], [r.s1 - 8, -1, r.pts[-1].yaw]]:
-			var q := Kit.off_pt(Kit.cut(r.pts, e[0], e[0] + 1)[0], e[1] * (r.T.hw + 0.8))
-			Kit.sign_post(self, "max", str(r.T.lim), q.x, q.z, e[2], 2.2, 0.6)
-			boxes.append({"x": q.x, "z": q.z, "hw": 0.1, "hl": 0.1, "r": 0.0})
-	# 가로등: 큰길과 순환로 오른쪽 보도에 35m마다 (밤에 켜짐)
-	for r: Dictionary in roads:
-		if r.type != "main" and r.type != "ring":
-			continue
-		var s: float = r.s0 + 6
-		while s < r.s1 - 6:
-			var q := Kit.off_pt(Kit.cut(r.pts, s, s + 1)[0], r.T.hw + 1.1)
-			if not _near_node(q.x, q.z, 0):
-				lamps.append({"x": q.x, "z": q.z, "yaw": q.yaw})
-				boxes.append({"x": q.x, "z": q.z, "hw": 0.12, "hl": 0.12, "r": 0.0})
-			s += 35
-	var pm := MultiMesh.new()
-	pm.transform_format = MultiMesh.TRANSFORM_3D
-	var pole := CylinderMesh.new()
-	pole.top_radius = 0.07
-	pole.bottom_radius = 0.09
-	pole.height = 7.0
-	pole.radial_segments = 6
-	pole.material = Kit.POLE
-	pm.mesh = pole
-	pm.instance_count = lamps.size()
-	var hm := MultiMesh.new()
-	hm.transform_format = MultiMesh.TRANSFORM_3D
-	var head := BoxMesh.new()
-	head.size = Vector3(0.35, 0.16, 1.2)
-	lamp_head_mat = Kit.mat(Color(1.0, 0.86, 0.6), 0.4).duplicate() as StandardMaterial3D
-	head.material = lamp_head_mat
-	hm.mesh = head
-	hm.instance_count = lamps.size()
-	for i in lamps.size():
-		var L: Dictionary = lamps[i]
-		pm.set_instance_transform(i, Transform3D(Basis(), Vector3(L.x, 3.5, L.z)))
-		var inward := Vector3(cos(L.yaw), 0, -sin(L.yaw)) # 길 쪽 (왼쪽)
-		hm.set_instance_transform(i, Transform3D(Basis(Vector3.UP, L.yaw + PI / 2), Vector3(L.x, 7.0, L.z) + inward * 0.6))
-	for m: MultiMesh in [pm, hm]:
-		var mi := MultiMeshInstance3D.new()
-		mi.multimesh = m
-		add_child(mi)
+# ───────── 부딪히는 물체: 16m 칸 격자에 넣어 가까운 것만 봄 ─────────
+func _cells(b: Dictionary) -> Array:
+	var r: float = maxf(b.hw, b.hl) * 1.5
+	var out := []
+	for i in range(floori((b.x - r) / 16.0), floori((b.x + r) / 16.0) + 1):
+		for j in range(floori((b.z - r) / 16.0), floori((b.z + r) / 16.0) + 1):
+			out.append(_gkey(i, j))
+	return out
 
-func _label(x: float, y: float, z: float, ry: float, txt: String, w: float, bg: Color) -> void:
-	var g := Node3D.new()
-	g.position = Vector3(x, y, z)
-	g.rotation.y = ry
-	add_child(g)
-	Kit.box(g, Vector3(w, w / 7, 0.08), Vector3.ZERO, Kit.mat(bg, 0.6), false)
-	var l := Kit.label3d(g, txt, Vector3(0, 0, 0.06), 128, Color.WHITE)
-	l.pixel_size = w / (128.0 * txt.length() * 1.15)
+func add_box(b: Dictionary) -> void:
+	if not b.has("kind"):
+		b.kind = "bld"
+	boxes.append(b)
+	for k in _cells(b):
+		if not bgrid.has(k):
+			bgrid[k] = []
+		bgrid[k].append(b)
+
+func del_box(b: Dictionary) -> void:
+	_erase_same(boxes, b)
+	for k in _cells(b):
+		if bgrid.has(k):
+			_erase_same(bgrid[k], b)
+
+func _erase_same(list: Array, b: Dictionary) -> void: # erase()는 사전 내용을 다 비교해서 느리고, 같은 내용의 다른 물체를 지울 수도 있음
+	for i in list.size():
+		if is_same(list[i], b):
+			list.remove_at(i)
+			return
+
+func boxes_near(x: float, z: float) -> Array:
+	var out := []
+	var i0 := floori(x / 16.0)
+	var j0 := floori(z / 16.0)
+	for a in range(-1, 2):
+		for c in range(-1, 2):
+			var k := _gkey(i0 + a, j0 + c)
+			if bgrid.has(k):
+				out.append_array(bgrid[k]) # 여러 칸에 걸친 물체는 두 번 나올 수 있음 (두 번째엔 이미 밀려나 안 겹침)
+	return out
+
+# 정지선 앞 노면 화살표: 안쪽 차로 직진+좌회전, 바깥 차로 직진+우회전 (moves()와 같은 규칙)
+func _lane_arrows(fl: Kit.Flat) -> void:
+	for r: Dictionary in roads:
+		if r.T.n != 2:
+			continue
+		for dir in [1, -1]:
+			for k in 2:
+				var seg := lane(r, dir, k)
+				var p: Dictionary = pos_at(seg, seg.L - 14.0)
+				var f := Vector2(sin(p.yaw), cos(p.yaw))
+				var l := Vector2(cos(p.yaw), -sin(p.yaw))
+				var at := func(a: float, b: float) -> Dictionary: return {"x": p.x + f.x * a + l.x * b, "z": p.z + f.y * a + l.y * b}
+				fl.quad(at.call(-2.5, 0.08), at.call(1.2, 0.08), at.call(1.2, -0.08), at.call(-2.5, -0.08), C_WHITE, 0.036, 2.0)
+				fl.tri(at.call(1.2, 0.4), at.call(2.4, 0.0), at.call(1.2, -0.4), C_WHITE, 0.036, 2.0)
+				var s: float = 1.0 if k == 0 else -1.0 # 왼쪽(+)으로 갈래
+				fl.quad(at.call(-0.6, 0.0), at.call(-0.2, 0.0), at.call(0.3, s * 0.75), at.call(-0.1, s * 0.75), C_WHITE, 0.036, 2.0)
+				fl.tri(at.call(0.55, s * 0.62), at.call(0.15, s * 1.25), at.call(-0.35, s * 0.62), C_WHITE, 0.036, 2.0)
 
 # 물웅덩이(비), 빙판(블랙 아이스) 자리
 func _weather_spots() -> void:
@@ -651,7 +587,7 @@ func set_work(on: bool) -> void:
 			c.position = Vector3(q.x, 0.35, q.z)
 			work_node.add_child(c)
 			Kit.box(work_node, Vector3(0.36, 0.06, 0.36), Vector3(q.x, 0.03, q.z), Kit.mat(Color(0.1, 0.1, 0.1)), false)
-			var b := {"x": q.x, "z": q.z, "hw": 0.2, "hl": 0.2, "r": 0.0}
+			var b := {"x": q.x, "z": q.z, "hw": 0.2, "hl": 0.2, "r": 0.0, "kind": "cone", "node": c}
 			work.boxes.append(b)
 			s += 2.5 if t < 1.0 else 4.0
 		# 막힌 차로 안: 화살표 판, 일하는 사람, 흙더미
@@ -665,27 +601,27 @@ func set_work(on: bool) -> void:
 		arrow.shaded = false
 		arrow.pixel_size = 0.0055
 		work.arrow = arrow
-		work.boxes.append({"x": ab.x, "z": ab.z, "hw": 0.8, "hl": 0.3, "r": r.pts[0].yaw})
+		work.boxes.append({"x": ab.x, "z": ab.z, "hw": 0.8, "hl": 0.3, "r": r.pts[0].yaw, "kind": "sign", "node": board})
 		var wp := Kit.off_pt(Kit.cut(r.pts, work.s0 + 12, work.s0 + 13)[0], lw * 1.6)
-		var man := Kit.person(work_node, Color(0.98, 0.55, 0.1))
+		var man := Models.person(work_node, Color(0.98, 0.55, 0.1))
 		man.position = Vector3(wp.x, 0, wp.z)
 		man.rotation.y = r.pts[0].yaw + PI / 2
-		work.boxes.append({"x": wp.x, "z": wp.z, "hw": 0.3, "hl": 0.3, "r": 0.0})
+		work.boxes.append({"x": wp.x, "z": wp.z, "hw": 0.3, "hl": 0.3, "r": 0.0, "kind": "person", "node": man})
 		var hp := Kit.off_pt(Kit.cut(r.pts, work.s0 + 24, work.s0 + 25)[0], lw * 1.5)
 		var heap := Kit.box(work_node, Vector3(2.2, 0.8, 5.0), Vector3(hp.x, 0.4, hp.z), Kit.mat(Color(0.45, 0.38, 0.3), 1.0), true)
 		heap.rotation.y = r.pts[0].yaw
 		work.boxes.append({"x": hp.x, "z": hp.z, "hw": 1.1, "hl": 2.5, "r": r.pts[0].yaw})
 		var sg := Kit.off_pt(Kit.cut(r.pts, r.s0 + 4, r.s0 + 5)[0], r.T.hw + 0.8)
 		Kit.sign_post(work_node, "work", "", sg.x, sg.z, r.pts[0].yaw + PI)
-		work.sign = {"x": sg.x, "z": sg.z, "hw": 0.1, "hl": 0.1, "r": 0.0}
+		work.sign = {"x": sg.x, "z": sg.z, "hw": 0.1, "hl": 0.1, "r": 0.0, "kind": "sign", "node": Kit.LAST_SIGN}
 		work.boxes.append(work.sign)
 	work.on = on
 	work_node.visible = on
 	for b: Dictionary in work.boxes:
-		if on and not boxes.has(b):
-			boxes.append(b)
+		if on and not boxes.has(b) and not b.get("down", false):
+			add_box(b)
 		elif not on:
-			boxes.erase(b)
+			del_box(b)
 
 # ───────── 차로 그래프 ─────────
 func lane(r: Dictionary, dir: int, k: int) -> Dictionary: # dir +1 = 길 점 순서대로. 정지선(출발 쪽은 횡단보도 끝)에서 정지선까지
@@ -838,7 +774,10 @@ func light(n: Dictionary, d: String, t: float):
 	return {"r": 1, "walk": ""}
 
 # ───────── 다른 차 ─────────
-func spawn_ai(col: Color, seg = null, s := -1.0, v := 4.0, kind := "car") -> Dictionary:
+const MODELS := {"gangnam": ["sedan", "suv", "taxi", "sedan", "bus", "sedan", "taxi", "suv", "sedan", "sedan", "bus"], "ssu": ["sedan", "suv", "taxi", "mbus", "sedan", "sedan", "suv", "sedan", "bus", "taxi", "sedan"]}
+const SIZE := {"sedan": [0.9, 2.3], "suv": [0.93, 2.3], "taxi": [0.9, 2.3], "bus": [1.25, 5.5], "mbus": [1.2, 3.6], "amb": [1.0, 2.7]}
+
+func spawn_ai(col: Color, seg = null, s := -1.0, v := 4.0, kind := "car", model := "sedan") -> Dictionary:
 	var c := {}
 	for tries in 40:
 		var sg: Dictionary = seg if seg != null else all_lanes[rng.randi() % all_lanes.size()]
@@ -854,8 +793,16 @@ func spawn_ai(col: Color, seg = null, s := -1.0, v := 4.0, kind := "car") -> Dic
 			if seg != null:
 				return {}
 			continue
-		var mesh: Node3D = _amb_mesh() if kind == "amb" else Kit.car_mesh(self, col)
-		c = {"seg": sg, "s": ss, "v": v, "x": p.x, "z": p.z, "yaw": p.yaw, "pi": p.i, "mesh": mesh, "stopT": 0.0, "stuck": 0.0, "move": null, "con": null, "brake": false,
+		if kind == "amb":
+			model = "amb"
+		if model == "taxi":
+			col = Color("#e98a3a") if rng.randf() < 0.4 else Color("#f2f1ec")
+		elif model == "bus":
+			col = Color("#2f6fd0") if theme == "gangnam" or rng.randf() < 0.5 else Color("#3aa04a")
+		elif model == "mbus":
+			col = Color("#4bab4e")
+		var mesh: Node3D = _amb_mesh() if kind == "amb" else Models.car(self, col, model)
+		c = {"model": model, "hw": SIZE[model][0], "hl": SIZE[model][1], "seg": sg, "s": ss, "v": v, "x": p.x, "z": p.z, "yaw": p.yaw, "pi": p.i, "mesh": mesh, "stopT": 0.0, "stuck": 0.0, "move": null, "con": null, "brake": false,
 			"lat": 0.0, "lc": null, "force": 0.0, "hold": 0.0, "kind": kind, "yield": false, "high": rng.randf() < 0.4, "blink": 0, "honk": 0.0, "age": 0.0}
 		_pick_next(c)
 		ai.append(c)
@@ -899,6 +846,64 @@ func _amb_mesh() -> Node3D:
 	g.set_meta("bars", bars)
 	return g
 
+# 부딪혀 밀려난 차: 미끄러지다 서고, 비상등을 켜고 기다림. 운전자가 멀리 가면 다시 차로로
+func _tick_wreck(c: Dictionary, dt: float, t: float, player) -> void:
+	var w: Dictionary = c.wreck
+	w.t += dt
+	var vel := Vector2(w.vx, w.vz)
+	var sp := vel.length()
+	var fr := 7.0 * maxf(speed_k, 0.4) * dt
+	vel = vel * maxf(0.0, sp - fr) / sp if sp > 0.001 else Vector2.ZERO
+	w.vx = vel.x
+	w.vz = vel.y
+	c.x += vel.x * dt
+	c.z += vel.y * dt
+	c.yaw += w.w * dt
+	w.w *= exp(-dt * 2.5)
+	c.v = 0.0
+	for b: Dictionary in boxes_near(c.x, c.z): # 건물, 기둥에 막힘
+		if b.kind == "parked" or b.get("down", false):
+			continue
+		var p = Kit.obb_hit({"x": c.x, "z": c.z, "hw": c.hw, "hl": c.hl, "r": c.yaw}, b)
+		if p != null:
+			c.x += p.x
+			c.z += p.y
+			w.vx *= 0.3
+			w.vz *= 0.3
+	var m: Node3D = c.mesh
+	m.position = Vector3(c.x, 0, c.z)
+	m.rotation.y = c.yaw
+	var blink_on := fmod(t, 0.76) < 0.38
+	var bl: Array = m.get_meta("blink")
+	for x in bl:
+		(x as MeshInstance3D).material_override = Kit.BLINK_ON if blink_on else Kit.BLINK_OFF
+	if w.t > 12.0 and Vector2(w.vx, w.vz).length() < 0.1: # 크게 돌지 않았으면 비상등을 켠 채 다시 차로로 (가벼운 접촉 사고처럼)
+		var ln = lane_of(c.x, c.z, c.yaw)
+		if ln != null and absf(Kit.wrap_a(c.yaw - pos_at(ln.seg, clampf(ln.s, 0.0, ln.seg.L)).yaw)) < 0.6 and ln.s > 0.0 and ln.s < ln.seg.L - 2.0:
+			c.erase("wreck")
+			c.seg = ln.seg
+			c.s = ln.s
+			c.pi = 1
+			c.v = 0.0
+			c.lc = null
+			c.lat = clampf(float(ln.off) - float(ln.seg.r.T.lw) * (ln.k + 0.5), -2.0, 2.0)
+			c.stuck = 0.0
+			_pick_next(c)
+			return
+	if player != null and w.t > 25.0 and Vector2(c.x - player.x, c.z - player.z).length() > 90:
+		c.erase("wreck") # 견인된 셈: 아무 차로에 다시 놓음
+		var sg: Dictionary = all_lanes[rng.randi() % all_lanes.size()]
+		c.seg = sg
+		c.s = 5.0 + rng.randf() * maxf(1.0, sg.L - 10)
+		c.pi = 1
+		c.v = 3.0
+		c.lat = 0.0
+		c.lc = null
+		_pick_next(c)
+		for k in ["body", "glass"]:
+			if m.has_meta(k):
+				(m.get_meta(k) as GeometryInstance3D).set_instance_shader_parameter("dent", Vector4.ZERO)
+
 func _pick_next(c: Dictionary) -> void:
 	var opts := []
 	for m: Dictionary in moves(c.seg):
@@ -911,18 +916,20 @@ func _pick_next(c: Dictionary) -> void:
 # 다른 차가 갈 길(차로 조각, 거기서 s)을 따라 앞으로 40m 안의 차, 사람까지 거리
 func _gap(c: Dictionary, path: Array, player, only_player: bool, lat: float) -> float:
 	var cand := []
+	var fx := sin(c.yaw) if c.has("yaw") else 0.0 # 시험 봇은 방향이 없음 → 거르지 않음
+	var fz := cos(c.yaw) if c.has("yaw") else 0.0
 	if not only_player and c.kind != "amb":
-		for o: Dictionary in ai:
-			if not is_same(o, c) and absf(o.x - c.x) < 46 and absf(o.z - c.z) < 46:
-				cand.append([o.x, o.z, 2.3 if o.kind != "amb" else 2.7, 1.6, true])
+		for o: Dictionary in ai: # 내 뒤에 있는 차는 앞길에 올 수 없음
+			if not is_same(o, c) and absf(o.x - c.x) < 46 and absf(o.z - c.z) < 46 and (o.x - c.x) * fx + (o.z - c.z) * fz > -3.0:
+				cand.append([o.x, o.z, o.hl, 1.6, true])
 	if player != null and absf(player.x - c.x) < 50 and absf(player.z - c.z) < 50:
 		for f in [-0.6, 1.35, 3.3]:
 			var m: Dictionary = player.at(f, 0)
 			cand.append([m.x, m.z, 2.3 if f == 1.35 else 0.35, 1.7, true])
 	if not only_player:
 		for p: Dictionary in peds:
-			if p.walking and absf(p.x - c.x) < 46 and absf(p.z - c.z) < 46:
-				cand.append([p.x, p.z, 0.3, 1.6, false])
+			if p.walking and absf(p.x - c.x) < 46 and absf(p.z - c.z) < 46 and (p.x - c.x) * fx + (p.z - c.z) * fz > -3.0:
+				cand.append([p.x, p.z, 0.3, 2.4, false]) # 횡단보도 위 사람은 옆 차로에 있어도 기다림 (돌 때 차 옆구리가 지나는 자리까지)
 	for e: Dictionary in extra_obs:
 		if absf(e.x - c.x) < 46 and absf(e.z - c.z) < 46:
 			cand.append([e.x, e.z, e.get("half", 0.3), e.get("lat", 1.6), false])
@@ -934,7 +941,10 @@ func _gap(c: Dictionary, path: Array, player, only_player: bool, lat: float) -> 
 		var seg: Dictionary = pf[0]
 		var from: float = pf[1]
 		var P: Array = seg.pts
-		for i in range(0, P.size()):
+		var i0 := clampi(int(from) - 1, 0, P.size() - 1) # 점이 약 1m 간격이라 처음부터 훑지 않고 그 근처에서 시작
+		while i0 > 0 and P[i0].s > from:
+			i0 -= 1
+		for i in range(i0, P.size()):
 			var q: Dictionary = P[i]
 			if q.s < from:
 				continue
@@ -957,7 +967,7 @@ func _gap(c: Dictionary, path: Array, player, only_player: bool, lat: float) -> 
 
 func tick(dt: float, t: float, player) -> void:
 	acc += dt
-	if acc < 1.0 / 60.0:
+	if acc < 1.0 / 60.0 - 0.0005:
 		return
 	_tick_ai(acc, t, player)
 	_tick_peds(acc, t, player)
@@ -973,6 +983,9 @@ func _tick_ai(dt: float, t: float, player) -> void:
 		if c.kind == "amb":
 			amb_list.append(c)
 	for c: Dictionary in ai:
+		if c.has("wreck"):
+			_tick_wreck(c, dt, t, player)
+			continue
 		var seg: Dictionary = c.seg
 		var on_con: bool = seg.con
 		c.age += dt
@@ -1054,11 +1067,16 @@ func _tick_ai(dt: float, t: float, player) -> void:
 							_lane_change(c, 1 - seg.k, 1.4)
 					elif (pl.off - seg.r.T.lw * 0.5 > 0.45 and absf(player.v) < 7.0) or (c.lat < -1.0 and ahead > -12) or stuck_behind: # 12m 넘게 앞선 뒤에 차로로 돌아옴
 						lat_target = -2.4
-		var gap := _gap(c, path, player, c.stuck > 10 or amb, c.lat)
+		# 앞 거리: 가까우면(15m 안) 매번, 멀면 세 번에 한 번만 다시 잼 (다른 차 22대를 매번 재면 무거움)
+		c.gap_n = int(c.get("gap_n", rng.randi() % 3)) + 1
+		var gap: float = c.get("gap", 1e9)
+		if gap < 15.0 or c.gap_n % 3 == 0 or amb or c.has("cut"):
+			gap = _gap(c, path, player, c.stuck > 10 or amb, c.lat)
+			c.gap = gap
 		if stop_d < 1e8:
 			want_v = minf(want_v, sqrt(2 * 3 * maxf(0.0, stop_d - 0.5)))
 		if gap < 1e8:
-			want_v = minf(want_v, sqrt(2 * 3 * maxf(0.0, gap - 2.2)))
+			want_v = minf(want_v, sqrt(2 * 3 * maxf(0.0, gap - 2.2 - (c.hl - 2.3))))
 		if on_con and seg.turn != "s":
 			want_v = minf(want_v, 5.0)
 		if c.force > 0: # 급정거 (돌발 상황)
@@ -1112,13 +1130,16 @@ func _tick_ai(dt: float, t: float, player) -> void:
 		var m: Node3D = c.mesh
 		m.position = Vector3(c.x, 0, c.z)
 		m.rotation.y = c.yaw
-		(m.get_meta("tail") as MeshInstance3D).material_override = Kit.TAIL_ON if c.brake or (night) else Kit.TAIL_OFF
-		(m.get_meta("head") as MeshInstance3D).material_override = Kit.HEAD_ON if night or amb else Kit.HEAD_OFF
 		var blink_on := fmod(t, 0.76) < 0.38
-		var bl: Array = m.get_meta("blink")
-		if bl.size() == 2:
-			(bl[0] as MeshInstance3D).material_override = Kit.BLINK_ON if (c.blink == 1 or c.yield) and blink_on else Kit.BLINK_OFF
-			(bl[1] as MeshInstance3D).material_override = Kit.BLINK_ON if (c.blink == 2 or c.yield) and blink_on else Kit.BLINK_OFF
+		var key := int(c.brake or night) + 2 * int(night or amb) + 4 * int((c.blink == 1 or c.yield) and blink_on) + 8 * int((c.blink == 2 or c.yield) and blink_on)
+		if key != c.get("lamp_key", -1): # 바뀔 때만 재질을 바꿈
+			c.lamp_key = key
+			(m.get_meta("tail") as MeshInstance3D).material_override = Kit.TAIL_ON if key & 1 else Kit.TAIL_OFF
+			(m.get_meta("head") as MeshInstance3D).material_override = Kit.HEAD_ON if key & 2 else Kit.HEAD_OFF
+			var bl: Array = m.get_meta("blink")
+			if bl.size() == 2:
+				(bl[0] as MeshInstance3D).material_override = Kit.BLINK_ON if key & 4 else Kit.BLINK_OFF
+				(bl[1] as MeshInstance3D).material_override = Kit.BLINK_ON if key & 8 else Kit.BLINK_OFF
 		if amb:
 			var bars: Array = m.get_meta("bars")
 			var ph := fmod(t, 0.5) < 0.25
@@ -1191,7 +1212,19 @@ func _walk_ok(cr: Dictionary, t: float) -> bool:
 	return w.contains(cr.d) and L.get("left", 99.0) > 6
 
 func _tick_peds(dt: float, t: float, player) -> void:
+	_tick_walkers(dt, player)
+	ped_t -= dt
+	for h: Array in (ped_heads if ped_t <= 0.0 else []): # 보행자 신호등 (0.25초마다)
+		var go := _walk_ok(h[0], t)
+		if go != h[3]:
+			h[3] = go
+			(h[1] as MeshInstance3D).material_override = Kit.PED_R_OFF if go else Kit.PED_R_ON
+			(h[2] as MeshInstance3D).material_override = Kit.PED_G_ON if go else Kit.PED_G_OFF
+	if ped_t <= 0.0:
+		ped_t = 0.25
 	for p: Dictionary in peds:
+		if p.m.has_meta("down"): # 차에 치인 사람은 그대로 (Crash가 움직임)
+			continue
 		var cr: Dictionary = p.cr
 		if not p.walking:
 			p.wait -= dt
@@ -1214,18 +1247,60 @@ func _tick_peds(dt: float, t: float, player) -> void:
 			var a: Dictionary = cr.ends[p.side]
 			var b: Dictionary = cr.ends[1 - p.side]
 			var L := Vector2(b.x - a.x, b.z - a.z).length()
-			p.t += p.sp * dt
+			# 바로 앞(1m)에 움직이는 차가 있으면 멈춰 섬 (차 옆구리로 걸어 들어가지 않음)
+			var dirv := Vector2(b.x - a.x, b.z - a.z) / L
+			var ahead := {"x": p.x + dirv.x * 0.9, "z": p.z + dirv.y * 0.9, "hw": 0.3, "hl": 0.3, "r": 0.0}
+			var blocked := false
+			if player != null and absf(player.v) > 0.5 and absf(player.x - p.x) < 8 and absf(player.z - p.z) < 8: # 선 차 앞은 그냥 지나감
+				var pb: Dictionary = player.box()
+				pb.hw += 0.3
+				pb.hl += 0.3
+				blocked = Kit.obb_hit(pb, ahead) != null
+			if not blocked:
+				p.t += p.sp * dt
 			var k := minf(1.0, p.t / L)
 			p.x = lerpf(a.x, b.x, k) + cr.ax.x * p.off
 			p.z = lerpf(a.z, b.z, k) + cr.ax.y * p.off
 			p.m.rotation.y = atan2(b.x - a.x, b.z - a.z)
-			var legs: Array = p.m.get_meta("legs")
-			for i in 2:
-				(legs[i] as Node3D).rotation.x = sin(p.t * 6 + i * PI) * 0.5
+			Models.walk_pose(p.m, p.t * 6)
 			if k >= 1:
 				p.walking = false
 				p.side = 1 - p.side
 				p.wait = 6 + rng.randf() * 25
-				for l: Node3D in legs:
-					l.rotation.x = 0
+				Models.walk_pose(p.m, 0.0)
 		p.m.position = Vector3(p.x, 0, p.z)
+
+# 보도를 걷는 사람: 길 따라 오가다 끝에서 돌아섬. 운전자 차가 보도로 올라오면 부딪힐 수 있음
+func add_walker(r: Dictionary, sd: int, s: float, m: Node3D) -> void:
+	walkers.append({"r": r, "sd": sd, "s": s, "dir": 1.0 if rng.randf() < 0.5 else -1.0, "sp": 1.0 + rng.randf() * 0.5, "m": m, "o": r.T.hw + 0.9 + rng.randf() * 1.3, "ph": rng.randf() * 6.0, "x": 0.0, "z": 0.0, "walking": true})
+
+func _tick_walkers(dt: float, player) -> void:
+	for w: Dictionary in walkers:
+		var m: Node3D = w.m
+		if m.has_meta("down"):
+			continue
+		var r: Dictionary = w.r
+		var near: bool = player == null or (absf(w.x - player.x) < 120 and absf(w.z - player.z) < 120)
+		w.s += w.dir * w.sp * dt
+		var lo: float = (r.cut.R0 if w.sd > 0 else r.cut.L0) + 1.0
+		var hi: float = r.L - (r.cut.R1 if w.sd > 0 else r.cut.L1) - 1.0
+		if w.s < lo or w.s > hi:
+			w.dir = -w.dir
+			w.s = clampf(w.s, lo, hi)
+		if not near and w.x != 0.0:
+			continue
+		var P: Array = r.pts # 점이 1m 간격이라 s로 바로 찾음
+		var i := clampi(int(w.s), 0, P.size() - 2)
+		while i > 0 and P[i].s > w.s:
+			i -= 1
+		while i < P.size() - 2 and P[i + 1].s < w.s:
+			i += 1
+		var q: Dictionary = P[i]
+		var p := Kit.off_pt(q, w.sd * w.o)
+		w.x = p.x
+		w.z = p.z
+		m.position = Vector3(p.x, 0.12, p.z)
+		m.rotation.y = q.yaw + (0.0 if w.dir > 0 else PI)
+		w.ph += dt * w.sp * 5.2
+		if player == null or (absf(w.x - player.x) < 60 and absf(w.z - player.z) < 60): # 팔다리는 가까울 때만
+			Models.walk_pose(m, w.ph)

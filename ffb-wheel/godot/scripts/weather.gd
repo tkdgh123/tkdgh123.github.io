@@ -41,11 +41,11 @@ func setup(c: City) -> void:
 	sun.rotation = Vector3(deg_to_rad(-48), deg_to_rad(-35), 0)
 	sun.shadow_enabled = true
 	sun.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS
-	sun.directional_shadow_max_distance = 70.0
+	sun.directional_shadow_max_distance = 55.0
 	add_child(sun)
 	rain = _particles(7000, 1.1, Vector3(32, 1, 32), 17.0, 21.0, Vector3(0, -9.8, 0), Vector2(0.022, 0.75), Color(0.78, 0.82, 0.9, 0.32), true)
 	snowp = _particles(4500, 7.0, Vector3(36, 2, 36), 0.8, 1.6, Vector3(0, -0.35, 0), Vector2(0.075, 0.075), Color(1, 1, 1, 0.92), false)
-	for i in 10:
+	for i in 7:
 		var o := OmniLight3D.new()
 		o.light_color = Color(1.0, 0.82, 0.55)
 		o.light_energy = 9.0
@@ -175,6 +175,8 @@ func apply() -> void:
 	city.night = night
 	city.puddle_node.visible = kind == "rain"
 	city.bld_mat.set_shader_parameter("night", 1.0 if night else 0.0)
+	for m: ShaderMaterial in city.sign_mats:
+		m.set_shader_parameter("night", 1.0 if night else 0.0)
 	city.lamp_head_mat.emission_enabled = night
 	city.lamp_head_mat.emission = Color(1.0, 0.86, 0.6)
 	city.lamp_head_mat.emission_energy_multiplier = 3.0
@@ -201,6 +203,8 @@ func tick(dt: float, at: Vector3, fwd: Vector3) -> void:
 			pool_t = 0.35
 			var near := []
 			for L: Dictionary in city.lamps:
+				if L.get("dead", false):
+					continue
 				var d: float = Vector2(L.x - ahead.x, L.z - ahead.z).length_squared()
 				if d < 90 * 90:
 					near.append([d, L])

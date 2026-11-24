@@ -37,6 +37,8 @@ var lim_note: Label
 var gap_l: Label
 var rec_l: Label
 var allow_btn := {}
+var map_btn := {}
+var seat_sl := {}
 var snaps := []
 var log := []            # 시험에서 읽음: 알림과 결과
 
@@ -356,6 +358,28 @@ func _build_panel() -> void:
 	var sub := _lab(v, "비, 눈, 밤길과 당황하기 쉬운 일을 연습해요. 켜 둔 상황은 달리다 보면 저절로 일어나요(숫자 키로 바로도). 결과는 위험이 나타나기 전에 미리 속도를 줄였는지를 가장 먼저 봐요.", 15, MUTED)
 	sub.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	sub.custom_minimum_size.x = 820
+	# 지도
+	_lab(v, "지도", 20, INK)
+	var mr := HBoxContainer.new()
+	mr.add_theme_constant_override("separation", 10)
+	v.add_child(mr)
+	var mg := ButtonGroup.new()
+	for k in City.THEMES:
+		var th: Dictionary = City.THEMES[k]
+		var b := Button.new()
+		b.text = String(th.name)
+		b.toggle_mode = true
+		b.button_group = mg
+		b.custom_minimum_size = Vector2(150, 40)
+		b.tooltip_text = String(th.desc)
+		b.toggled.connect(func(on: bool) -> void:
+			if on:
+				_fire("map", k))
+		mr.add_child(b)
+		map_btn[k] = b
+	var md := _lab(v, "강남역: 유리 빌딩, 간판, 버스와 택시가 많은 큰 사거리.  숭실대입구: 상도로와 정문, 언덕 위 빌라, 좁은 동네길, 마을버스. 바꾸면 도시를 새로 지어요.", 13, MUTED)
+	md.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	md.custom_minimum_size.x = 820
 	# 날씨
 	_lab(v, "날씨", 20, INK)
 	var wr := HBoxContainer.new()
@@ -430,6 +454,28 @@ func _build_panel() -> void:
 	var atip := _lab(v, "위험이 보인 뒤 이만큼 안에 브레이크를 세게 밟으면 멈출 수 있는 거리에서 일어나요. 익숙해지면 한 단계씩 줄여요.", 13, MUTED)
 	atip.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	atip.custom_minimum_size.x = 820
+	# 운전석 의자 (C로 운전석 시점)
+	_lab(v, "운전석 의자", 20, INK)
+	var sg := GridContainer.new()
+	sg.columns = 3
+	sg.add_theme_constant_override("h_separation", 12)
+	v.add_child(sg)
+	for e in [["h", "높이", Cockpit.SEAT_LIM.h, 0.005, "낮게", "높게"], ["f", "앞뒤", Cockpit.SEAT_LIM.f, 0.005, "뒤로", "앞으로"], ["r", "등받이", Cockpit.SEAT_LIM.r, 0.5, "세움", "눕힘"]]:
+		_lab(sg, e[1], 15, INK).custom_minimum_size.x = 70
+		var sl := HSlider.new()
+		sl.min_value = e[2][0]
+		sl.max_value = e[2][1]
+		sl.step = e[3]
+		sl.custom_minimum_size = Vector2(420, 28)
+		sl.focus_mode = Control.FOCUS_NONE
+		var key: String = e[0]
+		sl.value_changed.connect(func(val: float) -> void: _fire("seat", key, val))
+		sg.add_child(sl)
+		seat_sl[key] = sl
+		_lab(sg, "%s ↔ %s" % [e[4], e[5]], 13, MUTED)
+	var stip := _lab(v, "의자를 높이면 보닛과 길이 더 보이고, 낮추면 앞이 덜 보여요. 운전석 시점에서 T G 키" + " (간단 조작이면 마우스 휠)로도 높이를 바꿔요. 간단 조작일 때는 마우스로 고개를 돌려 옆과 사각지대를 봐요.", 13, MUTED)
+	stip.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	stip.custom_minimum_size.x = 820
 	# 조작 (아래에 늘 보임)
 	outer.add_child(HSeparator.new())
 	simple_c = _check(outer, "간단 조작 (WASD, 기어 없음)")
@@ -454,6 +500,14 @@ func _on_allow_btn(on: bool, a: float) -> void:
 func set_allow(a: float) -> void: # 묶음 단추는 코드로 누르면 다른 단추가 안 풀려서 모두 직접 정함
 	for k in allow_btn:
 		allow_btn[k].set_pressed_no_signal(absf(k - a) < 0.01)
+
+func set_map(k: String) -> void:
+	for m in map_btn:
+		map_btn[m].set_pressed_no_signal(m == k)
+
+func set_seat(st: Dictionary) -> void:
+	for k in seat_sl:
+		seat_sl[k].set_value_no_signal(float(st[k]))
 
 func set_record_text(t: String) -> void:
 	rec_l.text = t
@@ -484,8 +538,8 @@ func set_check(id: String, on: bool) -> void:
 
 func set_simple(on: bool) -> void:
 	simple_c.set_pressed_no_signal(on)
-	keys_l.text = ("W 앞으로   S 브레이크 (멈춘 뒤 다시 누르면 뒤로)   A D 핸들   Q E 방향지시등   H 비상등   F 전조등   C 시점   방향키도 돼요" if on
-		else "↑ 가속   ↓ 브레이크   ← → 핸들   P R N D 기어   Q E 방향지시등   H 비상등   Space 주차 브레이크   F 전조등   C 시점")
+	keys_l.text = ("W 앞으로   S 브레이크 (멈춘 뒤 다시 누르면 뒤로)   A D 핸들   Q E 방향지시등   H 비상등   F 전조등   V 와이퍼   C 시점(운전석에선 마우스로 고개, 휠로 의자 높이)   Backspace 차 고치기" if on
+		else "↑ 가속   ↓ 브레이크   ← → 핸들   P R N D 기어   Q E 방향지시등   H 비상등   Space 주차 브레이크   F 전조등   V 와이퍼   C 시점   T G 의자 높이   Backspace 차 고치기")
 
 func set_weather_ui(kind: String, fog: bool, night: bool) -> void:
 	for k in wbtn:
@@ -556,7 +610,7 @@ func flash(txt: String, secs := 1.6) -> void:
 	get_tree().create_timer(secs).timeout.connect(func() -> void: big_l.visible = false)
 
 func update(s: Dictionary) -> void:
-	top_l.text = "운전 연습   %s   상황 %d개 켬   Tab 설정" % [s.weather, s.n_on]
+	top_l.text = "운전 연습   %s   %s   상황 %d개 켬   Tab 설정" % [s.get("map", ""), s.weather, s.n_on]
 	spd_l.text = str(int(round(s.kmh)))
 	if s.simple:
 		gear_l.text = "[color=#f2f1ec][bgcolor=#2b44a6] 후진 [/bgcolor][/color]" if s.gear == "R" else ""

@@ -262,7 +262,7 @@ func _start_child(manual: bool) -> bool:
 		var w := Kit.cyl(van, 0.33, 0.24, p, Kit.mat(Color(0.08, 0.08, 0.08), 0.9), 12)
 		w.rotation.z = PI / 2
 	var vbox := {"x": vp.x, "z": vp.z, "hw": 0.98, "hl": 2.45, "r": sp.yaw}
-	city().boxes.append(vbox)
+	city().add_box(vbox)
 	var kid := _person(Color(0.98, 0.78, 0.12), 0.68)
 	kid.position = _pt(sp, hw - 0.2, 3.2)
 	kid.rotation.y = sp.yaw - PI / 2
@@ -288,6 +288,11 @@ func _start_child(manual: bool) -> bool:
 func _tick_child(dt: float, t: float) -> void:
 	var st: Dictionary = act.child
 	st.age += dt
+	if st.get("hit", false): # 부딪힌 뒤: 사람은 Crash가 움직이고, 10초 뒤 정리
+		st.hit_t = st.get("hit_t", 0.0) + dt
+		if st.hit_t > 10.0:
+			_end_child(st, true)
+		return
 	var kid: Node3D = st.who
 	var van: Node3D = st.van
 	var rel := _rel(kid.position.x, kid.position.z)
@@ -369,7 +374,7 @@ func _end_child(st: Dictionary, done) -> void:
 	st.who.queue_free()
 	if st.ball != null:
 		(st.ball as Node3D).queue_free()
-	city().boxes.erase(st.vbox)
+	city().del_box(st.vbox)
 	(st.van as Node3D).queue_free()
 	act.erase("child")
 
@@ -397,11 +402,8 @@ func people() -> Array:
 	return out
 
 func _legs(o: Node3D, ph: float) -> void:
-	var legs: Array = o.get_meta("legs")
-	for i in 2:
-		(legs[i] as Node3D).rotation.x = sin(ph + i * PI) * 0.6 if ph != 0 else 0.0
+	Models.walk_pose(o, ph)
 
-# ── 무단횡단: 길가에 서서 휴대전화를 보던 사람이 길로 들어섬 (안 건널 때도 있음) ──
 func _start_jay(manual: bool) -> bool:
 	if absf(car().v) < (1.0 if manual else 2.5):
 		return false
@@ -423,6 +425,12 @@ func _start_jay(manual: bool) -> bool:
 func _tick_jay(dt: float, t: float) -> void:
 	var st: Dictionary = act.jay
 	st.age += dt
+	if st.get("hit", false):
+		st.hit_t = st.get("hit_t", 0.0) + dt
+		if st.hit_t > 10.0:
+			(st.who as Node3D).queue_free()
+			act.erase("jay")
+		return
 	var who: Node3D = st.who
 	var rel := _rel(who.position.x, who.position.z)
 	_react(st, t)

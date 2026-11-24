@@ -167,11 +167,13 @@ static func floor_text(parent: Node3D, txt: String, x: float, z: float, yaw: flo
 
 # ── 표지판: 기둥 + 얼굴. face = 표지가 바라보는 방향(yaw) ──
 static var POLE := mat(Color(0.56, 0.56, 0.55), 0.5, 0.0, 0.3)
+static var LAST_SIGN: Node3D # 방금 세운 표지판 (부딪히면 넘어뜨리려고)
 static func sign_post(parent: Node3D, kind: String, arg: String, x: float, z: float, face: float, h := 2.2, size := 0.75) -> Node3D:
 	var g := Node3D.new()
 	g.position = Vector3(x, 0, z)
 	g.rotation.y = face
 	parent.add_child(g)
+	LAST_SIGN = g
 	cyl(g, 0.045, h, Vector3(0, h / 2, 0), POLE, 8)
 	var cy := h + size * 0.1
 	match kind:
@@ -259,55 +261,12 @@ static func set_signal(lamps: Array, st: Dictionary) -> void:
 		var on := int(st.get(keys[i], 0)) == 1
 		m.material_override = m.get_meta("on") if on else m.get_meta("off")
 
-# ── 사람: 몸통 캡슐 + 머리 + 다리 ──
+# ── 사람, 차 모양은 Models에 ──
 static func person(parent: Node3D, col: Color, scale := 1.0) -> Node3D:
-	var o := Node3D.new()
-	parent.add_child(o)
-	o.scale = Vector3.ONE * scale
-	var cap := CapsuleMesh.new()
-	cap.radius = 0.2
-	cap.height = 1.15
-	cap.radial_segments = 10
-	cap.rings = 3
-	var b := MeshInstance3D.new()
-	b.mesh = cap
-	b.material_override = mat(col, 0.8)
-	b.position.y = 0.95
-	o.add_child(b)
-	var hs := SphereMesh.new()
-	hs.radius = 0.15
-	hs.height = 0.3
-	hs.radial_segments = 12
-	hs.rings = 6
-	var hd := MeshInstance3D.new()
-	hd.mesh = hs
-	hd.material_override = mat(Color(0.91, 0.83, 0.75), 0.8)
-	hd.position.y = 1.62
-	o.add_child(hd)
-	var legs := []
-	for s in [-1, 1]:
-		var leg := box(o, Vector3(0.13, 0.55, 0.13), Vector3(s * 0.1, 0.28, 0), mat(Color(0.16, 0.17, 0.19)), true)
-		legs.append(leg)
-	o.set_meta("legs", legs)
-	return o
+	return Models.person(parent, col, scale)
 
-# ── 다른 차 모양 (꼬리등은 브레이크 때 켜짐, 전조등은 밤에) ──
 static func car_mesh(parent: Node3D, col: Color) -> Node3D:
-	var g := Node3D.new()
-	parent.add_child(g)
-	box(g, Vector3(1.8, 0.55, 4.5), Vector3(0, 0.62, 0), mat(col, 0.45))
-	box(g, Vector3(1.56, 0.48, 2.1), Vector3(0, 1.12, -0.2), mat(Color(0.16, 0.17, 0.2), 0.25))
-	for p in [Vector3(0.8, 0.31, 1.35), Vector3(-0.8, 0.31, 1.35), Vector3(0.8, 0.31, -1.35), Vector3(-0.8, 0.31, -1.35)]:
-		var w := cyl(g, 0.31, 0.22, p, mat(Color(0.08, 0.08, 0.08), 0.9), 12)
-		w.rotation.z = PI / 2
-	var tail := box(g, Vector3(1.5, 0.1, 0.04), Vector3(0, 0.78, -2.26), mat(Color(0.35, 0.08, 0.06), 0.4), false)
-	var head := box(g, Vector3(1.4, 0.1, 0.04), Vector3(0, 0.72, 2.26), mat(Color(0.5, 0.5, 0.45), 0.4), false)
-	var bl := box(g, Vector3(0.14, 0.1, 0.04), Vector3(0.82, 0.72, 2.27), mat(Color(0.4, 0.25, 0.05), 0.4), false)
-	var br := box(g, Vector3(0.14, 0.1, 0.04), Vector3(-0.82, 0.72, 2.27), mat(Color(0.4, 0.25, 0.05), 0.4), false)
-	g.set_meta("tail", tail)
-	g.set_meta("head", head)
-	g.set_meta("blink", [bl, br])
-	return g
+	return Models.car(parent, col)
 
 static var TAIL_ON := mat(Color(1.0, 0.16, 0.1), 0.4, 3.0)
 static var TAIL_OFF := mat(Color(0.35, 0.08, 0.06), 0.4)
@@ -315,6 +274,10 @@ static var HEAD_ON := mat(Color(1.0, 0.97, 0.85), 0.3, 5.0)
 static var HEAD_OFF := mat(Color(0.5, 0.5, 0.45), 0.4)
 static var BLINK_ON := mat(Color(1.0, 0.63, 0.1), 0.3, 4.0)
 static var BLINK_OFF := mat(Color(0.4, 0.25, 0.05), 0.4)
+static var PED_R_ON := mat(Color(1.0, 0.18, 0.12), 0.4, 3.5)
+static var PED_R_OFF := mat(Color(0.25, 0.06, 0.05), 0.4)
+static var PED_G_ON := mat(Color(0.2, 1.0, 0.55), 0.4, 3.5)
+static var PED_G_OFF := mat(Color(0.05, 0.22, 0.12), 0.4)
 
 # 땅 위 직사각형(가운데, 반폭, 반길이, 각도) 두 개가 겹치면 밀어낼 벡터, 아니면 null (분리축)
 static func obb_hit(a: Dictionary, b: Dictionary):

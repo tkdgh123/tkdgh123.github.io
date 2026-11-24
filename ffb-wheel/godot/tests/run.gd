@@ -25,6 +25,7 @@ func fresh(seed: int, react: float, kind := "clear", fog := false, night := fals
 	var b := Bot.new(main, react, seed)
 	bot_ref = b # Callable은 RefCounted를 붙잡지 않음
 	main.bot = b.drive
+	main.recover() # 앞 시험에서 부딪혀 벽에 붙어 있으면 봇은 후진을 못 하니 길 위에서 새로 시작
 	main.set_weather(kind, fog, night)
 	for id in main.events.on:
 		main.events.set_on(id, false)
@@ -70,10 +71,21 @@ func situation(id: String, seed: int, react: float, kind := "clear", setup := Ca
 		setup.call(b)
 	var started := false
 	var tries := 0
+	var still := 0
 	while not started and tries < 90:
 		await sim(1.0)
 		tries += 1
 		started = main.events.trigger(id, false)
+		still = still + 1 if absf(main.car.v) < 0.5 else 0
+		if still > 12: # 봇은 장애물을 비켜 가지 못하니 오래 서 있으면 다른 차로로 옮김
+			var lanes: Array = main.city.all_lanes
+			var ln: Dictionary = lanes[(seed * 7 + tries) % lanes.size()]
+			place(ln, minf(15.0, ln.L * 0.3))
+			b.seg = {}
+			still = 0
+		if args.has("dbg") and tries % 10 == 1:
+			var q = main.city.road_at(main.car.x, main.car.z)
+			print("  try %d v %.1f x %.0f z %.0f 길 %s inp %s act %s paused %s" % [tries, main.car.v * 3.6, main.car.x, main.car.z, q.r.type if q else "-", main.inp, main.events.act.keys(), main.paused])
 	var t0: float = main.sim_t
 	if started:
 		var guard := 0
@@ -104,6 +116,7 @@ func _run() -> void:
 				if a.v > 0.5:
 					moving += 1
 			print("DRIVE %s: 90초 %.0fm, 부딪힘 %d, 다른 차 움직임 %d/%d, 결과 %s" % [kind, dist, crashes(), moving, main.city.ai.size(), results()])
+			print("  hits ", main.hits)
 	if case in ["all", "sit"]:
 		for id in ["child", "jay", "brake", "cut"]:
 			for seed in [11, 12, 13]:

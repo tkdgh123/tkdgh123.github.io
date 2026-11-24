@@ -179,6 +179,11 @@ func drive(dt: float) -> Dictionary:
 					want = minf(want, 5.0)
 	var fake := {"x": car.x, "z": car.z, "kind": "car", "stuck": 0.0}
 	var gap: float = _city()._gap(fake, path, null, false, lat)
+	for pd: Dictionary in _city().peds: # 횡단보도를 건너는 사람: 차로 선이 아니라 내 차 앞쪽을 직접 봄 (돌 때 차로 선 밖으로 지나는 자리)
+		if pd.walking:
+			var rq: Vector2 = main.events._rel(pd.x, pd.z)
+			if rq.x > -0.5 and rq.x < 15.0 and absf(rq.y) < 2.2:
+				gap = minf(gap, maxf(rq.x, 0.0) - 0.8)
 	for who: Node3D in main.events.people(): # 길에 들어선 사람은 미리 봄 (내 길 옆 4.5m 안)
 		var rp: Vector2 = main.events._rel(who.position.x, who.position.z)
 		if rp.x > 0 and absf(rp.y - lat) < 4.5:
