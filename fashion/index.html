@@ -571,6 +571,14 @@ main{padding-bottom:120px}
 @media (max-width:560px){.kr-grid{grid-template-columns:1fr}}
 .kr-st{flex-wrap:wrap;margin-top:6px}.kr-st small{font-size:11px;color:var(--faint);margin-left:2px}
 .kr-foot{display:flex;justify-content:center;padding:34px 0 10px}.kr-more span{font-size:13px;color:var(--faint);margin-left:8px;font-weight:500}
+/* 상품명 만들기 */
+.bd-slots{display:flex;flex-wrap:wrap;gap:8px;min-height:52px;margin:6px 0 18px;padding:10px 0 12px;border-bottom:2px solid var(--ink)}
+.bd-s{min-width:72px;height:44px;background:var(--tile);display:inline-flex;align-items:center;padding:0 14px;font:inherit;font-size:17px;font-weight:700;border:0;letter-spacing:-.03em}
+.bd-s.on{background:var(--ink);color:#fff;cursor:pointer}
+.bd-slots.ok{border-color:var(--ok)}.bd-slots.ok .bd-s.on{background:var(--ok)}
+.bd-slots.no{border-color:var(--no)}.bd-slots.no .bd-s.on{background:var(--no)}
+#bd-pool .op:disabled{opacity:.3}
+.rule-fb .strip{margin:14px 0 6px}
 </style>
 </head>
 <body>
@@ -749,6 +757,44 @@ function nameSet() {
     return { id: p.id, type: "parse", t: n.t, parts: n.parts, ask: kind(byId[p.id]), last: n.parts.map(x => x.id) };
   });
 }
+// 상품명 만들기: 낱말 조각을 눌러 순서대로. 색은 맨 끝, 옷 종류는 그 바로 앞이면 맞음(꾸미는 말끼리 순서는 쇼핑몰마다 달라요)
+function buildSet() {
+  return shuffle(N.filter(n => n.parts.length >= 3 && n.parts.every(p => byId[p.id])).slice()).slice(0, 10).map(n => {
+    let pool = shuffle(n.parts.slice()); for (let k = 0; k < 5 && pool.every((p, i) => p.id === n.parts[i].id); k++) pool = shuffle(n.parts.slice());
+    const noun = n.parts.filter(p => kind(byId[p.id]) !== "색").pop();
+    return { type: "build", id: noun.id, t: n.t, parts: n.parts, pool, pick: [] };
+  });
+}
+function buildOk(q) {
+  const col = p => kind(byId[p.id]) === "색", tail = q.parts.filter(col).length, a = q.pick, b = q.parts;
+  const n = b.length, k = n - tail;
+  for (let i = k; i < n; i++) if (!col(a[i])) return false;
+  if (a[k - 1].id !== b[k - 1].id) return false;
+  return true;
+}
+const bdSlots = q => q.parts.map((_, i) => q.pick[i] ? `<button class="bd-s on" data-bds="${i}">${esc(q.pick[i].w)}</button>` : `<span class="bd-s"></span>`).join("");
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-bd],[data-bds]"); if (!b || !Q || Q.done) return;
+  const q = Q.list[Q.i]; if (q.type !== "build") return;
+  if (b.dataset.bd) { if (q.pick.some(p => p.id === b.dataset.bd)) return; q.pick.push(q.parts.find(p => p.id === b.dataset.bd)); b.disabled = true; }
+  else { const [x] = q.pick.splice(+b.dataset.bds, 1); const c = document.querySelector(`[data-bd="${x.id}"]`); if (c) c.disabled = false; }
+  $("#bd-slots").innerHTML = bdSlots(q);
+  if (q.pick.length === q.parts.length) buildAnswer(q);
+});
+function buildAnswer(q) {
+  Q.done = true; const ok = buildOk(q);
+  if (ok) Q.right++; else Q.wrong.push(null);
+  tick(ok, false);
+  $("#bd-pool").classList.add("done"); $("#bd-slots").classList.add(ok ? "ok" : "no");
+  const same = q.pick.every((p, i) => p.id === q.parts[i].id);
+  $("#fb").innerHTML = `<div class="fb one rule-fb"><div><p class="r ${ok ? "ok" : "no"}">${ok ? "맞았어요" : "아쉬워요"}</p>
+    <p>쇼핑몰에 적힌 이름은 <b>${esc(q.t)}</b>${batchim(q.t) ? "이에요" : "예요"}.${ok && !same ? " 꾸미는 말끼리는 순서가 바뀌어도 돼요." : ""}</p>
+    <p class="sub">상품명은 꾸미는 말(핏, 디테일, 소재)을 앞에, 옷 종류를 그 뒤에, 색을 맨 끝에 붙여요.</p>
+    <div class="strip">${q.parts.map(p => `<figure>${ph(byId[p.id], true, false)}<figcaption>${esc(p.w)}<small>${esc(kind(byId[p.id]))}</small></figcaption></figure>`).join("")}</div>
+    <button class="btn solid" id="q-next">${Q.i + 1 < Q.list.length ? "다음" : "결과 보기"}</button></div></div>`;
+  $("#q-next").focus({ preventScroll: true });
+  $("#fb").scrollIntoView({ block: "nearest" });
+}
 // 코디 규칙: 같은 규칙의 좋은 예와 피할 예 가운데 맞는 쪽 고르기
 function ruleSet() {
   const by = Object.fromEntries(K.r.map(r => [r.id, r])), shots = K.f.filter(f => f.shot && f.shot.yes);
@@ -792,7 +838,7 @@ const credit = ps => `<p class="credit${ps.length > 1 ? " many" : ""}">사진 ${
 // 섞어서: 한 판 안에서 문제 종류를 바꿔 가며
 function mixSet() {
   const a = pickSet(null, ""), out = a.slice(0, 4);
-  if (N.length) out.push(...nameSet().slice(0, 2));
+  if (N.length) out.push(...nameSet().slice(0, 1), ...buildSet().slice(0, 1));
   if (RP.length) out.push(...realSet().slice(0, 2));
   if (K.r.length) out.push(...ruleSet().slice(0, 1));
   if (C.some(c => c.spot)) out.push(...shuffle(partList()).slice(0, 1).map(p => ({ photo: p })));
@@ -819,6 +865,7 @@ function startQuiz(only, scope) {
   const list = scope === "photo" ? findList().slice(0, 10)
     : scope === "part" ? shuffle(partList()).slice(0, 10).map(p => ({ photo: p }))
     : scope === "name" && !only ? nameSet()
+    : scope === "build" ? buildSet()
     : scope === "rule" ? ruleSet()
     : scope === "real" ? realSet()
     : scope === "care" ? careSet() : scope === "mat" ? matSet()
@@ -827,8 +874,8 @@ function startQuiz(only, scope) {
 }
 function quiz() {
   const el = $("#v-quiz");
-  const mode = ["mix", "name", "rule", "real", "part", "photo", "review", "care", "mat"].includes(Q.scope) ? Q.scope : "";
-  const modes = [["mix", "섞어서", 1], ["", "이름 맞히기", 1], ["review", `복습 ${dueIds().length}`, dueIds().length || mode === "review"], ["name", "상품명 뜯어보기", N.length], ["rule", "코디 규칙", K.r.length], ["real", "실제 사진", RP.length], ["part", "부분 누르기", C.some(c => c.spot)], ["photo", "사진에서 찾기", F.length], ["care", "세탁 기호", !!CARE], ["mat", "재질", MT.materials.length]];
+  const mode = ["mix", "name", "build", "rule", "real", "part", "photo", "review", "care", "mat"].includes(Q.scope) ? Q.scope : "";
+  const modes = [["mix", "섞어서", 1], ["", "이름 맞히기", 1], ["review", `복습 ${dueIds().length}`, dueIds().length || mode === "review"], ["name", "상품명 뜯어보기", N.length], ["build", "상품명 만들기", N.length], ["rule", "코디 규칙", K.r.length], ["real", "실제 사진", RP.length], ["part", "부분 누르기", C.some(c => c.spot)], ["photo", "사진에서 찾기", F.length], ["care", "세탁 기호", !!CARE], ["mat", "재질", MT.materials.length]];
   const nav = `<nav class="useg qmode" aria-label="문제 종류">${modes.filter(m => m[2]).map(([k, label]) => `<a href="#quiz${k ? "/" + k : ""}" aria-current="${k === mode}">${label}</a>`).join("")}</nav>` +
     (mode ? "" : `<nav class="seg qunit" aria-label="단원">${[["", "전체"], ...U.map(x => [String(x.u), x.name])].map(([k, label]) => `<a href="#quiz${k ? "/" + k : ""}" aria-current="${String(Q.scope) === k}">${esc(label)}</a>`).join("")}</nav>`);
   if (Q.i >= Q.list.length) {
@@ -861,6 +908,10 @@ function quiz() {
   if (q.type === "pic") {
     el.innerHTML = nav + `<div class="qz split">${head}<div class="q-img">${ph(c, false, false)}</div><div class="qa"><h2>이 사진은 무엇일까요?</h2>
       <div class="ops" id="ops">${q.ops.map((o, k) => `<button class="op" data-op="${o}"><kbd>${k + 1}</kbd>${esc(byId[o].ko)}</button>`).join("")}</div><div id="fb"></div></div></div>`;
+  } else if (q.type === "build") {
+    const main = q.parts.filter(p => kind(byId[p.id]) !== "색").pop();
+    el.innerHTML = nav + `<div class="qz split">${head}<div class="q-img">${ph(byId[main.id], false, false)}</div><div class="qa"><p class="q-kind">상품명 만들기</p><h2>낱말을 눌러 상품명을 순서대로 만들어 보세요</h2>
+      <div class="bd-slots" id="bd-slots">${bdSlots(q)}</div><div class="ops chips" id="bd-pool">${q.pool.map(p => `<button class="op chip" data-bd="${p.id}">${esc(p.w)}</button>`).join("")}</div><div id="fb"></div></div></div>`;
   } else if (q.type === "parse") {
     el.innerHTML = nav + `<div class="qz">${head}<h2>이 상품명에서 <em class="q-key">${esc(q.ask)}</em>${batchim(q.ask) ? "을" : "를"} 알려 주는 말을 눌러 보세요</h2>
       <div class="ops chips" id="ops">${q.parts.map(p => `<button class="op chip" data-op="${p.id}">${esc(p.w)}</button>`).join("")}</div><div id="fb"></div></div>`;
@@ -1385,7 +1436,7 @@ function route() {
   document.querySelector('.tabs a[aria-current="page"]')?.scrollIntoView({ block: "nearest", inline: "nearest" });
   if (view === "read") { if (!$("#rd-in")) readView(); else readRender(); prog(); }
   else if (view === "quiz") {
-    const scope = U.some(x => x.u == arg) || (arg === "name" && N.length) || arg === "mix" || (arg === "rule" && K.r.length) || (arg === "real" && RP.length) || (arg === "photo" && F.length) || arg === "part" || arg === "review" || (arg === "care" && CARE) || (arg === "mat" && MT.materials.length) ? arg : "";
+    const scope = U.some(x => x.u == arg) || (arg === "name" && N.length) || (arg === "build" && N.length) || arg === "mix" || (arg === "rule" && K.r.length) || (arg === "real" && RP.length) || (arg === "photo" && F.length) || arg === "part" || arg === "review" || (arg === "care" && CARE) || (arg === "mat" && MT.materials.length) ? arg : "";
     if (!Q || Q.scope !== scope) startQuiz(null, scope); else quiz();
     prog();
   } else refresh();
