@@ -1098,11 +1098,13 @@ const ruleShots = id => K.f.filter(f => f.shot && f.shot.yes && f.shot.yes.inclu
 
 /* 한국 사람 코디: 인스타그램, 유튜브 공식 퍼가기 + 옷 이름표 */
 function krView(top, el) {
-  const list = KR.filter(k => (!KS.season || k.season === KS.season) && (!KS.sex || k.for === KS.sex));
+  const ok = k => (!KS.season || k.season === KS.season) && (!KS.sex || k.for === KS.sex);
+  const list = KR.filter(ok), ph = LK.filter(l => l.kr && ok(l));
   const frame = k => k.kind === "youtube"
     ? `<div class="kr-yt"><iframe src="https://www.youtube-nocookie.com/embed/${esc(k.code)}${k.start ? "?start=" + k.start : ""}" loading="lazy" title="${esc(k.account)} 영상" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe></div>`
     : `<div class="kr-ig"><iframe src="https://www.instagram.com/p/${esc(k.code)}/embed/" loading="lazy" title="${esc(k.account)} 인스타그램 게시물" scrolling="no"></iframe></div>`;
-  el.innerHTML = top + `<div class="lead"><h1>한국 사람 코디 <span>${list.length}가지</span></h1></div><p class="cmp-say">인스타그램과 유튜브 원래 게시물을 그대로 띄웠어요. 옷 이름과 설명은 따로 달았어요.</p>${seasonSeg(true)}
+  el.innerHTML = top + `<div class="lead"><h1>한국 사람 코디 <span>${list.length + ph.length}가지</span></h1></div><p class="cmp-say">한국에서 찍은 공개 사진(얼굴은 흐리게)과 인스타그램, 유튜브 원래 게시물이에요. 옷 이름과 설명은 따로 달았어요.</p>${seasonSeg(true)}
+    ${ph.length ? `<h2 class="sec-h">한국 거리에서 찍은 사진 ${ph.length}장</h2><div class="lk-grid">${ph.map(l => `<a class="lkc" href="#codi/l-${l.id}"><div class="lkph"><img src="lk/${l.id}.webp" alt="" loading="lazy"></div><div class="lk-tags">${l.pieces.filter(p => ["아우터", "상의", "하의", "신발", "원피스"].includes(p.role)).map(p => `<span>${esc([p.color, p.name].filter(Boolean).join(" "))}</span>`).join("")}</div></a>`).join("")}</div><h2 class="sec-h">인스타그램, 유튜브 ${list.length}개</h2>` : ""}
     <div class="kr-grid">${list.map(k => `<article class="kr-c">${frame(k)}<div class="kr-tx"><p class="kr-who"><b>${esc(k.who)}</b> <a href="${esc(k.url)}" target="_blank" rel="noopener">${esc(k.account)}</a></p><p class="kd-meta">${esc([k.season, k.style, k.for === "여" ? "여자" : "남자", (k.scene || []).join(", ")].filter(Boolean).join("  |  "))}</p><p class="lk-point">${esc(k.point || "")}</p><ul class="lk-pcs">${k.pieces.map(pc => pieceRow(pc)).join("")}</ul></div></article>`).join("") || `<p class="cmp-say">이 조건에 맞는 코디가 아직 없어요.</p>`}</div>`;
 }
 /* 실제 코디: 계절별 실제 사진, 옷마다 이름표 */
