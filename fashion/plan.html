@@ -13,7 +13,7 @@
   --wrap:1180px; --gut:max(16px,4vw);
 }
 *{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
+html{-webkit-text-size-adjust:100%;scrollbar-gutter:stable}
 body{margin:0;background:var(--paper);color:var(--ink);font:400 16px/1.55 "Pretendard Variable",Pretendard,system-ui,"Malgun Gothic",sans-serif;letter-spacing:-.01em}
 a{color:inherit}
 :focus-visible{outline:2px solid var(--ink);outline-offset:3px}
@@ -102,16 +102,69 @@ h2{margin:0;font-size:22px;font-weight:800;letter-spacing:-.04em}
 <main>
   <div class="lead">
     <h1>카드 <b id="n-up">107</b>장 <span>/ 용어 <b id="n-all">883</b>개</span></h1>
-    <p class="goal">쇼핑몰 상품명 한 줄을 읽으면 그 옷이 머릿속에 그려지고, 길에서 본 옷을 이름으로 부를 수 있게 되는 게 목표예요.</p>
+    <p class="goal">쇼핑몰 상품명과 라벨을 읽으면 그 옷이 머릿속에 그려지고, 집에 있는 옷으로 코디를 짤 수 있게 되는 게 목표예요.</p>
   </div>
 
   <section class="sec">
     <h2>다 하면 할 수 있는 것</h2>
     <ul class="can">
       <li><b>사진을 보고</b>아이템, 부분, 색, 재질 이름을 말해요</li>
-      <li><b>상품명을 읽고</b>"세미오버 드롭숄더 케이블 니트, 울 30%"가 어떤 옷인지 그려요</li>
-      <li><b>차림을 보고</b>고프코어, 올드머니 같은 스타일과 몇 년대 유행인지 구분해요</li>
-      <li><b>내 옷을 살 때</b>찾는 옷을 검색어로 정확히 쳐요</li>
+      <li><b>상품명과 라벨을 읽고</b>"세미오버 드롭숄더 케이블 니트, 울 30% 아크릴 70%"가 어떤 옷이고 어떤 느낌인지 알아요</li>
+      <li><b>집에 있는 옷으로</b>바지나 아우터 하나를 정하면 이너, 신발, 소품까지 골라 입어요</li>
+      <li><b>요즘 유행을 보고</b>스웨이드, 발레코어 같은 말이 무엇인지 알고 내 옷으로 따라 해 봐요</li>
+    </ul>
+  </section>
+
+  <section class="sec">
+    <h2>11월 24일에 다시 쓴 기획</h2>
+    <p>사용자가 짚은 문제를 그대로 옮기고, 무엇을 바꾸는지 적었어요. 모든 옷 설명에는 그림이나 실제 사진을 붙여요. 글만으로 옷을 설명하지 않아요.</p>
+    <ul class="adds">
+      <li><b>공부 순서가 없었어요</b><p>처음 온 사람이 무엇부터 할지 몰랐어요. '공부 순서' 칸을 맨 앞에 두고 5단계(아이템, 재질, 핏과 색, 코디, 요즘 유행)로 나눠요. 단계마다 볼 카드, 끝나면 풀 퀴즈, 다 했는지 표시가 있어요.</p></li>
+      <li><b>재질이 묻혀 있었어요</b><p>폴리, 스웨이드, 기모 같은 재질 132개가 용어 사전에 글로만 있었어요. 재질 칸을 따로 만들어 재질마다 실제 원단 사진, 만졌을 때 느낌, 좋은 점과 아쉬운 점, 계절, 많이 쓰는 옷, 세탁법을 붙여요.</p></li>
+      <li><b>섞은 재질과 섞어 입기가 없었어요</b><p>옷 라벨은 '면 60% 폴리 40%'처럼 섞여 있어요. 혼용률 읽는 법과 자주 보는 혼방(T/C, CVC, 울 혼방 코트, 폴리 레이온 슬랙스)을 라벨 예시와 함께 보여 줘요. 한 코디 안에서 스웨이드와 데님, 울과 면처럼 재질을 섞는 규칙도 실제 사진으로 보여 줘요.</p></li>
+      <li><b>신발, 소품, 이너가 모호했어요</b><p>아우터나 바지는 알아도 무엇을 신고 받쳐 입을지 몰랐어요. '짝 맞추기'에서 가진 옷 하나를 고르면 이너, 신발, 소품을 색까지 그림으로 보여 주고 피할 조합도 알려 줘요.</p></li>
+      <li><b>요즘 유행이 없었어요</b><p>2026 가을겨울에 실제로 뜨는 것 18가지(스웨이드 재킷, 발레 플랫, 스트레이트 데님, 퍼 아우터 등)를 기사와 판매 자료로 확인하고 실제 사진, 핵심 아이템, 따라 입는 코디를 붙여요.</p></li>
+      <li><b>코디에 사진이 없었어요</b><p>코디 공식마다 추천한 옷이 모두 들어간 실제 사진을 Unsplash, Pexels에서 찾아 붙여요. 지금 42가지 가운데 21가지에 붙었고 나머지는 더 찾는 중이에요.</p></li>
+      <li><b>퀴즈가 쉽고 여백이 많았어요</b><p>사진에서 모자 찾기처럼 뻔한 문제를 빼고 라펠과 칼라, 겹쳐 입은 셔츠와 블레이저처럼 헷갈리는 것을 눌러 찾게 바꿔요. 코디 규칙은 실제 코디 사진을 보고 네 가지 가운데 고르게 하고, 상품명은 그림을 보고 낱말 조각을 순서대로 골라 상품명을 만드는 문제로 바꿔요.</p></li>
+      <li><b>무엇을 참고했는지 안 보였어요</b><p>'참고한 곳' 페이지에 기사, 앱, 사진 출처를 링크로 모아요. 화면마다 출처도 그 자리에 적어요.</p></li>
+    </ul>
+  </section>
+
+  <section class="sec">
+    <h2>공부 순서</h2>
+    <ol class="order steps">
+      <li><span>아이템 30장 <small style="color:var(--faint)">집에 흔한 옷부터: 티셔츠, 맨투맨, 후드티, 셔츠, 니트, 청바지, 슬랙스, 치노, 트러커, 블루종, 코트, 패딩, 스니커즈, 로퍼</small></span><em>이름 맞히기</em></li>
+      <li><span>재질 20가지 <small style="color:var(--faint)">면, 폴리, 나일론, 울, 스웨이드, 기모, 플리스, 코듀로이, 데님 등과 혼용률 읽기</small></span><em>재질 맞히기, 라벨 읽기</em></li>
+      <li><span>핏과 색 <small style="color:var(--faint)">오버핏과 레귤러, 와이드와 스트레이트, 차콜과 그레이처럼 헷갈리는 짝</small></span><em>나란히 비교</em></li>
+      <li><span>코디 <small style="color:var(--faint)">코디 공식, 짝 맞추기, 기본 규칙, 재질 섞어 입기</small></span><em>코디 규칙</em></li>
+      <li><span>요즘 유행 <small style="color:var(--faint)">지금 뜨는 것과 집에 있는 옷으로 따라 하는 법</small></span><em>사진에서 찾기</em></li>
+    </ol>
+  </section>
+
+  <section class="sec">
+    <h2>화면 구성</h2>
+    <ul class="adds">
+      <li><b>공부 순서 <em>새로</em></b><p>5단계 길잡이. 오늘 할 것 하나를 크게 보여 주고, 단계마다 카드와 퀴즈로 바로 가요.</p></li>
+      <li><b>도감</b><p>아이템, 부분, 부자재, 핏, 색, 무늬, 재질 그림 카드. 같은 옷을 한 곳만 바꿔 그려서 나란히 비교해요.</p></li>
+      <li><b>재질 <em>새로</em></b><p>재질 카드(원단 사진), 혼용률 읽기(라벨 예시), 재질 섞어 입기(실제 코디 사진).</p></li>
+      <li><b>코디</b><p>코디 공식(실제 사진), 짝 맞추기(새로), 요즘 유행(새로), 기본 규칙.</p></li>
+      <li><b>퀴즈</b><p>섞어서, 이름 맞히기, 재질 맞히기(새로), 상품명 만들기(새로), 코디 규칙(사진), 사진에서 찾기(라펠, 칼라, 겹쳐 입은 옷), 실제 사진, 부분 누르기, 복습.</p></li>
+      <li><b>용어 사전과 참고한 곳</b><p>용어 907개와 근거, 기획과 화면에 쓴 자료 링크 전부.</p></li>
+    </ul>
+  </section>
+
+  <section class="sec">
+    <h2>할 일과 진행</h2>
+    <ul class="adds">
+      <li><b>계절별 실제 코디 <em class="dn">159가지</em></b><p>봄, 여름, 가을, 겨울마다 40장(남 30, 여 10)을 모으고 옷마다 색과 재질을 붙였어요. 바지는 계절마다 10종류 넘게 섞었어요. 계절, 성별, 옷으로 거를 수 있어요.</p></li>
+      <li><b>코디 공식 사진 <em class="dn">31 / 42</em></b><p>추천한 옷이 다 보이는 사진만 붙였어요. 나머지 11가지는 모자나 로퍼까지 다 맞는 사진이 없어서 비워 뒀어요.</p></li>
+      <li><b>재질 <em class="dn">넣었어요</em></b><p>재질 39가지(원단 사진 32장), 혼방 11가지와 라벨 읽는 규칙 8개, 재질 섞어 입기 12가지. 출처 71곳을 직접 열어 확인했어요.</p></li>
+      <li><b>짝 맞추기 <em class="dn">34가지</em></b><p>옷 하나를 고르면 그 옷이 들어간 실제 코디 사진, 같이 입을 옷, 신발, 소품, 양말, 피할 조합을 보여 줘요. 출처가 없는 추천은 일반 상식이라고 적었어요.</p></li>
+      <li><b>요즘 유행 <em class="dn">18가지</em></b><p>2026 가을겨울 기사와 판매 자료로 확인한 것만 실제 사진과 함께 넣었어요.</p></li>
+      <li><b>퀴즈 <em class="dn">바꿨어요</em></b><p>사진에서 찾기는 라펠, 칼라, 겹쳐 입은 옷 48문제로, 코디 규칙은 실제 코디 사진을 보고 넷 중 고르는 문제로 바꿨어요.</p></li>
+      <li><b>기본 규칙 사진</b><p>지금은 9개 규칙에 좋은 예 사진이 있어요. 나머지 규칙과 피할 예는 같은 옷을 한 곳만 바꾼 그림(좋은 예와 피할 예 한 쌍)으로 Gemini에서 그려 넣어요.</p></li>
+      <li><b>상품명 만들기</b><p>지금의 상품명 뜯어보기(<b id="n-names">55</b>개)는 너무 쉬워요. 그림을 보고 비슷한 낱말 조각(원턱과 투턱, 차콜과 블랙) 가운데 골라 순서대로 상품명을 만드는 문제로 바꿔요.</p></li>
+      <li><b>재질 퀴즈</b><p>원단 사진을 보고 재질을 고르는 문제, 라벨을 보고 어떤 옷인지 고르는 문제를 넣어요.</p></li>
     </ul>
   </section>
 
@@ -128,43 +181,9 @@ h2{margin:0;font-size:22px;font-weight:800;letter-spacing:-.04em}
   </section>
 
   <section class="sec">
-    <h2>잘하는 것과 모자란 것</h2>
-    <p>11월 24일에 사이트 전체를 다시 보고 정리했어요. 바로 고칠 수 있는 것은 고쳤고, 나머지는 순서대로 할 일에 넣었어요.</p>
-    <ul class="adds">
-      <li><b>한 곳만 바꾼 그림</b><p>같은 회색 니트를 색만, 같은 흰 티를 핏만 바꿔 그려서 나란히 놓으면 차이 하나만 보여요. 쇼핑몰 사진으로는 이렇게 비교할 수 없어요.</p></li>
-      <li><b>이름 세 칸과 차이</b><p>쇼핑몰 이름, 정확한 이름, 편한 말을 나누고 카디건과 가디건, 폴라티와 터틀넥처럼 뜻이 갈리면 무엇이 다른지 적어요.</p></li>
-      <li><b>실제 쇼핑으로 이어짐</b><p>무신사 실제 옷에서 잰 색, 상품명 읽기와 뜯어보기, 실제 사람 사진 퀴즈로 배운 말을 쇼핑몰과 거리에서 다시 만나요.</p></li>
-      <li><b>근거가 붙은 사전</b><p>용어 907개마다 무신사 상품명 수나 기사, 커뮤니티 같은 근거를 붙였어요.</p></li>
-      <li><b>모자람 1. 그림이 늦어요</b><p>907개 가운데 그림이 있는 건 182장이에요. 코디 칸에 쓰이는 옷부터 그리고, 브랜드 대표 상품과 닮게 나온 그림은 다시 그려요.</p></li>
-      <li><b>모자람 2. 퀴즈가 지루했어요</b><p>한 가지 틀에 여백이 많았어요. 섞어서 모드, 그림 왼쪽 문제 오른쪽 배치, 연속 맞힘, 오늘 푼 수와 며칠째, 맞히면 저절로 다음 문제로 고쳤어요.</p></li>
-      <li><b>모자람 3. 내 옷과 따로 놀았어요</b><p>아이템 카드에 '내 옷장에 넣기'를 넣고, 코디 칸 '내 옷으로'에서 가진 옷이 많이 들어간 코디부터 보여 주게 했어요.</p></li>
-      <li><b>모자람 4. 시작점과 코디 폭</b><p>처음 온 사람이 어디서 시작할지 몰라요. 자주 보는 말 30장 코스를 만들 거예요. 코디는 남자 36, 여자 6가지이고 사진이 일본 사이트라 한국 사진과 여자 코디를 늘려요.</p></li>
-      <li><b>다음에 할 것</b><p>같은 바탕 그림 둘에서 다른 곳을 누르는 '다른 곳 찾기' 퀴즈, 실제 사진 더 받기(Fashionpedia 남은 묶음), 도감 처음 화면의 '처음이면 여기부터'.</p></li>
-    </ul>
-  </section>
-
-  <section class="sec">
-    <h2>화면 기능</h2>
-    <ul class="adds">
-      <li><b>이름 세 칸 <em class="dn">넣었어요</em></b><p>카드마다 쇼핑몰 이름, 정확한 이름, 편한 말을 나눠 보여 주고, 뜻이 다르면 차이를 적어요. 읽기에서 편한 말로 찾아도 카드가 나와요.</p></li>
-      <li><b>날짜 맞춘 복습 <em class="dn">넣었어요</em></b><p>틀린 카드는 내일, 맞힌 카드는 3일, 7일, 21일 뒤에 퀴즈의 '복습'에 다시 나와요.</p></li>
-      <li><b>실제 옷 색 <em class="dn">넣었어요</em></b><p>12색을 무신사 실제 옷에서 잰 색으로 고쳤고, 색 카드마다 실제 옷과 코디 링크, 한 줄 팁을 붙였어요.</p></li>
-      <li><b>부분 누르기 <em class="dn">넣었어요</em></b><p>점 자리가 있는 그림 카드에서 "밴딩 허리를 눌러 보세요" 같은 문제를 내요. 2단원, 4단원 그림이 늘면 문제도 늘어요.</p></li>
-      <li><b>섞어서 <em class="dn">넣었어요</em></b><p>퀴즈 탭을 누르면 이름, 상품명, 실제 사진, 코디 규칙, 부분 누르기가 한 판에 섞여 나와요. 맞히면 1.3초 뒤 저절로 다음 문제로 넘어가고, 연속 맞힘과 오늘 푼 수, 며칠째인지 보여 줘요.</p></li>
-      <li><b>내 옷장 <em class="dn">넣었어요</em></b><p>아이템 카드에서 가진 옷을 표시하면 코디 칸 '내 옷으로'에서 그 옷이 많이 들어간 코디부터 보여 줘요. 로그인하면 폰과 노트북에 같이 남아요.</p></li>
-      <li><b>상품명 뜯어보기 <em class="dn">넣었어요</em></b><p>"원턱 슬랙스 차콜"처럼 상품명을 보여 주고 핏, 색, 옷 종류를 알려 주는 말이 어느 것인지 눌러 고르게 해요. 답을 고르면 낱말마다 무엇을 뜻하는지 카드로 풀어 줘요. 카드가 다 있는 상품명 55개에서 나와요.</p></li>
-      <li><b>실제 사진 <em class="dn">넣었어요</em></b><p>실제 사람이 입은 사진(Fashionpedia)에서 노란 네모 친 옷이나 깃의 이름을 맞히거나, 이 옷이 들어간 사진을 네 장 가운데 골라요. 라벨이 틀린 사진은 하나씩 보고 뺐어요. 블레이저, 라이더 재킷, 코트 사진은 그 카드 그림이 생기면 문제에 나와요.</p></li>
-      <li><b>코디 규칙 <em class="dn">넣었어요</em></b><p>코디 칸의 기본 규칙 17개를 좋은 예와 피할 예 둘 중 고르는 문제로 내요.</p></li>
-      <li><b>뜻 맞히기 <em class="dn">넣었어요</em></b><p>그림이 아직 없는 용어도 용어 사전에서 이름과 뜻으로 맞혀 볼 수 있어요.</p></li>
-      <li><b>코디 <em class="dn">42가지</em></b><p>실제로 많이 입는 코디 공식을 상황별로 모았어요. 옷마다 카드 그림, 왜 어울리는지, 따라 입을 때 놓치기 쉬운 것, 실제로 입은 사진 링크가 있어요. 색, 핏, 레이어드 기본 규칙 17개도 같이 있어요.</p></li>
-      <li><b>몇 년대 퀴즈</b><p>차림 그림을 보고 시대를 고르는 문제예요. 9, 10단원 그림이 오면 넣어요.</p></li>
-    </ul>
-  </section>
-
-  <section class="sec">
     <h2>용어 전체</h2>
     <p>카드로 만들 용어 <b id="n-all2">883</b>개를 쇼핑몰 이름, 정확한 이름, 편한 말로 나눠 정리했어요. 이름끼리 뜻이 다른 것은 차이와 근거를 같이 적었어요.</p>
-    <p style="margin-top:14px"><a href="terms.html" style="font-weight:700;color:var(--ink);text-underline-offset:4px">용어 사전 열기</a></p>
+    <p style="margin-top:14px"><a href="terms.html" style="font-weight:700;color:var(--ink);text-underline-offset:4px">용어 사전 열기</a>  <a href="refs.html" style="font-weight:700;color:var(--ink);text-underline-offset:4px;margin-left:14px">참고한 곳</a></p>
   </section>
 </main>
 
@@ -184,7 +203,7 @@ function draw(up, names) {
   document.getElementById("bars").innerHTML = U.map((n, i) => { const [a, b] = cnt(i + 1); return `<a class="bar" href="#u${i + 1}"><span>${i + 1}. ${n}</span><i style="--p:${a / b * 100}%"></i><em>${a} / ${b}</em></a>`; }).join("");
   document.getElementById("order").innerHTML = ORDER.map(([u, n, d]) => { const [a, b] = cnt(u); return `<li><span>${n}${d ? ` <small style="color:var(--faint)">${d}</small>` : ""}</span><em>남은 ${b - a}개</em></li>`; }).join("");
 }
-draw(new Set(["aloha", "anorak", "ashgray", "babyblue", "babypink", "ballcap", "band", "beige", "beltloop", "black", "blouson", "boatshoes", "bolero", "boxpleat", "boxy", "brickred", "brown", "burgundy", "burntbrown", "burntorange", "butteryellow", "buttondown", "buttonfly", "cable", "camel", "canvas", "cardigan", "cardiganvariants", "cargo", "cargopocket", "carpenter", "charcoal", "chelsea", "cherryred", "chino", "chocolate", "chore", "chunky", "clouddancer", "coach", "cobalt", "cocoabrown", "coinpocket", "contrast", "coolgray", "coral", "corduroypants", "cream", "crease", "crew", "cropped", "croptee", "cuffs", "denimshirt", "derby", "double", "drawcord", "drop", "dustyblue", "dustypink", "ecru", "elastic", "elbowpatch", "epaulet", "espressobrown", "flannel", "flappocket", "forest", "greige", "henley", "hidden", "hightop", "hood", "hoodie", "hotpink", "indigo", "ivory", "jeans", "jersey", "jogger", "kangaroo", "khaki", "khakibeige", "knitpolo", "knittop", "knitzipup", "lavender", "lemonyellow", "lightgray", "lilac", "lime", "loafer", "longline", "longsleeve", "lowtop", "ma1", "maroon", "middlegray", "midnightblue", "mint", "mocha", "mock", "mule", "mustard", "navy", "notch", "oatmeal", "offwhite", "olive", "olivedrab", "opencollar", "overshirt", "oversized", "oxford", "parachute", "patchpocket", "peach", "peak", "pleat", "plum", "polo", "purewhite", "qzip", "raglan", "red", "regular", "ribcuff", "rivet", "rolltab", "royalblue", "rugby", "runner", "rust", "sage", "salmon", "sand", "semiover", "setin", "shawl", "shirttail", "shorts", "skyblue", "slacks", "slant", "slim", "slit", "smoke", "snap", "sportsandal", "stand", "stone", "straight", "stripeshirt", "sweater", "sweatshirt", "tan", "tank", "taupe", "teal", "tee", "terracotta", "thumbhole", "toggle", "track", "trackpants", "trucker", "turnup", "turtle", "twoway", "varsity", "velcro", "vest", "vneck", "warmbeige", "warmgray", "weltpocket", "western", "windbreaker", "yoke", "zipper", "zippocket", "zipup"]), null);
+draw(new Set(["aloha", "anorak", "ashgray", "babyblue", "babypink", "ballcap", "balloon", "band", "barrel", "beanie", "beige", "beltloop", "beret", "black", "blouson", "boatshoes", "bolero", "bootcut", "boxpleat", "boxy", "brickred", "brown", "bucket", "burgundy", "burntbrown", "burntorange", "butteryellow", "buttondown", "buttonfly", "cable", "camel", "campcap", "canvas", "cardigan", "cardiganvariants", "cargo", "cargopocket", "carpenter", "charcoal", "chelsea", "cherryred", "chino", "chocolate", "chore", "chunky", "clog", "clouddancer", "coach", "cobalt", "cocoabrown", "coinpocket", "contrast", "coolgray", "coral", "corduroypants", "cream", "crease", "crew", "cropped", "croptee", "cuffs", "denimshirt", "derby", "double", "downvest", "drawcord", "drop", "duffle", "dustyblue", "dustypink", "ecru", "elastic", "elbowpatch", "epaulet", "espressobrown", "flannel", "flappocket", "flatcap", "forest", "greige", "henley", "hidden", "hightop", "hood", "hoodie", "hotpink", "indigo", "ivory", "jeans", "jersey", "jogger", "kangaroo", "khaki", "khakibeige", "knitpolo", "knittop", "knitzipup", "lavender", "lemonyellow", "lightdown", "lightgray", "lilac", "lime", "loafer", "longline", "longpuffer", "longsleeve", "lowtop", "ma1", "maroon", "middlegray", "midnightblue", "mint", "mocha", "mock", "mule", "mustard", "navy", "notch", "oatmeal", "offwhite", "olive", "olivedrab", "opencollar", "overshirt", "oversized", "oxford", "parachute", "patchpocket", "peach", "peak", "pleat", "plum", "polo", "puffer", "purewhite", "qzip", "raglan", "red", "regular", "ribcuff", "rivet", "rolltab", "royalblue", "rugby", "runner", "rust", "sage", "salmon", "sand", "semiover", "setin", "shawl", "shirttail", "shorts", "skinny", "skyblue", "slacks", "slant", "slim", "slimfit", "slit", "smoke", "snap", "sportsandal", "stand", "stone", "straight", "stripeshirt", "sweater", "sweatshirt", "tan", "tank", "tapered", "taupe", "teal", "tee", "terracotta", "thumbhole", "toggle", "track", "trackpants", "trucker", "truckercap", "turnup", "turtle", "twoway", "varsity", "velcro", "vest", "vneck", "warmbeige", "warmgray", "weltpocket", "western", "wide", "windbreaker", "workboots", "yoke", "zipper", "zippocket", "zipup"]), null);
 fetch("cards.json", {cache: "no-cache"}).then(r => r.json()).then(d => draw(new Set(d.cards.map(c => c.id)), d.names.length)).catch(() => {});
 </script>
 <script src="../hub/back.js" data-cat="study" defer></script>
