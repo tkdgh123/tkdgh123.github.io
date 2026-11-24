@@ -569,6 +569,8 @@ main{padding-bottom:120px}
 .kr-who{margin:0;font-size:15px}.kr-who a{font-size:13px;color:var(--sub);margin-left:4px}
 .kr-tx .kd-meta{margin:2px 0 0}.kr-tx .lk-point{margin:8px 0 0}
 @media (max-width:560px){.kr-grid{grid-template-columns:1fr}}
+.kr-st{flex-wrap:wrap;margin-top:6px}.kr-st small{font-size:11px;color:var(--faint);margin-left:2px}
+.kr-foot{display:flex;justify-content:center;padding:34px 0 10px}.kr-more span{font-size:13px;color:var(--faint);margin-left:8px;font-weight:500}
 </style>
 </head>
 <body>
@@ -608,7 +610,7 @@ main{padding-bottom:120px}
 
 <script>
 const KEY = "ot-gongbu-v1";
-let LK = [], KR = [], TR = [], PR = [], MT = { materials: [], blends: [], label_rules: [], mixing: [] }, KS = { season: "", sex: "", item: "" };
+let LK = [], KR = [], TR = [], PR = [], MT = { materials: [], blends: [], label_rules: [], mixing: [] }, KS = { season: "", sex: "", item: "", st: "" };
 let U = [], G = [], C = [], N = [], F = [], R = {}, byId = {}, K = { f: [], r: [] }, RP = [];
 let st = { seen: {}, stat: {} };
 try { st = Object.assign(st, JSON.parse(localStorage.getItem(KEY) || "{}")); } catch (e) {}
@@ -1097,16 +1099,30 @@ const srcLinks = us => (us || []).filter(Boolean).map((u, i) => `<a href="${esc(
 const ruleShots = id => K.f.filter(f => f.shot && f.shot.yes && f.shot.yes.includes(id));
 
 /* 한국 사람 코디: 인스타그램, 유튜브 공식 퍼가기 + 옷 이름표 */
+const krFrame = k => k.kind === "youtube"
+  ? `<div class="kr-yt"><iframe src="https://www.youtube-nocookie.com/embed/${esc(k.code)}${k.start ? "?start=" + k.start : ""}" loading="lazy" title="${esc(k.account)} 영상" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe></div>`
+  : `<div class="kr-ig"><iframe src="https://www.instagram.com/p/${esc(k.code)}/embed/" loading="lazy" title="${esc(k.account)} 인스타그램 게시물" scrolling="no"></iframe></div>`;
+const krCard = k => `<article class="kr-c">${krFrame(k)}<div class="kr-tx"><p class="kr-who"><b>${esc(k.who)}</b> <a href="${esc(k.url)}" target="_blank" rel="noopener">${esc(k.account)}</a></p><p class="kd-meta">${esc([k.season, k.style, k.for === "여" ? "여자" : "남자", (k.scene || []).join(", ")].filter(Boolean).join("  |  "))}</p><p class="lk-point">${esc(k.point || "")}</p><ul class="lk-pcs">${k.pieces.map(pc => pieceRow(pc)).join("")}</ul></div></article>`;
+const KR_STEP = 12;
+let krList = [], krShown = 0;
+function krMoreBtn() { const n = krList.length - krShown; return n > 0 ? `<button class="btn kr-more" data-krmore>${Math.min(n, KR_STEP)}개 더 보기 <span>남은 ${n}개</span></button>` : ""; }
 function krView(top, el) {
   const ok = k => (!KS.season || k.season === KS.season) && (!KS.sex || k.for === KS.sex);
-  const list = KR.filter(ok), ph = LK.filter(l => l.kr && ok(l));
-  const frame = k => k.kind === "youtube"
-    ? `<div class="kr-yt"><iframe src="https://www.youtube-nocookie.com/embed/${esc(k.code)}${k.start ? "?start=" + k.start : ""}" loading="lazy" title="${esc(k.account)} 영상" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe></div>`
-    : `<div class="kr-ig"><iframe src="https://www.instagram.com/p/${esc(k.code)}/embed/" loading="lazy" title="${esc(k.account)} 인스타그램 게시물" scrolling="no"></iframe></div>`;
-  el.innerHTML = top + `<div class="lead"><h1>한국 사람 코디 <span>${list.length + ph.length}가지</span></h1></div><p class="cmp-say">한국에서 찍은 공개 사진(얼굴은 흐리게)과 인스타그램, 유튜브 원래 게시물이에요. 옷 이름과 설명은 따로 달았어요.</p>${seasonSeg(true)}
-    ${ph.length ? `<h2 class="sec-h">한국 거리에서 찍은 사진 ${ph.length}장</h2><div class="lk-grid">${ph.map(l => `<a class="lkc" href="#codi/l-${l.id}"><div class="lkph"><img src="lk/${l.id}.webp" alt="" loading="lazy"></div><div class="lk-tags">${l.pieces.filter(p => ["아우터", "상의", "하의", "신발", "원피스"].includes(p.role)).map(p => `<span>${esc([p.color, p.name].filter(Boolean).join(" "))}</span>`).join("")}</div></a>`).join("")}</div><h2 class="sec-h">인스타그램, 유튜브 ${list.length}개</h2>` : ""}
-    <div class="kr-grid">${list.map(k => `<article class="kr-c">${frame(k)}<div class="kr-tx"><p class="kr-who"><b>${esc(k.who)}</b> <a href="${esc(k.url)}" target="_blank" rel="noopener">${esc(k.account)}</a></p><p class="kd-meta">${esc([k.season, k.style, k.for === "여" ? "여자" : "남자", (k.scene || []).join(", ")].filter(Boolean).join("  |  "))}</p><p class="lk-point">${esc(k.point || "")}</p><ul class="lk-pcs">${k.pieces.map(pc => pieceRow(pc)).join("")}</ul></div></article>`).join("") || `<p class="cmp-say">이 조건에 맞는 코디가 아직 없어요.</p>`}</div>`;
+  const pool = KR.filter(ok), ph = LK.filter(l => l.kr && ok(l) && !KS.st);
+  const cnt = {}; pool.forEach(k => { cnt[k.style] = (cnt[k.style] || 0) + 1; });
+  const styles = Object.keys(cnt).filter(x => cnt[x] >= 2).sort((x, y) => cnt[y] - cnt[x]);
+  if (KS.st && !styles.includes(KS.st)) KS.st = "";
+  krList = pool.filter(k => !KS.st || k.style === KS.st); krShown = Math.min(KR_STEP, krList.length);
+  el.innerHTML = top + `<div class="lead"><h1>한국 사람 코디 <span>${krList.length + ph.length}가지</span></h1></div><p class="cmp-say">한국에서 찍은 공개 사진(얼굴은 흐리게)과 인스타그램, 유튜브 원래 게시물이에요. 옷 이름과 설명은 따로 달았어요.</p>${seasonSeg(true)}
+    ${styles.length > 1 ? `<nav class="seg kr-st" aria-label="스타일">${["", ...styles].map(x => `<button data-ks="st" data-kv="${esc(x)}" aria-current="${(KS.st || "") === x}">${x ? `${esc(x)} <small>${cnt[x]}</small>` : "모든 스타일"}</button>`).join("")}</nav>` : ""}
+    ${ph.length ? `<h2 class="sec-h">한국 거리에서 찍은 사진 ${ph.length}장</h2><div class="lk-grid">${ph.map(l => `<a class="lkc" href="#codi/l-${l.id}"><div class="lkph"><img src="lk/${l.id}.webp" alt="" loading="lazy"></div><div class="lk-tags">${l.pieces.filter(p => ["아우터", "상의", "하의", "신발", "원피스"].includes(p.role)).map(p => `<span>${esc([p.color, p.name].filter(Boolean).join(" "))}</span>`).join("")}</div></a>`).join("")}</div><h2 class="sec-h">인스타그램, 유튜브 ${krList.length}개</h2>` : ""}
+    <div class="kr-grid" id="kr-grid">${krList.slice(0, krShown).map(krCard).join("") || `<p class="cmp-say">이 조건에 맞는 코디가 아직 없어요.</p>`}</div><div class="kr-foot" id="kr-foot">${krMoreBtn()}</div>`;
 }
+document.addEventListener("click", e => {
+  if (!e.target.closest("[data-krmore]")) return;
+  const next = krList.slice(krShown, krShown + KR_STEP); krShown += next.length;
+  $("#kr-grid").insertAdjacentHTML("beforeend", next.map(krCard).join("")); $("#kr-foot").innerHTML = krMoreBtn();
+});
 /* 실제 코디: 계절별 실제 사진, 옷마다 이름표 */
 function lookView(arg, top, el) {
   const lk = arg.startsWith("l-") && LK.find(x => x.id === arg.slice(2));
