@@ -58,12 +58,14 @@ main{max-width:var(--wrap);margin:0 auto;padding:0 var(--gut) 96px}
 .grp{padding-top:30px}
 .grp h2{margin:0 0 4px;font-size:20px;font-weight:800;letter-spacing:-.04em}
 .list{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));column-gap:28px}
-.t{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;padding:12px 0;border-bottom:1px solid var(--line);width:100%}
+.t{display:grid;grid-template-columns:42px minmax(0,1fr) auto;gap:2px 12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);width:100%}
+.th{grid-row:1/3;grid-column:1;width:42px;aspect-ratio:3/4;background:var(--tile);overflow:hidden}
+.th img{width:100%;height:100%;object-fit:cover;display:block}
 .t:hover .tn{text-decoration:underline;text-underline-offset:4px}
-.tn{font-size:17px;font-weight:700;letter-spacing:-.03em}
+.tn{grid-column:2;align-self:end;font-size:17px;font-weight:700;letter-spacing:-.03em}
 .tn small{font-size:13px;font-weight:500;color:var(--sub);margin-left:6px}
-.tm{grid-column:1;font-size:14px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.badges{grid-row:1/3;grid-column:2;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.tm{grid-column:2;align-self:start;font-size:14px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.badges{grid-row:1/3;grid-column:3;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
 .pr{font-size:12px;font-weight:800;color:var(--faint)}
 .pr.A{color:var(--ink)}
 .df{font-size:11px;font-weight:700;padding:1px 5px;border:1px solid currentColor}
@@ -71,14 +73,15 @@ main{max-width:var(--wrap);margin:0 auto;padding:0 var(--gut) 96px}
 .empty{padding:48px 0;color:var(--sub)}
 
 /* 자세히 */
-.scrim{position:fixed;inset:0;background:rgba(18,18,18,.35);z-index:40}
-.pane{position:fixed;z-index:50;background:#fff;top:0;right:0;bottom:0;width:min(460px,100%);overflow-y:auto;padding:calc(20px + env(safe-area-inset-top,0px)) 28px calc(32px + env(safe-area-inset-bottom,0px));box-shadow:-12px 0 40px rgba(0,0,0,.08)}
+.scrim{position:fixed;inset:0;background:rgba(18,18,18,.35);z-index:45}
+.pane{position:fixed;z-index:50;background:#fff;top:50%;left:50%;transform:translate(-50%,-50%);width:min(560px,calc(100% - 24px));max-height:min(86vh,860px);overflow-y:auto;overscroll-behavior:contain;padding:22px 30px 30px;border-radius:14px;box-shadow:0 24px 60px rgba(0,0,0,.18)}
+body.sheet-open{overflow:hidden}
 .x{position:sticky;top:0;float:right;font-size:14px;font-weight:600;color:var(--sub);padding:6px 0 6px 12px;background:#fff}
 .pu{font-size:13px;color:var(--sub);font-weight:600}
 .pane h2{margin:6px 0 0;font-size:34px;line-height:1.15;font-weight:800;letter-spacing:-.05em}
 .pane .say{margin:12px 0 0;font-size:17px;line-height:1.6}
-.pic{margin:16px 0 0;display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:end}
-.pic img{width:120px;aspect-ratio:3/4;object-fit:cover;background:var(--tile)}
+.pic{margin:16px 0 0;display:grid;grid-template-columns:150px 1fr;gap:12px;align-items:end}
+.pic img{width:150px;aspect-ratio:3/4;object-fit:cover;background:var(--tile)}
 .pic a{font-size:14px;font-weight:600}
 dl{margin:20px 0 0;display:grid;grid-template-columns:5.5em 1fr;gap:8px 14px;font-size:15px}
 dt{color:var(--faint);font-size:13px;padding-top:2px}
@@ -95,7 +98,8 @@ dd{margin:0}
 .meta{margin:18px 0 0;font-size:12px;color:var(--faint)}
 
 @media (max-width:760px){
-  .pane{top:auto;left:0;width:100%;max-height:82vh;border-radius:14px 14px 0 0;box-shadow:0 -12px 40px rgba(0,0,0,.12);padding:16px var(--gut) calc(24px + env(safe-area-inset-bottom,0px))}
+  .pane{max-height:82vh;padding:16px 20px 24px}
+  .pic{grid-template-columns:120px 1fr}.pic img{width:120px}
   .pane h2{font-size:28px}
   .list{grid-template-columns:1fr}
   .tools .n{margin-left:0}
@@ -196,7 +200,7 @@ function draw() {
   $("#out").innerHTML = groups.map(g => `<section class="grp"><h2>${esc(g.k)}</h2><div class="list">${g.items.map(t => {
     const sub = t.title && t.title !== t.shop ? t.shop : "";
     const other = (t.casual || []).filter(c => c !== name(t)).slice(0, 3).join(", ");
-    return `<button class="t" data-t="${t.id}"><span class="tn">${esc(name(t))}${sub ? `<small>${esc(sub)}</small>` : other ? `<small>${esc(other)}</small>` : ""}</span><span class="tm">${esc(t.meaning)}</span><span class="badges">${dfBadge(t)}</span></button>`;
+    return `<button class="t" data-t="${t.id}"><span class="th">${t.img ? `<img src="img/${t.id}.webp" alt="" loading="lazy">` : ""}</span><span class="tn">${esc(name(t))}${sub ? `<small>${esc(sub)}</small>` : other ? `<small>${esc(other)}</small>` : ""}</span><span class="tm">${esc(t.meaning)}</span><span class="badges">${dfBadge(t)}</span></button>`;
   }).join("")}</div></section>`).join("");
 }
 function open(id, push = true) {
