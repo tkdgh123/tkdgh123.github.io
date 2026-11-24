@@ -579,6 +579,7 @@ main{padding-bottom:120px}
 .bd-slots.no{border-color:var(--no)}.bd-slots.no .bd-s.on{background:var(--no)}
 #bd-pool .op:disabled{opacity:.3}
 .rule-fb .strip{margin:14px 0 6px}
+.kr-note{margin:6px 0 0;font-size:12px;color:var(--faint)}
 </style>
 </head>
 <body>
@@ -1093,7 +1094,7 @@ function colorHex(name) {
 }
 function piece(p, big) {
   const c = p.id && byId[p.id], hex = colorHex(p.color);
-  const label = `<span>${hex ? `<i style="background:${hex}"></i>` : ""}${esc([p.color, p.name].filter(Boolean).join(" "))}${c && owned(c.id) ? `<em class="have">있어요</em>` : ""}</span>`;
+  const label = `<span>${hex ? `<i style="background:${hex}"></i>` : ""}${esc(cn(p.color, p.name))}${c && owned(c.id) ? `<em class="have">있어요</em>` : ""}</span>`;
   if (!big) return c ? `<div class="ph"><img src="img/${c.id}.webp" alt="" width="600" height="800" loading="lazy"></div>` : `<div class="ph blank" style="--c:${hex || "#e4e4e0"}"><i></i><em>${esc(p.name)}</em></div>`;
   return c ? `<button class="pc" data-card="${c.id}"><small>${esc(p.role)}</small><div class="ph"><img src="img/${c.id}.webp" alt="${esc(c.ko)}" width="600" height="800" loading="lazy"></div>${label}</button>`
     : `<div class="pc"><small>${esc(p.role)}</small><div class="ph blank" style="--c:${hex || "#e4e4e0"}"><i></i><em>그림 준비 중</em></div>${label}</div>`;
@@ -1153,7 +1154,7 @@ const ruleShots = id => K.f.filter(f => f.shot && f.shot.yes && f.shot.yes.inclu
 const krFrame = k => k.kind === "youtube"
   ? `<div class="kr-yt"><iframe src="https://www.youtube-nocookie.com/embed/${esc(k.code)}${k.start ? "?start=" + k.start : ""}" loading="lazy" title="${esc(k.account)} 영상" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe></div>`
   : `<div class="kr-ig"><iframe src="https://www.instagram.com/p/${esc(k.code)}/embed/" loading="lazy" title="${esc(k.account)} 인스타그램 게시물" scrolling="no"></iframe></div>`;
-const krCard = k => `<article class="kr-c">${krFrame(k)}<div class="kr-tx"><p class="kr-who"><b>${esc(k.who)}</b> <a href="${esc(k.url)}" target="_blank" rel="noopener">${esc(k.account)}</a></p><p class="kd-meta">${esc([k.season, k.style, k.for === "여" ? "여자" : "남자", (k.scene || []).join(", ")].filter(Boolean).join("  |  "))}</p><p class="lk-point">${esc(k.point || "")}</p><ul class="lk-pcs">${k.pieces.map(pc => pieceRow(pc)).join("")}</ul></div></article>`;
+const krCard = k => `<article class="kr-c">${krFrame(k)}<div class="kr-tx"><p class="kr-who"><b>${esc(k.who)}</b> <a href="${esc(k.url)}" target="_blank" rel="noopener">${esc(k.account)}</a></p><p class="kd-meta">${esc([k.season, k.style, k.for === "여" ? "여자" : "남자", (k.scene || []).join(", ")].filter(Boolean).join("  |  "))}</p><p class="lk-point">${esc(k.point || "")}</p>${k.kind === "youtube" ? `<p class="kr-note">이름표는 영상 첫 장면 차림이에요.</p>` : ""}<ul class="lk-pcs">${k.pieces.map(pc => pieceRow(pc)).join("")}</ul></div></article>`;
 const KR_STEP = 12;
 let krList = [], krShown = 0;
 function krMoreBtn() { const n = krList.length - krShown; return n > 0 ? `<button class="btn kr-more" data-krmore>${Math.min(n, KR_STEP)}개 더 보기 <span>남은 ${n}개</span></button>` : ""; }
@@ -1166,7 +1167,7 @@ function krView(top, el) {
   krList = pool.filter(k => !KS.st || k.style === KS.st); krShown = Math.min(KR_STEP, krList.length);
   el.innerHTML = top + `<div class="lead"><h1>한국 사람 코디 <span>${krList.length + ph.length}가지</span></h1></div><p class="cmp-say">한국에서 찍은 공개 사진(얼굴은 흐리게)과 인스타그램, 유튜브 원래 게시물이에요. 옷 이름과 설명은 따로 달았어요.</p>${seasonSeg(true)}
     ${styles.length > 1 ? `<nav class="seg kr-st" aria-label="스타일">${["", ...styles].map(x => `<button data-ks="st" data-kv="${esc(x)}" aria-current="${(KS.st || "") === x}">${x ? `${esc(x)} <small>${cnt[x]}</small>` : "모든 스타일"}</button>`).join("")}</nav>` : ""}
-    ${ph.length ? `<h2 class="sec-h">한국 거리에서 찍은 사진 ${ph.length}장</h2><div class="lk-grid">${ph.map(l => `<a class="lkc" href="#codi/l-${l.id}"><div class="lkph"><img src="lk/${l.id}.webp" alt="" loading="lazy"></div><div class="lk-tags">${l.pieces.filter(p => ["아우터", "상의", "하의", "신발", "원피스"].includes(p.role)).map(p => `<span>${esc([p.color, p.name].filter(Boolean).join(" "))}</span>`).join("")}</div></a>`).join("")}</div><h2 class="sec-h">인스타그램, 유튜브 ${krList.length}개</h2>` : ""}
+    ${ph.length ? `<h2 class="sec-h">한국 거리에서 찍은 사진 ${ph.length}장</h2><div class="lk-grid">${ph.map(l => `<a class="lkc" href="#codi/l-${l.id}"><div class="lkph"><img src="lk/${l.id}.webp" alt="" loading="lazy"></div><div class="lk-tags">${l.pieces.filter(p => ["아우터", "상의", "하의", "신발", "원피스"].includes(p.role)).map(p => `<span>${esc(cn(p.color, p.name))}</span>`).join("")}</div></a>`).join("")}</div><h2 class="sec-h">인스타그램, 유튜브 ${krList.length}개</h2>` : ""}
     <div class="kr-grid" id="kr-grid">${krList.slice(0, krShown).map(krCard).join("") || `<p class="cmp-say">이 조건에 맞는 코디가 아직 없어요.</p>`}</div><div class="kr-foot" id="kr-foot">${krMoreBtn()}</div>`;
 }
 document.addEventListener("click", e => {
@@ -1187,13 +1188,15 @@ function lookView(arg, top, el) {
   const list = LK.filter(l => (!KS.season || l.season === KS.season) && (!KS.sex || l.for === KS.sex) && (!KS.item || l.pieces.some(p => p.role + ":" + p.name === KS.item)));
   el.innerHTML = top + `<div class="lead"><h1>실제 코디 <span>${list.length}가지</span></h1></div>${seasonSeg(true)}
     <div class="lk-filter"><select id="lk-item" aria-label="옷으로 거르기"><option value="">옷으로 거르기</option>${["아우터", "상의", "하의", "신발"].map(r => `<optgroup label="${r}">${items.filter(x => x.startsWith(r + ":")).map(x => `<option value="${esc(x)}"${KS.item === x ? " selected" : ""}>${esc(x.split(":")[1])}</option>`).join("")}</optgroup>`).join("")}</select></div>
-    <div class="lk-grid">${list.map(l => `<a class="lkc" href="#codi/l-${l.id}"><div class="lkph"><img src="lk/${l.id}.webp" alt="" loading="lazy"></div><div class="lk-tags">${l.pieces.filter(p => ["아우터", "상의", "하의", "신발"].includes(p.role)).map(p => `<span>${esc([p.color, p.name].filter(Boolean).join(" "))}</span>`).join("")}</div></a>`).join("") || `<p class="cmp-say">이 조건에 맞는 코디가 아직 없어요.</p>`}</div>`;
+    <div class="lk-grid">${list.map(l => `<a class="lkc" href="#codi/l-${l.id}"><div class="lkph"><img src="lk/${l.id}.webp" alt="" loading="lazy"></div><div class="lk-tags">${l.pieces.filter(p => ["아우터", "상의", "하의", "신발"].includes(p.role)).map(p => `<span>${esc(cn(p.color, p.name))}</span>`).join("")}</div></a>`).join("") || `<p class="cmp-say">이 조건에 맞는 코디가 아직 없어요.</p>`}</div>`;
 }
 // 옷 한 줄: 종류 그림(카드가 있으면 눌러서 카드), 색 칸, 이름과 재질
-const lab = x => !x.color || (x.name || "").includes(x.color) ? x.name : x.color + " " + x.name;
+// 색과 이름을 붙이며 겹친 낱말은 한 번만("브라운 체크" + "체크 셔츠" = "브라운 체크 셔츠")
+const cn = (c, n) => (c || "") + " " + (n || "") === " " ? "" : `${c || ""} ${n || ""}`.trim().split(/\s+/).filter((w, i, a) => w !== a[i - 1]).join(" ");
+const lab = x => !x.color || (x.name || "").includes(x.color) ? x.name : cn(x.color, x.name);
 const pieceRow = (pc, extra = "") => { const c = pc.id && byId[pc.id], hex = colorHex(pc.color);
   return `<li>${c ? `<button class="lk-th" data-card="${c.id}" aria-label="${esc(c.ko)} 카드">${cimg(c.id)}</button>` : `<span class="lk-th none" style="background:${hex || "var(--tile)"}"></span>`}<div>${pc.role ? `<small>${esc(pc.role)}</small>` : ""}<b>${hex ? `<i style="background:${hex}"></i>` : ""}${esc(lab(pc))}</b>${pc.mat ? `<em class="mat">${esc(pc.mat)}</em>` : ""}${c ? `<span class="kind">그림은 종류만 보여 줘요: ${esc(c.ko)}</span>` : ""}${extra}</div></li>`; };
-const pieceCard = pc => { const c = pc.id && byId[pc.id]; const lab = `<small>${esc(pc.role)}</small>${c ? `<div class="ph">${cimg(c.id, c.ko)}</div>` : swatch(pc.color, pc.name)}<span>${esc([pc.color, pc.name].filter(Boolean).join(" "))}${pc.mat ? ` <em class="mat">${esc(pc.mat)}</em>` : ""}</span>`;
+const pieceCard = pc => { const c = pc.id && byId[pc.id]; const lab = `<small>${esc(pc.role)}</small>${c ? `<div class="ph">${cimg(c.id, c.ko)}</div>` : swatch(pc.color, pc.name)}<span>${esc(cn(pc.color, pc.name))}${pc.mat ? ` <em class="mat">${esc(pc.mat)}</em>` : ""}</span>`;
   return c ? `<button class="pc" data-card="${c.id}">${lab}</button>` : `<div class="pc">${lab}</div>`; };
 
 /* 짝 맞추기: 집에 있는 옷 하나로 이너, 신발, 소품까지 */

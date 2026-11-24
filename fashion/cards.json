@@ -30672,6 +30672,413 @@
    "point": "어두운 색을 위아래로 맞추고 자켓의 자수와 볼캡으로만 디테일을 줘서 걸을 때 실루엣이 깔끔해요."
   },
   {
+   "id": "K2A7",
+   "kind": "instagram",
+   "url": "https://www.instagram.com/p/DVaj5S7kvtk/",
+   "code": "DVaj5S7kvtk",
+   "start": 0,
+   "who": "패션 유튜버",
+   "account": "@cosmoss_xx",
+   "season": "봄",
+   "for": "남",
+   "scene": [
+    "일상"
+   ],
+   "style": "아메카지",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "하이넥 자켓",
+     "color": "카키 그레이",
+     "mat": "나일론",
+     "id": "jacket"
+    },
+    {
+     "role": "하의",
+     "name": "와이드 데님 팬츠",
+     "color": "연청",
+     "mat": "데님",
+     "id": "jeans"
+    },
+    {
+     "role": "신발",
+     "name": "슬립온 슈즈",
+     "color": "베이지",
+     "mat": "",
+     "id": null
+    },
+    {
+     "role": "가방",
+     "name": "숄더백",
+     "color": "검정",
+     "mat": "",
+     "id": "shoulderbag"
+    }
+   ],
+   "point": "카키 그레이 자켓과 빛바랜 연청 바지가 같은 낮은 채도라 서로 번지듯 어울려요. 검정 가방이 한 점으로 모양을 잡아 줘요."
+  },
+  {
+   "id": "K2A8",
+   "kind": "instagram",
+   "url": "https://www.instagram.com/p/DWV6ikIEpJx/",
+   "code": "DWV6ikIEpJx",
+   "start": 0,
+   "who": "패션 유튜버",
+   "account": "@cosmoss_xx",
+   "season": "봄",
+   "for": "남",
+   "scene": [
+    "일상"
+   ],
+   "style": "워크웨어",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "풀오버 셔츠",
+     "color": "검정",
+     "mat": "면",
+     "id": "overshirt"
+    },
+    {
+     "role": "하의",
+     "name": "와이드 데님 팬츠",
+     "color": "진청",
+     "mat": "데님",
+     "id": "jeans"
+    },
+    {
+     "role": "신발",
+     "name": "가죽 워커 슈즈",
+     "color": "브라운",
+     "mat": "가죽",
+     "id": "workboots"
+    },
+    {
+     "role": "소품",
+     "name": "뿔테 안경",
+     "color": "검정",
+     "mat": "",
+     "id": "glasses"
+    }
+   ],
+   "point": "검정 상의에 진청 바지를 겹쳐 어두운 톤으로 모았고 브라운 가죽 신발만 따뜻한 색이에요. 앉은 자세에서도 바지 밑단이 신발 위로 자연스럽게 쌓여요."
+  },
+  {
+   "id": "K2A9",
+   "kind": "instagram",
+   "url": "https://www.instagram.com/p/DLhQHJGxAxo/",
+   "code": "DLhQHJGxAxo",
+   "start": 0,
+   "who": "패션 유튜버",
+   "account": "@cosmoss_xx",
+   "season": "여름",
+   "for": "남",
+   "scene": [
+    "일상"
+   ],
+   "style": "스트릿",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "그래픽 반팔 티셔츠",
+     "color": "빨강",
+     "mat": "면",
+     "id": "tee"
+    },
+    {
+     "role": "하의",
+     "name": "와이드 팬츠",
+     "color": "차콜",
+     "mat": "",
+     "id": "wide"
+    },
+    {
+     "role": "신발",
+     "name": "스니커즈",
+     "color": "흰색",
+     "mat": "",
+     "id": "lowtop"
+    },
+    {
+     "role": "소품",
+     "name": "볼캡",
+     "color": "카키",
+     "mat": "",
+     "id": "ballcap"
+    }
+   ],
+   "point": "빨간 티셔츠가 유일한 원색이라 차콜 와이드 팬츠 위에서 눈에 확 띄어요. 볼캡과 흰 신발이 위와 아래를 가볍게 이어요."
+  },
+  {
+   "id": "K2A10",
+   "kind": "instagram",
+   "url": "https://www.instagram.com/p/DNhWi-qvFyN/",
+   "code": "DNhWi-qvFyN",
+   "start": 0,
+   "who": "패션 유튜버",
+   "account": "@cosmoss_xx",
+   "season": "여름",
+   "for": "남",
+   "scene": [
+    "여행"
+   ],
+   "style": "스포티",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "후드 바람막이",
+     "color": "주황",
+     "mat": "나일론",
+     "id": "windbreaker"
+    },
+    {
+     "role": "하의",
+     "name": "프린트 반바지",
+     "color": "검정",
+     "mat": "",
+     "id": "shorts"
+    },
+    {
+     "role": "신발",
+     "name": "슬리퍼",
+     "color": "검정",
+     "mat": "",
+     "id": null
+    },
+    {
+     "role": "소품",
+     "name": "밀짚모자",
+     "color": "베이지",
+     "mat": "",
+     "id": null
+    }
+   ],
+   "point": "주황 바람막이를 검정 반바지 위에 걸쳐 색 대비가 크고 모래색 배경에서도 선명해요. 밀짚모자를 얹어 여행 분위기를 한 번에 냈어요."
+  },
+  {
+   "id": "K2A15",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/watch?v=CwEOCowmodE",
+   "code": "CwEOCowmodE",
+   "start": 0,
+   "who": "일반인 유튜버",
+   "account": "뽀글머리의 옷장",
+   "season": "봄",
+   "for": "남",
+   "scene": [
+    "일상"
+   ],
+   "style": "아메카지",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "워크 재킷",
+     "color": "차콜 그레이",
+     "mat": "린넨",
+     "id": "chore"
+    },
+    {
+     "role": "상의",
+     "name": "데님 셔츠",
+     "color": "중청",
+     "mat": "데님",
+     "id": "denimshirt"
+    },
+    {
+     "role": "하의",
+     "name": "스트레이트 데님 팬츠",
+     "color": "진청",
+     "mat": "데님",
+     "id": "jeans"
+    }
+   ],
+   "point": "회색 재킷 안에 중청 셔츠, 밑에 진청 바지로 파랑이 점점 짙어져서 단정하게 보여요. 재킷 앞을 열어 셔츠 색을 보여 준 게 포인트예요."
+  },
+  {
+   "id": "K2C23",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/shorts/SN8IRzUyvtU",
+   "code": "SN8IRzUyvtU",
+   "start": 0,
+   "who": "패션 유튜버",
+   "account": "Joon tube 준튜브",
+   "season": "가을",
+   "for": "남",
+   "scene": [
+    "출근"
+   ],
+   "style": "미니멀",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "니트 집업 카디건",
+     "color": "네이비",
+     "mat": "니트",
+     "id": "knitzipup"
+    },
+    {
+     "role": "하의",
+     "name": "와이드 슬랙스",
+     "color": "그레이",
+     "mat": "",
+     "id": "slacks"
+    }
+   ],
+   "point": "지퍼를 올린 네이비 니트에 회색 슬랙스를 입으면 출근길에 구김 걱정 없이 단정해 보여요."
+  },
+  {
+   "id": "K2C32",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/shorts/lHhQVp2wLKA",
+   "code": "lHhQVp2wLKA",
+   "start": 0,
+   "who": "패션 유튜버",
+   "account": "제이치 JeyH",
+   "season": "가을",
+   "for": "남",
+   "scene": [
+    "일상"
+   ],
+   "style": "시티보이",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "롱 트렌치 코트",
+     "color": "블랙",
+     "mat": "면",
+     "id": "trench"
+    },
+    {
+     "role": "하의",
+     "name": "와이드 카고 팬츠",
+     "color": "베이지",
+     "mat": "면",
+     "id": "cargo"
+    },
+    {
+     "role": "신발",
+     "name": "로퍼",
+     "color": "블랙",
+     "mat": "가죽",
+     "id": "loafer"
+    },
+    {
+     "role": "소품",
+     "name": "볼캡",
+     "color": "블랙",
+     "mat": "",
+     "id": "ballcap"
+    }
+   ],
+   "point": "발목까지 오는 검정 트렌치 아래로 베이지 바지가 빠져서 어두운 겉옷이 무겁게만 보이지 않아요."
+  },
+  {
+   "id": "K2C33",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/shorts/RLelSykbZqI",
+   "code": "RLelSykbZqI",
+   "start": 0,
+   "who": "패션 유튜버",
+   "account": "데일리룸",
+   "season": "가을",
+   "for": "남",
+   "scene": [
+    "등교"
+   ],
+   "style": "시티보이",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "프린트 맨투맨",
+     "color": "네이비",
+     "mat": "면",
+     "id": "sweatshirt"
+    },
+    {
+     "role": "상의",
+     "name": "옥스포드 셔츠",
+     "color": "화이트",
+     "mat": "면",
+     "id": "oxford"
+    },
+    {
+     "role": "하의",
+     "name": "와이드 데님 팬츠",
+     "color": "연청",
+     "mat": "데님",
+     "id": "jeans"
+    },
+    {
+     "role": "소품",
+     "name": "볼캡",
+     "color": "베이지",
+     "mat": "",
+     "id": "ballcap"
+    },
+    {
+     "role": "신발",
+     "name": "스웨이드 슈즈",
+     "color": "베이지",
+     "mat": "스웨이드",
+     "id": "loafer"
+    }
+   ],
+   "point": "맨투맨 아래로 흰 셔츠 단을 살짝 빼 입고 헐렁한 청바지를 맞춰서 학교 가는 날 편하고 단정해요."
+  },
+  {
+   "id": "K2C34",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/shorts/-TsbAA89NNA",
+   "code": "-TsbAA89NNA",
+   "start": 0,
+   "who": "패션 유튜버",
+   "account": "빵권오빠",
+   "season": "가을",
+   "for": "남",
+   "scene": [
+    "일상"
+   ],
+   "style": "빈티지",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "M-65 야상",
+     "color": "빈티지 올리브",
+     "mat": "면",
+     "id": "m65"
+    },
+    {
+     "role": "상의",
+     "name": "웨스턴 셔츠",
+     "color": "라이트 블루",
+     "mat": "면",
+     "id": "western"
+    },
+    {
+     "role": "상의",
+     "name": "나바호 베스트",
+     "color": "레드",
+     "mat": "",
+     "id": "vest2"
+    },
+    {
+     "role": "하의",
+     "name": "리바이스 505",
+     "color": "진청",
+     "mat": "데님",
+     "id": "jeans"
+    },
+    {
+     "role": "신발",
+     "name": "웨스턴 부츠",
+     "color": "브라운",
+     "mat": "가죽",
+     "id": null
+    }
+   ],
+   "point": "야상 속에 붉은 베스트와 웨스턴 셔츠를 겹쳐 입어서 빈티지 한 벌 안에서 색이 층마다 나뉘어요."
+  },
+  {
    "id": "K6",
    "kind": "instagram",
    "url": "https://www.instagram.com/p/DVGN100Ehlq/",
@@ -31136,6 +31543,2884 @@
    "point": "네이비 한 색으로 위아래를 맞추고 검정 구두로 마무리해서 정장처럼 단정한데 안은 티셔츠라 편해요."
   },
   {
+   "id": "K2A1",
+   "kind": "instagram",
+   "url": "https://www.instagram.com/p/C5mq7y2vI_i/",
+   "code": "C5mq7y2vI_i",
+   "start": 0,
+   "who": "일반인",
+   "account": "@_lookatmedude",
+   "season": "봄",
+   "for": "남",
+   "scene": [
+    "출근"
+   ],
+   "style": "캐주얼",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "스트라이프 옥스포드 셔츠",
+     "color": "하늘색",
+     "mat": "면",
+     "id": "oxford"
+    },
+    {
+     "role": "하의",
+     "name": "와이드 데님 팬츠",
+     "color": "연청",
+     "mat": "데님",
+     "id": "jeans"
+    },
+    {
+     "role": "신발",
+     "name": "캔버스 스니커즈",
+     "color": "파랑",
+     "mat": "",
+     "id": "lowtop"
+    },
+    {
+     "role": "가방",
+     "name": "토트백",
+     "color": "검정",
+     "mat": "",
+     "id": "tote"
+    }
+   ],
+   "point": "하늘색 셔츠를 밑단까지 풀어 입고 연청 와이드 팬츠로 이어서 위아래가 시원하게 떨어져요. 파란 스니커즈가 하나뿐인 포인트라서 눈이 아래로 모여요."
+  },
+  {
+   "id": "K2A5",
+   "kind": "instagram",
+   "url": "https://www.instagram.com/p/DWV2RclkUJb/",
+   "code": "DWV2RclkUJb",
+   "start": 0,
+   "who": "일반인",
+   "account": "@hxxax_",
+   "season": "봄",
+   "for": "남",
+   "scene": [
+    "일상"
+   ],
+   "style": "미니멀",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "숏 블루종",
+     "color": "검정",
+     "mat": "",
+     "id": "blouson"
+    },
+    {
+     "role": "상의",
+     "name": "티셔츠",
+     "color": "흰색",
+     "mat": "면",
+     "id": "tee"
+    },
+    {
+     "role": "하의",
+     "name": "와이드 슬랙스",
+     "color": "검정",
+     "mat": "",
+     "id": "slacks"
+    },
+    {
+     "role": "신발",
+     "name": "구두",
+     "color": "검정",
+     "mat": "",
+     "id": null
+    }
+   ],
+   "point": "검정 짧은 자켓 안에 흰 티를 넣어 가슴 쪽만 밝게 비워 두었어요. 일자로 떨어지는 검정 바지가 다리를 길게 보여 줘요."
+  },
+  {
+   "id": "K2A11",
+   "kind": "instagram",
+   "url": "https://www.instagram.com/p/DLhiKMBJwS8/",
+   "code": "DLhiKMBJwS8",
+   "start": 0,
+   "who": "일반인",
+   "account": "@daily_han_soo",
+   "season": "봄",
+   "for": "남",
+   "scene": [
+    "일상"
+   ],
+   "style": "댄디",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "블레이저",
+     "color": "버건디",
+     "mat": "",
+     "id": "blazer"
+    },
+    {
+     "role": "하의",
+     "name": "데님 팬츠",
+     "color": "연청",
+     "mat": "데님",
+     "id": "jeans"
+    },
+    {
+     "role": "신발",
+     "name": "로퍼",
+     "color": "브라운",
+     "mat": "가죽",
+     "id": "loafer"
+    }
+   ],
+   "point": "버건디 블레이저에 연청 바지를 입어 격식과 편함이 반반이에요. 브라운 로퍼가 재킷 색과 이어져서 아래까지 정리돼요."
+  },
+  {
+   "id": "K2B1",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/watch?v=wwCaHproZkI",
+   "code": "wwCaHproZkI",
+   "start": 0,
+   "who": "일반인",
+   "account": "율오공",
+   "season": "봄",
+   "for": "여",
+   "scene": [
+    "일상"
+   ],
+   "style": "캐주얼",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "화이트 자켓",
+     "color": "화이트",
+     "mat": "",
+     "id": "jacket"
+    },
+    {
+     "role": "상의",
+     "name": "슬림 탑",
+     "color": "세이지 그레이",
+     "mat": "",
+     "id": null
+    },
+    {
+     "role": "하의",
+     "name": "데미지 데님 팬츠",
+     "color": "라이트 블루",
+     "mat": "데님",
+     "id": "jeans"
+    },
+    {
+     "role": "소품",
+     "name": "스카프",
+     "color": "아이보리",
+     "mat": "",
+     "id": null
+    }
+   ],
+   "point": "흰 재킷 속에 톤을 낮춘 회색 탑을 입고 색 바랜 찢어진 청바지로 힘을 빼서 단정한데도 부담스럽지 않아요."
+  },
+  {
+   "id": "K2B2",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/watch?v=Q-XDPBXzReY",
+   "code": "Q-XDPBXzReY",
+   "start": 0,
+   "who": "일반인",
+   "account": "배배자매",
+   "season": "봄",
+   "for": "여",
+   "scene": [
+    "일상"
+   ],
+   "style": "페미닌",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "케이블 가디건",
+     "color": "화이트",
+     "mat": "니트",
+     "id": "cable"
+    },
+    {
+     "role": "상의",
+     "name": "캐미 탑",
+     "color": "라벤더 그레이",
+     "mat": "",
+     "id": null
+    },
+    {
+     "role": "하의",
+     "name": "쉬폰 레이어드 스커트",
+     "color": "라일락",
+     "mat": "쉬폰",
+     "id": null
+    },
+    {
+     "role": "하의",
+     "name": "와이드 팬츠",
+     "color": "화이트",
+     "mat": "",
+     "id": "slacks"
+    },
+    {
+     "role": "소품",
+     "name": "벨트",
+     "color": "화이트",
+     "mat": "",
+     "id": "belt"
+    }
+   ],
+   "point": "흰 꽈배기 가디건 아래로 연보라 쉬폰 자락을 층지게 내보내고 흰 바지로 받쳐서 가볍고 몽글한 색이 한 번에 맞아요."
+  },
+  {
+   "id": "K2B5",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/watch?v=7JfncX2fU24",
+   "code": "7JfncX2fU24",
+   "start": 0,
+   "who": "일반인",
+   "account": "미정",
+   "season": "봄",
+   "for": "여",
+   "scene": [
+    "등교"
+   ],
+   "style": "스트릿",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "프린트 후드티",
+     "color": "민트",
+     "mat": "기모",
+     "id": "hoodie"
+    },
+    {
+     "role": "하의",
+     "name": "플리츠 스커트",
+     "color": "그레이",
+     "mat": "",
+     "id": "pleatskirt"
+    },
+    {
+     "role": "소품",
+     "name": "크루 삭스",
+     "color": "화이트",
+     "mat": "",
+     "id": "socks"
+    },
+    {
+     "role": "신발",
+     "name": "스니커즈",
+     "color": "블랙",
+     "mat": "",
+     "id": "lowtop"
+    },
+    {
+     "role": "가방",
+     "name": "숄더백",
+     "color": "화이트",
+     "mat": "",
+     "id": "shoulderbag"
+    }
+   ],
+   "point": "헐렁한 민트 후드에 짧은 회색 플리츠 스커트를 입고 흰 양말을 크게 보여 주어서 큰 윗도리와 작은 아랫도리의 균형이 귀여워요."
+  },
+  {
+   "id": "K2B7",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/watch?v=9-isgnd99ZM",
+   "code": "9-isgnd99ZM",
+   "start": 0,
+   "who": "일반인",
+   "account": "정잉주",
+   "season": "봄",
+   "for": "여",
+   "scene": [
+    "출근"
+   ],
+   "style": "미니멀",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "스트라이프 셔츠",
+     "color": "다크 틸",
+     "mat": "면",
+     "id": "stripeshirt"
+    },
+    {
+     "role": "하의",
+     "name": "와이드 팬츠",
+     "color": "크림",
+     "mat": "",
+     "id": "slacks"
+    }
+   ],
+   "point": "허리 뒤가 밴딩이라 편한 줄무늬 셔츠 위에 크림색 통바지를 입어서 진한 윗색과 밝은 아랫색이 나뉘어 앉아 있어도 갑갑해 보이지 않아요."
+  },
+  {
+   "id": "K2B8",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/watch?v=r234c4YIp0o",
+   "code": "r234c4YIp0o",
+   "start": 0,
+   "who": "일반인",
+   "account": "LOVELY핫핑",
+   "season": "봄",
+   "for": "여",
+   "scene": [
+    "데이트"
+   ],
+   "style": "페미닌",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "니트 가디건",
+     "color": "네이비",
+     "mat": "니트",
+     "id": "cardigan"
+    },
+    {
+     "role": "원피스",
+     "name": "미니 원피스",
+     "color": "화이트",
+     "mat": "",
+     "id": null
+    },
+    {
+     "role": "신발",
+     "name": "롱 부츠",
+     "color": "블랙",
+     "mat": "",
+     "id": null
+    }
+   ],
+   "point": "남색 가디건이 흰 미니 원피스의 가벼움을 눌러 주고 검은 부츠가 다리를 이어서 벚꽃 아래에서도 색이 또렷해요."
+  },
+  {
+   "id": "K2B9",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/watch?v=DO7ys_8dARc",
+   "code": "DO7ys_8dARc",
+   "start": 0,
+   "who": "일반인",
+   "account": "스타일앤이지",
+   "season": "봄",
+   "for": "여",
+   "scene": [
+    "일상"
+   ],
+   "style": "캐주얼",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "스트라이프 가디건",
+     "color": "그레이 화이트",
+     "mat": "니트",
+     "id": "cardigan"
+    },
+    {
+     "role": "하의",
+     "name": "크림 팬츠",
+     "color": "크림",
+     "mat": "",
+     "id": "slacks"
+    },
+    {
+     "role": "신발",
+     "name": "플랫 슈즈",
+     "color": "베이지",
+     "mat": "",
+     "id": null
+    },
+    {
+     "role": "가방",
+     "name": "니트 백",
+     "color": "화이트",
+     "mat": "",
+     "id": "sweater"
+    }
+   ],
+   "point": "줄무늬 가디건을 어깨에 두르고 아래는 크림 바지와 베이지 플랫으로 맞춰서 횡단보도에서도 밝은 색이 한 줄로 이어져요."
+  },
+  {
+   "id": "K2B10",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/watch?v=CG0J00rX134",
+   "code": "CG0J00rX134",
+   "start": 0,
+   "who": "일반인",
+   "account": "세니",
+   "season": "봄",
+   "for": "여",
+   "scene": [
+    "일상"
+   ],
+   "style": "페미닌",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "레이스 소매 탑",
+     "color": "화이트",
+     "mat": "레이스",
+     "id": null
+    },
+    {
+     "role": "상의",
+     "name": "캐미 레이어드",
+     "color": "핑크",
+     "mat": "",
+     "id": null
+    },
+    {
+     "role": "하의",
+     "name": "롱스커트",
+     "color": "화이트",
+     "mat": "",
+     "id": "longskirt"
+    }
+   ],
+   "point": "흰 레이스 소매 위에 분홍 캐미를 겹치고 흰 롱스커트로 내려서 색은 적지만 겹친 면이 많아 밋밋하지 않아요."
+  },
+  {
+   "id": "K2B11",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/watch?v=FJKwHt-wPco",
+   "code": "FJKwHt-wPco",
+   "start": 0,
+   "who": "일반인",
+   "account": "진숭이",
+   "season": "봄",
+   "for": "여",
+   "scene": [
+    "데이트"
+   ],
+   "style": "페미닌",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "리본 포인트 티",
+     "color": "그레이",
+     "mat": "",
+     "id": "tee"
+    },
+    {
+     "role": "하의",
+     "name": "플리츠 롱스커트",
+     "color": "민트",
+     "mat": "",
+     "id": "pleatskirt"
+    }
+   ],
+   "point": "짧은 회색 티에 연한 민트 플리츠 스커트를 입어서 상체는 단정하게 줄이고 치맛자락이 퍼지며 키가 커 보여요."
+  },
+  {
+   "id": "K2B13",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/watch?v=JMH4sBmfun0",
+   "code": "JMH4sBmfun0",
+   "start": 0,
+   "who": "일반인",
+   "account": "쏠미체 MICHAE",
+   "season": "봄",
+   "for": "여",
+   "scene": [
+    "일상"
+   ],
+   "style": "빈티지",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "니트 가디건",
+     "color": "블루 그레이",
+     "mat": "니트",
+     "id": "cardigan"
+    },
+    {
+     "role": "상의",
+     "name": "블라우스",
+     "color": "화이트",
+     "mat": "",
+     "id": "blouse"
+    },
+    {
+     "role": "하의",
+     "name": "플라워 롱스커트",
+     "color": "멀티",
+     "mat": "코튼",
+     "id": "longskirt"
+    },
+    {
+     "role": "하의",
+     "name": "와이드 데님",
+     "color": "라이트 블루",
+     "mat": "데님",
+     "id": "jeans"
+    }
+   ],
+   "point": "꽃무늬 롱스커트 밑으로 연한 청바지를 한 번 더 겹쳐서 무늬가 요란한데도 색이 비슷해 정리돼 보여요."
+  },
+  {
+   "id": "K2B14",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/watch?v=DKdyRw6vNV4",
+   "code": "DKdyRw6vNV4",
+   "start": 0,
+   "who": "일반인",
+   "account": "yyoonsu윤수수깡",
+   "season": "봄",
+   "for": "여",
+   "scene": [
+    "일상"
+   ],
+   "style": "고프코어",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "컬러블록 윈드브레이커",
+     "color": "블루 블랙",
+     "mat": "나일론",
+     "id": "windbreaker"
+    },
+    {
+     "role": "하의",
+     "name": "미니 스커트",
+     "color": "블랙",
+     "mat": "",
+     "id": null
+    },
+    {
+     "role": "소품",
+     "name": "양말",
+     "color": "그레이 블루",
+     "mat": "",
+     "id": "socks"
+    }
+   ],
+   "point": "남색과 검정이 갈린 바람막이를 크게 입고 짧은 검은 스커트에 회청색 양말을 올려서 아웃도어 옷이 귀엽게 풀려요."
+  },
+  {
+   "id": "K2B15",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/watch?v=e3Uzv8l6uOo",
+   "code": "e3Uzv8l6uOo",
+   "start": 0,
+   "who": "일반인",
+   "account": "어썸하비",
+   "season": "봄",
+   "for": "여",
+   "scene": [
+    "데이트"
+   ],
+   "style": "페미닌",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "가디건",
+     "color": "네이비",
+     "mat": "니트",
+     "id": "cardigan"
+    },
+    {
+     "role": "상의",
+     "name": "롱 캐미",
+     "color": "화이트",
+     "mat": "",
+     "id": null
+    },
+    {
+     "role": "하의",
+     "name": "플레어 데님",
+     "color": "라이트 블루",
+     "mat": "데님",
+     "id": "jeans"
+    },
+    {
+     "role": "신발",
+     "name": "샌들",
+     "color": "베이지",
+     "mat": "",
+     "id": "sandal"
+    }
+   ],
+   "point": "엉덩이를 덮는 흰 캐미 위에 남색 가디건을 열어 입고 아래를 플레어 청바지로 넓혀서 하체가 한 번에 정리돼 보여요."
+  },
+  {
+   "id": "K2B16",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/watch?v=narMgBcVvlY",
+   "code": "narMgBcVvlY",
+   "start": 0,
+   "who": "일반인",
+   "account": "소희 Savhee",
+   "season": "봄",
+   "for": "여",
+   "scene": [
+    "일상"
+   ],
+   "style": "프레피",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "헨리넥 롱슬리브",
+     "color": "네이비",
+     "mat": "면",
+     "id": "henleytee"
+    },
+    {
+     "role": "아우터",
+     "name": "가디건",
+     "color": "그레이",
+     "mat": "니트",
+     "id": "cardigan"
+    },
+    {
+     "role": "하의",
+     "name": "플레어 데님",
+     "color": "블랙",
+     "mat": "데님",
+     "id": "jeans"
+    },
+    {
+     "role": "신발",
+     "name": "로퍼",
+     "color": "블랙",
+     "mat": "",
+     "id": "loafer"
+    }
+   ],
+   "point": "단추가 달린 남색 헨리넥을 허리 아래로 넣고 검은 부츠컷 청바지에 로퍼를 맞춰서 색은 어두운데 선이 날렵해요."
+  },
+  {
+   "id": "K2B18",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/watch?v=H9juv9M-M9E",
+   "code": "H9juv9M-M9E",
+   "start": 0,
+   "who": "일반인",
+   "account": "오느리 oneulee",
+   "season": "봄",
+   "for": "여",
+   "scene": [
+    "데이트"
+   ],
+   "style": "시크",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "레더 자켓",
+     "color": "블랙",
+     "mat": "레더",
+     "id": "leatherjacket"
+    },
+    {
+     "role": "원피스",
+     "name": "언발란스 니트 원피스",
+     "color": "아이보리",
+     "mat": "니트",
+     "id": "knitdress"
+    },
+    {
+     "role": "하의",
+     "name": "와이드 팬츠",
+     "color": "블랙",
+     "mat": "",
+     "id": "slacks"
+    }
+   ],
+   "point": "각진 검정 가죽 재킷 안에 자락이 비대칭인 아이보리 원피스를 입고 검은 바지를 겹쳐서 딱딱한 것과 흐르는 것이 같이 있어요."
+  },
+  {
+   "id": "K2B19",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/watch?v=9uZWI32kujI",
+   "code": "9uZWI32kujI",
+   "start": 0,
+   "who": "일반인",
+   "account": "리안데",
+   "season": "봄",
+   "for": "여",
+   "scene": [
+    "출근"
+   ],
+   "style": "미니멀",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "포플린 셔츠",
+     "color": "스카이 블루",
+     "mat": "면",
+     "id": "poplinshirt"
+    },
+    {
+     "role": "하의",
+     "name": "와이드 데님",
+     "color": "워싱 블루",
+     "mat": "데님",
+     "id": "jeans"
+    },
+    {
+     "role": "소품",
+     "name": "벨트",
+     "color": "블랙",
+     "mat": "",
+     "id": "belt"
+    },
+    {
+     "role": "가방",
+     "name": "나일론 숄더백",
+     "color": "블랙",
+     "mat": "나일론",
+     "id": "shoulderbag"
+    }
+   ],
+   "point": "하늘색 셔츠를 바지 안에 넣고 검은 벨트와 검은 가방으로 포인트를 맞춰서 청바지가 편해도 출근룩처럼 정돈돼요."
+  },
+  {
+   "id": "K2B20",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/watch?v=gZbtg4-HtA0",
+   "code": "gZbtg4-HtA0",
+   "start": 0,
+   "who": "일반인",
+   "account": "백세시대",
+   "season": "봄",
+   "for": "여",
+   "scene": [
+    "등교"
+   ],
+   "style": "캐주얼",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "체크 셔츠",
+     "color": "블랙 화이트",
+     "mat": "면",
+     "id": "casualshirt"
+    },
+    {
+     "role": "상의",
+     "name": "크롭 탱크",
+     "color": "화이트",
+     "mat": "",
+     "id": "tank"
+    },
+    {
+     "role": "하의",
+     "name": "배기 데님",
+     "color": "라이트 블루",
+     "mat": "데님",
+     "id": "jeans"
+    },
+    {
+     "role": "가방",
+     "name": "백팩",
+     "color": "블랙",
+     "mat": "",
+     "id": "backpack"
+    }
+   ],
+   "point": "검정 체크 셔츠를 풀어 걸치고 흰 탱크와 헐렁한 연청바지로 이어서 어두운 줄과 밝은 줄이 교차해 가볍게 입은 티가 나요."
+  },
+  {
+   "id": "K2B21",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/watch?v=S31gRA0kJeU",
+   "code": "S31gRA0kJeU",
+   "start": 0,
+   "who": "일반인",
+   "account": "희희룩 HEEHEELOOK",
+   "season": "봄",
+   "for": "여",
+   "scene": [
+    "등교"
+   ],
+   "style": "캐주얼",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "데님 셔츠",
+     "color": "인디고",
+     "mat": "데님",
+     "id": "denimshirt"
+    },
+    {
+     "role": "하의",
+     "name": "와이드 팬츠",
+     "color": "블랙",
+     "mat": "",
+     "id": "slacks"
+    },
+    {
+     "role": "신발",
+     "name": "스니커즈",
+     "color": "화이트",
+     "mat": "",
+     "id": "lowtop"
+    }
+   ],
+   "point": "어깨가 넉넉한 진청 데님 셔츠에 검은 통바지를 내려 입고 흰 운동화로 끊어서 큰 옷끼리도 위아래 색이 갈려 단단해 보여요."
+  },
+  {
+   "id": "K2B22",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/watch?v=j_Xg8Hzwy8s",
+   "code": "j_Xg8Hzwy8s",
+   "start": 0,
+   "who": "일반인",
+   "account": "자꼬기",
+   "season": "봄",
+   "for": "여",
+   "scene": [
+    "일상"
+   ],
+   "style": "캐주얼",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "반팔 티셔츠",
+     "color": "화이트",
+     "mat": "면",
+     "id": "tee"
+    },
+    {
+     "role": "하의",
+     "name": "데미지 스키니 데님",
+     "color": "블루",
+     "mat": "데님",
+     "id": "jeans"
+    },
+    {
+     "role": "신발",
+     "name": "하이탑 스니커즈",
+     "color": "그레이",
+     "mat": "캔버스",
+     "id": "hightop"
+    },
+    {
+     "role": "가방",
+     "name": "백팩",
+     "color": "블랙",
+     "mat": "",
+     "id": "backpack"
+    }
+   ],
+   "point": "흰 티에 무릎이 찢어진 몸에 붙는 청바지를 입고 하이탑을 신어서 기본 두 가지만으로 다리선이 곧게 보여요."
+  },
+  {
+   "id": "K2B23",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/watch?v=9258RH0_atY",
+   "code": "9258RH0_atY",
+   "start": 0,
+   "who": "일반인",
+   "account": "여은 Yeo Eun",
+   "season": "봄",
+   "for": "여",
+   "scene": [
+    "일상"
+   ],
+   "style": "캐주얼",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "로고 티셔츠",
+     "color": "화이트",
+     "mat": "면",
+     "id": "tee"
+    },
+    {
+     "role": "하의",
+     "name": "플레어 데님",
+     "color": "미디엄 블루",
+     "mat": "데님",
+     "id": "jeans"
+    },
+    {
+     "role": "신발",
+     "name": "캔버스 스니커즈",
+     "color": "블랙",
+     "mat": "캔버스",
+     "id": "canvas"
+    }
+   ],
+   "point": "흰 로고 티를 짧게 입고 허리가 높은 플레어 청바지로 이어서 상체는 작고 다리는 길게 보이는 비율이 나와요."
+  },
+  {
+   "id": "K2B26",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/watch?v=EeGOQ3gIzBI",
+   "code": "EeGOQ3gIzBI",
+   "start": 0,
+   "who": "일반인",
+   "account": "아리ARI_HI",
+   "season": "봄",
+   "for": "여",
+   "scene": [
+    "일상"
+   ],
+   "style": "캐주얼",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "레더 자켓",
+     "color": "블랙",
+     "mat": "레더",
+     "id": "leatherjacket"
+    },
+    {
+     "role": "하의",
+     "name": "주름 롱스커트",
+     "color": "화이트",
+     "mat": "",
+     "id": "longskirt"
+    },
+    {
+     "role": "소품",
+     "name": "양말",
+     "color": "블루",
+     "mat": "",
+     "id": "socks"
+    },
+    {
+     "role": "가방",
+     "name": "미니 숄더백",
+     "color": "블랙",
+     "mat": "",
+     "id": "shoulderbag"
+    }
+   ],
+   "point": "짧은 검은 가죽 재킷에 바닥까지 닿는 흰 스커트를 입고 푸른 양말로 한 군데만 색을 넣어서 흑백 안에서 발이 눈에 띄어요."
+  },
+  {
+   "id": "K2B29",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/watch?v=tTa1pxAQ8Yw",
+   "code": "tTa1pxAQ8Yw",
+   "start": 0,
+   "who": "일반인",
+   "account": "화영 hwayoung",
+   "season": "봄",
+   "for": "여",
+   "scene": [
+    "데이트"
+   ],
+   "style": "캐주얼",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "래글런 티",
+     "color": "그레이",
+     "mat": "면",
+     "id": null
+    },
+    {
+     "role": "소품",
+     "name": "니트(허리에 묶음)",
+     "color": "퍼플",
+     "mat": "니트",
+     "id": "sweater"
+    },
+    {
+     "role": "하의",
+     "name": "쇼츠",
+     "color": "블랙",
+     "mat": "",
+     "id": "shorts"
+    }
+   ],
+   "point": "회색 티에 짙은 보라 니트를 허리에 묶고 검은 쇼츠를 입어서 무채색 속에 보라색이 한 번만 들어가 단정히 눈에 띄어요."
+  },
+  {
+   "id": "K2B30",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/watch?v=6nvsQkNMVas",
+   "code": "6nvsQkNMVas",
+   "start": 0,
+   "who": "일반인",
+   "account": "모노데일리 MONO_DAILY",
+   "season": "여름",
+   "for": "여",
+   "scene": [
+    "데이트"
+   ],
+   "style": "미니멀",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "레이어드 탱크",
+     "color": "베이지 오렌지",
+     "mat": "",
+     "id": "tank"
+    },
+    {
+     "role": "하의",
+     "name": "맥시 스커트",
+     "color": "그레이",
+     "mat": "",
+     "id": null
+    },
+    {
+     "role": "소품",
+     "name": "벨트",
+     "color": "브라운",
+     "mat": "",
+     "id": "belt"
+    },
+    {
+     "role": "신발",
+     "name": "플립플랍",
+     "color": "블랙",
+     "mat": "",
+     "id": null
+    }
+   ],
+   "point": "베이지 탱크 안쪽에 주황을 한 겹 비치게 입고 회색 맥시 스커트를 길게 내려서 한 계열 색이 따뜻하게 이어져요."
+  },
+  {
+   "id": "K2B32",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/watch?v=qKqSzEqI1uM",
+   "code": "qKqSzEqI1uM",
+   "start": 0,
+   "who": "일반인",
+   "account": "뉴데이뉴미",
+   "season": "여름",
+   "for": "여",
+   "scene": [
+    "출근"
+   ],
+   "style": "출근룩",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "반팔 티",
+     "color": "크림",
+     "mat": "",
+     "id": "tee"
+    },
+    {
+     "role": "하의",
+     "name": "슬릿 롱스커트",
+     "color": "블랙",
+     "mat": "",
+     "id": "longskirt"
+    },
+    {
+     "role": "소품",
+     "name": "벨트",
+     "color": "블랙",
+     "mat": "",
+     "id": "belt"
+    },
+    {
+     "role": "신발",
+     "name": "스트랩 샌들",
+     "color": "블랙",
+     "mat": "",
+     "id": "sandal"
+    }
+   ],
+   "point": "크림색 반팔을 넣어 입고 검은 벨트로 허리를 끊어서 슬릿이 갈라지는 치마가 걸을 때 시원하게 열려요."
+  },
+  {
+   "id": "K2B37",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/watch?v=f8eB8Sg_i9k",
+   "code": "f8eB8Sg_i9k",
+   "start": 0,
+   "who": "일반인",
+   "account": "롱롱쌤",
+   "season": "여름",
+   "for": "여",
+   "scene": [
+    "일상"
+   ],
+   "style": "페미닌",
+   "pieces": [
+    {
+     "role": "원피스",
+     "name": "티어드 슬립 원피스",
+     "color": "화이트",
+     "mat": "",
+     "id": null
+    }
+   ],
+   "point": "어깨끈이 가는 흰 원피스가 프릴 층으로 흘러내려서 한 벌만으로 바닥까지 길고 시원한 선이 나와요."
+  },
+  {
+   "id": "K2B38",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/watch?v=VCpzX3iyzA4",
+   "code": "VCpzX3iyzA4",
+   "start": 0,
+   "who": "일반인",
+   "account": "히씨 HeeSee",
+   "season": "여름",
+   "for": "여",
+   "scene": [
+    "일상"
+   ],
+   "style": "페미닌",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "플로럴 레이스업 탑",
+     "color": "화이트 블루",
+     "mat": "",
+     "id": null
+    },
+    {
+     "role": "하의",
+     "name": "티어드 롱스커트",
+     "color": "화이트",
+     "mat": "",
+     "id": "longskirt"
+    }
+   ],
+   "point": "잔꽃무늬 끈 탑에 흰 티어드 스커트를 입어서 윗도리 무늬는 작고 치마는 단색이라 둘이 부딪치지 않아요."
+  },
+  {
+   "id": "K2B40",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/watch?v=kQ64LJrzL_Y",
+   "code": "kQ64LJrzL_Y",
+   "start": 0,
+   "who": "일반인",
+   "account": "몽뜨 monter",
+   "season": "여름",
+   "for": "여",
+   "scene": [
+    "일상"
+   ],
+   "style": "미니멀",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "반팔 티",
+     "color": "블랙",
+     "mat": "면",
+     "id": "tee"
+    },
+    {
+     "role": "하의",
+     "name": "롱스커트",
+     "color": "블랙",
+     "mat": "",
+     "id": "longskirt"
+    },
+    {
+     "role": "소품",
+     "name": "헤어밴드",
+     "color": "블랙",
+     "mat": "",
+     "id": null
+    },
+    {
+     "role": "가방",
+     "name": "라탄 바스켓백",
+     "color": "내추럴",
+     "mat": "라탄",
+     "id": null
+    }
+   ],
+   "point": "검정 한 벌로 맞추고 라탄 바구니 가방 하나만 연한 갈색으로 들어서 무채색 안에서 질감이 달라져요."
+  },
+  {
+   "id": "K2B41",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/watch?v=9eCVlEkILmU",
+   "code": "9eCVlEkILmU",
+   "start": 0,
+   "who": "일반인",
+   "account": "꽁여사",
+   "season": "여름",
+   "for": "여",
+   "scene": [
+    "일상"
+   ],
+   "style": "미니멀",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "캐미솔",
+     "color": "블랙",
+     "mat": "",
+     "id": null
+    },
+    {
+     "role": "하의",
+     "name": "롱스커트",
+     "color": "블랙",
+     "mat": "",
+     "id": "longskirt"
+    },
+    {
+     "role": "가방",
+     "name": "위빙 토트백",
+     "color": "레드 브라운",
+     "mat": "",
+     "id": "tote"
+    },
+    {
+     "role": "신발",
+     "name": "웨지 샌들",
+     "color": "블랙",
+     "mat": "",
+     "id": "sandal"
+    }
+   ],
+   "point": "검은 캐미와 검은 긴 치마 위에 붉은 갈색 가방을 들어서 어두운 옷에 한 점 색이 생기고 허리 쪽 흰 레이스가 가볍게 비쳐요."
+  },
+  {
+   "id": "K2B43",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/watch?v=KH-MdEsl_Lc",
+   "code": "KH-MdEsl_Lc",
+   "start": 0,
+   "who": "일반인",
+   "account": "라니",
+   "season": "여름",
+   "for": "여",
+   "scene": [
+    "출근"
+   ],
+   "style": "미니멀",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "린넨 셔츠",
+     "color": "화이트",
+     "mat": "린넨",
+     "id": "linenshirt"
+    },
+    {
+     "role": "하의",
+     "name": "와이드 팬츠",
+     "color": "화이트",
+     "mat": "",
+     "id": "linenpants"
+    },
+    {
+     "role": "소품",
+     "name": "벨트",
+     "color": "블랙",
+     "mat": "",
+     "id": "belt"
+    },
+    {
+     "role": "신발",
+     "name": "플랫 샌들",
+     "color": "브라운",
+     "mat": "",
+     "id": "sandal"
+    }
+   ],
+   "point": "흰 린넨 셔츠에 흰 통바지를 겹쳐 입고 검은 벨트 하나로 허리를 끊어서 올 화이트인데도 윗선이 또렷해요."
+  },
+  {
+   "id": "K2B45",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/watch?v=M8IIgA8jksM",
+   "code": "M8IIgA8jksM",
+   "start": 0,
+   "who": "일반인",
+   "account": "희락희",
+   "season": "여름",
+   "for": "여",
+   "scene": [
+    "일상"
+   ],
+   "style": "미니멀",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "민소매 탑",
+     "color": "블랙",
+     "mat": "",
+     "id": "tank"
+    },
+    {
+     "role": "하의",
+     "name": "미디 스커트",
+     "color": "블랙",
+     "mat": "",
+     "id": null
+    },
+    {
+     "role": "소품",
+     "name": "스웻셔츠(허리에 묶음)",
+     "color": "민트",
+     "mat": "",
+     "id": "sweatshirt"
+    },
+    {
+     "role": "신발",
+     "name": "스니커즈",
+     "color": "블랙",
+     "mat": "",
+     "id": "lowtop"
+    }
+   ],
+   "point": "검은 민소매에 검은 미디 스커트를 입고 민트색 상의를 허리에 묶어서 어두운 옷에 연한 색 한 덩어리가 들어가요."
+  },
+  {
+   "id": "K2B46",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/watch?v=HGiNV5wXt8A",
+   "code": "HGiNV5wXt8A",
+   "start": 0,
+   "who": "일반인",
+   "account": "솔솔한날",
+   "season": "여름",
+   "for": "여",
+   "scene": [
+    "일상"
+   ],
+   "style": "빈티지",
+   "pieces": [
+    {
+     "role": "원피스",
+     "name": "레이스 슬립 원피스",
+     "color": "브라운",
+     "mat": "레이스",
+     "id": null
+    },
+    {
+     "role": "아우터",
+     "name": "크로셰 볼레로",
+     "color": "화이트",
+     "mat": "니트",
+     "id": "bolero"
+    }
+   ],
+   "point": "갈색 레이스 원피스 위에 흰 끈 볼레로를 얹어서 짙은 색과 밝은 색이 나뉘고 어깨 선이 부드러워 보여요."
+  },
+  {
+   "id": "K2B47",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/watch?v=iW9mAdr8h1g",
+   "code": "iW9mAdr8h1g",
+   "start": 0,
+   "who": "일반인",
+   "account": "한소루 hansoru",
+   "season": "여름",
+   "for": "여",
+   "scene": [
+    "일상"
+   ],
+   "style": "고프코어",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "프린트 티",
+     "color": "라이트 블루",
+     "mat": "면",
+     "id": "tee"
+    },
+    {
+     "role": "하의",
+     "name": "카고 롱스커트",
+     "color": "베이지",
+     "mat": "나일론",
+     "id": "longskirt"
+    },
+    {
+     "role": "소품",
+     "name": "볼캡",
+     "color": "화이트",
+     "mat": "",
+     "id": "ballcap"
+    },
+    {
+     "role": "신발",
+     "name": "스니커즈",
+     "color": "블랙",
+     "mat": "",
+     "id": "lowtop"
+    }
+   ],
+   "point": "짧은 하늘색 티에 주머니 달린 베이지 롱스커트를 입어서 허리가 올라가 보이고 바닥까지 떨어지는 선이 길게 나와요."
+  },
+  {
+   "id": "K2B48",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/watch?v=dGfBH052wtA",
+   "code": "dGfBH052wtA",
+   "start": 0,
+   "who": "일반인",
+   "account": "지꾸ZGGU",
+   "season": "여름",
+   "for": "여",
+   "scene": [
+    "일상"
+   ],
+   "style": "고프코어",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "오버핏 그래픽 티",
+     "color": "크림",
+     "mat": "면",
+     "id": "tee"
+    },
+    {
+     "role": "하의",
+     "name": "와이드 카고 팬츠",
+     "color": "딥 틸",
+     "mat": "",
+     "id": "cargo"
+    },
+    {
+     "role": "신발",
+     "name": "스니커즈",
+     "color": "화이트",
+     "mat": "",
+     "id": "lowtop"
+    }
+   ],
+   "point": "크림색 큰 티에 짙은 청록 카고 팬츠를 넉넉하게 입어서 위는 가볍고 아래는 색이 깊어 부피가 있어도 둔해 보이지 않아요."
+  },
+  {
+   "id": "K2B51",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/watch?v=0RInBUtl43M",
+   "code": "0RInBUtl43M",
+   "start": 0,
+   "who": "일반인",
+   "account": "선 빈",
+   "season": "여름",
+   "for": "여",
+   "scene": [
+    "일상"
+   ],
+   "style": "미니멀",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "슬리브리스 탑",
+     "color": "화이트",
+     "mat": "",
+     "id": "tank"
+    },
+    {
+     "role": "하의",
+     "name": "팬츠",
+     "color": "화이트",
+     "mat": "",
+     "id": null
+    }
+   ],
+   "point": "흰 슬리브리스 탑에 흰 바지를 맞춰 입어서 올 화이트 한 색이라 가볍고 팔 선이 시원하게 드러나요."
+  },
+  {
+   "id": "K2B54",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/watch?v=xGBqIh_Ilio",
+   "code": "xGBqIh_Ilio",
+   "start": 0,
+   "who": "일반인",
+   "account": "한솜 Hansom",
+   "season": "여름",
+   "for": "여",
+   "scene": [
+    "출근"
+   ],
+   "style": "미니멀",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "랩 반팔 셔츠",
+     "color": "화이트",
+     "mat": "면",
+     "id": "shortsleeveshirt"
+    },
+    {
+     "role": "하의",
+     "name": "플레어 팬츠",
+     "color": "그레이",
+     "mat": "",
+     "id": "slacks"
+    },
+    {
+     "role": "가방",
+     "name": "숄더백",
+     "color": "그레이",
+     "mat": "",
+     "id": "shoulderbag"
+    },
+    {
+     "role": "신발",
+     "name": "샌들",
+     "color": "블랙",
+     "mat": "",
+     "id": "sandal"
+    }
+   ],
+   "point": "허리를 끈으로 여미는 흰 셔츠에 회색 플레어 바지를 맞춰서 허리가 들어가 보이고 아래가 넓어서 몸매가 한 번에 정리돼요."
+  },
+  {
+   "id": "K2C2",
+   "kind": "instagram",
+   "url": "https://www.instagram.com/p/Dfj008yk7-T/",
+   "code": "Dfj008yk7-T",
+   "start": 0,
+   "who": "일반인",
+   "account": "@zxcvr0626",
+   "season": "가을",
+   "for": "남",
+   "scene": [
+    "일상"
+   ],
+   "style": "아메카지",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "M-65 야상",
+     "color": "올리브 카키",
+     "mat": "면",
+     "id": "m65"
+    },
+    {
+     "role": "상의",
+     "name": "크루넥 니트",
+     "color": "네이비",
+     "mat": "니트",
+     "id": "crewknit"
+    },
+    {
+     "role": "하의",
+     "name": "치노 팬츠",
+     "color": "베이지",
+     "mat": "면",
+     "id": "chino"
+    },
+    {
+     "role": "신발",
+     "name": "뉴발란스",
+     "color": "네이비 그레이",
+     "mat": "",
+     "id": null
+    },
+    {
+     "role": "소품",
+     "name": "볼캡",
+     "color": "레드",
+     "mat": "",
+     "id": "ballcap"
+    },
+    {
+     "role": "가방",
+     "name": "캔버스 토트백",
+     "color": "아이보리",
+     "mat": "",
+     "id": "ecobag"
+    }
+   ],
+   "point": "올리브 야상 안에 네이비 니트를 받치고 바지는 베이지로 밝게 해서 군복 느낌이 무겁지 않고 정돈돼 보여요."
+  },
+  {
+   "id": "K2C3",
+   "kind": "instagram",
+   "url": "https://www.instagram.com/p/DgC0CPpIKpI/",
+   "code": "DgC0CPpIKpI",
+   "start": 0,
+   "who": "일반인",
+   "account": "@jeonguss",
+   "season": "겨울",
+   "for": "남",
+   "scene": [
+    "데이트"
+   ],
+   "style": "미니멀",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "숏 울 자켓",
+     "color": "그레이",
+     "mat": "울",
+     "id": "shortjacket"
+    },
+    {
+     "role": "상의",
+     "name": "크루넥 니트",
+     "color": "다크 그레이",
+     "mat": "니트",
+     "id": "crewknit"
+    },
+    {
+     "role": "하의",
+     "name": "와이드 데님 팬츠",
+     "color": "차콜",
+     "mat": "데님",
+     "id": "jeans"
+    },
+    {
+     "role": "신발",
+     "name": "더비 슈즈",
+     "color": "블랙",
+     "mat": "가죽",
+     "id": "derby"
+    }
+   ],
+   "point": "회색 계열 위에 회색 바지를 이어 입고 광택 있는 검정 구두로 끝을 잡아서 앉아 있어도 차분하고 깔끔해요."
+  },
+  {
+   "id": "K2C5",
+   "kind": "instagram",
+   "url": "https://www.instagram.com/p/Dd48ZQwmcYw/",
+   "code": "Dd48ZQwmcYw",
+   "start": 0,
+   "who": "일반인",
+   "account": "@kim.noin",
+   "season": "가을",
+   "for": "남",
+   "scene": [
+    "출근"
+   ],
+   "style": "워크웨어",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "프렌치 워크자켓",
+     "color": "블루",
+     "mat": "면",
+     "id": "chore"
+    },
+    {
+     "role": "하의",
+     "name": "와이드 팬츠",
+     "color": "블랙",
+     "mat": "면",
+     "id": null
+    },
+    {
+     "role": "소품",
+     "name": "볼캡",
+     "color": "블루",
+     "mat": "",
+     "id": "ballcap"
+    }
+   ],
+   "point": "파란 워크자켓은 단추와 큰 주머니가 있어서 검정 바지만 맞춰도 출근길에 힘주지 않은 멋이 나요."
+  },
+  {
+   "id": "K2C7",
+   "kind": "instagram",
+   "url": "https://www.instagram.com/p/DRxmKSJkxTO/",
+   "code": "DRxmKSJkxTO",
+   "start": 0,
+   "who": "일반인",
+   "account": "@leesaelook",
+   "season": "겨울",
+   "for": "남",
+   "scene": [
+    "일상"
+   ],
+   "style": "스트릿",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "눕시 패딩",
+     "color": "블랙",
+     "mat": "나일론",
+     "id": "puffer"
+    },
+    {
+     "role": "하의",
+     "name": "와이드 데님 팬츠",
+     "color": "연회청",
+     "mat": "데님",
+     "id": "jeans"
+    },
+    {
+     "role": "소품",
+     "name": "줄무늬 비니",
+     "color": "그레이 카키",
+     "mat": "니트",
+     "id": "beanie"
+    }
+   ],
+   "point": "광택이 도는 검정 패딩은 부피가 크니까 바지를 밝은 청바지로 잡아서 위아래 무게가 맞아요."
+  },
+  {
+   "id": "K2C8",
+   "kind": "instagram",
+   "url": "https://www.instagram.com/p/DgHxCjNj3Y_/",
+   "code": "DgHxCjNj3Y_",
+   "start": 0,
+   "who": "일반인",
+   "account": "@nuke_chan93",
+   "season": "겨울",
+   "for": "남",
+   "scene": [
+    "일상"
+   ],
+   "style": "프레피",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "더플 코트",
+     "color": "카멜",
+     "mat": "울",
+     "id": "duffle"
+    },
+    {
+     "role": "상의",
+     "name": "크루넥 니트",
+     "color": "연두",
+     "mat": "니트",
+     "id": "crewknit"
+    },
+    {
+     "role": "하의",
+     "name": "생지 데님 팬츠",
+     "color": "진청",
+     "mat": "데님",
+     "id": "jeans"
+    },
+    {
+     "role": "신발",
+     "name": "로퍼",
+     "color": "브라운",
+     "mat": "스웨이드",
+     "id": "loafer"
+    },
+    {
+     "role": "가방",
+     "name": "나일론 가방",
+     "color": "카키",
+     "mat": "나일론",
+     "id": null
+    }
+   ],
+   "point": "카멜 코트와 진청 데님, 갈색 신발로 톤을 맞추고 연두 니트만 한 점 튀게 해서 겨울에도 산뜻해요."
+  },
+  {
+   "id": "K2C12",
+   "kind": "instagram",
+   "url": "https://www.instagram.com/p/DYUBYTjJUdT/",
+   "code": "DYUBYTjJUdT",
+   "start": 0,
+   "who": "일반인",
+   "account": "@gong__do",
+   "season": "가을",
+   "for": "남",
+   "scene": [
+    "여행"
+   ],
+   "style": "아메카지",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "피쉬테일 파카",
+     "color": "올리브",
+     "mat": "면",
+     "id": null
+    },
+    {
+     "role": "하의",
+     "name": "와이드 데님 팬츠",
+     "color": "연청",
+     "mat": "데님",
+     "id": "jeans"
+    },
+    {
+     "role": "소품",
+     "name": "볼캡",
+     "color": "블랙",
+     "mat": "",
+     "id": "ballcap"
+    },
+    {
+     "role": "가방",
+     "name": "백팩",
+     "color": "블랙",
+     "mat": "",
+     "id": "backpack"
+    }
+   ],
+   "point": "기장이 긴 올리브 파카 아래로 연청 밑단이 살짝 보여서 여행에서 걸을 때 실루엣이 길어 보여요."
+  },
+  {
+   "id": "K2C15",
+   "kind": "instagram",
+   "url": "https://www.instagram.com/p/DgHsMmqRp2A/",
+   "code": "DgHsMmqRp2A",
+   "start": 0,
+   "who": "일반인",
+   "account": "@avant_garde_hoo",
+   "season": "겨울",
+   "for": "남",
+   "scene": [
+    "일상"
+   ],
+   "style": "스트릿",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "눕시 패딩",
+     "color": "옐로 블랙",
+     "mat": "나일론",
+     "id": "puffer"
+    },
+    {
+     "role": "상의",
+     "name": "후드티",
+     "color": "블루",
+     "mat": "면",
+     "id": "hoodie"
+    },
+    {
+     "role": "하의",
+     "name": "와이드 팬츠",
+     "color": "블랙",
+     "mat": "",
+     "id": null
+    },
+    {
+     "role": "소품",
+     "name": "선글라스",
+     "color": "블랙",
+     "mat": "",
+     "id": null
+    }
+   ],
+   "point": "노란 패딩 안에 파란 후드가 겹쳐 보이고 바지는 검정이라 색이 위에만 몰려서 시선이 상체로 가요."
+  },
+  {
+   "id": "K2C19",
+   "kind": "instagram",
+   "url": "https://www.instagram.com/p/Df07e8rDsfq/",
+   "code": "Df07e8rDsfq",
+   "start": 0,
+   "who": "일반인",
+   "account": "@9.99.999.7.77.777",
+   "season": "겨울",
+   "for": "남",
+   "scene": [
+    "일상"
+   ],
+   "style": "빈티지",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "가디건",
+     "color": "크림",
+     "mat": "니트",
+     "id": "cardigan"
+    },
+    {
+     "role": "소품",
+     "name": "줄무늬 머플러",
+     "color": "멀티",
+     "mat": "니트",
+     "id": "muffler"
+    },
+    {
+     "role": "하의",
+     "name": "와이드 치노 팬츠",
+     "color": "카멜",
+     "mat": "면",
+     "id": "chino"
+    },
+    {
+     "role": "신발",
+     "name": "로퍼",
+     "color": "블랙",
+     "mat": "가죽",
+     "id": "loafer"
+    },
+    {
+     "role": "소품",
+     "name": "볼캡",
+     "color": "레드",
+     "mat": "",
+     "id": "ballcap"
+    }
+   ],
+   "point": "크림 가디건에 알록달록한 머플러를 두르고 바지를 카멜로 내려서 색은 많아도 따뜻한 톤 안에 있어요."
+  },
+  {
+   "id": "K2D1",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/shorts/wbBaWWSaKts",
+   "code": "wbBaWWSaKts",
+   "start": 0,
+   "who": "일반인",
+   "account": "라니 | 출근룩 데일리룩",
+   "season": "겨울",
+   "for": "여",
+   "scene": [
+    "출근"
+   ],
+   "style": "미니멀",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "카라 니트 가디건",
+     "color": "크림",
+     "mat": "니트",
+     "id": "cardigan"
+    },
+    {
+     "role": "하의",
+     "name": "롱 스커트",
+     "color": "차콜",
+     "mat": "울",
+     "id": "longskirt"
+    },
+    {
+     "role": "신발",
+     "name": "앵클 부츠",
+     "color": "블랙",
+     "mat": "",
+     "id": null
+    },
+    {
+     "role": "가방",
+     "name": "숄더백",
+     "color": "블랙",
+     "mat": "",
+     "id": "shoulderbag"
+    }
+   ],
+   "point": "밝은 크림 가디건 아래로 어두운 차콜 롱스커트가 길게 떨어져서 위는 가볍고 아래는 차분하게 눌려요."
+  },
+  {
+   "id": "K2D2",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/shorts/P6vQtN_2vRw",
+   "code": "P6vQtN_2vRw",
+   "start": 0,
+   "who": "일반인",
+   "account": "루피타 Lupita",
+   "season": "겨울",
+   "for": "여",
+   "scene": [
+    "출근"
+   ],
+   "style": "캐주얼",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "라운드 니트",
+     "color": "라임 그린",
+     "mat": "울",
+     "id": "crewknit"
+    },
+    {
+     "role": "하의",
+     "name": "하이웨이스트 팬츠",
+     "color": "아이보리",
+     "mat": "",
+     "id": "wide"
+    }
+   ],
+   "point": "라임 그린 니트 한 장이 색을 다 맡고 아이보리 바지가 바탕이 돼서 소매 끝 흰 선까지 또렷해요."
+  },
+  {
+   "id": "K2D4",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/shorts/yIB6RG3FoZg",
+   "code": "yIB6RG3FoZg",
+   "start": 0,
+   "who": "일반인",
+   "account": "폴리라이프polylife",
+   "season": "겨울",
+   "for": "여",
+   "scene": [
+    "일상"
+   ],
+   "style": "스트릿",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "퍼 크롭 자켓",
+     "color": "브라운",
+     "mat": "퍼",
+     "id": "jacket"
+    },
+    {
+     "role": "상의",
+     "name": "이너 티셔츠",
+     "color": "흰색",
+     "mat": "",
+     "id": "tee"
+    },
+    {
+     "role": "하의",
+     "name": "와이드 데님 팬츠",
+     "color": "미디엄 블루",
+     "mat": "데님",
+     "id": "jeans"
+    },
+    {
+     "role": "소품",
+     "name": "볼캡",
+     "color": "레드",
+     "mat": "",
+     "id": "ballcap"
+    },
+    {
+     "role": "가방",
+     "name": "토트백",
+     "color": "블랙",
+     "mat": "가죽",
+     "id": "tote"
+    },
+    {
+     "role": "신발",
+     "name": "앵클 부츠",
+     "color": "베이지",
+     "mat": "",
+     "id": null
+    }
+   ],
+   "point": "풍성한 브라운 퍼 자켓이 허리 위에서 끝나고 밑단이 넉넉한 청바지가 이어져서 짧은 상체와 긴 다리가 한눈에 보여요."
+  },
+  {
+   "id": "K2D5",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/shorts/uXA3DQX2NoE",
+   "code": "uXA3DQX2NoE",
+   "start": 0,
+   "who": "일반인",
+   "account": "메이블루",
+   "season": "가을",
+   "for": "여",
+   "scene": [
+    "일상"
+   ],
+   "style": "캐주얼",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "라운드 가디건",
+     "color": "올리브 그린",
+     "mat": "니트",
+     "id": "cardigan"
+    },
+    {
+     "role": "상의",
+     "name": "이너 티셔츠",
+     "color": "크림",
+     "mat": "",
+     "id": "tee"
+    },
+    {
+     "role": "하의",
+     "name": "와이드 팬츠",
+     "color": "다크 브라운",
+     "mat": "",
+     "id": "wide"
+    },
+    {
+     "role": "소품",
+     "name": "반다나",
+     "color": "브라운 체크",
+     "mat": "",
+     "id": null
+    },
+    {
+     "role": "가방",
+     "name": "숄더백",
+     "color": "탄",
+     "mat": "",
+     "id": "shoulderbag"
+    }
+   ],
+   "point": "올리브와 다크 브라운이 가을 흙빛으로 붙고 체크 반다나가 머리 위에서 작게 포인트를 줘요."
+  },
+  {
+   "id": "K2D6",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/shorts/h6E7AhdzL94",
+   "code": "h6E7AhdzL94",
+   "start": 0,
+   "who": "일반인",
+   "account": "지영이래요",
+   "season": "가을",
+   "for": "여",
+   "scene": [
+    "일상"
+   ],
+   "style": "스트릿",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "하이넥 숏 자켓",
+     "color": "카키 브라운",
+     "mat": "",
+     "id": "jacket"
+    },
+    {
+     "role": "하의",
+     "name": "쇼츠",
+     "color": "블랙",
+     "mat": "",
+     "id": "shorts"
+    },
+    {
+     "role": "소품",
+     "name": "타이츠",
+     "color": "블랙",
+     "mat": "",
+     "id": "necktie"
+    },
+    {
+     "role": "신발",
+     "name": "롱 부츠",
+     "color": "블랙",
+     "mat": "",
+     "id": null
+    },
+    {
+     "role": "가방",
+     "name": "숄더백",
+     "color": "그레이",
+     "mat": "",
+     "id": "shoulderbag"
+    },
+    {
+     "role": "소품",
+     "name": "선글라스",
+     "color": "블랙",
+     "mat": "",
+     "id": null
+    }
+   ],
+   "point": "짧은 쇼츠에 검정 타이츠와 부츠를 이어 검정 한 덩어리를 만들고 카키 자켓과 회색 가방만 색이 달라요."
+  },
+  {
+   "id": "K2D9",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/shorts/S4QCFf8excw",
+   "code": "S4QCFf8excw",
+   "start": 0,
+   "who": "일반인",
+   "account": "서하 SeoHa",
+   "season": "겨울",
+   "for": "여",
+   "scene": [
+    "데이트"
+   ],
+   "style": "페미닌",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "숏 무스탕",
+     "color": "베이지",
+     "mat": "양털",
+     "id": "shearling"
+    },
+    {
+     "role": "하의",
+     "name": "플리츠 미니 스커트",
+     "color": "아이보리",
+     "mat": "",
+     "id": "pleatskirt"
+    },
+    {
+     "role": "소품",
+     "name": "타이츠",
+     "color": "그레이",
+     "mat": "",
+     "id": "necktie"
+    }
+   ],
+   "point": "베이지 무스탕이 포근하고 아이보리 플리츠 밑단이 가볍게 퍼져서 짧은 길이도 겨울에 부담이 없어요."
+  },
+  {
+   "id": "K2D13",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/shorts/6QL7lUn_O00",
+   "code": "6QL7lUn_O00",
+   "start": 0,
+   "who": "일반인",
+   "account": "임마멜 mamel",
+   "season": "겨울",
+   "for": "여",
+   "scene": [
+    "데이트"
+   ],
+   "style": "페미닌",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "하프 트렌치 코트",
+     "color": "베이지",
+     "mat": "울",
+     "id": "woolcoat"
+    },
+    {
+     "role": "상의",
+     "name": "숏 가디건",
+     "color": "블랙",
+     "mat": "니트",
+     "id": "cardigan"
+    },
+    {
+     "role": "하의",
+     "name": "롱 스커트",
+     "color": "화이트",
+     "mat": "",
+     "id": "longskirt"
+    }
+   ],
+   "point": "베이지 코트 속에 짧은 검정 가디건을 입고 흰 롱스커트가 코트 밑으로 풍성하게 나와서 색 구분이 또렷해요."
+  },
+  {
+   "id": "K2D14",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/shorts/QNH7mNLO3zg",
+   "code": "QNH7mNLO3zg",
+   "start": 0,
+   "who": "일반인",
+   "account": "주미니 jumini",
+   "season": "겨울",
+   "for": "여",
+   "scene": [
+    "일상"
+   ],
+   "style": "페미닌",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "라운드 니트",
+     "color": "올리브 브라운",
+     "mat": "니트",
+     "id": "crewknit"
+    },
+    {
+     "role": "하의",
+     "name": "A라인 롱 스커트",
+     "color": "브라운",
+     "mat": "",
+     "id": "longskirt"
+    },
+    {
+     "role": "신발",
+     "name": "워커",
+     "color": "베이지",
+     "mat": "",
+     "id": "workboots"
+    },
+    {
+     "role": "가방",
+     "name": "숄더백",
+     "color": "아이보리",
+     "mat": "",
+     "id": "shoulderbag"
+    },
+    {
+     "role": "소품",
+     "name": "안경",
+     "color": "브라운",
+     "mat": "",
+     "id": "glasses"
+    }
+   ],
+   "point": "올리브 브라운 니트와 진한 브라운 스커트가 같은 계열이라 한 벌처럼 보이고 아이보리 가방만 밝게 떠요."
+  },
+  {
+   "id": "K2D15",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/shorts/11AqrSuam0s",
+   "code": "11AqrSuam0s",
+   "start": 0,
+   "who": "일반인",
+   "account": "러블리영",
+   "season": "겨울",
+   "for": "여",
+   "scene": [
+    "출근"
+   ],
+   "style": "프레피",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "숏 코트",
+     "color": "블랙",
+     "mat": "울",
+     "id": null
+    },
+    {
+     "role": "소품",
+     "name": "머플러",
+     "color": "크림",
+     "mat": "",
+     "id": "muffler"
+    },
+    {
+     "role": "하의",
+     "name": "미디 스커트",
+     "color": "블랙",
+     "mat": "",
+     "id": null
+    },
+    {
+     "role": "소품",
+     "name": "스타킹",
+     "color": "흰색",
+     "mat": "",
+     "id": null
+    },
+    {
+     "role": "신발",
+     "name": "로퍼",
+     "color": "블랙",
+     "mat": "",
+     "id": "loafer"
+    }
+   ],
+   "point": "검정 코트와 스커트 사이에 큼직한 크림 머플러를 두르고 흰 양말과 로퍼로 마무리해서 얼굴 쪽이 환해요."
+  },
+  {
+   "id": "K2D16",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/shorts/nSJuG7frbXA",
+   "code": "nSJuG7frbXA",
+   "start": 0,
+   "who": "일반인",
+   "account": "이셈이셈",
+   "season": "겨울",
+   "for": "여",
+   "scene": [
+    "하객"
+   ],
+   "style": "클래식",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "니트 캐미솔",
+     "color": "그레이",
+     "mat": "모헤어",
+     "id": "sweater"
+    },
+    {
+     "role": "상의",
+     "name": "셔츠",
+     "color": "블랙",
+     "mat": "",
+     "id": "blouse"
+    },
+    {
+     "role": "하의",
+     "name": "롱 스커트",
+     "color": "블랙",
+     "mat": "울",
+     "id": "longskirt"
+    },
+    {
+     "role": "신발",
+     "name": "앵클 부츠",
+     "color": "블랙",
+     "mat": "",
+     "id": null
+    }
+   ],
+   "point": "검정 셔츠 위에 털이 보송한 회색 캐미솔을 겹치고 검정 롱스커트로 이어서 단정한 중에 한 군데만 질감이 달라요."
+  },
+  {
+   "id": "K2D22",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/shorts/P5BhuQuvunA",
+   "code": "P5BhuQuvunA",
+   "start": 0,
+   "who": "일반인",
+   "account": "Uni ♡",
+   "season": "가을",
+   "for": "여",
+   "scene": [
+    "일상"
+   ],
+   "style": "스포티",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "가디건",
+     "color": "블루",
+     "mat": "",
+     "id": "cardigan"
+    },
+    {
+     "role": "상의",
+     "name": "긴팔 이너",
+     "color": "블랙",
+     "mat": "",
+     "id": "longsleeve"
+    },
+    {
+     "role": "하의",
+     "name": "와이드 팬츠",
+     "color": "흰색",
+     "mat": "",
+     "id": "wide"
+    },
+    {
+     "role": "신발",
+     "name": "삼바",
+     "color": "블랙 화이트",
+     "mat": "",
+     "id": null
+    },
+    {
+     "role": "소품",
+     "name": "볼캡",
+     "color": "네이비",
+     "mat": "",
+     "id": "ballcap"
+    },
+    {
+     "role": "가방",
+     "name": "숄더백",
+     "color": "블랙",
+     "mat": "",
+     "id": "shoulderbag"
+    }
+   ],
+   "point": "어깨에 걸친 하늘색 가디건과 흰 바지가 밝고 삼바와 네이비 볼캡, 검정 가방이 색을 단단히 잡아줘요."
+  },
+  {
+   "id": "K2D25",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/shorts/sUm3BHPXoI0",
+   "code": "sUm3BHPXoI0",
+   "start": 0,
+   "who": "일반인",
+   "account": "데일리쏙",
+   "season": "겨울",
+   "for": "여",
+   "scene": [
+    "일상"
+   ],
+   "style": "미니멀",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "집업 가디건",
+     "color": "블랙",
+     "mat": "니트",
+     "id": "cardigan"
+    },
+    {
+     "role": "상의",
+     "name": "이너 티셔츠",
+     "color": "흰색",
+     "mat": "",
+     "id": "tee"
+    },
+    {
+     "role": "하의",
+     "name": "플레어 팬츠",
+     "color": "블랙",
+     "mat": "",
+     "id": null
+    }
+   ],
+   "point": "짧은 검정 집업과 밑단이 퍼지는 검정 팬츠를 맞춰서 흰 티 한 줄만 보여도 선이 길어요."
+  },
+  {
+   "id": "K2D26",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/shorts/0l49V3-vlhI",
+   "code": "0l49V3-vlhI",
+   "start": 0,
+   "who": "일반인",
+   "account": "그레이레이즈",
+   "season": "가을",
+   "for": "여",
+   "scene": [
+    "일상"
+   ],
+   "style": "프레피",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "반팔 니트",
+     "color": "블루 그레이",
+     "mat": "니트",
+     "id": "knittop"
+    },
+    {
+     "role": "상의",
+     "name": "긴팔 이너",
+     "color": "흰색",
+     "mat": "",
+     "id": "longsleeve"
+    },
+    {
+     "role": "소품",
+     "name": "스트라이프 머플러",
+     "color": "그레이 베이지",
+     "mat": "",
+     "id": "muffler"
+    },
+    {
+     "role": "하의",
+     "name": "롱 스커트",
+     "color": "다크 브라운",
+     "mat": "",
+     "id": "longskirt"
+    },
+    {
+     "role": "신발",
+     "name": "로퍼",
+     "color": "블랙",
+     "mat": "",
+     "id": "loafer"
+    }
+   ],
+   "point": "반팔 니트 안에 흰 긴팔을 겹치고 줄무늬 머플러를 길게 늘어뜨려서 어두운 스커트 위에 세로선이 생겨요."
+  },
+  {
+   "id": "K2D29",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/shorts/5i8-wUh2rtA",
+   "code": "5i8-wUh2rtA",
+   "start": 0,
+   "who": "일반인",
+   "account": "키키코 KIKIKO",
+   "season": "가을",
+   "for": "여",
+   "scene": [
+    "등교"
+   ],
+   "style": "캐주얼",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "후드티",
+     "color": "베이지",
+     "mat": "",
+     "id": "hoodie"
+    },
+    {
+     "role": "상의",
+     "name": "체크 셔츠",
+     "color": "브라운 체크",
+     "mat": "",
+     "id": "casualshirt"
+    },
+    {
+     "role": "하의",
+     "name": "와이드 데님 팬츠",
+     "color": "라이트 워싱",
+     "mat": "데님",
+     "id": "jeans"
+    },
+    {
+     "role": "신발",
+     "name": "하이탑 스니커즈",
+     "color": "흰색 블랙",
+     "mat": "",
+     "id": "hightop"
+    }
+   ],
+   "point": "베이지 후드티 허리에 체크 셔츠를 묶고 연한 워싱 청바지를 입어서 편한 학교 가는 날 룩이 돼요."
+  },
+  {
+   "id": "K2D33",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/shorts/RtgJd7EZyvI",
+   "code": "RtgJd7EZyvI",
+   "start": 0,
+   "who": "일반인",
+   "account": "윤자의 서랍",
+   "season": "가을",
+   "for": "여",
+   "scene": [
+    "출근"
+   ],
+   "style": "프레피",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "라운드 니트",
+     "color": "블랙",
+     "mat": "니트",
+     "id": "crewknit"
+    },
+    {
+     "role": "상의",
+     "name": "셔츠",
+     "color": "흰색",
+     "mat": "",
+     "id": "casualshirt"
+    },
+    {
+     "role": "하의",
+     "name": "플리츠 롱 스커트",
+     "color": "그레이",
+     "mat": "",
+     "id": "pleatskirt"
+    },
+    {
+     "role": "신발",
+     "name": "로퍼",
+     "color": "블랙",
+     "mat": "",
+     "id": "loafer"
+    }
+   ],
+   "point": "검정 니트 밑으로 흰 셔츠 칼라와 자락이 나오고 회색 플리츠 스커트가 이어져서 학생 같은 단정함이 있어요."
+  },
+  {
+   "id": "K2D35",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/shorts/90tSYKolVPg",
+   "code": "90tSYKolVPg",
+   "start": 0,
+   "who": "일반인",
+   "account": "정과장",
+   "season": "겨울",
+   "for": "여",
+   "scene": [
+    "출근"
+   ],
+   "style": "캐주얼",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "숏 패딩",
+     "color": "라벤더 블루",
+     "mat": "",
+     "id": "puffer"
+    },
+    {
+     "role": "하의",
+     "name": "미디 스커트",
+     "color": "블랙",
+     "mat": "",
+     "id": null
+    },
+    {
+     "role": "신발",
+     "name": "롱 부츠",
+     "color": "블랙",
+     "mat": "",
+     "id": null
+    },
+    {
+     "role": "가방",
+     "name": "숄더백",
+     "color": "블랙",
+     "mat": "",
+     "id": "shoulderbag"
+    }
+   ],
+   "point": "짧고 도톰한 푸른 패딩을 입고 검정 스커트와 롱 부츠를 이어서 부피가 위에만 있고 아래는 가늘게 보여요."
+  },
+  {
+   "id": "K2D36",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/shorts/JPzmTTejTiU",
+   "code": "JPzmTTejTiU",
+   "start": 0,
+   "who": "일반인",
+   "account": "황꿀 gguul's boundary",
+   "season": "가을",
+   "for": "여",
+   "scene": [
+    "일상"
+   ],
+   "style": "페미닌",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "레더 자켓",
+     "color": "블랙",
+     "mat": "가죽",
+     "id": "leatherjacket"
+    },
+    {
+     "role": "상의",
+     "name": "리브 니트",
+     "color": "아이보리",
+     "mat": "니트",
+     "id": "knittop"
+    },
+    {
+     "role": "하의",
+     "name": "플로럴 롱 스커트",
+     "color": "연한 민트",
+     "mat": "",
+     "id": "longskirt"
+    }
+   ],
+   "point": "거친 검정 가죽 자켓 속에 아이보리 리브 니트와 꽃무늬 스커트를 입어서 부드러운 옷에 단단한 겉옷이 섞여요."
+  },
+  {
+   "id": "K2D38",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/shorts/ZZP05xUTwxI",
+   "code": "ZZP05xUTwxI",
+   "start": 0,
+   "who": "일반인",
+   "account": "YOUIS 유이즈",
+   "season": "겨울",
+   "for": "여",
+   "scene": [
+    "데이트"
+   ],
+   "style": "페미닌",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "브이넥 니트",
+     "color": "블랙",
+     "mat": "니트",
+     "id": "knittop"
+    },
+    {
+     "role": "하의",
+     "name": "플리츠 미니 스커트",
+     "color": "그레이",
+     "mat": "",
+     "id": null
+    },
+    {
+     "role": "소품",
+     "name": "타이츠",
+     "color": "블랙",
+     "mat": "",
+     "id": "necktie"
+    },
+    {
+     "role": "신발",
+     "name": "앵클 부츠",
+     "color": "블랙",
+     "mat": "",
+     "id": null
+    }
+   ],
+   "point": "몸에 붙는 검정 니트에 회색 미니스커트를 입고 검정 타이츠와 부츠를 이어서 춥지 않으면서 다리가 길어 보여요."
+  },
+  {
+   "id": "K2D39",
+   "kind": "instagram",
+   "url": "https://www.instagram.com/p/DgFFUkID_MV/",
+   "code": "DgFFUkID_MV",
+   "start": 0,
+   "who": "일반인",
+   "account": "@happy__ootd",
+   "season": "가을",
+   "for": "여",
+   "scene": [
+    "출근"
+   ],
+   "style": "미니멀",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "마블 니트",
+     "color": "그레이",
+     "mat": "니트",
+     "id": "crewknit"
+    },
+    {
+     "role": "하의",
+     "name": "부츠컷 팬츠",
+     "color": "블랙",
+     "mat": "",
+     "id": "bootcut"
+    },
+    {
+     "role": "신발",
+     "name": "발레리나",
+     "color": "블랙",
+     "mat": "",
+     "id": null
+    },
+    {
+     "role": "가방",
+     "name": "퍼 미니백",
+     "color": "베이지",
+     "mat": "",
+     "id": null
+    }
+   ],
+   "point": "회색 니트에 부츠컷 검정 바지를 입어서 위는 가볍고 아래로 갈수록 곧게 퍼지고 털 가방이 시선을 위로 올려요."
+  },
+  {
+   "id": "K2D43",
+   "kind": "instagram",
+   "url": "https://www.instagram.com/p/De8hI9vkoDb/",
+   "code": "De8hI9vkoDb",
+   "start": 0,
+   "who": "일반인",
+   "account": "@sincerelee.look",
+   "season": "가을",
+   "for": "여",
+   "scene": [
+    "출근"
+   ],
+   "style": "미니멀",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "페플럼 블라우스",
+     "color": "흰색",
+     "mat": "",
+     "id": "blouse"
+    },
+    {
+     "role": "하의",
+     "name": "슬릿 롱 스커트",
+     "color": "블랙",
+     "mat": "",
+     "id": "longskirt"
+    },
+    {
+     "role": "신발",
+     "name": "슬링백 힐",
+     "color": "블랙",
+     "mat": "",
+     "id": "sling"
+    }
+   ],
+   "point": "볼륨 있는 흰 블라우스를 허리에서 끊고 몸에 붙는 검정 스커트로 이어서 윗부분만 풍성하게 보여요."
+  },
+  {
+   "id": "K2D44",
+   "kind": "instagram",
+   "url": "https://www.instagram.com/p/C2cSHGPPDCY/",
+   "code": "C2cSHGPPDCY",
+   "start": 0,
+   "who": "일반인",
+   "account": "@00._.00td",
+   "season": "겨울",
+   "for": "여",
+   "scene": [
+    "출근"
+   ],
+   "style": "미니멀",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "배색 가디건",
+     "color": "크림 블루 포인트",
+     "mat": "니트",
+     "id": "cardigan"
+    },
+    {
+     "role": "하의",
+     "name": "부츠컷 슬랙스",
+     "color": "블랙",
+     "mat": "",
+     "id": "bootcut"
+    },
+    {
+     "role": "신발",
+     "name": "앵클 부츠",
+     "color": "블랙",
+     "mat": "",
+     "id": null
+    }
+   ],
+   "point": "크림 가디건의 청색 배색이 포인트가 되고 검정 부츠컷 슬랙스가 다리선을 곧게 길러줘요."
+  },
+  {
    "id": "K7",
    "kind": "instagram",
    "url": "https://www.instagram.com/p/DXapRh2GuIr/",
@@ -31508,6 +34793,817 @@
    "point": "카멜 자켓과 카모 카고를 같은 따뜻한 색계로 모으고 붉은 갈색 워커를 더해서 낙엽 배경과 어울려요."
   },
   {
+   "id": "K2A2",
+   "kind": "instagram",
+   "url": "https://www.instagram.com/p/C5pOfK-P0wp/",
+   "code": "C5pOfK-P0wp",
+   "start": 0,
+   "who": "일반인",
+   "account": "@_lookatmedude",
+   "season": "봄",
+   "for": "남",
+   "scene": [
+    "일상"
+   ],
+   "style": "아메카지",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "데님 트러커 자켓",
+     "color": "진청",
+     "mat": "데님",
+     "id": "trucker"
+    },
+    {
+     "role": "하의",
+     "name": "와이드 팬츠",
+     "color": "베이지",
+     "mat": "면",
+     "id": null
+    },
+    {
+     "role": "신발",
+     "name": "로우탑 스니커즈",
+     "color": "흰색",
+     "mat": "",
+     "id": "lowtop"
+    }
+   ],
+   "point": "짙은 데님 자켓이 상체를 잡아 주고 베이지 팬츠가 밝게 받쳐서 봄 낮에 입기 좋은 명암이 나와요. 흰 스니커즈로 무게를 덜었어요."
+  },
+  {
+   "id": "K2A6",
+   "kind": "instagram",
+   "url": "https://www.instagram.com/p/DZey_AWlLl3/",
+   "code": "DZey_AWlLl3",
+   "start": 0,
+   "who": "일반인",
+   "account": "@hxxax_",
+   "season": "여름",
+   "for": "남",
+   "scene": [
+    "일상"
+   ],
+   "style": "댄디",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "얇은 자켓",
+     "color": "검정",
+     "mat": "",
+     "id": "jacket"
+    },
+    {
+     "role": "상의",
+     "name": "티셔츠",
+     "color": "흰색",
+     "mat": "면",
+     "id": "tee"
+    },
+    {
+     "role": "하의",
+     "name": "와이드 팬츠",
+     "color": "검정",
+     "mat": "",
+     "id": "slacks"
+    },
+    {
+     "role": "신발",
+     "name": "스니커즈",
+     "color": "베이지",
+     "mat": "",
+     "id": "lowtop"
+    }
+   ],
+   "point": "앞을 열어 입은 검정 자켓이 흰 티를 세로로 드러내서 몸이 날씬해 보여요. 베이지 신발이 검정 일색 코디에 밝은 끝점을 줘요."
+  },
+  {
+   "id": "K2A12",
+   "kind": "instagram",
+   "url": "https://www.instagram.com/p/DLJR_ebSJZ4/",
+   "code": "DLJR_ebSJZ4",
+   "start": 0,
+   "who": "일반인",
+   "account": "@daily_han_soo",
+   "season": "봄",
+   "for": "남",
+   "scene": [
+    "일상"
+   ],
+   "style": "스트릿",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "오버핏 자켓",
+     "color": "검정",
+     "mat": "",
+     "id": "jacket"
+    },
+    {
+     "role": "상의",
+     "name": "스트라이프 티셔츠",
+     "color": "검정 흰색",
+     "mat": "면",
+     "id": "tee"
+    },
+    {
+     "role": "하의",
+     "name": "워싱 와이드 데님",
+     "color": "블랙 워싱",
+     "mat": "데님",
+     "id": "jeans"
+    },
+    {
+     "role": "소품",
+     "name": "선글라스",
+     "color": "검정",
+     "mat": "",
+     "id": null
+    }
+   ],
+   "point": "품이 큰 검정 자켓 안으로 줄무늬가 살짝 보이고 워싱이 들어간 검정 와이드 데님이 아래로 길게 떨어져요. 선글라스 하나로 전체가 어두운 한 덩어리가 돼요."
+  },
+  {
+   "id": "K2B53",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/watch?v=JAqehkCtW04",
+   "code": "JAqehkCtW04",
+   "start": 0,
+   "who": "일반인",
+   "account": "미정",
+   "season": "여름",
+   "for": "여",
+   "scene": [
+    "일상"
+   ],
+   "style": "빈티지",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "깅엄체크 반팔 셔츠",
+     "color": "레드",
+     "mat": "면",
+     "id": "shortsleeveshirt"
+    },
+    {
+     "role": "하의",
+     "name": "벌룬 와이드 팬츠",
+     "color": "베이지",
+     "mat": "",
+     "id": null
+    },
+    {
+     "role": "소품",
+     "name": "볼캡",
+     "color": "브라운",
+     "mat": "",
+     "id": "ballcap"
+    },
+    {
+     "role": "가방",
+     "name": "숄더백",
+     "color": "화이트",
+     "mat": "",
+     "id": "shoulderbag"
+    },
+    {
+     "role": "신발",
+     "name": "스니커즈",
+     "color": "베이지",
+     "mat": "",
+     "id": "lowtop"
+    }
+   ],
+   "point": "붉은 깅엄 체크 셔츠에 크림색 벌룬 바지를 입어서 포인트 색이 윗옷에만 모이고 갈색 캡이 한 번 더 받쳐 줘요."
+  },
+  {
+   "id": "K2B17",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/watch?v=S5DjVXgZ7ls",
+   "code": "S5DjVXgZ7ls",
+   "start": 0,
+   "who": "일반인",
+   "account": "소희 Savhee",
+   "season": "봄",
+   "for": "여",
+   "scene": [
+    "일상"
+   ],
+   "style": "미니멀",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "골지 가디건",
+     "color": "블랙",
+     "mat": "니트",
+     "id": "cardigan"
+    },
+    {
+     "role": "하의",
+     "name": "스티치 데님 팬츠",
+     "color": "다크 인디고",
+     "mat": "데님",
+     "id": "jeans"
+    }
+   ],
+   "point": "소매 끝이 나팔처럼 퍼지는 검은 골지 가디건과 앞주머니에 흰 스티치가 보이는 진청 바지로 어두운 색 안에서 선만 살려요."
+  },
+  {
+   "id": "K2B31",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/watch?v=WLCPz68Lm54",
+   "code": "WLCPz68Lm54",
+   "start": 0,
+   "who": "일반인",
+   "account": "모노데일리 MONO_DAILY",
+   "season": "여름",
+   "for": "여",
+   "scene": [
+    "여행"
+   ],
+   "style": "페미닌",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "스트라이프 캐미",
+     "color": "핑크 라일락",
+     "mat": "",
+     "id": null
+    },
+    {
+     "role": "하의",
+     "name": "새틴 미니 스커트",
+     "color": "라일락",
+     "mat": "새틴",
+     "id": null
+    },
+    {
+     "role": "신발",
+     "name": "샌들",
+     "color": "화이트",
+     "mat": "",
+     "id": "sandal"
+    }
+   ],
+   "point": "분홍과 연보라가 섞인 줄무늬 캐미에 같은 계열 새틴 스커트를 입어서 윗도리 색을 아래가 받아 주고 흰 샌들이 가볍게 닫아요."
+  },
+  {
+   "id": "K2D28",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/shorts/i8I2XMKVLh4",
+   "code": "i8I2XMKVLh4",
+   "start": 0,
+   "who": "일반인",
+   "account": "한솜 Hansom",
+   "season": "가을",
+   "for": "여",
+   "scene": [
+    "여행"
+   ],
+   "style": "페미닌",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "퍼프 소매 조끼",
+     "color": "그레이 하운드투스",
+     "mat": "",
+     "id": "vest"
+    },
+    {
+     "role": "상의",
+     "name": "레이스 이너",
+     "color": "흰색",
+     "mat": "",
+     "id": null
+    },
+    {
+     "role": "하의",
+     "name": "티어드 미니 스커트",
+     "color": "블랙",
+     "mat": "코듀로이",
+     "id": null
+    },
+    {
+     "role": "가방",
+     "name": "크로스백",
+     "color": "블랙",
+     "mat": "",
+     "id": "crossbody"
+    }
+   ],
+   "point": "체크 조끼의 퍼프 소매와 흰 레이스, 블랙 티어드 스커트가 모두 볼륨이 있어서 귀엽고 입체적이에요."
+  },
+  {
+   "id": "K2C4",
+   "kind": "instagram",
+   "url": "https://www.instagram.com/p/Dft7_fjoMrN/",
+   "code": "Dft7_fjoMrN",
+   "start": 0,
+   "who": "일반인",
+   "account": "@jeonguss",
+   "season": "가을",
+   "for": "남",
+   "scene": [
+    "일상"
+   ],
+   "style": "댄디",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "싱글 코트",
+     "color": "블랙",
+     "mat": "울",
+     "id": null
+    },
+    {
+     "role": "상의",
+     "name": "크루넥 니트",
+     "color": "퍼플",
+     "mat": "니트",
+     "id": "crewknit"
+    },
+    {
+     "role": "하의",
+     "name": "와이드 슬랙스",
+     "color": "차콜",
+     "mat": "",
+     "id": "slacks"
+    },
+    {
+     "role": "가방",
+     "name": "토트백",
+     "color": "블랙",
+     "mat": "",
+     "id": "tote"
+    }
+   ],
+   "point": "검정 코트 안에서 보라색 니트와 붉은 이너가 한 줄씩만 보여서 어두운 옷에 포인트가 딱 한 번 생겨요."
+  },
+  {
+   "id": "K2C6",
+   "kind": "instagram",
+   "url": "https://www.instagram.com/p/DdO_j3lGceP/",
+   "code": "DdO_j3lGceP",
+   "start": 0,
+   "who": "일반인",
+   "account": "@kim.noin",
+   "season": "가을",
+   "for": "남",
+   "scene": [
+    "일상"
+   ],
+   "style": "아메카지",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "샴브레이 셔츠",
+     "color": "블루",
+     "mat": "면",
+     "id": null
+    },
+    {
+     "role": "하의",
+     "name": "와이드 데님 팬츠",
+     "color": "연청",
+     "mat": "데님",
+     "id": "jeans"
+    },
+    {
+     "role": "신발",
+     "name": "워커 부츠",
+     "color": "블랙",
+     "mat": "가죽",
+     "id": "workboots"
+    }
+   ],
+   "point": "헐렁한 파란 셔츠와 밑단을 접은 연청바지를 맞추고 검정 부츠로 눌러서 전체가 가볍게 뜨지 않아요."
+  },
+  {
+   "id": "K2C9",
+   "kind": "instagram",
+   "url": "https://www.instagram.com/p/DgCp7JuD5wK/",
+   "code": "DgCp7JuD5wK",
+   "start": 0,
+   "who": "일반인",
+   "account": "@nuke_chan93",
+   "season": "가을",
+   "for": "남",
+   "scene": [
+    "일상"
+   ],
+   "style": "프레피",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "하운드투스 자켓",
+     "color": "브라운",
+     "mat": "울",
+     "id": "jacket"
+    },
+    {
+     "role": "상의",
+     "name": "페어아일 니트 베스트",
+     "color": "레드 패턴",
+     "mat": "니트",
+     "id": "vest"
+    },
+    {
+     "role": "상의",
+     "name": "데님 셔츠",
+     "color": "블루",
+     "mat": "면",
+     "id": "denimshirt"
+    },
+    {
+     "role": "소품",
+     "name": "넥타이",
+     "color": "레드",
+     "mat": "",
+     "id": "necktie"
+    },
+    {
+     "role": "하의",
+     "name": "에크루 데님 팬츠",
+     "color": "아이보리",
+     "mat": "데님",
+     "id": "jeans"
+    },
+    {
+     "role": "신발",
+     "name": "로퍼",
+     "color": "브라운",
+     "mat": "스웨이드",
+     "id": "loafer"
+    }
+   ],
+   "point": "낙엽 색에 맞춘 갈색 자켓과 붉은 무늬 베스트, 같은 붉은 타이로 가을 색만 골라 쓴 것이 포인트예요."
+  },
+  {
+   "id": "K2C13",
+   "kind": "instagram",
+   "url": "https://www.instagram.com/p/DT0C8dpEuHP/",
+   "code": "DT0C8dpEuHP",
+   "start": 0,
+   "who": "일반인",
+   "account": "@gong__do",
+   "season": "겨울",
+   "for": "남",
+   "scene": [
+    "여행"
+   ],
+   "style": "캐주얼",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "하이넥 블루종",
+     "color": "블랙",
+     "mat": "나일론",
+     "id": "blouson"
+    },
+    {
+     "role": "하의",
+     "name": "워싱 와이드 데님",
+     "color": "인디고",
+     "mat": "데님",
+     "id": "jeans"
+    },
+    {
+     "role": "신발",
+     "name": "스니커즈",
+     "color": "블랙",
+     "mat": "",
+     "id": "lowtop"
+    }
+   ],
+   "point": "짧은 검정 블루종에 통이 아주 넓은 워싱 청바지를 입어서 키가 작아도 다리가 길어 보이는 비율이에요."
+  },
+  {
+   "id": "K2C16",
+   "kind": "instagram",
+   "url": "https://www.instagram.com/p/DgCYt15kU0T/",
+   "code": "DgCYt15kU0T",
+   "start": 0,
+   "who": "일반인",
+   "account": "@avant_garde_hoo",
+   "season": "겨울",
+   "for": "남",
+   "scene": [
+    "일상"
+   ],
+   "style": "스트릿",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "후드 경량 패딩",
+     "color": "블루 그레이",
+     "mat": "나일론",
+     "id": "lightdown"
+    },
+    {
+     "role": "하의",
+     "name": "그래픽 와이드 데님",
+     "color": "연청",
+     "mat": "데님",
+     "id": "jeans"
+    },
+    {
+     "role": "신발",
+     "name": "팀버랜드 부츠",
+     "color": "옐로 브라운",
+     "mat": "누벅",
+     "id": "workboots"
+    },
+    {
+     "role": "소품",
+     "name": "선글라스",
+     "color": "블랙",
+     "mat": "",
+     "id": null
+    }
+   ],
+   "point": "은은한 청회색 패딩과 연청바지를 맞춘 뒤 노란 부츠 하나로 색을 터뜨려서 발끝이 눈에 들어와요."
+  },
+  {
+   "id": "K2C20",
+   "kind": "instagram",
+   "url": "https://www.instagram.com/p/DflfuIBE1Qk/",
+   "code": "DflfuIBE1Qk",
+   "start": 0,
+   "who": "일반인",
+   "account": "@9.99.999.7.77.777",
+   "season": "가을",
+   "for": "남",
+   "scene": [
+    "일상"
+   ],
+   "style": "빈티지",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "숏 레더 자켓",
+     "color": "레드",
+     "mat": "가죽",
+     "id": "leatherjacket"
+    },
+    {
+     "role": "하의",
+     "name": "와이드 슬랙스",
+     "color": "올리브 그레이",
+     "mat": "",
+     "id": "slacks"
+    },
+    {
+     "role": "소품",
+     "name": "머플러",
+     "color": "멀티",
+     "mat": "니트",
+     "id": "muffler"
+    },
+    {
+     "role": "신발",
+     "name": "더비 슈즈",
+     "color": "블랙",
+     "mat": "가죽",
+     "id": "derby"
+    }
+   ],
+   "point": "붉은 짧은 가죽 자켓에 올리브 그레이 바지를 입어서 보색에 가까운 두 색이 서로를 눈에 띄게 해요."
+  },
+  {
+   "id": "K2D20",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/shorts/ZwvhRzdsD2I",
+   "code": "ZwvhRzdsD2I",
+   "start": 0,
+   "who": "일반인",
+   "account": "라니 | 출근룩 데일리룩",
+   "season": "겨울",
+   "for": "여",
+   "scene": [
+    "출근"
+   ],
+   "style": "미니멀",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "롱 코트",
+     "color": "브라운 그레이",
+     "mat": "울",
+     "id": "woolcoat"
+    },
+    {
+     "role": "하의",
+     "name": "와이드 데님 팬츠",
+     "color": "다크 네이비",
+     "mat": "데님",
+     "id": "jeans"
+    },
+    {
+     "role": "가방",
+     "name": "백팩",
+     "color": "블랙",
+     "mat": "",
+     "id": "backpack"
+    }
+   ],
+   "point": "무릎 아래까지 오는 브라운 그레이 코트에 어두운 데님을 받쳐서 길이감이 한 줄로 이어지고 검정 가방이 중심을 잡아요."
+  },
+  {
+   "id": "K2D18",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/shorts/NcLjHfjplTg",
+   "code": "NcLjHfjplTg",
+   "start": 0,
+   "who": "일반인",
+   "account": "메이블루",
+   "season": "가을",
+   "for": "여",
+   "scene": [
+    "일상"
+   ],
+   "style": "프레피",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "스트라이프 니트",
+     "color": "블랙 화이트",
+     "mat": "니트",
+     "id": "crewknit"
+    },
+    {
+     "role": "하의",
+     "name": "와이드 데님 팬츠",
+     "color": "미디엄 블루",
+     "mat": "데님",
+     "id": "jeans"
+    },
+    {
+     "role": "신발",
+     "name": "플랫 슈즈",
+     "color": "블랙",
+     "mat": "",
+     "id": null
+    },
+    {
+     "role": "가방",
+     "name": "클러치",
+     "color": "베이지",
+     "mat": "",
+     "id": null
+    }
+   ],
+   "point": "줄무늬 니트와 청바지를 입고 플랫을 신은 가장 기본 조합인데 베이지 클러치 하나가 색을 따뜻하게 만들어요."
+  },
+  {
+   "id": "K2D10",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/shorts/dZJM8UVn0Qc",
+   "code": "dZJM8UVn0Qc",
+   "start": 0,
+   "who": "일반인",
+   "account": "서하 SeoHa",
+   "season": "겨울",
+   "for": "여",
+   "scene": [
+    "일상"
+   ],
+   "style": "캐주얼",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "슬림 니트",
+     "color": "블랙",
+     "mat": "니트",
+     "id": "crewknit"
+    },
+    {
+     "role": "하의",
+     "name": "와이드 데님 팬츠",
+     "color": "연청",
+     "mat": "데님",
+     "id": "jeans"
+    },
+    {
+     "role": "신발",
+     "name": "부츠",
+     "color": "블랙",
+     "mat": "",
+     "id": null
+    }
+   ],
+   "point": "몸에 붙는 검정 니트에 헐렁한 연청 바지를 입어서 위아래 부피가 서로 반대로 가고 다리 선이 곧게 보여요."
+  },
+  {
+   "id": "K2D37",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/shorts/olB1Mt408xg",
+   "code": "olB1Mt408xg",
+   "start": 0,
+   "who": "일반인",
+   "account": "황꿀 gguul's boundary",
+   "season": "가을",
+   "for": "여",
+   "scene": [
+    "일상"
+   ],
+   "style": "클래식",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "싱글 코트",
+     "color": "브라운",
+     "mat": "울",
+     "id": null
+    },
+    {
+     "role": "상의",
+     "name": "니트",
+     "color": "아이보리",
+     "mat": "니트",
+     "id": "crewknit"
+    },
+    {
+     "role": "하의",
+     "name": "롱 스커트",
+     "color": "블랙",
+     "mat": "",
+     "id": "longskirt"
+    }
+   ],
+   "point": "브라운 코트를 열어 입어서 안쪽 아이보리 니트가 보이고 검정 롱스커트가 아래를 정리해요."
+  },
+  {
+   "id": "K2D40",
+   "kind": "instagram",
+   "url": "https://www.instagram.com/p/DgE4Xh_j_Ss/",
+   "code": "DgE4Xh_j_Ss",
+   "start": 0,
+   "who": "일반인",
+   "account": "@happy__ootd",
+   "season": "가을",
+   "for": "여",
+   "scene": [
+    "여행"
+   ],
+   "style": "페미닌",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "스트라이프 니트 가디건",
+     "color": "핑크 그레이",
+     "mat": "니트",
+     "id": "cardigan"
+    },
+    {
+     "role": "하의",
+     "name": "케이블 롱 스커트",
+     "color": "아이보리",
+     "mat": "니트",
+     "id": "longskirt"
+    },
+    {
+     "role": "가방",
+     "name": "숄더백",
+     "color": "레오파드",
+     "mat": "",
+     "id": "shoulderbag"
+    }
+   ],
+   "point": "핑크와 회색 줄무늬 가디건에 아이보리 롱스커트를 입고 레오파드 가방을 들어서 따뜻한 색이 서로 어울려요."
+  },
+  {
+   "id": "K2D45",
+   "kind": "instagram",
+   "url": "https://www.instagram.com/p/C2ZgCnCvXnY/",
+   "code": "C2ZgCnCvXnY",
+   "start": 0,
+   "who": "일반인",
+   "account": "@00._.00td",
+   "season": "겨울",
+   "for": "여",
+   "scene": [
+    "출근"
+   ],
+   "style": "미니멀",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "터틀넥 니트",
+     "color": "블랙",
+     "mat": "니트",
+     "id": "poloneckknit"
+    },
+    {
+     "role": "하의",
+     "name": "하이웨이스트 와이드 슬랙스",
+     "color": "다크 그레이",
+     "mat": "",
+     "id": "slacks"
+    }
+   ],
+   "point": "검정 목폴라를 바지 안에 넣어 입고 허리가 높은 회색 슬랙스로 이어서 상체가 작고 다리가 길어 보여요."
+  },
+  {
    "id": "K8",
    "kind": "instagram",
    "url": "https://www.instagram.com/p/Dd8Sax7mgsZ/",
@@ -31820,6 +35916,360 @@
    "point": "파란 반팔 안에 회색 긴팔을 겹쳐서 소매 길이 차이가 생기고 베이지 바지와 카멜 캡이 따뜻하게 이어요."
   },
   {
+   "id": "K2A3",
+   "kind": "instagram",
+   "url": "https://www.instagram.com/p/CtbXJilvzjh/",
+   "code": "CtbXJilvzjh",
+   "start": 0,
+   "who": "일반인",
+   "account": "@_lookatmedude",
+   "season": "여름",
+   "for": "남",
+   "scene": [
+    "출근"
+   ],
+   "style": "미니멀",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "오버핏 셔츠",
+     "color": "하늘색",
+     "mat": "면",
+     "id": "casualshirt"
+    },
+    {
+     "role": "하의",
+     "name": "와이드 팬츠",
+     "color": "검정",
+     "mat": "",
+     "id": "slacks"
+    },
+    {
+     "role": "신발",
+     "name": "로우탑 스니커즈",
+     "color": "흰색",
+     "mat": "",
+     "id": "lowtop"
+    },
+    {
+     "role": "가방",
+     "name": "숄더백",
+     "color": "검정",
+     "mat": "",
+     "id": "shoulderbag"
+    }
+   ],
+   "point": "하늘색 셔츠 하나만 색이 있고 나머지는 검정과 흰색이라 더운 날에도 깔끔해 보여요. 어깨에 건 검정 가방이 하의 색과 이어져요."
+  },
+  {
+   "id": "K2A13",
+   "kind": "instagram",
+   "url": "https://www.instagram.com/p/DSKlgqeCUIR/",
+   "code": "DSKlgqeCUIR",
+   "start": 0,
+   "who": "일반인",
+   "account": "@daily_han_soo",
+   "season": "여름",
+   "for": "남",
+   "scene": [
+    "여행"
+   ],
+   "style": "캐주얼",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "오픈칼라 반팔 셔츠",
+     "color": "크림",
+     "mat": "레이스 자수",
+     "id": "shortsleeveshirt"
+    },
+    {
+     "role": "하의",
+     "name": "와이드 팬츠",
+     "color": "다크 브라운",
+     "mat": "",
+     "id": null
+    }
+   ],
+   "point": "구멍 뚫린 자수 셔츠가 크림색이라 더운 곳에서도 시원해 보이고 어두운 하의가 아래를 단단히 눌러 줘요."
+  },
+  {
+   "id": "K2C10",
+   "kind": "instagram",
+   "url": "https://www.instagram.com/p/Df1sxn3D0Ty/",
+   "code": "Df1sxn3D0Ty",
+   "start": 0,
+   "who": "일반인",
+   "account": "@nuke_chan93",
+   "season": "가을",
+   "for": "남",
+   "scene": [
+    "일상"
+   ],
+   "style": "프레피",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "크리켓 니트",
+     "color": "아이보리 그린 라인",
+     "mat": "니트",
+     "id": "vneckknit"
+    },
+    {
+     "role": "상의",
+     "name": "옥스포드 셔츠",
+     "color": "화이트",
+     "mat": "면",
+     "id": "oxford"
+    },
+    {
+     "role": "하의",
+     "name": "데님 팬츠",
+     "color": "진청",
+     "mat": "데님",
+     "id": "jeans"
+    },
+    {
+     "role": "신발",
+     "name": "로퍼",
+     "color": "브라운",
+     "mat": "스웨이드",
+     "id": "loafer"
+    },
+    {
+     "role": "가방",
+     "name": "에코 토트백",
+     "color": "아이보리",
+     "mat": "",
+     "id": "ecobag"
+    }
+   ],
+   "point": "아이보리 크리켓 니트의 초록 줄을 청바지와 갈색 로퍼가 받쳐 줘서 학생 같은 프레피 느낌이 깔끔해요."
+  },
+  {
+   "id": "K2C14",
+   "kind": "instagram",
+   "url": "https://www.instagram.com/p/DEHDgyFTLiJ/",
+   "code": "DEHDgyFTLiJ",
+   "start": 0,
+   "who": "일반인",
+   "account": "@gong__do",
+   "season": "겨울",
+   "for": "남",
+   "scene": [
+    "여행"
+   ],
+   "style": "아메카지",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "피쉬테일 파카",
+     "color": "올리브",
+     "mat": "면",
+     "id": null
+    },
+    {
+     "role": "하의",
+     "name": "와이드 카고 팬츠",
+     "color": "블랙",
+     "mat": "면",
+     "id": "cargo"
+    },
+    {
+     "role": "신발",
+     "name": "뉴발란스",
+     "color": "그레이",
+     "mat": "",
+     "id": null
+    },
+    {
+     "role": "소품",
+     "name": "볼캡",
+     "color": "베이지",
+     "mat": "",
+     "id": "ballcap"
+    },
+    {
+     "role": "가방",
+     "name": "백팩",
+     "color": "블랙",
+     "mat": "",
+     "id": "backpack"
+    }
+   ],
+   "point": "긴 올리브 파카 속에 검정 바지와 회색 운동화를 맞춰서 무겁지 않게 걸어 다니기 좋은 여행룩이에요."
+  },
+  {
+   "id": "K2C17",
+   "kind": "instagram",
+   "url": "https://www.instagram.com/p/DgCX_C6kXRN/",
+   "code": "DgCX_C6kXRN",
+   "start": 0,
+   "who": "일반인",
+   "account": "@avant_garde_hoo",
+   "season": "가을",
+   "for": "남",
+   "scene": [
+    "일상"
+   ],
+   "style": "스트릿",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "스트라이프 니트",
+     "color": "브라운",
+     "mat": "니트",
+     "id": "crewknit"
+    },
+    {
+     "role": "하의",
+     "name": "그래픽 와이드 데님",
+     "color": "연청",
+     "mat": "데님",
+     "id": "jeans"
+    },
+    {
+     "role": "신발",
+     "name": "팀버랜드 부츠",
+     "color": "옐로 브라운",
+     "mat": "누벅",
+     "id": "workboots"
+    },
+    {
+     "role": "소품",
+     "name": "선글라스",
+     "color": "블랙",
+     "mat": "",
+     "id": null
+    }
+   ],
+   "point": "갈색 니트가 단풍색과 어울리고 아주 넓은 청바지로 밑단이 부츠 위에 쌓여서 힙한 느낌이 나요."
+  },
+  {
+   "id": "K2D11",
+   "kind": "youtube",
+   "url": "https://www.youtube.com/shorts/ytzfIevyvR0",
+   "code": "ytzfIevyvR0",
+   "start": 0,
+   "who": "일반인",
+   "account": "서하 SeoHa",
+   "season": "겨울",
+   "for": "여",
+   "scene": [
+    "일상"
+   ],
+   "style": "스트릿",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "크롭 집업 가디건",
+     "color": "그레이",
+     "mat": "니트",
+     "id": "cardigan"
+    },
+    {
+     "role": "상의",
+     "name": "이너 티셔츠",
+     "color": "흰색",
+     "mat": "",
+     "id": "tee"
+    },
+    {
+     "role": "하의",
+     "name": "워싱 플레어 데님",
+     "color": "그레이 블루",
+     "mat": "데님",
+     "id": null
+    },
+    {
+     "role": "신발",
+     "name": "스니커즈",
+     "color": "흰색",
+     "mat": "",
+     "id": "lowtop"
+    }
+   ],
+   "point": "허리 위에서 끝나는 회색 집업에 밑단이 넓어지는 플레어 청바지를 맞춰서 키가 작아도 다리가 길게 내려와요."
+  },
+  {
+   "id": "K2D41",
+   "kind": "instagram",
+   "url": "https://www.instagram.com/p/Df8vBVID-CJ/",
+   "code": "Df8vBVID-CJ",
+   "start": 0,
+   "who": "일반인",
+   "account": "@happy__ootd",
+   "season": "겨울",
+   "for": "여",
+   "scene": [
+    "출근"
+   ],
+   "style": "클래식",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "버튼 가디건",
+     "color": "차콜",
+     "mat": "니트",
+     "id": "cardigan"
+    },
+    {
+     "role": "하의",
+     "name": "롱 스커트",
+     "color": "베이지",
+     "mat": "코듀로이",
+     "id": "longskirt"
+    },
+    {
+     "role": "소품",
+     "name": "타이츠",
+     "color": "블랙",
+     "mat": "",
+     "id": "necktie"
+    },
+    {
+     "role": "신발",
+     "name": "플랫 슈즈",
+     "color": "블랙",
+     "mat": "",
+     "id": null
+    }
+   ],
+   "point": "금단추가 달린 차콜 가디건을 베이지 롱스커트 위에 올려서 차분하고 허리에서 위아래가 확실히 나뉘어요."
+  },
+  {
+   "id": "K2D46",
+   "kind": "instagram",
+   "url": "https://www.instagram.com/p/C2PNHbNPhZQ/",
+   "code": "C2PNHbNPhZQ",
+   "start": 0,
+   "who": "일반인",
+   "account": "@00._.00td",
+   "season": "겨울",
+   "for": "여",
+   "scene": [
+    "출근"
+   ],
+   "style": "클래식",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "라운드 니트",
+     "color": "그레이",
+     "mat": "니트",
+     "id": "crewknit"
+    },
+    {
+     "role": "하의",
+     "name": "부츠컷 슬랙스",
+     "color": "브라운",
+     "mat": "",
+     "id": "bootcut"
+    }
+   ],
+   "point": "회색 니트와 초콜릿 브라운 슬랙스의 차분한 배색에 바지가 허리부터 다리까지 붙다가 끝에서 살짝 퍼져요."
+  },
+  {
    "id": "K9",
    "kind": "instagram",
    "url": "https://www.instagram.com/p/DfRTO9jS5Oh/",
@@ -31981,6 +36431,229 @@
     }
    ],
    "point": "흰색 린넨 니트에 베이지 롱스커트를 이어 입어서 밝은 두 색이 부드럽게 퍼지고 갈색 가방이 중심을 잡아요."
+  },
+  {
+   "id": "K2A4",
+   "kind": "instagram",
+   "url": "https://www.instagram.com/p/CwnUEVVrxL7/",
+   "code": "CwnUEVVrxL7",
+   "start": 0,
+   "who": "일반인",
+   "account": "@_lookatmedude",
+   "season": "여름",
+   "for": "남",
+   "scene": [
+    "여행"
+   ],
+   "style": "시티보이",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "반팔 카라 니트",
+     "color": "회청색",
+     "mat": "니트",
+     "id": "knitpolo"
+    },
+    {
+     "role": "하의",
+     "name": "와이드 팬츠",
+     "color": "베이지",
+     "mat": "면",
+     "id": "chino"
+    },
+    {
+     "role": "신발",
+     "name": "로퍼형 신발",
+     "color": "검정",
+     "mat": "",
+     "id": "loafer"
+    }
+   ],
+   "point": "회청색 카라 상의에 베이지 팬츠를 맞춰 톤이 차분하고 다리가 길게 이어져요. 검정 신발이 맨 아래를 눌러 줘서 가벼운 여름 조합이 들뜨지 않아요."
+  },
+  {
+   "id": "K2C11",
+   "kind": "instagram",
+   "url": "https://www.instagram.com/p/DfzR2j8CQZ6/",
+   "code": "DfzR2j8CQZ6",
+   "start": 0,
+   "who": "일반인",
+   "account": "@nuke_chan93",
+   "season": "겨울",
+   "for": "남",
+   "scene": [
+    "하객"
+   ],
+   "style": "댄디",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "헤링본 슈트 재킷",
+     "color": "그레이",
+     "mat": "울",
+     "id": "suitjacket"
+    },
+    {
+     "role": "하의",
+     "name": "헤링본 슬랙스",
+     "color": "그레이",
+     "mat": "울",
+     "id": "slacks"
+    },
+    {
+     "role": "상의",
+     "name": "드레스 셔츠",
+     "color": "화이트",
+     "mat": "면",
+     "id": "dressshirt"
+    },
+    {
+     "role": "소품",
+     "name": "넥타이",
+     "color": "블랙",
+     "mat": "",
+     "id": "necktie"
+    },
+    {
+     "role": "신발",
+     "name": "더비 슈즈",
+     "color": "블랙",
+     "mat": "가죽",
+     "id": "derby"
+    }
+   ],
+   "point": "헤링본 무늬의 회색 셋업에 검정 타이를 매면 톤이 하나로 모여서 겨울 결혼식에 단정하게 어울려요."
+  },
+  {
+   "id": "K2C18",
+   "kind": "instagram",
+   "url": "https://www.instagram.com/p/DfwTIcpEVIy/",
+   "code": "DfwTIcpEVIy",
+   "start": 0,
+   "who": "일반인",
+   "account": "@avant_garde_hoo",
+   "season": "가을",
+   "for": "남",
+   "scene": [
+    "일상"
+   ],
+   "style": "미니멀",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "니트 집업",
+     "color": "블랙",
+     "mat": "니트",
+     "id": "knitzipup"
+    },
+    {
+     "role": "상의",
+     "name": "티셔츠",
+     "color": "그레이",
+     "mat": "면",
+     "id": "tee"
+    },
+    {
+     "role": "하의",
+     "name": "와이드 데님 팬츠",
+     "color": "네이비",
+     "mat": "데님",
+     "id": "jeans"
+    },
+    {
+     "role": "신발",
+     "name": "러닝 스니커즈",
+     "color": "실버 그레이",
+     "mat": "",
+     "id": "lowtop"
+    }
+   ],
+   "point": "검정 집업 안에 회색 티를 한 장만 받치고 짙은 바지로 내려서 군더더기 없이 정리된 가을 차림이에요."
+  },
+  {
+   "id": "K2D42",
+   "kind": "instagram",
+   "url": "https://www.instagram.com/p/Df8nbVjj67L/",
+   "code": "Df8nbVjj67L",
+   "start": 0,
+   "who": "일반인",
+   "account": "@happy__ootd",
+   "season": "가을",
+   "for": "여",
+   "scene": [
+    "출근"
+   ],
+   "style": "페미닌",
+   "pieces": [
+    {
+     "role": "아우터",
+     "name": "얇은 롱 코트",
+     "color": "베이지",
+     "mat": "울",
+     "id": "woolcoat"
+    },
+    {
+     "role": "원피스",
+     "name": "플로럴 미디 원피스",
+     "color": "네이비",
+     "mat": "",
+     "id": "mididress"
+    },
+    {
+     "role": "소품",
+     "name": "타이츠",
+     "color": "블랙",
+     "mat": "",
+     "id": "necktie"
+    },
+    {
+     "role": "가방",
+     "name": "미니 숄더백",
+     "color": "블랙",
+     "mat": "",
+     "id": "shoulderbag"
+    }
+   ],
+   "point": "밝은 베이지 코트를 열어 입고 어두운 꽃무늬 원피스를 보이게 해서 가을 끝자락에 입기 좋은 얇은 겹침이에요."
+  },
+  {
+   "id": "K2D47",
+   "kind": "instagram",
+   "url": "https://www.instagram.com/p/C2MsDFlvYwv/",
+   "code": "C2MsDFlvYwv",
+   "start": 0,
+   "who": "일반인",
+   "account": "@00._.00td",
+   "season": "겨울",
+   "for": "여",
+   "scene": [
+    "출근"
+   ],
+   "style": "페미닌",
+   "pieces": [
+    {
+     "role": "상의",
+     "name": "앙고라 가디건",
+     "color": "아이보리",
+     "mat": "앙고라",
+     "id": "cardigan"
+    },
+    {
+     "role": "하의",
+     "name": "머메이드 스커트",
+     "color": "라이트 핑크",
+     "mat": "",
+     "id": null
+    },
+    {
+     "role": "신발",
+     "name": "삭스 부츠",
+     "color": "흰색",
+     "mat": "",
+     "id": "socks"
+    }
+   ],
+   "point": "솜털 가디건과 머메이드 스커트, 흰 부츠를 모두 연한 색으로 맞춰서 몸선이 부드럽게 이어져요."
   },
   {
    "id": "K24",
