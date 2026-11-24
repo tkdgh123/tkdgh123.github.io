@@ -332,6 +332,46 @@ button.pc:hover span{text-decoration:underline;text-underline-offset:3px}
   .op{font-size:16px}
   .fb{grid-template-columns:84px 1fr}
 }
+/* 입고 관리 */
+.goal{margin:10px 0 0;color:var(--sub);font-size:16px}
+.tp{padding-top:24px}
+.tp-l{display:block;font-size:14px;font-weight:700;color:var(--sub);margin-bottom:6px}
+#tp-r{width:100%;accent-color:var(--ink)}
+.tp-bands{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 22px}
+.tp-bands button{font-size:13px;padding:5px 10px;border:1px solid var(--line);border-radius:999px;color:var(--sub)}
+.tp-now{display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:start;margin-bottom:22px}
+.tp-deg{display:flex;align-items:baseline;gap:2px}
+.tp-deg b{font-size:clamp(56px,10vw,88px);font-weight:800;letter-spacing:-.05em;line-height:1}
+.tp-deg span{font-size:20px;color:var(--sub)}
+.tp-now h2{margin:4px 0 6px;font-size:22px;letter-spacing:-.03em}
+.tp-now p{margin:0}
+.cl{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;padding-top:20px}
+.cl-i{border:1px solid var(--line);padding:16px 18px}
+.cl-i h3{margin:0 0 4px;font-size:17px;letter-spacing:-.03em}
+.cl-i h3 small{margin-left:8px;font-size:12px;font-weight:600;color:var(--faint)}
+.cl-i p{margin:6px 0 0;font-size:15px}
+.cl-c{color:var(--faint);font-size:13px!important}
+.cl-d{color:var(--sub);font-size:14px!important}
+.cl-h{margin:40px 0 0;font-size:20px;letter-spacing:-.03em}
+.syms{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;padding-top:14px}
+.sy{border:1px solid var(--line);padding:14px;display:flex;flex-direction:column;gap:4px}
+.sy .sym{width:52px;height:52px;margin-bottom:6px}
+.sy b{font-size:15px}
+.sy span{font-size:13px;color:var(--sub)}
+.q-sym{display:flex;justify-content:center;align-items:center;aspect-ratio:1;border:1px solid var(--line)}
+.q-sym .sym{width:55%;height:55%}
+.q-mat{aspect-ratio:1;overflow:hidden;background:var(--tile)}.q-mat img{width:100%;height:100%;object-fit:cover}
+.sz{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;padding-top:24px}
+.sz-c{border:1px solid var(--line);padding:18px}
+.sz-c h2{margin:0 0 10px;font-size:18px}
+.sz-c label{display:flex;align-items:center;gap:8px;font-size:15px;margin-top:6px}
+.sz-c input[type=number]{width:96px;font:inherit;padding:8px 10px;border:1px solid var(--line)}
+.sz-chk{font-size:13px!important;color:var(--sub)}
+.sz-o{margin:12px 0 0;font-size:15px;color:var(--sub)}
+.sz-o b{color:var(--ink);font-size:18px}
+.sz-t{border-collapse:collapse;margin-top:22px;width:100%;max-width:520px;font-size:15px}
+.sz-t th,.sz-t td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left}
+.src{font-size:13px;color:var(--faint);margin-top:16px}
 </style>
 </head>
 <body>
@@ -343,6 +383,7 @@ button.pc:hover span{text-decoration:underline;text-underline-offset:3px}
     <a href="#mat" data-v="mat">재질</a>
     <a href="#cmp" data-v="cmp">비교</a>
     <a href="#codi" data-v="codi">코디</a>
+    <a href="#care" data-v="care">입고 관리</a>
     <a href="#quiz/mix" data-v="quiz">퀴즈</a>
     <a href="#read" data-v="read">읽기</a>
     <a href="plan.html">계획</a>
@@ -355,6 +396,7 @@ button.pc:hover span{text-decoration:underline;text-underline-offset:3px}
   <section id="v-mat" hidden></section>
   <section id="v-cmp" hidden></section>
   <section id="v-codi" hidden></section>
+  <section id="v-care" hidden></section>
   <section id="v-quiz" hidden></section>
   <section id="v-read" hidden></section>
 </main>
@@ -558,6 +600,8 @@ function mixSet() {
   if (K.r.length) out.push(...ruleSet().slice(0, 1));
   if (C.some(c => c.spot)) out.push(...shuffle(partList()).slice(0, 1).map(p => ({ photo: p })));
   if (F.length) out.push(...findList().slice(0, 1));
+  if (CARE) out.push(tempSet()[0], careSet()[0]);
+  if (MT.materials.length) out.push(matSet()[0]);
   return shuffle(out.concat(a.slice(4)).slice(0, 10));
 }
 // 맞히면 연속 수를 올리고, 오늘 푼 수와 며칠째인지 센다. 맞힌 문제는 잠깐 뒤 저절로 다음으로
@@ -580,13 +624,14 @@ function startQuiz(only, scope) {
     : scope === "name" && !only ? nameSet()
     : scope === "rule" ? ruleSet()
     : scope === "real" ? realSet()
+    : scope === "temp" ? tempSet() : scope === "care" ? careSet() : scope === "mat" ? matSet()
     : scope === "mix" ? mixSet() : shuffle(pickSet(only, scope === "name" || scope === "review" ? "" : scope));
   Q = { scope, list, i: 0, right: 0, wrong: [], done: false }; quiz();
 }
 function quiz() {
   const el = $("#v-quiz");
-  const mode = ["mix", "name", "rule", "real", "part", "photo", "review"].includes(Q.scope) ? Q.scope : "";
-  const modes = [["mix", "섞어서", 1], ["", "이름 맞히기", 1], ["review", `복습 ${dueIds().length}`, dueIds().length || mode === "review"], ["name", "상품명 뜯어보기", N.length], ["rule", "코디 규칙", K.r.length], ["real", "실제 사진", RP.length], ["part", "부분 누르기", C.some(c => c.spot)], ["photo", "사진에서 찾기", F.length]];
+  const mode = ["mix", "name", "rule", "real", "part", "photo", "review", "temp", "care", "mat"].includes(Q.scope) ? Q.scope : "";
+  const modes = [["mix", "섞어서", 1], ["", "이름 맞히기", 1], ["review", `복습 ${dueIds().length}`, dueIds().length || mode === "review"], ["name", "상품명 뜯어보기", N.length], ["rule", "코디 규칙", K.r.length], ["real", "실제 사진", RP.length], ["part", "부분 누르기", C.some(c => c.spot)], ["photo", "사진에서 찾기", F.length], ["temp", "기온 보고 입기", !!CARE], ["care", "세탁 기호", !!CARE], ["mat", "재질", MT.materials.length]];
   const nav = `<nav class="useg qmode" aria-label="문제 종류">${modes.filter(m => m[2]).map(([k, label]) => `<a href="#quiz${k ? "/" + k : ""}" aria-current="${k === mode}">${label}</a>`).join("")}</nav>` +
     (mode ? "" : `<nav class="seg qunit" aria-label="단원">${[["", "전체"], ...U.map(x => [String(x.u), x.name])].map(([k, label]) => `<a href="#quiz${k ? "/" + k : ""}" aria-current="${String(Q.scope) === k}">${esc(label)}</a>`).join("")}</nav>`);
   if (Q.i >= Q.list.length) {
@@ -632,6 +677,9 @@ function quiz() {
     const by = Object.fromEntries(K.r.map(r => [r.id, r]));
     el.innerHTML = nav + `<div class="qz split">${head}${kshot(q.f)}<div class="qa"><h2>이 코디에서 볼 수 있는 규칙은 무엇일까요?</h2>
       <div class="ops two" id="ops">${q.ops.map((o, k) => `<button class="op" data-op="${o}"><kbd>${k + 1}</kbd><span>${esc(by[o].name)}<small></small></span></button>`).join("")}</div><div id="fb"></div></div></div>`;
+  } else if (q.type === "tq") {
+    el.innerHTML = nav + `<div class="qz${q.vis ? " split" : ""}">${head}${q.vis ? `<div class="q-vis">${q.vis}</div>` : ""}<div class="qa">${q.kicker ? `<p class="q-rule">${esc(q.kicker)}</p>` : ""}<h2>${esc(q.h)}</h2>
+      <div class="ops two" id="ops">${q.ops.map((o, k) => `<button class="op" data-op="${o}"><kbd>${k + 1}</kbd><span>${esc(q.txt[o])}<small></small></span></button>`).join("")}</div><div id="fb"></div></div></div>`;
   } else if (q.type === "rule") {
     el.innerHTML = nav + `<div class="qz${q.ex ? " split" : ""}">${head}${q.ex ? kshot(q.ex, "이 규칙을 지킨 실제 코디") : ""}<div class="qa"><p class="q-rule">${esc(q.r.name)}</p><h2>이 규칙에 맞는 예는 무엇일까요?</h2>
       <div class="ops two" id="ops">${q.ops.map((o, k) => `<button class="op" data-op="${o}"><kbd>${k + 1}</kbd><span>${esc(q.txt[o])}<small></small></span></button>`).join("")}</div><div id="fb"></div></div></div>`;
@@ -707,6 +755,7 @@ function answer(o) {
   if (!Q || Q.done) return;
   Q.done = true;
   if (["rule", "rphoto"].includes(Q.list[Q.i].type)) return ruleAnswer(o);
+  if (Q.list[Q.i].type === "tq") return tqAnswer(o);
   if (Q.list[Q.i].type === "rpick") return pickAnswer(o);
   const q = Q.list[Q.i], c = byId[q.id], ok = o === q.id;
   const s = st.stat[q.id] || (st.stat[q.id] = { s: 0, w: 0 });
@@ -968,7 +1017,130 @@ function start() {
 
 /* 화면 전환 */
 let view = "book";
-const VIEWS = ["start", "book", "mat", "cmp", "codi", "quiz", "read"];
+const VIEWS = ["start", "book", "mat", "cmp", "codi", "care", "quiz", "read"];
+/* 입고 관리: 기온, 사이즈, 세탁 기호, 관리, 쇼핑몰 말, 체형, 드레스 코드 (care.json) */
+let CARE = null;
+const CTABS = [["", "기온"], ["size", "사이즈"], ["wash", "세탁 기호"], ["keep", "옷 관리"], ["shop", "쇼핑몰 말"], ["body", "체형"], ["dress", "드레스 코드"]];
+const CGROUP = { keep: "옷 관리", shop: "쇼핑몰 말", body: "체형별 고르기", dress: "드레스 코드" };
+const SKIND = { wash: "물세탁", hand: "물세탁", bleach: "표백", tumble: "건조기", line: "자연 건조", iron: "다림질", dc: "드라이클리닝" };
+function sym(k, v) {
+  const L = 'stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"';
+  const X = '<path d="M7 7L41 41M41 7L7 41" stroke="currentColor" stroke-width="2.4"/>';
+  const dots = (n, y) => Array.from({ length: n }, (_, i) => `<circle cx="${24 + (i - (n - 1) / 2) * 7}" cy="${y}" r="2.3" fill="currentColor"/>`).join("");
+  let g = "";
+  if (k === "wash" || k === "hand") {
+    g = `<path d="M6 15L10 37H38L42 15" ${L}/><path d="M6 15q4.5-4 9 0t9 0t9 0t9 0" ${L}/>`;
+    const n = parseInt(v); if (n) g += `<text x="24" y="31" text-anchor="middle" font-size="12" font-weight="700" fill="currentColor">${n}</text>`;
+    if (k === "hand") g += `<path d="M18 33v-9a2 2 0 0 1 4 0v4m0-6a2 2 0 0 1 4 0v6m0-4a2 2 0 0 1 4 0v5c0 3-2 5-5 5h-3c-2 0-3-1-4-2l-3-4a2 2 0 0 1 3-2l2 2" ${L} stroke-width="1.8"/>`;
+    if (v.includes("-")) g += `<path d="M10 42H38" ${L}/>`;
+    if (v.includes("=")) g += `<path d="M10 41H38M10 45H38" ${L}/>`;
+  } else if (k === "bleach") {
+    g = `<path d="M24 7L43 40H5Z" ${L}/>`;
+    if (v === "//") g += `<path d="M20 36l8-16M26 36l8-16" ${L} stroke-width="2"/>`;
+  } else if (k === "tumble" || k === "line") {
+    g = `<rect x="7" y="7" width="34" height="34" ${L}/>`;
+    if (k === "tumble") g += `<circle cx="24" cy="24" r="12" ${L}/>` + (v === "x" ? "" : dots(v.length, 24));
+    if (v === "|") g += `<path d="M24 14V34" ${L}/>`;
+    if (v === "||") g += `<path d="M20 14V34M28 14V34" ${L}/>`;
+    if (v === "-") g += `<path d="M14 24H34" ${L}/>`;
+    if (v === "/") g += `<path d="M7 19L19 7" ${L}/><path d="M24 14V34" ${L}/>`;
+  } else if (k === "iron") {
+    g = `<path d="M7 36H41L39 25Q37 18 29 18H17Q12 18 10 24Z" ${L}/><path d="M17 18Q17 12 23 12H35" ${L}/>` + (v === "x" ? "" : dots(v.length, 29));
+  } else if (k === "dc") {
+    g = `<circle cx="24" cy="24" r="16" ${L}/>` + (v !== "x" ? `<text x="24" y="29.5" text-anchor="middle" font-size="15" font-weight="700" fill="currentColor">${v}</text>` : "");
+  }
+  return `<svg class="sym" viewBox="0 0 48 48" aria-hidden="true">${g}${v === "x" ? X : ""}</svg>`;
+}
+const bandOf = t => CARE.temps.find(b => t >= b.lo && t <= b.hi);
+function careList(name) {
+  const g = CARE.groups.find(x => x.name === name); if (!g) return "";
+  return `<div class="cl">${g.items.map(it => `<section class="cl-i"><h3>${esc(it.n)}${it.p === "A" ? "" : `<small>${it.p === "B" ? "알아 두면 좋아요" : "더 깊이"}</small>`}</h3>${it.c.length ? `<p class="cl-c">${it.c.map(esc).join(", ")}</p>` : ""}<p>${esc(it.m)}</p>${it.d ? `<p class="cl-d">${esc(it.d)}</p>` : ""}</section>`).join("")}</div>`;
+}
+function tempBody(t) {
+  const b = bandOf(t);
+  return `<div class="tp-now"><div class="tp-deg"><b>${t}</b><span>도</span></div><div><h2>${esc(b.name)}</h2><p>${esc(b.say)}</p>${b.tip ? `<p class="cl-d">${esc(b.tip)}</p>` : ""}</div></div>
+    <div class="grid">${b.ids.filter(id => byId[id]).map(id => tile(byId[id])).join("")}</div>`;
+}
+function care(arg) {
+  const el = $("#v-care");
+  if (!CARE) { el.innerHTML = `<p class="cmp-say">불러오는 중이에요</p>`; return; }
+  const cur = CTABS.some(t => t[0] === arg) ? arg : "";
+  const top = `<div class="lead"><h1>입고 관리</h1><p class="goal">오늘 날씨에 뭘 입을지, 어느 치수를 살지, 어떻게 빨지.</p></div><nav class="useg" aria-label="입고 관리">${CTABS.map(([k, l]) => `<a href="#care${k ? "/" + k : ""}" aria-current="${k === cur}">${l}</a>`).join("")}</nav>`;
+  let body = "";
+  if (!cur) {
+    const t = st.temp ?? 14;
+    body = `<div class="tp"><label class="tp-l" for="tp-r">낮 기온</label><input type="range" id="tp-r" min="-10" max="35" value="${t}" step="1">
+      <div class="tp-bands">${CARE.temps.slice().reverse().map(b => `<button data-temp="${Math.max(-10, Math.min(35, b.lo === -99 ? 0 : b.hi === 99 ? 30 : Math.round((b.lo + b.hi) / 2)))}">${esc(b.name)}</button>`).join("")}</div>
+      <div id="tp-b">${tempBody(t)}</div><p class="src">기준: <a href="${CARE.src[0][1]}" target="_blank" rel="noopener">${CARE.src[0][0]}</a>. 기상청 공식 표는 없어요. 바람이 세면 한 단계 따뜻하게, 일교차가 크면 벗기 쉬운 겉옷을 겹쳐요.</p>
+      <p><a class="btn" href="#quiz/temp">기온 퀴즈</a></p></div>`;
+  } else if (cur === "size") {
+    body = `<div class="sz">
+      <section class="sz-c"><h2>상의 호수</h2><label>가슴둘레 <input type="number" inputmode="decimal" id="sz-chest" placeholder="96"> cm</label><p class="sz-o" id="sz-chest-o">줄자로 겨드랑이 아래 가장 넓은 곳을 둘러 재요.</p></section>
+      <section class="sz-c"><h2>바지 인치</h2><label>허리둘레 <input type="number" inputmode="decimal" id="sz-waist" placeholder="80"> cm</label><label class="sz-chk"><input type="checkbox" id="sz-half"> 쇼핑몰 실측(허리단면)으로 넣었어요</label><p class="sz-o" id="sz-waist-o">1인치는 2.54센티예요.</p></section>
+      <section class="sz-c"><h2>신발 사이즈</h2><label>발 길이 <input type="number" inputmode="numeric" id="sz-foot" placeholder="260"> mm</label><p class="sz-o" id="sz-foot-o">한국 신발 사이즈는 발 길이 밀리미터예요.</p></section></div>
+      <table class="sz-t"><thead><tr><th>남성 상의</th><th>가슴둘레</th><th>알파벳</th></tr></thead><tbody>${[[90, "88~92", "S"], [95, "93~97", "M"], [100, "98~102", "L"], [105, "103~107", "XL"], [110, "108~", "XXL"]].map(r => `<tr><td>${r[0]}</td><td>${r[1]} cm</td><td>${r[2]}</td></tr>`).join("")}</tbody></table>
+      <p class="src">알파벳 크기는 브랜드마다 달라서 실제로는 상품의 실측표를 내 옷 실측과 견줘요. 신발 환산은 대략이고 브랜드 표를 봐요.</p>
+      ${careList("사이즈 표기")}<h2 class="cl-h">실측 재는 법</h2>${careList("실측 재는 법")}`;
+  } else if (cur === "wash") {
+    const kinds = [...new Set(CARE.syms.map(x => SKIND[x.k]))];
+    body = `<p class="cmp-say">라벨의 기호는 보통 물세탁, 표백, 건조, 다림질, 드라이클리닝 순서로 놓여요. X가 겹치면 그 처리를 하면 안 돼요.</p>
+      ${kinds.map(kd => `<h2 class="cl-h">${kd}</h2><div class="syms">${CARE.syms.filter(x => SKIND[x.k] === kd).map(x => `<div class="sy">${sym(x.k, x.v)}<b>${esc(x.ko)}</b><span>${esc(x.ex)}</span></div>`).join("")}</div>`).join("")}
+      <p class="src">기준: ISO 3758, KS K 0021. 오래된 옷이나 수입 옷은 기호가 조금 다를 수 있어요.</p><p><a class="btn" href="#quiz/care">세탁 기호 퀴즈</a></p>`;
+  } else body = careList(CGROUP[cur]);
+  el.innerHTML = top + body;
+  if (cur === "size") szCalc();
+}
+function szCalc() {
+  const v = id => parseFloat($("#" + id)?.value);
+  const chest = v("sz-chest"), waist = v("sz-waist"), foot = v("sz-foot");
+  if (chest) { const h = Math.min(110, Math.max(85, Math.round(chest / 5) * 5)); const a = { 85: "XS", 90: "S", 95: "M", 100: "L", 105: "XL", 110: "XXL" }[h]; $("#sz-chest-o").innerHTML = `<b>${h}</b> 호, 보통 <b>${a}</b>예요.`; }
+  if (waist) { const w = $("#sz-half").checked ? waist * 2 : waist, i = w / 2.54; $("#sz-waist-o").innerHTML = `허리 ${w.toFixed(0)}cm는 <b>${i.toFixed(1)}</b>인치, 보통 <b>${Math.round(i)}</b> 사이즈예요.`; }
+  if (foot) { const c = foot / 10, us = c - 18; $("#sz-foot-o").innerHTML = `남성 US <b>${us.toFixed(1).replace(".0", "")}</b>, UK <b>${(us - 1).toFixed(1).replace(".0", "")}</b>, EU <b>${Math.round(c + 15)}</b>. 여성 US는 1~1.5 더 커요.`; }
+}
+document.addEventListener("input", e => {
+  if (e.target.id === "tp-r") { st.temp = +e.target.value; $("#tp-b").innerHTML = tempBody(st.temp); try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (x) {} }
+  if (e.target.closest(".sz")) szCalc();
+});
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-temp]"); if (!b) return;
+  const r = $("#tp-r"); r.value = b.dataset.temp; r.dispatchEvent(new Event("input", { bubbles: true }));
+});
+function tempSet() {
+  return shuffle(CARE.temps.slice()).slice(0, 10).map(b => {
+    const t = b.lo === -99 ? -3 + Math.floor(Math.random() * 7) : b.hi === 99 ? 28 + Math.floor(Math.random() * 6) : b.lo + Math.floor(Math.random() * (b.hi - b.lo + 1));
+    const others = shuffle(CARE.temps.filter(x => x !== b)).slice(0, 3);
+    const opt = x => x.ids.filter(id => byId[id]).slice(0, 4).map(id => byId[id].ko).join(", ");
+    const all = [b, ...others];
+    return { type: "tq", kicker: "기온 보고 입기", h: `낮 기온 ${t}도예요. 가장 알맞은 차림은?`, ans: b.name, ops: shuffle(all.map(x => x.name)), txt: Object.fromEntries(all.map(x => [x.name, opt(x)])), why: Object.fromEntries(all.map(x => [x.name, x.name + " 차림"])), ex: `<h3>${esc(b.name)}</h3><p>${esc(b.say)}</p>` };
+  });
+}
+function careSet() {
+  return shuffle(CARE.syms.slice()).slice(0, 10).map(x => {
+    const others = shuffle(CARE.syms.filter(y => y.ko !== x.ko && (y.k === x.k || Math.random() < .3))).slice(0, 3), all = [x, ...others];
+    return { type: "tq", kicker: "세탁 기호", vis: `<div class="q-sym">${sym(x.k, x.v)}</div>`, h: "이 기호는 무슨 뜻일까요?", ans: x.ko, ops: shuffle(all.map(y => y.ko)), txt: Object.fromEntries(all.map(y => [y.ko, y.ko])), why: Object.fromEntries(all.map(y => [y.ko, ""])), ex: `<h3>${esc(x.ko)}</h3><p>${esc(x.ex)}</p>` };
+  });
+}
+function matSet() {
+  const M = MT.materials;
+  return shuffle(M.slice()).slice(0, 10).map(m => {
+    const same = M.filter(x => x.id !== m.id && x.kind === m.kind), rest = M.filter(x => x.id !== m.id && x.kind !== m.kind);
+    const all = [m, ...shuffle(same).concat(shuffle(rest)).slice(0, 3)];
+    const photo = m.shot ? `<div class="q-mat"><img src="mt/${m.id}.webp" alt=""></div>` : "";
+    return { type: "tq", kicker: `재질, ${m.kind}`, vis: photo, h: photo ? `이 원단은 무엇일까요? 힌트: ${m.feel}` : `이 설명에 맞는 재질은? ${m.say.split(m.name).join("이것")}`, ans: m.id, ops: shuffle(all.map(x => x.id)), txt: Object.fromEntries(all.map(x => [x.id, x.name])), why: Object.fromEntries(all.map(x => [x.id, x.feel])), ex: `<h3>${esc(m.name)}</h3><p>${esc(m.say)}</p><p class="sub">${esc(m.tip || "")} <a href="#mat">재질 보기</a></p>` };
+  });
+}
+function tqAnswer(o) {
+  const q = Q.list[Q.i], ok = o === q.ans;
+  if (ok) Q.right++; else Q.wrong.push(null);
+  tick(ok, false);
+  $("#ops").classList.add("done");
+  $("#ops").querySelectorAll(".op").forEach(b => { const d = b.dataset.op; b.classList.add(d === q.ans ? "ok" : d === o ? "no" : "dim"); b.disabled = true; b.querySelector("small").textContent = q.why[d] || ""; });
+  $("#fb").innerHTML = `<div class="fb one rule-fb"><div><p class="r ${ok ? "ok" : "no"}">${ok ? "맞았어요" : "아쉬워요"}</p>${q.ex}
+    <button class="btn solid" id="q-next">${Q.i + 1 < Q.list.length ? "다음" : "결과 보기"}</button></div></div>`;
+  $("#q-next").focus({ preventScroll: true });
+  $("#fb").scrollIntoView({ block: "nearest" });
+}
+
 function refresh() {
   const arg = location.hash.split("/")[1];
   if (view === "start") start();
@@ -976,6 +1148,7 @@ function refresh() {
   else if (view === "book") book(arg);
   else if (view === "cmp") cmp(arg);
   else if (view === "codi") codi(arg);
+  else if (view === "care") care(arg);
   else if (view === "read" && $("#rd-in")) readRender();
   prog();
 }
@@ -992,7 +1165,7 @@ function route() {
   document.querySelector('.tabs a[aria-current="page"]')?.scrollIntoView({ block: "nearest", inline: "nearest" });
   if (view === "read") { if (!$("#rd-in")) readView(); else readRender(); prog(); }
   else if (view === "quiz") {
-    const scope = U.some(x => x.u == arg) || (arg === "name" && N.length) || arg === "mix" || (arg === "rule" && K.r.length) || (arg === "real" && RP.length) || (arg === "photo" && F.length) || arg === "part" || arg === "review" ? arg : "";
+    const scope = U.some(x => x.u == arg) || (arg === "name" && N.length) || arg === "mix" || (arg === "rule" && K.r.length) || (arg === "real" && RP.length) || (arg === "photo" && F.length) || arg === "part" || arg === "review" || ((arg === "temp" || arg === "care") && CARE) || (arg === "mat" && MT.materials.length) ? arg : "";
     if (!Q || Q.scope !== scope) startQuiz(null, scope); else quiz();
     prog();
   } else refresh();
@@ -1034,7 +1207,8 @@ document.addEventListener("keydown", e => {
 });
 window.addEventListener("hashchange", route);
 
-fetch("cards.json").then(r => r.json()).then(d => {
+Promise.all([fetch("cards.json").then(r => r.json()), fetch("care.json").then(r => r.json()).catch(() => null)]).then(([d, cr]) => {
+  CARE = cr;
   G = d.groups; C = d.cards; N = d.names || []; F = d.find || []; LK = d.looks || []; TR = d.trend || []; PR = d.pair || []; MT = d.mat && d.mat.materials ? d.mat : MT; R = d.read || {}; K = d.codi || K; RP = d.real || []; byId = Object.fromEntries(C.map(c => [c.id, c]));
   U = d.units.filter(x => C.some(c => c.u == x.u));
   if (location.hash.startsWith("#card/")) { const id = location.hash.split("/")[1]; history.replaceState(null, "", "#book"); route(); location.hash = "#card/" + id; }
