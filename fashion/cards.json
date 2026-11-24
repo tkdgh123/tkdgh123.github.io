@@ -211,9 +211,27 @@
    "say": ""
   },
   {
+   "id": "n1-상의",
+   "u": 1,
+   "name": "상의",
+   "say": ""
+  },
+  {
    "id": "n4-기장",
    "u": 4,
    "name": "기장",
+   "say": ""
+  },
+  {
+   "id": "n2-목과깃",
+   "u": 2,
+   "name": "목과 깃",
+   "say": ""
+  },
+  {
+   "id": "n2-박음질과장식",
+   "u": 2,
+   "name": "박음질과 장식",
    "say": ""
   }
  ],
@@ -506,6 +524,54 @@
    ]
   },
   {
+   "id": "linenshirt",
+   "u": 1,
+   "g": "shirts",
+   "ko": "린넨 셔츠",
+   "en": "linen shirt",
+   "say": "삼 섬유(린넨)로 만든 가볍고 구김 있는 셔츠예요. 여름에 입어요.",
+   "look": "천에 가는 줄기 같은 결과 자연스러운 구김이 있어요.",
+   "where": "",
+   "shop": "린넨 셔츠",
+   "pro": "리넨 셔츠",
+   "casual": [
+    "리넨 셔츠",
+    "마 셔츠"
+   ]
+  },
+  {
+   "id": "poplinshirt",
+   "u": 1,
+   "g": "shirts",
+   "ko": "포플린 셔츠",
+   "en": "poplin shirt",
+   "say": "가늘고 촘촘하게 짠 면 천으로 만든 빳빳한 셔츠예요.",
+   "look": "천이 매끈하고 얇으며 결이 가늘어요.",
+   "where": "",
+   "shop": "포플린 셔츠",
+   "pro": "포플린 셔츠",
+   "casual": [
+    "빳빳한 셔츠",
+    "와이셔츠 천 셔츠"
+   ]
+  },
+  {
+   "id": "shortsleeveshirt",
+   "u": 1,
+   "g": "shirts",
+   "ko": "반팔 셔츠",
+   "en": "short-sleeve shirt",
+   "say": "소매가 팔꿈치 위까지인 셔츠예요.",
+   "look": "소매가 짧고 앞에 단추가 있어요.",
+   "where": "",
+   "shop": "반팔 셔츠",
+   "pro": "반소매 셔츠",
+   "casual": [
+    "반팔 남방",
+    "반팔 와이셔츠"
+   ]
+  },
+  {
    "id": "cable",
    "u": 1,
    "g": "knits",
@@ -600,6 +666,40 @@
    ]
   },
   {
+   "id": "crewknit",
+   "u": 1,
+   "g": "knits",
+   "ko": "크루넥 니트",
+   "en": "crew neck sweater",
+   "say": "목둘레가 동그랗게 몸에 붙은 가장 기본적인 니트예요.",
+   "look": "목선이 동그랗고 깃이 없어요. 목 부분에 골지가 둘러 있어요.",
+   "where": "",
+   "shop": "크루넥 니트",
+   "pro": "크루넥 스웨터",
+   "casual": [
+    "라운드 니트",
+    "라운드넥 니트",
+    "목 동그란 니트"
+   ]
+  },
+  {
+   "id": "halfzipknit",
+   "u": 1,
+   "g": "knits",
+   "ko": "하프집업 니트",
+   "en": "half-zip sweater",
+   "say": "목에서 가슴까지 지퍼가 있고 세우면 깃이 되는 니트예요.",
+   "look": "목 앞에 짧은 지퍼가 있고 지퍼를 올리면 목이 높아져요.",
+   "where": "",
+   "shop": "하프집업 니트",
+   "pro": "하프 집 스웨터",
+   "casual": [
+    "반집업 니트",
+    "하프짚업 니트",
+    "지퍼 니트"
+   ]
+  },
+  {
    "id": "knittop",
    "u": 1,
    "g": "knits",
@@ -631,6 +731,23 @@
    ]
   },
   {
+   "id": "poloneckknit",
+   "u": 1,
+   "g": "knits",
+   "ko": "폴라 니트",
+   "en": "turtleneck sweater",
+   "say": "목을 감싸는 높은 깃이 달린 니트예요. 겨울에 목도리 없이 따뜻해요.",
+   "look": "목이 턱까지 올라오고 접어 입는 부분이 있어요.",
+   "where": "",
+   "shop": "폴라 니트",
+   "pro": "터틀넥 스웨터",
+   "casual": [
+    "터틀넥 니트",
+    "목폴라 니트",
+    "목티 니트"
+   ]
+  },
+  {
    "id": "sweater",
    "u": 1,
    "g": "knits",
@@ -650,6 +767,22 @@
    ],
    "same": "일부",
    "diff": "니트는 짜는 방식이고 스웨터는 그 방식으로 만든 옷이에요. 한국에서 니트는 스웨터를 뜻하기도 하고 영어 knit는 편물 전체예요. 세타는 일본어 セーター예요."
+  },
+  {
+   "id": "vneckknit",
+   "u": 1,
+   "g": "knits",
+   "ko": "브이넥 니트",
+   "en": "V-neck sweater",
+   "say": "목선이 V자로 파인 니트예요. 셔츠 위에 겹쳐 입기 좋아요.",
+   "look": "목 앞이 V자로 깊게 파였고 앞이 안 열려요. 앞이 열리면 가디건이에요.",
+   "where": "",
+   "shop": "브이넥 니트",
+   "pro": "브이넥 스웨터",
+   "casual": [
+    "V넥 니트",
+    "브이넥 스웨터"
+   ]
   },
   {
    "id": "blouson",
@@ -1361,6 +1494,23 @@
    ]
   },
   {
+   "id": "denimshorts",
+   "u": 1,
+   "g": "pants",
+   "ko": "데님 반바지",
+   "en": "denim shorts",
+   "say": "청바지 천으로 만든 짧은 바지예요.",
+   "look": "데님 천이고 기장이 무릎 위예요.",
+   "where": "",
+   "shop": "데님 반바지",
+   "pro": "데님 쇼츠",
+   "casual": [
+    "청반바지",
+    "데님 쇼츠",
+    "컷오프"
+   ]
+  },
+  {
    "id": "fatiguepants",
    "u": 1,
    "g": "pants",
@@ -1386,6 +1536,22 @@
    "pro": "하렘 팬츠",
    "casual": [
     "사루엘 팬츠"
+   ]
+  },
+  {
+   "id": "linenpants",
+   "u": 1,
+   "g": "pants",
+   "ko": "린넨 팬츠",
+   "en": "linen trousers",
+   "say": "가볍고 시원한 삼 섬유 바지예요. 여름에 입어요.",
+   "look": "천에 결이 있고 구김이 가요.",
+   "where": "",
+   "shop": "린넨 팬츠",
+   "pro": "리넨 팬츠",
+   "casual": [
+    "리넨 바지",
+    "마 바지"
    ]
   },
   {
@@ -1868,6 +2034,41 @@
     "양말",
     "삭스",
     "목 양말"
+   ]
+  },
+  {
+   "id": "halfzipsweat",
+   "u": 1,
+   "g": "n1-상의",
+   "ko": "반집업 티",
+   "en": "quarter-zip pullover",
+   "say": "가슴까지만 지퍼가 있는 머리로 입는 티예요.",
+   "look": "깃 아래에서 가슴까지 짧은 지퍼가 있어요.",
+   "where": "",
+   "shop": "반집업 티",
+   "pro": "쿼터 집 풀오버",
+   "casual": [
+    "하프집업 티",
+    "하프집업 맨투맨",
+    "반짚업",
+    "쿼터 지퍼"
+   ]
+  },
+  {
+   "id": "henleytee",
+   "u": 1,
+   "g": "n1-상의",
+   "ko": "헨리넥 티",
+   "en": "Henley shirt",
+   "say": "목 앞에 단추가 2~3개 달린 깃 없는 티예요.",
+   "look": "동그란 목 아래에 단추 줄(여밈)이 있고 깃이 없어요.",
+   "where": "",
+   "shop": "헨리넥 티",
+   "pro": "헨리 셔츠",
+   "casual": [
+    "헨리넥",
+    "헨리넥 롱슬리브",
+    "단추 티"
    ]
   },
   {
@@ -2655,6 +2856,28 @@
    "casual": []
   },
   {
+   "id": "notuck",
+   "u": 2,
+   "g": "pantsparts",
+   "ko": "노턱",
+   "en": "Flat front (no tuck)",
+   "say": "허리 앞에 주름이 없는 바지예요. 매끈하고 슬림해 보여요.",
+   "look": "허리 아래 앞판이 주름 없이 평평한지 봐요.",
+   "where": "",
+   "spot": [
+    0.38,
+    0.2
+   ],
+   "shop": "노턱",
+   "pro": "노 턱",
+   "casual": [
+    "플랫 프론트",
+    "주름 없는 바지"
+   ],
+   "same": "일부",
+   "diff": "원턱, 투턱은 주름이 한 줄, 두 줄이고 노턱은 주름이 없어요."
+  },
+  {
    "id": "yoke",
    "u": 2,
    "g": "details",
@@ -2794,6 +3017,49 @@
     "스티치",
     "배색 스티치",
     "포인트 박음질"
+   ]
+  },
+  {
+   "id": "lapel",
+   "u": 2,
+   "g": "n2-목과깃",
+   "ko": "라펠",
+   "en": "Lapel",
+   "say": "재킷이나 코트 앞이 접혀 가슴 쪽으로 뒤집힌 부분이에요. 칼라 아래에 이어져요.",
+   "look": "목에서 가슴 쪽으로 V자로 접혀 내려온 천을 봐요.",
+   "where": "",
+   "spot": [
+    0.44,
+    0.27
+   ],
+   "shop": "라펠",
+   "pro": "라펠",
+   "casual": [
+    "옷깃",
+    "앞깃"
+   ],
+   "same": "일부",
+   "diff": "칼라는 목을 감싸는 부분이고 라펠은 그 아래 가슴 쪽으로 접힌 부분이에요. 노치드, 피크드, 숄은 라펠 모양 이름이에요."
+  },
+  {
+   "id": "quilting",
+   "u": 2,
+   "g": "n2-박음질과장식",
+   "ko": "퀼팅",
+   "en": "Quilting",
+   "say": "겉감과 안감 사이에 솜을 넣고 바둑판이나 줄무늬로 눌러 박은 가공이에요.",
+   "look": "겉면에 마름모나 줄무늬 모양 박음질이 솜을 눌러 볼록볼록하게 보이는지 봐요.",
+   "where": "",
+   "spot": [
+    0.38,
+    0.55
+   ],
+   "shop": "퀼팅",
+   "pro": "퀼팅",
+   "casual": [
+    "누빔",
+    "누비",
+    "퀼티드"
    ]
   },
   {
@@ -9039,6 +9305,16 @@
   "남방자켓": "overshirt",
   "웨스턴셔츠": "western",
   "카우보이셔츠": "western",
+  "린넨셔츠": "linenshirt",
+  "리넨셔츠": "linenshirt",
+  "마셔츠": "linenshirt",
+  "포플린셔츠": "poplinshirt",
+  "빳빳한셔츠": "poplinshirt",
+  "와이셔츠천셔츠": "poplinshirt",
+  "반팔셔츠": "shortsleeveshirt",
+  "반소매셔츠": "shortsleeveshirt",
+  "반팔남방": "shortsleeveshirt",
+  "반팔와이셔츠": "shortsleeveshirt",
   "케이블니트": "cable",
   "꽈배기니트": "cable",
   "꽈배기스웨터": "cable",
@@ -9056,11 +9332,26 @@
   "크롭가디건": "cardiganvariants",
   "숏가디건": "cardiganvariants",
   "짧은가디건": "cardiganvariants",
+  "크루넥니트": "crewknit",
+  "크루넥스웨터": "crewknit",
+  "라운드니트": "crewknit",
+  "라운드넥니트": "crewknit",
+  "목동그란니트": "crewknit",
+  "하프집업니트": "halfzipknit",
+  "하프집스웨터": "halfzipknit",
+  "반집업니트": "halfzipknit",
+  "하프짚업니트": "halfzipknit",
+  "지퍼니트": "halfzipknit",
   "니트탑": "knittop",
   "니트티": "knittop",
   "니트슬리브리스": "knittop",
   "니트집업": "knitzipup",
   "집업니트": "knitzipup",
+  "폴라니트": "poloneckknit",
+  "터틀넥스웨터": "poloneckknit",
+  "터틀넥니트": "poloneckknit",
+  "목폴라니트": "poloneckknit",
+  "목티니트": "poloneckknit",
   "니트": "sweater",
   "스웨터": "sweater",
   "풀오버": "sweater",
@@ -9068,6 +9359,9 @@
   "세터": "sweater",
   "세타": "sweater",
   "니트웨어": "sweater",
+  "브이넥니트": "vneckknit",
+  "브이넥스웨터": "vneckknit",
+  "V넥니트": "vneckknit",
   "MA-1봄버": "ma1",
   "MA-1플라이트재킷": "ma1",
   "봄버": "ma1",
@@ -9209,9 +9503,17 @@
   "낙하산바지": "parachute",
   "큐롯": "culottes",
   "큐롯팬츠": "culottes",
+  "데님반바지": "denimshorts",
+  "데님쇼츠": "denimshorts",
+  "청반바지": "denimshorts",
+  "컷오프": "denimshorts",
   "퍼티그팬츠": "fatiguepants",
   "하렘팬츠": "harempants",
   "사루엘팬츠": "harempants",
+  "린넨팬츠": "linenpants",
+  "리넨팬츠": "linenpants",
+  "리넨바지": "linenpants",
+  "마바지": "linenpants",
   "몸빼": "monpepants",
   "냉장고바지": "monpepants",
   "일바지": "monpepants",
@@ -9284,6 +9586,16 @@
   "양말": "socks",
   "삭스": "socks",
   "목양말": "socks",
+  "반집업티": "halfzipsweat",
+  "쿼터집풀오버": "halfzipsweat",
+  "하프집업티": "halfzipsweat",
+  "하프집업맨투맨": "halfzipsweat",
+  "반짚업": "halfzipsweat",
+  "쿼터지퍼": "halfzipsweat",
+  "헨리넥티": "henleytee",
+  "헨리셔츠": "henleytee",
+  "헨리넥롱슬리브": "henleytee",
+  "단추티": "henleytee",
   "라운드넥": "crew",
   "둥근목": "crew",
   "브이목": "vneck",
@@ -9301,7 +9613,6 @@
   "반집업": "qzip",
   "하프집업": "qzip",
   "집업티": "qzip",
-  "쿼터지퍼": "qzip",
   "1/4집업": "qzip",
   "모자": "hood",
   "모자달린": "hood",
@@ -9425,6 +9736,9 @@
   "리벳": "rivet",
   "구리징": "rivet",
   "버튼플라이": "buttonfly",
+  "노턱": "notuck",
+  "플랫프론트": "notuck",
+  "주름없는바지": "notuck",
   "요크": "yoke",
   "어깨판": "yoke",
   "백요크": "yoke",
@@ -9453,6 +9767,12 @@
   "스티치": "contrast",
   "배색스티치": "contrast",
   "포인트박음질": "contrast",
+  "라펠": "lapel",
+  "옷깃": "lapel",
+  "앞깃": "lapel",
+  "누빔": "quilting",
+  "누비": "quilting",
+  "퀼티드": "quilting",
   "지퍼": "zipper",
   "쟈크": "zipper",
   "자크": "zipper",
@@ -15718,7 +16038,7 @@
      "name": "아가일 브이넥 니트",
      "color": "기사에 색 언급 없음",
      "note": "GQ Korea가 말한 할아버지 니트 느낌이에요.",
-     "id": "sweater"
+     "id": "vneckknit"
     },
     {
      "name": "페어아일 니트",
@@ -16137,7 +16457,7 @@
      "name": "브이넥 니트",
      "color": "기사에 색 언급 없음",
      "note": "셔츠 위에 겹쳐요.",
-     "id": "sweater"
+     "id": "vneckknit"
     },
     {
      "name": "핀스트라이프 셔츠",
@@ -17028,7 +17348,7 @@
     "https://www.harpersbazaar.co.kr/article/1893913"
    ],
    "socks_src": "",
-   "id": "sweater"
+   "id": "crewknit"
   },
   {
    "base": "가디건",
@@ -17410,7 +17730,7 @@
       "color": "회색",
       "why": "차분한 출근룩이 돼요.",
       "src": "",
-      "id": "sweater"
+      "id": "crewknit"
      },
      {
       "name": "티셔츠",
@@ -18434,7 +18754,7 @@
       "color": "회색",
       "why": "차분한 느낌이에요.",
       "src": "",
-      "id": "sweater"
+      "id": "crewknit"
      }
     ],
     "신발": [
@@ -18510,14 +18830,14 @@
       "color": "회색",
       "why": "코트 안에 차분하게 입어요.",
       "src": "https://www.gqkorea.co.kr/2025/11/10/%ec%bd%94%ed%8a%b8-%ec%82%ac%ea%b8%b0-%ec%a0%84-%ed%95%84%eb%8f%85-%ed%95%8f%eb%b3%84%eb%a1%9c-%eb%8b%ac%eb%9d%bc%ec%a7%80%eb%8a%94-%eb%82%a8%ec%9e%90-%eb%a1%b1%ec%bd%94%ed%8a%b8-%ec%98%AC%ea%b2%a8/",
-      "id": "sweater"
+      "id": "crewknit"
      },
      {
       "name": "터틀넥 니트",
       "color": "검정",
       "why": "깔끔하고 단정해요.",
       "src": "https://www.esquirekorea.co.kr/article/1892656",
-      "id": "sweater"
+      "id": "poloneckknit"
      },
      {
       "name": "셔츠",
@@ -23590,14 +23910,14 @@
      "name": "린넨 셔츠 앞단추 풀기",
      "color": "흰색",
      "mat": "린넨",
-     "id": null
+     "id": "linenshirt"
     },
     {
      "role": "하의",
      "name": "린넨 팬츠 밑단 롤업",
      "color": "남색",
      "mat": "린넨",
-     "id": null
+     "id": "linenpants"
     },
     {
      "role": "신발",
@@ -23933,14 +24253,14 @@
      "name": "린넨 셔츠 앞단추 풀기",
      "color": "흰색",
      "mat": "린넨",
-     "id": null
+     "id": "linenshirt"
     },
     {
      "role": "하의",
      "name": "와이드 린넨 팬츠",
      "color": "토프 베이지",
      "mat": "린넨",
-     "id": null
+     "id": "linenpants"
     },
     {
      "role": "신발",
@@ -24378,7 +24698,7 @@
      "name": "오픈칼라 반팔 셔츠",
      "color": "오렌지",
      "mat": "",
-     "id": "tee"
+     "id": "shortsleeveshirt"
     },
     {
      "role": "하의",
@@ -24424,7 +24744,7 @@
      "name": "반팔 셔츠 셋업",
      "color": "갈색",
      "mat": "",
-     "id": "tee"
+     "id": "shortsleeveshirt"
     },
     {
      "role": "하의",
@@ -24463,7 +24783,7 @@
      "name": "오픈칼라 반팔 셔츠",
      "color": "연회색",
      "mat": "",
-     "id": "tee"
+     "id": "shortsleeveshirt"
     },
     {
      "role": "하의",
@@ -24950,7 +25270,7 @@
      "name": "와이드 린넨 팬츠",
      "color": "흰색",
      "mat": "린넨",
-     "id": null
+     "id": "linenpants"
     },
     {
      "role": "신발",
@@ -24989,14 +25309,14 @@
      "name": "린넨 셔츠",
      "color": "흰색",
      "mat": "린넨",
-     "id": null
+     "id": "linenshirt"
     },
     {
      "role": "하의",
      "name": "와이드 린넨 팬츠",
      "color": "흰색",
      "mat": "린넨",
-     "id": null
+     "id": "linenpants"
     },
     {
      "role": "신발",
@@ -28880,7 +29200,7 @@
      "name": "크루넥 니트",
      "color": "검정",
      "mat": "",
-     "id": "sweater"
+     "id": "crewknit"
     }
    ],
    "point": "허리를 벨트로 조인 베이지 트렌치에 흰 털 카라가 붙어서 얼굴 쪽이 환해지고, 안의 검정 니트가 대비를 만들어요.",
@@ -29468,7 +29788,7 @@
      "name": "린넨 셔츠",
      "color": "흰색",
      "mat": "린넨",
-     "id": null
+     "id": "linenshirt"
     },
     {
      "role": "하의",
@@ -30224,7 +30544,7 @@
      "name": "터틀넥",
      "color": "블랙",
      "mat": "",
-     "id": null
+     "id": "poloneckknit"
     },
     {
      "role": "하의",
@@ -30564,7 +30884,7 @@
      "name": "데님 반바지",
      "color": "중청",
      "mat": "데님",
-     "id": "shorts"
+     "id": "denimshorts"
     },
     {
      "role": "가방",
