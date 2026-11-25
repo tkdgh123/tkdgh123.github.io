@@ -158,6 +158,13 @@ pre.txt.err{color:#b3261e;font-weight:700;white-space:pre-wrap;overflow-wrap:any
 :root[data-theme="dark"] .dfw tbody tr:nth-child(odd){background:rgba(255,255,255,.06)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .dfw tbody tr:nth-child(odd){background:rgba(255,255,255,.06)}}
 .dfw p{margin:8px 0 0;font-size:var(--small);color:var(--muted)}
+.cap{margin:12px 0 4px;font-size:var(--small);color:#c9c9c9}
+.xl{overflow-x:auto;margin:0 0 6px}
+.xl p{margin:0 0 4px;font-size:var(--small);color:#c9c9c9}
+.xl table{border-collapse:collapse;font:13px/1.35 var(--sans);font-variant-numeric:tabular-nums;background:#fff;color:#1f1f1f}
+.xl th{background:#f3f4f6;color:#5f6368;font-weight:400;border:1px solid #c9cdd2;padding:2px 8px;text-align:center}
+.xl td{border:1px solid #dfe2e5;padding:2px 8px;white-space:nowrap;text-align:left;min-width:2.5em}
+.xl td.n{text-align:right}
 img.plot{width:min(100%,var(--w));background:#fff}
 .out img.plot+img.plot{margin-top:12px}
 .why{margin:0;padding:14px 20px 4px 58px;max-width:none;font-size:var(--body);line-height:1.6}
@@ -289,7 +296,7 @@ img.plot{width:min(100%,var(--w));background:#fff}
 </head>
 <body>
 <header class="top">
-  
+  <a class="home" href="../">창업실</a>
   <span class="name">AI와 데이터 기초 시험 정리</span>
   <span class="dd" id="dd">11/26 시험</span>
   <label class="sw" title="실행 결과를 가리고 먼저 맞혀 본 뒤 눌러서 확인해요"><input type="checkbox" id="hideOut"><i></i><span>결과 가리기</span></label>
@@ -309,6 +316,7 @@ img.plot{width:min(100%,var(--w));background:#fff}
   <a href="#w10"><span class="b"></span><span>10주차<span class="x"> folium 지도</span></span></a>
   <a href="#mock1"><span class="b"></span><span>모의고사 1회</span></a>
   <a href="#mock2"><span class="b"></span><span>모의고사 2회</span></a>
+  <a href="#ex"><span class="b"></span><span>예제 형식</span></a>
   <a href="#wrongs"><span class="b"></span><span>오답 노트</span></a>
 </nav>
 <main id="main">
@@ -417,19 +425,19 @@ df.iloc[0:2]</pre>
 <div class="quiz"><h3>1주차 문제 <span class="sc"></span></h3><ol class="qs">
   <li class="q" id="q1-1" data-type="s" data-ans='["RAG","검색증강생성"]'><p>질문이 들어오면 외부 문서나 데이터베이스에서 관련 정보를 찾고, 그 내용을 토대로 답을 생성하게 만드는 기술은?<span class="ty">단답형</span></p>
     <form class="sa"><input aria-label="답" placeholder="답을 쓰고 확인"><button>확인</button><button type="button" class="giveup">정답 보기</button></form>
-    <p class="exp"><b>RAG</b> · 환각과 지식의 시점 제약을 보완해요.</p></li>
-  <li class="q" id="q1-2" data-type="s" data-ans='["MCP"]'><p>AI 앱이 파일·데이터베이스·API·웹 서비스와 표준화된 방식으로 연결되도록 지원하는 개방형 프로토콜은?<span class="ty">단답형</span></p>
+    <p class="exp"><b>RAG</b> 환각과 지식의 시점 제약을 보완해요.</p></li>
+  <li class="q" id="q1-2" data-type="s" data-ans='["MCP"]'><p>AI 앱이 파일, 데이터베이스, API, 웹 서비스와 표준화된 방식으로 연결되도록 지원하는 개방형 프로토콜은?<span class="ty">단답형</span></p>
     <form class="sa"><input aria-label="답" placeholder="답을 쓰고 확인"><button>확인</button><button type="button" class="giveup">정답 보기</button></form>
     <p class="exp"><b>MCP</b></p></li>
-  <li class="q" id="q1-3" data-type="s" data-ans='["AI에이전트","에이전트","AIagent"]'><p>"다음 주 부산 출장을 계획해줘"라고 하면 일정·항공편·호텔·날씨를 스스로 찾고 일정표까지 만드는 AI 시스템은?<span class="ty">단답형</span></p>
+  <li class="q" id="q1-3" data-type="s" data-ans='["AI에이전트","에이전트","AIagent"]'><p>"다음 주 부산 출장을 계획해줘"라고 하면 일정, 항공편, 호텔, 날씨를 스스로 찾고 일정표까지 만드는 AI 시스템은?<span class="ty">단답형</span></p>
     <form class="sa"><input aria-label="답" placeholder="답을 쓰고 확인"><button>확인</button><button type="button" class="giveup">정답 보기</button></form>
     <p class="exp"><b>AI 에이전트</b></p></li>
   <li class="q" id="q1-4" data-type="m" data-ans="4"><p>LLM의 한계와 보완 기술의 짝이 <b>틀린</b> 것은?<span class="ty">객관식</span></p>
     <div class="opts"><button class="opt" type="button">환각 – RAG</button><button class="opt" type="button">특정 분야 정확도 부족 – 파인튜닝</button><button class="opt" type="button">답변 품질 불안정 – 프롬프트 엔지니어링</button><button class="opt" type="button">복잡한 다단계 작업 – 파인튜닝</button></div>
-    <p class="exp"><b>4번</b> · 복잡한 다단계 작업은 AI 에이전트, 랭그래프로 보완해요.</p></li>
+    <p class="exp"><b>4번</b> 복잡한 다단계 작업은 AI 에이전트, 랭그래프로 보완해요.</p></li>
   <li class="q" id="q1-5" data-type="m" data-ans="3"><p>학습 방식이 나머지와 <b>다른</b> 하나는?<span class="ty">객관식</span></p>
     <div class="opts"><button class="opt" type="button">회귀</button><button class="opt" type="button">SVM 분류</button><button class="opt" type="button">K-means 군집화</button><button class="opt" type="button">의사결정나무</button></div>
-    <p class="exp"><b>3번</b> · K-means는 정답 없이 묶는 비지도학습, 나머지는 지도학습이에요.</p></li>
+    <p class="exp"><b>3번</b> K-means는 정답 없이 묶는 비지도학습, 나머지는 지도학습이에요.</p></li>
   <li class="q" id="q1-6" data-type="s" data-ans='["파인튜닝","fine-tuning","finetuning","파인 튜닝"]'><p>이미 학습된 언어 모델에 특정 분야의 데이터를 추가로 학습시켜 최적화하는 기법은?<span class="ty">단답형</span></p>
     <form class="sa"><input aria-label="답" placeholder="답을 쓰고 확인"><button>확인</button><button type="button" class="giveup">정답 보기</button></form>
     <p class="exp"><b>파인튜닝(Fine-tuning)</b></p></li>
@@ -598,26 +606,26 @@ total = <span class="f">sum</span>(<mark>customers.<span class="f">values</span>
 <div class="quiz"><h3>2주차 문제 <span class="sc"></span></h3><ol class="qs">
   <li class="q" id="q2-1" data-type="m" data-ans="3"><p>빅데이터의 핵심 요소(5V)가 <b>아닌</b> 것은?<span class="ty">객관식</span></p>
     <div class="opts"><button class="opt" type="button">Volume</button><button class="opt" type="button">Velocity</button><button class="opt" type="button">Visualization</button><button class="opt" type="button">Veracity</button></div>
-    <p class="exp"><b>3번</b> · 5V는 Volume, Velocity, Variety, Veracity, Value예요.</p></li>
+    <p class="exp"><b>3번</b> 5V는 Volume, Velocity, Variety, Veracity, Value예요.</p></li>
   <li class="q" id="q2-2" data-type="m" data-ans="2"><p>데이터 분석 프로세스의 순서로 맞는 것은?<span class="ty">객관식</span></p>
-    <div class="opts"><button class="opt" type="button">수집 → 문제 정의 → 전처리 → 시각화 → 탐색적 분석 → 결과 해석</button><button class="opt" type="button">문제 정의 → 수집 → 전처리 → 탐색적 분석 → 시각화 → 결과 해석</button><button class="opt" type="button">문제 정의 → 전처리 → 수집 → 탐색적 분석 → 결과 해석 → 시각화</button><button class="opt" type="button">수집 → 전처리 → 문제 정의 → 탐색적 분석 → 시각화 → 결과 해석</button></div>
+    <div class="opts"><button class="opt" type="button">수집, 문제 정의, 전처리, 시각화, 탐색적 분석, 결과 해석</button><button class="opt" type="button">문제 정의, 수집, 전처리, 탐색적 분석, 시각화, 결과 해석</button><button class="opt" type="button">문제 정의, 전처리, 수집, 탐색적 분석, 결과 해석, 시각화</button><button class="opt" type="button">수집, 전처리, 문제 정의, 탐색적 분석, 시각화, 결과 해석</button></div>
     <p class="exp"><b>2번</b></p></li>
   <li class="q" id="q2-3" data-type="m" data-ans="3"><p>데이터 <b>전처리</b> 단계에서 하는 일이 <b>아닌</b> 것은?<span class="ty">객관식</span></p>
     <div class="opts"><button class="opt" type="button">결측치 처리</button><button class="opt" type="button">중복 데이터 제거</button><button class="opt" type="button">변수 간 관계 분석</button><button class="opt" type="button">데이터 형식 변환</button></div>
-    <p class="exp"><b>3번</b> · 변수 간 관계·분포·기초 통계 확인은 탐색적 분석(EDA)이에요.</p></li>
+    <p class="exp"><b>3번</b> 변수 간 관계, 분포, 기초 통계 확인은 탐색적 분석(EDA)이에요.</p></li>
   <li class="q" id="q2-4" data-type="s" data-ans='["92"]'><p>실행 결과를 쓰세요.<span class="ty">단답형</span></p>
     <pre>scores = [[90, 85, 88], [78, 95, 82], [100, 92, 96]]
 print(scores[2][1])</pre>
     <form class="sa"><input aria-label="답" placeholder="결과를 쓰고 확인"><button>확인</button><button type="button" class="giveup">정답 보기</button></form>
-    <p class="exp"><b>92</b> · 2행(세 번째 줄)의 1열(두 번째 값)</p></li>
+    <p class="exp"><b>92</b> 2행(세 번째 줄)의 1열(두 번째 값)</p></li>
   <li class="q" id="q2-5" data-type="m" data-ans="2"><p>실행 결과는?<span class="ty">객관식</span></p>
     <pre>x = [15, 25, 35, 45]
 print(x[1:3])</pre>
     <div class="opts"><button class="opt" type="button"><code>[15, 25, 35]</code></button><button class="opt" type="button"><code>[25, 35]</code></button><button class="opt" type="button"><code>[25, 35, 45]</code></button><button class="opt" type="button"><code>[15, 25]</code></button></div>
-    <p class="exp"><b>2번</b> · 끝 번호 3은 포함하지 않아요.</p></li>
+    <p class="exp"><b>2번</b> 끝 번호 3은 포함하지 않아요.</p></li>
   <li class="q" id="q2-6" data-type="m" data-ans="2"><p>한 번 만들면 값을 수정할 수 없는 자료형은?<span class="ty">객관식</span></p>
     <div class="opts"><button class="opt" type="button">리스트</button><button class="opt" type="button">튜플</button><button class="opt" type="button">딕셔너리</button><button class="opt" type="button">세트</button></div>
-    <p class="exp"><b>2번</b> · 고치려 하면 <code class="i">TypeError: 'tuple' object does not support item assignment</code></p></li>
+    <p class="exp"><b>2번</b> 고치려 하면 <code class="i">TypeError: 'tuple' object does not support item assignment</code></p></li>
 </ol></div>
 <p class="nextwk"><a href="#w1">← 1주차</a><a href="#w3">3주차 판다스 · 불러오기 →</a></p>
 </section>
@@ -1594,30 +1602,42 @@ birthData.<span class="f">to_csv</span>(<span class="s">'저장2.csv'</span>, <m
 <div class="quiz"><h3>3주차 문제 <span class="sc"></span></h3><ol class="qs">
   <li class="q" id="q3-1" data-type="m" data-ans="3"><p>데이터 종류가 나머지와 <b>다른</b> 하나는?<span class="ty">객관식</span></p>
     <div class="opts"><button class="opt" type="button">CSV 파일</button><button class="opt" type="button">엑셀 스프레드시트</button><button class="opt" type="button">JSON 파일</button><button class="opt" type="button">관계형 데이터베이스 테이블</button></div>
-    <p class="exp"><b>3번</b> · JSON은 반정형, 나머지는 정형이에요.</p></li>
+    <p class="exp"><b>3번</b> JSON은 반정형, 나머지는 정형이에요.</p></li>
   <li class="q" id="q3-2" data-type="m" data-ans="3"><p>비정형 데이터에 해당하는 것은?<span class="ty">객관식</span></p>
     <div class="opts"><button class="opt" type="button">XML 문서</button><button class="opt" type="button">웹 로그</button><button class="opt" type="button">동영상</button><button class="opt" type="button">CSV 파일</button></div>
-    <p class="exp"><b>3번</b> · XML·웹 로그는 반정형, CSV는 정형이에요.</p></li>
+    <p class="exp"><b>3번</b> XML, 웹 로그는 반정형, CSV는 정형이에요.</p></li>
   <li class="q" id="q3-3" data-type="s" data-ans='["thousands=&#39;,&#39;","thousands"]'><p>숫자에 천 단위 쉼표가 들어 있어 object로 읽히는 열을 숫자로 읽으려면 <code class="i">pd.read_csv('exam4.csv', encoding='euc-kr', ____)</code>의 빈칸은?<span class="ty">단답형</span></p>
     <form class="sa"><input aria-label="답" placeholder="옵션을 쓰고 확인"><button>확인</button><button type="button" class="giveup">정답 보기</button></form>
-    <p class="exp"><b>thousands=','</b> · 쉼표를 지우고 int64로 읽어요.</p></li>
+    <p class="exp"><b>thousands=','</b> 쉼표를 지우고 int64로 읽어요.</p></li>
   <li class="q" id="q3-4" data-type="s" data-ans='["header=None"]'><p>열 이름 줄이 없는 파일을 읽어서 열 이름을 0, 1, 2…로 자동으로 붙이려면 <code class="i">pd.read_csv('exam.txt', ____)</code>의 빈칸은?<span class="ty">단답형</span></p>
     <form class="sa"><input aria-label="답" placeholder="옵션을 쓰고 확인"><button>확인</button><button type="button" class="giveup">정답 보기</button></form>
     <p class="exp"><b>header=None</b></p></li>
   <li class="q" id="q3-5" data-type="s" data-ans='["&#39;\\t&#39;","sep=&#39;\\t&#39;","\\t","delimiter=&#39;\\t&#39;"]'><p>탭으로 열이 나뉜 파일을 읽을 때 <code class="i">pd.read_csv('a.txt', sep=____)</code>의 빈칸은?<span class="ty">단답형</span></p>
     <form class="sa"><input aria-label="답" placeholder="답을 쓰고 확인"><button>확인</button><button type="button" class="giveup">정답 보기</button></form>
-    <p class="exp"><b>'\t'</b> · delimiter='\t'도 같아요.</p></li>
-  <li class="q" id="q3-6" data-type="m" data-ans="2"><p>위 exam.txt를 <code class="i">pd.read_csv('exam.txt', header=1)</code>로 읽으면 열 이름은?<span class="ty">객관식</span></p>
+    <p class="exp"><b>'\t'</b> delimiter='\t'도 같아요.</p></li>
+  <li class="q" id="q3-6" data-type="m" data-ans="2"><p>아래 exam.txt를 <code class="i">pd.read_csv('exam.txt', header=1)</code>로 읽으면 열 이름은?<span class="ty">객관식</span></p>
+    <pre># exam.txt 내용 (5줄, 열 이름 줄 없음)
+kim, 95, 3
+choi, 100, 0
+lee, 90, 2
+park, 85, 1
+cho, 77, 5</pre>
     <div class="opts"><button class="opt" type="button">kim, 95, 3</button><button class="opt" type="button">choi, 100, 0</button><button class="opt" type="button">0, 1, 2</button><button class="opt" type="button">lee, 90, 2</button></div>
-    <p class="exp"><b>2번</b> · 1번 행이 열 이름이 되고 0번 행 kim은 빠져요.</p></li>
+    <p class="exp"><b>2번</b> 1번 행이 열 이름이 되고 0번 행 kim은 빠져요.</p></li>
   <li class="q" id="q3-7" data-type="m" data-ans="2"><p>실행 결과 데이터프레임은 몇 행일까요?<span class="ty">객관식</span></p>
-    <pre>df = pd.read_csv('exam.txt', skiprows=[1, 3])   # exam.txt는 5줄, 열 이름 줄 없음
+    <pre># exam.txt 내용 (5줄, 열 이름 줄 없음)
+kim, 95, 3
+choi, 100, 0
+lee, 90, 2
+park, 85, 1
+cho, 77, 5</pre>
+    <pre>df = pd.read_csv('exam.txt', skiprows=[1, 3])
 df</pre>
     <div class="opts"><button class="opt" type="button">1행</button><button class="opt" type="button">2행</button><button class="opt" type="button">3행</button><button class="opt" type="button">5행</button></div>
-    <p class="exp"><b>2행</b> · 1·3번 줄을 빼면 kim, lee, cho가 남고, 첫 줄 kim이 열 이름이 돼서 데이터는 lee, cho 2행이에요.</p></li>
-  <li class="q" id="q3-8" data-type="m" data-ans="4"><p>학번·이름·학과·학년 열이 있고 학생 4명인 표에서 수치형 칼럼 수와 범주형 칼럼 수는? (학번·학년은 정수)<span class="ty">객관식</span></p>
+    <p class="exp"><b>2행</b> 1, 3번 줄을 빼면 kim, lee, cho가 남고, 첫 줄 kim이 열 이름이 돼서 데이터는 lee, cho 2행이에요.</p></li>
+  <li class="q" id="q3-8" data-type="m" data-ans="4"><p>학번, 이름, 학과, 학년 열이 있고 학생 4명인 표에서 수치형 칼럼 수와 범주형 칼럼 수는? (학번, 학년은 정수)<span class="ty">객관식</span></p>
     <div class="opts"><button class="opt" type="button">수치형 1, 범주형 3</button><button class="opt" type="button">수치형 3, 범주형 1</button><button class="opt" type="button">수치형 4, 범주형 0</button><button class="opt" type="button">수치형 2, 범주형 2</button></div>
-    <p class="exp"><b>4번</b> · 학번·학년은 int(수치형), 이름·학과는 object(범주형). 레코드는 4개예요.</p></li>
+    <p class="exp"><b>4번</b> 학번, 학년은 int(수치형), 이름, 학과는 object(범주형). 레코드는 4개예요.</p></li>
 </ol></div>
 <p class="nextwk"><a href="#w2">← 2주차</a><a href="#w4">4주차 정보 확인 · 선택 →</a></p>
 </section>
@@ -3245,25 +3265,69 @@ accData.<span class="f">head</span>()</code></pre>
 </figure>
 
 <div class="quiz"><h3>4주차 문제 <span class="sc"></span></h3><ol class="qs">
-  <li class="q" id="q4-1" data-type="s" data-ans='["age,embarked,deck,embark_town","age,deck,embarked,embark_town"]'><p>위 타이타닉 info() 결과에서 결측치가 있는 열 이름을 모두 쓰세요. (쉼표로 구분)<span class="ty">단답형</span></p>
+  <li class="q" id="q4-1" data-type="s" data-ans='["age,embarked,deck,embark_town","age,deck,embarked,embark_town"]'><p>아래는 타이타닉 <code class="i">data.info()</code> 결과예요. 결측치가 있는 열 이름을 모두 쓰세요. (쉼표로 구분)<span class="ty">단답형</span></p>
+    <pre>&lt;class &#x27;pandas.core.frame.DataFrame&#x27;&gt;
+RangeIndex: 891 entries, 0 to 890
+Data columns (total 15 columns):
+ #   Column       Non-Null Count  Dtype
+---  ------       --------------  -----
+ 0   survived     891 non-null    int64
+ 1   pclass       891 non-null    int64
+ 2   sex          891 non-null    object
+ 3   age          714 non-null    float64
+ 4   sibsp        891 non-null    int64
+ 5   parch        891 non-null    int64
+ 6   fare         891 non-null    float64
+ 7   embarked     889 non-null    object
+ 8   class        891 non-null    category
+ 9   who          891 non-null    object
+ 10  adult_male   891 non-null    bool
+ 11  deck         203 non-null    category
+ 12  embark_town  889 non-null    object
+ 13  alive        891 non-null    object
+ 14  alone        891 non-null    bool
+dtypes: bool(2), category(2), float64(2), int64(4), object(5)
+memory usage: 80.7+ KB</pre>
     <form class="sa"><input aria-label="답" placeholder="예: a, b"><button>확인</button><button type="button" class="giveup">정답 보기</button></form>
-    <p class="exp"><b>age, embarked, deck, embark_town</b> · Non-Null Count가 891보다 작은 열</p></li>
-  <li class="q" id="q4-2" data-type="m" data-ans="3"><p>위 info() 결과에서 범주형 열의 개수는?<span class="ty">객관식</span></p>
+    <p class="exp"><b>age, embarked, deck, embark_town</b> Non-Null Count가 891보다 작은 열</p></li>
+  <li class="q" id="q4-2" data-type="m" data-ans="3"><p>아래 타이타닉 <code class="i">data.info()</code> 결과에서 범주형 열의 개수는?<span class="ty">객관식</span></p>
+    <pre>&lt;class &#x27;pandas.core.frame.DataFrame&#x27;&gt;
+RangeIndex: 891 entries, 0 to 890
+Data columns (total 15 columns):
+ #   Column       Non-Null Count  Dtype
+---  ------       --------------  -----
+ 0   survived     891 non-null    int64
+ 1   pclass       891 non-null    int64
+ 2   sex          891 non-null    object
+ 3   age          714 non-null    float64
+ 4   sibsp        891 non-null    int64
+ 5   parch        891 non-null    int64
+ 6   fare         891 non-null    float64
+ 7   embarked     889 non-null    object
+ 8   class        891 non-null    category
+ 9   who          891 non-null    object
+ 10  adult_male   891 non-null    bool
+ 11  deck         203 non-null    category
+ 12  embark_town  889 non-null    object
+ 13  alive        891 non-null    object
+ 14  alone        891 non-null    bool
+dtypes: bool(2), category(2), float64(2), int64(4), object(5)
+memory usage: 80.7+ KB</pre>
     <div class="opts"><button class="opt" type="button">5개</button><button class="opt" type="button">7개</button><button class="opt" type="button">9개</button><button class="opt" type="button">15개</button></div>
-    <p class="exp"><b>3번</b> · object 5 + category 2 + bool 2 = 9개. 수치형은 int64 4 + float64 2 = 6개.</p></li>
+    <p class="exp"><b>3번</b> object 5 + category 2 + bool 2 = 9개. 수치형은 int64 4 + float64 2 = 6개.</p></li>
   <li class="q" id="q4-3" data-type="m" data-ans="3"><p><code class="i">describe(include='object')</code> 결과의 <code class="i">freq</code>는?<span class="ty">객관식</span></p>
     <div class="opts"><button class="opt" type="button">고유한 값의 개수</button><button class="opt" type="button">가장 많이 나온 값</button><button class="opt" type="button">가장 많이 나온 값의 빈도수</button><button class="opt" type="button">결측치를 뺀 개수</button></div>
-    <p class="exp"><b>3번</b> · unique 고유 값 개수, top 가장 많은 값, count 결측 뺀 개수</p></li>
+    <p class="exp"><b>3번</b> unique 고유 값 개수, top 가장 많은 값, count 결측 뺀 개수</p></li>
   <li class="q" id="q4-4" data-type="m" data-ans="3"><p>기본 인덱스(0, 1, 2…)인 df에서 결과 행 수가 <b>다른</b> 하나는?<span class="ty">객관식</span></p>
     <div class="opts"><button class="opt" type="button"><code>df[0:3]</code></button><button class="opt" type="button"><code>df.iloc[0:3]</code></button><button class="opt" type="button"><code>df.loc[0:3]</code></button><button class="opt" type="button"><code>df.head(3)</code></button></div>
-    <p class="exp"><b>3번</b> · loc은 끝을 포함해서 0~3행, 4행. 나머지는 3행.</p></li>
-  <li class="q" id="q4-5" data-type="m" data-ans="3"><p>오류가 나는 코드는?<span class="ty">객관식</span></p>
+    <p class="exp"><b>3번</b> loc은 끝을 포함해서 0~3행, 4행. 나머지는 3행.</p></li>
+  <li class="q" id="q4-5" data-type="m" data-ans="3"><p>오류가 나는 코드는? (df는 기본 인덱스인 타이타닉 표, 'age'는 3번 열)<span class="ty">객관식</span></p>
     <div class="opts"><button class="opt" type="button"><code>df.loc[0:2, 'age']</code></button><button class="opt" type="button"><code>df.iloc[0:3, 3]</code></button><button class="opt" type="button"><code>df.iloc[0:3, 'age']</code></button><button class="opt" type="button"><code>df[['class', 'who']][10:15]</code></button></div>
-    <p class="exp"><b>3번</b> · iloc에는 열 이름(문자)을 쓸 수 없어요.</p></li>
+    <p class="exp"><b>3번</b> iloc에는 열 이름(문자)을 쓸 수 없어요.</p></li>
   <li class="q" id="q4-6" data-type="m" data-ans="2"><p>인덱스가 ['가', '나', '다', '라', '마']인 small에서 <code class="i">small.loc['나':'라']</code>는 몇 행?<span class="ty">객관식</span></p>
     <div class="opts"><button class="opt" type="button">2행</button><button class="opt" type="button">3행</button><button class="opt" type="button">4행</button><button class="opt" type="button">오류</button></div>
-    <p class="exp"><b>3행</b> · 나, 다, 라. loc은 이름으로, 끝까지 포함해요.</p></li>
-  <li class="q" id="q4-7" data-type="s" data-ans='["fillna(data[&#39;age&#39;].mean())","fillna(data.age.mean())"]'><p>'age' 열의 결측치를 평균으로 채우는 코드를 완성하세요. <code class="i">data['age'] = data['age'].____</code><span class="ty">단답형</span></p>
+    <p class="exp"><b>3행</b> 나, 다, 라. loc은 이름으로, 끝까지 포함해요.</p></li>
+  <li class="q" id="q4-7" data-type="s" data-ans='["fillna(data[&#39;age&#39;].mean())","fillna(data.age.mean())","fillna(value=data[&#39;age&#39;].mean())"]'><p>'age' 열의 결측치를 평균으로 채우는 코드를 완성하세요. <code class="i">data['age'] = data['age'].____</code><span class="ty">단답형</span></p>
     <form class="sa"><input aria-label="답" placeholder="코드를 쓰고 확인"><button>확인</button><button type="button" class="giveup">정답 보기</button></form>
     <p class="exp"><b>fillna(data['age'].mean())</b></p></li>
   <li class="q" id="q4-8" data-type="s" data-ans='["isnull().sum()","isna().sum()"]'><p>열마다 결측치 개수를 구하는 코드는? <code class="i">data.____</code><span class="ty">단답형</span></p>
@@ -3271,7 +3335,7 @@ accData.<span class="f">head</span>()</code></pre>
     <p class="exp"><b>isnull().sum()</b> 또는 <b>isna().sum()</b></p></li>
   <li class="q" id="q4-9" data-type="m" data-ans="2"><p>행을 지운 뒤 기존 인덱스를 버리고 0부터 다시 매기며 원본에 반영하는 코드는?<span class="ty">객관식</span></p>
     <div class="opts"><button class="opt" type="button"><code>df.reset_index()</code></button><button class="opt" type="button"><code>df.reset_index(drop=True, inplace=True)</code></button><button class="opt" type="button"><code>df.set_index('열', inplace=True)</code></button><button class="opt" type="button"><code>df.reset_index(drop=False, inplace=True)</code></button></div>
-    <p class="exp"><b>2번</b> · 1·4번은 기존 인덱스가 'index' 열로 추가되고, 3번은 특정 열을 인덱스로 만들어요.</p></li>
+    <p class="exp"><b>2번</b> 1, 4번은 기존 인덱스가 'index' 열로 추가되고, 3번은 특정 열을 인덱스로 만들어요.</p></li>
 </ol></div>
 <p class="nextwk"><a href="#w3">← 3주차</a><a href="#w5">5주차 연산 · 조건 · 그룹 →</a></p>
 </section>
@@ -4494,23 +4558,23 @@ Name: 거래금액, dtype: float64</pre>
   <li class="q" id="q5-2" data-type="s" data-ans='["resultData[(resultData[&#39;사망자수&#39;]>=30)&amp;(resultData[&#39;중상자수&#39;]>=800)]"]'><p>resultData에서 사망자수 30 이상이고 중상자수 800 이상인 행을 대괄호 방식으로 고르는 코드를 쓰세요.<span class="ty">단답형</span></p>
     <form class="sa"><input aria-label="답" placeholder="코드를 쓰고 확인"><button>확인</button><button type="button" class="giveup">정답 보기</button></form>
     <p class="exp"><b>resultData[(resultData['사망자수'] &gt;= 30) &amp; (resultData['중상자수'] &gt;= 800)]</b></p></li>
-  <li class="q" id="q5-3" data-type="s" data-ans='["&#39;사망자수>=30&amp;중상자수>=800&#39;"]'><p>같은 조건을 query로 쓰면? <code class="i">resultData.query(____)</code><span class="ty">단답형</span></p>
+  <li class="q" id="q5-3" data-type="s" data-ans='["&#39;사망자수>=30&중상자수>=800&#39;","&#39;사망자수>=30and중상자수>=800&#39;","&#39;(사망자수>=30)&(중상자수>=800)&#39;"]'><p>같은 조건을 query로 쓰면? <code class="i">resultData.query(____)</code><span class="ty">단답형</span></p>
     <form class="sa"><input aria-label="답" placeholder="조건을 쓰고 확인"><button>확인</button><button type="button" class="giveup">정답 보기</button></form>
     <p class="exp"><b>'사망자수 &gt;= 30 &amp; 중상자수 &gt;= 800'</b></p></li>
-  <li class="q" id="q5-4" data-type="m" data-ans="2"><p>위 <code class="i">score1.groupby('분반')[['중간고사', '기말고사']].mean()</code> 결과에 대해 맞는 것은?<span class="ty">객관식</span></p>
-    <div class="opts"><button class="opt" type="button">분반이 열로 나온다</button><button class="opt" type="button">A반의 기말고사 평균은 75.5이다</button><button class="opt" type="button">결과는 Series이다</button><button class="opt" type="button">성별마다 평균을 구했다</button></div>
-    <p class="exp"><b>2번</b> · 분반은 인덱스로 나오고, [[ ]] 두 겹이라 DataFrame이에요.</p></li>
+  <li class="q" id="q5-4" data-type="m" data-ans="2"><p><code class="i">score1.groupby('분반')[['중간고사', '기말고사']].mean()</code>의 결과에 대해 맞는 것은?<span class="ty">객관식</span></p>
+    <div class="opts"><button class="opt" type="button">분반이 열로 나온다</button><button class="opt" type="button">분반이 인덱스인 DataFrame이 나온다</button><button class="opt" type="button">결과는 Series이다</button><button class="opt" type="button">성별마다 평균을 구했다</button></div>
+    <p class="exp"><b>2번</b> 분반은 인덱스로 나오고, [[ ]] 두 겹이라 DataFrame이에요. 실제로 돌리면 A반 기말고사 평균이 75.5예요.</p></li>
   <li class="q" id="q5-5" data-type="m" data-ans="2"><p>시도별 부상자수 합계를 구하는 코드는?<span class="ty">객관식</span></p>
     <div class="opts"><button class="opt" type="button"><code>df.groupby('부상자수')['시도'].sum()</code></button><button class="opt" type="button"><code>df.groupby('시도')['부상자수'].sum()</code></button><button class="opt" type="button"><code>df.groupby('시도').sum('부상자수')['시도']</code></button><button class="opt" type="button"><code>df['시도'].groupby('부상자수').sum()</code></button></div>
-    <p class="exp"><b>2번</b> · groupby 괄호에 묶을 열, 그 뒤 대괄호에 계산할 열, 마지막에 통계 함수.</p></li>
+    <p class="exp"><b>2번</b> groupby 괄호에 묶을 열, 그 뒤 대괄호에 계산할 열, 마지막에 통계 함수.</p></li>
   <li class="q" id="q5-6" data-type="m" data-ans="2"><p>조건을 여러 개 연결하는 맞는 코드는?<span class="ty">객관식</span></p>
     <div class="opts"><button class="opt" type="button"><code>df[df['a'] > 1 and df['b'] > 2]</code></button><button class="opt" type="button"><code>df[(df['a'] > 1) &amp; (df['b'] > 2)]</code></button><button class="opt" type="button"><code>df[df['a'] > 1 &amp; df['b'] > 2]</code></button><button class="opt" type="button"><code>df[(df['a'] > 1) + (df['b'] > 2)]</code></button></div>
-    <p class="exp"><b>2번</b> · and/or 대신 &amp;, |를 쓰고 조건마다 괄호로 묶어요.</p></li>
-  <li class="q" id="q5-7" data-type="m" data-ans="3"><p>실행 결과의 '이름' 열 0번 값은? (df3, df4 모두 0번 이름이 '홍길동')<span class="ty">객관식</span></p>
+    <p class="exp"><b>2번</b> and/or 대신 &amp;, |를 쓰고 조건마다 괄호로 묶어요.</p></li>
+  <li class="q" id="q5-7" data-type="m" data-ans="3"><p>실행 결과는? (df3, df4는 열이 같은 표이고, 둘 다 '이름' 열 0번 값이 '홍길동')<span class="ty">객관식</span></p>
     <pre>df5 = df3 + df4
 df5['이름'][0]</pre>
     <div class="opts"><button class="opt" type="button">홍길동</button><button class="opt" type="button">NaN</button><button class="opt" type="button">홍길동홍길동</button><button class="opt" type="button">오류</button></div>
-    <p class="exp"><b>3번</b> · 문자열에 +를 하면 이어 붙여져요.</p></li>
+    <p class="exp"><b>3번</b> 문자열에 +를 하면 이어 붙여져요.</p></li>
 </ol></div>
 <p class="nextwk"><a href="#w4">← 4주차</a><a href="#w6">6주차 concat · merge →</a></p>
 </section>
@@ -5663,26 +5727,26 @@ score3[[<span class="s">'ID'</span>, <span class="s">'실험날짜'</span>, <spa
 </figure>
 
 <div class="quiz"><h3>6주차 문제 <span class="sc"></span></h3><ol class="qs">
-  <li class="q" id="q6-1" data-type="m" data-ans="2"><p>아래 결과를 만든 코드는?<span class="ty">객관식</span></p>
+  <li class="q" id="q6-1" data-type="m" data-ans="2"><p>아래 결과를 만든 코드는? (test1, test2는 학번, 출석, 프로젝트 열이 있는 2행짜리 표)<span class="ty">객관식</span></p>
     <div class="dfw"><table><thead><tr><th></th><th>학번</th><th>출석</th><th>프로젝트</th><th>학번</th><th>출석</th><th>프로젝트</th></tr></thead><tbody><tr><th>0</th><td>2323</td><td>0</td><td>0</td><td>2324</td><td>80</td><td>95</td></tr><tr><th>1</th><td>2201</td><td>74</td><td>65</td><td>2325</td><td>50</td><td>65</td></tr></tbody></table></div>
     <div class="opts"><button class="opt" type="button"><code>pd.concat([test1, test2])</code></button><button class="opt" type="button"><code>pd.concat([test1, test2], axis=1)</code></button><button class="opt" type="button"><code>pd.merge(test1, test2, on='학번')</code></button><button class="opt" type="button"><code>pd.concat([test1, test2], ignore_index=True)</code></button></div>
-    <p class="exp"><b>2번</b> · 같은 열 이름이 좌우로 두 번 → 열 방향 concat. merge였다면 학번이 한 번만 나와요.</p></li>
-  <li class="q" id="q6-2" data-type="m" data-ans="1"><p>아래 결과를 만든 코드는?<span class="ty">객관식</span></p>
+    <p class="exp"><b>2번</b> 같은 열 이름이 좌우로 두 번 나오니 열 방향 concat이에요. merge였다면 학번이 한 번만 나와요.</p></li>
+  <li class="q" id="q6-2" data-type="m" data-ans="1"><p>아래 결과를 만든 코드는? (test1, test2는 학번, 출석, 프로젝트 열이 있는 2행짜리 표)<span class="ty">객관식</span></p>
     <div class="dfw"><table><thead><tr><th></th><th>학번</th><th>출석</th><th>프로젝트</th></tr></thead><tbody><tr><th>0</th><td>2323</td><td>0</td><td>0</td></tr><tr><th>1</th><td>2201</td><td>74</td><td>65</td></tr><tr><th>0</th><td>2324</td><td>80</td><td>95</td></tr><tr><th>1</th><td>2325</td><td>50</td><td>65</td></tr></tbody></table></div>
     <div class="opts"><button class="opt" type="button"><code>pd.concat([test1, test2])</code></button><button class="opt" type="button"><code>pd.concat([test1, test2], axis=1)</code></button><button class="opt" type="button"><code>pd.merge(test1, test2, on='학번', how='outer')</code></button><button class="opt" type="button"><code>test1.join(test2)</code></button></div>
-    <p class="exp"><b>1번</b> · 위아래로 붙고 인덱스가 0, 1, 0, 1로 겹쳐요.</p></li>
+    <p class="exp"><b>1번</b> 위아래로 붙고 인덱스가 0, 1, 0, 1로 겹쳐요.</p></li>
   <li class="q" id="q6-3" data-type="s" data-ans='["on=&#39;학번&#39;"]'><p>공통 열 '학번'으로 결합하는 코드의 빈칸은? <code class="i">pd.merge(score1, score2, ____)</code><span class="ty">단답형</span></p>
     <form class="sa"><input aria-label="답" placeholder="옵션을 쓰고 확인"><button>확인</button><button type="button" class="giveup">정답 보기</button></form>
     <p class="exp"><b>on='학번'</b></p></li>
   <li class="q" id="q6-4" data-type="m" data-ans="3"><p>merge의 how 기본값은?<span class="ty">객관식</span></p>
     <div class="opts"><button class="opt" type="button">left</button><button class="opt" type="button">right</button><button class="opt" type="button">inner</button><button class="opt" type="button">outer</button></div>
-    <p class="exp"><b>3번</b> · inner: 양쪽에 다 있는 키만 남아요.</p></li>
+    <p class="exp"><b>3번</b> inner: 양쪽에 다 있는 키만 남아요.</p></li>
   <li class="q" id="q6-5" data-type="s" data-ans='["ignore_index=True"]'><p>concat으로 위아래로 붙였더니 인덱스가 0, 1, 0, 1로 겹쳤어요. 붙일 때 넣어서 0부터 다시 매기게 하는 옵션은?<span class="ty">단답형</span></p>
     <form class="sa"><input aria-label="답" placeholder="옵션을 쓰고 확인"><button>확인</button><button type="button" class="giveup">정답 보기</button></form>
     <p class="exp"><b>ignore_index=True</b> (또는 붙인 뒤 reset_index(drop=True))</p></li>
   <li class="q" id="q6-6" data-type="m" data-ans="2"><p>score1(학번 21명)과 test1(학번 2323, 2201)을 <code class="i">how='right'</code>로 merge하면 몇 행?<span class="ty">객관식</span></p>
     <div class="opts"><button class="opt" type="button">1행</button><button class="opt" type="button">2행</button><button class="opt" type="button">21행</button><button class="opt" type="button">22행</button></div>
-    <p class="exp"><b>2번</b> · 오른쪽 표의 학번 2개가 모두 남아요. inner 1, left 21, outer 22.</p></li>
+    <p class="exp"><b>2번</b> 오른쪽 표의 학번 2개가 모두 남아요. inner 1, left 21, outer 22.</p></li>
 </ol></div>
 <p class="nextwk"><a href="#w5">← 5주차</a><a href="#w7">7주차 plot · scatter →</a></p>
 </section>
@@ -5940,19 +6004,19 @@ plt.<span class="f">show</span>()</code></pre>
     <p class="exp"><b>2번</b></p></li>
   <li class="q" id="q7-2" data-type="m" data-ans="1"><p><code class="i">plt.plot(data2021, 'g*--')</code>의 'g*--'는?<span class="ty">객관식</span></p>
     <div class="opts"><button class="opt" type="button">초록색, 별 마커, 파선</button><button class="opt" type="button">회색, 별 마커, 실선</button><button class="opt" type="button">초록색, 점 마커, 점선</button><button class="opt" type="button">격자, 별, 파선</button></div>
-    <p class="exp"><b>1번</b> · 색 → 마커 → 선 순서예요.</p></li>
-  <li class="q" id="q7-3" data-type="m" data-ans="3"><p>위 실습 ① 마지막 그래프처럼 x축 0~11 자리에 '1월'~'12월'을 45도 기울여 쓰는 코드는?<span class="ty">객관식</span></p>
+    <p class="exp"><b>1번</b> 색, 마커, 선 순서예요.</p></li>
+  <li class="q" id="q7-3" data-type="m" data-ans="3"><p>선 그래프의 x축 0~11 자리에 '1월'~'12월'을 45도 기울여 쓰는 코드는? (x축 = ['1월', '2월', …, '12월'])<span class="ty">객관식</span></p>
     <div class="opts"><button class="opt" type="button"><code>plt.xlim(0, 12)</code></button><button class="opt" type="button"><code>plt.xlabel(x축, rotation=45)</code></button><button class="opt" type="button"><code>plt.xticks(range(0, 12, 1), x축, rotation=45)</code></button><button class="opt" type="button"><code>plt.ylim(x축)</code></button></div>
-    <p class="exp"><b>3번</b> · xticks(눈금 위치, 레이블, rotation=각도)</p></li>
+    <p class="exp"><b>3번</b> xticks(눈금 위치, 레이블, rotation=각도)</p></li>
   <li class="q" id="q7-4" data-type="s" data-ans='["plt.xlabel(&#39;년도&#39;)"]'><p>x축 제목을 '년도'로 다는 코드는?<span class="ty">단답형</span></p>
     <form class="sa"><input aria-label="답" placeholder="코드를 쓰고 확인"><button>확인</button><button type="button" class="giveup">정답 보기</button></form>
-    <p class="exp"><b>plt.xlabel('년도')</b> · 눈금 글자는 xticks, 축 제목은 xlabel.</p></li>
+    <p class="exp"><b>plt.xlabel('년도')</b> 눈금 글자는 xticks, 축 제목은 xlabel.</p></li>
   <li class="q" id="q7-5" data-type="m" data-ans="2"><p>두 수치형 변수의 관계를 보기에 가장 알맞은 것은?<span class="ty">객관식</span></p>
     <div class="opts"><button class="opt" type="button">선 그래프 – plot()</button><button class="opt" type="button">산점도 – scatter()</button><button class="opt" type="button">원 그래프 – pie()</button><button class="opt" type="button">막대 그래프 – bar()</button></div>
-    <p class="exp"><b>2번</b> · 수치로는 corr()로 상관계수를 구해요.</p></li>
+    <p class="exp"><b>2번</b> 수치로는 corr()로 상관계수를 구해요.</p></li>
   <li class="q" id="q7-6" data-type="m" data-ans="4"><p>linestyle과 모양의 짝이 <b>틀린</b> 것은?<span class="ty">객관식</span></p>
     <div class="opts"><button class="opt" type="button"><code>'-'</code> 실선</button><button class="opt" type="button"><code>'--'</code> 파선</button><button class="opt" type="button"><code>':'</code> 점선</button><button class="opt" type="button"><code>'-.'</code> 굵은 실선</button></div>
-    <p class="exp"><b>4번</b> · '-.'는 일점쇄선이에요. 굵기는 linewidth.</p></li>
+    <p class="exp"><b>4번</b> '-.'는 일점쇄선이에요. 굵기는 linewidth.</p></li>
 </ol></div>
 <p class="nextwk"><a href="#w6">← 6주차</a><a href="#w8">8주차 bar · pie · subplot →</a></p>
 </section>
@@ -6205,19 +6269,19 @@ plt.<span class="f">show</span>()</code></pre>
     <p class="exp"><b>autopct</b></p></li>
   <li class="q" id="q8-3" data-type="m" data-ans="3"><p>어떤 조각의 비율이 25.554…%일 때 <code class="i">autopct='%.1f%%'</code>로 보이는 모양은?<span class="ty">객관식</span></p>
     <div class="opts"><button class="opt" type="button">25.554</button><button class="opt" type="button">25.6</button><button class="opt" type="button">25.6%</button><button class="opt" type="button">26%</button></div>
-    <p class="exp"><b>3번</b> · %.1f 소수 첫째 자리, %% 가 % 기호</p></li>
+    <p class="exp"><b>3번</b> %.1f 소수 첫째 자리, %% 가 % 기호</p></li>
   <li class="q" id="q8-4" data-type="s" data-ans='["ax[0,1]","ax=ax[0,1]"]'><p><code class="i">fig, ax = plt.subplots(2, 2)</code>에서 <b>오른쪽 위</b> 칸에 그리려면 <code class="i">ax=____</code>?<span class="ty">단답형</span></p>
     <form class="sa"><input aria-label="답" placeholder="예: ax[?, ?]"><button>확인</button><button type="button" class="giveup">정답 보기</button></form>
-    <p class="exp"><b>ax[0, 1]</b> · 0행 1열</p></li>
+    <p class="exp"><b>ax[0, 1]</b> 0행 1열</p></li>
   <li class="q" id="q8-5" data-type="m" data-ans="3"><p><code class="i">plt.subplot(2, 2, 3)</code>이 가리키는 칸은?<span class="ty">객관식</span></p>
     <div class="opts"><button class="opt" type="button">왼쪽 위</button><button class="opt" type="button">오른쪽 위</button><button class="opt" type="button">왼쪽 아래</button><button class="opt" type="button">오른쪽 아래</button></div>
-    <p class="exp"><b>3번</b> · 1 2 / 3 4 순서라 3은 왼쪽 아래(subplots로는 ax[1, 0])</p></li>
-  <li class="q" id="q8-6" data-type="s" data-ans='["&#39;bar&#39;","bar","kind=&#39;bar&#39;"]'><p>막대가 겹치지 않게 <code class="i">광역시.plot(x='도시', y=['출생아수', '혼인건수'], kind=____)</code>의 빈칸은?<span class="ty">단답형</span></p>
+    <p class="exp"><b>3번</b> 1 2 / 3 4 순서라 3은 왼쪽 아래(subplots로는 ax[1, 0])</p></li>
+  <li class="q" id="q8-6" data-type="s" data-ans='["&#39;bar&#39;","bar","kind=&#39;bar&#39;"]'><p>출생아수와 혼인건수를 도시마다 막대 두 개로 나란히 그리려면 <code class="i">광역시.plot(x='도시', y=['출생아수', '혼인건수'], kind=____)</code>의 빈칸은?<span class="ty">단답형</span></p>
     <form class="sa"><input aria-label="답" placeholder="값을 쓰고 확인"><button>확인</button><button type="button" class="giveup">정답 보기</button></form>
     <p class="exp"><b>'bar'</b></p></li>
   <li class="q" id="q8-7" data-type="m" data-ans="3"><p>도시들의 혼인건수 합계에서 각 도시가 <b>차지하는 비율</b>을 보이기에 알맞은 그래프는?<span class="ty">객관식</span></p>
     <div class="opts"><button class="opt" type="button">선 그래프</button><button class="opt" type="button">막대 그래프</button><button class="opt" type="button">원 그래프</button><button class="opt" type="button">산점도</button></div>
-    <p class="exp"><b>3번</b> · 크기 비교는 막대, 관계는 산점도예요.</p></li>
+    <p class="exp"><b>3번</b> 크기 비교는 막대, 관계는 산점도예요.</p></li>
 </ol></div>
 <p class="nextwk"><a href="#w7">← 7주차</a><a href="#w9">9주차 워드클라우드 →</a></p>
 </section>
@@ -6567,8 +6631,8 @@ plt.<span class="f">show</span>()</code></pre>
     <p class="exp"><b>random_state</b> (예: random_state=1)</p></li>
   <li class="q" id="q9-2" data-type="m" data-ans="2"><p>텍스트 파일 전체를 문자열 하나로 읽는 코드는?<span class="ty">객관식</span></p>
     <div class="opts"><button class="opt" type="button"><code>text = open('a.txt', 'w').read()</code></button><button class="opt" type="button"><code>text = open('a.txt', 'r', encoding='UTF8').read()</code></button><button class="opt" type="button"><code>text = pd.read_csv('a.txt').read()</code></button><button class="opt" type="button"><code>text = open('a.txt', 'r').write()</code></button></div>
-    <p class="exp"><b>2번</b> · 'r'은 읽기, 'w'는 쓰기예요.</p></li>
-  <li class="q" id="q9-3" data-type="s" data-ans='["STOPWORDS.union({&#39;있는&#39;,&#39;있다&#39;})","STOPWORDS.union({&#39;있다&#39;,&#39;있는&#39;})"]'><p>기본 불용어에 '있는', '있다'를 더하는 코드는? <code class="i">불용어 = ____</code><span class="ty">단답형</span></p>
+    <p class="exp"><b>2번</b> 'r'은 읽기, 'w'는 쓰기예요.</p></li>
+  <li class="q" id="q9-3" data-type="s" data-ans='["STOPWORDS.union({&#39;있는&#39;,&#39;있다&#39;})","STOPWORDS.union({&#39;있다&#39;,&#39;있는&#39;})","STOPWORDS|{&#39;있는&#39;,&#39;있다&#39;}","set(STOPWORDS).union({&#39;있는&#39;,&#39;있다&#39;})","STOPWORDS.union([&#39;있는&#39;,&#39;있다&#39;])"]'><p>wordcloud의 기본 불용어 STOPWORDS에 '있는', '있다'를 더하는 코드는? <code class="i">불용어 = ____</code><span class="ty">단답형</span></p>
     <form class="sa"><input aria-label="답" placeholder="코드를 쓰고 확인"><button>확인</button><button type="button" class="giveup">정답 보기</button></form>
     <p class="exp"><b>STOPWORDS.union({'있는', '있다'})</b></p></li>
   <li class="q" id="q9-4" data-type="s" data-ans='["np.array","numpy.array"]'><p>마스크 그림을 배열로 바꾸는 코드의 빈칸은? <code class="i">mask = ____(Image.open('heart.jpg'))</code><span class="ty">단답형</span></p>
@@ -6576,13 +6640,13 @@ plt.<span class="f">show</span>()</code></pre>
     <p class="exp"><b>np.array</b></p></li>
   <li class="q" id="q9-5" data-type="m" data-ans="2"><p><code class="i">dic = data.set_index('행정구역별').to_dict()['출생아수']</code>의 결과는?<span class="ty">객관식</span></p>
     <div class="opts"><button class="opt" type="button">키는 출생아수, 값은 행정구역별</button><button class="opt" type="button">키는 행정구역별, 값은 출생아수</button><button class="opt" type="button">키는 0, 1, 2…, 값은 출생아수</button><button class="opt" type="button">리스트가 만들어진다</button></div>
-    <p class="exp"><b>2번</b> · {'서울특별시': 4258, '부산광역시': 1318, …}</p></li>
+    <p class="exp"><b>2번</b> {'서울특별시': 4258, '부산광역시': 1318, …}</p></li>
   <li class="q" id="q9-6" data-type="m" data-ans="2"><p>딕셔너리(단어: 빈도)로 워드클라우드를 만드는 함수는?<span class="ty">객관식</span></p>
     <div class="opts"><button class="opt" type="button"><code>generate()</code></button><button class="opt" type="button"><code>generate_from_frequencies()</code></button><button class="opt" type="button"><code>to_file()</code></button><button class="opt" type="button"><code>imshow()</code></button></div>
     <p class="exp"><b>2번</b></p></li>
   <li class="q" id="q9-7" data-type="m" data-ans="2"><p>마스크 그림에서 글자가 채워지는 곳은?<span class="ty">객관식</span></p>
     <div class="opts"><button class="opt" type="button">흰색 부분</button><button class="opt" type="button">검은색 부분</button><button class="opt" type="button">그림 전체</button><button class="opt" type="button">테두리</button></div>
-    <p class="exp"><b>2번</b> · 흰색은 비워 둬요.</p></li>
+    <p class="exp"><b>2번</b> 흰색은 비워 둬요.</p></li>
 </ol></div>
 <p class="nextwk"><a href="#w8">← 8주차</a><a href="#w10">10주차 folium 지도 →</a></p>
 </section>
@@ -6788,7 +6852,7 @@ parkingMap2</code></pre>
 <div class="quiz"><h3>10주차 문제 <span class="sc"></span></h3><ol class="qs">
   <li class="q" id="q10-1" data-type="s" data-ans='["popup"]'><p>마커를 <b>클릭했을 때</b> 메시지가 나오게 하는 속성은?<span class="ty">단답형</span></p>
     <form class="sa"><input aria-label="답" placeholder="속성 이름"><button>확인</button><button type="button" class="giveup">정답 보기</button></form>
-    <p class="exp"><b>popup</b> · 마우스를 올리면 나오는 건 tooltip</p></li>
+    <p class="exp"><b>popup</b> 마우스를 올리면 나오는 건 tooltip</p></li>
   <li class="q" id="q10-2" data-type="s" data-ans='["zoom_start"]'><p>지도를 처음 그릴 때 확대 정도를 정하는 Map의 속성은?<span class="ty">단답형</span></p>
     <form class="sa"><input aria-label="답" placeholder="속성 이름"><button>확인</button><button type="button" class="giveup">정답 보기</button></form>
     <p class="exp"><b>zoom_start</b> (기본 10, 최대 18)</p></li>
@@ -6798,19 +6862,20 @@ for i, row in data.iterrows():
     mk = folium.Marker(location=[row['위도'], row['경도']])
     mk.add_to( ② )</pre>
     <div class="opts"><button class="opt" type="button">① mc ② parkingMap2</button><button class="opt" type="button">① parkingMap2 ② mc</button><button class="opt" type="button">① parkingMap2 ② parkingMap2</button><button class="opt" type="button">① mc ② mc</button></div>
-    <p class="exp"><b>2번</b> · 클러스터는 지도에, 마커는 클러스터에.</p></li>
+    <p class="exp"><b>2번</b> 클러스터는 지도에, 마커는 클러스터에.</p></li>
   <li class="q" id="q10-4" data-type="m" data-ans="2"><p>지도의 중심 좌표를 정하는 코드는?<span class="ty">객관식</span></p>
     <div class="opts"><button class="opt" type="button"><code>folium.Map(center=[37.49, 126.95])</code></button><button class="opt" type="button"><code>folium.Map(location=[37.49, 126.95])</code></button><button class="opt" type="button"><code>folium.Map(zoom_start=[37.49, 126.95])</code></button><button class="opt" type="button"><code>folium.Map(tiles=[37.49, 126.95])</code></button></div>
-    <p class="exp"><b>2번</b> · location=[위도, 경도]</p></li>
+    <p class="exp"><b>2번</b> location=[위도, 경도]</p></li>
   <li class="q" id="q10-5" data-type="m" data-ans="3"><p><code class="i">for i, row in data.iterrows():</code>에서 row에 담기는 것은?<span class="ty">객관식</span></p>
     <div class="opts"><button class="opt" type="button">열 이름</button><button class="opt" type="button">행 번호</button><button class="opt" type="button">한 행의 데이터</button><button class="opt" type="button">데이터프레임 전체</button></div>
-    <p class="exp"><b>3번</b> · i는 인덱스, row는 그 행의 데이터라 row['위도']처럼 꺼내요.</p></li>
+    <p class="exp"><b>3번</b> i는 인덱스, row는 그 행의 데이터라 row['위도']처럼 꺼내요.</p></li>
   <li class="q" id="q10-6" data-type="s" data-ans='["tooltip"]'><p>마커에 <b>마우스를 올렸을 때</b> 메시지가 나오게 하는 속성은?<span class="ty">단답형</span></p>
     <form class="sa"><input aria-label="답" placeholder="속성 이름"><button>확인</button><button type="button" class="giveup">정답 보기</button></form>
     <p class="exp"><b>tooltip</b></p></li>
 </ol></div>
 <p class="nextwk"><a href="#w9">← 9주차</a><a href="#mock1">모의고사 1회 →</a></p>
 </section>
+
 
 <section class="wk mock" id="mock1">
 <h2><span class="wn">모의고사 1회</span> 시험처럼 풀기</h2>
@@ -6900,7 +6965,7 @@ print(df['합'].mean())</pre>
                    tooltip=row['주소'])</pre>
     <div class="opts"><button class="opt" type="button">공원명</button><button class="opt" type="button">주소</button><button class="opt" type="button">위도와 경도</button><button class="opt" type="button">아무것도 안 나온다</button></div>
     <p class="exp"><b>2번</b> tooltip은 마우스를 올리면, popup은 클릭하면 나와요. 클릭하면 공원명이 떠요.</p></li>
-  <li class="q" id="qm1-24" data-type="s" data-ans='["iterrows()"]'><p>표의 각 행을 (인덱스, 행 데이터)로 하나씩 돌려주는 함수를 쓰세요. <code class="i">for n, row in df.____:</code><span class="ty">10주차 단답형</span></p>
+  <li class="q" id="qm1-24" data-type="s" data-ans='["iterrows()","iterrows"]'><p>표의 각 행을 (인덱스, 행 데이터)로 하나씩 돌려주는 함수를 쓰세요. <code class="i">for n, row in df.____:</code><span class="ty">10주차 단답형</span></p>
     <form class="sa"><input aria-label="답" placeholder="코드를 쓰고 확인"><button>확인</button><button type="button" class="giveup">정답 보기</button></form>
     <p class="exp"><b>iterrows()</b> n은 인덱스, row는 그 행이라 row['위도']처럼 꺼내요.</p></li>
 </ol></div>
@@ -6920,7 +6985,7 @@ print(df['합'].mean())</pre>
     <p class="exp"><b>3번</b> 강화학습은 Q-Learning, DQN. K-means와 PCA는 비지도학습, SVM은 지도학습이에요.</p></li>
   <li class="q" id="qm2-3" data-type="m" data-ans="2"><p>"목적에 맞게 데이터를 가공하고 처리한 것"은?<span class="ty">2주차 객관식</span></p>
     <div class="opts"><button class="opt" type="button">데이터</button><button class="opt" type="button">정보</button><button class="opt" type="button">지식</button><button class="opt" type="button">지혜</button></div>
-    <p class="exp"><b>2번</b> 데이터 → 정보 → 지식 → 지혜 순서예요. 정보를 해석해 일반화하면 지식이에요.</p></li>
+    <p class="exp"><b>2번</b> 데이터, 정보, 지식, 지혜 순서예요. 정보를 해석해 일반화하면 지식이에요.</p></li>
   <li class="q" id="qm2-4" data-type="m" data-ans="4"><p>이상치가 있는지 그래프로 찾아보는 일은 데이터 분석 프로세스의 어느 단계인가요?<span class="ty">2주차 객관식</span></p>
     <div class="opts"><button class="opt" type="button">문제 정의</button><button class="opt" type="button">데이터 수집</button><button class="opt" type="button">전처리</button><button class="opt" type="button">탐색적 분석</button></div>
     <p class="exp"><b>4번</b> 찾아보는 건 탐색적 분석, 찾은 이상치를 고치거나 지우는 건 전처리예요.</p></li>
@@ -6931,7 +6996,13 @@ customers["김철수"] = 90000
 print(len(customers))</pre>
     <form class="sa"><input aria-label="답" placeholder="결과를 쓰고 확인"><button>확인</button><button type="button" class="giveup">정답 보기</button></form>
     <p class="exp"><b>3</b> 없는 키(이영희)는 추가되고, 있는 키(김철수)는 값만 바뀌어요.</p></li>
-  <li class="q" id="qm2-6" data-type="m" data-ans="2"><p>열 이름 줄이 없는 5줄짜리 exam.txt를 옵션 없이 <code class="i">pd.read_csv('exam.txt')</code>로 읽으면?<span class="ty">3주차 객관식</span></p>
+  <li class="q" id="qm2-6" data-type="m" data-ans="2"><p>아래 exam.txt를 옵션 없이 <code class="i">pd.read_csv('exam.txt')</code>로 읽으면?<span class="ty">3주차 객관식</span></p>
+    <pre># exam.txt 내용 (5줄, 열 이름 줄 없음)
+kim, 95, 3
+choi, 100, 0
+lee, 90, 2
+park, 85, 1
+cho, 77, 5</pre>
     <div class="opts"><button class="opt" type="button">5행, 열 이름 0, 1, 2</button><button class="opt" type="button">4행, 열 이름 kim, 95, 3</button><button class="opt" type="button">5행, 열 이름 kim, 95, 3</button><button class="opt" type="button">오류</button></div>
     <p class="exp"><b>2번</b> header 기본값 0이라 첫 줄이 열 이름이 되고 데이터는 4행만 남아요. 5행 모두 데이터로 읽으려면 header=None이에요.</p></li>
   <li class="q" id="qm2-7" data-type="s" data-ans='["read_excel","pd.read_excel"]'><p>엑셀 파일을 읽는 판다스 함수 이름은? <code class="i">pd.____('연도별출생인구.xlsx')</code><span class="ty">3주차 단답형</span></p>
@@ -6990,7 +7061,7 @@ Name: 중간고사, dtype: float64</pre>
   <li class="q" id="qm2-19" data-type="m" data-ans="3"><p>x축 눈금에 연도가 나오지 <b>않는</b> 코드는? (numData의 '시점'은 2010~2025)<span class="ty">7주차 객관식</span></p>
     <div class="opts"><button class="opt" type="button"><code>plt.plot(numData['시점'], numData['혼인건수'])</code></button><button class="opt" type="button"><code>plt.plot(numData['혼인건수'])</code> 다음 줄 <code>plt.xticks(range(len(numData['시점'])), numData['시점'])</code></button><button class="opt" type="button"><code>plt.plot(numData['혼인건수'])</code> 다음 줄 <code>plt.xlabel('년도')</code></button><button class="opt" type="button"><code>numData.plot(x='시점', y='혼인건수')</code></button></div>
     <p class="exp"><b>3번</b> xlabel은 축 제목만 '년도'로 달고, 눈금은 그대로 0~15예요.</p></li>
-  <li class="q" id="qm2-20" data-type="s" data-ans='["&#39;upperleft&#39;"]'><p>범례를 그래프 왼쪽 위에 두려면? <code class="i">plt.legend(loc=____)</code><span class="ty">7주차 단답형</span></p>
+  <li class="q" id="qm2-20" data-type="s" data-ans='["&#39;upperleft&#39;","upperleft","2"]'><p>범례를 그래프 왼쪽 위에 두려면? <code class="i">plt.legend(loc=____)</code><span class="ty">7주차 단답형</span></p>
     <form class="sa"><input aria-label="답" placeholder="값을 쓰고 확인"><button>확인</button><button type="button" class="giveup">정답 보기</button></form>
     <p class="exp"><b>'upper left'</b> 안 주면 알맞은 곳('best')에 놓여요. 범례가 보이려면 plot에 label도 있어야 해요.</p></li>
   <li class="q" id="qm2-21" data-type="s" data-ans='["4"]'><p>아래 네 차트는 칸마다 <code class="i">plt.subplot(2, 2, 번호)</code>를 쓴 뒤 그렸어요. 막대차트를 그리기 전에 쓴 코드의 빈칸은? <code class="i">plt.subplot(2, 2, ____)</code><span class="ty">8주차 단답형</span></p>
@@ -7004,14 +7075,694 @@ Name: 중간고사, dtype: float64</pre>
     <img class="plot" src="img/mk1-0.webp" width="516" height="368" alt="하트 모양으로 단어가 채워진 워드클라우드" loading="lazy" style="--w:516px">
     <div class="opts"><button class="opt" type="button"><code>mask</code></button><button class="opt" type="button"><code>background_color</code></button><button class="opt" type="button"><code>colormap</code></button><button class="opt" type="button"><code>random_state</code></button></div>
     <p class="exp"><b>1번</b> <code class="i">np.array(Image.open('heart_mask.jpg'))</code>로 만든 배열을 mask에 넣어요. 검은 부분에 글자가 들어가요.</p></li>
-  <li class="q" id="qm2-24" data-type="s" data-ans='["to_file"]'><p>만든 워드클라우드를 그림 파일로 저장하는 코드의 빈칸은? <code class="i">wc_output.____('한글워드클라우드.png')</code><span class="ty">9주차 단답형</span></p>
+  <li class="q" id="qm2-24" data-type="s" data-ans='["to_file","to_file()"]'><p>만든 워드클라우드를 그림 파일로 저장하는 코드의 빈칸은? <code class="i">wc_output.____('한글워드클라우드.png')</code><span class="ty">9주차 단답형</span></p>
     <form class="sa"><input aria-label="답" placeholder="함수 이름"><button>확인</button><button type="button" class="giveup">정답 보기</button></form>
     <p class="exp"><b>to_file</b> to_image()로 바꾼 뒤 save('이름')으로도 저장해요.</p></li>
   <li class="q" id="qm2-25" data-type="m" data-ans="2"><p>folium 지도 왼쪽 아래에 축척을 보이게 하는 Map 속성은?<span class="ty">10주차 객관식</span></p>
     <div class="opts"><button class="opt" type="button"><code>zoom_control=True</code></button><button class="opt" type="button"><code>control_scale=True</code></button><button class="opt" type="button"><code>tiles=None</code></button><button class="opt" type="button"><code>zoom_start=18</code></button></div>
     <p class="exp"><b>2번</b> 기본값은 False예요. zoom_control은 왼쪽 위 +/− 버튼이에요.</p></li>
 </ol></div>
-<p class="nextwk"><a href="#mock1">← 모의고사 1회</a><a href="#wrongs">오답 노트 →</a></p>
+<p class="nextwk"><a href="#mock1">← 모의고사 1회</a><a href="#ex">예제 형식 →</a></p>
+</section>
+
+
+<section class="wk mock" id="ex">
+<h2><span class="wn">예제 형식</span> 교수님 예제와 같은 꼴</h2>
+<p>교수님이 올린 예제 4문제(파일 화면 보고 read_csv 옵션 고르기, info() 보고 행과 열과 결측치 쓰기, loc와 iloc 고르기, 그래프 보고 빈칸 코드 고르기)를 그대로 넣고, 같은 꼴로 19문제를 더 만들었어요. 결과 표와 그래프는 모두 코드를 실제로 돌려서 나온 거예요.</p>
+<div class="quiz"><h3>예제 형식 23문제 <span class="sc"></span></h3><ol class="qs">
+  <li class="q" id="qe1" data-type="m" data-ans="3"><p>아래 그림1처럼 저장된 exam.csv를 불러와서 그림2 결과를 출력하려고 해요. 알맞은 코드는?<span class="ty">교수님 예제 1, 3주차 객관식</span></p>
+    <div class="xl"><p>그림1. exam.csv를 엑셀로 연 화면</p><table><thead><tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>F</th><th>G</th><th>H</th><th>I</th><th>J</th><th>K</th></tr></thead><tbody><tr><th>1</th><td>서울지역 자전거 대여</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><th>2</th><td>자전거번호</td><td>대여일시</td><td>대여소번호</td><td>대여소명</td><td>대여거치대</td><td>반납일시</td><td>반납대여소번호</td><td>반납대여소명</td><td>반납거치대</td><td>이용시간</td><td>이용거리</td></tr><tr><th>3</th><td>SPB-23220</td><td>2019-11-01 8:48</td><td class="n">646</td><td>장한평역 1번출구 (국민은행앞)</td><td class="n">3</td><td>2019-11-01 9:01</td><td class="n">3</td><td>중랑센터</td><td class="n">7</td><td class="n">12</td><td class="n">1100</td></tr><tr><th>4</th><td>SPB-16216</td><td>2019-11-04 8:38</td><td class="n">646</td><td>장한평역 1번출구 (국민은행앞)</td><td class="n">2</td><td>2019-11-04 8:56</td><td class="n">3</td><td>중랑센터</td><td class="n">2</td><td class="n">7</td><td class="n">1420</td></tr><tr><th>5</th><td>SPB-21097</td><td>2019-11-04 8:46</td><td class="n">646</td><td>장한평역 1번출구 (국민은행앞)</td><td class="n">1</td><td>2019-11-04 8:57</td><td class="n">3</td><td>중랑센터</td><td class="n">7</td><td class="n">10</td><td></td></tr><tr><th>6</th><td>SPB-22292</td><td>2019-11-05 8:34</td><td class="n">646</td><td>장한평역 1번출구 (국민은행앞)</td><td class="n">1</td><td>2019-11-05 8:45</td><td class="n">3</td><td>중랑센터</td><td></td><td class="n">10</td><td class="n">1380</td></tr><tr><th>7</th><td>SPB-07935</td><td>2019-11-05 12:29</td><td class="n">512</td><td>뚝섬역 1번 출구 옆</td><td class="n">11</td><td>2019-11-05 12:39</td><td class="n">3</td><td>중랑센터</td><td class="n">7</td><td class="n">10</td><td class="n">1650</td></tr><tr><th>8</th><td>SPB-18403</td><td>2019-11-06 8:52</td><td class="n">646</td><td>장한평역 1번출구 (국민은행앞)</td><td class="n">1</td><td>2019-11-06 9:09</td><td class="n">3</td><td>중랑센터</td><td class="n">7</td><td class="n">11</td><td class="n">1350</td></tr><tr><th>9</th><td>SPB-11557</td><td>2019-11-08 14:52</td><td class="n">3</td><td>중랑센터</td><td></td><td>2019-11-08 15:40</td><td class="n">3</td><td>중랑센터</td><td class="n">7</td><td class="n">47</td><td class="n">0</td></tr></tbody></table></div>
+    <p class="cap">그림2. 출력 결과 (exam.head())</p><div class="dfw"><div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>자전거번호</th>
+      <th>대여일시</th>
+      <th>대여소번호</th>
+      <th>대여소명</th>
+      <th>대여거치대</th>
+      <th>반납일시</th>
+      <th>반납대여소번호</th>
+      <th>반납대여소명</th>
+      <th>반납거치대</th>
+      <th>이용시간</th>
+      <th>이용거리</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>SPB-23220</td>
+      <td>2019-11-01 8:48</td>
+      <td>646</td>
+      <td>장한평역 1번출구 (국민은행앞)</td>
+      <td>3.0</td>
+      <td>2019-11-01 9:01</td>
+      <td>3</td>
+      <td>중랑센터</td>
+      <td>7.0</td>
+      <td>12</td>
+      <td>1100.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>SPB-16216</td>
+      <td>2019-11-04 8:38</td>
+      <td>646</td>
+      <td>장한평역 1번출구 (국민은행앞)</td>
+      <td>2.0</td>
+      <td>2019-11-04 8:56</td>
+      <td>3</td>
+      <td>중랑센터</td>
+      <td>2.0</td>
+      <td>7</td>
+      <td>1420.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>SPB-21097</td>
+      <td>2019-11-04 8:46</td>
+      <td>646</td>
+      <td>장한평역 1번출구 (국민은행앞)</td>
+      <td>1.0</td>
+      <td>2019-11-04 8:57</td>
+      <td>3</td>
+      <td>중랑센터</td>
+      <td>7.0</td>
+      <td>10</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>SPB-22292</td>
+      <td>2019-11-05 8:34</td>
+      <td>646</td>
+      <td>장한평역 1번출구 (국민은행앞)</td>
+      <td>1.0</td>
+      <td>2019-11-05 8:45</td>
+      <td>3</td>
+      <td>중랑센터</td>
+      <td>NaN</td>
+      <td>10</td>
+      <td>1380.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>SPB-07935</td>
+      <td>2019-11-05 12:29</td>
+      <td>512</td>
+      <td>뚝섬역 1번 출구 옆</td>
+      <td>11.0</td>
+      <td>2019-11-05 12:39</td>
+      <td>3</td>
+      <td>중랑센터</td>
+      <td>7.0</td>
+      <td>10</td>
+      <td>1650.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+    <div class="opts"><button class="opt" type="button"><code>exam = pd.read_csv(&quot;exam.csv&quot;, encoding=&quot;euc-kr&quot;, header=[2])</code></button><button class="opt" type="button"><code>exam = pd.read_csv(&quot;exam.csv&quot;, encoding=&quot;euc-kr&quot;, header=[0])</code></button><button class="opt" type="button"><code>exam = pd.read_csv(&quot;exam.csv&quot;, encoding=&quot;euc-kr&quot;, header=[1])</code></button><button class="opt" type="button"><code>exam = pd.read_csv(&quot;exam.csv&quot;, encoding=&quot;latin-1&quot;, header=[2])</code></button></div>
+    <p class="exp"><b>3번</b> 엑셀 1행(파이썬 0번 줄)은 제목 '서울지역 자전거 대여'이고, 열 이름은 엑셀 2행, 곧 1번 줄에 있어요. 그래서 header=[1]이에요(header=1과 같아요). header=[0]이면 제목 줄이 열 이름이 돼서 '서울지역 자전거 대여', 'Unnamed: 1'…이 나오고, header=[2]면 SPB-23220 줄이 열 이름이 돼요. latin-1은 한글을 못 읽어 글자가 깨져요. 엑셀 행 번호는 1부터, header 번호는 0부터 센다는 게 함정이에요. 빈칸은 NaN이 되고, 그래서 대여거치대, 반납거치대, 이용거리가 3.0처럼 실수로 나와요.</p></li>
+  <li class="q" id="qe2" data-type="m" data-ans="2"><p>실습 파일 '출생혼인.csv'를 엑셀로 열면 아래와 같아요. 열 이름이 시점, 출생아수(명), 혼인건수(건)이고 숫자 열이 int64인 표로 읽는 코드는?<span class="ty">3주차 객관식</span></p>
+    <div class="xl"><p>출생혼인.csv를 엑셀로 연 화면 (6행까지)</p><table><thead><tr><th></th><th>A</th><th>B</th><th>C</th></tr></thead><tbody><tr><th>1</th><td>시점</td><td>전국</td><td>전국</td></tr><tr><th>2</th><td>시점</td><td>출생아수(명)</td><td>혼인건수(건)</td></tr><tr><th>3</th><td class="n">2000</td><td class="n">640089</td><td class="n">332090</td></tr><tr><th>4</th><td class="n">2001</td><td class="n">559934</td><td class="n">318407</td></tr><tr><th>5</th><td class="n">2002</td><td class="n">496911</td><td class="n">304877</td></tr><tr><th>6</th><td class="n">2003</td><td class="n">495036</td><td class="n">302503</td></tr></tbody></table></div>
+    <p class="cap">원하는 결과 (head(3))</p><div class="dfw"><div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>시점</th>
+      <th>출생아수(명)</th>
+      <th>혼인건수(건)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2000</td>
+      <td>640089</td>
+      <td>332090</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2001</td>
+      <td>559934</td>
+      <td>318407</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2002</td>
+      <td>496911</td>
+      <td>304877</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+    <div class="opts"><button class="opt" type="button"><code>pd.read_csv(&#x27;출생혼인.csv&#x27;, encoding=&#x27;euc-kr&#x27;)</code></button><button class="opt" type="button"><code>pd.read_csv(&#x27;출생혼인.csv&#x27;, encoding=&#x27;euc-kr&#x27;, header=1)</code></button><button class="opt" type="button"><code>pd.read_csv(&#x27;출생혼인.csv&#x27;, encoding=&#x27;euc-kr&#x27;, header=None)</code></button><button class="opt" type="button"><code>pd.read_csv(&#x27;출생혼인.csv&#x27;, encoding=&#x27;euc-kr&#x27;, header=2)</code></button></div>
+    <p class="exp"><b>2번</b> 진짜 열 이름은 엑셀 2행, 곧 1번 줄이에요. 옵션 없이 읽으면 1행(시점, 전국, 전국)이 열 이름이 돼서 '전국', '전국.1'이 나오고, '출생아수(명)' 글자 줄이 데이터에 섞여 모든 열이 object가 돼요. header=2면 2000년 줄이 열 이름이 돼요.</p></li>
+  <li class="q" id="qe3" data-type="m" data-ans="3"><p>메모장으로 연 매출.csv가 아래와 같아요. 매출액을 숫자(int64)로 읽어 아래 결과를 내는 코드는?<span class="ty">3주차 객관식</span></p>
+    <pre># 메모장으로 연 매출.csv (UTF-8)
+월,매장,매출액
+1월,강남점,&quot;1,250,000&quot;
+1월,홍대점,&quot;980,000&quot;
+2월,강남점,&quot;1,410,000&quot;
+2월,홍대점,&quot;1,020,000&quot;</pre>
+    <p class="cap">원하는 결과</p><div class="dfw"><div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>월</th>
+      <th>매장</th>
+      <th>매출액</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1월</td>
+      <td>강남점</td>
+      <td>1250000</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1월</td>
+      <td>홍대점</td>
+      <td>980000</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2월</td>
+      <td>강남점</td>
+      <td>1410000</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>2월</td>
+      <td>홍대점</td>
+      <td>1020000</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+    <pre>df.dtypes
+월      object
+매장     object
+매출액     int64</pre>
+    <div class="opts"><button class="opt" type="button"><code>pd.read_csv(&#x27;매출.csv&#x27;)</code></button><button class="opt" type="button"><code>pd.read_csv(&#x27;매출.csv&#x27;, sep=&#x27;,&#x27;)</code></button><button class="opt" type="button"><code>pd.read_csv(&#x27;매출.csv&#x27;, thousands=&#x27;,&#x27;)</code></button><button class="opt" type="button"><code>pd.read_csv(&#x27;매출.csv&#x27;, header=None)</code></button></div>
+    <p class="exp"><b>3번</b> 옵션 없이 읽어도 표 모양은 같지만 매출액이 '1,250,000' 글자(object)로 남아요. sep=','는 기본값이라 결과가 같고, thousands=','를 줘야 쉼표를 지우고 int64로 읽어요.</p></li>
+  <li class="q" id="qe4" data-type="m" data-ans="2"><p>점수.txt는 칸이 탭으로 나뉘어 있어요. 아래 결과처럼 3열로 읽는 코드는?<span class="ty">3주차 객관식</span></p>
+    <pre># 메모장으로 연 점수.txt (칸 사이는 탭)
+이름	국어	영어
+김민지	88	92
+이준호	75	81
+박서연	93	87</pre>
+    <p class="cap">원하는 결과</p><div class="dfw"><div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>이름</th>
+      <th>국어</th>
+      <th>영어</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>김민지</td>
+      <td>88</td>
+      <td>92</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>이준호</td>
+      <td>75</td>
+      <td>81</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>박서연</td>
+      <td>93</td>
+      <td>87</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+    <div class="opts"><button class="opt" type="button"><code>pd.read_csv(&#x27;점수.txt&#x27;)</code></button><button class="opt" type="button"><code>pd.read_csv(&#x27;점수.txt&#x27;, sep=&#x27;\t&#x27;)</code></button><button class="opt" type="button"><code>pd.read_csv(&#x27;점수.txt&#x27;, sep=&#x27; &#x27;)</code></button><button class="opt" type="button"><code>pd.read_csv(&#x27;점수.txt&#x27;, header=None)</code></button></div>
+    <p class="exp"><b>2번</b> 구분 기호가 탭이면 sep='\t'(delimiter='\t')예요. 옵션 없이 읽으면 쉼표로 나누려다 '이름\t국어\t영어'가 한 열이 돼서 3행 1열이 나와요.</p></li>
+  <li class="q" id="qe5" data-type="m" data-ans="4"><p>아래 시도.csv를 읽어서 행정구역별이 인덱스가 된 결과를 만들려고 해요. 알맞은 코드는?<span class="ty">3주차 객관식</span></p>
+    <div class="xl"><p>시도.csv를 엑셀로 연 화면</p><table><thead><tr><th></th><th>A</th><th>B</th><th>C</th></tr></thead><tbody><tr><th>1</th><td>행정구역별</td><td>출생아수</td><td>혼인건수</td></tr><tr><th>2</th><td>서울특별시</td><td class="n">4258</td><td class="n">3957</td></tr><tr><th>3</th><td>부산광역시</td><td class="n">1318</td><td class="n">991</td></tr><tr><th>4</th><td>대구광역시</td><td class="n">993</td><td class="n">695</td></tr><tr><th>5</th><td>인천광역시</td><td class="n">1527</td><td class="n">1097</td></tr></tbody></table></div>
+    <p class="cap">원하는 결과</p><div class="dfw"><div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>출생아수</th>
+      <th>혼인건수</th>
+    </tr>
+    <tr>
+      <th>행정구역별</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>서울특별시</th>
+      <td>4258</td>
+      <td>3957</td>
+    </tr>
+    <tr>
+      <th>부산광역시</th>
+      <td>1318</td>
+      <td>991</td>
+    </tr>
+    <tr>
+      <th>대구광역시</th>
+      <td>993</td>
+      <td>695</td>
+    </tr>
+    <tr>
+      <th>인천광역시</th>
+      <td>1527</td>
+      <td>1097</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+    <div class="opts"><button class="opt" type="button"><code>pd.read_csv(&#x27;시도.csv&#x27;, encoding=&#x27;euc-kr&#x27;, header=1)</code></button><button class="opt" type="button"><code>pd.read_csv(&#x27;시도.csv&#x27;, encoding=&#x27;euc-kr&#x27;, skiprows=1)</code></button><button class="opt" type="button"><code>pd.read_csv(&#x27;시도.csv&#x27;, encoding=&#x27;euc-kr&#x27;, index_col=1)</code></button><button class="opt" type="button"><code>pd.read_csv(&#x27;시도.csv&#x27;, encoding=&#x27;euc-kr&#x27;, index_col=0)</code></button></div>
+    <p class="exp"><b>4번</b> index_col=0은 0번 열(행정구역별)을 인덱스로 써요. 결과 표 왼쪽 위에 '행정구역별'이 한 줄 아래 따로 붙은 게 인덱스 이름이라는 표시예요. index_col=1이면 출생아수가 인덱스가 되고, header=1이나 skiprows=1은 서울특별시 줄이 열 이름이 돼요.</p></li>
+  <li class="q" id="qe6" data-type="s" data-ans='["244,8", "(244,8)", "244행8열", "244행,8열", "행244,열8", "244x8", "244*8"]'><p>아래와 같이 정보가 주어졌을 때 행과 열의 개수는? (행, 열 순서로 쉼표로 구분)<span class="ty">교수님 예제 2(1), 4주차 단답형</span></p>
+    <pre>&lt;class &#x27;pandas.core.frame.DataFrame&#x27;&gt;
+RangeIndex: 244 entries, 0 to 243
+Data columns (total 8 columns):
+total_bill    244 non-null  float64
+tip           200 non-null  float64
+sex           244 non-null  category
+smoker        244 non-null  bool
+day           224 non-null  category
+time          244 non-null  category
+size          198 non-null  int64
+smoker_str    244 non-null  object</pre>
+    <form class="sa"><input aria-label="답" placeholder="예: 10, 3"><button>확인</button><button type="button" class="giveup">정답 보기</button></form>
+    <p class="exp"><b>244, 8</b> RangeIndex: 244 entries가 행 수, total 8 columns가 열 수예요. df.shape로 보면 (244, 8)이에요.</p></li>
+  <li class="q" id="qe7" data-type="s" data-ans='["tip,day,size", "tip,size,day", "day,tip,size", "day,size,tip", "size,tip,day", "size,day,tip"]'><p>아래 info() 결과에서 결측치가 있는 열을 모두 쓰세요. (쉼표로 구분)<span class="ty">교수님 예제 2(2), 4주차 단답형</span></p>
+    <pre>&lt;class &#x27;pandas.core.frame.DataFrame&#x27;&gt;
+RangeIndex: 244 entries, 0 to 243
+Data columns (total 8 columns):
+total_bill    244 non-null  float64
+tip           200 non-null  float64
+sex           244 non-null  category
+smoker        244 non-null  bool
+day           224 non-null  category
+time          244 non-null  category
+size          198 non-null  int64
+smoker_str    244 non-null  object</pre>
+    <form class="sa"><input aria-label="답" placeholder="열 이름을 쉼표로"><button>확인</button><button type="button" class="giveup">정답 보기</button></form>
+    <p class="exp"><b>tip, day, size</b> non-null 개수가 전체 행 수 244보다 작은 열이에요. tip은 44개, day는 20개, size는 46개가 비어 있어요.</p></li>
+  <li class="q" id="qe8" data-type="m" data-ans="2"><p>아래 info() 결과에서 수치형 열은 몇 개인가요?<span class="ty">4주차 객관식</span></p>
+    <pre>&lt;class &#x27;pandas.core.frame.DataFrame&#x27;&gt;
+RangeIndex: 244 entries, 0 to 243
+Data columns (total 8 columns):
+total_bill    244 non-null  float64
+tip           200 non-null  float64
+sex           244 non-null  category
+smoker        244 non-null  bool
+day           224 non-null  category
+time          244 non-null  category
+size          198 non-null  int64
+smoker_str    244 non-null  object</pre>
+    <div class="opts"><button class="opt" type="button">2개</button><button class="opt" type="button">3개</button><button class="opt" type="button">4개</button><button class="opt" type="button">5개</button></div>
+    <p class="exp"><b>2번</b> float64인 total_bill, tip과 int64인 size, 3개예요. category(sex, day, time), bool(smoker), object(smoker_str)는 범주형이라 5개예요.</p></li>
+  <li class="q" id="qe9" data-type="s" data-ans='["1909,8", "(1909,8)", "1909행8열", "1909행,8열", "1909x8"]'><p>서울시 공영주차장 실습 데이터에서 8개 열만 골라 info()를 했어요. 행과 열의 개수는? (행, 열 순서로 쉼표로 구분)<span class="ty">4주차 단답형</span></p>
+    <pre>&lt;class &#x27;pandas.core.frame.DataFrame&#x27;&gt;
+RangeIndex: 1909 entries, 0 to 1908
+Data columns (total 8 columns):
+ #   Column    Non-Null Count  Dtype  
+---  ------    --------------  -----  
+ 0   주차장명      1909 non-null   object 
+ 1   주소        1909 non-null   object 
+ 2   전화번호      987 non-null    object 
+ 3   총 주자면     1731 non-null   float64
+ 4   유무료구분명    1909 non-null   object 
+ 5   기본 주차 요금  1695 non-null   float64
+ 6   위도        1236 non-null   float64
+ 7   경도        1236 non-null   float64
+dtypes: float64(4), object(4)
+memory usage: 119.4+ KB</pre>
+    <form class="sa"><input aria-label="답" placeholder="예: 10, 3"><button>확인</button><button type="button" class="giveup">정답 보기</button></form>
+    <p class="exp"><b>1909, 8</b> RangeIndex: 1909 entries, total 8 columns예요.</p></li>
+  <li class="q" id="qe10" data-type="s" data-ans='["주차장명,주소,유무료구분명", "주차장명,유무료구분명,주소", "주소,주차장명,유무료구분명", "주소,유무료구분명,주차장명", "유무료구분명,주차장명,주소", "유무료구분명,주소,주차장명"]'><p>아래 info() 결과에서 결측치가 <b>없는</b> 열을 모두 쓰세요. (쉼표로 구분)<span class="ty">4주차 단답형</span></p>
+    <pre>&lt;class &#x27;pandas.core.frame.DataFrame&#x27;&gt;
+RangeIndex: 1909 entries, 0 to 1908
+Data columns (total 8 columns):
+ #   Column    Non-Null Count  Dtype  
+---  ------    --------------  -----  
+ 0   주차장명      1909 non-null   object 
+ 1   주소        1909 non-null   object 
+ 2   전화번호      987 non-null    object 
+ 3   총 주자면     1731 non-null   float64
+ 4   유무료구분명    1909 non-null   object 
+ 5   기본 주차 요금  1695 non-null   float64
+ 6   위도        1236 non-null   float64
+ 7   경도        1236 non-null   float64
+dtypes: float64(4), object(4)
+memory usage: 119.4+ KB</pre>
+    <form class="sa"><input aria-label="답" placeholder="열 이름을 쉼표로"><button>확인</button><button type="button" class="giveup">정답 보기</button></form>
+    <p class="exp"><b>주차장명, 주소, 유무료구분명</b> Non-Null Count가 1909로 꽉 찬 열만 골라요. 나머지 다섯 열은 1909보다 작아서 결측치가 있어요.</p></li>
+  <li class="q" id="qe11" data-type="s" data-ans='["673", "673개"]'><p>아래 info() 결과에서 '위도' 열의 결측치는 몇 개인가요?<span class="ty">4주차 단답형</span></p>
+    <pre>&lt;class &#x27;pandas.core.frame.DataFrame&#x27;&gt;
+RangeIndex: 1909 entries, 0 to 1908
+Data columns (total 8 columns):
+ #   Column    Non-Null Count  Dtype  
+---  ------    --------------  -----  
+ 0   주차장명      1909 non-null   object 
+ 1   주소        1909 non-null   object 
+ 2   전화번호      987 non-null    object 
+ 3   총 주자면     1731 non-null   float64
+ 4   유무료구분명    1909 non-null   object 
+ 5   기본 주차 요금  1695 non-null   float64
+ 6   위도        1236 non-null   float64
+ 7   경도        1236 non-null   float64
+dtypes: float64(4), object(4)
+memory usage: 119.4+ KB</pre>
+    <form class="sa"><input aria-label="답" placeholder="숫자로"><button>확인</button><button type="button" class="giveup">정답 보기</button></form>
+    <p class="exp"><b>673</b> 1909 − 1236 = 673개예요. data['위도'].isnull().sum()으로 확인하면 같은 값이 나와요.</p></li>
+  <li class="q" id="qe12" data-type="m" data-ans="2"><p>행 0~2까지와 열 'A'만 선택하는 올바른 방법은? (df는 기본 인덱스 0, 1, 2…)<span class="ty">교수님 예제 3, 4주차 객관식</span></p>
+    
+    <div class="opts"><button class="opt" type="button"><code>df.loc[:3, &#x27;A&#x27;]</code></button><button class="opt" type="button"><code>df.loc[0:2, &#x27;A&#x27;]</code></button><button class="opt" type="button"><code>df.iloc[0:2, &#x27;A&#x27;]</code></button><button class="opt" type="button"><code>df.iloc[:3, &#x27;A&#x27;]</code></button></div>
+    <p class="exp"><b>2번</b> loc은 이름으로 고르고 끝 번호를 포함해서 0:2가 0, 1, 2행이에요. 1번 df.loc[:3]은 3행까지 포함해 4행이 나와요. 3번, 4번은 iloc에 열 이름 'A'를 써서 오류예요(iloc은 숫자 위치만).</p></li>
+  <li class="q" id="qe13" data-type="m" data-ans="3"><p>아래 df에서 1~3번 행, B~D 열(3행 3열)을 고르는 코드는?<span class="ty">4주차 객관식</span></p>
+    <pre>df   # 6행 5열, 기본 인덱스</pre><div class="dfw"><div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>A</th>
+      <th>B</th>
+      <th>C</th>
+      <th>D</th>
+      <th>E</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>10</td>
+      <td>20</td>
+      <td>30</td>
+      <td>40</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>11</td>
+      <td>21</td>
+      <td>31</td>
+      <td>41</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2</td>
+      <td>12</td>
+      <td>22</td>
+      <td>32</td>
+      <td>42</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>3</td>
+      <td>13</td>
+      <td>23</td>
+      <td>33</td>
+      <td>43</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>4</td>
+      <td>14</td>
+      <td>24</td>
+      <td>34</td>
+      <td>44</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>5</td>
+      <td>15</td>
+      <td>25</td>
+      <td>35</td>
+      <td>45</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+    <div class="opts"><button class="opt" type="button"><code>df.iloc[1:3, 1:3]</code></button><button class="opt" type="button"><code>df.loc[1:4, &#x27;B&#x27;:&#x27;D&#x27;]</code></button><button class="opt" type="button"><code>df.loc[1:3, &#x27;B&#x27;:&#x27;D&#x27;]</code></button><button class="opt" type="button"><code>df.iloc[1:3, &#x27;B&#x27;:&#x27;D&#x27;]</code></button></div>
+    <p class="exp"><b>3번</b> loc은 행과 열 모두 끝을 포함해요. 1번 iloc[1:3, 1:3]은 끝을 빼서 2행 2열(1~2행, B~C열), 2번은 4행, 4번은 iloc에 열 이름을 써서 오류예요.</p></li>
+  <li class="q" id="qe14" data-type="m" data-ans="3"><p>아래 df에서 마지막 2행의 A열과 C열만 고르는 코드는?<span class="ty">4주차 객관식</span></p>
+    <pre>df   # 6행 5열, 기본 인덱스</pre><div class="dfw"><div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>A</th>
+      <th>B</th>
+      <th>C</th>
+      <th>D</th>
+      <th>E</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>10</td>
+      <td>20</td>
+      <td>30</td>
+      <td>40</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>11</td>
+      <td>21</td>
+      <td>31</td>
+      <td>41</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2</td>
+      <td>12</td>
+      <td>22</td>
+      <td>32</td>
+      <td>42</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>3</td>
+      <td>13</td>
+      <td>23</td>
+      <td>33</td>
+      <td>43</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>4</td>
+      <td>14</td>
+      <td>24</td>
+      <td>34</td>
+      <td>44</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>5</td>
+      <td>15</td>
+      <td>25</td>
+      <td>35</td>
+      <td>45</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+    <div class="opts"><button class="opt" type="button"><code>df.iloc[-2:, 0:2]</code></button><button class="opt" type="button"><code>df.iloc[:-2, [0, 2]]</code></button><button class="opt" type="button"><code>df.iloc[-2:, [0, 2]]</code></button><button class="opt" type="button"><code>df.iloc[-2:, &#x27;A&#x27;:&#x27;C&#x27;]</code></button></div>
+    <p class="exp"><b>3번</b> iloc에서 -2:는 끝에서 두 번째부터 끝까지, [0, 2]는 0번(A)과 2번(C) 열이에요. 1번은 A, B열, 2번은 마지막 2행을 뺀 나머지, 4번은 iloc에 열 이름이라 오류예요.</p></li>
+  <li class="q" id="qe15" data-type="m" data-ans="4"><p>인덱스가 'a'~'e'인 아래 small에서 'b'~'d' 행의 A열(3개 값)을 고르는 코드는?<span class="ty">4주차 객관식</span></p>
+    <pre>small</pre><div class="dfw"><div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>A</th>
+      <th>B</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>a</th>
+      <td>1</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <th>b</th>
+      <td>2</td>
+      <td>7</td>
+    </tr>
+    <tr>
+      <th>c</th>
+      <td>3</td>
+      <td>8</td>
+    </tr>
+    <tr>
+      <th>d</th>
+      <td>4</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>e</th>
+      <td>5</td>
+      <td>10</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+    <div class="opts"><button class="opt" type="button"><code>small.loc[1:3, &#x27;A&#x27;]</code></button><button class="opt" type="button"><code>small.iloc[1:3, 0]</code></button><button class="opt" type="button"><code>small.iloc[&#x27;b&#x27;:&#x27;d&#x27;, 0]</code></button><button class="opt" type="button"><code>small.loc[&#x27;b&#x27;:&#x27;d&#x27;, &#x27;A&#x27;]</code></button></div>
+    <p class="exp"><b>4번</b> 인덱스가 글자면 loc에 그 글자를 쓰고, 끝('d')까지 들어가요. 1번은 글자 인덱스에 숫자로 잘라 오류, 2번은 b, c 두 개만, 3번은 iloc에 글자를 써서 오류예요.</p></li>
+  <li class="q" id="qe16" data-type="m" data-ans="2"><p>아래 df에서 C가 23 이상인 행의 B열 값만 고르는 올바른 코드는?<span class="ty">4주차 객관식</span></p>
+    <pre>df   # 6행 5열, 기본 인덱스</pre><div class="dfw"><div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>A</th>
+      <th>B</th>
+      <th>C</th>
+      <th>D</th>
+      <th>E</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>10</td>
+      <td>20</td>
+      <td>30</td>
+      <td>40</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>11</td>
+      <td>21</td>
+      <td>31</td>
+      <td>41</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2</td>
+      <td>12</td>
+      <td>22</td>
+      <td>32</td>
+      <td>42</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>3</td>
+      <td>13</td>
+      <td>23</td>
+      <td>33</td>
+      <td>43</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>4</td>
+      <td>14</td>
+      <td>24</td>
+      <td>34</td>
+      <td>44</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>5</td>
+      <td>15</td>
+      <td>25</td>
+      <td>35</td>
+      <td>45</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+    <div class="opts"><button class="opt" type="button"><code>df[df[&#x27;C&#x27;] &gt;= 23, &#x27;B&#x27;]</code></button><button class="opt" type="button"><code>df.loc[df[&#x27;C&#x27;] &gt;= 23, &#x27;B&#x27;]</code></button><button class="opt" type="button"><code>df.iloc[df[&#x27;C&#x27;] &gt;= 23, &#x27;B&#x27;]</code></button><button class="opt" type="button"><code>df.loc[&#x27;B&#x27;, df[&#x27;C&#x27;] &gt;= 23]</code></button></div>
+    <p class="exp"><b>2번</b> loc[행 조건, 열 이름] 순서예요. 결과는 3, 4, 5번 행의 B값 13, 14, 15예요. 1번은 대괄호 하나에 조건과 열을 같이 넣어 오류, 3번은 iloc에 열 이름이라 오류, 4번은 행과 열 순서가 바뀌어 오류예요.</p></li>
+  <li class="q" id="qe17" data-type="m" data-ans="3"><p>아래처럼 시각화하려고 해요. 밑줄 ①, ②, ③에 들어갈 답을 순서대로 나열한 것은?<span class="ty">교수님 예제 4, 8주차 객관식</span></p>
+    <img class="plot" src="img/ex-pie.webp" width="405" height="426" alt="USA 62.6%, EU 17.6%, JAPAN 19.8% 원 그래프, EU 조각이 떨어져 있음" loading="lazy" style="--w:405px">
+    <pre>count = pd.Series([249, 70, 79], index=[&#x27;USA&#x27;, &#x27;EU&#x27;, &#x27;JAPAN&#x27;])
+plt.①(count, labels=count.index, colors=[&#x27;chocolate&#x27;, &#x27;bisque&#x27;, &#x27;cadetblue&#x27;],
+      ②=[0, 0.1, 0], ③=&#x27;%1.1f%%&#x27;)
+plt.title(&#x27;Model Origin&#x27;)
+plt.legend()</pre>
+    <div class="opts"><button class="opt" type="button"><code>pie, explode, format</code></button><button class="opt" type="button"><code>pie, loc, format</code></button><button class="opt" type="button"><code>pie, explode, autopct</code></button><button class="opt" type="button"><code>pie, autopct, explode</code></button></div>
+    <p class="exp"><b>3번</b> 원 그래프는 pie, 조각을 떼어 내는 건 explode(두 번째 EU만 0.1), 비율 글자는 autopct예요. '%1.1f%%'는 소수 첫째 자리까지 쓰고 % 기호를 붙여요. 교수님 예제는 첫 줄이 plt.pie('count', …)로 적혀 있었는데, 여기서는 실제로 돌아가게 count 변수를 만들어 그렸어요.</p></li>
+  <li class="q" id="qe18" data-type="m" data-ans="1"><p>numData(2010~2025년 출생아수)로 아래 그래프를 그렸어요. ①, ②, ③을 순서대로 나열한 것은?<span class="ty">7주차 객관식</span></p>
+    <img class="plot" src="img/ex-line.webp" width="623" height="393" alt="2010년부터 2025년까지 출생아수, 초록 동그라미와 실선, x축 연도 글자가 45도 기울어짐" loading="lazy" style="--w:623px">
+    <pre>plt.①(numData[&#x27;시점&#x27;], numData[&#x27;출생아수(명)&#x27;], ②, label=&#x27;출생아수&#x27;)
+plt.③(rotation=45)
+plt.legend()
+plt.title(&#x27;연도별 출생아수&#x27;)</pre>
+    <div class="opts"><button class="opt" type="button"><code>plot, &#x27;go-&#x27;, xticks</code></button><button class="opt" type="button"><code>plot, &#x27;g--&#x27;, xticks</code></button><button class="opt" type="button"><code>plot, &#x27;go-&#x27;, xlabel</code></button><button class="opt" type="button"><code>scatter, &#x27;go-&#x27;, xticks</code></button></div>
+    <p class="exp"><b>1번</b> 선 그래프는 plot, 초록(g) 동그라미(o) 실선(-)이라 'go-', 눈금 글자를 기울이는 건 xticks(rotation=45)예요. 'g--'는 마커 없는 파선, xlabel은 축 제목만 달아요.</p></li>
+  <li class="q" id="qe19" data-type="m" data-ans="3"><p>광역시 표로 아래 그래프를 그렸어요. ①, ②, ③을 순서대로 나열한 것은?<span class="ty">7주차 객관식</span></p>
+    <img class="plot" src="img/ex-bar.webp" width="625" height="373" alt="광역시 6곳 출생아수 주황색 세로 막대 그래프, 왼쪽에 &#x27;출생아수&#x27; 축 제목" loading="lazy" style="--w:625px">
+    <pre>plt.①(광역시[&#x27;행정구역별&#x27;], 광역시[&#x27;출생아수&#x27;], color=②)
+plt.③(&#x27;출생아수&#x27;)
+plt.title(&#x27;광역시 출생아수&#x27;)</pre>
+    <div class="opts"><button class="opt" type="button"><code>barh, &#x27;orange&#x27;, ylabel</code></button><button class="opt" type="button"><code>bar, &#x27;orange&#x27;, xlabel</code></button><button class="opt" type="button"><code>bar, &#x27;orange&#x27;, ylabel</code></button><button class="opt" type="button"><code>bar, &#x27;blue&#x27;, ylabel</code></button></div>
+    <p class="exp"><b>3번</b> 세로 막대는 bar(가로 막대가 barh), 색은 'orange', 왼쪽 세로축 제목은 ylabel이에요.</p></li>
+  <li class="q" id="qe20" data-type="m" data-ans="1"><p>17개 시도의 혼인건수와 출생아수로 아래 그래프를 그렸어요. ①, ②, ③을 순서대로 나열한 것은?<span class="ty">7주차 객관식</span></p>
+    <img class="plot" src="img/ex-scatter.webp" width="548" height="410" alt="가로 혼인건수, 세로 출생아수, 빨간 큰 점 17개가 오른쪽 위로 올라가는 산점도" loading="lazy" style="--w:548px">
+    <pre>plt.①(sido_all[&#x27;혼인건수&#x27;], sido_all[&#x27;출생아수&#x27;], ②=&#x27;red&#x27;, ③=100)
+plt.xlabel(&#x27;혼인건수&#x27;)
+plt.ylabel(&#x27;출생아수&#x27;)</pre>
+    <div class="opts"><button class="opt" type="button"><code>scatter, c, s</code></button><button class="opt" type="button"><code>scatter, s, c</code></button><button class="opt" type="button"><code>plot, c, s</code></button><button class="opt" type="button"><code>bar, c, s</code></button></div>
+    <p class="exp"><b>1번</b> 두 수치형 변수의 관계는 scatter, 점 색은 c, 점 크기는 s예요. 점들이 오른쪽 위로 올라가니 혼인건수가 많은 시도일수록 출생아수도 많아요.</p></li>
+  <li class="q" id="qe21" data-type="m" data-ans="3"><p>한 그림에 아래처럼 그래프 두 개를 나란히 그렸어요. ①, ②, ③을 순서대로 나열한 것은?<span class="ty">8주차 객관식</span></p>
+    <img class="plot" src="img/ex-sub.webp" width="933" height="373" alt="왼쪽은 연도별 출생아수 선 그래프, 오른쪽은 광역시 출생아수 막대 그래프" loading="lazy" style="--w:933px">
+    <pre>fig, ax = plt.①(1, 2, figsize=(11, 4))
+ax[②].plot(numData[&#x27;시점&#x27;], numData[&#x27;출생아수(명)&#x27;])
+ax[③].bar(광역시[&#x27;행정구역별&#x27;].str.replace(&#x27;광역시&#x27;, &#x27;&#x27;), 광역시[&#x27;출생아수&#x27;])</pre>
+    <div class="opts"><button class="opt" type="button"><code>subplot, 0, 1</code></button><button class="opt" type="button"><code>subplots, 1, 0</code></button><button class="opt" type="button"><code>subplots, 0, 1</code></button><button class="opt" type="button"><code>subplots, 1, 2</code></button></div>
+    <p class="exp"><b>3번</b> fig와 ax를 함께 돌려주는 건 subplots예요. 1행 2열이면 ax가 한 줄짜리라 ax[0]이 왼쪽, ax[1]이 오른쪽이에요. 2행 2열일 때만 ax[0, 1]처럼 두 번호를 써요.</p></li>
+  <li class="q" id="qe22" data-type="m" data-ans="1"><p>9주차 실습 코드로 아래 워드클라우드를 만들었어요. ①, ②, ③을 순서대로 나열한 것은?<span class="ty">9주차 객관식</span></p>
+    <img class="plot" src="img/mk1-0.webp" width="516" height="368" alt="하트 모양 안에 영어 단어가 채워진 흰 바탕 워드클라우드" loading="lazy" style="--w:516px">
+    <pre>maskHeart = np.array(Image.open(&#x27;heart_mask.jpg&#x27;))
+wc_output = WordCloud(width=1500, height=1000, stopwords=불용어, ①=&#x27;white&#x27;,
+                      ②=maskHeart, colormap=&#x27;Set1&#x27;, max_words=1000,
+                      random_state=1).③(text)   # text는 위키백과 글 전체 문자열</pre>
+    <div class="opts"><button class="opt" type="button"><code>background_color, mask, generate</code></button><button class="opt" type="button"><code>background_color, mask, generate_from_frequencies</code></button><button class="opt" type="button"><code>colormap, mask, generate</code></button><button class="opt" type="button"><code>background_color, shape, generate</code></button></div>
+    <p class="exp"><b>1번</b> 배경색은 background_color, 그림 모양은 mask예요. text가 문자열이라 generate를 쓰고, generate_from_frequencies는 {단어: 빈도} 딕셔너리를 넣을 때 써요. colormap은 글자 색상표('Set1')예요.</p></li>
+  <li class="q" id="qe23" data-type="m" data-ans="1"><p>아래 지도는 마커를 클릭했을 때 모습이에요. ①, ②, ③을 순서대로 나열한 것은?<span class="ty">10주차 객관식</span></p>
+    <img class="plot" src="img/mpop2.webp" width="760" height="440" alt="숭실대 근처 지도, 파란 마커 위에 &#x27;숭실대학교&#x27; 말풍선이 떠 있음" loading="lazy" style="--w:760px">
+    <pre>map = folium.①(location=[37.496594, 126.957499], ②=15)
+mk1 = folium.Marker(location=[37.496, 126.957],
+                    ③=folium.Popup(&#x27;숭실대학교&#x27;, max_width=200))
+mk1.add_to(map)
+map</pre>
+    <div class="opts"><button class="opt" type="button"><code>Map, zoom_start, popup</code></button><button class="opt" type="button"><code>Map, zoom_start, tooltip</code></button><button class="opt" type="button"><code>Marker, zoom_start, popup</code></button><button class="opt" type="button"><code>Map, zoom, popup</code></button></div>
+    <p class="exp"><b>1번</b> 지도는 folium.Map, 처음 확대 정도는 zoom_start, 클릭하면 뜨는 말풍선은 popup이에요. 마우스를 올렸을 때 뜨는 건 tooltip이에요.</p></li>
+</ol></div>
+<p class="nextwk"><a href="#mock2">← 모의고사 2회</a><a href="#wrongs">오답 노트 →</a></p>
 </section>
 
 <section class="wrongs" id="wrongs">
@@ -7140,6 +7891,5 @@ Name: 중간고사, dtype: float64</pre>
   }
 })();
 </script>
-<script src="../hub/back.js" data-cat="study" defer></script>
 </body>
 </html>
