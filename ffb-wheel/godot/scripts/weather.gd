@@ -52,6 +52,10 @@ func setup(c: City) -> void:
 		o.omni_range = 21.0
 		o.omni_attenuation = 0.6
 		o.visible = false
+		if OS.has_feature("web"):
+			var q := Kit.glow_quad(Vector2(15, 15), Color(1.0, 0.8, 0.5, 0.55))
+			q.position.y = -6.57
+			o.add_child(q)
 		add_child(o)
 		pool.append(o)
 	apply()

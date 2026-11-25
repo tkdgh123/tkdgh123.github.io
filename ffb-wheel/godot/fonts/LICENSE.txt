@@ -1,0 +1,6 @@
+NotoSansKR-Bold-sub.ttf
+Noto Sans KR(가변 글꼴)을 굵기 700으로 고정하고, 이 게임 코드에 쓴 글자와 완성형 한글 2350자만 남긴 것.
+
+© 2014-2021 Adobe (http://www.adobe.com/), with Reserved Font Name 'Source'.
+This Font Software is licensed under the SIL Open Font License, Version 1.1.
+Full license text: https://openfontlicense.org/open-font-license-official-text/

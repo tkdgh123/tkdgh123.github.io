@@ -26,7 +26,8 @@ var wheel_m: Node3D
 var lamps := {}
 var outside := []
 var head_spot: SpotLight3D
-var splash_p: GPUParticles3D
+var head_beam: MeshInstance3D # 웹판 전조등 바닥 빛 (Kit.glow_quad)
+var splash_p # GPUParticles3D, 웹판은 CPUParticles3D (Crash.web_cpu)
 var splash_t := 0.0
 var inp := {"steer": 0.0, "thr": 0.0, "brk": 0.0}
 var hold_u := 0.0
@@ -364,6 +365,10 @@ func _build_car() -> void:
 	head_spot.light_color = Color(1.0, 0.96, 0.86)
 	head_spot.shadow_enabled = false
 	car_g.add_child(head_spot)
+	if OS.has_feature("web"):
+		head_beam = Kit.glow_quad(Vector2(8, 30), Color(1.0, 0.95, 0.8, 0.5))
+		head_beam.position = Vector3(0, 0.05, Car.WB + Car.FO + 13.0)
+		car_g.add_child(head_beam)
 
 func _lamp(body: Node3D, k: String, x: float, y: float, z: float, w := 0.32, h := 0.12) -> void:
 	var m := Kit.box(body, Vector3(w, h, 0.04), Vector3(x, y, z), Kit.HEAD_OFF, false)
@@ -396,6 +401,7 @@ func _build_splash() -> void:
 	q.material = m
 	splash_p.draw_pass_1 = q
 	add_child(splash_p)
+	splash_p = Crash.web_cpu(splash_p)
 
 func splash(w: Dictionary, kmh: float) -> void:
 	if splash_t > 0 or kmh < 12:
@@ -671,7 +677,12 @@ func _skid(_dt: float) -> void:
 		skid_last[i] = p
 
 # ───────── 그리기 ─────────
+var _pf := 0 # 웹판: 첫 장면을 다 그린 뒤 페이지의 '준비 중' 안내를 지움
 func _process(dt: float) -> void:
+	if _pf < 3:
+		_pf += 1
+		if _pf == 3 and OS.has_feature("web"):
+			JavaScriptBridge.eval("window.godotReady && godotReady()")
 	var real_dt := dt / maxf(Engine.time_scale, 0.01)
 	if paused and Engine.time_scale < 1.0: # 판을 연 채로 느린 순간이 남지 않게
 		Engine.time_scale = 1.0
@@ -727,6 +738,10 @@ func _draw_car() -> void:
 	_lamp_set(lamps.turnL, blink and (car.sig == 1 or car.hazard), Kit.BLINK_ON, Kit.BLINK_OFF)
 	_lamp_set(lamps.turnR, blink and (car.sig == 2 or car.hazard), Kit.BLINK_ON, Kit.BLINK_OFF)
 	head_spot.visible = car.lights > 0
+	if head_beam:
+		head_beam.visible = head_spot.visible and weather.night
+		head_beam.scale = Vector3(1, 1, 1.5 if car.lights == 2 else 1.0)
+		head_beam.position.z = Car.WB + Car.FO + (20.5 if car.lights == 2 else 13.0)
 	head_spot.light_energy = 16.0 if weather.night else 2.0
 	head_spot.spot_attenuation = 0.45
 	head_spot.spot_range = 95.0 if car.lights == 2 else 55.0

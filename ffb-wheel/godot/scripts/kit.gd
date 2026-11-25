@@ -3,13 +3,20 @@
 class_name Kit
 extends RefCounted
 
-static var FONT: SystemFont
+static var FONT: Font
 
-static func font() -> SystemFont:
+# 웹에서는 컴퓨터 글꼴을 못 읽어서 넣어 둔 글꼴(Noto Sans KR 굵게, 쓰는 글자와 완성형 2350자만)을 씀
+static func font() -> Font:
 	if FONT == null:
-		FONT = SystemFont.new()
-		FONT.font_names = PackedStringArray(["Pretendard", "Malgun Gothic", "맑은 고딕", "Apple SD Gothic Neo", "Noto Sans CJK KR", "sans-serif"])
-		FONT.font_weight = 700
+		var kr: Font = load("res://fonts/NotoSansKR-Bold-sub.ttf")
+		if OS.has_feature("web"):
+			FONT = kr
+		else:
+			var sf := SystemFont.new()
+			sf.font_names = PackedStringArray(["Pretendard", "Malgun Gothic", "맑은 고딕", "Apple SD Gothic Neo", "Noto Sans CJK KR", "sans-serif"])
+			sf.font_weight = 700
+			sf.fallbacks = [kr]
+			FONT = sf
 	return FONT
 
 # ── 중심선: 1m 간격 점 {x, z, yaw, s} ──
@@ -117,6 +124,35 @@ static func mat(col: Color, rough := 0.6, emit := 0.0, metal := 0.0) -> Standard
 		m.emission_energy_multiplier = emit
 	_mats[key] = m
 	return m
+
+# 가운데가 진하고 가장자리로 갈수록 투명한 동그라미 (연기, 먼지, 바닥 불빛)
+static func soft_dot(col := Color.WHITE) -> GradientTexture2D:
+	var g := Gradient.new()
+	g.set_color(0, Color(col, 1.0))
+	g.set_color(1, Color(col, 0.0))
+	g.add_point(0.45, Color(col, 0.45))
+	var t := GradientTexture2D.new()
+	t.gradient = g
+	t.fill = GradientTexture2D.FILL_RADIAL
+	t.fill_from = Vector2(0.5, 0.5)
+	t.fill_to = Vector2(0.5, 0.0)
+	return t
+
+# 웹판은 정점 조명이라 큰 바닥 판에 불빛 웅덩이가 안 생김 → 바닥에 둥근 빛 판을 깔아 대신함
+static func glow_quad(size: Vector2, col: Color) -> MeshInstance3D:
+	var m := StandardMaterial3D.new()
+	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	m.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	m.albedo_color = Color.WHITE
+	m.albedo_texture = soft_dot(col)
+	var pm := PlaneMesh.new()
+	pm.size = size
+	pm.material = m
+	var o := MeshInstance3D.new()
+	o.mesh = pm
+	o.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	return o
 
 static func box(parent: Node3D, size: Vector3, pos: Vector3, m: Material, shadow := true) -> MeshInstance3D:
 	var o := MeshInstance3D.new()

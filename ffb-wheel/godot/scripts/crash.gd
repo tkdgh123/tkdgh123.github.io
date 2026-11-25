@@ -13,12 +13,12 @@ var falls := []           # 넘어지는 사물
 var flying := []          # 날아가는 사람, 라바콘
 var cool := 0.0           # 같은 충돌로 결과 카드가 여러 장 나오지 않게
 var card_t := -99.0
-var glass_p: GPUParticles3D
-var debris_p: GPUParticles3D
-var spark_p: GPUParticles3D
-var dust_p: GPUParticles3D
-var leaf_p: GPUParticles3D
-var smoke_p: GPUParticles3D
+var glass_p # GPUParticles3D, 웹판은 CPUParticles3D (web_cpu)
+var debris_p
+var spark_p
+var dust_p
+var leaf_p
+var smoke_p
 var waters := []
 var slow_left := 0.0
 var t := 0.0
@@ -52,6 +52,26 @@ func setup(m) -> void:
 	c.add_point(Vector2(1, 1.0))
 	curve.curve = c
 	sm.scale_curve = curve
+	glass_p = web_cpu(glass_p)
+	debris_p = web_cpu(debris_p)
+	spark_p = web_cpu(spark_p)
+	dust_p = web_cpu(dust_p)
+	leaf_p = web_cpu(leaf_p)
+	smoke_p = web_cpu(smoke_p)
+
+# 웹판: 입자 계산 셰이더(GPU)는 브라우저에서 준비하는 데 하나에 수 초에서 25초까지 걸려 화면이 멈춤 → CPU 입자로 바꿈
+# (CPU 입자는 땅 충돌, 난류가 없어서 파편이 땅을 뚫고 사라지고 잎이 덜 흩날림)
+static func web_cpu(p: GPUParticles3D) -> Node3D:
+	if not OS.has_feature("web"):
+		return p
+	var c := CPUParticles3D.new()
+	c.convert_from_particles(p)
+	c.set_meta("n", p.amount)
+	var par := p.get_parent()
+	par.remove_child(p)
+	p.free()
+	par.add_child(c)
+	return c
 
 func _ps(n: int, life: float, size: Vector2, col: Color, grav: Vector3, v0: float, v1: float, emit: float, collide: bool) -> GPUParticles3D:
 	var p := GPUParticles3D.new()
@@ -91,6 +111,8 @@ func _ps(n: int, life: float, size: Vector2, col: Color, grav: Vector3, v0: floa
 		m.emission_energy_multiplier = emit
 	elif col.a < 0.9:
 		m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		if size.x > 0.3: # 연기, 먼지는 네모 대신 흐린 동그라미
+			m.albedo_texture = Kit.soft_dot()
 	else:
 		m.metallic = 0.6
 		m.roughness = 0.2
@@ -99,12 +121,30 @@ func _ps(n: int, life: float, size: Vector2, col: Color, grav: Vector3, v0: floa
 	add_child(p)
 	return p
 
-func _burst(p: GPUParticles3D, at: Vector3, dir: Vector3, amount := 1.0) -> void:
+func _burst(p: Node3D, at: Vector3, dir: Vector3, amount := 1.0) -> void:
 	p.global_position = at
-	(p.process_material as ParticleProcessMaterial).direction = (dir + Vector3(0, 0.8, 0)).normalized()
-	p.amount_ratio = clampf(amount, 0.1, 1.0)
+	var d := (dir + Vector3(0, 0.8, 0)).normalized()
+	if p is CPUParticles3D:
+		p.direction = d
+		p.amount = maxi(1, roundi(int(p.get_meta("n")) * clampf(amount, 0.1, 1.0)))
+	else:
+		(p.process_material as ParticleProcessMaterial).direction = d
+		p.amount_ratio = clampf(amount, 0.1, 1.0)
 	p.restart()
 	p.emitting = true
+
+# 웹판: 효과를 처음 그릴 때 그래픽 준비로 몇 초 멈춰서, 시작 화면(가려져 있음)에서 한 번씩 미리 그려 둠
+func warm(at: Vector3) -> void:
+	var ps: Array = [glass_p, debris_p, spark_p, dust_p, leaf_p, smoke_p, main.splash_p]
+	for p: Node3D in ps:
+		_burst(p, at, Vector3.FORWARD, 0.1)
+	await get_tree().create_timer(0.4).timeout
+	smoke_p.emitting = false
+	for p: Node3D in ps:
+		p.visible = false
+	await get_tree().create_timer(4.0).timeout
+	for p: Node3D in ps:
+		p.visible = true
 
 # ───────── 매 걸음: 내 차가 무엇과 겹쳤는지 ─────────
 func collide(dt: float) -> void:
@@ -531,8 +571,10 @@ func _shake_tree(b: Dictionary, imp: float) -> void:
 	_burst(leaf_p, tr.origin + Vector3(0, 1.0, 0), Vector3(0, 0.3, 0), imp / 8.0)
 
 func _water(at: Vector3) -> void: # 소화전이 부러지면 물기둥
-	var w := _ps(220, 1.6, Vector2(0.08, 0.3), Color(0.8, 0.88, 0.95, 0.6), Vector3(0, -9.8, 0), 9.0, 12.0, 0.0, false)
+	var w = _ps(220, 1.6, Vector2(0.08, 0.3), Color(0.8, 0.88, 0.95, 0.6), Vector3(0, -9.8, 0), 9.0, 12.0, 0.0, false)
 	w.one_shot = false
+	w.global_position = at
+	w = web_cpu(w)
 	w.explosiveness = 0.0
 	var pm := w.process_material as ParticleProcessMaterial
 	pm.spread = 8.0
@@ -552,7 +594,7 @@ func tick(dt: float, real_dt: float) -> void:
 	for w: Array in waters.duplicate():
 		w[1] -= dt
 		if w[1] <= 0:
-			(w[0] as GPUParticles3D).emitting = false
+			w[0].emitting = false
 			if w[1] < -2:
 				(w[0] as Node).queue_free()
 				waters.erase(w)

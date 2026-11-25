@@ -8,6 +8,17 @@
 - 실행 파일 만들기: `godot --headless --path . --export-release "Windows Desktop" build/운전연습.exe`
 - 그래픽: Windows에서는 Direct3D 12로 돎 (`project.godot`의 `rendering_device/driver.windows`)
 
+## 웹판 (창업실 창공설 페이지 05 실감 운전 연습, `../play/`)
+- 만들기: `godot --headless --path . --export-release "Web" ../play/index.html` (스레드 없는 웹 틀이라 GitHub Pages에서 그대로 돎)
+- 웹은 컴퓨터 글꼴을 못 읽어서 `fonts/NotoSansKR-Bold-sub.ttf`(Noto Sans KR 굵게, 코드에 쓴 글자와 완성형 2350자만 남김, 0.5MB)를 씀
+- 크롬의 웹 그래픽(D3D11 변환)은 Godot 셰이더 하나를 준비하는 데 수 초가 걸림. 처음 그대로 내보내면 첫 화면까지 약 105초, 처음 부딪힐 때 또 수십 초 멈췄음. 그래서 웹판만 이렇게 바꿈:
+  - 조명을 정점 단위로 계산 (`project.godot`의 `force_vertex_shading.web`). 첫 화면 준비가 약 20~60초로 줄어듦(노트북이 바쁠수록 김)
+  - 그러면 바닥에 전조등, 가로등 불빛 웅덩이가 안 생겨서 바닥에 흐린 빛 판을 깔아 대신함 (`Kit.glow_quad`)
+  - 부딪힘 효과(유리, 파편, 불꽃, 먼지, 은행잎, 연기, 물기둥, 물튀김)는 CPU 입자로 바꿈 (`Crash.web_cpu`). 입자 계산 셰이더가 하나에 10~25초 걸려서. CPU 입자는 땅 충돌과 난류가 없어 파편이 땅을 뚫고 사라짐
+  - 소리는 웹 기본(샘플 재생)에선 직접 만든 소리가 안 나서 스트림 재생으로 (`default_playback_type.web`)
+  - 준비하는 동안 페이지에 안내 글을 띄우고, 첫 장면을 그린 뒤 지움 (`export_presets.cfg`의 `html/head_include`, `main.gd`의 `godotReady`)
+- 키보드가 있어야 함 (휴대폰에선 조작 못 함)
+
 ## 조작
 - 간단 조작(처음 켜져 있음): W 앞으로, S 브레이크(멈춘 뒤 다시 누르면 뒤로), A D 핸들, 방향키도 됨
 - 실제 조작: ↑ 가속, ↓ 브레이크, ← → 핸들, P R N D 기어, Space 주차 브레이크
