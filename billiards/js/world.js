@@ -54,7 +54,7 @@ function ringFromProfile(prof, hx, hz, uvScale = 1) {
       const P = [[a0[0], v0, a0[1]], [b0[0], v0, b0[1]], [b1[0], v1, b1[1]], [a1[0], v1, a1[1]]];
       const L = Math.hypot(b0[0] - a0[0], b0[1] - a0[1]) * uvScale;
       const U = [[0, 0], [L, 0], [L, 1], [0, 1]];
-      for (const j of [0, 2, 1, 0, 3, 2]) { pos.push(...P[j]); uv.push(...U[j]); }
+      for (const j of [0, 1, 2, 0, 2, 3]) { pos.push(...P[j]); uv.push(...U[j]); } // 바깥(위)을 보는 면이 앞면이 되게
     }
   }
   const g = new THREE.BufferGeometry();

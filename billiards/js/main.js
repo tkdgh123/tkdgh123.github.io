@@ -14,7 +14,7 @@ const store = {
   set(k, v) { try { localStorage.setItem("bill4." + k, JSON.stringify(v)); } catch {} },
 };
 const cfg = {
-  gain: store.get("gain", 1.0),        // 스트로크 감도 (1 = 마우스 1px에 큐 0.08mm)
+  gain: store.get("gain", 1.0),        // 스트로크 감도 (1 = 마우스 1px에 큐 0.2mm)
   aim: store.get("aim", 1.0),          // 마우스 감도 (둘러보기, 겨냥, 눈높이)
   lock: store.get("lock", false),      // 스트로크 고정: 치는 동안 큐가 옆으로 안 흔들림
   vol: store.get("vol", 0.8),
@@ -159,10 +159,11 @@ $("#start").addEventListener("click", () => {
   drawBoard(); hud(); closeMenu();
 });
 $("#resume").addEventListener("click", () => { readCfg(); closeMenu(); });
-function openMenu() { mode = mode === "menu" ? "menu" : mode; $("#menu").hidden = false; $("#resume").hidden = !game; if (document.pointerLockElement) document.exitPointerLock(); }
-function closeMenu() { $("#menu").hidden = true; lock(); }
-function lock() { if (TEST) return; const r = canvas.requestPointerLock?.({ unadjustedMovement: true }); if (r?.catch) r.catch(() => canvas.requestPointerLock()); }
-canvas.addEventListener("click", () => { if ($("#menu").hidden && !document.pointerLockElement) lock(); });
+function openMenu() { mode = mode === "menu" ? "menu" : mode; $("#menu").hidden = false; $("#resume").hidden = !game; canvas.style.cursor = ""; if (document.pointerLockElement) document.exitPointerLock(); }
+function closeMenu() { $("#menu").hidden = true; canvas.style.cursor = "none"; lock(); }
+// 마우스 포인터를 숨기고 화면이 마우스를 따라 돌게. 잠금이 안 걸렸으면 다음 클릭이나 키에서 다시 걺
+// 손으로 미는 느낌이 평소 마우스와 같도록 운영체제 가속을 그대로 씀
+function lock() { if (TEST || document.pointerLockElement === canvas || !$("#menu").hidden) return; try { canvas.requestPointerLock()?.catch?.(() => {}); } catch {} }
 document.addEventListener("pointerlockchange", () => { if (!document.pointerLockElement && !TEST && mode !== "chalk") openMenu(); });
 
 // ---------- 뱅킹 (둘이 칠 때 선공 정하기) ----------
@@ -519,14 +520,14 @@ function onMove(dx, dy) {
   if (mode === "chalk") return chalkMove(dx, dy);
   if (mode === "aim" || mode === "roll") {
     if (stroke.on && !stroke.hit && mode === "aim") {
-      const g = 0.00008 * cfg.gain;
+      const g = 0.0002 * cfg.gain;
       stroke.s = Math.min(0.32, stroke.s + dy * g);
       if (!cfg.lock) stroke.dl += dx * g / 0.95 * (st.rest ? 1.8 : 1);
       stroke.hist.push({ t: performance.now(), s: stroke.s }); if (stroke.hist.length > 40) stroke.hist.shift();
       strokeUpdate();
       return;
     }
-    if (stroke.on && stroke.hit) { stroke.s = Math.max(-0.22, Math.min(0.32, stroke.s + dy * 0.00008 * cfg.gain)); return; }
+    if (stroke.on && stroke.hit) { stroke.s = Math.max(-0.22, Math.min(0.32, stroke.s + dy * 0.0002 * cfg.gain)); return; }
     if (rmb || mode === "roll") { st.headYaw -= dx * 0.0013 * cfg.aim; st.headPitch = Math.max(-0.9, Math.min(0.9, st.headPitch - dy * 0.0013 * cfg.aim)); return; }
     const fine = keys.has("ShiftLeft") || keys.has("ShiftRight") ? 0.1 : 1;
     st.phi -= dx * 0.0005 * fine * cfg.aim;
@@ -535,9 +536,10 @@ function onMove(dx, dy) {
   }
 }
 let rmb = false;
-addEventListener("mousemove", (e) => { if (document.pointerLockElement === canvas || TEST) onMove(e.movementX, e.movementY); });
+addEventListener("mousemove", (e) => { if (document.pointerLockElement === canvas || TEST || ($("#menu").hidden && mode !== "menu")) onMove(e.movementX, e.movementY); });
 addEventListener("mousedown", (e) => {
   SND.unlock();
+  lock();
   if (!$("#menu").hidden) return;
   if (e.button === 2) { rmb = true; return; }
   if (e.button !== 0) return;
@@ -557,6 +559,7 @@ addEventListener("mouseup", (e) => {
 addEventListener("contextmenu", (e) => e.preventDefault());
 addEventListener("keydown", (e) => {
   SND.unlock();
+  if (e.code !== "Escape") lock();
   if (!$("#menu").hidden) { if (e.code === "Escape" && game) closeMenu(); return; }
   if (e.code === "Tab") { e.preventDefault(); $("#score").hidden = false; renderScore(); return; }
   keys.add(e.code);
@@ -645,4 +648,4 @@ placeBalls(R4.opening(p, 0));
 requestAnimationFrame(frame);
 
 // 시험용 손잡이 (?test 일 때 봇이 같은 입력 길로 침)
-window.__bill = { place: (pos) => placeBalls(pos), get p() { return p; }, get balls() { return balls; }, get mode() { return mode; }, get sim() { return sim; }, get game() { return game; }, st, stroke, me, onMove, tryStance, stand, keys, shotLog, get stance() { return stance; }, updateStance, camera, renderer, P, tipCov, get cueSpec() { return cueSpec; }, holdCue, openChalk, closeChalk, chalkSt, tipCoverage, renderScore, get lastShot() { return lastShot; } };
+window.__bill = { place: (pos) => placeBalls(pos), get world() { return world; }, get p() { return p; }, get balls() { return balls; }, get mode() { return mode; }, get sim() { return sim; }, get game() { return game; }, st, stroke, me, onMove, tryStance, stand, keys, shotLog, get stance() { return stance; }, updateStance, camera, renderer, P, tipCov, get cueSpec() { return cueSpec; }, holdCue, openChalk, closeChalk, chalkSt, tipCoverage, renderScore, get lastShot() { return lastShot; } };
