@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>당구 4구</title>
+<meta name="description" content="1인칭 3D 4구 당구. 길 안내선 없이 직접 엎드려 겨냥하고 마우스로 큐를 밀어 쳐요.">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js"}}</script>
+<style>
+:root { --ink: #ecebe6; --ink-2: #a6a59f; --panel: rgba(16,17,19,.9); --line: #2e3136; --blue: #2b5fa8; --lamp: #ffe7b8;
+  --ui: "Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif }
+[hidden] { display: none !important }
+* { box-sizing: border-box }
+html, body { margin: 0; height: 100%; background: #0c0d0e; color: var(--ink); font: 15px/1.5 var(--ui); overflow: hidden; user-select: none; -webkit-user-select: none }
+#gl { position: fixed; inset: 0; width: 100%; height: 100%; display: block; cursor: crosshair }
+#turn { position: fixed; top: calc(14px + env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%); font-weight: 600; font-size: 15px; padding: 6px 14px; background: rgba(0,0,0,.45); border-radius: 6px; white-space: nowrap; pointer-events: none }
+#msg { position: fixed; top: 24%; left: 50%; transform: translateX(-50%); max-width: min(92vw, 680px); text-align: center; font-size: 19px; font-weight: 600; padding: 10px 18px; background: rgba(0,0,0,.55); border-radius: 8px; pointer-events: none; text-shadow: 0 1px 2px #000 }
+#tip { position: fixed; right: 18px; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); width: 120px; height: 120px; pointer-events: none }
+#dot { position: fixed; left: 50%; top: 50%; width: 4px; height: 4px; margin: -2px; border-radius: 2px; background: rgba(255,255,255,.55); pointer-events: none }
+.panel { position: fixed; inset: 0; display: grid; place-items: center; background: rgba(6,7,8,.72); padding: 16px; overflow: auto }
+.card { width: min(560px, 100%); background: var(--panel); border-radius: 10px; padding: 28px 28px 24px; box-shadow: 0 30px 80px -20px #000 }
+h1 { margin: 0 0 4px; font-size: 40px; font-weight: 300; letter-spacing: -.02em } h1 b { font-weight: 800; color: var(--lamp) }
+.sub { color: var(--ink-2); margin: 0 0 22px }
+.seg { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--line); border-radius: 7px; overflow: hidden; margin-bottom: 18px }
+.seg button { font: 600 15px var(--ui); color: var(--ink-2); background: transparent; border: 0; padding: 12px; cursor: pointer }
+.seg button[aria-pressed="true"] { background: #23272d; color: var(--ink) }
+.row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--line) }
+.row label { color: var(--ink-2) }
+select, input[type=range] { font: 15px var(--ui); color: var(--ink); background: #1c1f23; border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px }
+input[type=range] { padding: 0; width: 150px; accent-color: var(--blue) }
+.sw { appearance: none; width: 42px; height: 24px; border-radius: 12px; background: #3a3d42; position: relative; cursor: pointer; transition: background .2s }
+.sw::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 9px; background: #fff; transition: left .2s }
+.sw:checked { background: var(--blue) } .sw:checked::after { left: 21px }
+.go { display: flex; gap: 10px; margin-top: 22px }
+.go button { flex: 1; font: 700 16px var(--ui); padding: 13px; border-radius: 7px; border: 0; cursor: pointer; background: var(--lamp); color: #1b1712 }
+.go button.ghost { background: #23272d; color: var(--ink) }
+.keys { margin-top: 18px; color: var(--ink-2); font-size: 13.5px; line-height: 1.75 }
+kbd { font: 600 12px var(--ui); background: #2a2d31; border-radius: 4px; padding: 1px 6px; border-bottom: 2px solid #111; color: var(--ink) }
+a.plan { color: #8fb6ff; font-size: 13.5px }
+#help { position: fixed; left: 16px; top: calc(56px + env(safe-area-inset-top, 0px)); background: rgba(0,0,0,.55); border-radius: 8px; padding: 12px 16px; font-size: 13px; line-height: 1.8; color: var(--ink-2); pointer-events: none }
+#score table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums }
+#score th, #score td { text-align: left; padding: 7px 8px 7px 0; border-bottom: 1px solid var(--line) }
+#score th { color: var(--ink-2); font-weight: 500; font-size: 13px }
+#scoreLog { white-space: pre-wrap; color: var(--ink-2); font-size: 13px; margin-top: 12px }
+#chalkWrap { position: fixed; inset: 0; display: grid; place-items: center; background: radial-gradient(circle at 50% 45%, rgba(30,32,36,.75), rgba(4,5,6,.92)); pointer-events: none }
+#chalkWrap p { position: absolute; bottom: 12%; width: 100%; text-align: center; color: var(--ink-2) }
+#chalk { width: min(60vmin, 520px); height: min(60vmin, 520px) }
+</style>
+</head>
+<body>
+<canvas id="gl"></canvas>
+<div id="dot"></div>
+<div id="turn"></div>
+<div id="msg" hidden></div>
+<canvas id="tip" width="240" height="240"></canvas>
+
+<div id="help" hidden>
+  서서 <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 걷기, 마우스 둘러보기, <kbd>Space</kbd> 엎드리기, <kbd>E</kbd> 큐걸이에서 큐 집기<br>
+  엎드려 마우스 좌우 겨냥, 위아래 눈높이, <kbd>Shift</kbd> 미세 겨냥, <kbd>Q</kbd><kbd>E</kbd> 한 칸<br>
+  <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 당점, <kbd>R</kbd><kbd>F</kbd> 큐 뒤 들기, 오른쪽 단추 누른 채 고개 돌리기<br>
+  왼쪽 단추를 누른 채 마우스를 당겼다 밀면 쳐요<br>
+  <kbd>C</kbd> 초크, <kbd>Tab</kbd> 점수, <kbd>H</kbd> 이 설명 닫기, <kbd>Esc</kbd> 메뉴
+</div>
+
+<div id="score" class="panel" hidden><div class="card">
+  <table><thead><tr><th>이름</th><th>공</th><th>수지</th><th>남은</th><th>득점</th><th>이닝</th><th>하이런</th><th>파울</th></tr></thead><tbody id="scoreBody"></tbody></table>
+  <div id="scoreLog"></div>
+</div></div>
+
+<div id="chalkWrap" hidden><canvas id="chalk"></canvas><p>왼쪽 단추를 누른 채 초크를 팁 위로 쓸어요. 다 칠했으면 <kbd>C</kbd></p></div>
+
+<div id="menu" class="panel"><div class="card">
+  <h1>당구 <b>4구</b></h1>
+  <p class="sub">국내식 중대, 65.5mm 공. 길 안내 없이 직접 엎드려 봐요.</p>
+  <div class="seg"><button type="button" data-mode="solo">혼자 연습</button><button type="button" data-mode="duo">둘이 번갈아</button></div>
+  <div class="row"><label for="suji1">1번 수지</label><select id="suji1"></select></div>
+  <div class="row" id="p2row"><label for="suji2">2번 수지</label><select id="suji2"></select></div>
+  <div class="row"><label for="optTable">테이블</label><select id="optTable"><option>중대</option><option>대대</option></select></div>
+  <div class="row"><label for="optBall">공 지름</label><select id="optBall"><option value="65.5">65.5mm</option><option value="63">63mm</option></select></div>
+  <div class="row"><label for="optGain">스트로크 감도</label><input id="optGain" type="range" min="0.4" max="2.5" step="0.05"></div>
+  <div class="row"><label for="optAim">겨냥 감도</label><input id="optAim" type="range" min="0.3" max="2" step="0.05"></div>
+  <div class="row"><label for="optTip">당점 그림 보이기</label><input id="optTip" class="sw" type="checkbox"></div>
+  <div class="go"><button type="button" id="resume" class="ghost" hidden>이어서</button><button type="button" id="start">새 게임</button></div>
+  <div class="keys">
+    <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 걷기 &nbsp; <kbd>Space</kbd> 엎드리기 &nbsp; 마우스 위아래 눈높이<br>
+    엎드려서 <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 당점 &nbsp; 왼쪽 단추 누른 채 당겼다 밀기 &nbsp; <kbd>C</kbd> 초크 &nbsp; <kbd>H</kbd> 조작 전체
+  </div>
+  <p style="margin:14px 0 0"><a class="plan" href="plan.html">기획서 보기</a></p>
+</div></div>
+
+<script type="module" src="js/main.js"></script>
+<script src="../hub/back.js" data-cat="game" defer></script>
+</body>
+</html>

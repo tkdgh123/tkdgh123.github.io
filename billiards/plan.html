@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>당구 4구 기획</title>
+<meta name="description" content="1인칭 3D 4구 당구 기획. 실제 규격, 물리, 규칙, 만드는 순서">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+:root {
+  --bg: #121315; --panel: #1b1d20; --ink: #ecebe6; --ink-2: #a6a59f; --rule: #2c2f33;
+  --cloth: #1f58a8; --cloth-2: #17447f; --wood: #4a2f1f; --lamp: #ffe7b8; --red: #c8231f; --yel: #f2c230;
+  --ui: "Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif;
+}
+* { box-sizing: border-box }
+html { background: var(--bg) }
+body { margin: 0; color: var(--ink); font: 16px/1.65 var(--ui); background: var(--bg); padding-inline: 20px }
+main { max-width: 1060px; margin: 0 auto; padding-block: 56px 120px }
+h1 { font-size: clamp(34px, 6vw, 60px); line-height: 1.1; font-weight: 300; margin: 0 0 18px; letter-spacing: -.02em }
+h1 b { font-weight: 800; color: var(--lamp) }
+.lead { font-size: 19px; color: var(--ink-2); max-width: 42em; margin: 0 }
+.lead b { color: var(--ink); font-weight: 600 }
+section { margin-top: 88px }
+h2 { font-size: 28px; font-weight: 700; margin: 0 0 6px; letter-spacing: -.01em }
+.sub { color: var(--ink-2); margin: 0 0 28px }
+h3 { font-size: 18px; margin: 32px 0 10px; font-weight: 700 }
+p { margin: 0 0 12px }
+.fig { background: radial-gradient(ellipse at 50% 0%, #2a2a26 0%, var(--panel) 70%); border-radius: 6px; padding: 24px; overflow-x: auto }
+.fig svg { display: block; width: 100%; height: auto; min-width: 640px }
+.cap { color: var(--ink-2); font-size: 14px; margin-top: 10px }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 28px 40px }
+table { border-collapse: collapse; width: 100%; font-size: 15px }
+.tw { overflow-x: auto }
+th, td { text-align: left; padding: 9px 12px 9px 0; border-bottom: 1px solid var(--rule); vertical-align: top }
+th { color: var(--ink-2); font-weight: 500; font-size: 13px }
+td:first-child { white-space: nowrap }
+td.n { font-variant-numeric: tabular-nums; white-space: nowrap; font-weight: 600 }
+.src { color: var(--ink-2); font-size: 13px }
+kbd { font: 600 13px var(--ui); background: #2a2d31; border-radius: 4px; padding: 2px 7px; border-bottom: 2px solid #111 }
+.flow { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 2px; margin-top: 8px }
+.flow div { background: var(--panel); padding: 16px 14px 18px }
+.flow div:first-child { border-radius: 6px 0 0 6px } .flow div:last-child { border-radius: 0 6px 6px 0 }
+.flow strong { display: block; font-size: 17px; margin-bottom: 6px; color: var(--lamp) }
+.flow span { color: var(--ink-2); font-size: 14px; line-height: 1.5; display: block }
+.big { display: flex; flex-wrap: wrap; gap: 12px 44px; margin: 26px 0 8px }
+.big div { min-width: 120px }
+.big b { display: block; font-size: 38px; font-weight: 300; line-height: 1.1; font-variant-numeric: tabular-nums }
+.big span { color: var(--ink-2); font-size: 14px }
+.no { background: #24181a; border-left: 3px solid var(--red); padding: 16px 20px; border-radius: 0 6px 6px 0 }
+.no p:last-child, .yes p:last-child { margin: 0 }
+.yes { background: #16202b; border-left: 3px solid var(--cloth); padding: 16px 20px; border-radius: 0 6px 6px 0 }
+ol.steps { padding: 0; margin: 0; list-style: none; counter-reset: s }
+ol.steps li { counter-increment: s; display: grid; grid-template-columns: 44px 1fr; gap: 4px 12px; padding: 16px 0; border-bottom: 1px solid var(--rule) }
+ol.steps li::before { content: counter(s); grid-row: span 2; font-size: 26px; font-weight: 300; color: var(--lamp) }
+ol.steps b { font-size: 17px }
+ol.steps span { color: var(--ink-2); font-size: 15px }
+ul { padding-left: 20px; margin: 0 0 12px } li { margin: 4px 0 }
+a { color: #8fb6ff }
+@media (max-width: 560px) { body { font-size: 15px } .lead { font-size: 17px } section { margin-top: 64px } .fig { padding: 14px } }
+</style>
+</head>
+<body>
+<main>
+
+<h1>1인칭 <b>4구</b>, 길 안내 없이</h1>
+<p class="lead">국내식 중대 위에서 <b>65.5mm 공 네 개</b>로 칩니다. 테이블 둘레를 걸어 자리를 잡고, 엎드려 눈높이를 직접 내려 보고, 마우스로 큐를 당겼다 밀어 칩니다. 공 길을 그려 주는 선과 힘 막대는 없습니다.</p>
+
+<div class="big">
+  <div><b>2448 × 1224</b><span>중대 경기면 mm</span></div>
+  <div><b>65.5</b><span>공 지름 mm, 255g</span></div>
+  <div><b>40</b><span>쿠션 높이 mm</span></div>
+  <div><b>306</b><span>포인트 간격 mm</span></div>
+</div>
+
+<!-- ───────── 장비 ───────── -->
+<section id="gear">
+<h2>장비</h2>
+<p class="sub">숫자는 대한당구연맹 총칙, UMB 규칙, 국내 당구 재료상과 큐 회사 자료에서 가져왔습니다.</p>
+
+<div class="fig">
+<svg viewBox="-1460 -800 2920 1660" role="img" aria-label="국내식 중대와 초구 배치를 실제 비율로 그린 그림">
+  <defs>
+    <radialGradient id="gW" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#cfcabd"/></radialGradient>
+    <radialGradient id="gY" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#ffe58a"/><stop offset="1" stop-color="#d29a10"/></radialGradient>
+    <radialGradient id="gR" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#ff6a5a"/><stop offset="1" stop-color="#8e1410"/></radialGradient>
+    <linearGradient id="gC" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2163b8"/><stop offset="1" stop-color="#1a4f95"/></linearGradient>
+  </defs>
+  <!-- 바깥 틀 2700 x 1500 -->
+  <rect x="-1350" y="-750" width="2700" height="1500" rx="40" fill="#4a2f1f"/>
+  <rect x="-1350" y="-750" width="2700" height="1500" rx="40" fill="none" stroke="#6b4630" stroke-width="6"/>
+  <!-- 쿠션 고무 -->
+  <rect x="-1259" y="-647" width="2518" height="1294" fill="#173f78"/>
+  <!-- 경기면 -->
+  <rect x="-1224" y="-612" width="2448" height="1224" fill="url(#gC)"/>
+  <!-- 포인트: 긴 쪽 7개, 짧은 쪽 3개 -->
+  <g fill="#f1ead8">
+    <circle cx="-918" cy="-690" r="11"/><circle cx="-612" cy="-690" r="11"/><circle cx="-306" cy="-690" r="11"/><circle cx="0" cy="-690" r="11"/><circle cx="306" cy="-690" r="11"/><circle cx="612" cy="-690" r="11"/><circle cx="918" cy="-690" r="11"/>
+    <circle cx="-918" cy="690" r="11"/><circle cx="-612" cy="690" r="11"/><circle cx="-306" cy="690" r="11"/><circle cx="0" cy="690" r="11"/><circle cx="306" cy="690" r="11"/><circle cx="612" cy="690" r="11"/><circle cx="918" cy="690" r="11"/>
+    <circle cx="-1295" cy="-306" r="11"/><circle cx="-1295" cy="0" r="11"/><circle cx="-1295" cy="306" r="11"/>
+    <circle cx="1295" cy="-306" r="11"/><circle cx="1295" cy="0" r="11"/><circle cx="1295" cy="306" r="11"/>
+  </g>
+  <!-- 둘째 포인트 줄 -->
+  <g stroke="#ffffff" stroke-opacity=".18" stroke-width="3" stroke-dasharray="14 14">
+    <line x1="-612" y1="-612" x2="-612" y2="612"/><line x1="612" y1="-612" x2="612" y2="612"/><line x1="-1224" y1="0" x2="1224" y2="0"/>
+  </g>
+  <!-- 공 (지름 65.5, 실제 크기) -->
+  <circle cx="-612" cy="0" r="32.75" fill="url(#gR)"/>
+  <circle cx="612" cy="0" r="32.75" fill="url(#gR)"/>
+  <circle cx="-612" cy="153" r="32.75" fill="url(#gW)"/>
+  <circle cx="1181" cy="0" r="32.75" fill="url(#gY)"/>
+  <!-- 글자 -->
+  <g font-family="Pretendard Variable, sans-serif" font-size="44" fill="#ecebe6">
+    <text x="-612" y="-70" text-anchor="middle">빨간 공</text>
+    <text x="612" y="-70" text-anchor="middle">빨간 공</text>
+    <text x="-612" y="240" text-anchor="middle">내 공 (반 포인트 옆)</text>
+    <text x="1120" y="-70" text-anchor="end">상대 공</text>
+    <text x="0" y="820" text-anchor="middle" fill="#a6a59f">경기면 2448 mm, 바깥 약 2700 mm</text>
+    <text x="-1400" y="0" text-anchor="middle" fill="#a6a59f" transform="rotate(-90 -1400 0)">1224 mm</text>
+    <text x="-1110" y="-560" fill="#a6a59f" font-size="36">치는 사람 쪽</text>
+  </g>
+</svg>
+</div>
+<p class="cap">실제 비율 그대로입니다. 빨간 공은 양쪽 둘째 포인트 줄 가운데, 내 공은 앞 빨간 공에서 반 포인트(153mm) 옆, 상대 공은 먼 쪽 단쿠션 가운데. 포인트는 경기면 길이의 1/8마다 하나씩, 긴 쪽 7개 짧은 쪽 3개.</p>
+
+<div class="grid" style="margin-top:36px">
+<div>
+<h3>테이블</h3>
+<div class="tw"><table>
+<tr><th>항목</th><th>값</th><th>쓰는 곳</th></tr>
+<tr><td>중대 경기면</td><td class="n">2448 × 1224 mm</td><td>4구 기본</td></tr>
+<tr><td>대대 경기면</td><td class="n">2844 × 1422 mm</td><td>설정에서 바꿈, 3구 때 기본</td></tr>
+<tr><td>쿠션 코끝 높이</td><td class="n">40 mm</td><td>공 중심보다 7.25mm 위를 때림</td></tr>
+<tr><td>틀 높이</td><td class="n">800 mm</td><td>규정 750~850 가운데</td></tr>
+<tr><td>틀 폭</td><td class="n">약 130 mm</td><td>레일 브리지, 큐 걸림</td></tr>
+<tr><td>천</td><td class="n">울 90% 파란 천</td><td>히터로 30~36도, 빠른 천</td></tr>
+</table></div>
+</div>
+<div>
+<h3>공</h3>
+<svg viewBox="0 0 300 90" style="width:100%;max-width:360px;height:auto" role="img" aria-label="공 크기 비교">
+  <circle cx="45" cy="45" r="32.75" fill="#e9e5da"/><circle cx="135" cy="49" r="30.75" fill="#e9e5da" opacity=".55"/><circle cx="220" cy="51.4" r="28.6" fill="#e9e5da" opacity=".3"/>
+  <g font-family="Pretendard Variable, sans-serif" font-size="11" fill="#a6a59f" text-anchor="middle"><text x="45" y="45">4구</text><text x="135" y="49">3구</text><text x="220" y="52">포켓</text></g>
+</svg>
+<div class="tw"><table>
+<tr><th>종류</th><th>지름</th><th>무게</th></tr>
+<tr><td>4구 (흰, 노랑, 빨강 2)</td><td class="n">65.5 mm</td><td class="n">255 g</td></tr>
+<tr><td>3구 쓰리쿠션</td><td class="n">61.5 mm</td><td class="n">210 g</td></tr>
+<tr><td>포켓볼</td><td class="n">57.15 mm</td><td class="n">156~170 g</td></tr>
+</table></div>
+<p class="src">4구 공 무게는 한 벌 1015~1020g을 넷으로 나눈 값과 당구박사 자료가 같습니다. 설정에 63mm 공도 둡니다.</p>
+</div>
+</div>
+
+<div class="grid" style="margin-top:12px">
+<div>
+<h3>큐 고르기</h3>
+<p>벽의 큐걸이에서 직접 집습니다. 무게와 샤프트 끝 무게가 공 속도와 휘어 나가는 정도(스쿼트)를 바꿉니다.</p>
+<div class="tw"><table>
+<tr><th>큐</th><th>무게</th><th>팁</th><th>특징</th></tr>
+<tr><td>하우스 큐 1</td><td class="n">540 g</td><td class="n">12 mm 하드</td><td>샤프트가 무거워 옆 당점에서 많이 밀림</td></tr>
+<tr><td>하우스 큐 2</td><td class="n">520 g</td><td class="n">11.5 mm 미디엄</td><td>가볍고 팁이 조금 닳음</td></tr>
+<tr><td>개인 카본 큐</td><td class="n">525 g</td><td class="n">12 mm 미디엄</td><td>저편향, 스쿼트가 절반쯤</td></tr>
+</table></div>
+<p class="src">길이 140~145cm, 무게 520~545g, 팁 11.5~12mm (Kozoom, 빌리어즈). 스쿼트는 Dr. Dave TP A.31 식.</p>
+</div>
+<div>
+<h3>초크</h3>
+<p>파란 초크를 팁에 직접 칠합니다. <kbd>C</kbd>를 누르면 일어나 큐 끝을 눈앞에 들고, 마우스로 초크를 팁 위에 쓸어 바릅니다. 칠한 자리만 파래집니다.</p>
+<ul>
+<li>한 번 칠 때마다 팁 마찰이 회복되고, 칠 때마다 닿은 자리부터 닳습니다.</li>
+<li>초크를 돌려 비비면 떡져서 덜 묻습니다.</li>
+<li>마찰이 줄면 옆으로 벗길 수 있는 당점 한계가 줄어 미스큐가 납니다. 미스큐가 나면 공에 초크 자국이 남습니다.</li>
+</ul>
+<p class="src">미스큐 한계 = 팁 마찰 μ / √(1+μ²) × 반지름. μ 0.6이면 0.51배 (Shepard, Dr. Dave TP 2.1).</p>
+</div>
+</div>
+</section>
+
+<!-- ───────── 치는 순서 ───────── -->
+<section id="play">
+<h2>치는 순서</h2>
+<p class="sub">당구장에서 사람이 하는 순서를 그대로 옮겼습니다.</p>
+<div class="flow">
+  <div><strong>걷기</strong><span>테이블 둘레를 돌며 공 배치를 봅니다. 서 있는 눈높이 약 1.65m.</span></div>
+  <div><strong>엎드리기</strong><span>수구 뒤에서 자세를 잡습니다. 몸이 테이블이나 벽에 걸리면 못 엎드립니다.</span></div>
+  <div><strong>눈높이</strong><span>머리를 내리면 큐 위로 공을 겨눠 보고, 올리면 배치 전체가 보입니다.</span></div>
+  <div><strong>당점</strong><span>팁을 공 위아래 좌우로 옮깁니다. 엎드린 눈으로 보이는 그대로.</span></div>
+  <div><strong>스트로크</strong><span>마우스를 당겼다 밉니다. 예비 스트로크는 몇 번이든.</span></div>
+  <div><strong>지켜보기</strong><span>쳐 놓고 엎드린 채 보거나 일어나 걸어가며 봅니다.</span></div>
+</div>
+
+<h3>조작 (노트북 마우스와 키보드)</h3>
+<div class="tw"><table>
+<tr><th>할 일</th><th>서 있을 때</th><th>엎드렸을 때</th></tr>
+<tr><td>움직이기, 보기</td><td><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 걷기, 마우스로 둘러보기</td><td>마우스 좌우 = 겨냥 방향, 마우스 위아래 = 눈높이</td></tr>
+<tr><td>자세</td><td><kbd>Space</kbd> 수구 쪽으로 엎드리기</td><td><kbd>Space</kbd> 일어나기</td></tr>
+<tr><td>미세 겨냥</td><td></td><td><kbd>Shift</kbd> 누른 채 마우스 = 10분의 1 속도, <kbd>Q</kbd><kbd>E</kbd> 한 칸씩</td></tr>
+<tr><td>당점</td><td></td><td><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 팁을 위 왼쪽 아래 오른쪽으로</td></tr>
+<tr><td>큐 뒤 들기</td><td></td><td><kbd>R</kbd> 들기 <kbd>F</kbd> 내리기 (찍어치기)</td></tr>
+<tr><td>치기</td><td></td><td>왼쪽 단추를 누른 채 마우스를 당겼다 밀기</td></tr>
+<tr><td>초크</td><td><kbd>C</kbd></td><td><kbd>C</kbd> (일어나서 칠함)</td></tr>
+<tr><td>점수판, 메뉴</td><td><kbd>Tab</kbd> <kbd>Esc</kbd></td><td><kbd>Tab</kbd> <kbd>Esc</kbd></td></tr>
+</table></div>
+
+<h3>스트로크가 힘이 되는 방식</h3>
+<p>팁이 공에 닿는 순간의 큐 속도가 그대로 힘입니다. 마우스를 민 속도를 큐 속도 0.2~5 m/s로 바꾸고, 큐 무게와 팁 반발로 공 속도를 계산합니다(큐 0.54kg, 공 0.255kg이면 공은 큐의 약 1.2배). 스트로크 중에 마우스가 옆으로 흔들리면 큐도 그만큼 비틀려 나갑니다. 사람마다 마우스 감도가 달라서 처음에 한 번 감도를 맞춥니다.</p>
+
+<h3>몸과 큐가 걸리는 것</h3>
+<ul>
+<li>수구가 쿠션에 붙어 있으면 큐가 레일에 걸려 뒤를 들어야 합니다. 큐를 들면 공에 아래로 누르는 힘이 들어가 휘어 나갑니다.</li>
+<li>큐 길에 다른 공이 있으면 그 공을 넘도록 큐를 들어야 합니다. 그대로 밀면 큐가 공을 건드려 파울입니다.</li>
+<li>벽이 가까운 자리는 큐 뒤끝이 벽에 걸립니다.</li>
+<li>테이블 가운데 공은 손이 안 닿으면 보조 브리지(레스트)를 씁니다. 두 발이 다 뜨는 자세는 파울입니다.</li>
+<li>공이 쿠션 가까이 있으면 브리지가 레일 브리지로 바뀌고, 앞에 공이 있으면 손을 세운 브리지가 됩니다.</li>
+</ul>
+</section>
+
+<!-- ───────── 물리 ───────── -->
+<section id="physics">
+<h2>공이 움직이는 방식</h2>
+<p class="sub">당구 물리 연구에 나온 식을 그대로 씁니다. 공이 서로 부딪히는 시각을 정확히 계산하는 사건 기반 방식입니다.</p>
+
+<div class="grid">
+<div>
+<svg viewBox="-80 -80 160 160" style="width:100%;max-width:300px;height:auto;display:block;margin:0 auto" role="img" aria-label="당점 그림">
+  <circle r="65.5" fill="#e9e5da"/>
+  <circle r="32.75" fill="none" stroke="#c8231f" stroke-width="1.4" stroke-dasharray="4 3"/>
+  <circle cx="0" cy="-22" r="12" fill="#2b5fa8" opacity=".85"/>
+  <line x1="-65.5" y1="0" x2="65.5" y2="0" stroke="#000" stroke-opacity=".12"/><line x1="0" y1="-65.5" x2="0" y2="65.5" stroke="#000" stroke-opacity=".12"/>
+  <g font-family="Pretendard Variable, sans-serif" font-size="9" fill="#ecebe6" text-anchor="middle">
+    <text y="-70">상단 = 밀어치기</text><text y="78">하단 = 끌어치기</text>
+  </g>
+  <text x="0" y="40" font-family="Pretendard Variable, sans-serif" font-size="8" fill="#8e1410" text-anchor="middle">미스큐 한계 (반지름 절반)</text>
+</svg>
+<p class="cap" style="text-align:center">공 지름을 2배로 키워 그렸습니다. 파란 원이 12mm 팁, 빨간 점선이 반지름 절반.</p>
+</div>
+<div>
+<div class="tw"><table>
+<tr><th>무엇</th><th>어떻게</th></tr>
+<tr><td>천 위</td><td>미끄러짐 마찰 0.2, 구름 저항 0.005, 옆 회전 감속 10 rad/s². 미끄러지던 공은 속도 5/7에서 구르기 시작합니다.</td></tr>
+<tr><td>쿠션</td><td>4구, 3구용으로 만든 Han(2005) 모델. 느린 공일수록 쿠션이 죽고(반발 0.46~0.77), 회전 방향에 따라 반사각이 길어지거나 짧아집니다.</td></tr>
+<tr><td>공과 공</td><td>반발 0.95, 표면 마찰은 미끄러지는 속도에 따라 0.01~0.11. 두께에 따라 1적구가 1~4도 끌려 나갑니다(쓰로우).</td></tr>
+<tr><td>큐와 공</td><td>당점에 따라 회전이 붙고, 옆 당점은 공을 반대쪽으로 밀어냅니다(스쿼트 0.5R에서 1.5~3.5도). 큐를 들면 휘어지고(마세), 많이 들면 튑니다.</td></tr>
+<tr><td>투터치</td><td>친 뒤에도 큐가 계속 나아갑니다. 붙어 있던 공에 막혀 수구가 큐 끝에 다시 닿으면 그대로 투터치입니다.</td></tr>
+</table></div>
+<p class="src">Dr. Dave 기술 증명 TP A.14, A.30, A.31, B.2. Han, J. Mech. Sci. Technol. 19(4) 2005. pooltool(Kiefl) 소스.</p>
+</div>
+</div>
+
+<h3>숫자로 맞춰 볼 것</h3>
+<ul>
+<li>구르는 공이 정지한 공을 반 두께로 맞히면 수구가 33.7도 꺾이는지 (30도 규칙)</li>
+<li>당점 0.5R에서 스쿼트가 3.47도 나오는지 (샤프트 끝 무게 비 15)</li>
+<li>Dr. Dave가 계산한 수구 이동 거리 5개(포켓 테이블 조건)를 같은 조건으로 재현하는지</li>
+<li>러닝 회전이면 쿠션 반사각이 길어지고 속도가 늘며, 반대 회전이면 짧아지는지</li>
+</ul>
+<p>캐롬 천 마찰은 실측 자료가 한 편뿐이라 위 숫자는 시작값입니다. 공이 한 테이블을 몇 번 오가는지 같은 감각으로 마지막에 맞춥니다.</p>
+</section>
+
+<!-- ───────── 규칙 ───────── -->
+<section id="rules">
+<h2>4구 규칙</h2>
+<p class="sub">동네 당구장에서 흔히 치는 방식입니다.</p>
+<div class="grid">
+<div>
+<h3>득점과 차례</h3>
+<ul>
+<li>내 수구로 빨간 공 두 개를 다 맞히면 1점. 순서와 쿠션 수는 상관없습니다.</li>
+<li>득점하면 계속 치고, 못 하면 차례가 넘어갑니다.</li>
+<li>수지(다마수)를 30, 50, 80, 100, 120, 150, 200, 250, 300, 400, 500 가운데 고릅니다. 수지의 1/10에서 시작해 1점씩 줄어듭니다.</li>
+<li>둘이 칠 때는 뱅킹으로 선공을 정합니다. 앞 단쿠션에 맞고 돌아와 자기 쪽 단쿠션에 더 가까이 선 사람이 고릅니다. 선공은 흰 공.</li>
+</ul>
+<h3>마무리</h3>
+<p>점수를 다 풀면 쓰리쿠션으로 끝냅니다. 두 번째 빨간 공을 맞히기 전에 수구가 쿠션을 3번 이상 맞아야 합니다. 실패하면 차례가 넘어가고 다음 차례에 다시 마무리를 노립니다. 수지 30은 마무리가 없습니다.</p>
+</div>
+<div>
+<h3>파울</h3>
+<div class="tw"><table>
+<tr><th>파울</th><th>게임이 알아채는 방법</th></tr>
+<tr><td>상대 공을 맞힘</td><td>수구와 상대 공 충돌</td></tr>
+<tr><td>공이 대 밖으로</td><td>뜬 공이 틀 밖에 떨어짐, 초구 자리로 다시 놓음</td></tr>
+<tr><td>투터치</td><td>큐 끝과 수구가 두 번 닿음</td></tr>
+<tr><td>큐로 다른 공을 건드림</td><td>큐 몸통과 공 충돌</td></tr>
+<tr><td>두 발이 뜸</td><td>손이 안 닿는 거리를 레스트 없이 침</td></tr>
+</table></div>
+<p>수지 50 이상은 파울하면 남은 점수에 1점이 더해집니다. 파울한 샷의 득점은 없고 차례가 넘어갑니다. 공이 멈추기 전에는 엎드릴 수 없게 막습니다.</p>
+</div>
+</div>
+</section>
+
+<!-- ───────── 화면 ───────── -->
+<section id="screen">
+<h2>화면에 나오는 것</h2>
+<div class="grid">
+<div class="no">
+<p><b>없는 것</b></p>
+<p>공 길 예상선, 두께 표시, 힘 막대, 위에서 내려다보는 겨냥 화면. 시중 당구 게임에 있는 도움은 모두 뺍니다.</p>
+</div>
+<div class="yes">
+<p><b>있는 것</b></p>
+<p>벽에 걸린 당구장 전자 점수판, 팁에 묻은 초크 색, 엎드린 눈으로 보이는 큐 끝. 당점은 작은 공 그림으로 띄우되 설정에서 끌 수 있습니다.</p>
+</div>
+</div>
+<p style="margin-top:20px">당구장은 등박스 조명(4000K, 테이블 위 2500 lux 안팎) 아래 파란 천, 큐걸이, 점수판, 옆 테이블 두어 대가 있는 방으로 만듭니다. 벽에 붙는 그림은 그림 AI로 따로 뽑습니다. 소리는 실제 녹음이 필요해서 쓸 녹음을 고른 뒤 내려받기 전에 여쭤봅니다.</p>
+</section>
+
+<!-- ───────── 순서 ───────── -->
+<section id="steps">
+<h2>만드는 순서</h2>
+<p class="sub">아래 단계부터 하나씩 쌓고, 단계마다 확인한 뒤 넘어갑니다.</p>
+<ol class="steps">
+<li><b>물리 엔진</b><span>화면 없이 공 운동만. 위 "숫자로 맞춰 볼 것" 네 가지를 시험으로 돌립니다.</span></li>
+<li><b>당구장과 테이블</b><span>실제 치수로 테이블, 공, 조명, 방. 걸어 다니며 보기.</span></li>
+<li><b>자세와 스트로크</b><span>엎드리기, 눈높이, 당점, 마우스 스트로크, 큐 걸림, 초크, 미스큐.</span></li>
+<li><b>4구 규칙과 점수판</b><span>혼자 연습, 둘이 번갈아, 뱅킹, 수지, 파울, 마무리.</span></li>
+<li><b>사람처럼 쳐 보기</b><span>1인칭 화면만 보고 겨냥하는 봇과 제가 직접 쳐서 판마다 기록. 같은 조건 5판 이상.</span></li>
+<li><b>소리와 다듬기</b><span>녹음 소리, 큐 고르기, 창업실 카드.</span></li>
+</ol>
+<p style="margin-top:20px;color:var(--ink-2)">3구(쓰리쿠션, 대대)와 포켓볼, 컴퓨터 상대는 4구를 확인받은 뒤 이어서 합니다.</p>
+</section>
+
+<section id="src">
+<h2>출처</h2>
+<p class="src">대한당구연맹 총칙(gbpa.or.kr), UMB 캐롬 규칙(ebc-billiard.com), 당구박사 당구용품과 규격, 금남당구재료, japong.com 당구대 규격과 매너, 빌리어즈 큐 밸런스와 팁, Kozoom 큐 고르는 법, Dr. Dave 물리 상수와 기술 증명, Han 2005, Mathavan 2010, Shepard, pooltool, mk2info 4구 규칙, 나무위키 당구, 영어 위키백과 Four-ball billiards, 브라보마이라이프 초구, 빌리어즈 4구 초구.</p>
+</section>
+
+</main>
+<script src="../hub/back.js" data-cat="game" defer></script>
+</body>
+</html>
