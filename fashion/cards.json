@@ -229,6 +229,18 @@
    "say": "같은 니트에서 색만 바꿨어요"
   },
   {
+   "id": "combos",
+   "u": 5,
+   "name": "색 조합",
+   "say": "한 벌 차림에서 색을 맞추는 방법"
+  },
+  {
+   "id": "patterns",
+   "u": 6,
+   "name": "무늬",
+   "say": "같은 셔츠 모양에 무늬만 바꿨어요"
+  },
+  {
    "id": "fibers",
    "u": 7,
    "name": "섬유",
@@ -8380,6 +8392,185 @@
    ]
   },
   {
+   "id": "tonetone",
+   "u": 5,
+   "g": "combos",
+   "ko": "톤온톤",
+   "en": "Tone-on-tone",
+   "say": "같은 색을 밝기만 다르게 겹치는 조합이에요.",
+   "look": "베이지, 카멜, 브라운처럼 한 색의 진하기 차이",
+   "where": "미니멀, 올드머니",
+   "shop": "톤온톤",
+   "pro": "톤온톤",
+   "casual": []
+  },
+  {
+   "id": "toneintone",
+   "u": 5,
+   "g": "combos",
+   "ko": "톤인톤",
+   "en": "Tone-in-tone",
+   "say": "색은 달라도 밝기와 탁하기를 비슷하게 맞춘 조합이에요.",
+   "look": "서로 다른 색이 모두 비슷하게 연하거나 탁함",
+   "where": "꾸안꾸, 내추럴",
+   "shop": "톤인톤",
+   "pro": "톤인톤",
+   "casual": []
+  },
+  {
+   "id": "monotone",
+   "u": 5,
+   "g": "combos",
+   "ko": "모노톤",
+   "en": "Monotone",
+   "say": "검정, 회색, 흰색 같은 무채색만 쓰는 조합이에요.",
+   "look": "색 없이 검정, 회색, 흰색만",
+   "where": "미니멀, 시티보이",
+   "shop": "모노톤",
+   "pro": "모노톤",
+   "casual": [
+    "모노크롬",
+    "원톤"
+   ]
+  },
+  {
+   "id": "pointcolor",
+   "u": 5,
+   "g": "combos",
+   "ko": "포인트 컬러",
+   "en": "Accent color",
+   "say": "차분한 색 사이에 한 곳만 강한 색을 넣는 조합이에요.",
+   "look": "무채색 사이의 한 가지 선명한 색",
+   "where": "2026 레드 포인트, 스트릿",
+   "shop": "포인트 컬러",
+   "pro": "액센트 컬러",
+   "casual": [
+    "포인트"
+   ]
+  },
+  {
+   "id": "stripe",
+   "u": 6,
+   "g": "patterns",
+   "ko": "스트라이프",
+   "en": "Stripe",
+   "say": "같은 간격으로 반복되는 줄무늬예요.",
+   "look": "같은 굵기로 반복되는 줄",
+   "where": "셔츠, 니트, 프레피",
+   "shop": "스트라이프",
+   "pro": "스트라이프",
+   "casual": [
+    "줄무늬"
+   ]
+  },
+  {
+   "id": "gingham",
+   "u": 6,
+   "g": "patterns",
+   "ko": "깅엄 체크",
+   "en": "Gingham",
+   "say": "흰색과 한 색이 같은 크기로 겹친 작은 바둑판 체크예요.",
+   "look": "두 색이 겹친 진한 칸이 생기는 작은 체크",
+   "where": "셔츠, 여름, 프레피",
+   "shop": "깅엄 체크",
+   "pro": "깅엄",
+   "casual": [
+    "기엄"
+   ]
+  },
+  {
+   "id": "glen",
+   "u": 6,
+   "g": "patterns",
+   "ko": "글렌 체크",
+   "en": "Glen check",
+   "say": "작은 체크 여러 개가 모여 큰 체크를 이루는 무늬예요.",
+   "look": "큰 체크 안에 잔 체크가 들어 있음",
+   "where": "재킷, 슬랙스, 올드머니",
+   "shop": "글렌 체크",
+   "pro": "글렌 체크",
+   "casual": [
+    "글렌플레이드",
+    "글렌플래드"
+   ]
+  },
+  {
+   "id": "tartan",
+   "u": 6,
+   "g": "patterns",
+   "ko": "타탄 체크",
+   "en": "Tartan",
+   "say": "여러 색 굵은 줄이 겹치는 스코틀랜드 체크예요.",
+   "look": "여러 색, 여러 굵기 선의 겹침",
+   "where": "플란넬, 스커트, 머플러",
+   "shop": "타탄 체크",
+   "pro": "타탄 체크",
+   "casual": [
+    "타탄"
+   ],
+   "same": "일부",
+   "diff": "타탄은 스코틀랜드 씨족 문양 체크이고 체크는 격자무늬 전체예요."
+  },
+  {
+   "id": "houndstooth",
+   "u": 6,
+   "g": "patterns",
+   "ko": "하운드투스",
+   "en": "Houndstooth",
+   "say": "개 이빨처럼 뾰족한 모양이 반복되는 체크예요.",
+   "look": "톱니 같은 네 갈래 무늬",
+   "where": "재킷, 코트, 올드머니",
+   "shop": "하운드투스",
+   "pro": "하운드투스",
+   "casual": [
+    "치도리"
+   ]
+  },
+  {
+   "id": "herringbone",
+   "u": 6,
+   "g": "patterns",
+   "ko": "헤링본",
+   "en": "Herringbone",
+   "say": "생선 뼈처럼 V자가 이어지는 짜임 무늬예요.",
+   "look": "세로로 이어진 V자 줄",
+   "where": "트위드 재킷, 코트, 헌팅캡",
+   "shop": "헤링본",
+   "pro": "헤링본",
+   "casual": [
+    "청어뼈",
+    "생선뼈 무늬"
+   ]
+  },
+  {
+   "id": "argyle",
+   "u": 6,
+   "g": "patterns",
+   "ko": "아가일",
+   "en": "Argyle",
+   "say": "마름모가 이어지고 가는 사선이 지나가는 무늬예요.",
+   "look": "마름모와 그 위를 지나는 가는 선",
+   "where": "니트 베스트, 양말, 프레피",
+   "shop": "아가일",
+   "pro": "아가일",
+   "casual": [
+    "다이아몬드 무늬"
+   ]
+  },
+  {
+   "id": "fairisle",
+   "u": 6,
+   "g": "patterns",
+   "ko": "페어아일",
+   "en": "Fair Isle",
+   "say": "여러 색 작은 무늬를 가로 띠로 짜 넣은 니트 무늬예요.",
+   "look": "가로 띠로 반복되는 작은 기하무늬",
+   "where": "겨울 니트, 빈티지",
+   "shop": "페어아일",
+   "pro": "페어 아일",
+   "casual": []
+  },
+  {
    "id": "cotton",
    "u": 7,
    "g": "fibers",
@@ -9031,6 +9222,21 @@
    "diff": "고어텍스는 방수 투습 막의 상표 이름이에요."
   },
   {
+   "id": "blend",
+   "u": 7,
+   "g": "special",
+   "ko": "혼방",
+   "en": "Blend",
+   "say": "두 가지 이상 섬유를 섞은 거예요. '울 30%'면 울이 30%뿐이고 나머지는 다른 섬유예요.",
+   "look": "소재 칸의 여러 섬유와 퍼센트",
+   "where": "니트, 코트",
+   "shop": "혼방",
+   "pro": "블렌드",
+   "casual": [
+    "혼용"
+   ]
+  },
+  {
    "id": "seotaiji",
    "u": 9,
    "g": "korea",
@@ -9260,6 +9466,40 @@
     {
      "w": "아이보리",
      "id": "ivory"
+    }
+   ]
+  },
+  {
+   "t": "헤링본 트위드 헌팅캡",
+   "parts": [
+    {
+     "w": "헤링본",
+     "id": "herringbone"
+    },
+    {
+     "w": "트위드",
+     "id": "tweed"
+    },
+    {
+     "w": "헌팅캡",
+     "id": "flatcap"
+    }
+   ]
+  },
+  {
+   "t": "글렌 체크 울 슬랙스",
+   "parts": [
+    {
+     "w": "글렌 체크",
+     "id": "glen"
+    },
+    {
+     "w": "울",
+     "id": "wool"
+    },
+    {
+     "w": "슬랙스",
+     "id": "slacks"
     }
    ]
   },
@@ -10638,6 +10878,7 @@
   "와플": "waffle",
   "린넨": "linen",
   "리넨": "linen",
+  "스트라이프": "stripe",
   "후리스": "fleece",
   "플리스": "fleece",
   "후드집업": "zipup",
@@ -10756,6 +10997,13 @@
   "틸": "teal",
   "에크루": "ecru",
   "오프화이트": "offwhite",
+  "깅엄": "gingham",
+  "글렌체크": "glen",
+  "타탄": "tartan",
+  "하운드투스": "houndstooth",
+  "헤링본": "herringbone",
+  "아가일": "argyle",
+  "페어아일": "fairisle",
   "트위드": "tweed",
   "옥스포드": "oxfordcloth",
   "옥스퍼드": "oxfordcloth",
@@ -11622,6 +11870,24 @@
   "살몬": "salmon",
   "연어색": "salmon",
   "인디언핑크": "salmon",
+  "톤온톤": "tonetone",
+  "톤인톤": "toneintone",
+  "모노톤": "monotone",
+  "모노크롬": "monotone",
+  "원톤": "monotone",
+  "포인트컬러": "pointcolor",
+  "액센트컬러": "pointcolor",
+  "포인트": "pointcolor",
+  "줄무늬": "stripe",
+  "깅엄체크": "gingham",
+  "기엄": "gingham",
+  "글렌플레이드": "glen",
+  "글렌플래드": "glen",
+  "타탄체크": "tartan",
+  "치도리": "houndstooth",
+  "청어뼈": "herringbone",
+  "생선뼈무늬": "herringbone",
+  "다이아몬드무늬": "argyle",
   "순면": "cotton",
   "양모": "wool",
   "마": "linen",
@@ -11702,6 +11968,9 @@
   "방수원단": "waterproof",
   "투습방수": "waterproof",
   "워터프루프": "waterproof",
+  "혼방": "blend",
+  "블렌드": "blend",
+  "혼용": "blend",
   "서태지와아이들차림": "seotaiji",
   "서태지": "seotaiji",
   "배기바지": "seotaiji",
