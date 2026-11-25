@@ -67,13 +67,13 @@ const check = (name, ok, info) => { console.log(`${ok ? "통과" : "실패"}  ${
 {
   const p = P.makeParams();
   const b = P.newBall(0, 0, 0, p);
-  const r = P.strike(b, { speed: 2, yaw: 0, elev: 0, a: 0.4, b: 0, M: 0.54, endRatio: 25 }, p);
+  const r = P.strike(b, { speed: 2, yaw: 0, elev: 0, a: 0.4, b: 0, M: 0.54, endRatio: 25 }, p, () => 0.5);
   check("오른쪽 당점", b.w[2] > 0 && b.v[1] > 0, `wz ${b.w[2].toFixed(1)} rad/s, 옆으로 ${deg(Math.atan2(b.v[1], b.v[0])).toFixed(2)}도`);
   const c = P.newBall(0, 0, 0, p);
-  P.strike(c, { speed: 2, yaw: 0, elev: 0, a: 0, b: 0.5, M: 0.54 }, p);
+  P.strike(c, { speed: 2, yaw: 0, elev: 0, a: 0, b: 0.5, M: 0.54 }, p, () => 0.5);
   check("위 당점 0.5R = 구름의 125%", Math.abs(c.w[1] * p.R / c.v[0] - 1.25) < 1e-6, `앞 회전 ${(c.w[1] * p.R / c.v[0] * 100).toFixed(0)}% (구름 100%)`);
   const d = P.newBall(0, 0, 0, p);
-  P.strike(d, { speed: 2, yaw: 0, elev: 0, a: 0, b: 0, M: 0.54 }, p);
+  P.strike(d, { speed: 2, yaw: 0, elev: 0, a: 0, b: 0, M: 0.54 }, p, () => 0.5);
   check("중심 타격 속도비", d.v[0] / 2 > 1.15 && d.v[0] / 2 < 1.25, `공/큐 ${(d.v[0] / 2).toFixed(3)}`);
   const e = P.newBall(0, 0, 0, p);
   const m = P.strike(e, { speed: 2, yaw: 0, elev: 0, a: 0.55, b: 0.2, M: 0.54, tipMu: 0.45 }, p, () => 0.5);

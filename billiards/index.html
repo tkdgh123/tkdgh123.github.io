@@ -57,10 +57,10 @@ a.plan { color: #8fb6ff; font-size: 13.5px }
 
 <div id="help" hidden>
   서서 <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 걷기, 마우스 둘러보기, <kbd>Space</kbd> 엎드리기, <kbd>E</kbd> 큐걸이에서 큐 집기<br>
-  엎드려 마우스 좌우 겨냥, 위아래 눈높이, <kbd>Shift</kbd> 미세 겨냥, <kbd>Q</kbd><kbd>E</kbd> 한 칸<br>
+  엎드려 마우스 좌우 겨냥, 위아래 눈높이(끝까지 내리면 턱이 큐에 닿아요), <kbd>Shift</kbd> 미세 겨냥, <kbd>Q</kbd><kbd>E</kbd> 한 칸<br>
   <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 당점, <kbd>R</kbd><kbd>F</kbd> 큐 뒤 들기, 오른쪽 단추 누른 채 고개 돌리기<br>
   왼쪽 단추를 누른 채 마우스를 당겼다 밀면 쳐요<br>
-  <kbd>C</kbd> 초크, <kbd>Tab</kbd> 점수, <kbd>H</kbd> 이 설명 닫기, <kbd>Esc</kbd> 메뉴
+  <kbd>X</kbd> 스트로크 고정 켜고 끄기, <kbd>C</kbd> 초크, <kbd>Tab</kbd> 점수, <kbd>H</kbd> 이 설명 닫기, <kbd>Esc</kbd> 메뉴
 </div>
 
 <div id="score" class="panel" hidden><div class="card">
@@ -79,12 +79,14 @@ a.plan { color: #8fb6ff; font-size: 13.5px }
   <div class="row"><label for="optTable">테이블</label><select id="optTable"><option>중대</option><option>대대</option></select></div>
   <div class="row"><label for="optBall">공 지름</label><select id="optBall"><option value="65.5">65.5mm</option><option value="63">63mm</option></select></div>
   <div class="row"><label for="optGain">스트로크 감도</label><input id="optGain" type="range" min="0.4" max="2.5" step="0.05"></div>
-  <div class="row"><label for="optAim">겨냥 감도</label><input id="optAim" type="range" min="0.3" max="2" step="0.05"></div>
+  <div class="row"><label for="optAim">마우스 감도</label><input id="optAim" type="range" min="0.3" max="2" step="0.05"></div>
+  <div class="row"><label for="optVol">소리 크기</label><input id="optVol" type="range" min="0" max="1.5" step="0.05"></div>
+  <div class="row"><label for="optLock">스트로크 고정 (큐가 옆으로 안 흔들림)</label><input id="optLock" class="sw" type="checkbox"></div>
   <div class="row"><label for="optTip">당점 그림 보이기</label><input id="optTip" class="sw" type="checkbox"></div>
   <div class="go"><button type="button" id="resume" class="ghost" hidden>이어서</button><button type="button" id="start">새 게임</button></div>
   <div class="keys">
     <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 걷기 &nbsp; <kbd>Space</kbd> 엎드리기 &nbsp; 마우스 위아래 눈높이<br>
-    엎드려서 <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 당점 &nbsp; 왼쪽 단추 누른 채 당겼다 밀기 &nbsp; <kbd>C</kbd> 초크 &nbsp; <kbd>H</kbd> 조작 전체
+    엎드려서 <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 당점 &nbsp; 왼쪽 단추 누른 채 당겼다 밀기 &nbsp; <kbd>X</kbd> 스트로크 고정 &nbsp; <kbd>C</kbd> 초크 &nbsp; <kbd>H</kbd> 조작 전체
   </div>
   <p style="margin:14px 0 0"><a class="plan" href="plan.html">기획서 보기</a></p>
 </div></div>

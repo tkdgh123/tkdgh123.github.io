@@ -3,6 +3,7 @@ import * as THREE from "three";
 import * as P from "./physics.js";
 import * as W from "./world.js";
 import * as R4 from "./rules4.js";
+import * as SND from "./sound.js";
 
 const $ = (s) => document.querySelector(s);
 const TEST = new URLSearchParams(location.search).has("test");
@@ -13,8 +14,10 @@ const store = {
   set(k, v) { try { localStorage.setItem("bill4." + k, JSON.stringify(v)); } catch {} },
 };
 const cfg = {
-  gain: store.get("gain", 1.0),        // 스트로크 감도 (1 = 마우스 1px에 큐 0.15mm)
-  aim: store.get("aim", 1.0),
+  gain: store.get("gain", 1.0),        // 스트로크 감도 (1 = 마우스 1px에 큐 0.08mm)
+  aim: store.get("aim", 1.0),          // 마우스 감도 (둘러보기, 겨냥, 눈높이)
+  lock: store.get("lock", false),      // 스트로크 고정: 치는 동안 큐가 옆으로 안 흔들림
+  vol: store.get("vol", 0.8),
   showTip: store.get("showTip", true),
   table: store.get("table", "중대"),
   ball: store.get("ball", 65.5),
@@ -37,7 +40,7 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 
 let world = W.buildWorld(renderer, p);
-const camera = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.02, 40);
+const camera = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.01, 40);
 camera.rotation.order = "YXZ";
 addEventListener("resize", () => { renderer.setSize(innerWidth, innerHeight); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); });
 
@@ -64,11 +67,18 @@ const hand = W.buildHand(); hand.visible = false; world.scene.add(hand);
 const tipCov = new Float32Array(32 * 32).fill(0.75);
 const tipCells = [];
 for (let j = 0; j < 32; j++) for (let i = 0; i < 32; i++) { const x = (i + 0.5) / 16 - 1, y = (j + 0.5) / 16 - 1; if (x * x + y * y <= 1) tipCells.push([j * 32 + i, x, y]); }
-const tipMuNow = () => {
-  let s = 0, n = 0; for (const [k, x, y] of tipCells) if (x * x + y * y < 0.4) { s += tipCov[k]; n++; }
-  return 0.25 + 0.40 * (s / n) * (cueSpec.worn ? 0.85 : 1);
-};
-function wearTip(speed) { for (const [k, x, y] of tipCells) if (x * x + y * y < 0.5) tipCov[k] *= Math.max(0.55, 0.82 - 0.025 * speed); }
+// 공에 닿는 팁 자리: 팁 끝은 반지름 약 9.5mm(10원 동전) 둥근 면이라 당점이 가장자리로 갈수록 팁 가장자리가 닿음
+// 초크 그림은 팁을 앞에서 본 모양: 오른쪽 당점(a>0)은 그림 오른쪽, 위 당점(b>0)은 그림 아래
+function tipSpot(a, b) { const k = 0.0095 / (cueSpec.tip / 2); return [a * k, b * k]; }
+function tipMuAt(a, b) {
+  const [sx, sy] = tipSpot(a, b);
+  let s = 0, n = 0; for (const [k, x, y] of tipCells) if (Math.hypot(x - sx, y - sy) < 0.3) { s += tipCov[k]; n++; }
+  return 0.25 + 0.40 * (n ? s / n : 0) * (cueSpec.worn ? 0.85 : 1);
+}
+function wearTip(speed, a, b) {
+  const [sx, sy] = tipSpot(a, b);
+  for (const [k, x, y] of tipCells) if (Math.hypot(x - sx, y - sy) < 0.35) tipCov[k] *= Math.max(0.55, 0.82 - 0.025 * speed);
+}
 
 // ---------- 게임 상태 ----------
 let game = null, mode = "menu", sim = null, simT = 0, shotInfo = null, banking = null;
@@ -121,7 +131,7 @@ const sujiSel = [$("#suji1"), $("#suji2")];
 for (const s of sujiSel) { for (const v of R4.SUJI) s.add(new Option(v, v)); s.value = 100; }
 $("#suji1").value = store.get("suji1", 100); $("#suji2").value = store.get("suji2", 100);
 $("#optTip").checked = cfg.showTip; $("#optTable").value = cfg.table; $("#optBall").value = String(cfg.ball);
-$("#optGain").value = cfg.gain; $("#optAim").value = cfg.aim;
+$("#optGain").value = cfg.gain; $("#optAim").value = cfg.aim; $("#optLock").checked = cfg.lock; $("#optVol").value = cfg.vol; SND.setVolume(cfg.vol);
 let menuMode = store.get("mode", "solo");
 function syncMenu() {
   document.querySelectorAll("[data-mode]").forEach((b) => b.setAttribute("aria-pressed", b.dataset.mode === menuMode));
@@ -132,10 +142,10 @@ syncMenu();
 
 function readCfg() {
   const t = $("#optTable").value, bl = +$("#optBall").value;
-  cfg.showTip = $("#optTip").checked; cfg.gain = +$("#optGain").value; cfg.aim = +$("#optAim").value;
+  cfg.showTip = $("#optTip").checked; cfg.gain = +$("#optGain").value; cfg.aim = +$("#optAim").value; cfg.lock = $("#optLock").checked; cfg.vol = +$("#optVol").value; SND.setVolume(cfg.vol);
   const rebuild = t !== cfg.table || bl !== cfg.ball;
   cfg.table = t; cfg.ball = bl;
-  for (const k of ["showTip", "gain", "aim", "table", "ball"]) store.set(k, cfg[k]);
+  for (const k of ["showTip", "gain", "aim", "lock", "vol", "table", "ball"]) store.set(k, cfg[k]);
   if (rebuild) { p = params(); world.scene.clear(); world = W.buildWorld(renderer, p); makeBalls(); holdCue(cueIdx); }
 }
 
@@ -287,9 +297,9 @@ function updateStance(force) {
 function stanceCamera() {
   const c = balls[myBall()].r, d = [Math.cos(st.phi), Math.sin(st.phi)];
   const back = 0.44 + st.eyeH * 0.4;
-  // 큐를 들면 턱도 큐를 따라 올라감: 눈 자리의 큐 높이보다 7.5cm 위
+  // 끝까지 숙이면 턱이 큐에 닿아 눈이 큐 3cm 위. 큐를 들면 턱도 큐를 따라 올라감
   const cueZ = stance.contact[2] + Math.tan(stance.th) * (back - p.R);
-  const eyeH = Math.max(st.eyeH, cueZ + 0.075);
+  const eyeH = Math.max(st.eyeH, cueZ + 0.03);
   const ex = c[0] - d[0] * back, ey = c[1] - d[1] * back;
   camera.position.copy(W.toThree([ex, ey, eyeH]));
   const look = 1.0;
@@ -366,10 +376,10 @@ function shoot(D2, t) {
   const speed = Math.max(0, Math.min(8, strokeSpeed()));
   if (speed < 0.05) { stroke.hit = false; return; }
   const yaw = Math.atan2(D2[1], D2[0]), th = Math.asin(-D2[2]);
-  const tipMu = tipMuNow();
+  const tipMu = tipMuAt(a, b);
   const ball = balls[myBall()];
   const r = P.strike(ball, { speed, yaw, elev: th, a, b, M: cueSpec.M, endRatio: cueSpec.endRatio, eta: 0.87, tipMu }, p);
-  wearTip(speed);
+  wearTip(speed, a, b);
   // 공 표면에 초크 자국 (공이 돌아가 있는 만큼 거꾸로 돌려 공 기준 좌표로)
   const local = W.toThree(n).sub(new THREE.Vector3(0, W.CLOTH_Y, 0)).normalize().applyQuaternion(ballMesh[myBall()].quaternion.clone().invert());
   W.chalkMark(ballMesh[myBall()], local);
@@ -377,9 +387,20 @@ function shoot(D2, t) {
   simT = 0;
   shotInfo = { cue: myBall(), speed, a, b, th, miscue: r.miscue, foul: null };
   if (r.miscue) say("삑! 미스큐", 2);
+  const tv = 0.25 + Math.min(1, speed / 4) ** 0.7;
+  if (r.miscue) SND.play("miscue", tv, 0, 0.95 + Math.random() * 0.1);
+  else SND.play(speed > 2.5 ? "tip_hard" : "tip_soft", tv, 0, 0.95 + Math.random() * 0.1);
+  evIdx = 0;
   lastShot = { speed, a, b, th: th * 180 / Math.PI, tipMu, miscue: r.miscue, vb: r.vb, hist: TEST ? stroke.hist.slice(-6).map((h) => [+h.t.toFixed(1), +h.s.toFixed(4)]) : undefined };
 }
-let lastShot = null;
+let lastShot = null, evIdx = 0;
+// 공 자리에서 나는 소리: 눈 기준 좌우로 나누고 멀수록 작게
+const earV = new THREE.Vector3();
+function playAt(name, vol, r, rate) {
+  earV.copy(W.toThree(r)).applyMatrix4(camera.matrixWorldInverse);
+  const d = earV.length();
+  SND.play(name, vol / (1 + d * 0.5), earV.x / (Math.abs(earV.z) + 0.4), rate * (0.96 + Math.random() * 0.08));
+}
 
 // 친 뒤에도 큐가 계속 나가다 수구에 다시 닿으면 투터치
 function followCheck() {
@@ -403,7 +424,17 @@ function rollBalls(dt) {
     const w = b.w, wl = Math.hypot(w[0], w[1], w[2]);
     if (wl > 1e-6) { axis.set(w[0], w[2], -w[1]).normalize(); tmpQ.setFromAxisAngle(axis, wl * dt); ballMesh[i].quaternion.premultiply(tmpQ); }
   });
-  if (simT > sim.tEnd + 0.4) shotOver(bs);
+  // 이번 틀 동안 일어난 부딪침 소리
+  const evs = sim.events;
+  for (; evIdx < evs.length && evs[evIdx].t <= simT; evIdx++) {
+    const e = evs[evIdx], r = bs[e.i].r;
+    if (e.type === "bb") playAt(e.vn > 1.2 ? "click_hard" : "click_soft", 0.08 + Math.min(1, e.vn / 3) ** 0.8, r, 1);
+    else if (e.type === "bc") playAt("cushion", 0.05 + Math.min(1, e.vn / 2.5) ** 0.8, r, 1);
+    else if (e.type === "land") playAt("cushion", 0.35, r, 0.7);
+  }
+  let rs = 0; for (const b of bs) if (b.s === P.SLIDE || b.s === P.ROLL) rs += Math.hypot(b.v[0], b.v[1]);
+  SND.rolling(Math.min(1, rs / 2) * 0.45, 0.8 + 0.35 * Math.min(1, rs / 2));
+  if (simT > sim.tEnd + 0.4) { SND.rolling(0, 0.8); shotOver(bs); }
 }
 
 function shotOver(bs) {
@@ -457,6 +488,7 @@ function chalkMove(dx, dy) {
       const d = Math.hypot(x - chalkSt.x, y - chalkSt.y);
       if (d < 0.75) tipCov[k] = Math.min(1, tipCov[k] + amt * (1 - d / 0.75));
     }
+    if (Math.hypot(chalkSt.x, chalkSt.y) < 1.4 && amt > 0.003) SND.chalk(Math.min(1, amt * 25));
   } else chalkSt.lastAng = null;
   drawChalk();
 }
@@ -483,28 +515,29 @@ ck.width = 520; ck.height = 520;
 
 // ---------- 입력 ----------
 function onMove(dx, dy) {
-  if (mode === "walk") { me.yaw -= dx * 0.0022; me.pitch = Math.max(-1.45, Math.min(1.2, me.pitch - dy * 0.0022)); return; }
+  if (mode === "walk") { me.yaw -= dx * 0.0014 * cfg.aim; me.pitch = Math.max(-1.45, Math.min(1.2, me.pitch - dy * 0.0014 * cfg.aim)); return; }
   if (mode === "chalk") return chalkMove(dx, dy);
   if (mode === "aim" || mode === "roll") {
     if (stroke.on && !stroke.hit && mode === "aim") {
-      const g = 0.00015 * cfg.gain;
+      const g = 0.00008 * cfg.gain;
       stroke.s = Math.min(0.32, stroke.s + dy * g);
-      stroke.dl += dx * g / 0.95 * (st.rest ? 1.8 : 1);
+      if (!cfg.lock) stroke.dl += dx * g / 0.95 * (st.rest ? 1.8 : 1);
       stroke.hist.push({ t: performance.now(), s: stroke.s }); if (stroke.hist.length > 40) stroke.hist.shift();
       strokeUpdate();
       return;
     }
-    if (stroke.on && stroke.hit) { stroke.s = Math.max(-0.22, Math.min(0.32, stroke.s + dy * 0.00015 * cfg.gain)); return; }
-    if (rmb || mode === "roll") { st.headYaw -= dx * 0.002; st.headPitch = Math.max(-0.9, Math.min(0.9, st.headPitch - dy * 0.002)); return; }
+    if (stroke.on && stroke.hit) { stroke.s = Math.max(-0.22, Math.min(0.32, stroke.s + dy * 0.00008 * cfg.gain)); return; }
+    if (rmb || mode === "roll") { st.headYaw -= dx * 0.0013 * cfg.aim; st.headPitch = Math.max(-0.9, Math.min(0.9, st.headPitch - dy * 0.0013 * cfg.aim)); return; }
     const fine = keys.has("ShiftLeft") || keys.has("ShiftRight") ? 0.1 : 1;
-    st.phi -= dx * 0.0012 * fine * cfg.aim;
-    st.eyeH = Math.max(0.11, Math.min(0.75, st.eyeH - dy * 0.0009));
+    st.phi -= dx * 0.0005 * fine * cfg.aim;
+    st.eyeH = Math.max(0.04, Math.min(0.75, st.eyeH - dy * 0.0006 * cfg.aim));
     updateStance();
   }
 }
 let rmb = false;
 addEventListener("mousemove", (e) => { if (document.pointerLockElement === canvas || TEST) onMove(e.movementX, e.movementY); });
 addEventListener("mousedown", (e) => {
+  SND.unlock();
   if (!$("#menu").hidden) return;
   if (e.button === 2) { rmb = true; return; }
   if (e.button !== 0) return;
@@ -523,11 +556,13 @@ addEventListener("mouseup", (e) => {
 });
 addEventListener("contextmenu", (e) => e.preventDefault());
 addEventListener("keydown", (e) => {
+  SND.unlock();
   if (!$("#menu").hidden) { if (e.code === "Escape" && game) closeMenu(); return; }
   if (e.code === "Tab") { e.preventDefault(); $("#score").hidden = false; renderScore(); return; }
   keys.add(e.code);
   if (e.code === "Escape") { if (mode === "chalk") closeChalk(); else openMenu(); return; }
   if (e.code === "KeyH") { $("#help").hidden = !$("#help").hidden; return; }
+  if (e.code === "KeyX") { cfg.lock = !cfg.lock; store.set("lock", cfg.lock); $("#optLock").checked = cfg.lock; say(cfg.lock ? "스트로크 고정: 큐가 옆으로 안 흔들려요" : "스트로크 고정 풀림: 손이 흔들리면 큐도 흔들려요", 2); return; }
   if (e.code === "KeyC") { if (mode === "chalk") closeChalk(); else openChalk(); return; }
   if (e.code === "Space") {
     e.preventDefault();

@@ -169,7 +169,8 @@ a { color: #8fb6ff }
 <ul>
 <li>한 번 칠 때마다 팁 마찰이 회복되고, 칠 때마다 닿은 자리부터 닳습니다.</li>
 <li>초크를 돌려 비비면 떡져서 덜 묻습니다.</li>
-<li>마찰이 줄면 옆으로 벗길 수 있는 당점 한계가 줄어 미스큐가 납니다. 미스큐가 나면 공에 초크 자국이 남습니다.</li>
+<li>마찰이 줄면 옆으로 벗길 수 있는 당점 한계가 줄어 미스큐가 납니다. 당점이 가장자리로 갈수록 팁 가장자리가 공에 닿으므로 그 자리에 묻은 초크로 따집니다.</li>
+<li>초크 알갱이가 고르지 않아 한계는 샷마다 조금씩 흔들립니다. 가운데 당점은 미스큐가 안 나고, 한계 근처에서는 날 때도 안 날 때도 있습니다. 미스큐가 나면 공에 초크 자국이 남습니다.</li>
 </ul>
 <p class="src">미스큐 한계 = 팁 마찰 μ / √(1+μ²) × 반지름. μ 0.6이면 0.51배 (Shepard, Dr. Dave TP 2.1).</p>
 </div>
@@ -183,9 +184,9 @@ a { color: #8fb6ff }
 <div class="flow">
   <div><strong>걷기</strong><span>테이블 둘레를 돌며 공 배치를 봅니다. 서 있는 눈높이 약 1.65m.</span></div>
   <div><strong>엎드리기</strong><span>수구 뒤에서 자세를 잡습니다. 몸이 테이블이나 벽에 걸리면 못 엎드립니다.</span></div>
-  <div><strong>눈높이</strong><span>머리를 내리면 큐 위로 공을 겨눠 보고, 올리면 배치 전체가 보입니다.</span></div>
+  <div><strong>눈높이</strong><span>머리를 내리면 큐 위로 공을 겨눠 보고, 올리면 배치 전체가 보입니다. 끝까지 내리면 턱이 큐에 닿아 눈이 큐 3cm 위에 옵니다.</span></div>
   <div><strong>당점</strong><span>팁을 공 위아래 좌우로 옮깁니다. 엎드린 눈으로 보이는 그대로.</span></div>
-  <div><strong>스트로크</strong><span>마우스를 당겼다 밉니다. 예비 스트로크는 몇 번이든.</span></div>
+  <div><strong>스트로크</strong><span>마우스를 당겼다 밉니다. 예비 스트로크는 몇 번이든. 마우스패드에 따라 손이 옆으로 흔들리면 스트로크 고정(<kbd>X</kbd>)으로 큐를 겨눈 선에 묶습니다.</span></div>
   <div><strong>지켜보기</strong><span>쳐 놓고 엎드린 채 보거나 일어나 걸어가며 봅니다.</span></div>
 </div>
 
@@ -198,6 +199,7 @@ a { color: #8fb6ff }
 <tr><td>당점</td><td></td><td><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 팁을 위 왼쪽 아래 오른쪽으로</td></tr>
 <tr><td>큐 뒤 들기</td><td></td><td><kbd>R</kbd> 들기 <kbd>F</kbd> 내리기 (찍어치기)</td></tr>
 <tr><td>치기</td><td></td><td>왼쪽 단추를 누른 채 마우스를 당겼다 밀기</td></tr>
+<tr><td>스트로크 고정</td><td></td><td><kbd>X</kbd> 켜고 끄기 (메뉴에도 있음)</td></tr>
 <tr><td>초크</td><td><kbd>C</kbd></td><td><kbd>C</kbd> (일어나서 칠함)</td></tr>
 <tr><td>점수판, 메뉴</td><td><kbd>Tab</kbd> <kbd>Esc</kbd></td><td><kbd>Tab</kbd> <kbd>Esc</kbd></td></tr>
 </table></div>
@@ -301,7 +303,7 @@ a { color: #8fb6ff }
 <p>벽에 걸린 당구장 전자 점수판, 팁에 묻은 초크 색, 엎드린 눈으로 보이는 큐 끝. 당점은 작은 공 그림으로 띄우되 설정에서 끌 수 있습니다.</p>
 </div>
 </div>
-<p style="margin-top:20px">당구장은 등박스 조명(4000K, 테이블 위 2500 lux 안팎) 아래 파란 천, 큐걸이, 점수판, 옆 테이블 두어 대가 있는 방으로 만듭니다. 벽에 붙는 그림은 그림 AI로 따로 뽑습니다. 소리는 실제 녹음이 필요해서 쓸 녹음을 고른 뒤 내려받기 전에 여쭤봅니다.</p>
+<p style="margin-top:20px">당구장은 등박스 조명(4000K, 테이블 위 2500 lux 안팎) 아래 파란 천, 큐걸이, 점수판, 옆 테이블 두어 대가 있는 방으로 만듭니다. 벽에 붙는 그림은 그림 AI로 따로 뽑습니다. 소리는 큐 팁 소리와 미스큐 소리를 Stable Audio 3로 만들고, 공 부딪침, 쿠션, 천 위 구르기, 초크 소리는 Freesound에 CC0로 올라온 실제 녹음을 잘라 씁니다. 부딪친 세기에 따라 크기가 바뀌고, 공 자리에 따라 왼쪽 오른쪽 귀로 나뉘어 들립니다.</p>
 </section>
 
 <!-- ───────── 순서 ───────── -->
@@ -322,6 +324,7 @@ a { color: #8fb6ff }
 <section id="src">
 <h2>출처</h2>
 <p class="src">대한당구연맹 총칙(gbpa.or.kr), UMB 캐롬 규칙(ebc-billiard.com), 당구박사 당구용품과 규격, 금남당구재료, japong.com 당구대 규격과 매너, 빌리어즈 큐 밸런스와 팁, Kozoom 큐 고르는 법, Dr. Dave 물리 상수와 기술 증명, Han 2005, Mathavan 2010, Shepard, pooltool, mk2info 4구 규칙, 나무위키 당구, 영어 위키백과 Four-ball billiards, 브라보마이라이프 초구, 빌리어즈 4구 초구.</p>
+<p class="src">소리 녹음(CC0, Freesound): csaszi 350918, 13FPanska_Marval_Lukas 379327, mccarthy 42364, MaoDin204 732790, Caitlin_100 365477. 큐 팁과 미스큐 소리는 Stability AI Stable Audio 3 small-sfx로 만듦.</p>
 </section>
 
 </main>

@@ -228,6 +228,12 @@ export function resolveCushion(b, wi, p) {
   om[0] += -(R / I) * PY * S;
   om[1] += (R / I) * (PX * S - PZ * Cc);
   om[2] += (R / I) * PY * Cc;
+  // 옆 회전 미끄럼이 공을 쿠션 쪽으로 계속 밀면 아주 작은 튕김이 끝없이 이어짐: 최소 2cm/s로 떼고 그만큼 옆 속도에서 덜어 에너지는 그대로
+  const VMIN = 0.02;
+  if (b.s !== AIR && -v[0] < VMIN) {
+    const sp2 = v[0] * v[0] + v[1] * v[1], n0 = Math.min(VMIN, Math.sqrt(sp2));
+    v[0] = -n0; v[1] = Math.sign(v[1]) * Math.sqrt(Math.max(sp2 - n0 * n0, 0));
+  }
   const vz = b.v[2];
   b.v = toG([v[0], v[1], 0]); b.v[2] = b.s === AIR ? vz : 0;
   b.w = toG(om);
@@ -278,7 +284,9 @@ export function strike(ball, cue, p, rand = Math.random) {
   const d = [Math.cos(cue.yaw) * ce, Math.sin(cue.yaw) * ce, -se];   // 큐가 미는 방향
   const side = unit(cross(d, [0, 0, 1])), up = cross(side, d);
   let a = cue.a, bb = cue.b;
-  const off = Math.hypot(a, bb), lim = miscueLimit(cue.tipMu ?? 0.6);
+  // 미스큐 한계는 당점이 가장자리로 갈수록 넘기 쉬움. 초크 알갱이가 고르지 않아 한계가 샷마다 조금씩(표준편차 10%) 흔들림
+  const muJit = (cue.tipMu ?? 0.6) * (1 + 0.2 * (rand() + rand() + rand() - 1.5));
+  const off = Math.hypot(a, bb), lim = miscueLimit(muJit);
   let miscue = false, speed = cue.speed;
   if (off > lim) { // 팁이 미끄러짐: 힘이 덜 들어가고 엉뚱한 쪽으로
     miscue = true;
