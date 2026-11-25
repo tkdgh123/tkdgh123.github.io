@@ -203,7 +203,8 @@ function cushionTime(b, wi, T, p) {
 }
 
 // ---------- 충돌 처리 ----------
-export function hanE(vn) { const v = Math.min(Math.max(vn, 0), 3); return 0.39 + 0.257 * v - 0.044 * v * v; }
+// Han 식은 e 0.6~0.95 구간에서 맞춘 것이라 1m/s 아래로 외삽하면 너무 죽음. 느린 공은 0.6에서 멈춤(조사 노트 05)
+export function hanE(vn) { const v = Math.min(Math.max(vn, 0), 3); return Math.max(0.6, 0.39 + 0.257 * v - 0.044 * v * v); }
 
 // Han 2005 쿠션 모델. 쿠션 좌표: x = 쿠션 쪽, z = 위, y = z x x
 export function resolveCushion(b, wi, p) {
@@ -270,52 +271,67 @@ export function resolveBallBall(a, b, p) {
 }
 
 // ---------- 큐 타격 ----------
-// cue: { speed, yaw, elev, a, b, M, endRatio, eta, tipMu }
-//  yaw: 큐가 미는 수평 방향(rad), elev: 큐 뒤를 든 각(rad), a: 옆 당점(오른쪽 +, 반지름 비), b: 높이 당점(위 +)
+// cue: { speed, yaw, elev, a, b, M, endRatio, eta, tipMu, tipR, psi }
+//  yaw: 큐가 미는 수평 방향(rad), elev: 큐 뒤를 든 각(rad)
+//  a, b: 큐 축이 공에서 떨어진 거리(반지름 비, 오른쪽 +, 위 +)
+//  tipR: 팁 끝 둥근 면 반지름(m). 팁이 둥글어 닿는 점은 축보다 공 중심 쪽: 닿는 점 = 축 / (1 + tipR/R) (Dr. Dave TP A.22, pooltool)
+//  psi: 맞는 순간 큐가 옆으로 움직여 큐 축과 큐 속도 방향이 벌어진 각(rad)
 export function squirtAngle(a, endRatio) {
   const q = 1 - a * a;
   return Math.atan(2.5 * Math.abs(a) * Math.sqrt(Math.max(q, 0)) / (1 + endRatio + 2.5 * q));
 }
+// 닿는 점 기준 한계 sin(gamma) (Dr. Dave TP 2.1, Shepard 1.7)
 export function miscueLimit(tipMu) { return tipMu / Math.sqrt(1 + tipMu * tipMu); }
 
 export function strike(ball, cue, p, rand = Math.random) {
   const { m, R, I } = p;
   const ce = Math.cos(cue.elev), se = Math.sin(cue.elev);
-  const d = [Math.cos(cue.yaw) * ce, Math.sin(cue.yaw) * ce, -se];   // 큐가 미는 방향
+  const d = [Math.cos(cue.yaw) * ce, Math.sin(cue.yaw) * ce, -se];   // 큐 축 방향
   const side = unit(cross(d, [0, 0, 1])), up = cross(side, d);
-  let a = cue.a, bb = cue.b;
-  // 미스큐 한계는 당점이 가장자리로 갈수록 넘기 쉬움. 초크 알갱이가 고르지 않아 한계가 샷마다 조금씩(표준편차 10%) 흔들림
-  const muJit = (cue.tipMu ?? 0.6) * (1 + 0.2 * (rand() + rand() + rand() - 1.5));
-  const off = Math.hypot(a, bb), lim = miscueLimit(muJit);
-  let miscue = false, speed = cue.speed;
-  if (off > lim) { // 팁이 미끄러짐: 힘이 덜 들어가고 엉뚱한 쪽으로
-    miscue = true;
-    speed *= 0.25 + 0.3 * rand();
-    const k = lim / off * 0.9; a *= k; bb *= k;
-  }
-  const cdep = -Math.sqrt(Math.max(1 - a * a - bb * bb, 0));
-  const rh = add(add(mul(side, a), mul(up, bb)), mul(d, cdep));       // 공 중심에서 접촉점(단위)
-  const k = 2.5 * dot(cross(rh, d), cross(rh, d));
+  const sc = 1 + (cue.tipR ?? 0.010) / R;
+  let a = cue.a / sc, bb = cue.b / sc;                                  // 닿는 점
+  const cdep0 = -Math.sqrt(Math.max(1 - a * a - bb * bb, 0));
+  let rh = add(add(mul(side, a), mul(up, bb)), mul(d, cdep0));         // 공 중심에서 닿는 점(단위)
+  // 미스큐: 닿는 점 법선과 큐 속도 방향 사이 각 gamma에서 tan(gamma)가 팁 마찰을 넘으면 팁이 미끄러짐
+  // 초크 알갱이가 고르지 않아 마찰이 샷마다 표준편차 6%쯤 흔들림(설계값). 큐가 옆으로 흔들린 각 psi만큼 한계가 줄어듦
+  const psi = cue.psi ?? 0;
+  const u = add(mul(d, Math.cos(psi)), mul(side, Math.sin(psi)));
+  const cg = Math.max(1e-6, -dot(rh, u)), need = Math.sqrt(Math.max(1 - cg * cg, 0)) / cg;
+  const mu = (cue.tipMu ?? 0.66) * (1 + 0.12 * (rand() + rand() + rand() - 1.5));
   const mr = m / cue.M, eta = cue.eta ?? 0.87;
-  const den = mr * mr + mr * (1 + k);
-  const vb = speed * (mr + Math.sqrt(Math.max(mr * mr - (1 - eta) * den, 0))) / den;
-  let v = mul(d, vb);
-  const w = mul(cross(mul(rh, R), v), m / I);
-  // 스쿼트: 팁이 닿은 쪽 반대로 밀림
-  const sq = squirtAngle(a, cue.endRatio ?? 25) * Math.sign(a) * (miscue ? 1 + 2 * rand() : 1);
-  const c = Math.cos(sq), s = Math.sin(sq);
-  v = [v[0] * c - v[1] * s, v[0] * s + v[1] * c, v[2]];
-  if (miscue) { const j = (rand() - 0.5) * 0.15; const cj = Math.cos(j), sj = Math.sin(j); v = [v[0] * cj - v[1] * sj, v[0] * sj + v[1] * cj, v[2]]; }
+  const ballSpeed = (spd, k) => { const den = mr * mr + mr * (1 + k); return spd * (mr + Math.sqrt(Math.max(mr * mr - (1 - eta) * den, 0))) / den; };
+  let miscue = false, v, w, vb, sq = 0;
+  if (need > mu * 1.08) {
+    // 완전 미스큐: 팁이 미끄러져 힘이 거의 닿는 점 법선(공 중심 쪽)으로만 들어감. 마찰은 법선 힘의 0.1배(Cross 2008 모델값)
+    miscue = true;
+    const nIn = mul(rh, -1), ut = sub(u, mul(nIn, dot(u, nIn))), tl = Math.hypot(...ut);
+    const tDir = tl > 1e-9 ? mul(ut, 1 / tl) : [0, 0, 0];
+    vb = ballSpeed(cue.speed * cg, 0);
+    const J = add(mul(nIn, m * vb), mul(tDir, 0.1 * m * vb));
+    v = mul(J, 1 / m); w = mul(cross(mul(rh, R), J), 1 / I);
+  } else {
+    // 한계를 살짝 넘으면(100~108%) 팁이 조금 미끄러지는 부분 미스큐: 회전이 덜 걸리고 옆으로 더 밀림(설계값)
+    if (need > mu) miscue = "partial";
+    const k = 2.5 * dot(cross(rh, d), cross(rh, d));
+    vb = ballSpeed(cue.speed, k);
+    v = mul(d, vb);
+    w = mul(cross(mul(rh, R), v), m / I);
+    if (miscue) w = mul(w, 0.6);
+    sq = squirtAngle(a, cue.endRatio ?? 25) * Math.sign(a) * (miscue ? 1.6 : 1);
+    const c = Math.cos(sq), s = Math.sin(sq);
+    v = [v[0] * c - v[1] * s, v[0] * s + v[1] * c, v[2]];
+  }
   ball.v = v; ball.w = w;
-  // 큐를 들고 쳤으면 공이 천에 눌렸다가 튀어 오름
   if (v[2] < 0) {
+    // 큐를 들고 쳤으면 공이 천에 눌렸다가 튀어 오름
     const vn = -v[2], Jn = m * (1 + p.eT) * vn;
     ball.v[2] = 0;
     frictionKick(ball, p, p.muS * Jn);
     const upv = p.eT * vn;
     if (upv > 0.15) { ball.v[2] = upv; ball.s = AIR; } else ball.s = classify(ball, p);
-  } else ball.s = classify(ball, p);
-  return { miscue, vb, squirt: sq };
+  } else if (v[2] > 0.15) ball.s = AIR;  // 아래를 빡 치면 공이 살짝 뜸
+  else { ball.v[2] = 0; ball.s = classify(ball, p); }
+  return { miscue, vb, squirt: sq, need, mu };
 }
 
 // ---------- 시뮬레이션 ----------

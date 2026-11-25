@@ -69,11 +69,13 @@ const tipCells = [];
 for (let j = 0; j < 32; j++) for (let i = 0; i < 32; i++) { const x = (i + 0.5) / 16 - 1, y = (j + 0.5) / 16 - 1; if (x * x + y * y <= 1) tipCells.push([j * 32 + i, x, y]); }
 // 공에 닿는 팁 자리: 팁 끝은 반지름 약 9.5mm(10원 동전) 둥근 면이라 당점이 가장자리로 갈수록 팁 가장자리가 닿음
 // 초크 그림은 팁을 앞에서 본 모양: 오른쪽 당점(a>0)은 그림 오른쪽, 위 당점(b>0)은 그림 아래
-function tipSpot(a, b) { const k = 0.0095 / (cueSpec.tip / 2); return [a * k, b * k]; }
+const TIP_R = 0.010; // 팁 끝 둥근 면 반지름(10원 동전쯤)
+function tipSpot(a, b) { const k = (TIP_R / (cueSpec.tip / 2)) / (1 + TIP_R / p.R); return [a * k, b * k]; }
 function tipMuAt(a, b) {
   const [sx, sy] = tipSpot(a, b);
   let s = 0, n = 0; for (const [k, x, y] of tipCells) if (Math.hypot(x - sx, y - sy) < 0.3) { s += tipCov[k]; n++; }
-  return 0.25 + 0.40 * (n ? s / n : 0) * (cueSpec.worn ? 0.85 : 1);
+  // 초크가 꽉 차면 0.66(Dr. Dave: 닿는 점 0.55R까지 안 빡), 없으면 0.25. 조금만 묻어도 빨리 회복되게 제곱근(설계값)
+  return (0.25 + 0.41 * Math.sqrt(n ? s / n : 0)) * (cueSpec.worn ? 0.9 : 1);
 }
 function wearTip(speed, a, b) {
   const [sx, sy] = tipSpot(a, b);
@@ -84,7 +86,7 @@ function wearTip(speed, a, b) {
 let game = null, mode = "menu", sim = null, simT = 0, shotInfo = null, banking = null;
 const me = { x: -2.1, z: 0.9, yaw: -Math.PI / 2 + 0.35, pitch: -0.35, eye: 1.62 };
 const st = { phi: 0, a: 0, b: 0, elevUser: 0, eyeH: 0.22, headYaw: 0, headPitch: 0, rest: false, lean: 0 };
-const stroke = { on: false, s: 0, dl: 0, hist: [], hit: false, hitT: 0, follow: 0 };
+const stroke = { on: false, s: 0, dl: 0, hist: [], hit: false, hitT: 0, hitS: 0, u: 0 };
 const keys = new Set();
 let msgTimer = 0;
 function say(t, sec = 2.6) { const m = $("#msg"); m.textContent = t; m.hidden = !t; msgTimer = sec; }
@@ -367,6 +369,18 @@ function strokeSpeed() {
   return -(now.s - old.s) / ((now.t - old.t) / 1000);
 }
 
+// 맞는 순간 큐 속도가 큐 축에서 옆으로 벌어진 각. 마우스가 옆으로 흔들린 만큼 + 자세가 불안할수록 커지는 몸 떨림
+function strokePsi(speed, th) {
+  const h = stroke.hist, now = h[h.length - 1];
+  let k = h.length - 2; while (k > 0 && now.t - h[k].t < 30) k--;
+  const old = h[Math.max(k, 0)], dt = (now.t - old.t) / 1000;
+  const lat = dt > 0.0005 ? -((now.dl ?? 0) - (old.dl ?? 0)) / dt * stance.bridgeLen : 0;   // 팁이 옆으로 가는 속도
+  // 떨림 표준편차(도, 설계값): 기본 0.25, 레일 브리지 +0.3, 레스트 +0.5, 큐를 많이 들면 +0.3, 몸을 멀리 뻗으면 최대 +0.4, 브리지가 길면 +0.2
+  const sd = 0.25 + (stance.onRail ? 0.3 : 0) + (st.rest ? 0.5 : 0) + (th > 0.2 ? 0.3 : 0) + Math.max(0, Math.min(0.4, (st.lean - 0.25) * 3)) + (stance.bridgeLen > 0.25 ? 0.2 : 0);
+  let g = 0; for (let i = 0; i < 6; i++) g += Math.random(); g = (g - 3) / 0.707;
+  return Math.atan2(lat, Math.max(speed, 0.05)) + g * sd * Math.PI / 180;
+}
+
 function shoot(D2, t) {
   stroke.hit = true; stroke.hitT = performance.now();
   const c = balls[myBall()].r;
@@ -379,7 +393,9 @@ function shoot(D2, t) {
   const yaw = Math.atan2(D2[1], D2[0]), th = Math.asin(-D2[2]);
   const tipMu = tipMuAt(a, b);
   const ball = balls[myBall()];
-  const r = P.strike(ball, { speed, yaw, elev: th, a, b, M: cueSpec.M, endRatio: cueSpec.endRatio, eta: 0.87, tipMu }, p);
+  const psi = strokePsi(speed, th);
+  const r = P.strike(ball, { speed, yaw, elev: th, a, b, M: cueSpec.M, endRatio: cueSpec.endRatio, eta: 0.87, tipMu, tipR: TIP_R, psi }, p);
+  stroke.hitS = stroke.s; stroke.u = Math.max(0, speed - (p.m / cueSpec.M) * r.vb);
   wearTip(speed, a, b);
   // 공 표면에 초크 자국 (공이 돌아가 있는 만큼 거꾸로 돌려 공 기준 좌표로)
   const local = W.toThree(n).sub(new THREE.Vector3(0, W.CLOTH_Y, 0)).normalize().applyQuaternion(ballMesh[myBall()].quaternion.clone().invert());
@@ -387,12 +403,13 @@ function shoot(D2, t) {
   sim = P.simulate(balls.map((o) => ({ ...o, r: o.r.slice(), v: o.v.slice(), w: o.w.slice() })), p, 200);
   simT = 0;
   shotInfo = { cue: myBall(), speed, a, b, th, miscue: r.miscue, foul: null };
-  if (r.miscue) say("삑! 미스큐", 2);
+  if (r.miscue === true) say("삑! 미스큐", 2);
   const tv = 0.25 + Math.min(1, speed / 4) ** 0.7;
-  if (r.miscue) SND.play("miscue", tv, 0, 0.95 + Math.random() * 0.1);
+  if (r.miscue === true) SND.play("miscue", tv, 0, 0.95 + Math.random() * 0.1);
+  else if (r.miscue) SND.play("miscue", tv * 0.45, 0, 0.8 + Math.random() * 0.1);   // 팁이 살짝 미끄러진 소리
   else SND.play(speed > 2.5 ? "tip_hard" : "tip_soft", tv, 0, 0.95 + Math.random() * 0.1);
   evIdx = 0;
-  lastShot = { speed, a, b, th: th * 180 / Math.PI, tipMu, miscue: r.miscue, vb: r.vb, hist: TEST ? stroke.hist.slice(-6).map((h) => [+h.t.toFixed(1), +h.s.toFixed(4)]) : undefined };
+  lastShot = { speed, a, b, th: th * 180 / Math.PI, tipMu, psi: psi * 180 / Math.PI, need: r.need, miscue: r.miscue, vb: r.vb, hist: TEST ? stroke.hist.slice(-6).map((h) => [+h.t.toFixed(1), +h.s.toFixed(4)]) : undefined };
 }
 let lastShot = null, evIdx = 0;
 // 공 자리에서 나는 소리: 눈 기준 좌우로 나누고 멀수록 작게
@@ -523,11 +540,17 @@ function onMove(dx, dy) {
       const g = 0.0002 * cfg.gain;
       stroke.s = Math.min(0.32, stroke.s + dy * g);
       if (!cfg.lock) stroke.dl += dx * g / 0.95 * (st.rest ? 1.8 : 1);
-      stroke.hist.push({ t: performance.now(), s: stroke.s }); if (stroke.hist.length > 40) stroke.hist.shift();
+      stroke.hist.push({ t: performance.now(), s: stroke.s, dl: stroke.dl }); if (stroke.hist.length > 40) stroke.hist.shift();
       strokeUpdate();
       return;
     }
-    if (stroke.on && stroke.hit) { stroke.s = Math.max(-0.22, Math.min(0.32, stroke.s + dy * 0.0002 * cfg.gain)); return; }
+    if (stroke.on && stroke.hit) {
+      // 친 뒤 큐는 공에 운동량을 넘겨 느려진 속도(stroke.u)에서 출발해 브리지 손에 잡혀 점점 멈춤(0.12초 시간 상수, 4m/s로 치면 약 15cm 더 나감)
+      // 손이 더 밀어도 그보다 앞으로는 못 감
+      const t = (performance.now() - stroke.hitT) / 1000, want = stroke.s + dy * 0.0002 * cfg.gain;
+      stroke.s = Math.max(-0.22, Math.min(0.32, Math.max(want, stroke.hitS - stroke.u * 0.12 * (1 - Math.exp(-t / 0.12)))));
+      return;
+    }
     if (rmb || mode === "roll") { st.headYaw -= dx * 0.0013 * cfg.aim; st.headPitch = Math.max(-0.9, Math.min(0.9, st.headPitch - dy * 0.0013 * cfg.aim)); return; }
     const fine = keys.has("ShiftLeft") || keys.has("ShiftRight") ? 0.1 : 1;
     st.phi -= dx * 0.0005 * fine * cfg.aim;

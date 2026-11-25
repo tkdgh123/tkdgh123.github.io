@@ -67,10 +67,10 @@ const check = (name, ok, info) => { console.log(`${ok ? "통과" : "실패"}  ${
 {
   const p = P.makeParams();
   const b = P.newBall(0, 0, 0, p);
-  const r = P.strike(b, { speed: 2, yaw: 0, elev: 0, a: 0.4, b: 0, M: 0.54, endRatio: 25 }, p, () => 0.5);
+  const r = P.strike(b, { speed: 2, yaw: 0, elev: 0, a: 0.4, b: 0, M: 0.54, endRatio: 25, tipR: 0 }, p, () => 0.5);
   check("오른쪽 당점", b.w[2] > 0 && b.v[1] > 0, `wz ${b.w[2].toFixed(1)} rad/s, 옆으로 ${deg(Math.atan2(b.v[1], b.v[0])).toFixed(2)}도`);
   const c = P.newBall(0, 0, 0, p);
-  P.strike(c, { speed: 2, yaw: 0, elev: 0, a: 0, b: 0.5, M: 0.54 }, p, () => 0.5);
+  P.strike(c, { speed: 2, yaw: 0, elev: 0, a: 0, b: 0.5, M: 0.54, tipR: 0 }, p, () => 0.5);
   check("위 당점 0.5R = 구름의 125%", Math.abs(c.w[1] * p.R / c.v[0] - 1.25) < 1e-6, `앞 회전 ${(c.w[1] * p.R / c.v[0] * 100).toFixed(0)}% (구름 100%)`);
   const d = P.newBall(0, 0, 0, p);
   P.strike(d, { speed: 2, yaw: 0, elev: 0, a: 0, b: 0, M: 0.54 }, p, () => 0.5);
@@ -78,6 +78,10 @@ const check = (name, ok, info) => { console.log(`${ok ? "통과" : "실패"}  ${
   const e = P.newBall(0, 0, 0, p);
   const m = P.strike(e, { speed: 2, yaw: 0, elev: 0, a: 0.55, b: 0.2, M: 0.54, tipMu: 0.45 }, p, () => 0.5);
   check("초크 부족 미스큐", m.miscue, `한계 ${P.miscueLimit(0.45).toFixed(3)}R, 당점 ${Math.hypot(0.55, 0.2).toFixed(3)}R`);
+  // 초크 충분(mu 0.66): 닿는 점 0.5R은 거의 안전, 0.6R은 거의 빡 (Dr. Dave 측정 최대 0.55R)
+  const rate = (axis, full) => { let n = 0; for (let k = 0; k < 2000; k++) { const z = P.newBall(0, 0, 0, p); const mc = P.strike(z, { speed: 2, yaw: 0, elev: 0, a: 0, b: -axis, M: 0.54, tipMu: 0.66 }, p).miscue; if (full ? mc === true : mc) n++; } return n / 2000; };
+  const sc = 1 + 0.010 / p.R, r50 = rate(0.5 * sc), r55 = rate(0.55 * sc), r60 = rate(0.6 * sc, true);
+  check("미스큐 확률", r50 < 0.05 && r55 > 0.3 && r55 < 0.7 && r60 > 0.7, `닿는 점 0.50R ${(r50 * 100).toFixed(1)}%, 0.55R ${(r55 * 100).toFixed(1)}% (부분 미스큐 포함), 0.60R 완전 미스큐 ${(r60 * 100).toFixed(1)}% (큐 축으로는 ${(0.5 * sc).toFixed(2)}R, ${(0.55 * sc).toFixed(2)}R, ${(0.6 * sc).toFixed(2)}R)`);
 }
 
 // 7. 무작위 샷 400번: 공이 겹치거나 테이블을 뚫거나 에너지가 늘지 않음
