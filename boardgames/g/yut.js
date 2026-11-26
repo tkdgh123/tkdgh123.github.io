@@ -127,7 +127,7 @@ export default {
     PT.forEach(([x, y], i) => { svg += `<circle cx="${x}" cy="${y}" r="${[0, 5, 10, 15, 22].includes(i) ? 5.2 : 3.4}" class="dot${i === 0 ? " start" : ""}"/>`; });
     for (const [pos, list] of Object.entries(stacks)) {
       const [x, y] = PT[pos], [p, i] = list[0], cnt = list.length;
-      svg += `<g class="tok${canMove(p, i) ? " can" : ""}" data-p="${p}" data-i="${i}"><circle cx="${x}" cy="${y}" r="5.6" style="fill:${SEAT[p]}"/>${cnt > 1 ? `<text x="${x}" y="${y + 2.4}">${cnt}</text>` : ""}</g>`;
+      svg += `<g class="tok${canMove(p, i) ? " can" : ""}" data-p="${p}" data-i="${i}" data-k="y${p}-${i}"><circle cx="${x}" cy="${y}" r="5.6" style="fill:${SEAT[p]}"/>${cnt > 1 ? `<text x="${x}" y="${y + 2.4}">${cnt}</text>` : ""}</g>`;
     }
     if (my && v.phase === "move" && r != null) {
       const seen = new Set();
@@ -137,6 +137,8 @@ export default {
     el.innerHTML = `<div class="yut">
       <p class="say">${v.win != null ? "판이 끝났어요" : !my ? `${esc(n[v.cur])} 차례` : v.phase === "throw" ? "윷을 던져요" : "쓸 윷을 고르고, 움직일 말을 눌러요 (집에 있는 말은 아래)"}</p>
       ${svg}
+      ${(() => { const t = v.log.find(x => x.k === "throw"); if (!t) return `<div class="sticks"></div>`; const flat = t.r === 5 ? 0 : t.r === -1 ? 1 : t.r; const fresh = UI.tk !== v.log.length + "-" + t.r && v.log[0] === t; UI.tk = v.log.length + "-" + t.r;
+        return `<div class="sticks${fresh ? " toss" : ""}">${[0, 1, 2, 3].map(i => `<i class="${i < flat ? "flat" : ""}${t.r === -1 && i === 0 ? " mark" : ""}" style="--i:${i}"></i>`).join("")}<b>${NAME[t.r]}!</b></div>`; })()}
       ${my && v.phase === "move" ? `<div class="ress">${v.res.map((x, i) => `<button class="rs${UI.ri === i ? " on" : ""}" data-ri="${i}">${NAME[x]}</button>`).join("")}</div>` : ""}
       ${my && v.phase === "throw" ? `<div class="acts"><button class="th">윷 던지기</button></div>` : ""}
       <div class="homes">${[...Array(v.n).keys()].map(p => `<div class="hm${p === v.cur ? " cur" : ""}" style="--s:${SEAT[p]}"><b>${esc(n[p])}</b>
@@ -149,4 +151,4 @@ export default {
     el.querySelectorAll(".tok.can, .hp:not([disabled])").forEach(b => b.onclick = () => send({ t: "move", ri: UI.ri, p: +b.dataset.i }));
   }
 };
-const UI = { ri: null };
+const UI = { ri: null, tk: "" };

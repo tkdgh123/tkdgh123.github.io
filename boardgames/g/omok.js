@@ -53,7 +53,7 @@ export default {
     const n = ui.names, my = v.cur === me && v.win == null;
     el.innerHTML = `<div class="omok">
       <p class="say">${v.win != null ? "판이 끝났어요" : my ? `내 차례 (${me ? "흰" : "검은"} 돌)` : `${esc(n[v.cur])} 차례`}</p>
-      <div class="go15">${v.b.map((c, i) => `<button class="pt${c === 0 ? " bk" : c === 1 ? " wh" : ""}${v.last === i ? " last" : ""}" data-i="${i}" ${my && c < 0 ? "" : "disabled"} aria-label="${i % N + 1}, ${Math.floor(i / N) + 1}"></button>`).join("")}</div>
+      <div class="go15">${v.b.map((c, i) => `<button ${c >= 0 ? `data-k="s${i}" data-anim="drop"` : ""} class="pt${c === 0 ? " bk" : c === 1 ? " wh" : ""}${v.last === i ? " last" : ""}" data-i="${i}" ${my && c < 0 ? "" : "disabled"} aria-label="${i % N + 1}, ${Math.floor(i / N) + 1}"></button>`).join("")}</div>
       <p class="dim small">검은 돌 ${esc(n[0])}, 흰 돌 ${esc(n[1] || "")}</p>
     </div>`;
     el.querySelectorAll(".pt:not([disabled])").forEach(b => b.onclick = () => send({ t: "put", i: +b.dataset.i }));

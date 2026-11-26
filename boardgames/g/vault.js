@@ -173,7 +173,7 @@ export function candidates(v, seat) {
 // ───────── 화면 ─────────
 const UI = { sel: null };
 const lab = n => n === J ? "★" : n;
-const tileHTML = (t, attrs = "") => `<button class="vt ${t.c ? "w" : "b"}${t.open ? " op" : ""}${t.nw ? " nw" : ""}" ${attrs}>${t.v !== undefined ? lab(t.v) : ""}</button>`;
+const tileHTML = (t, attrs = "") => `<button data-k="v${t.id}" class="vt ${t.c ? "w" : "b"}${t.open ? " op" : ""}${t.nw ? " nw" : ""}" ${attrs}>${t.v !== undefined ? lab(t.v) : ""}</button>`;
 
 function say(v, me, names) {
   const who = names[v.cur];

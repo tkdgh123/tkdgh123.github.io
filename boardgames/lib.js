@@ -82,3 +82,14 @@ const PIPS = { 1: [5], 2: [1, 9], 3: [1, 5, 9], 4: [1, 3, 7, 9], 5: [1, 3, 5, 7,
 export const dieHTML = (n, cls = "", attrs = "") => `<span class="die ${cls}" ${attrs}>${[...Array(9).keys()].map(i => `<i${PIPS[n]?.includes(i + 1) ? ' class="on"' : ""}></i>`).join("")}</span>`;
 export const logPush = (s, x, max = 12) => { s.log.unshift(x); s.log.length = Math.min(s.log.length, max); };
 export const nameB = (n, i) => `<b style="color:${SEAT[i]}">${esc(n[i])}</b>`;
+
+// 주사위 굴리는 모습: .die.rolling 인 것들이 구르며 눈이 바뀌다가 원래 눈으로 멈춤
+export function spinDice(root) {
+  root.querySelectorAll(".die.rolling").forEach(d => {
+    const final = d.innerHTML; let k = 0;
+    const t = setInterval(() => {
+      if (++k > 8 || !d.isConnected) { clearInterval(t); d.innerHTML = final; d.classList.remove("rolling"); return; }
+      d.innerHTML = dieHTML(1 + Math.floor(Math.random() * 6)).replace(/^<span[^>]*>/, "").replace(/<\/span>$/, "");
+    }, 65);
+  });
+}

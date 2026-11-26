@@ -200,7 +200,7 @@ const UI = { pick: [], card: null };
 const GI = c => c === 5 ? "art/coin.webp" : `art/gem${c}.webp`;
 const gem = (c, n, cls = "") => cls === "big" ? `<img class="gemimg" src="${GI(c)}" alt="${GEM[c][0]}">` : `<span class="gem ${cls}" style="--g:${GEM[c][1]};--gi:${GEM[c][2]}">${n ?? ""}</span>`;
 const cardHTML = (c, mine) => !c ? `<div class="gc none"></div>` : c.hid && c.b === undefined ? `<div class="gc back t${c.t}"><b>${["I", "II", "III"][c.t]}</b></div>` :
-  `<button class="gc t${c.t}${mine ? " can" : ""}" data-id="${c.id}" style="--g:${GEM[c.b][1]};--gi:${GEM[c.b][2]}">
+  `<button class="gc t${c.t}${mine ? " can" : ""}" data-id="${c.id}" data-k="g${c.id}" style="--g:${GEM[c.b][1]};--gi:${GEM[c.b][2]}">
     <span class="top"><b>${c.p || ""}</b>${gem(c.b, "", "big")}</span>
     <span class="cost">${c.cost.map((n, x) => n ? gem(x, n) : "").join("")}</span>
   </button>`;

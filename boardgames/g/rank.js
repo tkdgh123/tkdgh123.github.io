@@ -99,7 +99,7 @@ export default {
     el.innerHTML = `<div class="rank">
       <p class="say">${v.phase === "end" ? "판이 끝났어요" : my ? (v.top ? `${v.top.cards.length}장, ${v.top.v === J ? "광대" : v.top.v}보다 작은 숫자로 덮거나 넘겨요` : "새로 시작해요. 같은 숫자 묶음을 내요") : `${esc(n[v.cur])} 차례예요`}<small>${v.round}/${ROUNDS}판</small></p>
       <ol class="court">${v.order.map((p, i) => `<li class="${p === v.cur ? "cur" : ""}${v.out.includes(p) ? " gone" : ""}${v.passed.includes(p) ? " pass" : ""}" style="--s:${SEAT[p]}"><i>${titleOf(i, v.n)}</i><b>${esc(n[p])}</b><span>${v.out.includes(p) ? `${v.out.indexOf(p) + 1}등으로 나감` : `${v.counts[p]}장`}${v.passed.includes(p) ? ", 넘김" : ""}</span><small>${v.score[p]}점</small></li>`).join("")}</ol>
-      <div class="pit">${v.top ? v.top.cards.map(c => `<span class="rk${c === J ? " j" : ""}">${c === J ? "광대" : c}</span>`).join("") + `<small>${esc(n[v.top.by])}</small>` : `<span class="dim">비어 있음</span>`}</div>
+      <div class="pit">${v.top ? v.top.cards.map((c, i) => `<span data-k="p${v.log.length}-${i}" data-anim="drop" class="rk${c === J ? " j" : ""}">${c === J ? "광대" : c}</span>`).join("") + `<small>${esc(n[v.top.by])}</small>` : `<span class="dim">비어 있음</span>`}</div>
       ${v.hand ? `<div class="rhand">${v.hand.map((c, i) => `<button class="rk${c === J ? " j" : ""}${sel.includes(i) ? " on" : ""}" data-i="${i}" ${my ? "" : "disabled"}>${c === J ? "광대" : c}</button>`).join("")}</div>` : ""}
       ${my ? `<div class="acts"><button class="playb" ${sel.length ? "" : "disabled"}>${sel.length}장 내기</button>${v.top ? `<button class="ghost passb">넘기기</button>` : ""}</div>` : ""}
       <ol class="log">${v.log.map(x => `<li>${line(x, n)}</li>`).join("")}</ol>

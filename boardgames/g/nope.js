@@ -57,7 +57,7 @@ export default {
     const n = ui.names, my = v.cur === me && !v.done;
     el.innerHTML = `<div class="nope">
       <p class="say">${v.done ? "판이 끝났어요" : my ? "받을까요, 조개 하나 얹고 넘길까요?" : `${esc(n[v.cur])}이(가) 고민 중`}<small>더미 ${v.left}장</small></p>
-      <div class="ntop">${v.top != null ? `<div class="fish"><b>${v.top}</b><small>벌점</small></div><div class="pot"><b>${v.pot}</b><small>얹힌 조개</small></div>` : ""}</div>
+      <div class="ntop">${v.top != null ? `<div class="fish" data-k="n${v.top}" data-anim="drop"><b>${v.top}</b><small>벌점</small></div><div class="pot"><b>${v.pot}</b><small>얹힌 조개</small></div>` : ""}</div>
       ${my ? `<div class="acts"><button class="tk">받기 (${v.top}점, 조개 ${v.pot}개)</button><button class="ghost ps" ${v.chips[me] ? "" : "disabled"}>조개 얹고 넘기기</button></div>` : ""}
       ${me >= 0 ? `<p class="mine">내 조개 <b>${v.chips[me]}</b>개</p>` : ""}
       <div class="nrows">${[...Array(v.n).keys()].map(p => `<div class="nr${p === v.cur ? " cur" : ""}" style="--s:${SEAT[p]}"><b>${esc(n[p])}</b>${runs(v.cards[p]).map(r => `<span class="run">${r.map((x, i) => `<i class="${i ? "free" : ""}">${x}</i>`).join("")}</span>`).join("")}${v.score ? `<small>${v.score[p]}점</small>` : ""}</div>`).join("")}</div>

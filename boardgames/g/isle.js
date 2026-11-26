@@ -1,6 +1,6 @@
 // 섬 개척 — 주사위로 자원을 받고, 바꾸고, 길과 마을과 도시를 지어 10점을 먼저 내는 게임 (3~4명)
 // 판은 매판 무작위(땅 19칸). 7이 나오면 카드가 8장 이상인 사람은 절반을 버리고, 굴린 사람이 해적을 옮겨 한 장 뺏는다.
-import { esc, shuffle, pick, SEAT } from "../lib.js";
+import { esc, shuffle, pick, SEAT, dieHTML, spinDice } from "../lib.js";
 
 export const RES = [["나무", "#3f7d3a"], ["흙", "#b5562f"], ["양털", "#9cc65b"], ["밀", "#e3b93c"], ["돌", "#8d939b"]];
 const COST = { road: [1, 1, 0, 0, 0], set: [1, 1, 1, 1, 0], city: [0, 0, 0, 2, 3], dev: [0, 0, 1, 1, 1] };
@@ -446,7 +446,7 @@ function board(v, me, mode, can) {
     const t = v.hex[i], col = t.res < 0 ? "#e2cf9a" : RES[t.res][1];
     g += `<polygon class="hx${mode === "robber" && i !== v.robber ? " pick" : ""}" data-h="${i}" points="${poly(hx)}" fill="url(#t${t.res < 0 ? "d" : t.res})"/>`;
     if (t.num) g += `<circle cx="${hx.x}" cy="${hx.y}" r=".36" class="tok"/><text x="${hx.x}" y="${hx.y + .13}" class="num${t.num === 6 || t.num === 8 ? " hot" : ""}">${t.num}</text><text x="${hx.x}" y="${hx.y + .3}" class="dots">${"•".repeat(pip(t.num))}</text>`;
-    if (i === v.robber) g += `<g class="rob"><circle cx="${hx.x}" cy="${hx.y - .5}" r=".3"/><text x="${hx.x}" y="${hx.y - .44}">해적</text></g>`;
+    if (i === v.robber) g += `<g class="rob" data-k="rob${i}"><circle cx="${hx.x}" cy="${hx.y - .5}" r=".3"/><text x="${hx.x}" y="${hx.y - .44}">해적</text></g>`;
   });
   for (const pt of v.ports) {
     const e = E[pt.e], mx = (V[e.a].x + V[e.b].x) / 2, my = (V[e.a].y + V[e.b].y) / 2, d = Math.hypot(mx, my), px = mx + mx / d * .5, py = my + my / d * .5;
@@ -455,13 +455,13 @@ function board(v, me, mode, can) {
   }
   E.forEach((e, i) => {
     const o = v.eb[i];
-    if (o != null) g += `<line x1="${V[e.a].x}" y1="${V[e.a].y}" x2="${V[e.b].x}" y2="${V[e.b].y}" class="road" style="stroke:${SEAT[o]}"/>`;
+    if (o != null) g += `<line x1="${V[e.a].x}" y1="${V[e.a].y}" x2="${V[e.b].x}" y2="${V[e.b].y}" class="road" data-k="e${i}" style="stroke:${SEAT[o]}"/>`;
     else if (mode === "road" && can.e?.has(i)) g += `<line x1="${V[e.a].x}" y1="${V[e.a].y}" x2="${V[e.b].x}" y2="${V[e.b].y}" class="hot-e" data-e="${i}"/>`;
   });
   V.forEach((p, i) => {
     const b = v.vb[i];
-    if (b) g += b.city ? `<rect x="${p.x - .2}" y="${p.y - .2}" width=".4" height=".4" rx=".06" class="city${mode === "city" && can.v?.has(i) ? " hot-v" : ""}" style="fill:${SEAT[b.p]}" data-v="${i}"/>`
-      : `<circle cx="${p.x}" cy="${p.y}" r=".21" class="town${mode === "city" && can.v?.has(i) ? " hot-v" : ""}" style="fill:${SEAT[b.p]}" data-v="${i}"/>`;
+    if (b) g += b.city ? `<rect x="${p.x - .2}" y="${p.y - .2}" width=".4" height=".4" rx=".06" class="city${mode === "city" && can.v?.has(i) ? " hot-v" : ""}" data-k="c${i}" style="fill:${SEAT[b.p]}" data-v="${i}"/>`
+      : `<circle cx="${p.x}" cy="${p.y}" r=".21" class="town${mode === "city" && can.v?.has(i) ? " hot-v" : ""}" data-k="t${i}" style="fill:${SEAT[b.p]}" data-v="${i}"/>`;
     else if (mode === "set" && can.v?.has(i)) g += `<circle cx="${p.x}" cy="${p.y}" r=".17" class="hot-v" data-v="${i}"/>`;
   });
   const defs = `<defs>${[...TEX.map((t, r) => [r, t]), ["d", "desert"]].map(([r, t]) => `<pattern id="t${r}" patternUnits="objectBoundingBox" width="1" height="1"><image href="art/${t}.webp" x="0" y="0" width="2" height="2" preserveAspectRatio="xMidYMid slice"/></pattern>`).join("")}<filter id="hsh" x="-10%" y="-10%" width="120%" height="120%"><feDropShadow dx="0" dy=".05" stdDeviation=".05" flood-opacity=".5"/></filter></defs>`;
@@ -482,6 +482,7 @@ function legal(v, me) {
 function render(el, v, me, send, ui) {
   const n = ui.names, P = me >= 0 ? v.pl[me] : null, my = v.cur === me && v.phase !== "end";
   UIname = i => n[i];
+  const dk = v.dice ? `${v.cur}-${v.log.length}-${v.dice.join()}` : "", freshD = !!dk && v.log[0]?.k === "roll" && dk !== UI.dk; if (dk) UI.dk = dk;
   // 상황에 따라 모드 자동
   if (UI.ph !== v.phase || !my) { UI.mode = null; UI.ph = v.phase; }
   if (my && v.phase === "setup") UI.mode = v.setup.step === "set" ? "set" : "road";
@@ -500,7 +501,7 @@ function render(el, v, me, send, ui) {
 
   const others = v.pl.map((p, i) => i).filter(i => i !== me);
   el.innerHTML = `<div class="isle">
-    <p class="say">${say}${v.dice ? `<span class="dd">${v.dice[0]} + ${v.dice[1]} = ${v.dice[0] + v.dice[1]}</span>` : ""}</p>
+    <p class="say">${say}${v.dice ? `<span class="dd">${dieHTML(v.dice[0], freshD ? "rolling" : "")}${dieHTML(v.dice[1], freshD ? "rolling" : "")}<b>${v.dice[0] + v.dice[1]}</b></span>` : ""}</p>
     <div class="mapw">${board(v, me, UI.mode, can)}</div>
     <ol class="others">${v.pl.map((p, i) => `<li style="--s:${SEAT[i]}" class="${i === v.cur ? "cur" : ""}${i === me ? " me" : ""}"><b>${esc(n[i])}</b><span>${p.vp}점</span><small>카드 ${p.nres}, 개척 ${p.ndev}, 경비 ${p.kn}, 길 ${p.lr}${v.lr === i ? " 가장 긴 길" : ""}${v.la === i ? ", 가장 큰 경비대" : ""}</small></li>`).join("")}</ol>
     ${P ? `<div class="hand">${res.map((x, r) => resChip(r, x)).join("")}</div>` : ""}
@@ -509,6 +510,7 @@ function render(el, v, me, send, ui) {
     ${panel(v, me, my, P, R, n)}
     <ol class="log">${v.log.map(x => `<li>${line(x, n)}</li>`).join("")}</ol>
   </div>`;
+  spinDice(el);
   const re = () => render(el, v, me, send, ui);
   el.querySelectorAll("[data-v].hot-v").forEach(b => b.onclick = () => { const m = UI.mode; if (v.phase !== "setup" && v.phase !== "road2") UI.mode = null; send({ t: m === "city" ? "city" : "set", v: +b.dataset.v }); });
   el.querySelectorAll("[data-e].hot-e").forEach(b => b.onclick = () => { if (v.phase === "main") UI.mode = null; send({ t: "road", e: +b.dataset.e }); });
@@ -580,6 +582,7 @@ function actions(v, me, my, P, afford, R) {
 let UIname = i => "";
 function panel(v, me, my, P, R, n) {
   UIname = i => n[i];
+  const dk = v.dice ? `${v.cur}-${v.log.length}-${v.dice.join()}` : "", freshD = !!dk && v.log[0]?.k === "roll" && dk !== UI.dk; if (dk) UI.dk = dk;
   if (!P || !my || v.phase !== "main") return "";
   if (UI.panel === "bankp") {
     return `<div class="sheet"><div class="in"><p>은행에 주고 하나 받기 (항구가 있으면 싸져요)</p>

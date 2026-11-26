@@ -138,7 +138,7 @@ export default {
 
 // ───────── 화면 ─────────
 const UI = { flip: -1, at: 0, rung: -1 };
-const card = c => c ? `<div class="fc f${c.f} k${c.k}" aria-label="${FRUIT[c.f][0]} ${c.k}개">${Array(c.k).fill(`<img src="art/f-${FRUIT[c.f][1]}.webp" alt="">`).join("")}</div>` : `<div class="fc empty"></div>`;
+const card = (c, k = "") => c ? `<div class="fc f${c.f} k${c.k}" ${k ? `data-k="${k}" data-anim="flip"` : ""} aria-label="${FRUIT[c.f][0]} ${c.k}개">${Array(c.k).fill(`<img src="art/f-${FRUIT[c.f][1]}.webp" alt="">`).join("")}</div>` : `<div class="fc empty"></div>`;
 
 function render(el, v, me, send, ui) {
   if (v.flip !== UI.flip) { UI.flip = v.flip; UI.at = performance.now(); }
@@ -146,8 +146,8 @@ function render(el, v, me, send, ui) {
   const left = Math.max(0, Math.ceil((v.start + LIMIT - Date.now()) / 60000));
   const lastWin = v.log[0];
   el.innerHTML = `<div class="bell">
-    <div class="tbl t${v.n}">${[...Array(v.n).keys()].map(p => `<div class="pl${p === v.cur ? " cur" : ""}${v.out[p] ? " gone" : ""}${p === me ? " me" : ""}" style="--s:${SEAT[p]}">
-      ${card(v.up[p])}
+    <div class="tbl t${v.n}">${[...(ui.order || [...Array(v.n).keys()]).slice(1), (ui.order || [0])[0]].map(p => `<div class="pl${p === v.cur ? " cur" : ""}${v.out[p] ? " gone" : ""}${p === me ? " me" : ""}" style="--s:${SEAT[p]}">
+      ${card(v.up[p], `b${p}-${v.upN[p]}`)}
       <span class="nm">${esc(n[p])}</span><span class="cnt">손 ${v.left[p]}장${v.upN[p] ? `, 바닥 ${v.upN[p]}` : ""}</span>
     </div>`).join("")}</div>
     <p class="say">${v.done ? "판이 끝났어요" : v.ring ? "종 소리! 누가 먼저였는지 보는 중" : myTurn ? "내 카드를 뒤집어요" : `${esc(n[v.cur])} 차례, 다섯 개가 보이면 바로 종!`}

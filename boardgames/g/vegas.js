@@ -1,6 +1,6 @@
 // 주사위 내기 — 주사위 여덟 개를 굴려 같은 눈을 모두 그 번호 술집에 건다. 가장 많이 건 사람이 큰돈, 같은 수로 비기면 둘 다 못 받음 (2~5명)
 // 네 판. 판마다 술집 여섯 곳에 5만 원 넘게 상금을 깔고 시작. 돈이 가장 많은 사람이 이김.
-import { esc, shuffle, SEAT, dieHTML, logPush, nameB } from "../lib.js";
+import { esc, shuffle, SEAT, dieHTML, logPush, nameB, spinDice } from "../lib.js";
 
 const ROUNDS = 4, DICE = 8;
 function newRound(s, rng) {
@@ -65,16 +65,19 @@ export default {
   badge(v, i) { return `${v.money[i]}만`; },
   render(el, v, me, send, ui) {
     const n = ui.names, my = v.cur === me && !v.done;
+    const rk = v.roll ? `${v.cur}-${v.round}-${v.left.join()}` : "", fresh = !!rk && rk !== UI.rk; UI.rk = rk;
     el.innerHTML = `<div class="vegas">
       <p class="say">${v.done ? "판이 끝났어요" : my ? (v.roll ? "걸 눈을 골라요. 같은 눈은 모두 그 술집으로 가요" : `주사위 ${v.left[me]}개를 굴려요`) : `${esc(n[v.cur])} 차례`}<small>${v.round}/${ROUNDS}판</small></p>
       <div class="pubs">${v.casino.map((bills, c) => `<div class="pub${my && v.roll?.includes(c + 1) ? " can" : ""}" ${my && v.roll?.includes(c + 1) ? `data-v="${c + 1}"` : ""}>
         ${dieHTML(c + 1)}<div class="bills">${bills.map(b => `<span>${b}만</span>`).join("")}</div>
         <div class="bets">${v.bets[c].map((k, p) => k ? `<i style="--s:${SEAT[p]}">${k}</i>` : "").join("")}</div></div>`).join("")}</div>
-      ${my && v.roll ? `<div class="vroll">${v.roll.map(x => dieHTML(x, "", `data-v="${x}"`)).join("")}</div>` : my ? `<div class="acts"><button class="rl">굴리기</button></div>` : ""}
+      ${my && v.roll ? `<div class="vroll">${v.roll.map(x => dieHTML(x, fresh ? "rolling" : "", `data-v="${x}"`)).join("")}</div>` : my ? `<div class="acts"><button class="rl">굴리기</button></div>` : ""}
       <ol class="score">${v.money.map((m, p) => `<li style="--s:${SEAT[p]}" class="${p === v.cur ? "cur" : ""}"><b>${esc(n[p])}</b><span>${m}만, 남은 주사위 ${v.left[p]}</span></li>`).join("")}</ol>
       <ol class="log">${v.log.map(x => `<li>${x.k === "bet" ? `${nameB(n, x.s)} ${x.v}번 술집에 ${x.n}개` : `${x.round}판 정산: ${x.pay.map(([c, p, b]) => `${c + 1}번 ${esc(n[p])} ${b}만`).join(", ") || "아무도 못 받음"}`}</li>`).join("")}</ol>
     </div>`;
+    spinDice(el);
     el.querySelector(".rl")?.addEventListener("click", () => send({ t: "roll" }));
     el.querySelectorAll("[data-v]").forEach(b => b.onclick = () => send({ t: "bet", v: +b.dataset.v }));
   }
 };
+const UI = { rk: "" };

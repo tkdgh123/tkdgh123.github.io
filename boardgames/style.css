@@ -753,7 +753,6 @@ body:has(#app.room) { padding-inline: 6px }
 .isle .build button { padding: 6px 2px } .isle .acts .row { margin: 4px 0 0 } .isle .acts .row button { padding: 9px 6px }
 .isle .devs .dv { flex-basis: 110px; padding: 5px 8px }
 
-.crab .isle { flex: 1 !important; min-height: 220px; width: auto; max-width: 100%; aspect-ratio: 1 / .92; margin: 0 auto }
 
 .bell .tbl { flex: 1 !important; min-height: 0; align-content: center }
 .bell .fc { max-width: min(84px, 11vh) }
@@ -824,5 +823,124 @@ body:has(#app.room) { padding-inline: 6px }
 .gostop .floor { flex: 1 !important; min-height: 0; align-content: flex-start; overflow: auto; padding: 6px } .gostop .hhand { margin: 4px 0 0 }
 .gostop .hw { width: 40px; height: 60px } .gostop .caps { gap: 4px } .gostop .cp { padding: 4px 8px }
 .map .mapwrap { flex: 1 !important; min-height: 0; max-height: none } .map .mtool { margin: 0 } .map .mtool .cur svg { width: 62px; height: 62px }
-.crab .isle { flex: none !important; width: min(100%, 50vh); min-height: 0; margin: auto }
 .race .lanes { flex: none !important; margin: auto 0 }
+
+/* ════ 11-26 밤 3판: 닉네임, 나가기, 방장 메뉴, 규칙, 움직임, 소라게 판, 판 그림 ════ */
+/* 첫 화면 닉네임 */
+.nick { display: flex; align-items: center; gap: 10px; background: var(--paper); border-radius: 12px; padding: 10px 12px; margin: 14px 0 10px; box-shadow: var(--card-sh) }
+.nick span { font-size: 13px; color: var(--ink-2) } .nick b { flex: 1; font-size: 17px } .nick button { padding: 6px 12px }
+.join { grid-template-columns: 1fr auto; margin-top: 0 }
+.places .bt button[data-rule] { margin-left: auto }
+.nickin { font-size: 18px }
+/* 위 띠 단추 */
+#app.room .bar { gap: 6px }
+#app.room .bar .out, #app.room .bar .rule, #app.room .bar .hostb { background: rgba(255,240,210,.14); padding: 5px 9px; font-size: 13px; font-weight: 600 }
+#app.room .bar .hostb { background: #e0a526; color: #2b1d10 }
+/* 이름표: 닉네임과 점수를 따로 */
+#app.room .seats span { display: inline-flex; align-items: center; gap: 5px }
+#app.room .seats span b { font-weight: 700 }
+#app.room .seats em { background: rgba(0,0,0,.08); border-radius: 4px; padding: 0 5px; opacity: 1; font-size: 11px }
+#app.room .seats span.on em { background: rgba(255,255,255,.25) }
+#app.room .seats span.me { cursor: pointer }
+#app.room .seats .watch { background: #2b2f36; color: #fff; border-left: 0 }
+.banner { background: #fff2c6; color: #4a3a12; border-radius: 8px; padding: 6px 10px; font-size: 13px; margin: 0 0 5px; box-shadow: var(--card-sh); flex: none }
+/* 확인 창, 규칙 */
+.appsheet { z-index: 60 }
+.appsheet .in { gap: 8px }
+.appsheet .in > button { width: 100% }
+.appsheet .wrow { display: flex; flex-wrap: wrap; gap: 6px; align-items: center } .appsheet .wrow button { padding: 6px 10px; font-size: 13px }
+.rules .rt { font: 400 22px var(--box); color: var(--c); margin: 0 } .rules .rt small { font: 500 13px var(--ui); color: var(--ink-2); margin-left: 6px }
+.rules .rstep { display: grid; grid-template-columns: 42px 1fr; gap: 10px; align-items: start; min-height: 120px }
+.rules .rstep b { font: 400 18px var(--box); color: #fff; background: var(--sea); border-radius: 8px; padding: 6px 0; text-align: center }
+.rules .rstep p { margin: 0; font-weight: 500; font-size: 16px; line-height: 1.6 }
+.rules .row { margin: 0 } .rules .row button { flex: 1 }
+/* 대기실 */
+.lobbywait .wtitle { font: 400 26px var(--box); color: var(--c); margin: 0 0 4px; display: flex; align-items: baseline; gap: 8px }
+.lobbywait .wtitle small { font: 500 13px var(--ui); color: var(--ink-2) }
+.lobbywait .wcount { margin: 6px 0 0; font-weight: 650 }
+.wlist li.me { box-shadow: inset 0 0 0 2px var(--s) }
+.wlist li.empty { border-left-style: dashed; border-left-color: #b9ad97; color: #8a7d68; background: transparent; box-shadow: inset 0 0 0 1.5px dashed #c9bda6 }
+.wlist li.empty b { font-weight: 500; animation: blink 1.2s infinite alternate }
+.wrules { margin-top: 14px; border-top: 1px dashed #cdbf9f; padding-top: 10px }
+.wrules p { margin: 0 0 4px; font-weight: 700 } .wrules ol { margin: 0; padding-left: 20px; font-size: 14px; color: #4a3f30 } .wrules li { margin: 4px 0 }
+#app.room .stage > .lobbywait { overflow: auto }
+
+/* 화면 들썩임 막기: 안내 문장은 두 줄 자리를 늘 차지 */
+#app.room .say { min-height: 2.7em; max-height: 2.7em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical }
+
+/* 움직임 */
+.map [data-k], .yutb [data-k] { transform-box: fill-box; transform-origin: center }
+.die.rolling { animation: tumble .55s cubic-bezier(.2,.7,.3,1) }
+@keyframes tumble { 0% { transform: translate(-30px, -26px) rotate(-200deg) scale(1.15) } 55% { transform: translate(6px, 4px) rotate(30deg) } 80% { transform: translate(-2px, 0) rotate(-8deg) } 100% { transform: none } }
+.bell .ringb.hit { animation: ring .45s ease-out }
+@keyframes ring { 0%, 100% { rotate: 0deg } 20% { rotate: -9deg } 40% { rotate: 8deg } 60% { rotate: -5deg } 80% { rotate: 3deg } }
+.bell .flash.ok { animation: popin .35s ease-out } .bell .flash.bad { animation: shake .4s }
+@keyframes popin { from { transform: scale(.7); opacity: 0 } to { transform: none; opacity: 1 } }
+@keyframes shake { 0%, 100% { transform: none } 25% { transform: translateX(-6px) } 50% { transform: translateX(6px) } 75% { transform: translateX(-3px) } }
+.bell .pl.me { grid-column: 1 / -1; border-top-width: 6px }
+.bell .pl.me .fc { max-width: min(96px, 13vh) }
+.say { transition: color .2s }
+.endbox { animation: popin .35s ease-out }
+.stage button:not(:disabled) { transition: transform .08s, box-shadow .08s }
+
+/* 소라게 경주: 둘러앉아 보는 섬 판 */
+.crab .ctable { position: relative; width: min(100%, 52vh); aspect-ratio: 1; margin: 0 auto; flex: none }
+.crab .cboard { position: absolute; inset: 7%; border-radius: 50%; transform: rotate(var(--rot)); transition: transform .6s ease }
+.crab .cimg { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 18%; box-shadow: 0 8px 20px rgba(0,0,0,.4) }
+.crab .sp { position: absolute; width: 10%; aspect-ratio: 1; transform: translate(-50%, -50%) rotate(calc(-1 * var(--rot))); border-radius: 50%; background: radial-gradient(circle at 40% 35%, #fff8e6, #e9d6a8); box-shadow: inset 0 -2px 0 rgba(0,0,0,.15), 0 2px 3px rgba(0,0,0,.25) }
+.crab .sp > b { position: absolute; inset: 0; display: grid; place-items: center; font: 600 9px var(--ui); color: #9a7b45 }
+.crab .sp.beach { width: 13%; background: radial-gradient(circle at 40% 35%, #fff, #f3d58a); box-shadow: 0 0 0 3px #e0a526, 0 2px 4px rgba(0,0,0,.3) }
+.crab .sp.beach > b { font: 400 13px var(--box); color: #b07a10 }
+.crab .raft { position: absolute; left: 87.5%; top: 87%; width: 16%; aspect-ratio: 1; transform: translate(-50%, -50%) rotate(calc(-1 * var(--rot))); display: flex; flex-wrap: wrap; align-content: center; justify-content: center; gap: 1px }
+.crab .raft .cr { position: relative; left: auto; top: auto; width: 42%; transform: none }
+.crab .cr { position: absolute; left: 50%; top: 50%; width: 120%; aspect-ratio: 1; transform: translate(-50%, calc(-50% - var(--k, 0) * 32%)); background: none; box-shadow: none; z-index: calc(2 + var(--k, 0)) }
+.crab .cr::before { content: ""; position: absolute; inset: 58% 12% 2%; border-radius: 50%; background: var(--s); box-shadow: 0 2px 0 rgba(0,0,0,.45) }
+.crab .cr img { position: relative; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 2px 1px rgba(0,0,0,.45)) }
+.crab .cr.mv::before { box-shadow: 0 0 0 2px #fff, 0 0 10px 3px #ffe07a }
+.crab .cr.pick { cursor: pointer; animation: bob .7s infinite alternate } .crab .cr.pick::before { box-shadow: 0 0 0 3px #fff, 0 0 12px 4px #ffe07a }
+@keyframes bob { to { translate: 0 -4px } }
+.crab .seat { position: absolute; transform: translate(-50%, -50%); background: var(--paper); border-bottom: 3px solid var(--s); border-radius: 6px; padding: 1px 7px; font-size: 11px; font-weight: 700; box-shadow: var(--card-sh); white-space: nowrap; z-index: 9 }
+.crab .seat.cur { background: var(--s); color: #fff } .crab .seat.me { outline: 2px solid #fff }
+.crab .tray { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 46%; height: 16%; display: flex; gap: 6%; align-items: center; justify-content: center; z-index: 8; pointer-events: none }
+.crab .tray .die { width: 30%; max-width: 46px; height: auto; aspect-ratio: 1; padding: 6% }
+.crab .tray .die i { width: auto; height: auto; aspect-ratio: 1; margin: 18% }
+.crab .cinfo { display: flex; gap: 8px; align-items: stretch; flex: none }
+.crab .cinfo .shell { background: var(--paper); border-radius: 10px; padding: 4px 12px; text-align: center; box-shadow: var(--card-sh); line-height: 1.1 }
+.crab .cinfo .shell b { display: block; font: 400 26px var(--box); color: #c46a3a }
+.crab .cinfo .shell small { font-size: 10px; color: var(--ink-2) }
+.crab .cinfo .mine { flex: 1; background: var(--paper); border-radius: 10px; padding: 6px 12px; box-shadow: var(--card-sh); font-size: 14px }
+.crab .cinfo .mine b { font: 400 22px var(--box); color: #c46a3a } .crab .cinfo .mine small { color: var(--ink-2); font-size: 11px }
+#app.room .crab .acts { min-height: 48px; flex: none }
+
+/* 윷놀이: 조각보 천 위 윷판, 윷가락 */
+.yutb { background: url(art/yutcloth.webp) center / cover; border-radius: 12px }
+.yutb .sq { stroke: #5a3a1e; stroke-width: 1 } .yutb line { stroke: #5a3a1e; stroke-width: 1 }
+.yutb .dot { fill: #f5ead2; stroke: #5a3a1e; stroke-width: 1 } .yutb .dot.start { fill: #e7b84a }
+.yutb .lbl { fill: #5a3a1e }
+.sticks { display: flex; gap: 6px; align-items: center; justify-content: center; min-height: 54px; flex: none }
+.sticks i { width: 14px; height: 50px; border-radius: 7px; background: linear-gradient(90deg, #8a5a2a, #c48a4f 40%, #8a5a2a); box-shadow: 0 2px 3px rgba(0,0,0,.4) }
+.sticks i.flat { background: linear-gradient(90deg, #f1dcae, #fff3d6 50%, #e8cf98); box-shadow: inset 0 0 0 1px #b48b4c, 0 2px 3px rgba(0,0,0,.4) }
+.sticks i.mark { background-image: linear-gradient(90deg, #f1dcae, #fff3d6 50%, #e8cf98), linear-gradient(#000, #000); }
+.sticks i.flat.mark::after { content: "×"; display: block; text-align: center; font-size: 12px; color: #a33; margin-top: 16px }
+.sticks b { font: 400 26px var(--box); color: #fff; text-shadow: 0 2px 0 rgba(0,0,0,.35); margin-left: 8px }
+.sticks.toss i { animation: toss .7s cubic-bezier(.2,.7,.3,1) both; animation-delay: calc(var(--i) * 40ms) }
+.sticks.toss b { animation: popin .3s .55s both }
+@keyframes toss { 0% { transform: translateY(0) rotate(0) } 40% { transform: translateY(-60px) rotate(300deg) } 75% { transform: translateY(4px) rotate(350deg) } 100% { transform: translateY(0) rotate(360deg) } }
+
+/* 괴짜 달리기: 운동장 경주로 그림 */
+.lanes { background: url(art/track.webp) center / cover; box-shadow: 0 5px 0 #6e4a22, 0 12px 22px rgba(0,0,0,.4) }
+.trk { background: rgba(255,255,255,.12); border-right: 4px solid #fff }
+.lane .nm { text-shadow: 0 1px 2px rgba(0,0,0,.6) }
+.trk b { transition: left .5s cubic-bezier(.2,.8,.2,1) }
+
+/* 섬 지도 잇기: 그림 조각 */
+.mapsvg .fld, .mtool .fld { fill: url(#fldP); stroke: rgba(60,90,40,.5) }
+.mapsvg .town, .mtool .town { fill: url(#townP); stroke: #6b4a2a; stroke-width: 2.5 }
+.mapsvg .road, .mtool .road { stroke: #e9dcbc; stroke-width: 11 }
+.mapsvg .man { stroke-width: 4 }
+.isle .say .dd { display: inline-flex; gap: 4px; align-items: center } .isle .say .dd .die { width: 24px; height: 24px; padding: 3px } .isle .say .dd .die i { width: 4px; height: 4px }
+/* 시장 종: 다른 사람은 위 한 줄, 나는 아래 */
+.bell .tbl.t2 { grid-template-columns: 1fr } .bell .tbl.t3 { grid-template-columns: repeat(2, 1fr) } .bell .tbl.t4 { grid-template-columns: repeat(3, 1fr) }
+.bell .tbl.t5 { grid-template-columns: repeat(4, 1fr) } .bell .tbl.t6 { grid-template-columns: repeat(5, 1fr) }
+.bell .tbl .pl:not(.me) .fc { max-width: min(70px, 9vh) } .bell .tbl .pl:not(.me) { padding: 5px 3px } .bell .tbl .pl:not(.me) .cnt { font-size: 10px }
+.bell .tbl.t2 .pl:not(.me) .fc, .bell .tbl.t3 .pl:not(.me) .fc { max-width: min(84px, 11vh) }

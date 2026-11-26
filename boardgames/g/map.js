@@ -192,8 +192,8 @@ export default {
     const t = v.last && v.board[key(v.last.x, v.last.y)];
     el.innerHTML = `<div class="map">
       <p class="say">${v.phase === "end" ? "판이 끝났어요" : !my ? `${esc(n[v.cur])} 차례` : v.phase === "place" ? "조각을 돌려 보고, 점선 칸을 눌러 놓아요" : "방금 놓은 조각에 일꾼을 올릴까요?"}<small>남은 조각 ${v.deckN}</small></p>
-      <div class="mapwrap${UI.big ? " big" : ""}"><svg viewBox="${x0 * 100} ${y0 * 100} ${W * 100} ${H * 100}" class="mapsvg">${g}</svg></div>
-      <div class="mtool">${v.tile ? `<div class="cur"><svg viewBox="0 0 100 100">${tileSVG(v.tile, my && v.phase === "place" ? UI.rot : 0, 0, 0, [], false)}</svg><small>${my && v.phase === "place" ? "놓을 조각" : "지금 조각"}</small></div>` : ""}
+      <div class="mapwrap${UI.big ? " big" : ""}"><svg viewBox="${x0 * 100} ${y0 * 100} ${W * 100} ${H * 100}" class="mapsvg">${DEFS}${g}</svg></div>
+      <div class="mtool">${v.tile ? `<div class="cur"><svg viewBox="0 0 100 100">${DEFS}${tileSVG(v.tile, my && v.phase === "place" ? UI.rot : 0, 0, 0, [], false)}</svg><small>${my && v.phase === "place" ? "놓을 조각" : "지금 조각"}</small></div>` : ""}
         ${my && v.phase === "place" ? `<button class="rot">돌리기</button>` : ""}<button class="ghost zoom">${UI.big ? "작게 보기" : "크게 보기"}</button></div>
       ${my && v.phase === "man" && t ? `<div class="acts">${feats(t.k, t.r).map((f, i) => v.free?.[i] && v.men[me] ? `<button data-f="${i}">${({ town: "마을", road: "길", temple: "절" })[f.t]}에 올리기</button>` : "").join("")}<button class="ghost" data-f="-1">안 올리기</button></div>` : ""}
       <ol class="score">${v.score.map((x, p) => `<li style="--s:${SEAT[p]}" class="${p === v.cur ? "cur" : ""}"><b>${esc(n[p])}</b><span>${x}점, 일꾼 ${v.men[p]}</span></li>`).join("")}</ol>
@@ -209,11 +209,12 @@ export default {
 const UI = { rot: 0, big: false };
 
 // 조각 그림: 들판 바탕, 마을은 가장자리에서 안쪽으로, 길은 가장자리 가운데에서 중심으로
+const DEFS = `<defs><pattern id="fldP" patternUnits="userSpaceOnUse" width="100" height="100"><image href="art/pasture.webp" width="100" height="100" preserveAspectRatio="xMidYMid slice"/></pattern><pattern id="townP" patternUnits="userSpaceOnUse" width="100" height="100"><image href="art/town.webp" width="100" height="100" preserveAspectRatio="xMidYMid slice"/></pattern></defs>`;
 const MID = [[50, 0], [100, 50], [50, 100], [0, 50]];
 const CORN = [[[0, 0], [100, 0]], [[100, 0], [100, 100]], [[100, 100], [0, 100]], [[0, 100], [0, 0]]];
 function tileSVG(k, r, ox, oy, men, last) {
   const F = feats(k, r);
-  let s = `<g transform="translate(${ox} ${oy})"><rect width="100" height="100" class="fld${last ? " last" : ""}"/>`;
+  let s = `<g transform="translate(${ox} ${oy})" ${men.length || last || ox || oy ? `data-k="m${ox},${oy}"` : ""}><rect width="100" height="100" class="fld${last ? " last" : ""}"/>`;
   for (const f of F.filter(f => f.t === "town")) {
     if (f.e.length === 1) { const [[ax, ay], [bx, by]] = CORN[f.e[0]], [mx, my] = MID[f.e[0]], cx = mx + (50 - mx) * .62, cy = my + (50 - my) * .62; s += `<path class="town" d="M${ax} ${ay} Q${cx} ${cy} ${bx} ${by} Z"/>`; }
     else { const pts = []; f.e.sort((a, b) => a - b).forEach(d => pts.push(...CORN[d])); s += `<polygon class="town" points="${f.e.length === 4 ? "0,0 100,0 100,100 0,100" : [...pts, [50, 50]].map(p => p.join(",")).join(" ")}"/>`; if (f.e.length === 2 && Math.abs(f.e[0] - f.e[1]) === 2) s += `<rect class="town" x="${f.e[0] % 2 ? 15 : 0}" y="${f.e[0] % 2 ? 0 : 15}" width="${f.e[0] % 2 ? 70 : 100}" height="${f.e[0] % 2 ? 100 : 70}"/>`; }
@@ -223,7 +224,7 @@ function tileSVG(k, r, ox, oy, men, last) {
     else { const [a] = f.e.map(d => MID[d]); s += `<line class="road" x1="${a[0]}" y1="${a[1]}" x2="50" y2="50"/>`; }
   }
   if (F.some(f => f.t === "road" && f.e.length === 1) && !TILE[k].temple) s += `<rect class="cross" x="42" y="42" width="16" height="16"/>`;
-  if (TILE[k].temple) s += `<g class="temple"><rect x="36" y="40" width="28" height="22"/><path d="M32 42 L50 28 L68 42 Z"/></g>`;
+  if (TILE[k].temple) s += `<image href="art/temple.webp" x="24" y="24" width="52" height="52"/>`;
   for (const m of men) {
     const f = F[m.f]; let cx = 50, cy = 50;
     if (f && f.e.length) { const [mx, my] = MID[f.e[0]]; cx = mx + (50 - mx) * (f.t === "town" ? .35 : .55); cy = my + (50 - my) * (f.t === "town" ? .35 : .55); }

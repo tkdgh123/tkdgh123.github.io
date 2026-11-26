@@ -144,7 +144,7 @@ function render(G, el, v, me, send, ui) {
   const all = new Map([...v.table.flat(), ...(v.hand || [])].map(t => [t.id, t]));
   const onTable = new Set(UI.draft.flat());
   const handLeft = (v.hand || []).filter(t => !onTable.has(t.id)).sort((a, b) => a.c - b.c || a.v - b.v);
-  const tileB = (t, extra = "") => `<button class="tl${UI.sel.includes(t.id) ? " on" : ""}${extra}" data-id="${t.id}" style="--c:${t.v ? TC[t.c][1] : "#8a4fb0"}" ${my ? "" : "disabled"}>${t.v || "★"}</button>`;
+  const tileB = (t, extra = "") => `<button data-k="t${t.id}" class="tl${UI.sel.includes(t.id) ? " on" : ""}${extra}" data-id="${t.id}" style="--c:${t.v ? TC[t.c][1] : "#8a4fb0"}" ${my ? "" : "disabled"}>${t.v || "★"}</button>`;
   const changed = JSON.stringify(UI.draft) !== JSON.stringify(v.table.map(r => r.map(t => t.id)));
   el.innerHTML = `<div class="tile">
     <p class="say">${v.done ? "판이 끝났어요" : my ? (UI.sel.length ? "옮길 줄을 누르거나 새 줄을 만들어요" : "타일을 눌러 고른 뒤 줄로 옮겨요. 다 맞으면 내기") : `${esc(n[v.cur])} 차례예요`}<small>더미 ${v.poolN}</small></p>

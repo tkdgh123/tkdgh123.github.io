@@ -113,7 +113,7 @@ export default {
     else if (v.phase === "draft") say = v.racer[me] != null ? "골랐어요. 다른 사람을 기다려요" : `${v.race}번째 경주에 나갈 선수를 골라요`;
     else if (v.phase === "reroll" && my) say = `${v.roll}이 나왔어요. 행운아라서 한 번 다시 굴릴 수 있어요`;
     else say = my ? "주사위를 굴려요" : `${esc(n[v.cur])} 차례예요`;
-    const lane = p => { const pc = v.pos[p] / GOAL * 100; return `<div class="lane${p === v.cur && v.phase !== "draft" ? " cur" : ""}" style="--s:${SEAT[p]}"><span class="nm">${esc(n[p])}${v.racer[p] >= 0 && v.racer[p] != null ? ` <i>${RACER[v.racer[p]][0]}</i>` : ""}</span><div class="trk"><b style="left:${pc}%">${v.fin.includes(p) ? v.fin.indexOf(p) + 1 : ""}</b></div><small>${v.pos[p]}</small></div>`; };
+    const lane = p => { const pc = v.pos[p] / GOAL * 100; return `<div class="lane${p === v.cur && v.phase !== "draft" ? " cur" : ""}" style="--s:${SEAT[p]}"><span class="nm">${esc(n[p])}${v.racer[p] >= 0 && v.racer[p] != null ? ` <i>${RACER[v.racer[p]][0]}</i>` : ""}</span><div class="trk"><b data-k="r${p}" style="left:${pc}%">${v.fin.includes(p) ? v.fin.indexOf(p) + 1 : ""}</b></div><small>${v.pos[p]}</small></div>`; };
     el.innerHTML = `<div class="race">
       <p class="say">${say}<small>${v.race}/${RACES} 경주</small></p>
       ${v.phase === "draft" && v.racer[me] == null && me >= 0 ? `<div class="offer">${v.offer[me].map(r => `<button class="rcard" data-r="${r}"><b>${RACER[r][0]}</b><span>${RACER[r][1]}</span></button>`).join("")}</div>` : ""}

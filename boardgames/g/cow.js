@@ -86,7 +86,7 @@ export default {
   },
   badge(v, i) { return `벌점 ${v.score[i]}`; },
   render(el, v, me, send, ui) {
-    const n = ui.names, H = c => `<span class="cw h${heads(c)}"><b>${c}</b><i>${"▲".repeat(heads(c))}</i></span>`;
+    const n = ui.names, H = c => `<span class="cw h${heads(c)}" data-k="w${c}"><b>${c}</b><i>${"▲".repeat(heads(c))}</i></span>`;
     const mustTake = v.phase === "take" && v.taker === me;
     let say = v.phase === "end" ? "판이 끝났어요" : mustTake ? `내 카드 ${v.shown[0][1]}은(는) 어느 줄보다 작아요. 가져갈 줄을 눌러요` :
       v.phase === "take" ? `${esc(n[v.taker])}이(가) 가져갈 줄을 고르는 중` : v.mine != null ? "냈어요. 다른 사람을 기다려요" : "낼 카드를 골라요";

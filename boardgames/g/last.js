@@ -105,7 +105,7 @@ export default {
   badge(v, i) { return `${v.counts[i]}장`; },
   render(el, v, me, send, ui) {
     const n = ui.names, my = v.cur === me && v.win == null;
-    const card = (c, attrs = "", cls = "") => `<button class="lc ${cls}" style="--c:${c.c < 0 ? "#222" : COL[c.c][1]}" ${attrs}><b>${lab(c)}</b><small>${typeof c.v === "number" ? "" : SYM[c.v]}</small></button>`;
+    const card = (c, attrs = "", cls = "") => `<button class="lc ${cls}" data-k="l${c.id}" style="--c:${c.c < 0 ? "#222" : COL[c.c][1]}" ${attrs}><b>${lab(c)}</b><small>${typeof c.v === "number" ? "" : SYM[c.v]}</small></button>`;
     const playable = c => my && (c.c < 0 || c.c === v.color || c.v === v.top.v) && (v.drawn == null || c.id === v.drawn);
     el.innerHTML = `<div class="last">
       <p class="say">${v.win != null ? "판이 끝났어요" : my ? (v.drawn != null ? "가져온 카드를 내거나 넘겨요" : "낼 카드를 누르거나 한 장 가져와요") : `${esc(n[v.cur])} 차례예요`}</p>

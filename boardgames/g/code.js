@@ -71,7 +71,7 @@ export default {
       ${me >= 0 ? `<div class="myteam" style="--t:${TEAM[myTeam][1]}">나는 ${TEAM[myTeam][0]}${amSpy ? " 대장 (정답 지도가 보여요)" : " 팀원"}</div>` : ""}
       <p class="say">${say}</p>
       <div class="cscore"><span style="--t:${TEAM[0][1]}">빨강 남은 ${v.remain[0]}</span><span style="--t:${TEAM[1][1]}">파랑 남은 ${v.remain[1]}</span></div>
-      <div class="grid5">${v.words.map((w, i) => `<button class="cw ${col(v.key[i])}${v.open[i] ? " op" : ""}" data-i="${i}" ${my && v.phase === "guess" && !v.open[i] ? "" : "disabled"}>${esc(w)}</button>`).join("")}</div>
+      <div class="grid5">${v.words.map((w, i) => `<button class="cw ${col(v.key[i])}${v.open[i] ? " op" : ""}" data-i="${i}" data-k="w${i}-${v.open[i] ? 1 : 0}" ${v.open[i] ? 'data-anim="flip"' : ""} ${my && v.phase === "guess" && !v.open[i] ? "" : "disabled"}>${esc(w)}</button>`).join("")}</div>
       ${my && v.phase === "clue" ? `<form class="clue"><input name="w" maxlength="12" placeholder="힌트 낱말" autocomplete="off" required><select name="n">${[1, 2, 3, 4, 5, 6, 7, 8, 9].map(k => `<option>${k}</option>`).join("")}</select><button>힌트 주기</button></form>` : ""}
       ${my && v.phase === "guess" && v.guessed ? `<div class="acts"><button class="ghost stop">여기까지</button></div>` : ""}
       <div class="teams">${[0, 1].map(t => `<p style="--t:${TEAM[t][1]}"><b>${TEAM[t][0]}</b> ${[...Array(v.n).keys()].filter(p => team(p) === t).map(p => esc(n[p]) + (v.spy.includes(p) ? "(대장)" : "")).join(", ")}</p>`).join("")}</div>

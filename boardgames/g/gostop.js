@@ -128,13 +128,13 @@ export default {
   badge(v, i) { return `${v.scores[i].s}점${v.go[i] ? `, ${v.go[i]}고` : ""}`; },
   render(el, v, me, send, ui) {
     const n = ui.names, my = v.cur === me && v.win == null && !v.nagari;
-    const card = (c, attrs = "", cls = "") => `<button class="hw k-${kind(c)} ${cls}" style="--h:${MCOL[c.m]}" ${attrs}><b>${c.m}</b><small>${MON[c.m]}</small><i>${LABEL(c)}</i></button>`;
-    const capView = (cap) => ["g", "y", "d", "p"].map(k => { const l = cap.filter(c => kind(c) === k); return l.length ? `<span class="cg"><small>${({ g: "광", y: "열끗", d: "띠", p: "피" })[k]} ${k === "p" ? l.reduce((a, c) => a + piv(c), 0) : l.length}</small>${l.map(c => `<i style="--h:${MCOL[c.m]}">${c.m}</i>`).join("")}</span>` : ""; }).join("");
+    const card = (c, attrs = "", cls = "", k = true) => `<button ${k ? `data-k="h${c.id}"` : ""} class="hw k-${kind(c)} ${cls}" style="--h:${MCOL[c.m]}" ${attrs}><b>${c.m}</b><small>${MON[c.m]}</small><i>${LABEL(c)}</i></button>`;
+    const capView = (cap) => ["g", "y", "d", "p"].map(k => { const l = cap.filter(c => kind(c) === k); return l.length ? `<span class="cg"><small>${({ g: "광", y: "열끗", d: "띠", p: "피" })[k]} ${k === "p" ? l.reduce((a, c) => a + piv(c), 0) : l.length}</small>${l.map(c => `<i data-k="h${c.id}" style="--h:${MCOL[c.m]}">${c.m}</i>`).join("")}</span>` : ""; }).join("");
     const hl = v.hand ? new Set(v.hand.filter(c => v.floor.some(f => f.m === c.m)).map(c => c.id)) : new Set();
     el.innerHTML = `<div class="gostop">
       <p class="say">${v.nagari ? "나가리예요" : v.win != null ? "판이 끝났어요" : my ? (v.phase === "gostop" ? `${v.scores[me].s}점! 고 할까요, 스톱 할까요?` : "낼 패를 골라요 (짝이 있는 패는 위로 올라와 있어요)") : `${esc(n[v.cur])} 차례`}<small>더미 ${v.deckN}장, ${v.need}점부터 스톱</small></p>
       ${my && v.phase === "gostop" ? `<div class="acts"><button class="go">고 (${v.go[me] + 1}고)</button><button class="ghost st">스톱</button></div>` : ""}
-      <div class="floor">${v.floor.map(c => card(c, "disabled")).join("")}${v.flip ? `<div class="flipped"><small>방금 뒤집은 패</small>${card(v.flip, "disabled")}</div>` : ""}</div>
+      <div class="floor">${v.floor.map(c => card(c, "disabled")).join("")}${v.flip ? `<div class="flipped"><small>방금 뒤집은 패</small>${card(v.flip, "disabled", "", false)}</div>` : ""}</div>
       ${v.hand ? `<div class="hhand">${v.hand.map(c => card(c, `data-id="${c.id}" ${my && v.phase === "play" ? "" : "disabled"}`, hl.has(c.id) ? "up" : "")).join("")}</div>` : ""}
       <div class="caps">${[...Array(v.n).keys()].map(p => `<div class="cp${p === v.cur ? " cur" : ""}" style="--s:${SEAT[p]}"><div class="ch"><b>${esc(n[p])}</b><span>${v.scores[p].s}점${v.go[p] ? `, ${v.go[p]}고` : ""}</span><small>손 ${v.counts[p]}</small></div><div class="cr">${capView(v.cap[p])}</div>${v.scores[p].why.length ? `<small class="why">${v.scores[p].why.join(", ")}</small>` : ""}</div>`).join("")}</div>
       <ol class="log">${v.log.map(x => `<li>${line(x, n)}</li>`).join("")}</ol>

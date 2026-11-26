@@ -88,11 +88,11 @@ export default {
     const n = ui.names, my = v.cur === me && !v.done;
     if (!my) { UI.card = null; UI.to = null; }
     const card = (c, mine, attrs = "") => mine
-      ? `<button class="fcd hid${UI.card === c.id ? " on" : ""}" ${attrs} style="--c:${c.hc != null ? FC[c.hc][1] : "#c8cdd2"}"><b>${c.hn ?? "?"}</b><small>${c.hc != null ? FC[c.hc][0] : "색 ?"}</small></button>`
-      : `<span class="fcd" style="--c:${FC[c.c][1]}" ${attrs}><b>${c.v}</b>${c.hc != null || c.hn != null ? `<i>${[c.hc != null ? "색" : "", c.hn != null ? "수" : ""].filter(Boolean).join("+")} 앎</i>` : ""}</span>`;
+      ? `<button data-k="f${c.id}" class="fcd hid${UI.card === c.id ? " on" : ""}" ${attrs} style="--c:${c.hc != null ? FC[c.hc][1] : "#c8cdd2"}"><b>${c.hn ?? "?"}</b><small>${c.hc != null ? FC[c.hc][0] : "색 ?"}</small></button>`
+      : `<span data-k="f${c.id}" class="fcd" style="--c:${FC[c.c][1]}" ${attrs}><b>${c.v}</b>${c.hc != null || c.hn != null ? `<i>${[c.hc != null ? "색" : "", c.hn != null ? "수" : ""].filter(Boolean).join("+")} 앎</i>` : ""}</span>`;
     el.innerHTML = `<div class="fire">
       <p class="say">${v.done ? "판이 끝났어요" : my ? "내 카드를 골라 내거나 버리고, 아니면 다른 사람에게 힌트를 줘요" : `${esc(n[v.cur])} 차례예요`}${v.last != null && !v.done ? `<small>더미가 떨어져 ${v.last}번 남음</small>` : ""}</p>
-      <div class="stk">${v.stacks.map((x, c) => `<div class="st" style="--c:${FC[c][1]}"><b>${x || ""}</b><small>${FC[c][0]}</small></div>`).join("")}</div>
+      <div class="stk">${v.stacks.map((x, c) => `<div class="st" data-k="s${c}-${x}" style="--c:${FC[c][1]}"><b>${x || ""}</b><small>${FC[c][0]}</small></div>`).join("")}</div>
       <div class="tok"><span>힌트 <b>${v.hint}</b>/8</span><span>실수 <b>${3 - v.fuse}</b>/3</span><span>더미 <b>${v.deckN}</b></span><span>점수 <b>${v.score}</b></span></div>
       ${[...Array(v.n).keys()].filter(p => p !== me).map(p => `<div class="fh${p === v.cur ? " cur" : ""}" style="--s:${SEAT[p]}"><span class="who">${esc(n[p])}</span><div>${v.hands[p].map(c => card(c, false)).join("")}</div>
         ${my && v.hint > 0 ? `<div class="hints"><small>힌트</small>${[0, 1, 2, 3, 4].filter(c => v.hands[p].some(x => x.c === c)).map(c => `<button class="hb" data-to="${p}" data-c="${c}" style="background:${FC[c][1]}">${FC[c][0]}</button>`).join("")}${[1, 2, 3, 4, 5].filter(x => v.hands[p].some(c => c.v === x)).map(x => `<button class="hb ghost" data-to="${p}" data-v="${x}">${x}</button>`).join("")}</div>` : ""}</div>`).join("")}
