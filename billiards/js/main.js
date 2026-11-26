@@ -157,16 +157,50 @@ $("#start").addEventListener("click", () => {
   const names = menuMode === "solo" ? ["연습"] : ["1번", "2번"];
   game = R4.newGame(menuMode, names.map((n, i) => ({ name: n, suji: +sujiSel[i].value })));
   sim = null; stand(true);
-  if (menuMode === "duo") startBanking(); else { placeBalls(R4.opening(p, 0)); say("공 가까이 가서 Space로 엎드려요", 4); }
+  const begin = () => { if (menuMode === "duo") startBanking(); else { placeBalls(R4.opening(p, 0)); say("공 가까이 가서 Space로 엎드려요", 4); } };
   drawBoard(); hud(); closeMenu();
+  // 처음 한 번은 힘부터 맞춤 (가속을 끈 날 값은 마우스, 패드마다 크기가 달라서)
+  if (store.get("calib", 0) || TEST) begin(); else startCalib(() => setTimeout(begin, 1500));
 });
+$("#calib").addEventListener("click", () => { readCfg(); closeMenu(); startCalib(); });
 $("#resume").addEventListener("click", () => { readCfg(); closeMenu(); });
 function openMenu() { mode = mode === "menu" ? "menu" : mode; $("#menu").hidden = false; $("#resume").hidden = !game; canvas.style.cursor = ""; if (document.pointerLockElement) document.exitPointerLock(); }
 function closeMenu() { $("#menu").hidden = true; canvas.style.cursor = "none"; lock(); }
 // 마우스 포인터를 숨기고 화면이 마우스를 따라 돌게. 잠금이 안 걸렸으면 다음 클릭이나 키에서 다시 걺
-// 손으로 미는 느낌이 평소 마우스와 같도록 운영체제 가속을 그대로 씀
-function lock() { if (TEST || document.pointerLockElement === canvas || !$("#menu").hidden) return; try { canvas.requestPointerLock()?.catch?.(() => {}); } catch {} }
-document.addEventListener("pointerlockchange", () => { if (!document.pointerLockElement && !TEST && mode !== "chalk") openMenu(); });
+// 운영체제 가속(포인터 정확도 향상)을 끈 날 값으로 받음: 손을 두 배 빨리 밀면 힘도 두 배. 브라우저가 못 하면 보통 잠금
+function lock() {
+  if (TEST || document.pointerLockElement === canvas || !$("#menu").hidden) return;
+  const plain = () => { try { canvas.requestPointerLock()?.catch?.(() => {}); } catch {} };
+  try { const r = canvas.requestPointerLock({ unadjustedMovement: true }); if (r?.catch) r.catch(plain); else if (!r) setTimeout(() => { if (!document.pointerLockElement) plain(); }, 50); } catch { plain(); }
+}
+document.addEventListener("pointerlockchange", () => { if (!document.pointerLockElement && !TEST && mode !== "chalk" && mode !== "calib") openMenu(); });
+
+// ---------- 힘 맞추기: 평소 보통 힘으로 세 번 밀면 그 속도를 큐 2.5 m/s(공 약 3 m/s)로 ----------
+const CALIB_CUE = 2.5, CALIB_N = 3;
+const calib = { down: false, y: 0, hist: [], peak: 0, got: [], after: null };
+function startCalib(after) {
+  Object.assign(calib, { down: false, y: 0, hist: [], peak: 0, got: [], after });
+  mode = "calib"; cueMesh.visible = false;
+  say(`힘부터 맞춰요. 왼쪽 단추를 누른 채 평소 보통 힘으로 당겼다 밀어요 (0/${CALIB_N})`, 999);
+}
+function calibMove(dy, now) {
+  if (!calib.down) return;
+  calib.y += dy;
+  calib.hist.push({ t: now, y: calib.y }); if (calib.hist.length > 40) calib.hist.shift();
+  calib.peak = Math.max(calib.peak, -recentRate(calib.hist, "y", true));
+}
+function calibUp() {
+  calib.down = false;
+  if (calib.peak < 300) return say(`조금 더 빠르게 밀어요 (${calib.got.length}/${CALIB_N})`, 999);
+  calib.got.push(calib.peak);
+  if (calib.got.length < CALIB_N) return say(`좋아요, 한 번 더 같은 힘으로 (${calib.got.length}/${CALIB_N})`, 999);
+  const med = calib.got.slice().sort((a, b) => a - b)[1];
+  cfg.gain = Math.max(0.1, Math.min(6, CALIB_CUE / (0.0002 * med)));
+  store.set("gain", cfg.gain); store.set("calib", Math.round(med)); $("#optGain").value = cfg.gain;
+  mode = "walk";
+  say(`힘을 맞췄어요. 지금처럼 밀면 보통 힘이에요 (스트로크 감도 ${cfg.gain.toFixed(2)})`, 4);
+  calib.after?.();
+}
 
 // ---------- 뱅킹 (둘이 칠 때 선공 정하기) ----------
 function startBanking() {
@@ -358,23 +392,27 @@ function strokeUpdate() {
   if (along >= t) { stroke.s += along - t; shoot(D2, t); }
 }
 
-function strokeSpeed() {
-  // 최근 30ms 넘게 떨어진 기록과 비교. 화면이 느려 기록 간격이 벌어져도 바로 앞 기록은 씀
-  const h = stroke.hist, now = h[h.length - 1];
-  if (h.length < 2) return 0;
-  let k = h.length - 2;
-  while (k > 0 && now.t - h[k].t < 30) k--;
-  const old = h[k];
-  if (now.t - old.t < 0.5) return 0;
-  return -(now.s - old.s) / ((now.t - old.t) / 1000);
+// 최근 30ms 동안 key 값이 변한 빠르기(초당). 마우스가 멈춘 틈에는 기록이 없어서, 당겼다 멈췄다 밀면 첫 기록 간격에
+// 멈춘 시간이 통째로 들어가 힘이 몇 분의 일로 줄었음(11-26). 움직이는 동안 기록 간격은 화면 빠르기와 같으므로
+// 한 칸을 최근 간격 가운데값의 두 배까지만 셈(화면이 느려 간격이 고르게 벌어진 건 그대로 둠)
+// oneWay: 미는 방향이 바뀐 곳(당기던 기록)에서 멈춤. 밀기 시작하자마자 맞으면 당기던 움직임이 빼져 힘이 줄던 것 막음
+function recentRate(h, key, oneWay) {
+  const n = h.length; if (n < 2) return 0;
+  const gaps = []; for (let k = Math.max(1, n - 10); k < n; k++) gaps.push(h[k].t - h[k - 1].t);
+  const cap = 2 * Math.max(1, gaps.sort((a, b) => a - b)[gaps.length >> 1]);
+  let d = 0, dt = 0, sign = 0;
+  for (let k = n - 1; k > 0 && dt < 30; k--) {
+    const step = (h[k][key] ?? 0) - (h[k - 1][key] ?? 0);
+    if (oneWay) { if (!sign) sign = Math.sign(step); else if (Math.sign(step) !== sign) break; }
+    d += step; dt += Math.min(h[k].t - h[k - 1].t, cap);
+  }
+  return dt > 0.5 ? d / (dt / 1000) : 0;
 }
+const strokeSpeed = () => -recentRate(stroke.hist, "s", true);
 
 // 맞는 순간 큐 속도가 큐 축에서 옆으로 벌어진 각. 마우스가 옆으로 흔들린 만큼 + 자세가 불안할수록 커지는 몸 떨림
 function strokePsi(speed, th) {
-  const h = stroke.hist, now = h[h.length - 1];
-  let k = h.length - 2; while (k > 0 && now.t - h[k].t < 30) k--;
-  const old = h[Math.max(k, 0)], dt = (now.t - old.t) / 1000;
-  const lat = dt > 0.0005 ? -((now.dl ?? 0) - (old.dl ?? 0)) / dt * stance.bridgeLen : 0;   // 팁이 옆으로 가는 속도
+  const lat = -recentRate(stroke.hist, "dl") * stance.bridgeLen;   // 팁이 옆으로 가는 속도
   // 떨림 표준편차(도, 설계값): 기본 0.25, 레일 브리지 +0.3, 레스트 +0.5, 큐를 많이 들면 +0.3, 몸을 멀리 뻗으면 최대 +0.4, 브리지가 길면 +0.2
   const sd = 0.25 + (stance.onRail ? 0.3 : 0) + (st.rest ? 0.5 : 0) + (th > 0.2 ? 0.3 : 0) + Math.max(0, Math.min(0.4, (st.lean - 0.25) * 3)) + (stance.bridgeLen > 0.25 ? 0.2 : 0);
   let g = 0; for (let i = 0; i < 6; i++) g += Math.random(); g = (g - 3) / 0.707;
@@ -532,15 +570,16 @@ function drawChalk() {
 ck.width = 520; ck.height = 520;
 
 // ---------- 입력 ----------
-function onMove(dx, dy) {
+function onMove(dx, dy, t = performance.now()) {
   if (mode === "walk") { me.yaw -= dx * 0.0014 * cfg.aim; me.pitch = Math.max(-1.45, Math.min(1.2, me.pitch - dy * 0.0014 * cfg.aim)); return; }
   if (mode === "chalk") return chalkMove(dx, dy);
+  if (mode === "calib") return calibMove(dy, t);
   if (mode === "aim" || mode === "roll") {
     if (stroke.on && !stroke.hit && mode === "aim") {
       const g = 0.0002 * cfg.gain;
       stroke.s = Math.min(0.32, stroke.s + dy * g);
       if (!cfg.lock) stroke.dl += dx * g / 0.95 * (st.rest ? 1.8 : 1);
-      stroke.hist.push({ t: performance.now(), s: stroke.s, dl: stroke.dl }); if (stroke.hist.length > 40) stroke.hist.shift();
+      stroke.hist.push({ t, s: stroke.s, dl: stroke.dl }); if (stroke.hist.length > 40) stroke.hist.shift();
       strokeUpdate();
       return;
     }
@@ -567,9 +606,10 @@ addEventListener("mousedown", (e) => {
   if (e.button === 2) { rmb = true; return; }
   if (e.button !== 0) return;
   if (mode === "chalk") { chalkSt.down = true; return; }
+  if (mode === "calib") { Object.assign(calib, { down: true, y: 0, hist: [{ t: performance.now(), y: 0 }], peak: 0 }); return; }
   if (mode === "aim" && !sim) {
     if (st.rest && !stroke.on) say("손이 안 닿아 레스트를 대고 쳐요", 1.5);
-    Object.assign(stroke, { on: true, s: 0, dl: 0, hist: [{ t: performance.now(), s: 0 }], hit: false });
+    Object.assign(stroke, { on: true, s: 0, dl: 0, hist: [{ t: performance.now(), s: 0, dl: 0 }], hit: false });
     strokeUpdate();
   }
 });
@@ -577,6 +617,7 @@ addEventListener("mouseup", (e) => {
   if (e.button === 2) { rmb = false; if (mode === "aim") st.headYaw = st.headPitch = 0; return; }
   if (e.button !== 0) return;
   if (mode === "chalk") { chalkSt.down = false; return; }
+  if (mode === "calib") { if (calib.down) calibUp(); return; }
   if (stroke.on) { stroke.on = false; if (stroke.hit) mode = sim ? "roll" : mode; else { stroke.s = 0; stroke.dl = 0; } }
 });
 addEventListener("contextmenu", (e) => e.preventDefault());
@@ -588,6 +629,7 @@ addEventListener("keydown", (e) => {
   keys.add(e.code);
   if (e.code === "Escape") { if (mode === "chalk") closeChalk(); else openMenu(); return; }
   if (e.code === "KeyH") { $("#help").hidden = !$("#help").hidden; return; }
+  if (mode === "calib") return;
   if (e.code === "KeyX") { cfg.lock = !cfg.lock; store.set("lock", cfg.lock); $("#optLock").checked = cfg.lock; say(cfg.lock ? "스트로크 고정: 큐가 옆으로 안 흔들려요" : "스트로크 고정 풀림: 손이 흔들리면 큐도 흔들려요", 2); return; }
   if (e.code === "KeyC") { if (mode === "chalk") closeChalk(); else openChalk(); return; }
   if (e.code === "Space") {
@@ -671,4 +713,4 @@ placeBalls(R4.opening(p, 0));
 requestAnimationFrame(frame);
 
 // 시험용 손잡이 (?test 일 때 봇이 같은 입력 길로 침)
-window.__bill = { place: (pos) => placeBalls(pos), get world() { return world; }, get p() { return p; }, get balls() { return balls; }, get mode() { return mode; }, get sim() { return sim; }, get game() { return game; }, st, stroke, me, onMove, tryStance, stand, keys, shotLog, get stance() { return stance; }, updateStance, camera, renderer, P, tipCov, get cueSpec() { return cueSpec; }, holdCue, openChalk, closeChalk, chalkSt, tipCoverage, renderScore, get lastShot() { return lastShot; } };
+window.__bill = { place: (pos) => placeBalls(pos), get world() { return world; }, get p() { return p; }, get balls() { return balls; }, get mode() { return mode; }, get sim() { return sim; }, get game() { return game; }, st, stroke, me, onMove, tryStance, stand, keys, shotLog, get stance() { return stance; }, updateStance, camera, renderer, P, tipCov, get cueSpec() { return cueSpec; }, holdCue, openChalk, closeChalk, chalkSt, tipCoverage, renderScore, get lastShot() { return lastShot; }, startCalib, calib, get cfg() { return cfg; } };

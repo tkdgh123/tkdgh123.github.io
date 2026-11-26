@@ -35,6 +35,8 @@ input[type=range] { padding: 0; width: 150px; accent-color: var(--blue) }
 .go { display: flex; gap: 10px; margin-top: 22px }
 .go button { flex: 1; font: 700 16px var(--ui); padding: 13px; border-radius: 7px; border: 0; cursor: pointer; background: var(--lamp); color: #1b1712 }
 .go button.ghost { background: #23272d; color: var(--ink) }
+.row label { white-space: nowrap } .row > span { display: flex; align-items: center; min-width: 0 } .row > span input[type=range] { width: min(150px, 30vw) }
+.mini { font: 600 13px var(--ui); color: var(--ink); background: #23272d; border: 1px solid var(--line); border-radius: 6px; padding: 5px 10px; cursor: pointer; margin-right: 6px; vertical-align: middle }
 .keys { margin-top: 18px; color: var(--ink-2); font-size: 13.5px; line-height: 1.75 }
 kbd { font: 600 12px var(--ui); background: #2a2d31; border-radius: 4px; padding: 1px 6px; border-bottom: 2px solid #111; color: var(--ink) }
 a.plan { color: #8fb6ff; font-size: 13.5px }
@@ -78,7 +80,7 @@ a.plan { color: #8fb6ff; font-size: 13.5px }
   <div class="row" id="p2row"><label for="suji2">2번 수지</label><select id="suji2"></select></div>
   <div class="row"><label for="optTable">테이블</label><select id="optTable"><option>중대</option><option>대대</option></select></div>
   <div class="row"><label for="optBall">공 지름</label><select id="optBall"><option value="65.5">65.5mm</option><option value="63">63mm</option></select></div>
-  <div class="row"><label for="optGain">스트로크 감도</label><input id="optGain" type="range" min="0.3" max="3" step="0.05"></div>
+  <div class="row"><label for="optGain">스트로크 감도</label><span><button type="button" id="calib" class="mini">힘 맞추기</button> <input id="optGain" type="range" min="0.1" max="6" step="0.05"></span></div>
   <div class="row"><label for="optAim">마우스 감도</label><input id="optAim" type="range" min="0.3" max="2" step="0.05"></div>
   <div class="row"><label for="optVol">소리 크기</label><input id="optVol" type="range" min="0" max="1.5" step="0.05"></div>
   <div class="row"><label for="optLock">스트로크 고정 (큐가 옆으로 안 흔들림)</label><input id="optLock" class="sw" type="checkbox"></div>

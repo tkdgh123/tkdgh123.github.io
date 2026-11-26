@@ -42,7 +42,7 @@ const check = (name, ok, info) => { console.log(`${ok ? "통과" : "실패"}  ${
   const a = P.newBall(0, 0, 0, p); a.v = [3, 0, 0]; a.s = P.SLIDE;
   const sim = P.simulate([a], p, 30);
   const s1 = sim.snaps[1];
-  const want = 12 * 9 / (49 * 0.2 * 9.81);
+  const want = 12 * 9 / (49 * p.muS * 9.81);
   check("5/7 규칙", Math.abs(s1.balls[0].v[0] - 3 * 5 / 7) < 1e-9 && Math.abs(s1.balls[0].r[0] - want) < 1e-9,
     `구름 시작 ${s1.balls[0].v[0].toFixed(4)} m/s, 미끄러진 거리 ${s1.balls[0].r[0].toFixed(4)} m`);
 }
@@ -82,6 +82,32 @@ const check = (name, ok, info) => { console.log(`${ok ? "통과" : "실패"}  ${
   const rate = (axis, full) => { let n = 0; for (let k = 0; k < 2000; k++) { const z = P.newBall(0, 0, 0, p); const mc = P.strike(z, { speed: 2, yaw: 0, elev: 0, a: 0, b: -axis, M: 0.54, tipMu: 0.66 }, p).miscue; if (full ? mc === true : mc) n++; } return n / 2000; };
   const sc = 1 + 0.010 / p.R, r50 = rate(0.5 * sc), r55 = rate(0.55 * sc), r60 = rate(0.6 * sc, true);
   check("미스큐 확률", r50 < 0.05 && r55 > 0.3 && r55 < 0.7 && r60 > 0.7, `닿는 점 0.50R ${(r50 * 100).toFixed(1)}%, 0.55R ${(r55 * 100).toFixed(1)}% (부분 미스큐 포함), 0.60R 완전 미스큐 ${(r60 * 100).toFixed(1)}% (큐 축으로는 ${(0.5 * sc).toFixed(2)}R, ${(0.55 * sc).toFixed(2)}R, ${(0.6 * sc).toFixed(2)}R)`);
+}
+
+// 8. 쿠션 뒤 천 위를 구른 뒤에도 회전 순서 유지: 역회전이 가장 짧고(법선 쪽) 순회전이 가장 김 (11-26 쿠션 마찰 0.2에선 역회전이 무회전보다 넓었음)
+{
+  const p = P.makeParams({ L: 2.448, W: 1.224 });
+  const after = (v, wz) => {
+    const th = 40 * Math.PI / 180, b = P.newBall(0, -0.9, 0, p);
+    b.r = [-0.9, p.yMax - 1e-4, p.R]; b.v = [v * Math.sin(th), v * Math.cos(th), 0];
+    b.w = [-b.v[1] / p.R, b.v[0] / p.R, wz * v]; b.s = P.ROLL;
+    const sim = P.simulate([b], p, 5), f = sim.events[0];
+    const next = sim.events.find((e) => e.t > f.t + 1e-6 && e.type === "bc");
+    const s = P.stateAt(sim, Math.min(next ? next.t - 1e-4 : sim.tEnd, f.t + 0.6), p)[0];
+    return deg(Math.atan2(Math.abs(s.v[0]), Math.abs(s.v[1])));
+  };
+  const out = [1, 2, 3].map((v) => [after(v, -40), after(v, 0), after(v, 40)]);
+  check("쿠션 뒤 회전 순서", out.every(([r, n, u]) => r < n - 3 && n < u - 3), out.map((o) => o.map((x) => x.toFixed(0)).join("/")).join("  ") + " (1, 2, 3 m/s, 역/무/순)");
+}
+
+// 9. 끌어치기: 50cm 앞 공을 큐 2.2 m/s, 아래 0.6으로 치면 25cm 넘게 돌아옴 (11-26 천 값에선 15cm)
+{
+  const p = P.makeParams({ L: 2.448, W: 1.224 });
+  const balls = [P.newBall(0, -0.7, 0, p), P.newBall(1, -0.2, 0, p)];
+  P.strike(balls[0], { speed: 2.2, yaw: 0, elev: 0.03, a: 0, b: -0.6, M: 0.54, endRatio: 18, tipMu: 0.66, tipR: 0.010 }, p, () => 0.5);
+  const sim = P.simulate(balls, p, 100), hit = sim.events.find((e) => e.type === "bb");
+  const back = P.stateAt(sim, hit.t, p)[0].r[0] - sim.snaps.at(-1).balls[0].r[0];
+  check("끌어치기 50cm", back > 0.25, `${(back * 100).toFixed(0)}cm 돌아옴`);
 }
 
 // 7. 무작위 샷 400번: 공이 겹치거나 테이블을 뚫거나 에너지가 늘지 않음
