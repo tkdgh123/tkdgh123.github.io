@@ -4,8 +4,9 @@ import crab from "../g/crab.js";
 import bell from "../g/bell.js";
 import gems from "../g/gems.js";
 import isle from "../g/isle.js";
+import cow from "../g/cow.js"; import code from "../g/code.js"; import tele from "../g/tele.js"; import castle from "../g/castle.js"; import fire from "../g/fire.js"; import tile from "../g/tile.js"; import last from "../g/last.js"; import rank from "../g/rank.js"; import bug from "../g/bug.js"; import race from "../g/race.js"; import yacht from "../g/yacht.js"; import duel from "../g/duel.js";
 import { seeded } from "../lib.js";
-const ALL = { vault, crab, bell, gems, isle };
+const ALL = { vault, crab, bell, gems, isle, cow, code, tele, castle, fire, tile, last, rank, bug, race, yacht, duel };
 const only = process.argv[2], N = +(process.argv[3] || 200);
 for (const [id, G] of Object.entries(ALL)) {
   if (only && only !== id) continue;

@@ -237,3 +237,232 @@ body:has(#app.room) #cu-home { display: none }
 .tgr { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px }
 .tg { display: grid; gap: 4px }
 .tg button { padding: 6px 0 }
+
+/* ── 첫 화면 인원 거르기 ── */
+.want { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 0 0 14px }
+.want span { font-size: 14px; color: var(--ink-2); margin-right: 4px }
+.want button { background: var(--paper); color: var(--ink); padding: 7px 12px; font-size: 14px; box-shadow: inset 0 0 0 1.5px var(--rule) }
+.want button.on { background: var(--sea); color: #fff; box-shadow: none }
+
+/* ── 주사위 족보 ── */
+.ydice { display: flex; gap: 10px; justify-content: center; margin: 10px 0; min-height: 56px; align-items: center }
+.ydice .die { width: 52px; height: 52px; padding: 8px; cursor: pointer }
+.ydice .die i { width: 9px; height: 9px }
+.ydice .die.kept { background: #ffe9a8; box-shadow: 0 0 0 3px #e0a526; transform: translateY(-4px) }
+.ytab { overflow-x: auto; background: var(--paper); border-radius: 10px; padding: 6px 10px }
+.ytab table { border-collapse: collapse; width: 100%; font-size: 14px }
+.ytab th, .ytab td { padding: 5px 6px; border-bottom: 1px solid var(--rule); text-align: center; white-space: nowrap }
+.ytab td:first-child { text-align: left; color: var(--ink-2) }
+.ytab tr.sub td { font-size: 12px; color: var(--ink-2) }
+.ytab tr.gap td { border-top: 2px solid var(--rule) }
+.ytab tr.tot td { font-weight: 800; font-size: 16px; border-bottom: 0 }
+.yc { padding: 3px 10px; background: #e0a526; color: var(--ink); font-size: 14px }
+
+/* ── 여섯째 소 ── */
+.cow .rows { display: grid; gap: 6px }
+.crow { display: flex; gap: 4px; align-items: center; background: var(--paper); border-radius: 8px; padding: 6px }
+.crow.pickable { cursor: pointer; box-shadow: inset 0 0 0 2px #d9472b }
+.crow > small { margin-left: auto; font-size: 12px; color: var(--ink-2); white-space: nowrap }
+.cw { width: 44px; height: 58px; border-radius: 6px; background: #fff; color: var(--ink); box-shadow: inset 0 0 0 1.5px #d8d2c4; display: grid; place-items: center; align-content: center; line-height: 1 }
+.cw b { font: 400 18px var(--box) }
+.cw i { font-style: normal; font-size: 8px; color: #b8355e; letter-spacing: -1px }
+.cw.h2 { background: #eef5ff } .cw.h3 { background: #fff4d6 } .cw.h5 { background: #ffe0dc }
+.cw.h7 { background: #b8355e; color: #fff } .cw.h7 i { color: #fff }
+.cw.empty { background: transparent; box-shadow: inset 0 0 0 1.5px #e3ded2 }
+.cw.six { background: #fbe3e3; color: #b8355e; font: 400 16px var(--box); box-shadow: none; width: 26px }
+.cow .shown, .cow .picked { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; font-size: 13px }
+.cow .shown span { background: var(--s); color: #fff; padding: 3px 8px; border-radius: 6px; font-weight: 700 }
+.cow .picked span { padding: 3px 8px; border-radius: 6px; background: var(--paper); border-left: 4px solid var(--s) }
+.cow .picked span.on { background: var(--s); color: #fff }
+.hand.cows { display: flex; flex-wrap: wrap; gap: 5px }
+.cwb { padding: 0; background: none }
+.cwb:disabled { opacity: .5 }
+.cow .mine { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink-2) }
+
+/* ── 마지막 한 장 ── */
+.last .ring { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 10px }
+.last .ring span { background: var(--paper); border-left: 4px solid var(--s); border-radius: 6px; padding: 4px 10px; font-size: 14px }
+.last .ring span.cur { background: var(--s); color: #fff }
+.last .ring span.me { outline: 2px solid var(--ink); outline-offset: -2px }
+.last .ring i { font-style: normal; font-size: 11px; background: #d9472b; color: #fff; border-radius: 4px; padding: 0 4px; margin-left: 4px }
+.last .ring small { font-size: 12px; color: var(--ink-2) }
+.last .table { display: flex; gap: 14px; justify-content: center; align-items: center; margin: 14px 0 }
+.lc { width: 62px; height: 92px; border-radius: 10px; background: var(--c); color: #fff; padding: 4px; display: grid; place-items: center; align-content: center; gap: 2px; box-shadow: inset 0 0 0 4px #fff, 0 3px 0 rgba(0,0,0,.2) }
+.lc b { font: 400 30px var(--box) }
+.lc small { font-size: 9px; font-weight: 600; line-height: 1.1; text-align: center }
+.lc.top { width: 80px; height: 118px }
+.lc.top:disabled { opacity: 1 }
+.lc.back { background: var(--sea); box-shadow: 0 3px 0 rgba(0,0,0,.2) }
+.nowc { display: grid; place-items: center; font-size: 12px; color: var(--ink-2) }
+.nowc b { font: 400 20px var(--box); color: var(--c) }
+.lhand { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center }
+.lhand .lc { width: 52px; height: 78px }
+.lhand .lc b { font-size: 24px }
+.lhand .lc:disabled { opacity: .4 }
+.lhand .lc.ok { transform: translateY(-4px) }
+.catch { width: 100%; background: #d9472b; margin: 6px 0 }
+.callb { display: flex; gap: 8px; align-items: center; justify-content: center; margin: 10px 0; font-weight: 650 }
+.callb input { width: 20px; height: 20px }
+.sheet .in button[data-col] { padding: 14px }
+
+/* ── 갯벌 거짓말 ── */
+.ups { display: grid; gap: 6px }
+.upr { background: var(--paper); border-left: 5px solid var(--s); border-radius: 6px; padding: 6px 10px; display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center }
+.upr.cur { box-shadow: inset 0 0 0 2px var(--s) }
+.upr.to { background: #fff6dc }
+.upr.lost { background: #ffe0dc }
+.upr small { color: var(--ink-2); font-size: 12px }
+.upr > div { display: flex; flex-wrap: wrap; gap: 4px; width: 100% }
+.bk { background: var(--k); color: #fff; font-size: 12px; padding: 2px 7px; border-radius: 5px; font-weight: 650 }
+.bk.warn { outline: 2px solid #d9472b }
+.bpick p { margin: 12px 0 6px; font-weight: 650; font-size: 14px }
+.bh { display: flex; flex-wrap: wrap; gap: 5px }
+.bc, .bcl { background: var(--k); padding: 8px 10px; font-size: 14px }
+.bt { background: var(--s); padding: 8px 12px }
+.bc.on, .bt.on { outline: 3px solid var(--ink); outline-offset: 1px }
+.myhand { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; font-size: 14px }
+.myhand small { width: 100%; color: var(--ink-2) }
+
+/* ── 궁궐 신분전 ── */
+.court { list-style: none; padding: 0; margin: 0 0 10px; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px }
+.court li { background: var(--paper); border-left: 5px solid var(--s); border-radius: 6px; padding: 6px 10px; display: grid; grid-template-columns: auto 1fr auto; gap: 0 8px; align-items: baseline; font-size: 14px }
+.court li i { font-style: normal; font: 400 15px var(--box); color: #6b3f78 }
+.court li span { grid-column: 1 / -1; font-size: 12px; color: var(--ink-2) }
+.court li.cur { box-shadow: inset 0 0 0 2px var(--s) }
+.court li.gone { opacity: .55 }
+.court li.pass { background: #f0f0f0 }
+.pit { min-height: 84px; display: flex; gap: 6px; justify-content: center; align-items: center; background: #e9e1f0; border-radius: 12px; padding: 10px; margin: 6px 0 12px }
+.pit small { margin-left: 8px; color: var(--ink-2) }
+.rk { width: 44px; height: 62px; border-radius: 7px; background: #fff; color: #3a2348; font: 400 22px var(--box); display: grid; place-items: center; padding: 0; box-shadow: inset 0 0 0 2px #cdb8dc, 0 2px 0 rgba(0,0,0,.15) }
+.rk.j { font: 700 12px var(--ui); background: #f3d9a8 }
+.rhand { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center }
+.rhand .rk.on { transform: translateY(-8px); box-shadow: inset 0 0 0 3px #6b3f78 }
+
+/* ── 불꽃 축제 ── */
+.stk { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px }
+.st { background: var(--c); color: #fff; border-radius: 10px; padding: 8px 0; text-align: center; min-height: 64px }
+.st b { display: block; font: 400 28px var(--box); min-height: 34px }
+.st small { font-size: 11px; font-weight: 600 }
+.tok { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 10px 0; font-size: 14px; color: var(--ink-2) }
+.tok b { color: var(--ink); font-size: 18px }
+.fh { background: var(--paper); border-left: 5px solid var(--s); border-radius: 8px; padding: 8px 10px; margin: 6px 0 }
+.fh.cur { box-shadow: inset 0 0 0 2px var(--s) }
+.fh.mine { border-left-color: var(--ink) }
+.fh .who { font-size: 13px; font-weight: 700 }
+.fh > div { display: flex; gap: 5px; margin-top: 4px; flex-wrap: wrap }
+.fcd { width: 48px; height: 66px; border-radius: 8px; background: var(--c); color: #fff; display: grid; place-items: center; align-content: center; padding: 0; position: relative }
+.fcd b { font: 400 26px var(--box) }
+.fcd small { font-size: 10px }
+.fcd i { position: absolute; bottom: -2px; font-size: 9px; font-style: normal; background: #fff; color: var(--ink); border-radius: 4px; padding: 0 3px }
+.fcd.hid { box-shadow: inset 0 0 0 3px rgba(255,255,255,.6) }
+.fcd.hid.on { outline: 3px solid var(--ink); transform: translateY(-4px) }
+.hints { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; margin-top: 6px }
+.hints small { font-size: 12px; color: var(--ink-2) }
+.hb { padding: 4px 9px; font-size: 13px }
+.hb.ghost { background: #fff }
+.disc { display: flex; flex-wrap: wrap; gap: 3px; align-items: center; margin-top: 8px; font-size: 12px; color: var(--ink-2) }
+.disc .mini { background: var(--c); color: #fff; width: 20px; height: 26px; border-radius: 4px; display: grid; place-items: center; font-weight: 700 }
+
+/* ── 숫자 조합판 ── */
+.tile .who { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; font-size: 13px }
+.tile .who span { padding: 3px 8px; background: var(--paper); border-left: 4px solid var(--s); border-radius: 5px }
+.tile .who span.cur { background: var(--s); color: #fff }
+.tbl { background: #2e6b5e; border-radius: 12px; padding: 10px; display: grid; gap: 6px; min-height: 90px }
+.tbl .dim { color: #cfe5df }
+.trow { display: flex; flex-wrap: wrap; gap: 3px; background: rgba(255,255,255,.1); border-radius: 8px; padding: 5px; cursor: pointer; align-items: center }
+.trow.bad { box-shadow: inset 0 0 0 2px #ff6a4d }
+.drop { font-size: 11px; color: #fff; opacity: .8; margin-left: 4px }
+.tl { width: 34px; height: 46px; border-radius: 6px; background: #fbf8f0; color: var(--c); font: 400 19px var(--box); padding: 0; box-shadow: 0 2px 0 rgba(0,0,0,.25) }
+.tl.on { outline: 3px solid #ffd24d; transform: translateY(-3px) }
+.tl.new { background: #fff3c2 }
+.tl:disabled { opacity: 1 }
+.thand { display: flex; flex-wrap: wrap; gap: 4px; background: #d9c9a8; border-radius: 10px; padding: 8px; margin-top: 10px; min-height: 62px }
+.tbl .newrow { background: rgba(255,255,255,.9) }
+
+/* ── 괴짜 달리기 ── */
+.offer { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px }
+.rcard { background: var(--paper); color: var(--ink); text-align: left; display: grid; gap: 4px; padding: 12px; box-shadow: inset 0 0 0 2px #a3b23a }
+.rcard b { font: 400 20px var(--box); color: #5d6a10 }
+.rcard span { font-size: 13px; font-weight: 500 }
+.lanes { background: #c58a4a; border-radius: 12px; padding: 8px; display: grid; gap: 4px }
+.lane { display: grid; grid-template-columns: 88px 1fr 26px; gap: 6px; align-items: center; color: #fff; font-size: 12px }
+.lane .nm { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 700 }
+.lane .nm i { font-style: normal; font-weight: 500; opacity: .85 }
+.trk { height: 26px; background: #e2a868; border-radius: 4px; position: relative; border-right: 4px solid #fff }
+.trk b { position: absolute; top: 2px; width: 22px; height: 22px; border-radius: 50%; background: var(--s); border: 2px solid #fff; transform: translateX(-50%); display: grid; place-items: center; font-size: 11px; transition: left .4s }
+.lane.cur .nm { color: #fff7c2 }
+.goal { color: #fff; font-size: 11px; text-align: right }
+.powers p { margin: 4px 0; font-size: 13px }
+
+/* ── 해적선 결투 ── */
+.crew { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px }
+.mate { background: var(--paper); color: var(--ink); border-left: 5px solid var(--s); text-align: left; display: grid; gap: 2px; padding: 8px 10px; font-weight: 500 }
+.mate:disabled { opacity: 1 }
+.mate.cur { box-shadow: inset 0 0 0 2px var(--s) }
+.mate.dead { opacity: .45 }
+.mate.tgt { background: #ffe9d6; box-shadow: inset 0 0 0 2px #d9472b; cursor: pointer }
+.mate .role { font-size: 12px; font-weight: 700; color: var(--r) }
+.mate .hp { color: #d9472b; letter-spacing: 1px }
+.mate small { font-size: 11px; color: var(--ink-2) }
+.dhand { display: flex; gap: 6px; overflow-x: auto; padding: 6px 0 }
+.dc { flex: 0 0 104px; background: #f3ead5; color: var(--ink); display: grid; gap: 2px; text-align: left; padding: 8px }
+.dc b { font: 400 16px var(--box) }
+.dc small { font-size: 11px; font-weight: 500; color: var(--ink-2) }
+.dc.on { outline: 3px solid var(--ink); transform: translateY(-4px) }
+.dc.k-shot { background: #ffd9d2 } .dc.k-dodge { background: #dbe9ff } .dc.k-rum { background: #e3f3d8 }
+
+/* ── 성의 배신자 ── */
+.myrole { background: #e6ecf2; border-radius: 10px; padding: 10px 14px; margin-bottom: 6px }
+.myrole.evil { background: #2b2f36; color: #fff }
+.quests { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 6px 0 10px }
+.quests span { width: 54px; height: 54px; border-radius: 50%; background: var(--paper); display: grid; place-items: center; align-content: center; font-size: 12px; line-height: 1.1; box-shadow: inset 0 0 0 2px var(--rule) }
+.quests span b { font: 400 18px var(--box) }
+.quests span small { font-size: 9px }
+.quests span.now { box-shadow: inset 0 0 0 3px var(--sea) }
+.quests span.ok { background: #2f6fb0; color: #fff }
+.quests span.no { background: #2b2f36; color: #fff }
+.quests .rej { width: auto; height: auto; border-radius: 6px; padding: 4px 10px; font-size: 13px }
+.knights { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 6px }
+.kn { background: var(--paper); color: var(--ink); border-top: 5px solid var(--s); display: grid; gap: 2px; padding: 8px; font-weight: 500 }
+.kn:disabled { opacity: 1 }
+.kn.in { background: #fff2c6; box-shadow: inset 0 0 0 2px #e0a526 }
+.kn i { font-style: normal; font-size: 11px; color: var(--sea); font-weight: 700 }
+.kn span { font-size: 11px; font-weight: 700 }
+.kn span.ev { color: #c8321f }
+.kn small { font-size: 11px; color: var(--ink-2) }
+
+/* ── 암호 단어 ── */
+.myteam { background: var(--t); color: #fff; border-radius: 10px; padding: 8px 14px; font-weight: 700 }
+.cscore { display: flex; gap: 10px; margin: 6px 0 }
+.cscore span { color: var(--t); font-weight: 800 }
+.grid5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px }
+.grid5 .cw { width: auto; height: 50px; border-radius: 6px; background: #f3eee2; color: var(--ink); font: 600 13px var(--ui); padding: 2px; word-break: keep-all; box-shadow: none }
+.grid5 .cw:disabled { opacity: 1 }
+.grid5 .cw.r { box-shadow: inset 0 0 0 3px #c8321f }
+.grid5 .cw.b { box-shadow: inset 0 0 0 3px #2a64b8 }
+.grid5 .cw.a { box-shadow: inset 0 0 0 3px #111 }
+.grid5 .cw.x { box-shadow: inset 0 0 0 3px #c9bfa8 }
+.grid5 .cw.op.r { background: #c8321f; color: #fff }
+.grid5 .cw.op.b { background: #2a64b8; color: #fff }
+.grid5 .cw.op.x { background: #c9bfa8 }
+.grid5 .cw.op.a { background: #111; color: #fff }
+.clue { display: grid; grid-template-columns: 1fr 70px auto; gap: 6px; margin-top: 10px }
+.clue select { font: inherit; border-radius: 8px; border: 1.5px solid var(--rule) }
+.teams p { margin: 6px 0; font-size: 14px }
+.teams b { color: var(--t) }
+
+/* ── 그림 전화 ── */
+.tele .steps { font-size: 13px; color: var(--ink-2) }
+.tele .word { font: 400 24px var(--box); color: var(--sea) }
+.pad canvas { width: min(100%, 340px); aspect-ratio: 1; display: block; margin: 0 auto; border-radius: 10px; box-shadow: inset 0 0 0 2px var(--rule), 0 2px 10px rgba(0,0,0,.1); background: #fff }
+.pic img, .ent img { width: min(100%, 300px); aspect-ratio: 1; display: block; margin: 0 auto; border-radius: 10px; background: #fff }
+.gform { display: grid; grid-template-columns: 1fr auto; gap: 6px; margin-top: 10px }
+.tele .who { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 12px; font-size: 12px }
+.tele .who span { padding: 3px 8px; border-radius: 5px; background: var(--paper); border-left: 4px solid var(--s) }
+.tele .who span.on { background: var(--s); color: #fff }
+.books { display: grid; gap: 14px }
+.book { background: var(--paper); border-radius: 12px; padding: 12px }
+.book.now { box-shadow: inset 0 0 0 2px var(--sea) }
+.ent { margin: 8px 0; text-align: center }
+.ent small { display: block; color: var(--ink-2); font-size: 12px }
+.ent p { font: 400 22px var(--box); margin: 4px 0 }

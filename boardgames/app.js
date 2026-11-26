@@ -7,8 +7,22 @@ import crab from "./g/crab.js";
 import bell from "./g/bell.js";
 import gems from "./g/gems.js";
 import isle from "./g/isle.js";
+import cow from "./g/cow.js";
+import codeG from "./g/code.js";
+import tele from "./g/tele.js";
+import castle from "./g/castle.js";
+import fire from "./g/fire.js";
+import tile from "./g/tile.js";
+import lastG from "./g/last.js";
+import rank from "./g/rank.js";
+import bug from "./g/bug.js";
+import race from "./g/race.js";
+import yacht from "./g/yacht.js";
+import duel from "./g/duel.js";
 
-export const GAMES = { isle, bell, crab, gems, vault };
+export const GAMES = { isle, bell, crab, gems, vault, cow, code: codeG, tele, castle, fire, tile, last: lastG, rank, bug, race, yacht, duel };
+// 비밀이 큰 게임(그림 전화)은 공개 칸과 내 몫(secret)을 나눠 보내고, 받는 쪽에서 합친다
+const viewFor = (G, s, seat) => G.secret ? { ...G.view(s, -1), ...G.secret(s, seat) } : G.view(s, seat);
 const $ = s => document.querySelector(s);
 const app = $("#app");
 const Q = new URLSearchParams(location.search);
@@ -63,6 +77,7 @@ class Host {
   addBot() {
     const s = this.s;
     if (s.st !== "wait" || s.seats.length >= this.G.max) return;
+    if (this.G.party) return toast("말로 하는 게임이라 봇을 넣을 수 없어요");
     const used = new Set(s.seats.map(x => x.name));
     const name = BOTNAMES.find(n => !used.has(n)) || "봇";
     s.seats.push({ pid: "bot" + Math.random().toString(36).slice(2, 7), name, bot: true });
@@ -94,7 +109,7 @@ class Host {
     };
     if (s.gs) for (const [i, x] of s.seats.entries()) {
       if (x.bot || x.pid === ME || !x.pub) continue;
-      doc.priv[x.pid] = await seal(await sharedKey(keys.priv, x.pub), G.view(s.gs, i));
+      doc.priv[x.pid] = await seal(await sharedKey(keys.priv, x.pub), G.secret ? G.secret(s.gs, i) : G.view(s.gs, i));
     }
     const ver = s.ver;
     this.busy = this.busy.then(() => ver === this.ver ? net.write(this.c, doc) : null).catch(e => toast("저장이 안 돼요: " + e.message));
@@ -121,10 +136,17 @@ class Host {
 const BOTNAMES = ["바다봇", "모래봇", "파도봇", "갈매기봇", "조개봇", "등대봇", "소라봇", "물개봇", "해초봇"];
 
 // ───────── 화면: 첫 화면 ─────────
+// 주사위섬의 장소마다 게임 하나
 const PLACES = [
   ["isle", "개척지", "섬 안쪽 빈 땅"], ["bell", "시장", "부두 옆 과일 골목"], ["crab", "해변", "섬 남쪽 모래밭"],
-  ["gems", "항구", "배가 드나드는 상회 거리"], ["vault", "등대", "섬 끝 바위 위"]
+  ["gems", "항구", "배가 드나드는 상회 거리"], ["vault", "등대", "섬 끝 바위 위"],
+  ["cow", "목장", "언덕 위 소 우리"], ["last", "대합실", "배 기다리는 선착장 의자"], ["yacht", "주막", "부두 앞 주사위 소리 나는 집"],
+  ["bug", "갯벌", "물 빠진 바닷가"], ["rank", "옛 궁궐", "섬 한가운데 낡은 궁궐"], ["fire", "광장", "여름밤 축제 자리"],
+  ["tile", "찻집", "골목 안 조용한 가게"], ["race", "운동장", "섬 학교 마당"], ["duel", "해적선", "앞바다에 닻 내린 배"],
+  ["castle", "성터", "바위 언덕 옛 성"], ["code", "망루", "섬 꼭대기 망보는 탑"], ["tele", "우체국", "편지 오가는 작은 집"]
 ];
+let want = 0; // 첫 화면 인원 거르기 (0 = 전부)
+try { want = +sessionStorage.getItem("bg-want") || 0; } catch {}
 
 function lobby() {
   if (unwatch) { unwatch(); unwatch = null; }
@@ -141,15 +163,17 @@ function lobby() {
     <label>방 코드<input id="cd" maxlength="4" placeholder="ABCD" autocapitalize="characters" autocomplete="off"></label>
     <button>들어가기</button>
   </form>
+  <div class="want" role="group" aria-label="모인 사람 수"><span>몇 명이에요?</span>${[0, 2, 3, 4, 5, 6, 7, 8].map(k => `<button class="${want === k ? "on" : ""}" data-want="${k}">${k ? (k === 8 ? "8명 이상" : k + "명") : "전부"}</button>`).join("")}</div>
   <ol class="places">${PLACES.map(([g, place, where]) => {
-    const G = GAMES[g];
-    return `<li style="--c:${G.color}">
+    const G = GAMES[g], fit = !want || (G.min <= want && (want === 8 ? G.max >= 8 : G.max >= want));
+    return `<li style="--c:${G.color}" ${fit ? "" : "hidden"}>
       <div class="pl"><b>${place}</b><small>${where}</small></div>
-      <div class="gm"><h2>${G.name}</h2><p>${G.sub}</p><span>${G.min}~${G.max}명, ${G.time}</span></div>
-      <div class="bt"><button data-make="${g}">방 만들기</button><button class="ghost" data-solo="${g}">봇이랑 혼자</button></div>
+      <div class="gm"><h2>${G.name}</h2><p>${G.sub}</p><span>${G.min}~${G.max}명, ${G.time}${G.party ? ", 사람끼리만" : ""}</span></div>
+      <div class="bt"><button data-make="${g}">방 만들기</button>${G.party ? "" : `<button class="ghost" data-solo="${g}">봇이랑 혼자</button>`}</div>
     </li>`;
   }).join("")}</ol>
   ${LOCAL ? `<p class="note">이 브라우저 안에서만 도는 시험 모드예요.</p>` : ""}`;
+  app.querySelectorAll("[data-want]").forEach(b => b.onclick = () => { want = +b.dataset.want; try { sessionStorage.setItem("bg-want", want); } catch {} const nm = $("#nm").value; lobby(); $("#nm").value = nm; });
   const nameOk = () => {
     const n = $("#nm").value.trim();
     if (!n) { $("#nm").focus(); toast("이름을 먼저 적어 주세요"); return null; }
@@ -225,11 +249,11 @@ async function draw(d) {
   const G = GAMES[d.g], me = d.seats.findIndex(x => x.pid === ME), isHost = d.host === ME;
   let v = null;
   if (d.st !== "wait") {
-    if (isHost && host?.s.gs) v = G.view(host.s.gs, me);
+    const pub = typeof d.pub === "string" ? JSON.parse(d.pub) : d.pub;
+    if (isHost && host?.s.gs) v = viewFor(G, host.s.gs, me);
     else if (me >= 0 && d.priv?.[ME]) {
-      try { v = await open(await sharedKey(keys.priv, d.hpub), d.priv[ME]); } catch (e) { console.warn("내 몫을 못 풀었어요", e); v = d.pub; }
-    } else v = d.pub;
-    if (typeof v === "string") v = JSON.parse(v);
+      try { const mine = await open(await sharedKey(keys.priv, d.hpub), d.priv[ME]); v = G.secret ? { ...pub, ...mine } : mine; } catch (e) { console.warn("내 몫을 못 풀었어요", e); v = pub; }
+    } else v = pub;
   }
   if (room !== d) return;
   document.title = `${G.name} ${d.st === "wait" ? "대기" : ""} · 주사위섬`.replace(" ·", "");
@@ -249,13 +273,17 @@ async function draw(d) {
   app.querySelector(".seats").innerHTML = d.seats.map((x, i) =>
     `<span class="${turn.includes(i) ? "on" : ""}${i === me ? " me" : ""}" style="--s:${SEAT[i]}">${esc(x.name)}${x.bot ? "" : ""}${i === 0 ? '<i>방장</i>' : ""}</span>`).join("");
   const st = app.querySelector(".stage");
-  if (d.st === "wait") return waitRoom(st, d, G, me, isHost);
+  if (d.st === "wait") { st.dataset.sig = ""; return waitRoom(st, d, G, me, isHost); }
   if (d.err && d.err.pid === ME && d.err.n !== draw.errN) { draw.errN = d.err.n; toast(d.err.msg); }
   const send = a => {
     if (isHost) host.move(me, a, ME);
     else net.send(code, { k: "move", pid: ME, a });
   };
   st.classList.toggle("over", d.st === "end");
+  // 내 화면에 바뀐 게 없으면 다시 그리지 않는다(다시 그리는 순간 누른 단추가 씹히지 않게)
+  const sig = JSON.stringify([d.g, d.st, me, d.seats.map(x => x.name), v]);
+  if (sig === st.dataset.sig && d.st !== "end") return;
+  st.dataset.sig = sig;
   G.render(st, v, me, send, { names: d.seats.map(x => x.name), toast, isHost });
   if (d.st === "end") endBox(st, d, G, isHost);
 }
@@ -265,7 +293,7 @@ function waitRoom(st, d, G, me, isHost) {
   st.innerHTML = `<div class="lobbywait">
     <p class="big">방 코드 <b>${esc(code)}</b></p>
     <p>${G.name}, ${G.min}~${G.max}명. 지금 ${n}명이에요.</p>
-    <div class="row"><button class="share">초대 링크 보내기</button>${isHost ? `<button class="ghost addbot" ${n >= G.max ? "disabled" : ""}>봇 넣기</button>` : ""}</div>
+    <div class="row"><button class="share">초대 링크 보내기</button>${isHost && !G.party ? `<button class="ghost addbot" ${n >= G.max ? "disabled" : ""}>봇 넣기</button>` : ""}</div>
     <ol class="wlist">${d.seats.map((x, i) => `<li style="--s:${SEAT[i]}"><b>${esc(x.name)}</b>${x.bot ? "<small>봇</small>" : ""}${isHost && i > 0 ? `<button class="ghost kick" data-i="${i}">빼기</button>` : ""}</li>`).join("")}</ol>
     ${isHost ? `<div class="row">${Object.entries(GAMES).map(([g, X]) => `<button class="ghost gsel${g === d.g ? " sel" : ""}" data-g="${g}">${X.name}</button>`).join("")}</div>
       <button class="go" ${n < G.min || n > G.max ? "disabled" : ""}>시작하기</button>` : `<p class="dim">방장이 시작하면 바로 판이 열려요.</p>`}
@@ -274,7 +302,7 @@ function waitRoom(st, d, G, me, isHost) {
   </div>`;
   st.querySelector(".share").onclick = share;
   if (!isHost) return;
-  st.querySelector(".addbot").onclick = () => host.addBot();
+  st.querySelector(".addbot")?.addEventListener("click", () => host.addBot());
   st.querySelectorAll(".kick").forEach(b => b.onclick = () => host.kick(+b.dataset.i));
   st.querySelectorAll(".gsel").forEach(b => b.onclick = () => host.again(b.dataset.g));
   st.querySelector(".go").onclick = () => host.start();

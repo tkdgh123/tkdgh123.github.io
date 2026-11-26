@@ -159,6 +159,8 @@ function render(el, v, me, send, ui) {
     </div>` : me >= 0 ? `<p class="dim">카드가 떨어져 탈락했어요. 구경하며 기다려요.</p>` : ""}
     <ol class="log">${v.log.map(x => `<li>${line(x, n)}</li>`).join("")}</ol>
   </div>`;
+  clearInterval(UI.clock); // 남은 분은 다시 그리지 않아도 줄어들게
+  UI.clock = setInterval(() => { const m = el.querySelector(".bell .say small"); if (!m || v.done) return clearInterval(UI.clock); m.textContent = `${Math.max(0, Math.ceil((v.start + LIMIT - Date.now()) / 60000))}분 남음`; }, 5000);
   el.querySelector(".flipb")?.addEventListener("click", () => send({ t: "flip" }));
   el.querySelector(".ringb")?.addEventListener("pointerdown", e => {
     e.preventDefault();

@@ -59,13 +59,16 @@ export async function open(key, s) {
 }
 
 // 내 번호와 이름(이 폰에 저장)
+// 시험용: ?local&as=이름 이면 탭마다 다른 사람으로 (같은 브라우저 안에서 여럿 흉내)
+const AS = typeof location !== "undefined" && /[?&]local(&|=|$)/.test(location.search) ? new URLSearchParams(location.search).get("as") : null;
 export function myPid() {
+  if (AS) return "p" + AS.replace(/[^0-9A-Za-z가-힣]/g, "").slice(0, 12);
   let p = null;
   try { p = localStorage.getItem("bg-pid"); } catch {}
   if (!p) { p = "p" + Math.random().toString(36).slice(2, 12); try { localStorage.setItem("bg-pid", p); } catch {} }
   return p;
 }
-export function getName() { try { return localStorage.getItem("bg-name") || ""; } catch { return ""; } }
+export function getName() { if (AS) return AS; try { return localStorage.getItem("bg-name") || ""; } catch { return ""; } }
 export function setName(n) { try { localStorage.setItem("bg-name", n); } catch {} }
 
 // 자리 색 (최대 10자리)
@@ -73,3 +76,9 @@ export const SEAT = ["#d9472b", "#2f6fb0", "#e0a526", "#3c8d5a", "#8a4fb0", "#d2
 
 // 작은 DOM 도우미
 export function h(html) { const t = document.createElement("template"); t.innerHTML = html.trim(); return t.content.firstElementChild; }
+
+// 주사위 한 개 그림(점 9칸)
+const PIPS = { 1: [5], 2: [1, 9], 3: [1, 5, 9], 4: [1, 3, 7, 9], 5: [1, 3, 5, 7, 9], 6: [1, 3, 4, 6, 7, 9] };
+export const dieHTML = (n, cls = "", attrs = "") => `<span class="die ${cls}" ${attrs}>${[...Array(9).keys()].map(i => `<i${PIPS[n]?.includes(i + 1) ? ' class="on"' : ""}></i>`).join("")}</span>`;
+export const logPush = (s, x, max = 12) => { s.log.unshift(x); s.log.length = Math.min(s.log.length, max); };
+export const nameB = (n, i) => `<b style="color:${SEAT[i]}">${esc(n[i])}</b>`;
