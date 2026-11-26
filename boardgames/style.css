@@ -1,0 +1,239 @@
+/* 주사위섬 보드게임방 */
+:root {
+  --sea: #0f4c5c; --sea-2: #1b6a7a; --bg: #e7eff1; --paper: #fbfcfc; --ink: #14202a; --ink-2: #56636e; --rule: #cfdadf;
+  --ui: "Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif;
+  --box: "Black Han Sans", "Pretendard Variable", "Malgun Gothic", sans-serif;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent }
+html { background: var(--bg) }
+body { margin: 0; color: var(--ink); font: 16px/1.5 var(--ui); background: var(--bg); padding-inline: 14px; min-height: 100vh }
+#app { max-width: 760px; margin: 0 auto; padding-block: 18px 110px }
+button { font: inherit; cursor: pointer; border: 0; border-radius: 8px; background: var(--sea); color: #fff; padding: 10px 16px; font-weight: 650; touch-action: manipulation }
+button:disabled { opacity: .38; cursor: default }
+button.ghost { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--rule) }
+input { font: inherit; padding: 10px 12px; border: 1.5px solid var(--rule); border-radius: 8px; background: #fff; color: var(--ink); width: 100% }
+.dim { color: var(--ink-2) } .small { font-size: 13px }
+.row { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 }
+#toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(24px + env(safe-area-inset-bottom, 0px)); background: var(--ink); color: #fff; padding: 10px 18px; border-radius: 10px; z-index: 50; max-width: calc(100% - 32px); font-size: 15px }
+
+/* ── 첫 화면 ── */
+.lobby .top { padding: 18px 0 6px }
+.lobby h1 { font: 400 clamp(44px, 12vw, 72px)/1 var(--box); margin: 0 0 12px; color: var(--sea) }
+.lobby .top p { margin: 0; color: var(--ink-2); max-width: 30em }
+.join { display: grid; grid-template-columns: 1fr 110px auto; gap: 8px; align-items: end; margin: 22px 0 28px }
+.join label { font-size: 13px; color: var(--ink-2); display: grid; gap: 4px }
+@media (max-width: 460px) { .join { grid-template-columns: 1fr 1fr } .join button { grid-column: 1 / -1 } }
+.places { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px }
+.places li { display: grid; grid-template-columns: 88px 1fr; gap: 6px 16px; background: var(--paper); border-radius: 12px; padding: 16px; position: relative; overflow: hidden }
+.places li::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 6px; background: var(--c) }
+.places .pl { padding-left: 6px }
+.places .pl b { display: block; font: 400 24px/1.1 var(--box); color: var(--c) }
+.places .pl small { color: var(--ink-2); font-size: 12px }
+.places h2 { font: 400 23px/1.15 var(--box); margin: 0 0 4px }
+.places p { margin: 0 0 4px; font-size: 15px }
+.places span { font-size: 13px; color: var(--ink-2) }
+.places .bt { grid-column: 2; display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px }
+.places .bt button { background: var(--c) }
+.places .bt button.ghost { background: transparent }
+@media (max-width: 460px) { .places li { grid-template-columns: 1fr } .places .bt { grid-column: 1 } .places .pl { display: flex; gap: 8px; align-items: baseline } }
+.note { color: var(--ink-2); font-size: 13px; margin-top: 18px }
+
+/* ── 방 ── */
+.wait { padding: 40px 0; display: grid; gap: 12px; max-width: 360px }
+.bar { display: flex; align-items: center; gap: 10px; background: var(--sea); color: #fff; border-radius: 12px; padding: 8px 8px 8px 14px; position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20 }
+.bar .home { background: transparent; padding: 6px 4px; font: 400 18px var(--box) }
+.bar .gname { flex: 1; font: 400 19px var(--box); color: #fff; border-left: 4px solid var(--c); padding-left: 10px }
+.bar .code { background: rgba(255,255,255,.14); padding: 6px 12px; font-variant-numeric: tabular-nums; letter-spacing: .04em }
+.seats { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 6px }
+.seats span { font-size: 13px; padding: 4px 10px 4px 8px; border-radius: 6px; background: var(--paper); border-left: 4px solid var(--s); display: inline-flex; gap: 6px; align-items: center }
+.seats span.on { background: var(--s); color: #fff; font-weight: 700 }
+.seats span.me { outline: 2px solid var(--ink); outline-offset: -2px }
+.seats i { font-style: normal; font-size: 11px; opacity: .75 }
+.lobbywait { background: var(--paper); border-radius: 12px; padding: 20px }
+.lobbywait .big { font-size: 18px; margin: 0 0 4px }
+.lobbywait .big b { font: 400 42px var(--box); letter-spacing: .06em; color: var(--sea); margin-left: 6px }
+.wlist { list-style: none; padding: 0; margin: 12px 0; display: grid; gap: 6px }
+.wlist li { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-left: 5px solid var(--s); background: var(--bg); border-radius: 6px }
+.wlist li b { flex: 1 }
+.wlist li small { color: var(--ink-2) }
+.wlist .kick { padding: 4px 10px; font-size: 13px }
+.gsel.sel { background: var(--sea); color: #fff; box-shadow: none }
+.lobbywait .go { width: 100%; padding: 14px; font-size: 18px; margin-top: 6px }
+
+.say { font-size: 16px; font-weight: 650; margin: 8px 0 10px; min-height: 1.5em; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap }
+.say small { font-weight: 500; color: var(--ink-2); font-size: 13px }
+.log { list-style: none; padding: 0; margin: 18px 0 0; font-size: 13px; color: var(--ink-2); display: grid; gap: 3px; max-height: 210px; overflow: auto }
+.log li:first-child { color: var(--ink) }
+.stage { position: relative }
+.endbox { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(92vw, 420px); background: var(--paper); border-radius: 16px; padding: 22px; z-index: 40; box-shadow: 0 20px 60px rgba(10,30,40,.35) }
+.endbox h2 { font: 400 26px var(--box); margin: 0 0 12px; color: var(--sea) }
+.endbox ol { list-style: none; padding: 0; margin: 0 0 12px; display: grid; gap: 6px }
+.endbox li { display: flex; justify-content: space-between; padding: 10px 12px; border-left: 6px solid var(--s); background: var(--bg); border-radius: 6px }
+.endbox li:first-child { font-size: 18px; font-weight: 700 }
+.endbox .peek { width: 100%; margin-top: 6px }
+.endbox.min { top: auto; bottom: 12px; transform: translateX(-50%) }
+.endbox.min h2 ~ * { display: none } .endbox.min .peek { display: block }
+
+/* ── 등대 금고 ── */
+.vault .opps { display: grid; gap: 10px }
+.rack { background: var(--paper); border-radius: 10px; padding: 10px 12px }
+.rack.cur { box-shadow: inset 0 0 0 2px var(--sea) }
+.rack.gone { opacity: .5 }
+.rack .who { display: inline-block; font-size: 13px; font-weight: 700; border-left: 4px solid var(--s); padding-left: 6px; margin-bottom: 6px }
+.tiles { display: flex; flex-wrap: wrap; gap: 6px; align-items: center }
+.vt { width: 42px; height: 58px; border-radius: 6px; padding: 0; font: 400 24px var(--box); display: grid; place-items: center; position: relative; box-shadow: 0 3px 0 rgba(0,0,0,.25) }
+.vt.b { background: #1f2329; color: #f4f1ea }
+.vt.w { background: #f4f1ea; color: #1f2329; box-shadow: 0 3px 0 rgba(0,0,0,.25), inset 0 0 0 1.5px #c9c4b8 }
+.vt.op { opacity: .5 }
+.vt.op::after { content: "열림"; position: absolute; bottom: -16px; font: 600 10px var(--ui); color: var(--ink-2) }
+.vt.nw { outline: 3px solid #e0a526; outline-offset: 2px }
+.vt[aria-pressed="true"] { outline: 3px solid #d9472b; outline-offset: 2px; transform: translateY(-4px) }
+.opps .vt:not(.op):not(:disabled) { cursor: pointer }
+.vt:disabled { opacity: .35 }
+.vt.big { width: 76px; height: 96px; font-size: 30px; display: flex; flex-direction: column; justify-content: center; gap: 2px }
+.vt.big small { font: 600 12px var(--ui) }
+.vault .mid { margin: 16px 0; min-height: 110px }
+.vault .pool { display: flex; gap: 14px; align-items: center; justify-content: center }
+.vault .stop { padding: 14px 18px }
+.vault .pad { background: var(--paper); border-radius: 10px; padding: 12px; display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px }
+.vault .pad p { grid-column: 1 / -1; margin: 0 0 4px; font-weight: 650 }
+.vault .pad button { padding: 12px 0; font: 400 20px var(--box) }
+.vault .pad .x { grid-column: span 3; font: 600 14px var(--ui) }
+.vault .mine { margin-top: 6px; padding-bottom: 14px }
+.vault .mine .tiles { margin-bottom: 14px }
+.vault .slot { background: #e0a526; color: var(--ink); padding: 6px 8px; font-size: 12px; height: 58px }
+
+/* ── 소라게 경주 ── */
+.crab .isle { position: relative; width: 100%; aspect-ratio: 1 / .92; margin: 4px 0 8px }
+.crab .sea { position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(closest-side, #8fd0d8 70%, #4fa9b8 100%) }
+.crab .land { position: absolute; inset: 15% 14%; border-radius: 48%; background: radial-gradient(closest-side, #e8d39a, #d9bd77) }
+.crab .land b { position: absolute; bottom: -2px; left: 50%; transform: translateX(-50%); font: 400 13px var(--box); color: #8a6a2a }
+.crab .sp { position: absolute; width: 9%; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; background: rgba(255,255,255,.55); box-shadow: inset 0 0 0 2px rgba(255,255,255,.8) }
+.crab .sp.beach { background: #f6e3a8; box-shadow: inset 0 0 0 3px #e0a526; width: 12% }
+.crab .cr { position: absolute; left: 50%; top: 50%; width: 78%; aspect-ratio: 1.3; border-radius: 50% 50% 40% 40%; background: var(--s); transform: translate(-50%, calc(-50% - var(--k, 0) * 38%)); box-shadow: 0 2px 0 rgba(0,0,0,.35), inset 0 -3px 0 rgba(0,0,0,.18) }
+.crab .cr.cur { outline: 2.5px solid #fff }
+.crab .center { position: absolute; inset: 27% 25%; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto 1fr; gap: 6px; align-items: center; justify-items: center }
+.crab .dock { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; justify-content: center; font-size: 12px }
+.crab .dock small { width: 100%; text-align: center; color: #7a5d22 }
+.crab .dock .cr { position: static; width: 20px; transform: none }
+.crab .dice { display: flex; gap: 5px; flex-wrap: wrap; justify-content: center }
+.die { width: 34px; height: 34px; background: #fff; border-radius: 7px; display: grid; grid-template-columns: repeat(3, 1fr); padding: 5px; box-shadow: 0 3px 0 rgba(0,0,0,.2) }
+.die i { width: 6px; height: 6px; border-radius: 50%; margin: auto }
+.die i.on { background: var(--ink) }
+.die.bad { background: #ffd9d2 } .die.bad i.on { background: #c0301a }
+.crab .shell { background: #fff; border-radius: 10px; padding: 6px 10px; text-align: center; line-height: 1.15 }
+.crab .shell b { display: block; font: 400 28px var(--box); color: #c46a3a }
+.crab .shell small { font-size: 11px; color: var(--ink-2); display: block }
+.acts { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 8px 0 }
+.acts button { padding: 14px 20px; font-size: 17px }
+.score { list-style: none; padding: 0; margin: 10px 0 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 6px }
+.score li { background: var(--paper); border-left: 5px solid var(--s); border-radius: 6px; padding: 6px 10px; display: flex; justify-content: space-between; font-size: 14px }
+.score li.cur { box-shadow: inset 0 0 0 2px var(--s) }
+
+/* ── 시장 종 ── */
+.bell .tbl { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px }
+.bell .tbl.t2 { grid-template-columns: repeat(2, 1fr) } .bell .tbl.t4 { grid-template-columns: repeat(2, 1fr) }
+.bell .pl { background: var(--paper); border-radius: 10px; padding: 8px; display: grid; gap: 4px; justify-items: center; border-top: 5px solid var(--s) }
+.bell .pl.cur { box-shadow: inset 0 0 0 2px var(--s) }
+.bell .pl.gone { opacity: .45 }
+.bell .nm { font-weight: 700; font-size: 14px } .bell .cnt { font-size: 12px; color: var(--ink-2) }
+.fc { width: 100%; max-width: 92px; aspect-ratio: .74; border-radius: 10px; background: #fff; box-shadow: 0 2px 0 rgba(0,0,0,.15), inset 0 0 0 1.5px #e4e0d6; display: flex; flex-wrap: wrap; align-content: center; justify-content: center; gap: 2px 4px; padding: 6px; font-size: clamp(15px, 4.6vw, 22px); line-height: 1 }
+.fc i { font-style: normal }
+.fc.empty { background: repeating-linear-gradient(45deg, #eef2f3 0 6px, #e3e9eb 6px 12px); box-shadow: none }
+.bell .flash { margin: 0 0 8px; padding: 8px 12px; border-radius: 8px; font-weight: 650 }
+.bell .flash.ok { background: #dff2e4; color: #1c6b38 } .bell .flash.bad { background: #fde4df; color: #a42d17 }
+.bell .pads { display: grid; grid-template-columns: 1fr 1.3fr; gap: 12px; margin-top: 8px; align-items: center }
+.bell .flipb { padding: 22px 10px; font-size: 20px; display: grid; gap: 2px; background: var(--sea-2) }
+.bell .flipb small { font-size: 12px; font-weight: 500; opacity: .85 }
+.bell .ringb { background: #e0a526; color: var(--ink); border-radius: 50%; aspect-ratio: 1; max-height: 30vh; justify-self: center; width: 100%; max-width: 190px; font: 400 44px var(--box); box-shadow: 0 8px 0 #b07f0f; transition: transform .06s, box-shadow .06s; user-select: none }
+.bell .ringb.hit, .bell .ringb:active { transform: translateY(6px); box-shadow: 0 2px 0 #b07f0f }
+
+/* ── 항구 상회 ── */
+.gem { display: inline-grid; place-items: center; min-width: 22px; height: 22px; border-radius: 50%; background: var(--g); color: var(--gi); font-size: 12px; font-weight: 700; box-shadow: inset 0 0 0 1.5px rgba(0,0,0,.18); padding: 0 4px }
+.gem.sq { border-radius: 5px }
+.gem.big { min-width: 24px; height: 24px }
+.gems .nobles { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 10px }
+.gems .nobles small { color: var(--ink-2); font-size: 12px }
+.nob { background: #f3ead5; border-radius: 8px; padding: 6px 8px; display: flex; gap: 3px; align-items: center }
+.nob b { font: 400 18px var(--box); margin-right: 4px; color: #8a5a10 }
+.gems .board { display: grid; gap: 8px }
+.gems .board .row { display: grid; grid-template-columns: 38px repeat(4, minmax(0, 1fr)); gap: 5px; margin: 0 }
+.gc { background: var(--paper); border-radius: 8px; padding: 6px; min-height: 96px; min-width: 0; display: flex; flex-direction: column; justify-content: space-between; color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--rule); text-align: left; font-weight: 500 }
+.gc .top { display: flex; justify-content: space-between; align-items: center; background: var(--g); margin: -6px -6px 0; padding: 6px; border-radius: 8px 8px 0 0 }
+.gc .top b { font: 400 22px var(--box); color: var(--gi) }
+.gc .cost { display: flex; flex-wrap: wrap; gap: 3px; align-items: flex-end; padding-top: 6px }
+.gc .cost .gem { min-width: 20px; height: 20px; font-size: 11px }
+.gc.can { box-shadow: inset 0 0 0 2.5px #e0a526, 0 0 0 2px #e0a52655 }
+.gc.back { background: #1f4e5f; color: #fff; align-items: center; justify-content: center; box-shadow: none; cursor: pointer }
+.gc.back.t1 { background: #2e6b52 } .gc.back.t2 { background: #6b3f78 }
+.gc.back { padding: 4px 0 } .gc.back b { font: 400 18px var(--box) } .gc.back small { font-size: 11px; opacity: .8 }
+.gc.none { box-shadow: none; background: transparent }
+.gems .bank { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin: 12px 0 }
+.gemb { background: var(--g); color: var(--gi); border-radius: 50%; aspect-ratio: 1; padding: 0; display: grid; place-items: center; align-content: center; position: relative; box-shadow: inset 0 0 0 2px rgba(0,0,0,.15), 0 3px 0 rgba(0,0,0,.2) }
+.gemb b { font: 400 20px var(--box); line-height: 1 } .gemb small { font-size: 10px; font-weight: 600 }
+.gemb i { position: absolute; top: -6px; right: -6px; background: var(--ink); color: #fff; font-style: normal; font-size: 12px; border-radius: 10px; padding: 1px 6px }
+.gemb:disabled { opacity: 1; filter: saturate(.75) }
+.acts.disc { align-items: center }
+.acts.disc .gemb { width: 52px }
+.gems .me { background: var(--paper); border-radius: 10px; padding: 12px; display: grid; gap: 6px }
+.gems .me .hd { display: flex; justify-content: space-between; font-weight: 700 }
+.gems .me .hd span { font: 400 22px var(--box); color: var(--sea) }
+.gems .line { display: flex; flex-wrap: wrap; gap: 4px; align-items: center }
+.gems .line > small { width: 92px; color: var(--ink-2); font-size: 12px }
+.gems .line.res .gc { width: 64px }
+.others { list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 6px }
+.others li { background: var(--paper); border-left: 5px solid var(--s); border-radius: 6px; padding: 6px 10px; display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; font-size: 14px }
+.others li.cur { box-shadow: inset 0 0 0 2px var(--s) }
+.others li small { color: var(--ink-2); font-size: 12px }
+.others .mini { display: inline-flex; gap: 2px } .others .mini .gem { min-width: 18px; height: 18px; font-size: 10px }
+.passb { margin-top: 10px; font-size: 13px; padding: 6px 12px }
+.sheet { position: fixed; inset: 0; background: rgba(10,25,35,.45); z-index: 30; display: grid; place-items: end center }
+.sheet .in { background: var(--paper); width: min(100%, 520px); border-radius: 16px 16px 0 0; padding: 18px 18px calc(18px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 10px; justify-items: stretch }
+.sheet .in > .gc { width: 120px; justify-self: center }
+.sheet .in p { margin: 0; font-weight: 650 }
+
+/* ── 섬 개척 ── */
+.isle .say .dd { font: 400 20px var(--box); color: var(--sea) }
+.isle .mapw { background: radial-gradient(closest-side, #7fc4cf, #3d93a5); border-radius: 14px; padding: 4px }
+.map { display: block; width: 100%; height: auto }
+.map .hx { stroke: #f3ecd6; stroke-width: .06 }
+.map .hx.pick { cursor: pointer; stroke: #fff; stroke-width: .1; animation: blink 1s infinite alternate }
+@keyframes blink { to { opacity: .7 } }
+.map .tok { fill: #f8f2e0; stroke: rgba(0,0,0,.2); stroke-width: .02 }
+.map .num { font: 700 .34px var(--ui); text-anchor: middle; fill: #222 }
+.map .num.hot { fill: #c0301a }
+.map .dots { font: .2px var(--ui); text-anchor: middle; fill: #555 }
+.map .rob circle { fill: #1b1b1b; stroke: #fff; stroke-width: .04 } .map .rob text { font: 700 .17px var(--ui); fill: #fff; text-anchor: middle }
+body:has(#app.room) #cu-home { display: none }
+.map .pier { stroke: #8a6a3a; stroke-width: .07 }
+.map .port { stroke: #fff; stroke-width: .04 }
+.map .pt { font: 700 .16px var(--ui); text-anchor: middle; fill: #222 }
+.map .road { stroke-width: .17; stroke-linecap: round }
+.map .town, .map .city { stroke: #fff; stroke-width: .05 }
+.map .hot-e { stroke: #fff; stroke-width: .2; stroke-linecap: round; opacity: .75; cursor: pointer; stroke-dasharray: .08 .08 }
+.map circle.hot-v { fill: #fff; stroke: var(--ink); stroke-width: .05; cursor: pointer; animation: blink .8s infinite alternate }
+.map .town.hot-v, .map .city.hot-v { stroke: #ffe066; stroke-width: .1; cursor: pointer }
+.isle .others li.me { box-shadow: inset 0 0 0 2px var(--ink) }
+.hand { display: flex; gap: 6px; margin: 10px 0; flex-wrap: wrap }
+.rc { display: inline-grid; place-items: center; min-width: 52px; padding: 6px 4px; border-radius: 8px; background: var(--r); color: #fff; text-shadow: 0 1px 1px rgba(0,0,0,.35); line-height: 1.1 }
+.rc b { font: 400 20px var(--box) } .rc small { font-size: 11px; font-weight: 600 }
+.hand .rc { flex: 1 }
+.isle .build { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; width: 100% }
+.isle .build button { display: grid; gap: 4px; padding: 8px 4px; background: var(--sea-2) }
+.isle .build button.on { background: #e0a526; color: var(--ink) }
+.isle .cost { display: flex; gap: 2px; justify-content: center }
+.isle .cost i { font-style: normal; font-size: 11px; min-width: 16px; height: 16px; border-radius: 4px; background: var(--r); display: grid; place-items: center; color: #fff }
+.isle .acts .row { width: 100%; margin: 4px 0 0 }
+.isle .acts .row button { flex: 1; padding: 12px 8px; font-size: 15px }
+.isle .acts .endt { background: var(--ink) }
+.isle .acts .main { width: 100%; padding: 16px }
+.offer, .discp { background: var(--paper); border-radius: 10px; padding: 12px; width: 100%; display: flex; flex-wrap: wrap; gap: 6px; align-items: center }
+.offer p, .discp p { width: 100%; margin: 0 0 4px; font-weight: 650 }
+.devs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px }
+.dv { flex: 0 0 132px; background: #f3ead5; color: var(--ink); display: grid; gap: 2px; text-align: left; padding: 8px 10px }
+.dv b { font: 400 16px var(--box) } .dv small { font-size: 11px; font-weight: 500; color: var(--ink-2) }
+.brow { display: flex; gap: 4px; align-items: center; flex-wrap: wrap }
+.brow .rc { min-width: 46px }
+.tgr { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px }
+.tg { display: grid; gap: 4px }
+.tg button { padding: 6px 0 }
