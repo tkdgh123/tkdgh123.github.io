@@ -51,6 +51,7 @@ export default {
     if (s.phase === "guess") return { delay: 500, a: { t: "vote", i: Math.floor(rng() * 6) } };
     if (s.phase === "show") return { delay: 400, a: { t: "next" } };
   },
+  badge(v, i) { return i === v.wit ? "증인" : "탐정"; },
   render(el, v, me, send, ui) {
     const n = ui.names, amW = v.wit === me;
     let say;

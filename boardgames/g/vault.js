@@ -144,6 +144,7 @@ export default {
     return { ...d, a: { t: "guess", to: best.to, idx: best.idx, num: pick(best.nums, rng) } };
   },
 
+  badge(v, i) { return v.out.includes(i) ? "다 열림" : `닫힌 패 ${v.racks[i].filter(t => !t.open).length}`; },
   render(el, v, me, send, ui) { render(el, v, me, send, ui); }
 };
 

@@ -718,3 +718,111 @@ body::before { content: ""; position: fixed; inset: 0; pointer-events: none; z-i
 .cscore span { background: var(--paper); border-radius: 6px; padding: 3px 10px; box-shadow: var(--card-sh) }
 .tile .tbl > .dim { color: #cfe5df }
 .clock { color: #fff; text-shadow: 0 3px 0 rgba(0,0,0,.3) } .clock.low { color: #ffb4a0 }
+
+/* ════ 한 화면 (11-26): 방에서는 화면 높이에 맞춰 판이 줄어들고 스크롤이 없게 ════ */
+body:has(#app.room) { padding-inline: 6px }
+#app.room { height: 100dvh; display: flex; flex-direction: column; padding-block: calc(4px + env(safe-area-inset-top, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) }
+#app.room .bar { padding: 3px 4px 3px 10px; border-radius: 10px; flex: none }
+#app.room .bar .home { font-size: 15px; padding: 4px 2px }
+#app.room .bar .gname { font-size: 16px }
+#app.room .bar .code { padding: 4px 10px; font-size: 13px }
+#app.room .seats { flex: none; flex-wrap: nowrap; overflow-x: auto; margin: 5px 0; gap: 4px; scrollbar-width: none }
+#app.room .seats::-webkit-scrollbar { display: none }
+#app.room .seats span { flex: none; font-size: 12px; padding: 3px 8px 3px 6px; white-space: nowrap }
+#app.room .seats em { font-style: normal; font-weight: 500; opacity: .8; margin-left: 2px }
+#app.room .stage { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 8px 8px 6px; display: flex; flex-direction: column; margin-top: 0 }
+#app.room .stage > div { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 6px }
+#app.room .stage > div > * { flex: none }
+#app.room .say { margin: 0; font-size: 14px; min-height: 0; line-height: 1.35 }
+#app.room .acts { margin: 2px 0 }
+#app.room .acts button { padding: 10px 16px; font-size: 15px }
+/* 기록: 맨 아래 한 줄, 누르면 위로 펼침 */
+#app.room .stage > div > .log { margin: auto 0 0; max-height: 30px; overflow: hidden; padding: 4px 10px; cursor: pointer; position: relative; flex: none; line-height: 22px; background-image: none }
+#app.room .stage > div > .log::after { content: "기록"; position: absolute; right: 8px; top: 4px; font-size: 11px; color: #8a7a62 }
+#app.room .stage > div > .log li:not(:first-child) { display: none }
+#app.room .stage > div > .log.open { max-height: 45vh; overflow: auto; position: absolute; left: 8px; right: 8px; bottom: 8px; z-index: 25; box-shadow: 0 10px 30px rgba(0,0,0,.5) }
+#app.room .stage > div > .log.open li { display: list-item }
+#app.room .stage { position: relative }
+/* 이름표에 점수를 넣었으니 게임 안 점수 목록은 숨김 */
+#app.room .stage .score, #app.room .isle .others { display: none }
+
+/* ── 게임별: 판이 남는 높이를 차지 ── */
+.isle .mapw { flex: 1 !important; min-height: 140px; display: flex; align-items: center; justify-content: center }
+.isle .map { width: auto; height: 100%; max-width: 100%; max-height: 100% }
+.isle .hand { margin: 0 } .isle .hand .rc { padding: 3px 2px; min-width: 0 } .isle .hand .rc b { font-size: 17px }
+.isle .build button { padding: 6px 2px } .isle .acts .row { margin: 4px 0 0 } .isle .acts .row button { padding: 9px 6px }
+.isle .devs .dv { flex-basis: 110px; padding: 5px 8px }
+
+.crab .isle { flex: 1 !important; min-height: 220px; width: auto; max-width: 100%; aspect-ratio: 1 / .92; margin: 0 auto }
+
+.bell .tbl { flex: 1 !important; min-height: 0; align-content: center }
+.bell .fc { max-width: min(84px, 11vh) }
+.bell .pads { margin-top: 0 } .bell .flipb { padding: 14px 8px } .bell .ringb { max-height: 22vh; max-width: 22vh }
+.bell .flash { margin: 0; padding: 4px 10px; font-size: 13px }
+
+.gems .nobles { margin: 0; gap: 5px } .gems .nobles small { display: none } .nob { padding: 4px 6px }
+.gems .board { flex: 1 !important; min-height: 0; gap: 4px; align-content: center }
+.gems .gc { min-height: 0; height: clamp(62px, 10.5vh, 96px); padding: 4px }
+.gems .gc .top b { font-size: 18px } .gems .gc .top { padding: 3px 4px; margin: -4px -4px 0 }
+.gems .gc .cost .gem { min-width: 17px; height: 17px; font-size: 10px }
+.gems .bank { margin: 0; gap: 5px } .gems .gemb { max-width: 54px; justify-self: center; width: 100% }
+.gems .me { padding: 6px 10px; gap: 3px } .gems .line > small { width: 70px }
+.gems .others { margin: 0; gap: 3px } .gems .others li { padding: 3px 8px; font-size: 12px }
+.gems .passb { margin: 0; padding: 4px 10px }
+
+.vault .opps { gap: 6px } .vault .rack { padding: 6px 10px } .vault .mid { margin: 0; min-height: 0; flex: 1 !important; display: flex; align-items: center; justify-content: center }
+.vault .vt { width: 38px; height: 52px; font-size: 21px } .vault .vt.big { width: 64px; height: 84px }
+.vault .mine .tiles { margin-bottom: 10px }
+
+.cow .rows { gap: 4px } .cow .crow { padding: 4px } .cow .cw { width: 40px; height: 52px }
+.cow .shown, .cow .picked { margin: 0 } .cow .hand.cows { margin: 0 }
+
+.last .table { flex: 1 !important; margin: 0; min-height: 120px }
+.last .lhand { gap: 4px } .last .lhand .lc { width: 46px; height: 68px } .last .lhand .lc b { font-size: 21px }
+.last .ring { margin: 0 } .last .ring span { display: none } .last .ring small { font-size: 12px }
+
+.yacht .ydice { margin: 0; min-height: 50px } .yacht .ytab { flex: 1 !important; min-height: 0; overflow: auto; padding: 2px 8px }
+.yacht .ytab th, .yacht .ytab td { padding: 2px 5px; font-size: 13px }
+
+.bug .ups { gap: 4px } .bug .upr { padding: 4px 8px } .bug .bpick p { margin: 4px 0 2px; font-size: 13px }
+.bug .bc { width: 54px; height: 72px } .bug .bc img { width: 36px; height: 36px } .bug .bcl { padding: 5px 8px; font-size: 12px } .bug .bt { padding: 6px 10px }
+.bug .myhand { margin: 0; padding: 5px 8px; font-size: 12px }
+
+.rank .court { margin: 0; gap: 4px; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)) } .rank .court li { padding: 4px 8px; font-size: 12px }
+.rank .pit { margin: 0; flex: 1 !important; min-height: 70px }
+.rank .rk { width: 38px; height: 54px; font-size: 19px }
+
+.fire .stk .st { min-height: 0; padding: 4px 0 } .fire .st b { font-size: 22px; min-height: 26px }
+.fire .tok { margin: 0 } .fire .fh { margin: 0; padding: 5px 8px } .fire .fcd { width: 40px; height: 54px } .fire .fcd b { font-size: 21px }
+.fire .hints { margin-top: 3px } .fire .disc { margin: 0 }
+
+.tile .tbl { flex: 1 !important; min-height: 80px; overflow: auto; align-content: start }
+.tile .thand { margin: 0; min-height: 0; max-height: 26vh; overflow: auto } .tile .tl { width: 31px; height: 42px; font-size: 17px }
+
+.race .lanes { flex: 1 !important; align-content: center } .race .powers { margin: 0 } .race .powers p { margin: 1px 0; font-size: 12px }
+
+.duel .crew { gap: 4px; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)) } .duel .mate { padding: 5px 8px; gap: 0 }
+.duel .dhand { flex: none; padding: 4px 0 } .duel .dc { flex-basis: 92px; padding: 6px }
+
+.castle .myrole { margin: 0; padding: 7px 12px; font-size: 14px } .castle .quests { margin: 0 } .castle .quests span { width: 44px; height: 44px }
+.castle .knights { gap: 4px } .castle .kn { padding: 5px 6px }
+
+.code .myteam { padding: 6px 12px } .code .grid5 { flex: 1 !important; min-height: 0; align-content: center } .code .grid5 .cw { height: clamp(40px, 8vh, 56px) }
+.code .teams p { margin: 2px 0; font-size: 12px } .code .clue { margin: 0 }
+
+.tele .pad canvas { width: min(100%, 44vh) } .tele .pic img { width: min(100%, 40vh) }
+.five .clock { font-size: 52px } .five .topic, .odd .topic { margin: 0; padding: 10px 14px } .odd .cands { margin: 0; flex: 1 !important; align-content: center }
+
+.nope .ntop { margin: 0; flex: 1 !important; align-items: center } .nope .nrows { margin: 0; gap: 4px } .nope .nr { padding: 4px 8px }
+.omok .go15 { flex: none; width: min(100%, 62vh) }
+.vegas .pubs { flex: 1 !important; align-content: center } .vegas .pub { min-height: 0; padding: 6px; gap: 4px } .vegas .vroll { margin: 0 } .vegas .vroll .die { width: 38px; height: 38px; padding: 6px }
+.yut .yutb { flex: 1 !important; min-height: 0; width: auto; height: 100%; max-width: 100%; max-height: 100% }
+.yut .ress { margin: 0 } .yut .homes { margin: 0; gap: 4px } .yut .hm { padding: 4px 8px }
+.mosaic .facs { margin: 0; gap: 5px } .mosaic .fac { width: 64px; height: 64px; padding: 10px } .mosaic .fac.center { min-width: 100px }
+.mosaic .mb { margin: 0; padding: 6px 8px } .mosaic .mt { width: 19px; height: 19px } .mosaic .mline { min-width: 104px }
+.mosaic .others2 { display: flex; gap: 6px; overflow-x: auto } .mosaic .others2 .mb { flex: none; zoom: .62 }
+.gostop .floor { flex: 1 !important; min-height: 0; align-content: flex-start; overflow: auto; padding: 6px } .gostop .hhand { margin: 4px 0 0 }
+.gostop .hw { width: 40px; height: 60px } .gostop .caps { gap: 4px } .gostop .cp { padding: 4px 8px }
+.map .mapwrap { flex: 1 !important; min-height: 0; max-height: none } .map .mtool { margin: 0 } .map .mtool .cur svg { width: 62px; height: 62px }
+.crab .isle { flex: none !important; width: min(100%, 50vh); min-height: 0; margin: auto }
+.race .lanes { flex: none !important; margin: auto 0 }

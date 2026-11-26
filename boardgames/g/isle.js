@@ -315,6 +315,7 @@ export default {
 
   bot(s, seat, rng) { return { delay: 700 + rng() * 600, a: botMove(s, seat, rng) }; },
 
+  badge(v, i) { const p = v.pl[i]; return `${p.vp}점, 카드 ${p.nres}${v.lr === i ? ", 긴 길" : ""}${v.la === i ? ", 경비대" : ""}`; },
   render(el, v, me, send, ui) { render(el, v, me, send, ui); }
 };
 

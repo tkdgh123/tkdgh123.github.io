@@ -122,6 +122,7 @@ export default {
     return { ...d, a: { t: ev > sum * n * (0.95 + rng() * .2) ? "roll" : "go" } };
   },
 
+  badge(v, i) { return `조개 ${v.eggs[i]}`; },
   render(el, v, me, send, ui) { render(el, v, me, send, ui); }
 };
 

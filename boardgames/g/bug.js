@@ -80,6 +80,7 @@ export default {
     const pTrue = Math.max(0, 8 - seen) / 8 * .9;
     return { ...d, a: { t: "call", truth: rng() < pTrue } };
   },
+  badge(v, i) { return `손 ${v.counts[i]}`; },
   render(el, v, me, send, ui) {
     const n = ui.names, ch = v.chain;
     const myGive = v.phase === "give" && v.cur === me, myAns = ch && ch.to === me && v.phase === "answer", myPass = ch && ch.to === me && v.phase === "pass";

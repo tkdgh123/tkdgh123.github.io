@@ -283,8 +283,7 @@ async function draw(d) {
   app.querySelector(".gname").textContent = G.name;
   app.querySelector(".code").textContent = "방 " + code;
   const turn = v && d.st === "play" ? v.turn || [] : [];
-  app.querySelector(".seats").innerHTML = d.seats.map((x, i) =>
-    `<span class="${turn.includes(i) ? "on" : ""}${i === me ? " me" : ""}" style="--s:${SEAT[i]}">${esc(x.name)}${x.bot ? "" : ""}${i === 0 ? '<i>방장</i>' : ""}</span>`).join("");
+  app.querySelector(".seats").innerHTML = d.seats.map((x, i) => { const b = v && G.badge ? G.badge(v, i) : ""; return `<span class="${turn.includes(i) ? "on" : ""}${i === me ? " me" : ""}" style="--s:${SEAT[i]}">${esc(x.name)}${b ? `<em>${esc(b)}</em>` : ""}</span>`; }).join("");
   const st = app.querySelector(".stage");
   if (d.st === "wait") { st.dataset.sig = ""; return waitRoom(st, d, G, me, isHost); }
   if (d.err && d.err.pid === ME && d.err.n !== draw.errN) { draw.errN = d.err.n; toast(d.err.msg); }
@@ -298,6 +297,9 @@ async function draw(d) {
   if (sig === st.dataset.sig && d.st !== "end") return;
   st.dataset.sig = sig;
   G.render(st, v, me, send, { names: d.seats.map(x => x.name), toast, isHost });
+  // 진행 기록은 맨 아래 한 줄, 누르면 펼침
+  const lg = st.querySelector(".log");
+  if (lg) { lg.classList.toggle("open", !!draw.logOpen); lg.onclick = () => { draw.logOpen = !draw.logOpen; lg.classList.toggle("open", draw.logOpen); }; }
   if (d.st === "end") endBox(st, d, G, isHost);
 }
 

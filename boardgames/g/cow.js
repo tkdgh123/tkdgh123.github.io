@@ -84,6 +84,7 @@ export default {
     }
     return { ...d, a: { t: "pick", c: best } };
   },
+  badge(v, i) { return `벌점 ${v.score[i]}`; },
   render(el, v, me, send, ui) {
     const n = ui.names, H = c => `<span class="cw h${heads(c)}"><b>${c}</b><i>${"▲".repeat(heads(c))}</i></span>`;
     const mustTake = v.phase === "take" && v.taker === me;

@@ -176,6 +176,7 @@ export default {
     }
     return { ...d, a: { t: "place", x: best.x, y: best.y, r: best.r } };
   },
+  badge(v, i) { return `${v.score[i]}점, 일꾼 ${v.men[i]}`; },
   render(el, v, me, send, ui) {
     const n = ui.names, my = v.cur === me && v.phase !== "end";
     if (!my || v.phase !== "place") UI.rot = UI.rot || 0;

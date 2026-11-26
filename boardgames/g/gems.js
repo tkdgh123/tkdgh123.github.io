@@ -191,6 +191,7 @@ export default {
     return { ...d, a: { t: "pass" } };
   },
 
+  badge(v, i) { return `${v.pl[i].pts}점`; },
   render(el, v, me, send, ui) { render(el, v, me, send, ui); }
 };
 

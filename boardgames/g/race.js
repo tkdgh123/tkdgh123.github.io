@@ -105,6 +105,7 @@ export default {
     if (s.phase === "reroll") return { ...d, a: { t: s.roll <= 3 ? "reroll" : "keep" } };
     return { ...d, a: { t: "roll" } };
   },
+  badge(v, i) { return `${v.score[i]}점`; },
   render(el, v, me, send, ui) {
     const n = ui.names, my = v.turn.includes(me);
     let say;

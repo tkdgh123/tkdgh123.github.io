@@ -211,6 +211,7 @@ export default {
     }
     return { ...d, a: { t: "end" } };
   },
+  badge(v, i) { return v.hp[i] > 0 ? `체력 ${v.hp[i]}` : "쓰러짐"; },
   render(el, v, me, send, ui) {
     const n = ui.names, my = v.turn.includes(me) && v.phase !== "end";
     if (!my) UI.card = null;

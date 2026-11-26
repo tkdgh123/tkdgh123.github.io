@@ -27,7 +27,7 @@ function deal(s, rng) {
 const value = (cards) => { const nj = cards.filter(c => c !== J); return nj.length ? nj[0] : J; };
 
 export default {
-  id: "rank", name: "궁궐 신분전", color: "#6b3f78", min: 4, max: 8, time: "25분", solo: 5,
+  id: "rank", name: "대부호", color: "#6b3f78", min: 4, max: 8, time: "25분", solo: 5,
   sub: "같은 숫자 묶음을 더 작은 숫자로 덮어요. 먼저 턴 사람이 다음 판 왕, 늦은 사람은 노비",
   setup(n, rng) { const s = { n, round: 1, order: [...Array(n).keys()], score: Array(n).fill(0), log: [], phase: "play" }; deal(s, rng); return s; },
   view(s, seat) {
@@ -91,6 +91,7 @@ export default {
     }
     return { ...d, a: { t: "pass" } };
   },
+  badge(v, i) { return v.out.includes(i) ? `${v.out.indexOf(i) + 1}등` : `${v.counts[i]}장, ${v.score[i]}점`; },
   render(el, v, me, send, ui) {
     const n = ui.names, my = v.cur === me && v.phase === "play";
     if (!my) UI.sel = [];

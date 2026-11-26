@@ -27,7 +27,7 @@ function draw(s, p, k, rng) {
 }
 
 export default {
-  id: "last", name: "마지막 한 장", color: "#2a9d9b", min: 2, max: 10, time: "15분", solo: 4,
+  id: "last", name: "원카드", color: "#2a9d9b", min: 2, max: 10, time: "15분", solo: 4,
   sub: "같은 색이나 숫자를 내며 손패를 먼저 털어요. 한 장 남으면 \"한 장!\"",
   setup(n, rng) {
     const pile = newDeck(rng), hands = Array.from({ length: n }, () => pile.splice(0, 7));
@@ -102,6 +102,7 @@ export default {
     const c = ok[0], cnt = [0, 0, 0, 0]; H.forEach(h => h.c >= 0 && h.id !== c.id && cnt[h.c]++);
     return { ...d, a: { t: "play", id: c.id, color: cnt.indexOf(Math.max(...cnt)), call: rng() < .92 } };
   },
+  badge(v, i) { return `${v.counts[i]}장`; },
   render(el, v, me, send, ui) {
     const n = ui.names, my = v.cur === me && v.win == null;
     const card = (c, attrs = "", cls = "") => `<button class="lc ${cls}" style="--c:${c.c < 0 ? "#222" : COL[c.c][1]}" ${attrs}><b>${lab(c)}</b><small>${typeof c.v === "number" ? "" : SYM[c.v]}</small></button>`;

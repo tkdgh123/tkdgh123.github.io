@@ -110,6 +110,7 @@ export default {
     }
     return { delay: 900 + rng() * 600, a: best };
   },
+  badge(v, i) { return `${v.boards[i].score}점`; },
   render(el, v, me, send, ui) {
     const n = ui.names, my = v.cur === me && !v.done;
     if (!my) UI.pick = null;

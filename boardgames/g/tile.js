@@ -27,7 +27,7 @@ export function setInfo(tiles) {
 const val = t => t.v || 25;
 
 export default {
-  id: "tile", name: "숫자 조합판", color: "#4b8fa6", min: 2, max: 4, time: "40분", solo: 3,
+  id: "tile", name: "러미", color: "#4b8fa6", min: 2, max: 4, time: "40분", solo: 3,
   sub: "같은 숫자끼리, 같은 색 이어진 숫자끼리 내려놓아요. 판 위 조합을 고쳐 끼워 넣어도 돼요",
   setup(n, rng) {
     const pool = []; let id = 0;
@@ -87,6 +87,7 @@ export default {
     const plan = botPlan(s.table, s.hands[seat], s.melded[seat]);
     return { ...d, a: plan ? { t: "play", table: plan } : { t: "draw" } };
   },
+  badge(v, i) { return `${v.counts[i]}개`; },
   render(el, v, me, send, ui) { render(this, el, v, me, send, ui); }
 };
 

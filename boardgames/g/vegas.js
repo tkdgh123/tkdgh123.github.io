@@ -62,6 +62,7 @@ export default {
     }
     return { ...d, a: { t: "bet", v: best } };
   },
+  badge(v, i) { return `${v.money[i]}만`; },
   render(el, v, me, send, ui) {
     const n = ui.names, my = v.cur === me && !v.done;
     el.innerHTML = `<div class="vegas">

@@ -23,7 +23,7 @@ const upper = sh => sh.slice(0, 6).reduce((a, b) => a + (b ?? 0), 0);
 export const total = sh => sh.reduce((a, b) => a + (b ?? 0), 0) + (upper(sh) >= 63 ? 35 : 0);
 
 export default {
-  id: "yacht", name: "주사위 족보", color: "#8a3b2b", min: 2, max: 6, time: "20분", solo: 2,
+  id: "yacht", name: "요트", color: "#8a3b2b", min: 2, max: 6, time: "20분", solo: 2,
   sub: "주사위 다섯 개를 세 번까지 굴려 족보 열두 칸을 채워요. 다섯 개가 같으면 50점",
   setup(n) { return { n, cur: 0, dice: [1, 1, 1, 1, 1], keep: [false, false, false, false, false], rolls: 0, sheet: Array.from({ length: n }, () => Array(12).fill(null)), log: [], done: false }; },
   view(s) { return { ...JSON.parse(JSON.stringify(s)), totals: s.sheet.map(total), turn: this.turn(s) }; },
@@ -74,6 +74,7 @@ export default {
     for (const c of open) { const v = score(s.dice, c) - BASE[c] + (c < 6 && score(s.dice, c) >= 3 * (c + 1) ? 4 : 0); if (v > bs) { bs = v; bc = c; } }
     return { ...d, a: { t: "pick", c: bc } };
   },
+  badge(v, i) { return `${v.totals[i]}점`; },
   render(el, v, me, send, ui) {
     const n = ui.names, my = v.cur === me && !v.done;
     if (!my || v.rolls === 0) UI.keep = [false, false, false, false, false];

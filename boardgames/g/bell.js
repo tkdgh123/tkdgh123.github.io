@@ -132,6 +132,7 @@ export default {
     return null;
   },
 
+  badge(v, i) { return v.out[i] ? "탈락" : `손 ${v.left[i]}`; },
   render(el, v, me, send, ui) { render(el, v, me, send, ui); }
 };
 

@@ -113,6 +113,7 @@ export default {
     }));
     return { ...d, a: best };
   },
+  badge(v, i) { return `${v.pc[i].filter(x => x === 99).length}개 났음`; },
   render(el, v, me, send, ui) {
     const n = ui.names, my = v.cur === me && v.win == null;
     if (!my || v.phase !== "move") UI.ri = null;

@@ -74,6 +74,7 @@ export default {
     if (s.phase === "ready") return { ...d, a: { t: "go" } };
     if (s.phase === "talk") return { delay: 1200, a: { t: "said" } };
   },
+  badge(v, i) { return `${v.won[i]}장`; },
   render(el, v, me, send, ui) {
     const n = ui.names, my = v.cur === me, left = v.deadline ? Math.max(0, (v.deadline - Date.now()) / 1000) : 0;
     let body;

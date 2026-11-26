@@ -125,6 +125,7 @@ export default {
     }
     return { ...d, a: { t: "play", id: bc.id } };
   },
+  badge(v, i) { return `${v.scores[i].s}점${v.go[i] ? `, ${v.go[i]}고` : ""}`; },
   render(el, v, me, send, ui) {
     const n = ui.names, my = v.cur === me && v.win == null && !v.nagari;
     const card = (c, attrs = "", cls = "") => `<button class="hw k-${kind(c)} ${cls}" style="--h:${MCOL[c.m]}" ${attrs}><b>${c.m}</b><small>${MON[c.m]}</small><i>${LABEL(c)}</i></button>`;

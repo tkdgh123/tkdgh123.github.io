@@ -48,6 +48,7 @@ export default {
     }
     return { delay: 700 + rng() * 500, a: { t: "put", i: best } };
   },
+  badge(v, i) { return i ? "흰 돌" : "검은 돌"; },
   render(el, v, me, send, ui) {
     const n = ui.names, my = v.cur === me && v.win == null;
     el.innerHTML = `<div class="omok">

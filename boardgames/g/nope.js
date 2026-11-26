@@ -52,6 +52,7 @@ export default {
     const want = fits ? s.pot >= 1 || rng() < .5 : cost <= 8 + (s.chips[seat] < 3 ? 6 : 0) + rng() * 4;
     return { ...d, a: { t: want ? "take" : "pass" } };
   },
+  badge(v, i) { return `${v.cards[i].length}장`; },
   render(el, v, me, send, ui) {
     const n = ui.names, my = v.cur === me && !v.done;
     el.innerHTML = `<div class="nope">

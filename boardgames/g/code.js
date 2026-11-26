@@ -59,6 +59,7 @@ export default {
     if (s.guessed && rng() < .3) return { ...d, a: { t: "stop" } };
     return { ...d, a: { t: "guess", i: left[Math.floor(rng() * left.length)] } };
   },
+  badge(v, i) { return (i % 2 ? "파랑" : "빨강") + (v.spy.includes(i) ? " 대장" : ""); },
   render(el, v, me, send, ui) {
     const n = ui.names, my = v.turn.includes(me), amSpy = v.spy.includes(me), myTeam = me >= 0 ? team(me) : null;
     let say;
