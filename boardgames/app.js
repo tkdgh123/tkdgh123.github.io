@@ -19,8 +19,17 @@ import bug from "./g/bug.js";
 import race from "./g/race.js";
 import yacht from "./g/yacht.js";
 import duel from "./g/duel.js";
+import nope from "./g/nope.js";
+import omok from "./g/omok.js";
+import vegas from "./g/vegas.js";
+import five from "./g/five.js";
+import odd from "./g/odd.js";
+import yut from "./g/yut.js";
+import mosaic from "./g/mosaic.js";
+import gostop from "./g/gostop.js";
+import mapG from "./g/map.js";
 
-export const GAMES = { isle, bell, crab, gems, vault, cow, code: codeG, tele, castle, fire, tile, last: lastG, rank, bug, race, yacht, duel };
+export const GAMES = { isle, bell, crab, gems, vault, cow, code: codeG, tele, castle, fire, tile, last: lastG, rank, bug, race, yacht, duel, nope, omok, vegas, five, odd, yut, mosaic, gostop, map: mapG };
 // 비밀이 큰 게임(그림 전화)은 공개 칸과 내 몫(secret)을 나눠 보내고, 받는 쪽에서 합친다
 const viewFor = (G, s, seat) => G.secret ? { ...G.view(s, -1), ...G.secret(s, seat) } : G.view(s, seat);
 const $ = s => document.querySelector(s);
@@ -143,7 +152,10 @@ const PLACES = [
   ["cow", "목장", "언덕 위 소 우리"], ["last", "대합실", "배 기다리는 선착장 의자"], ["yacht", "주막", "부두 앞 주사위 소리 나는 집"],
   ["bug", "갯벌", "물 빠진 바닷가"], ["rank", "옛 궁궐", "섬 한가운데 낡은 궁궐"], ["fire", "광장", "여름밤 축제 자리"],
   ["tile", "찻집", "골목 안 조용한 가게"], ["race", "운동장", "섬 학교 마당"], ["duel", "해적선", "앞바다에 닻 내린 배"],
-  ["castle", "성터", "바위 언덕 옛 성"], ["code", "망루", "섬 꼭대기 망보는 탑"], ["tele", "우체국", "편지 오가는 작은 집"]
+  ["castle", "성터", "바위 언덕 옛 성"], ["code", "망루", "섬 꼭대기 망보는 탑"], ["tele", "우체국", "편지 오가는 작은 집"],
+  ["nope", "어시장", "새벽 생선 경매"], ["omok", "정자", "마을 어귀 느티나무 아래"], ["vegas", "선술집 거리", "주사위 소리 나는 골목"],
+  ["yut", "마당", "이장님 댁 앞마당"], ["gostop", "사랑방", "할머니 댁 아랫목"], ["mosaic", "공방", "조개껍데기 모자이크 가게"],
+  ["map", "지도방", "섬 지도를 그리는 방"], ["five", "교실", "섬 분교"], ["odd", "파출소", "섬에 하나뿐인 경찰서"]
 ];
 let want = 0; // 첫 화면 인원 거르기 (0 = 전부)
 try { want = +sessionStorage.getItem("bg-want") || 0; } catch {}
