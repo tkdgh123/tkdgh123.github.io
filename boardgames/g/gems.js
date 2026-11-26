@@ -196,7 +196,8 @@ export default {
 
 // ───────── 화면 ─────────
 const UI = { pick: [], card: null };
-const gem = (c, n, cls = "") => `<span class="gem ${cls}" style="--g:${GEM[c][1]};--gi:${GEM[c][2]}">${n ?? ""}</span>`;
+const GI = c => c === 5 ? "art/coin.webp" : `art/gem${c}.webp`;
+const gem = (c, n, cls = "") => cls === "big" ? `<img class="gemimg" src="${GI(c)}" alt="${GEM[c][0]}">` : `<span class="gem ${cls}" style="--g:${GEM[c][1]};--gi:${GEM[c][2]}">${n ?? ""}</span>`;
 const cardHTML = (c, mine) => !c ? `<div class="gc none"></div>` : c.hid && c.b === undefined ? `<div class="gc back t${c.t}"><b>${["I", "II", "III"][c.t]}</b></div>` :
   `<button class="gc t${c.t}${mine ? " can" : ""}" data-id="${c.id}" style="--g:${GEM[c.b][1]};--gi:${GEM[c.b][2]}">
     <span class="top"><b>${c.p || ""}</b>${gem(c.b, "", "big")}</span>
@@ -214,7 +215,7 @@ function render(el, v, me, send, ui) {
     <p class="say">${say}</p>
     <div class="nobles">${v.nobles.map(nb => `<div class="nob"><b>3</b>${nb.need.map((x, c) => x ? gem(c, x, "sq") : "").join("")}</div>`).join("")}<small>선장(조건을 채우면 찾아와 3점)</small></div>
     <div class="board">${[2, 1, 0].map(t => `<div class="row"><div class="gc back t${t}" data-deck="${t}"><b>${["I", "II", "III"][t]}</b><small>${v.deckN[t]}</small></div>${v.board[t].map(c => cardHTML(c, can(c))).join("")}</div>`).join("")}</div>
-    <div class="bank">${v.bank.map((x, c) => `<button class="gemb" data-c="${c}" ${c === 5 || !mine || v.phase !== "act" ? "disabled" : ""} style="--g:${GEM[c][1]};--gi:${GEM[c][2]}"><b>${x}</b><small>${GEM[c][0]}</small>${pk.filter(y => y === c).length ? `<i>+${pk.filter(y => y === c).length}</i>` : ""}</button>`).join("")}</div>
+    <div class="bank">${v.bank.map((x, c) => `<button class="gemb" data-c="${c}" ${c === 5 || !mine || v.phase !== "act" ? "disabled" : ""} style="--g:${GEM[c][1]};--gi:${GEM[c][2]}"><img src="${GI(c)}" alt=""><b>${x}</b><small>${GEM[c][0]}</small>${pk.filter(y => y === c).length ? `<i>+${pk.filter(y => y === c).length}</i>` : ""}</button>`).join("")}</div>
     ${mine && v.phase === "act" && pk.length ? `<div class="acts"><button class="takeb">가져오기</button><button class="ghost clr">다시 고르기</button></div>` : ""}
     ${mine && v.phase === "disc" ? `<div class="acts disc">${P.tok.map((x, c) => x ? `<button class="gemb" data-dc="${c}" style="--g:${GEM[c][1]};--gi:${GEM[c][2]}"><b>${x - (UI.disc?.[c] || 0)}</b><small>${GEM[c][0]}</small></button>` : "").join("")}<button class="discb">돌려주기</button></div>` : ""}
     ${P ? `<div class="me">

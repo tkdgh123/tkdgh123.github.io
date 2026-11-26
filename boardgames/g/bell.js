@@ -3,7 +3,7 @@
 // 방장은 첫 종이 오면 0.4초 동안 더 기다렸다가 가장 빠른 사람에게 준다.
 import { esc, shuffle, hash, SEAT } from "../lib.js";
 
-export const FRUIT = [["귤", "🍊"], ["포도", "🍇"], ["딸기", "🍓"], ["바나나", "🍌"]];
+export const FRUIT = [["귤", "orange"], ["포도", "grape"], ["딸기", "berry"], ["바나나", "banana"]];
 const COUNTS = [1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 5]; // 과일마다 14장
 const WINDOW = 400, AUTOFLIP = 7000, LIMIT = 8 * 60 * 1000;
 
@@ -137,7 +137,7 @@ export default {
 
 // ───────── 화면 ─────────
 const UI = { flip: -1, at: 0, rung: -1 };
-const card = c => c ? `<div class="fc f${c.f}">${Array(c.k).fill(`<i>${FRUIT[c.f][1]}</i>`).join("")}</div>` : `<div class="fc empty"></div>`;
+const card = c => c ? `<div class="fc f${c.f} k${c.k}" aria-label="${FRUIT[c.f][0]} ${c.k}개">${Array(c.k).fill(`<img src="art/f-${FRUIT[c.f][1]}.webp" alt="">`).join("")}</div>` : `<div class="fc empty"></div>`;
 
 function render(el, v, me, send, ui) {
   if (v.flip !== UI.flip) { UI.flip = v.flip; UI.at = performance.now(); }

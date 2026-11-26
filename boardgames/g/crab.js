@@ -150,9 +150,9 @@ function render(el, v, me, send, ui) {
     <p class="say">${say}</p>
     <div class="isle">
       <div class="sea"></div><div class="land"><b>해변</b></div>
-      ${Array.from({ length: L }, (_, i) => { const [x, y] = spot(i); return `<div class="sp${i === 0 ? " beach" : ""}" style="left:${x}%;top:${y}%">${v.track[i].map((p, k) => `<i class="cr${p === v.cur ? " cur" : ""}" style="--s:${SEAT[p]};--k:${k}" title="${esc(n[p])}"></i>`).join("")}</div>`; }).join("")}
+      ${Array.from({ length: L }, (_, i) => { const [x, y] = spot(i); return `<div class="sp${i === 0 ? " beach" : ""}" style="left:${x}%;top:${y}%">${v.track[i].map((p, k) => `<i class="cr${p === v.cur ? " cur" : ""}" style="--s:${SEAT[p]};--k:${k}" title="${esc(n[p])}"><img src="art/hermit.webp" alt=""></i>`).join("")}</div>`; }).join("")}
       <div class="center">
-        <div class="dock"><small>출발 뗏목</small>${dock.map(p => `<i class="cr" style="--s:${SEAT[p]}" title="${esc(n[p])}"></i>`).join("") || "<span class='dim'>비었음</span>"}</div>
+        <div class="dock"><small>출발 뗏목</small>${dock.map(p => `<i class="cr" style="--s:${SEAT[p]}" title="${esc(n[p])}"><img src="art/hermit.webp" alt=""></i>`).join("") || "<span class='dim'>비었음</span>"}</div>
         <div class="dice">${v.dice.map(d => die(d, sum > 7 ? "bad" : "")).join("") || `<span class="dim">주사위</span>`}</div>
         <div class="shell"><small>다음 조개</small><b>${v.next ?? "-"}</b><small>남은 ${v.left}장</small></div>
       </div>

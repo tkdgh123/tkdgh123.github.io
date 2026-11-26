@@ -432,7 +432,8 @@ function bestRoad(s, p) {
 
 // ───────── 화면 ─────────
 const UI = { mode: null, give: [0, 0, 0, 0, 0], get: [0, 0, 0, 0, 0], yp: [], panel: null, disc: null };
-const resChip = (r, n, attrs = "") => `<span class="rc" style="--r:${RES[r][1]}" ${attrs}><b>${n}</b><small>${RES[r][0]}</small></span>`;
+export const TEX = ["forest", "clay", "pasture", "wheat", "rock"];
+const resChip = (r, n, attrs = "") => `<span class="rc" style="--r:${RES[r][1]};--ri:url(art/${TEX[r]}.webp)" ${attrs}><b>${n}</b><small>${RES[r][0]}</small></span>`;
 const cost = c => c.map((n, r) => n ? `<i style="--r:${RES[r][1]}">${n}</i>` : "").join("");
 
 function board(v, me, mode, can) {
@@ -442,7 +443,7 @@ function board(v, me, mode, can) {
   let g = "";
   HEX.forEach((hx, i) => {
     const t = v.hex[i], col = t.res < 0 ? "#e2cf9a" : RES[t.res][1];
-    g += `<polygon class="hx${mode === "robber" && i !== v.robber ? " pick" : ""}" data-h="${i}" points="${poly(hx)}" fill="${col}"/>`;
+    g += `<polygon class="hx${mode === "robber" && i !== v.robber ? " pick" : ""}" data-h="${i}" points="${poly(hx)}" fill="url(#t${t.res < 0 ? "d" : t.res})"/>`;
     if (t.num) g += `<circle cx="${hx.x}" cy="${hx.y}" r=".36" class="tok"/><text x="${hx.x}" y="${hx.y + .13}" class="num${t.num === 6 || t.num === 8 ? " hot" : ""}">${t.num}</text><text x="${hx.x}" y="${hx.y + .3}" class="dots">${"•".repeat(pip(t.num))}</text>`;
     if (i === v.robber) g += `<g class="rob"><circle cx="${hx.x}" cy="${hx.y - .5}" r=".3"/><text x="${hx.x}" y="${hx.y - .44}">해적</text></g>`;
   });
@@ -462,7 +463,8 @@ function board(v, me, mode, can) {
       : `<circle cx="${p.x}" cy="${p.y}" r=".21" class="town${mode === "city" && can.v?.has(i) ? " hot-v" : ""}" style="fill:${SEAT[b.p]}" data-v="${i}"/>`;
     else if (mode === "set" && can.v?.has(i)) g += `<circle cx="${p.x}" cy="${p.y}" r=".17" class="hot-v" data-v="${i}"/>`;
   });
-  return `<svg class="map" viewBox="${x0} ${y0} ${w} ${h}">${g}</svg>`;
+  const defs = `<defs>${[...TEX.map((t, r) => [r, t]), ["d", "desert"]].map(([r, t]) => `<pattern id="t${r}" patternUnits="objectBoundingBox" width="1" height="1"><image href="art/${t}.webp" x="0" y="0" width="2" height="2" preserveAspectRatio="xMidYMid slice"/></pattern>`).join("")}<filter id="hsh" x="-10%" y="-10%" width="120%" height="120%"><feDropShadow dx="0" dy=".05" stdDeviation=".05" flood-opacity=".5"/></filter></defs>`;
+  return `<svg class="map" viewBox="${x0} ${y0} ${w} ${h}">${defs}${g}</svg>`;
 }
 
 function legal(v, me) {

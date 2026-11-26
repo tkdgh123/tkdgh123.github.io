@@ -167,8 +167,9 @@ function lobby() {
   app.className = "lobby";
   app.innerHTML = `
   <header class="top">
-    <h1>주사위섬</h1>
-    <p>친구들과 각자 폰으로 같은 방에 들어와 해요. 방을 만들고 코드나 링크를 보내 주세요.</p>
+    <img src="art/island.webp" alt="주사위섬 지도: 등대, 항구, 해변, 옛 궁궐, 성터, 목장, 갯벌과 앞바다의 해적선">
+    <div class="tt"><h1>주사위섬</h1>
+    <p>친구들과 각자 폰으로 같은 방에 들어와 해요. 방을 만들고 코드나 링크를 보내 주세요.</p></div>
   </header>
   <form class="join" id="joinF">
     <label>내 이름<input id="nm" maxlength="10" value="${esc(getName())}" placeholder="이름" autocomplete="nickname" required></label>

@@ -3,6 +3,8 @@
 import { esc, shuffle, SEAT, logPush, nameB } from "../lib.js";
 
 export const KIND = ["갯강구", "해파리", "따개비", "불가사리", "갈매기", "쥐", "모기", "게"];
+const KI = ["louse", "jelly", "barnacle", "star", "gull", "rat", "mosq", "crab"];
+const img = k => `<img src="art/b-${KI[k]}.webp" alt="">`;
 const KC = ["#7a5a3a", "#8a4fb0", "#9aa3ae", "#e07a3a", "#5b8bb8", "#6b6b6b", "#3a3a3a", "#d9472b"];
 const LOSE = 4;
 
@@ -82,7 +84,7 @@ export default {
     const n = ui.names, ch = v.chain;
     const myGive = v.phase === "give" && v.cur === me, myAns = ch && ch.to === me && v.phase === "answer", myPass = ch && ch.to === me && v.phase === "pass";
     if (!myGive && !myPass) { UI.card = null; UI.to = null; }
-    const chip = k => `<span class="bk" style="--k:${KC[k]}">${KIND[k]}</span>`;
+    const chip = k => `<span class="bk" style="--k:${KC[k]}">${img(k)}${KIND[k]}</span>`;
     let say;
     if (v.loser != null) say = "판이 끝났어요";
     else if (myGive) say = "건넬 카드, 받을 사람, 뭐라고 말할지 골라요";
@@ -94,12 +96,12 @@ export default {
     el.innerHTML = `<div class="bug">
       <p class="say">${say}</p>
       <div class="ups">${[...Array(v.n).keys()].map(p => `<div class="upr${p === v.cur ? " cur" : ""}${ch && ch.to === p ? " to" : ""}${v.loser === p ? " lost" : ""}" style="--s:${SEAT[p]}">
-        <b>${esc(n[p])}</b><small>손 ${v.counts[p]}</small><div>${v.up[p].map((x, k) => x ? `<span class="bk${x >= 3 ? " warn" : ""}" style="--k:${KC[k]}">${KIND[k]} ${x}</span>` : "").join("")}</div></div>`).join("")}</div>
+        <b>${esc(n[p])}</b><small>손 ${v.counts[p]}</small><div>${v.up[p].map((x, k) => x ? `<span class="bk${x >= 3 ? " warn" : ""}" style="--k:${KC[k]}">${img(k)}${KIND[k]} ${x}</span>` : "").join("")}</div></div>`).join("")}</div>
       ${myAns ? `<div class="acts"><button data-truth="1">참이야</button><button data-truth="0">거짓말!</button>${ch.seen.length + 1 < v.n ? `<button class="ghost peek">몰래 보고 넘기기</button>` : ""}</div>` : ""}
       ${myGive || myPass ? `<div class="bpick">
-        ${myGive ? `<p>건넬 카드</p><div class="bh">${v.hand.map(c => `<button class="bc${UI.card === c.id ? " on" : ""}" data-id="${c.id}" style="--k:${KC[c.k]}">${KIND[c.k]}</button>`).join("")}</div>` : ""}
+        ${myGive ? `<p>건넬 카드</p><div class="bh">${v.hand.map(c => `<button class="bc${UI.card === c.id ? " on" : ""}" data-id="${c.id}" style="--k:${KC[c.k]}">${img(c.k)}<span>${KIND[c.k]}</span></button>`).join("")}</div>` : ""}
         <p>받을 사람</p><div class="bh">${targets.map(p => `<button class="bt${UI.to === p ? " on" : ""}" data-to="${p}" style="--s:${SEAT[p]}">${esc(n[p])}</button>`).join("")}</div>
-        <p>"이건 ○○야"</p><div class="bh">${KIND.map((k, i) => `<button class="bcl" data-claim="${i}" style="--k:${KC[i]}" ${(myGive ? UI.card != null : true) && UI.to != null ? "" : "disabled"}>${k}</button>`).join("")}</div>
+        <p>"이건 ○○야"</p><div class="bh">${KIND.map((k, i) => `<button class="bcl" data-claim="${i}" style="--k:${KC[i]}" ${(myGive ? UI.card != null : true) && UI.to != null ? "" : "disabled"}>${img(i)}${k}</button>`).join("")}</div>
       </div>` : ""}
       ${v.hand ? `<div class="myhand"><small>내 손패</small>${KIND.map((k, i) => { const c = v.hand.filter(x => x.k === i).length; return c ? `${chip(i)}<b>${c}</b>` : ""; }).join(" ")}</div>` : ""}
       <ol class="log">${v.log.map(x => `<li>${line(x, n)}</li>`).join("")}</ol>

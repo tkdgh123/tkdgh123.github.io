@@ -596,3 +596,125 @@ body:has(#app.room) #cu-home { display: none }
 .mtool { display: flex; gap: 10px; align-items: center; margin: 10px 0 }
 .mtool .cur { display: grid; justify-items: center; gap: 2px } .mtool .cur svg { width: 84px; height: 84px; border-radius: 8px } .mtool .cur small { font-size: 11px; color: var(--ink-2) }
 .mtool .fld { fill: #8cc26b; stroke: #6fa250; stroke-width: 1.5 }
+
+/* ════ 실물 탁자 (11-26): 나무 탁자 위 펠트 깔개, 종이 카드, 상아 주사위 ════ */
+:root { --paper: #f8f3e6; --card-sh: 0 1px 0 rgba(0,0,0,.18), 0 4px 10px rgba(0,0,0,.32); --felt: #26684a; --felt-2: #1b4f37; }
+html, body { background: #5a3b22 url(art/wood.webp) center top / 640px repeat }
+body::before { content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0; background: radial-gradient(ellipse at 50% 20%, rgba(255,220,170,.10), rgba(0,0,0,.38) 85%) }
+#app { position: relative; z-index: 1 }
+
+/* 첫 화면: 섬 지도 + 게임 상자 */
+.lobby .top { position: relative; margin: 0 -14px; padding: 0; border-radius: 0 0 18px 18px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,.45) }
+.lobby .top img { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover }
+.lobby .top .tt { position: absolute; left: 0; right: 0; bottom: 0; padding: 40px 18px 16px; background: linear-gradient(transparent, rgba(8,30,40,.82)) }
+.lobby h1 { color: #fff; text-shadow: 0 3px 0 rgba(0,0,0,.35); margin: 0 0 6px }
+.lobby .top p { color: #e9f1f0; margin: 0 }
+@media (min-width: 800px) { .lobby .top { margin: 0; border-radius: 18px } }
+.join { background: var(--paper); border-radius: 12px; padding: 12px; box-shadow: var(--card-sh) }
+.want span { color: #fff3dc; text-shadow: 0 1px 2px rgba(0,0,0,.6) }
+.want button { box-shadow: var(--card-sh) }
+.places li { background: linear-gradient(180deg, #fffaf0, #f1e7d2); box-shadow: 0 2px 0 rgba(0,0,0,.25), 0 10px 22px rgba(0,0,0,.4); border-radius: 10px }
+.places li::before { width: 10px; box-shadow: inset -2px 0 0 rgba(0,0,0,.15) }
+.note { color: #f3e4c8 }
+
+/* 방 머리: 가죽 띠, 이름표 */
+.bar { background: linear-gradient(180deg, #3a2a1e, #24180f); box-shadow: 0 4px 14px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.08) }
+.bar .code { background: rgba(255,240,210,.14) }
+.seats span { background: var(--paper); box-shadow: var(--card-sh) }
+.seats span.on { box-shadow: 0 0 0 2px #fff, var(--card-sh) }
+
+/* 판: 펠트 깔개 */
+.stage { background:
+    radial-gradient(ellipse at 50% 0%, rgba(255,255,255,.10), transparent 60%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .22 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E"),
+    linear-gradient(180deg, var(--felt), var(--felt-2));
+  border-radius: 18px; padding: 14px 12px 18px; margin-top: 4px;
+  box-shadow: inset 0 0 0 3px rgba(0,0,0,.22), inset 0 10px 30px rgba(0,0,0,.35), 0 0 0 6px #4a2f1b, 0 0 0 8px #2e1c10, 0 14px 30px rgba(0,0,0,.5) }
+.stage > div > .say, .stage > div > p.dim, .stage > div > .dim, .stage .say small { color: #f6efdd; text-shadow: 0 1px 2px rgba(0,0,0,.5) }
+.stage > div > .say small { color: #d9e6dc }
+.stage > div > .log { background: #fbf6e8; color: #4a3f30; border-radius: 4px; padding: 10px 12px 10px 14px; box-shadow: var(--card-sh); background-image: repeating-linear-gradient(transparent 0 19px, rgba(80,120,160,.18) 19px 20px); line-height: 20px }
+.stage > div > .log li { color: #5a4c3a } .stage > div > .log li:first-child { color: #1d1a16 }
+.stage button.ghost { background: rgba(255,250,238,.95); box-shadow: 0 2px 0 rgba(0,0,0,.25) }
+.stage button:not(.ghost):not(:disabled) { box-shadow: 0 3px 0 rgba(0,0,0,.35) }
+.stage button:not(.ghost):not(:disabled):active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,.35) }
+.lobbywait { background: var(--paper); box-shadow: var(--card-sh) }
+
+/* 종이 판, 이름 칸 (펠트 위 판지) */
+.rack, .score li, .others li, .fh, .upr, .court li, .hm, .cp, .mb, .nr, .pub, .mate, .kn, .gems .me, .crow, .tile .who span, .last .ring span, .cow .picked span, .tele .who span, .myrole, .ups .upr, .wlist li, .offer, .discp, .bell .pl, .ytab, .ydice, .book, .cands .cd, .rcard {
+  box-shadow: 0 1px 0 rgba(0,0,0,.2), 0 5px 12px rgba(0,0,0,.28) }
+.rack, .score li, .others li, .fh, .upr, .court li, .hm, .cp, .mb, .nr, .pub, .mate, .kn, .gems .me, .crow, .bell .pl, .ytab, .book, .offer, .discp { background: linear-gradient(180deg, #fbf7ec, #efe6d2) }
+.stage .dim { color: #6f6455 }
+.stage > div > .dim, .stage > div > p.small { color: #e3eadf }
+
+/* 카드: 종이 두께와 그림자 */
+.fc, .lc, .gc, .rk, .hw, .dc, .cw, .fcd, .tl, .vt, .fish, .pot, .st, .grid5 .cw { box-shadow: var(--card-sh) !important }
+.lc { box-shadow: inset 0 0 0 4px #fff, var(--card-sh) !important }
+.hw { box-shadow: inset 0 0 0 3px var(--h), var(--card-sh) !important }
+.gc { background: linear-gradient(180deg, #fffdf6, #f1e9d6) }
+.gc.can { box-shadow: 0 0 0 3px #f2c14e, var(--card-sh) !important }
+.fc { background: linear-gradient(160deg, #fffef9, #f3ede0); border: 1px solid #d9cfba }
+.fc.empty { background: rgba(0,0,0,.18); border: 2px dashed rgba(255,255,255,.35); box-shadow: none !important }
+.vt.b { background: linear-gradient(160deg, #2d323a, #15181d) } .vt.w { background: linear-gradient(160deg, #fffdf6, #e6dfcf) }
+.tl { background: linear-gradient(180deg, #fffdf5, #ece3cf) }
+
+/* 주사위: 상아 */
+.die { background: linear-gradient(145deg, #fffdf7, #e8dfca); box-shadow: inset -2px -3px 4px rgba(0,0,0,.14), inset 2px 2px 3px rgba(255,255,255,.9), 0 3px 6px rgba(0,0,0,.35); border-radius: 9px }
+.die i.on { background: radial-gradient(circle at 35% 35%, #444, #111) }
+.die.bad { background: linear-gradient(145deg, #ffe4dc, #f3bdb0) }
+
+/* 시장 종: 과일 그림 카드, 놋쇠 종 */
+.fc { gap: 2px; padding: 8px 6px }
+.fc img { width: 34%; height: auto; filter: drop-shadow(0 1px 1px rgba(0,0,0,.3)) }
+.fc.k1 img { width: 62% } .fc.k2 img { width: 44% } .fc.k3 img { width: 40% }
+.bell .ringb { background: radial-gradient(circle at 38% 30%, #fff2b0, #e7b53c 35%, #a8771a 80%); box-shadow: 0 10px 0 #6e4c0f, 0 16px 24px rgba(0,0,0,.45), inset 0 -8px 16px rgba(0,0,0,.25) }
+.bell .ringb.hit, .bell .ringb:active { box-shadow: 0 3px 0 #6e4c0f, 0 6px 10px rgba(0,0,0,.4), inset 0 -8px 16px rgba(0,0,0,.25) }
+.bell .flipb { background: linear-gradient(160deg, #1f5f86, #164662) }
+
+/* 갯벌 거짓말: 생물 그림 */
+.bk { display: inline-flex; align-items: center; gap: 3px; background: #fffaf0; color: #3a2e22; box-shadow: inset 0 0 0 2px var(--k), 0 1px 2px rgba(0,0,0,.25) }
+.bk img { width: 18px; height: 18px; object-fit: contain }
+.bc { width: 64px; height: 88px; padding: 4px; display: grid; place-items: center; align-content: center; gap: 2px; background: linear-gradient(160deg, #fffdf6, #efe6d2); color: #3a2e22; box-shadow: inset 0 0 0 3px var(--k), var(--card-sh); font-size: 11px }
+.bc img { width: 46px; height: 46px; object-fit: contain }
+.bcl { display: inline-flex; align-items: center; gap: 4px; background: #fffaf0; color: #3a2e22; box-shadow: inset 0 0 0 2px var(--k), 0 2px 0 rgba(0,0,0,.25) }
+.bcl img { width: 22px; height: 22px; object-fit: contain }
+.bpick p { color: #f6efdd }
+.myhand { background: var(--paper); border-radius: 8px; padding: 8px; box-shadow: var(--card-sh) }
+
+/* 소라게: 소라게 말 */
+.crab .cr { background: transparent; box-shadow: none; aspect-ratio: 1; width: 92%; border-radius: 50%; }
+.crab .cr::before { content: ""; position: absolute; inset: 55% 8% 0; border-radius: 50%; background: var(--s); box-shadow: 0 2px 0 rgba(0,0,0,.4) }
+.crab .cr img { position: relative; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 2px 1px rgba(0,0,0,.4)) }
+.crab .cr.cur { outline: none } .crab .cr.cur::before { box-shadow: 0 0 0 2px #fff, 0 2px 0 rgba(0,0,0,.4) }
+.crab .dock .cr { width: 26px; height: 26px; position: relative }
+
+/* 항구 상회: 보석 그림 */
+.gemimg { width: 26px; height: 26px; object-fit: contain; filter: drop-shadow(0 1px 1px rgba(0,0,0,.35)) }
+.gemb { background: radial-gradient(circle at 50% 40%, #fff9ea, #e6dcc5); color: #2b2216; box-shadow: inset 0 0 0 3px var(--g), 0 3px 0 rgba(0,0,0,.3) }
+.gemb img { width: 46%; height: auto; margin-bottom: -2px; filter: drop-shadow(0 1px 1px rgba(0,0,0,.35)) }
+.gemb b { font-size: 16px } .gemb small { font-size: 9px }
+
+/* 섬 개척: 실제 땅 그림 */
+.isle .mapw { background: radial-gradient(closest-side, #5fb0c2, #2c7e93 70%, #1f6377); box-shadow: inset 0 0 30px rgba(0,0,0,.35) }
+.map .hx { stroke: #e8dcc0; stroke-width: .07; filter: url(#hsh) }
+.map .tok { fill: #f3e6c4; stroke: #8a6a3a; stroke-width: .03 }
+.rc { background: linear-gradient(rgba(0,0,0,.15), rgba(0,0,0,.45)), var(--ri, none) center / cover, var(--r); box-shadow: 0 2px 0 rgba(0,0,0,.3); }
+.isle .cost i { background: var(--r) }
+
+/* 기타 판 */
+.go15 { background: linear-gradient(135deg, #e3b873, #c99a52); box-shadow: 0 6px 0 #8a6532, 0 14px 26px rgba(0,0,0,.45) }
+.yutb { box-shadow: 0 6px 0 #a88a5a, 0 14px 26px rgba(0,0,0,.45) }
+.floor { box-shadow: inset 0 0 0 3px rgba(0,0,0,.2) }
+.lanes { box-shadow: 0 5px 0 #8a5a2a, 0 12px 22px rgba(0,0,0,.4) }
+.pit { background: linear-gradient(180deg, #efe4f5, #dccbe8); box-shadow: inset 0 2px 8px rgba(0,0,0,.2) }
+.tbl { box-shadow: inset 0 2px 10px rgba(0,0,0,.35) }
+.thand { background: linear-gradient(180deg, #c9a26a, #a77c45); box-shadow: inset 0 -4px 0 rgba(0,0,0,.2), 0 6px 14px rgba(0,0,0,.35) }
+.topic { box-shadow: var(--card-sh); background: linear-gradient(160deg, #1d5a6b, #123f4c) }
+.endbox { background: linear-gradient(180deg, #fffaf0, #f1e7d2) }
+/* 펠트 위 작은 글자 */
+.nowc, .last .ring small, .tok, .tok b, .disc, .tele .steps, .nope .mine, .goal { color: #f3ecda !important; text-shadow: 0 1px 2px rgba(0,0,0,.5) }
+.nowc b { color: #fff; background: var(--c); border-radius: 6px; padding: 2px 8px; text-shadow: none }
+.powers { background: linear-gradient(180deg, #fbf7ec, #efe6d2); border-radius: 8px; padding: 6px 10px; box-shadow: var(--card-sh); margin-top: 8px }
+.teams { background: var(--paper); border-radius: 8px; padding: 4px 10px; box-shadow: var(--card-sh) }
+.cscore span { background: var(--paper); border-radius: 6px; padding: 3px 10px; box-shadow: var(--card-sh) }
+.tile .tbl > .dim { color: #cfe5df }
+.clock { color: #fff; text-shadow: 0 3px 0 rgba(0,0,0,.3) } .clock.low { color: #ffb4a0 }
