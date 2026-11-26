@@ -123,7 +123,7 @@ const D = window.DECK, TC = D.theme.colors, NS = D.slides.length;
 const SCH = { tx1: TC.dk1, tx2: TC.dk2, bg1: TC.lt1, bg2: TC.lt2 };
 const col = c => c == null ? null : "#" + (SCH[c] || TC[c] || c);
 const IN = 96, PT = 4 / 3, PAD = 12, MORPH = 900;
-const FONT = { "Cambria Math": '"Cambria Math",Cambria,"STIX Two Math","Times New Roman",serif', Cambria: 'Cambria,Georgia,"Times New Roman",serif' };
+const FONT = { "Cambria Math": '"Cambria Math",Cambria,"STIX Two Math","Times New Roman",serif', Cambria: 'Cambria,Georgia,"Times New Roman",serif', "Malgun Gothic Semilight": '"Malgun Gothic Semilight","Malgun Gothic","Noto Sans KR",sans-serif' };
 const $ = id => document.getElementById(id);
 const el = (tag, cls) => { const e = document.createElement(tag); if (cls) e.className = cls; return e; };
 const SVGNS = "http://www.w3.org/2000/svg";
