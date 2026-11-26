@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Adam 발표 슬라이드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#0e1116;color:#e6eaee;font:14px/1.5 "Malgun Gothic","Noto Sans KR",system-ui,sans-serif;overflow:hidden;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+a{color:inherit}
+[hidden]{display:none!important}
+
+/* 슬라이드 무대: 13.33 x 7.5 인치 = 1280 x 720 */
+.box{position:relative;min-height:0;min-width:0}
+.stage{position:absolute;left:0;top:0;width:1280px;height:720px;transform-origin:0 0;overflow:hidden;background:#fff;
+  font-family:"Malgun Gothic","맑은 고딕","Noto Sans KR","Apple SD Gothic Neo",sans-serif;color:#101418}
+.layer{position:absolute;inset:0}
+.o{position:absolute}
+.tx{position:absolute;inset:0;display:flex;flex-direction:column;word-break:keep-all;overflow-wrap:break-word}
+.tx p{margin:0;white-space:pre-wrap}
+.o svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.o img{display:block;width:100%;height:100%}
+.hid{visibility:hidden}
+
+/* 보는 화면 */
+#app{position:fixed;inset:0;display:grid;grid-template-rows:1fr auto auto}
+#view{cursor:pointer}
+#app.idle #view{cursor:none}
+#notes{height:30vh;border-top:1px solid #262c34;background:#151a20;overflow:auto;padding:14px 22px 18px}
+.nt{font-size:18px;line-height:1.75;max-width:1100px}
+.nt .done{color:#6f7883}
+.nt .now{color:#fff}
+.nt .todo{color:#a9b1bb}
+.nt b{color:#7fb5f0;font-weight:700}
+#bar{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);display:flex;align-items:center;gap:2px;padding:6px;border-radius:12px;
+  background:rgba(20,24,30,.92);box-shadow:0 6px 24px rgba(0,0,0,.35);transition:opacity .25s;white-space:nowrap;z-index:5}
+#app.idle #bar{opacity:0;pointer-events:none}
+#bar a,#bar button{display:flex;align-items:center;gap:6px;height:36px;padding:0 12px;border-radius:8px;text-decoration:none;font-size:14px}
+#bar a:hover,#bar button:hover{background:#2a313a}
+#bar button[aria-pressed=true]{background:#2a78d6;color:#fff}
+#bar .ic{width:36px;padding:0;justify-content:center}
+#bar svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#bar .num{min-width:64px;justify-content:center;font-variant-numeric:tabular-nums;color:#c9d0d8}
+#bar .sep{width:1px;height:22px;background:#333a43;margin:0 4px}
+#prog{position:absolute;left:0;bottom:0;height:3px;background:#2a78d6;transition:width .3s;z-index:4}
+#toast{position:absolute;left:50%;top:18px;transform:translateX(-50%);background:rgba(20,24,30,.92);padding:8px 16px;border-radius:10px;font-size:14px;transition:opacity .6s;pointer-events:none;z-index:6;white-space:nowrap}
+#jump{position:absolute;right:20px;top:18px;background:#2a78d6;color:#fff;padding:6px 14px;border-radius:10px;font-size:20px;font-variant-numeric:tabular-nums;z-index:6}
+
+/* 목록 */
+#grid{position:fixed;inset:0;background:rgba(10,12,16,.96);z-index:10;overflow:auto;padding:24px max(16px,3vw) 40px}
+#grid header{display:flex;justify-content:space-between;align-items:center;max-width:1400px;margin:0 auto 16px;font-size:16px}
+#grid header button{padding:8px 14px;border-radius:8px;background:#232932}
+.cells{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;max-width:1400px;margin:0 auto}
+.cell{text-align:left;padding:0}
+.cell .box{aspect-ratio:16/9;border-radius:6px;overflow:hidden;outline:2px solid transparent;outline-offset:2px}
+.cell.on .box{outline-color:#2a78d6}
+.cell:hover .box{outline-color:#59606a}
+.cell span{display:block;margin-top:6px;font-size:13px;color:#aab2bc;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* 발표자 보기 */
+#pv{position:fixed;inset:0;display:grid;grid-template-rows:auto 1fr;background:#0e1116}
+#pv .top{display:flex;align-items:center;gap:18px;padding:10px 20px;border-bottom:1px solid #262c34;flex-wrap:wrap}
+#pv .clock{font-size:28px;font-variant-numeric:tabular-nums;font-weight:700}
+#pv .clock.late{color:#f39a75}
+#pv .top button{padding:7px 14px;border-radius:8px;background:#232932}
+#pv .top button:hover{background:#2f3741}
+#pv .top .sp{flex:1}
+#pv .main{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(280px,1fr);gap:18px;padding:18px 20px;min-height:0}
+#pv .left{display:grid;grid-template-rows:1fr auto;gap:10px;min-height:0}
+#pv .right{display:grid;grid-template-rows:auto auto 1fr;gap:8px;min-height:0}
+#pv .lab{font-size:13px;color:#8d96a0}
+#pv .nextbox{aspect-ratio:16/9;border-radius:6px;overflow:hidden;background:#000}
+#pv .nextbox.end{display:grid;place-items:center;color:#8d96a0}
+#pv .pnotes{overflow:auto;background:#151a20;border-radius:10px;padding:16px 18px}
+#pv .pnotes .nt{font-size:22px}
+#pv .cur{border-radius:6px;overflow:hidden;cursor:pointer}
+#pv .steps{display:flex;gap:6px;align-items:center;color:#8d96a0;font-size:14px}
+#pv .steps i{width:10px;height:10px;border-radius:50%;background:#2c333c}
+#pv .steps i.on{background:#2a78d6}
+
+@media (pointer:coarse){
+  #bar .sep{display:none}
+  #bar a,#bar button{padding:0 9px}
+  #bar{position:static;transform:none;margin:8px auto calc(8px + env(safe-area-inset-bottom));opacity:1!important;pointer-events:auto!important;flex-wrap:wrap;justify-content:center;max-width:calc(100vw - 32px)}
+  #notes{height:auto;max-height:40vh}
+}
+@media (max-width:500px){#bFull{display:none!important}}
+@media (max-width:720px){
+  #bar .wide{display:none}
+  #pv .main{grid-template-columns:1fr;overflow:auto}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="box" id="view" role="region" aria-label="슬라이드"><div class="stage" id="stage"></div></div>
+  <div id="notes" hidden><div class="nt" id="ntext"></div></div>
+  <div id="bar">
+    <a href="../?t=talk" title="Adam 페이지 발표 순서로">Adam 페이지</a>
+    <span class="sep"></span>
+    <button class="ic" id="bPrev" title="이전 (왼쪽 방향키)" aria-label="이전"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <button class="num" id="bNum" title="목록 (G)">1 / 17</button>
+    <button class="ic" id="bNext" title="다음 (오른쪽 방향키, 스페이스)" aria-label="다음"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+    <span class="sep"></span>
+    <button id="bNotes" aria-pressed="false" title="발표 메모 (M)">메모</button>
+    <button id="bPres" class="wide" title="발표자 보기를 새 창으로 (P)">발표자 보기</button>
+    <button id="bFull" title="전체 화면 (F)">전체 화면</button>
+  </div>
+  <div id="prog"></div>
+  <div id="toast">클릭하거나 방향키로 넘겨요</div>
+  <div id="jump" hidden></div>
+</div>
+<div id="grid" hidden><header><b>슬라이드 목록</b><button id="gClose">닫기</button></header><div class="cells" id="cells"></div></div>
+
+<script src="deck.js"></script>
+<script>
+"use strict";
+const D = window.DECK, TC = D.theme.colors, NS = D.slides.length;
+const SCH = { tx1: TC.dk1, tx2: TC.dk2, bg1: TC.lt1, bg2: TC.lt2 };
+const col = c => c == null ? null : "#" + (SCH[c] || TC[c] || c);
+const IN = 96, PT = 4 / 3, PAD = 12, MORPH = 900;
+const FONT = { "Cambria Math": '"Cambria Math",Cambria,"STIX Two Math","Times New Roman",serif', Cambria: 'Cambria,Georgia,"Times New Roman",serif' };
+const $ = id => document.getElementById(id);
+const el = (tag, cls) => { const e = document.createElement(tag); if (cls) e.className = cls; return e; };
+const SVGNS = "http://www.w3.org/2000/svg";
+const sv = (tag, attrs, parent) => { const e = document.createElementNS(SVGNS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
+const place = (e, x, y, w, h) => Object.assign(e.style, { left: x + "px", top: y + "px", width: w + "px", height: h + "px" });
+
+// ── 글상자: pptxgenjs 글 옵션을 그대로 ──
+function textBox(runs, o) {
+  const tx = el("div", "tx"), base = o.fontSize || 18;
+  tx.style.fontSize = base * PT + "px"; tx.dataset.fs = base * PT;
+  const m = o.margin == null ? [7.2, 7.2, 3.6, 3.6] : Array.isArray(o.margin) ? o.margin : [o.margin, o.margin, o.margin, o.margin]; // 왼, 오른, 아래, 위 (pt)
+  tx.style.padding = `${m[3] * PT}px ${m[1] * PT}px ${m[2] * PT}px ${m[0] * PT}px`;
+  tx.style.justifyContent = { middle: "center", ctr: "center", bottom: "flex-end" }[o.valign] || "flex-start";
+  tx.style.textAlign = o.align || "left";
+  tx.style.lineHeight = 1.2 * (o.lineSpacingMultiple || 1);
+  if (o.color) tx.style.color = col(o.color);
+  if (o.bold) tx.style.fontWeight = 700;
+  if (o.fontFace) tx.style.fontFamily = FONT[o.fontFace] || o.fontFace;
+  // 문단마다 가장 큰 글자로 줄 높이를 잡음 (PowerPoint처럼)
+  const paras = [[]];
+  runs.forEach(r => {
+    const ro = r.options || {};
+    String(r.text).split("\n").forEach((piece, i) => { if (i) paras.push([]); if (piece) paras[paras.length - 1].push({ t: piece, ro }); });
+    if (ro.breakLine) paras.push([]);
+  });
+  paras.forEach(list => {
+    const p = el("p"), pfs = list.length ? Math.max(...list.map(x => x.ro.fontSize || base)) : base;
+    if (pfs !== base) p.style.fontSize = pfs / base + "em";
+    list.forEach(({ t, ro }) => {
+      const s = el("span"); s.textContent = t;
+      if (ro.bold) s.style.fontWeight = 700;
+      if (ro.color) s.style.color = col(ro.color);
+      if ((ro.fontSize || base) !== pfs) s.style.fontSize = (ro.fontSize || base) / pfs + "em";
+      if (ro.fontFace) s.style.fontFamily = FONT[ro.fontFace] || ro.fontFace;
+      p.appendChild(s);
+    });
+    if (!list.length) p.textContent = "​";
+    tx.appendChild(p);
+  });
+  return tx;
+}
+// 선 두께는 가운데에 걸치게 (PowerPoint와 같게)
+function fillLine(e, o) {
+  if (o.fill && o.fill.color) e.style.background = col(o.fill.color);
+  if (o.line && o.line.color && o.line.type !== "none") { const w = (o.line.width || 0.75) * PT / 2, c = col(o.line.color); e.style.boxShadow = `0 0 0 ${w}px ${c}, inset 0 0 0 ${w}px ${c}`; }
+}
+function svgShape(o, draw) {
+  const e = el("div", "o"), W = o.w * IN, H = o.h * IN;
+  place(e, o.x * IN - PAD, o.y * IN - PAD, W + 2 * PAD, H + 2 * PAD);
+  const s = sv("svg", { viewBox: `0 0 ${W + 2 * PAD} ${H + 2 * PAD}`, preserveAspectRatio: "none" }, e);
+  const lw = (o.line.width || 0.75) * PT;
+  const a = { fill: "none", stroke: col(o.line.color), "stroke-width": lw, "vector-effect": "non-scaling-stroke", "stroke-linejoin": "round" };
+  if (o.line.dashType === "dash") a["stroke-dasharray"] = `${4 * lw} ${3 * lw}`;
+  draw(s, a, W, H);
+  return e;
+}
+
+// ── 선 그래프 (PowerPoint 기본 선 차트 모양) ──
+const meas = el("canvas").getContext("2d");
+const tw = (t, px) => { meas.font = `${px}px "Malgun Gothic","Noto Sans KR",sans-serif`; return meas.measureText(t).width; };
+function chart(data, o) {
+  const e = el("div", "o"), W = o.w * IN, H = o.h * IN;
+  place(e, o.x * IN, o.y * IN, W, H);
+  const s = sv("svg", { viewBox: `0 0 ${W} ${H}` }, e), mute = col(o.valAxisLabelColor || "6B737D");
+  const txt = (t, x, y, px, c, anchor) => { const n = sv("text", { x, y, "font-size": px, fill: c, "text-anchor": anchor || "middle" }, s); n.textContent = t; return n; };
+  const fT = (o.titleFontSize || 14) * PT, fL = (o.catAxisLabelFontSize || 11) * PT, fG = (o.legendFontSize || 12) * PT;
+  txt(o.title, W / 2, 12 + fT, fT, col(o.titleColor));
+  // 범례
+  const legY = H - 16, items = data.map((d, i) => ({ name: d.name, c: col(o.chartColors[i]), w: 26 + tw(d.name, fG) }));
+  let lx = (W - items.reduce((a, b) => a + b.w, 0) - 18 * (items.length - 1)) / 2;
+  items.forEach(it => { sv("line", { x1: lx, y1: legY - fG * 0.35, x2: lx + 20, y2: legY - fG * 0.35, stroke: it.c, "stroke-width": 3.3 }, s); txt(it.name, lx + 25, legY, fG, col(o.legendColor || "4A525C"), "start"); lx += it.w + 18; });
+  let labY = legY - fG - 16;
+  if (o.showCatAxisTitle) { txt(o.catAxisTitle, 0, 0, (o.catAxisTitleFontSize || 11) * PT, col(o.catAxisTitleColor || "6B737D")); s.lastChild.setAttribute("x", 0); }
+  const catT = o.showCatAxisTitle ? s.lastChild : null;
+  if (catT) { labY -= 15; catT.setAttribute("y", labY); labY -= fL + 10; }
+  const min = o.valAxisMinVal, max = o.valAxisMaxVal, unit = o.valAxisMajorUnit;
+  const ticks = []; for (let v = min; v <= max + 1e-9; v += unit) ticks.push(+v.toFixed(6));
+  const left = 12 + Math.max(...ticks.map(t => tw(String(t), fL))) + 10, right = W - 14, top = 41 + fT, bot = labY - fL - 12;
+  const n = data[0].values.length, cw = (right - left) / n, X = j => left + (j + 0.5) * cw, Y = v => bot - (v - min) / (max - min) * (bot - top);
+  if (catT) catT.setAttribute("x", (left + right) / 2);
+  ticks.forEach(t => { sv("line", { x1: left, x2: right, y1: Y(t), y2: Y(t), stroke: col(o.valGridLine.color), "stroke-width": 0.75 }, s); txt(String(t), left - 8, Y(t) + fL * 0.35, fL, mute, "end"); });
+  const ax = Y(Math.min(Math.max(0, min), max));
+  sv("line", { x1: left, x2: right, y1: ax, y2: ax, stroke: "#A6ABB2", "stroke-width": 1 }, s);
+  if (o.catAxisMajorTickMark !== "none") for (let j = 0; j <= n; j++) sv("line", { x1: left + j * cw, x2: left + j * cw, y1: ax, y2: ax + 5, stroke: "#A6ABB2", "stroke-width": 1 }, s);
+  const freq = o.catAxisLabelFrequency || 1;
+  data[0].labels.forEach((l, j) => { if (j % freq === 0) txt(l, X(j), labY, fL, mute); });
+  data.forEach((d, i) => sv("polyline", { points: d.values.map((v, j) => X(j).toFixed(1) + "," + Y(v).toFixed(1)).join(" "), fill: "none", stroke: col(o.chartColors[i]), "stroke-width": (o.lineSize || 2.5) * PT, "stroke-linejoin": "round", "stroke-linecap": "round" }, s));
+  return e;
+}
+
+// ── 장 하나 그리기 ──
+function render(i) {
+  const S = D.slides[i], M = D.masters[S.master], layer = el("div", "layer"), named = new Map();
+  layer.style.background = col(M.background.color);
+  const add = (e, name, kind) => { e.dataset.kind = kind; if (name) { e.dataset.n = name; named.set(name, e); } layer.appendChild(e); return e; };
+  if (M.slideNumber) { const n = M.slideNumber, e = el("div", "o"); place(e, n.x * IN, n.y * IN, n.w * IN, n.h * IN); e.appendChild(textBox([{ text: String(i + 1) }], n)); add(e, "ph:num", "text"); }
+  S.objs.forEach(ob => {
+    if (ob.k === "ph") {
+      const po = M.objects.find(x => x.placeholder.options.name === ob.ph).placeholder.options, e = el("div", "o");
+      place(e, po.x * IN, po.y * IN, po.w * IN, po.h * IN); e.appendChild(textBox(ob.runs, po)); add(e, "ph:" + ob.ph, "text"); return;
+    }
+    const o = ob.o;
+    if (ob.k === "text") {
+      const e = el("div", "o"); place(e, o.x * IN, o.y * IN, o.w * IN, o.h * IN);
+      if (o.shape === "roundRect") { fillLine(e, o); e.style.borderRadius = Math.min((o.rectRadius || 0) * IN, Math.min(o.w, o.h) * IN / 2) + "px"; }
+      e.appendChild(textBox(ob.runs, o)); add(e, o.objectName, o.shape ? "card" : "text"); return;
+    }
+    if (ob.k === "img") {
+      const e = el("div", "o"), im = el("img"); place(e, o.x * IN, o.y * IN, o.w * IN, o.h * IN);
+      im.src = "img/" + o.path + ".webp"; im.alt = o.altText || ""; im.draggable = false; e.appendChild(im); add(e, o.objectName, "img"); return;
+    }
+    if (ob.k === "chart") { add(chart(ob.data, o), o.objectName, "chart"); return; }
+    // 도형
+    if (ob.type === "roundRect" || ob.type === "ellipse") {
+      const e = el("div", "o"); place(e, o.x * IN, o.y * IN, o.w * IN, o.h * IN); fillLine(e, o);
+      e.style.borderRadius = ob.type === "ellipse" ? "50%" : Math.min((o.rectRadius || 0) * IN, Math.min(o.w, o.h) * IN / 2) + "px";
+      add(e, o.objectName, ob.type === "ellipse" ? "oval" : "card"); return;
+    }
+    if (ob.type === "line") { add(svgShape(o, (s, a, W, H) => sv("line", { ...a, x1: PAD, x2: PAD + W, y1: o.flipV ? PAD + H : PAD, y2: o.flipV ? PAD : PAD + H }, s)), o.objectName, "line"); return; }
+    if (ob.type === "custGeom") { add(svgShape(o, (s, a) => sv("polyline", { ...a, points: o.points.map(p => (PAD + p.x * IN).toFixed(1) + "," + (PAD + p.y * IN).toFixed(1)).join(" ") }, s)), o.objectName, "curve"); }
+  });
+  named.forEach(e => e.dataset.sig = e.style.cssText + e.innerHTML);
+  return { i, layer, named };
+}
+
+// ── 클릭 순서: 클릭이면 새 묶음, 같이는 앞과 같은 때, 다음은 앞이 끝난 뒤 ──
+const GROUPS = Array.from({ length: NS }, (_, i) => {
+  const G = []; let g = null, ps = 0, pe = 0;
+  D.anim.filter(a => a.slide === i + 1).forEach(a => {
+    const dur = a.dur || 0.5, del = a.delay || 0; let st;
+    if (a.trig === "click" || !g) { g = { auto: a.trig !== "click", fx: [] }; G.push(g); st = del; }
+    else st = (a.trig === "with" ? ps : pe) + del;
+    g.fx.push({ name: a.name, fx: a.fx, dir: a.dir, st, dur }); ps = st; pe = st + dur;
+  });
+  return G;
+});
+const AUTO = GROUPS.map(G => G[0] && G[0].auto ? 1 : 0), CLICKS = GROUPS.map((G, i) => G.length - AUTO[i]);
+function prep(i) {
+  const R = render(i);
+  R.G = GROUPS[i].map(g => ({ auto: g.auto, fx: g.fx.map(f => ({ ...f, el: R.named.get(f.name) })) }));
+  R.G.forEach(g => g.fx.forEach(f => f.el.classList.add("hid")));
+  return R;
+}
+function showTo(R, k) { R.G.forEach((g, gi) => g.fx.forEach(f => f.el.classList.toggle("hid", gi >= AUTO[R.i] + k))); }
+function still(i, k) { const R = prep(i); showTo(R, k); return R.layer; }
+function kf(f) {
+  const e = f.el, L = parseFloat(e.style.left), T = parseFloat(e.style.top), W = parseFloat(e.style.width), H = parseFloat(e.style.height);
+  if (f.fx === "zoom") return [{ opacity: 0, transform: "scale(.1)" }, { opacity: 1, transform: "none" }];
+  if (f.fx === "fly") { const d = f.dir || "bottom"; return [{ transform: d === "bottom" ? `translateY(${720 - T}px)` : d === "top" ? `translateY(${-(T + H)}px)` : d === "left" ? `translateX(${-(L + W)}px)` : `translateX(${1280 - L}px)` }, { transform: "none" }]; }
+  if (f.fx === "wipe") return [{ clipPath: { left: "inset(0 100% 0 0)", right: "inset(0 0 0 100%)", top: "inset(0 0 100% 0)", bottom: "inset(100% 0 0 0)" }[f.dir || "left"] }, { clipPath: "inset(0 0 0 0)" }];
+  return [{ opacity: 0 }, { opacity: 1 }];
+}
+
+// ── 무대 크기 맞추기 ──
+function fit(stage, box) {
+  const go = () => { const r = box.getBoundingClientRect(), k = Math.min(r.width / 1280, r.height / 720); stage.style.transform = `translate(${(r.width - 1280 * k) / 2}px,${(r.height - 720 * k) / 2}px) scale(${k})`; };
+  new ResizeObserver(go).observe(box); go();
+}
+function mini(i, k) { const b = el("div", "box"), s = el("div", "stage"); b.appendChild(s); s.appendChild(still(i, k)); fit(s, b); return b; }
+
+// ── 재생기 ──
+function Player(stage, onchange) {
+  let R = null, s = 0, k = 0, running = [], endMorph = null;
+  const flush = () => { if (endMorph) endMorph(); running.forEach(a => a.finish()); running = []; };
+  const play = g => g.fx.forEach(f => { f.el.classList.remove("hid"); running.push(f.el.animate(kf(f), { duration: f.dur * 1000, delay: f.st * 1000, fill: "backwards", easing: f.fx === "fly" ? "cubic-bezier(.2,.7,.3,1)" : "ease-in-out" })); });
+  const rect = e => ({ left: e.style.left, top: e.style.top, width: e.style.width, height: e.style.height, background: e.style.background || "transparent", borderRadius: e.style.borderRadius || "0px" });
+  // 모핑: 이름이 같은 개체는 자리, 크기, 색을 옮기고 글은 서로 바꿔 보이고, 나머지는 장 전체가 겹쳐 바뀜
+  function morph(A, B, done) {
+    const anims = [], hide = [], ov = el("div", "layer");
+    B.layer.style.opacity = 0; stage.appendChild(B.layer); stage.appendChild(ov); ov.style.background = "none";
+    const opt = { duration: MORPH, easing: "cubic-bezier(.45,0,.2,1)", fill: "forwards" };
+    B.named.forEach((eb, n) => {
+      const ea = A.named.get(n);
+      if (!ea || ea.dataset.kind !== eb.dataset.kind || ea.classList.contains("hid") || eb.classList.contains("hid") || ea.dataset.sig === eb.dataset.sig) return;
+      const p = eb.cloneNode(true), ta = ea.querySelector(".tx"), tb = p.querySelector(".tx");
+      if (ta && tb) {
+        const fs = [{ fontSize: ta.dataset.fs + "px" }, { fontSize: tb.dataset.fs + "px" }];
+        if (ta.innerHTML !== tb.innerHTML || ta.style.cssText !== tb.style.cssText) {
+          const old = ta.cloneNode(true); p.insertBefore(old, tb);
+          anims.push(old.animate([{ ...fs[0], opacity: 1 }, { ...fs[1], opacity: 0 }], opt), tb.animate([{ ...fs[0], opacity: 0 }, { ...fs[1], opacity: 1 }], opt));
+        } else anims.push(tb.animate(fs, opt));
+      }
+      anims.push(p.animate([rect(ea), rect(eb)], opt));
+      ov.appendChild(p); ea.style.visibility = "hidden"; eb.style.visibility = "hidden"; hide.push(eb);
+    });
+    const fade = B.layer.animate([{ opacity: 0 }, { opacity: 1 }], { duration: MORPH, easing: "ease-in-out", fill: "forwards" }); anims.push(fade);
+    let over = false;
+    endMorph = () => { if (over) return; over = true; endMorph = null; anims.forEach(a => a.cancel()); B.layer.style.opacity = ""; hide.forEach(e => e.style.visibility = ""); A.layer.remove(); ov.remove(); done(); };
+    fade.onfinish = endMorph;
+  }
+  function go(i, kk, anim, fwd) {
+    flush();
+    const N = prep(i), A = R; R = N; s = i; k = kk;
+    showTo(N, kk);
+    const auto = fwd && kk === 0 && AUTO[i];
+    if (auto) N.G[0].fx.forEach(f => f.el.classList.add("hid"));
+    const after = () => { if (auto && R === N) play(N.G[0]); };
+    if (A && anim) morph(A, N, after); else { stage.textContent = ""; stage.appendChild(N.layer); after(); }
+    onchange(s, k);
+  }
+  return {
+    get s() { return s; }, get k() { return k; },
+    go: (i, kk, anim = true) => go(Math.max(0, Math.min(NS - 1, i)), kk === "max" ? CLICKS[i] : Math.min(kk || 0, CLICKS[i]), anim, false),
+    next() { flush(); if (k < CLICKS[s]) { flush(); play(R.G[AUTO[s] + k]); k++; onchange(s, k); } else if (s < NS - 1) go(s + 1, 0, true, true); },
+    prev() { flush(); if (k > 0) { k--; R.G[AUTO[s] + k].fx.forEach(f => f.el.classList.add("hid")); onchange(s, k); } else if (s > 0) go(s - 1, CLICKS[s - 1], true, false); },
+  };
+}
+
+// ── 메모: (클릭) 자리로 나눠서 지금 할 말을 밝게 ──
+function notesHTML(i, k) {
+  const parts = D.slides[i].notes.split(/(\(클릭[^)]*\))/), segs = [""];
+  parts.forEach(p => { if (/^\(클릭/.test(p)) segs.push(p); else segs[segs.length - 1] += p; });
+  const now = Math.min(k, segs.length - 1), esc = t => t.replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+  return segs.map((t, j) => `<span class="${j < now ? "done" : j === now ? "now" : "todo"}">${esc(t).replace(/(\(클릭[^)]*\))/, "<b>$1</b>")}</span>`).join("");
+}
+
+// ── 창끼리 맞추기 (보는 창과 발표자 보기) ──
+const bc = "BroadcastChannel" in window ? new BroadcastChannel("adam-slides") : null;
+let remote = false;
+function follow(P, s, k) {
+  remote = true;
+  if (s === P.s && k === P.k + 1) P.next();
+  else if (s === P.s && k === P.k - 1) P.prev();
+  else if (s === P.s + 1 && k === 0 && P.k === CLICKS[P.s]) P.next();
+  else if (s !== P.s || k !== P.k) P.go(s, k, s !== P.s);
+  remote = false;
+}
+function keys(P, extra) {
+  let num = "", numT = 0;
+  document.addEventListener("keydown", e => {
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    const K = e.key;
+    if (/^[0-9]$/.test(K)) { num += K; clearTimeout(numT); numT = setTimeout(() => { num = ""; extra.jump && extra.jump(""); }, 2500); extra.jump && extra.jump(num); return; }
+    if (K === "Enter" && num) { P.go(+num - 1, 0); num = ""; extra.jump && extra.jump(""); e.preventDefault(); return; }
+    if (["ArrowRight", "ArrowDown", "PageDown", " ", "Enter", "n", "N"].includes(K)) { e.preventDefault(); P.next(); }
+    else if (["ArrowLeft", "ArrowUp", "PageUp", "Backspace", "p", "P"].includes(K) && !(extra.p && (K === "p" || K === "P"))) { e.preventDefault(); P.prev(); }
+    else if (K === "Home") P.go(0, 0); else if (K === "End") P.go(NS - 1, "max");
+    else if (extra[K.toLowerCase()]) extra[K.toLowerCase()]();
+  });
+}
+// 처음 열 때는 알리지 않고, 다른 창이 열려 있으면 그 창 자리로 맞춤
+function start(P) {
+  const [hs, hk] = readHash(); remote = true; P.go(hs, hk, false); remote = false;
+  if (!bc) return;
+  bc.onmessage = e => { if (e.data.hello) bc.postMessage({ s: P.s, k: P.k }); else follow(P, e.data.s, e.data.k); };
+  bc.postMessage({ hello: 1 });
+}
+function readHash() { const m = location.hash.match(/^#(\d+)(?:\.(\d+))?/); return m ? [+m[1] - 1, +(m[2] || 0)] : [0, 0]; }
+
+const PRESENTER = new URLSearchParams(location.search).has("presenter");
+PRESENTER ? presenter() : audience();
+
+// ── 보는 화면 ──
+function audience() {
+  const app = $("app"), stage = $("stage");
+  fit(stage, $("view"));
+  const P = Player(stage, (s, k) => {
+    $("bNum").textContent = `${s + 1} / ${NS}`;
+    $("prog").style.width = (s + (CLICKS[s] ? k / CLICKS[s] : 1)) / NS * 100 + "%";
+    $("ntext").innerHTML = notesHTML(s, k);
+    history.replaceState(null, "", `#${s + 1}${k ? "." + k : ""}`);
+    if (bc && !remote) bc.postMessage({ s, k });
+  });
+  start(P);
+  window.addEventListener("hashchange", () => { const [a, b] = readHash(); if (a !== P.s || b !== P.k) P.go(a, b, false); });
+
+  const notes = () => { const on = $("notes").hidden; $("notes").hidden = !on; $("bNotes").setAttribute("aria-pressed", on); };
+  const full = () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen && document.documentElement.requestFullscreen();
+  const pres = () => window.open(location.pathname + "?presenter" + location.hash, "adam-presenter", "width=1280,height=800");
+  const grid = () => openGrid(P);
+  $("bPrev").onclick = () => P.prev(); $("bNext").onclick = () => P.next();
+  $("bNotes").onclick = notes; $("bFull").onclick = full; $("bPres").onclick = pres; $("bNum").onclick = grid;
+  $("bar").addEventListener("click", e => e.stopPropagation());
+  // 화면 누르기: 왼쪽 4분의 1은 이전, 나머지는 다음. 밀어서 넘기기도
+  let sx = null, sy = 0, swiped = false;
+  $("view").addEventListener("pointerdown", e => { sx = e.clientX; sy = e.clientY; swiped = false; });
+  $("view").addEventListener("pointerup", e => { if (sx == null) return; const dx = e.clientX - sx, dy = e.clientY - sy; if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) { swiped = true; dx < 0 ? P.next() : P.prev(); } sx = null; });
+  $("view").addEventListener("click", e => { if (swiped) return; const r = $("view").getBoundingClientRect(); (e.pointerType === "touch" && e.clientX < r.left + r.width / 4) ? P.prev() : P.next(); });
+  $("view").addEventListener("contextmenu", e => { e.preventDefault(); P.prev(); });
+  keys(P, { m: notes, f: full, p: pres, g: grid, jump: n => { $("jump").hidden = !n; $("jump").textContent = n + "번 장"; } });
+  // 마우스를 가만두면 막대와 커서를 숨김
+  let idleT = 0; const wake = () => { app.classList.remove("idle"); clearTimeout(idleT); idleT = setTimeout(() => { if (!$("bar").matches(":hover")) app.classList.add("idle"); }, 2500); };
+  document.addEventListener("mousemove", wake); wake();
+  if (matchMedia("(pointer:coarse)").matches) $("toast").textContent = "화면을 누르거나 옆으로 밀어서 넘겨요";
+  if (!document.fullscreenEnabled) $("bFull").hidden = true;
+  setTimeout(() => $("toast").style.opacity = 0, 2800);
+}
+
+// ── 목록 ──
+function openGrid(P) {
+  const g = $("grid"), cells = $("cells");
+  if (!cells.childElementCount) D.slides.forEach((S, i) => {
+    const b = el("button", "cell"); b.appendChild(mini(i, CLICKS[i]));
+    const t = S.objs.find(o => o.ph === "title"); const sp = el("span"); sp.textContent = `${i + 1}. ${t.runs.map(r => r.text).join("").replace(/\n/g, " ")}`; b.appendChild(sp);
+    b.onclick = () => { g.hidden = true; P.go(i, 0); }; cells.appendChild(b);
+  });
+  [...cells.children].forEach((c, i) => c.classList.toggle("on", i === P.s));
+  g.hidden = false; cells.children[P.s].scrollIntoView({ block: "nearest" });
+  $("gClose").onclick = () => g.hidden = true;
+  const esc = e => { if (e.key === "Escape" || e.key === "g" || e.key === "G") { g.hidden = true; document.removeEventListener("keydown", esc, true); e.stopPropagation(); } };
+  document.addEventListener("keydown", esc, true);
+}
+
+// ── 발표자 보기 (새 창) ──
+function presenter() {
+  document.title = "Adam 발표자 보기";
+  $("app").remove();
+  const pv = el("div"); pv.id = "pv";
+  pv.innerHTML = `<div class="top"><span class="clock" id="pClock">00:00</span><button id="pPause">멈춤</button><button id="pReset">다시 0분부터</button><span class="lab">목표 15분</span><span class="sp"></span><span id="pNow" class="lab"></span>
+    <button id="pPrev">이전</button><b id="pNum" style="font-size:18px;font-variant-numeric:tabular-nums">1 / ${NS}</b><button id="pNext">다음</button></div>
+    <div class="main"><div class="left"><div class="box cur" id="pCur"><div class="stage" id="pStage"></div></div><div class="steps" id="pSteps"></div></div>
+    <div class="right"><span class="lab" id="pNextLab">다음</span><div class="nextbox" id="pNextBox"></div><div class="pnotes"><div class="nt" id="pNotes"></div></div></div></div>`;
+  document.body.appendChild(pv);
+  const stage = $("pStage"); fit(stage, $("pCur"));
+  const P = Player(stage, (s, k) => {
+    $("pNum").textContent = `${s + 1} / ${NS}`;
+    $("pNotes").innerHTML = notesHTML(s, k); $("pNotes").querySelector(".now").scrollIntoView({ block: "center", behavior: "smooth" });
+    $("pSteps").innerHTML = CLICKS[s] ? "클릭 " + Array.from({ length: CLICKS[s] }, (_, j) => `<i class="${j < k ? "on" : ""}"></i>`).join("") + ` ${k} / ${CLICKS[s]}` : "클릭 없음";
+    const nb = $("pNextBox"); nb.textContent = ""; nb.classList.remove("end");
+    if (k < CLICKS[s]) { $("pNextLab").textContent = "다음 클릭 뒤"; nb.appendChild(mini(s, k + 1)); }
+    else if (s < NS - 1) { $("pNextLab").textContent = `다음 장 (${s + 2}장)`; nb.appendChild(mini(s + 1, 0)); }
+    else { $("pNextLab").textContent = "다음"; nb.classList.add("end"); nb.textContent = "마지막 장이에요"; }
+    nb.firstChild && nb.firstChild.style && (nb.firstChild.style.height = "100%");
+    history.replaceState(null, "", `?presenter#${s + 1}${k ? "." + k : ""}`);
+    if (bc && !remote) bc.postMessage({ s, k });
+  });
+  start(P);
+  $("pPrev").onclick = () => P.prev(); $("pNext").onclick = () => P.next(); $("pCur").onclick = () => P.next();
+  // 시계
+  let t0 = Date.now(), paused = 0, pausedAt = 0;
+  const tick = () => { const ms = (pausedAt || Date.now()) - t0 - paused, m = Math.floor(ms / 60000), sec = Math.floor(ms / 1000) % 60;
+    $("pClock").textContent = `${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`; $("pClock").classList.toggle("late", ms > 15 * 60000);
+    const d = new Date(); $("pNow").textContent = `지금 ${d.getHours()}시 ${String(d.getMinutes()).padStart(2, "0")}분`; };
+  setInterval(tick, 500); tick();
+  $("pPause").onclick = () => { if (pausedAt) { paused += Date.now() - pausedAt; pausedAt = 0; $("pPause").textContent = "멈춤"; } else { pausedAt = Date.now(); $("pPause").textContent = "이어서"; } };
+  $("pReset").onclick = () => { t0 = Date.now(); paused = 0; pausedAt = pausedAt ? Date.now() : 0; tick(); };
+  keys(P, { p: null, g: () => openGrid(P) });
+}
+</script>
+</body>
+</html>

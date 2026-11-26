@@ -145,6 +145,8 @@ dd{margin:0;color:var(--sub)}
 .talk-h p{margin:0;color:var(--sub);max-width:36ch}
 .dl{display:grid;gap:12px;justify-items:start}
 .ppt{font:600 14px var(--sans);background:var(--blue);color:#fff;text-decoration:none;padding:9px 18px;border-radius:999px}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+.ppt.alt{background:none;color:var(--blue);box-shadow:inset 0 0 0 1.5px var(--blue)}
 .time{display:flex;height:10px;border-radius:999px;overflow:hidden;gap:2px;margin:28px 0 8px}
 .time span{background:var(--rule)}
 
@@ -639,7 +641,7 @@ td.c,th.c{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 <div class="wrap" id="talk" hidden>
   <div class="talk-h">
     <h1>발표 <b>순서</b></h1>
-    <div class="dl"><p>12월 3일, 15분, 슬라이드 17장. 할 말 속 (클릭)에서 한 번씩 누르면 다음 것이 나와요. 장이 넘어갈 때는 모핑으로 이어져요.</p><a class="ppt" href="Adam_PaperSeminar.pptx" download>PPT 받기</a></div>
+    <div class="dl"><p>12월 3일, 15분, 슬라이드 17장. 할 말 속 (클릭)에서 한 번씩 누르면 다음 것이 나와요. 장이 넘어갈 때는 모핑으로 이어져요. 슬라이드 화면에서도 같은 움직임이 나와요. 발표자 보기 창을 열면 할 말과 다음 장이 같이 보여요.</p><span class="btns"><a class="ppt" href="slides/">슬라이드로 발표하기</a><a class="ppt alt" href="Adam_PaperSeminar.pptx" download>PPT 받기</a></span></div>
   </div>
   <div class="time" id="time" aria-hidden="true"></div>
   <ol class="steps" id="steps"></ol>
