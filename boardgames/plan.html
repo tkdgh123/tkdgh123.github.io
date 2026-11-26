@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>보드게임방 기획</title>
+<meta name="description" content="친구들이 각자 폰으로 같은 방에 들어와 하는 보드게임 묶음 기획. 꼭 넣을 5개, 추천 6개, 후보 4개">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap">
+<style>
+:root {
+  --bg: #e9ecef; --paper: #f8f9fa; --ink: #16181d; --ink-2: #545a63; --rule: #d3d8de;
+  --wood: #7b4a2a; --wood-2: #5c341b; --felt: #1d5b45;
+  --ui: "Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif;
+  --box: "Black Han Sans", "Pretendard Variable", "Malgun Gothic", sans-serif;
+}
+* { box-sizing: border-box }
+html { background: var(--bg) }
+body { margin: 0; color: var(--ink); font: 16px/1.65 var(--ui); background: var(--bg); padding-inline: 20px }
+main { max-width: 1080px; margin: 0 auto; padding-block: 56px 120px }
+h1 { font: 400 clamp(40px, 7vw, 76px)/1.05 var(--box); margin: 0 0 18px; letter-spacing: -.01em }
+.lead { font-size: 19px; color: var(--ink-2); max-width: 40em; margin: 0 }
+.lead b { color: var(--ink); font-weight: 650 }
+section { margin-top: 96px }
+h2 { font: 400 32px/1.2 var(--box); margin: 0 0 8px }
+.sub { color: var(--ink-2); margin: 0 0 28px; max-width: 46em }
+h3 { font-size: 18px; margin: 36px 0 10px; font-weight: 700 }
+p { margin: 0 0 12px }
+a { color: #1f5fae }
+
+/* 선반 */
+.shelfwrap { overflow-x: auto; margin: 48px -20px 0; padding: 20px 20px 44px }
+.shelf { display: flex; align-items: flex-end; gap: 22px; min-width: 900px; border-bottom: 16px solid var(--wood);
+  box-shadow: 0 6px 0 var(--wood-2); padding: 0 14px }
+.grp { display: flex; align-items: flex-end; gap: 3px; position: relative }
+.grp > i { position: absolute; bottom: -50px; left: 0; font: 600 13px var(--ui); font-style: normal; color: var(--ink-2); white-space: nowrap }
+.spine { display: flex; flex-direction: column; justify-content: space-between; align-items: center; text-decoration: none;
+  border-radius: 3px 3px 0 0; padding: 12px 0 10px; color: #fff; transition: transform .15s ease-out;
+  box-shadow: inset -5px 0 0 rgba(0,0,0,.14), inset 2px 0 0 rgba(255,255,255,.15) }
+.spine:hover, .spine:focus-visible { transform: translateY(-10px) }
+.spine b { writing-mode: vertical-rl; font: 400 19px/1 var(--box); letter-spacing: .04em }
+.spine small { font-size: 11px; font-weight: 650; opacity: .85 }
+.spine.lt { color: var(--ink) }
+.grp.cand .spine { opacity: .62 }
+
+.big { display: flex; flex-wrap: wrap; gap: 14px 48px; margin: 36px 0 0 }
+.big b { display: block; font: 400 40px/1.1 var(--box); font-variant-numeric: tabular-nums }
+.big span { color: var(--ink-2); font-size: 14px }
+
+/* 인원 막대 */
+.chart { background: var(--paper); border-radius: 8px; padding: 22px 22px 16px; overflow-x: auto }
+.pc { display: grid; grid-template-columns: 150px repeat(9, minmax(38px, 1fr)); min-width: 560px; align-items: center; row-gap: 6px }
+.pc .hd { font-size: 13px; color: var(--ink-2); text-align: center; font-variant-numeric: tabular-nums; padding-bottom: 4px }
+.pc .nm { font-size: 14px; font-weight: 600; white-space: nowrap; padding-right: 10px }
+.pc .nm em { font-style: normal; font-weight: 500; color: var(--ink-2); font-size: 12px; margin-left: 4px }
+.pc .bar { height: 14px; border-radius: 4px; background: #3b4250; position: relative }
+.pc .bar.rec { background: #2f6fb0 }
+.pc .bar.ext { background: repeating-linear-gradient(45deg, #9aa3ae 0 4px, #c3c9d0 4px 8px) }
+
+.pc .split { grid-column: 1 / -1; height: 1px; background: var(--rule); margin: 6px 0 }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 22px; font-size: 13px; color: var(--ink-2); margin-top: 14px }
+.legend span::before { content: ""; display: inline-block; width: 22px; height: 10px; border-radius: 3px; margin-right: 7px; vertical-align: -1px; background: var(--c) }
+.tip { position: fixed; pointer-events: none; background: var(--ink); color: #fff; font-size: 13px; padding: 6px 10px; border-radius: 6px; z-index: 9 }
+
+/* 맛 표 */
+.taste { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; border-radius: 8px; overflow: hidden }
+.taste div { background: var(--paper); padding: 16px 18px 18px }
+.taste strong { display: block; font-size: 15px; margin-bottom: 4px }
+.taste span { color: var(--ink-2); font-size: 15px }
+.taste .gap { background: #dfe9f5 }
+.taste .gap strong::after { content: "  추천이 채움"; font-weight: 500; font-size: 12px; color: #2f6fb0 }
+
+/* 게임 하나 */
+.game { display: grid; grid-template-columns: 190px 1fr; gap: 8px 36px; padding: 40px 0; border-top: 1px solid var(--rule) }
+.lid { aspect-ratio: 1 / 1; border-radius: 6px; color: #fff; padding: 16px; display: flex; flex-direction: column; justify-content: space-between;
+  box-shadow: inset 0 -8px 0 rgba(0,0,0,.16) }
+.lid.lt { color: var(--ink) }
+.lid b { font: 400 30px/1.1 var(--box) }
+.lid small { font-size: 13px; font-weight: 600; opacity: .9 }
+.meta { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 14px; color: var(--ink-2); margin: 12px 0 0 }
+.meta b { color: var(--ink); font-weight: 650 }
+.why { font-size: 17px; margin: 0 0 16px; max-width: 40em }
+.flow { display: flex; flex-wrap: wrap; gap: 2px; margin: 0 0 18px }
+.flow span { background: var(--paper); padding: 10px 14px; font-size: 15px; line-height: 1.45; flex: 1 1 150px }
+.flow span:first-child { border-radius: 6px 0 0 6px } .flow span:last-child { border-radius: 0 6px 6px 0 }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 32px; font-size: 15px }
+.two p { margin: 0 }
+.two b { display: block; font-size: 13px; color: var(--ink-2); font-weight: 600; margin-bottom: 2px }
+.cands { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 28px 36px }
+.cands b { font-size: 17px } .cands .meta { margin: 2px 0 6px }
+.cands p { font-size: 15px; color: var(--ink-2) }
+
+/* 방 흐름 */
+.room { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 2px }
+.room div { background: var(--felt); color: #e8f2ec; padding: 18px 16px 20px }
+.room div:first-child { border-radius: 8px 0 0 8px } .room div:last-child { border-radius: 0 8px 8px 0 }
+.room strong { display: block; font: 400 21px/1.2 var(--box); margin-bottom: 6px; color: #fff }
+.room span { font-size: 14px; line-height: 1.5; display: block; opacity: .88 }
+table { border-collapse: collapse; width: 100%; font-size: 15px }
+.tw { overflow-x: auto }
+th, td { text-align: left; padding: 10px 14px 10px 0; border-bottom: 1px solid var(--rule); vertical-align: top }
+th { color: var(--ink-2); font-weight: 600; font-size: 13px }
+td:first-child { white-space: nowrap; font-weight: 600 }
+.note { background: var(--paper); border-radius: 8px; padding: 18px 22px; max-width: 50em }
+.note p:last-child { margin: 0 }
+
+ol.steps { padding: 0; margin: 0; list-style: none; counter-reset: s }
+ol.steps li { counter-increment: s; display: grid; grid-template-columns: 52px 1fr; gap: 2px 12px; padding: 18px 0; border-bottom: 1px solid var(--rule) }
+ol.steps li::before { content: counter(s); grid-row: span 2; font: 400 30px/1 var(--box); color: #2f6fb0 }
+ol.steps b { font-size: 17px }
+ol.steps span { color: var(--ink-2); font-size: 15px }
+.ask { display: grid; gap: 14px; counter-reset: q }
+.ask div { background: var(--paper); border-radius: 8px; padding: 18px 22px }
+.ask strong { display: block; font-size: 17px; margin-bottom: 4px }
+.ask span { color: var(--ink-2); font-size: 15px }
+.src { font-size: 14px; color: var(--ink-2) } .src li { margin: 4px 0 }
+ul { padding-left: 20px; margin: 0 0 12px }
+
+@media (max-width: 700px) {
+  body { font-size: 15px } .lead { font-size: 17px } section { margin-top: 72px }
+  .game { grid-template-columns: 1fr; padding: 32px 0 }
+  .taste { grid-template-columns: 1fr }
+  .lid { aspect-ratio: auto; min-height: 120px; max-width: 260px }
+  .two { grid-template-columns: 1fr; gap: 12px }
+  .flow span:first-child, .flow span:last-child, .room div:first-child, .room div:last-child { border-radius: 0 }
+  .flow, .room { border-radius: 6px; overflow: hidden }
+}
+</style>
+</head>
+<body>
+<main>
+
+<h1>창업실 보드게임방</h1>
+<p class="lead">친구들이 <b>각자 폰으로 같은 방 코드</b>에 들어와 같이 하는 보드게임 묶음이에요. 꼭 넣을 다섯 개에 맛이 겹치지 않는 추천 여섯 개를 더하고, 나중에 넣을 후보 네 개를 남겨 뒀어요. 이름은 지금 붙인 가제예요.</p>
+
+<div class="shelfwrap"><div class="shelf" id="shelf"></div></div>
+
+<div class="big">
+  <div><b>11</b><span>1차로 만들 게임</span></div>
+  <div><b>2~10</b><span>할 수 있는 인원</span></div>
+  <div><b>4자리</b><span>방 코드 하나로 입장</span></div>
+  <div><b>0원</b><span>파이어베이스 무료 한도 안</span></div>
+</div>
+
+<section id="who">
+<h2>몇 명이 모였을 때 할 게임</h2>
+<p class="sub">꼭 넣을 다섯 개는 대부분 2~4명용이라 다섯 명이 넘게 모이면 할리갈리와 마헤만 남아요. 추천은 그 빈자리를 먼저 채우도록 골랐어요.</p>
+<div class="chart"><div class="pc" id="pc"></div>
+<div class="legend"><span style="--c:#3b4250">꼭 넣을 게임</span><span style="--c:#2f6fb0">추천</span><span style="--c:repeating-linear-gradient(45deg,#9aa3ae 0 4px,#c3c9d0 4px 8px)">원작 확장판으로 늘어나는 인원</span></div>
+</div>
+</section>
+
+<section id="taste">
+<h2>묶음에 들어간 맛</h2>
+<p class="sub">같은 날 여러 판을 이어 할 때 비슷한 게임만 있으면 금방 질려요. 꼭 넣을 다섯 개가 못 채우는 칸을 파란색으로 칠했어요.</p>
+<div class="taste">
+  <div><strong>머리 쓰는 전략</strong><span>카탄, 스플렌더, 루미큐브</span></div>
+  <div><strong>순발력</strong><span>할리갈리</span></div>
+  <div><strong>운과 배짱</strong><span>마헤</span></div>
+  <div><strong>상대 패 추리</strong><span>다빈치 코드</span></div>
+  <div class="gap"><strong>많은 인원 동시에</strong><span>젝스님트</span></div>
+  <div class="gap"><strong>팀 대결, 말로 하기</strong><span>코드네임</span></div>
+  <div class="gap"><strong>그림으로 웃기</strong><span>텔레스트레이션</span></div>
+  <div class="gap"><strong>정체 숨기기</strong><span>아발론</span></div>
+  <div class="gap"><strong>다 같이 협력</strong><span>하나비</span></div>
+</div>
+</section>
+
+<section id="must">
+<h2>꼭 넣을 다섯 개</h2>
+<p class="sub">인원과 시간은 원작 상자 기준이에요. 화면에서는 섞기, 나누기, 점수 계산을 프로그램이 해서 대개 더 빨리 끝나요.</p>
+<div id="mustList"></div>
+</section>
+
+<section id="rec">
+<h2>추천 여섯 개</h2>
+<p class="sub">고른 근거는 세 가지예요. 실제로 많이 하는 게임인지(보드게임아레나 2025년 기록, 보드라이프 순위와 추천 글), 위에서 빈 맛을 채우는지, 폰 화면으로 하면 오히려 편해지는지.</p>
+<div id="recList"></div>
+</section>
+
+<section id="cand">
+<h2>나중에 넣을 후보</h2>
+<p class="sub">재미는 검증됐지만 1차 묶음 안의 게임과 맛이 겹치거나 화면 만들기가 오래 걸려서 뒤로 뺐어요.</p>
+<div class="cands" id="candList"></div>
+</section>
+
+<section id="play">
+<h2>같이 하는 방법</h2>
+<p class="sub">로그인 없이 이름만 넣고 들어와요. 카톡으로 링크 하나만 보내면 돼요.</p>
+<div class="room">
+  <div><strong>방 만들기</strong><span>게임을 고르면 4자리 방 코드와 초대 링크가 나와요.</span></div>
+  <div><strong>들어오기</strong><span>링크를 누르거나 코드를 치고 이름만 넣어요.</span></div>
+  <div><strong>자리 정하기</strong><span>빈자리는 봇으로 채울 수 있어요. 방장이 시작을 눌러요.</span></div>
+  <div><strong>한 판</strong><span>내 차례면 폰이 알려 줘요. 내 패는 내 폰에만 보여요.</span></div>
+  <div><strong>다음 판</strong><span>점수를 보고 같은 사람들로 다시 하거나 다른 게임으로 넘어가요.</span></div>
+</div>
+
+<h3>자리 방식</h3>
+<div class="tw"><table>
+<tr><th>방식</th><th>언제</th><th>되는 게임</th></tr>
+<tr><td>각자 폰</td><td>기본. 같은 방에 모였거나 통화하며 할 때</td><td>전부</td></tr>
+<tr><td>폰 하나 돌려 하기</td><td>폰이 하나뿐일 때</td><td>마헤, 카탄처럼 숨긴 패가 없거나 적은 게임만</td></tr>
+<tr><td>큰 화면 판 + 폰 손패</td><td>노트북이나 TV에 판을 띄울 때 (2차)</td><td>카탄, 젝스님트, 코드네임, 텔레스트레이션 결과 보기</td></tr>
+<tr><td>봇과 혼자</td><td>연습할 때, 사람이 모자랄 때</td><td>말로 하는 셋(코드네임, 텔레스트레이션, 아발론)을 뺀 나머지</td></tr>
+</table></div>
+</section>
+
+<section id="tech">
+<h2>만드는 방식</h2>
+<div class="tw"><table>
+<tr><th>부분</th><th>어떻게</th></tr>
+<tr><td>화면</td><td>창업실 안 boardgames/ 폴더의 HTML과 자바스크립트. 게임마다 규칙 파일 하나(지금 상태, 할 수 있는 행동, 행동을 적용한 다음 상태)와 화면 파일 하나. 방 기능은 모든 게임이 같이 써요.</td></tr>
+<tr><td>방 저장</td><td>데칼코마니가 쓰는 파이어베이스 changupsil-games의 Firestore에 방 문서 하나와 행동 기록을 쌓아요. 폰마다 같은 기록을 같은 규칙으로 다시 계산하니 화면이 어긋나지 않아요.</td></tr>
+<tr><td>무료 한도</td><td>하루 읽기 5만 번, 쓰기 2만 번. 4명이 카탄 한 판을 하면 행동이 300번쯤이라 쓰기 300, 읽기 1,200 정도예요. 하루 열 판을 해도 쓰기 15%, 읽기 24%예요.</td></tr>
+<tr><td>숨긴 패</td><td>각자 패는 그 사람만 읽을 수 있는 칸에 저장해요(익명 로그인과 저장소 규칙). 파이어베이스 무료판엔 서버 코드가 없어서 섞기는 방장 폰이 해요. 방장이 개발자 도구로 더미를 엿볼 수는 있어서, 친구끼리 하는 1차는 이대로 가고 필요하면 수파베이스 함수로 섞기를 옮겨요.</td></tr>
+<tr><td>할리갈리 판정</td><td>인터넷 속도가 사람마다 달라서 도착 순서로 정하면 와이파이 좋은 사람이 이겨요. 그래서 폰마다 카드가 내 화면에 뜬 순간부터 종을 누른 순간까지를 재서 보내고, 가장 짧은 사람이 가져가요.</td></tr>
+<tr><td>나갔다 들어오기</td><td>같은 폰으로 다시 들어오면 기록으로 판을 되살려요. 30초 넘게 안 돌아오면 그 자리는 봇이 대신 둬요.</td></tr>
+<tr><td>검사</td><td>게임마다 봇끼리 자동으로 수백 판을 돌려 규칙이 막히는 곳을 찾고, 폰 너비 화면을 확인한 뒤 사람 넷이 실제로 한 판 해요.</td></tr>
+</table></div>
+</section>
+
+<section id="name">
+<h2>이름과 그림</h2>
+<div class="note">
+<p>창업실은 누구나 보는 사이트라 원작 이름, 상자 그림, 카드 그림은 쓰지 않아요. 규칙의 재미는 살리고 이름, 테마, 그림은 우리 것으로 새로 만들어요. 그림은 Gemini로 그리고, 카드나 타일처럼 단순한 모양은 화면에서 바로 그려요.</p>
+<p>아래 가제는 원작이 뭔지 바로 떠오르게 붙인 임시 이름이에요. 묶음 전체를 하나의 세계로 묶을지(예를 들면 대학 동아리방에 있는 게임들) 게임마다 따로 갈지는 아래 정할 것에 있어요.</p>
+</div>
+<div class="tw" style="margin-top:22px"><table id="names"><tr><th>원작</th><th>가제</th><th>테마</th></tr></table></div>
+</section>
+
+<section id="order">
+<h2>만드는 순서</h2>
+<p class="sub">방 기능부터 단단히 만들고, 그 위에 규칙이 쉬운 게임부터 하나씩 올려요. 게임 하나가 끝날 때마다 창업실에 올려서 바로 해 볼 수 있게 해요.</p>
+<ol class="steps">
+  <li><b>방</b><span>방 만들기, 코드로 들어오기, 이름, 자리, 시작, 다시 하기, 나갔다 들어오기. 이것만 있으면 어떤 게임이든 붙일 수 있어요.</span></li>
+  <li><b>숨은 숫자 (다빈치 코드)</b><span>규칙이 짧은데 숨긴 패, 차례, 추측 기록이 다 들어 있어서 방이 숨긴 정보를 제대로 지키는지 시험하기 좋아요.</span></li>
+  <li><b>거북 알 달리기 (마헤)</b><span>주사위 굴림 연출과 거북 업기. 7명까지라 방이 사람 많을 때 버티는지도 봐요.</span></li>
+  <li><b>다섯 종 (할리갈리)</b><span>유일한 실시간 게임. 반응 시간 판정을 친구 폰 여러 대로 맞춰 봐요.</span></li>
+  <li><b>보석 상회 (스플렌더)</b><span>카드 90장과 귀족 타일 데이터, 살 수 있는 카드 표시.</span></li>
+  <li><b>섬 개척 (카탄)</b><span>가장 큰 게임. 육각 지도, 거래 창, 도둑, 가장 긴 길 계산.</span></li>
+  <li><b>추천 여섯 개</b><span>여섯째 소, 암호 단어, 그림 전화, 성의 배신자, 불꽃 축제, 숫자 조합판 순서. 말로 하는 게임은 한국어 단어 목록(400개 이상)을 먼저 만들어요.</span></li>
+  <li><b>묶음 첫 화면</b><span>선반에서 게임을 고르는 로비, 최근 같이 한 친구, 게임별 규칙 1분 설명.</span></li>
+</ol>
+</section>
+
+<section id="ask">
+<h2>정할 것</h2>
+<div class="ask">
+  <div><strong>추천 여섯 개를 다 넣을까요?</strong><span>빼거나 후보와 바꾸고 싶은 게임, 목록에 없는데 넣고 싶은 게임이 있으면 알려 주세요.</span></div>
+  <div><strong>주로 어떻게 할 건가요?</strong><span>한자리에 모여 각자 폰으로, 멀리서 통화하며, 혼자 봇과. 많이 쓸 쪽을 먼저 다듬어요.</span></div>
+  <div><strong>이름과 테마는 어떻게 갈까요?</strong><span>게임마다 따로, 아니면 묶음 전체를 하나의 세계로.</span></div>
+  <div><strong>들어올 때 로그인이 필요할까요?</strong><span>이름만 넣기(빠름), 구글 로그인(전적과 순위가 남음).</span></div>
+</div>
+</section>
+
+<section id="src">
+<h2>출처</h2>
+<ul class="src">
+  <li><a href="https://en.boardgamearena.com/news?id=1025">Board Game Arena, 2025: A Year in re-Play</a> 2025년 가장 많은 사람이 한 게임 6 Nimmt!, Azul, Catan 순. 대회 수 Carcassonne 6.5천, Can't Stop 5천, Azul 4천</li>
+  <li><a href="https://boardlife.co.kr/rank/all/party/1">보드라이프 파티 보드게임 순위</a> 텔레스트레이션 1위, 레지스탕스 아발론 3위, 코드네임 5위 (2026-11 확인)</li>
+  <li><a href="https://boardlife.co.kr/bbs_detail.php?tb=community_qna&amp;bbs_num=54375">보드라이프 4인 게임 추천 질문 (2025-12-18)</a> 답글에 하나비, 마헤, 코드네임, 노땡스, 라스베가스</li>
+  <li><a href="https://okaroma.com/%EB%B3%B4%EB%93%9C%EA%B2%8C%EC%9E%84-%EC%B9%B4%ED%8E%98-%EA%B2%8C%EC%9E%84-%EC%B6%94%EC%B2%9C/">2025년 보드게임 카페 게임 추천</a> 루미큐브, 스플렌더, 코드네임, 카탄, 아줄</li>
+  <li><a href="https://boardgamegeek.com/boardgame/3383/mahe">BoardGameGeek, Mahé</a> 2~7명, 주사위 최대 3개, 합 7 초과면 출발점, 업힌 거북 규칙</li>
+</ul>
+</section>
+
+</main>
+<div class="tip" id="tip" hidden></div>
+<script>
+// [원작, 가제, 테마, 인원 최소, 최대, 확장 최대, 시간, 색, 밝은 글씨?, 이유, 흐름[], 화면이라 좋아지는 점, 만들 때 걸리는 점, 봇]
+const MUST = [
+  ["카탄", "섬 개척", "새로 찾은 섬에 마을을 넓히는 개척민", 3, 4, 6, "60~90분", "#c8402f", 0,
+   "주사위 운, 자원 거래, 길 막기가 섞인 묶음의 큰 판이에요.",
+   ["주사위 두 개를 굴려요", "그 숫자 땅에 마을이 있는 사람이 자원을 받아요", "사람끼리, 또는 은행과 4대 1로 바꿔요", "길, 마을, 도시를 지어요", "10점 먼저 내면 이겨요. 7이 나오면 도둑이 움직여요"],
+   "자원 나눠 주기, 가장 긴 길, 점수를 자동으로 세요. 거래 제안을 창으로 띄워 받을지 말지 눌러요.",
+   "규칙이 가장 많고 거래 화면이 까다로워요. 육각 지도는 매판 무작위로 짜요.", "가능, 처음엔 약하게"],
+  ["할리갈리", "다섯 종", "시장 과일 대신 우리 테마 그림", 2, 6, 0, "15분", "#e0a526", 1,
+   "묶음에서 하나뿐인 순발력 게임이라 판 사이에 분위기를 띄워요.",
+   ["차례로 내 카드 맨 위를 뒤집어요", "펼쳐진 카드에서 같은 그림이 딱 다섯 개면 종을 쳐요", "먼저 친 사람이 깔린 카드를 다 가져가요", "잘못 치면 모두에게 한 장씩 줘요", "카드가 떨어지면 탈락, 마지막 한 명이 이겨요"],
+   "폰 화면 아래 절반이 통째로 종 단추예요. 진동과 소리로 누른 느낌을 줘요.",
+   "인터넷 지연. 반응 시간을 폰에서 재는 방식으로 풀어요(만드는 방식 참고).", "가능, 반응 0.6~1.2초"],
+  ["마헤", "거북 알 달리기", "섬 둘레를 도는 거북", 2, 7, 0, "30분", "#3c8d5a", 0,
+   "규칙은 1분이면 되는데 '한 번 더 굴려?'에서 매번 소리가 나요.",
+   ["주사위 하나를 굴리고 더 굴릴지 정해요 (최대 셋)", "합이 7을 넘으면 출발점으로 돌아가요", "안 넘으면 합에 굴린 개수를 곱한 만큼 가요", "남의 거북 위에 멈추면 업혀 가고, 맨 위 사람이 굴릴 개수를 정해요", "해변을 지나면 알 카드, 알을 가장 많이 낳은 사람이 이겨요"],
+   "업힌 거북 탑을 옆에서 보이게 쌓아요. 한 개, 두 개, 세 개째 주사위를 하나씩 굴려 긴장을 살려요.",
+   "업혔을 때 누가 몇 개 굴릴지 정하는 순서만 조심하면 돼요.", "쉬움"],
+  ["다빈치 코드", "숨은 숫자", "자물쇠 번호를 맞히는 금고털이", 2, 4, 0, "15분", "#2a2f6b", 0,
+   "남의 숫자를 좁혀 가는 추리라 짧고 진해요.",
+   ["0~11 검정, 흰 타일 24개와 조커 2개를 섞어요", "받은 타일을 작은 수부터 세워요 (같은 수면 검정이 왼쪽)", "차례에 한 장 가져와 남의 타일 하나를 맞혀요", "맞으면 열리고 더 맞힐지 골라요, 틀리면 가져온 내 타일을 열어요", "숨은 타일이 마지막까지 남은 사람이 이겨요"],
+   "내 타일은 내 폰에만 보이고 정렬은 자동이에요. 지난 추측을 기록으로 볼 수 있어요.",
+   "조커가 들어갈 자리를 고르는 화면.", "가능, 남은 수로 좁히기"],
+  ["스플렌더", "보석 상회", "보석을 모아 가게를 키우는 상인", 2, 4, 0, "30분", "#1f4e5f", 0,
+   "할 일이 차례마다 셋뿐인데 고르는 맛이 있는 입문 전략 게임이에요.",
+   ["다른 색 보석 셋, 또는 같은 색 둘을 가져와요", "또는 카드를 사거나 한 장 맡아 두고 황금을 받아요", "산 카드가 다음 구매 값을 깎아 줘요", "조건을 채우면 귀족이 찾아와 점수를 줘요", "15점에 닿으면 그 바퀴 끝에 점수가 높은 사람이 이겨요"],
+   "지금 살 수 있는 카드를 빛나게 표시하고 낼 보석을 자동으로 계산해요.",
+   "카드 90장과 귀족 타일 데이터를 우리 테마로 새로 짜야 해요.", "가능"],
+];
+const REC = [
+  ["젝스님트", "여섯째 소", "소 떼를 모는 목장", 2, 10, 0, "20~45분", "#b8355e", 0,
+   "보드게임아레나에서 2025년에 가장 많은 사람이 한 게임이에요. 10명까지 같이 해요.",
+   ["1~104 카드를 열 장씩 받아요", "모두 동시에 한 장을 몰래 골라요", "작은 카드부터 알맞은 줄 끝에 자동으로 놓여요", "여섯 번째로 놓이면 그 줄 다섯 장을 벌점으로 가져가요", "누가 벌점 66점을 넘으면 끝나고, 벌점이 가장 적은 사람이 이겨요"],
+   "동시 공개와 줄 배치를 프로그램이 해서 실물보다 훨씬 빨라요.", "거의 없어요. 1차 묶음에서 가장 쉬운 축이에요.", "가능"],
+  ["코드네임", "암호 단어", "첩보원 두 팀", 4, 8, 0, "15분", "#d26a2e", 0,
+   "보드라이프 파티 게임 5위. 다섯 명 넘게 모였을 때 팀으로 나눠요.",
+   ["단어 25개가 깔려요", "팀장 둘만 어느 단어가 우리 팀인지 봐요", "팀장이 단어 하나와 숫자 하나로 힌트를 줘요", "팀원이 의논해서 단어를 짚어요", "우리 단어를 다 찾으면 이기고, 암살자 단어를 짚으면 바로 져요"],
+   "팀장 폰에만 정답 지도가 보여서 카드 들고 가릴 일이 없어요.", "한국어 단어 목록이 재미를 좌우해요. 400개 이상 직접 골라요.", "없음, 말로 하는 게임"],
+  ["텔레스트레이션", "그림 전화", "엉망이 되는 전화 놀이", 4, 8, 0, "20분", "#7a4fa0", 0,
+   "보드라이프 파티 게임 1위. 그림 실력이 없을수록 웃겨요.",
+   ["각자 제시어를 받아요", "그림을 그려 옆 사람에게 넘겨요", "옆 사람은 그림만 보고 단어를 써요", "다시 그 단어를 그리며 한 바퀴 돌아요", "처음 단어가 어떻게 변했는지 차례로 넘겨 봐요"],
+   "폰에 손가락으로 그리고, 끝나면 단어가 변해 간 줄을 한 장씩 넘겨 봐요.", "그림 그리기 칸과 그림 저장 크기(한 장 100KB 안쪽).", "없음"],
+  ["아발론", "성의 배신자", "성을 지키는 기사와 숨은 배신자", 5, 10, 0, "30분", "#2f6fb0", 0,
+   "보드라이프 파티 게임 3위. 사람이 많을수록 재밌는 정체 숨기기 게임이에요.",
+   ["몰래 착한 편과 나쁜 편으로 나뉘어요 (나쁜 편끼리는 서로 알아요)", "대장이 원정대를 뽑고 모두 찬반 투표해요", "원정대는 몰래 성공이나 실패 카드를 내요", "원정 셋을 먼저 성공시키거나 실패시키는 편이 이겨요", "착한 편이 이겨도 암살자가 예언자를 맞히면 뒤집혀요"],
+   "역할 보기, 투표 집계, 원정 카드 섞기를 폰이 해 줘요. 진행자가 따로 필요 없어요.", "말싸움이 재미의 대부분이라 한자리에 있거나 통화하며 해야 해요.", "없음"],
+  ["하나비", "불꽃 축제", "여름밤 불꽃놀이를 같이 준비하는 사람들", 2, 5, 0, "25분", "#c9873a", 1,
+   "묶음에 하나뿐인 협력 게임. 이기고 지는 게 부담스러운 날에 해요.",
+   ["내 카드는 남들만 보고 나는 못 봐요", "차례에 힌트 주기, 카드 버리기, 카드 내기 중 하나를 해요", "힌트는 색 하나나 숫자 하나만 알려 줄 수 있어요", "색마다 1부터 5까지 순서대로 쌓아요", "실수 세 번이면 끝, 쌓은 숫자의 합이 모두의 점수예요"],
+   "카드를 뒤로 들 필요 없이 폰이 내 카드만 가려 줘요. 받은 힌트가 카드 위에 남아요.", "봇이 힌트를 사람처럼 읽기 어려워서 봇은 나중에 만들어요.", "어려움, 2차"],
+  ["루미큐브", "숫자 조합판", "숫자 타일 조합", 2, 4, 0, "30~60분", "#4b8fa6", 0,
+   "보드게임 카페 추천 글마다 앞쪽에 나오는 게임이라 처음 온 친구도 대개 규칙을 알아요.",
+   ["1~13 숫자 타일 네 색 두 벌과 조커 둘", "같은 숫자 다른 색 3~4개, 또는 같은 색 이어진 수 3개 이상으로 내려놔요", "처음 내려놓을 땐 합이 30 이상이어야 해요", "판에 있는 조합을 고쳐 내 타일을 끼워 넣어요", "타일을 먼저 다 내려놓는 사람이 이겨요"],
+   "판을 고치다 틀리면 차례 처음으로 되돌리는 단추가 있어요. 남은 시간도 보여요.", "작은 폰 화면에서 타일 수십 개를 끌어 놓는 조작이 가장 큰 일이에요.", "가능"],
+];
+const CAND = [
+  ["아줄", "2~4명, 30~45분", "타일을 골라 벽을 채우는 게임. 보드게임아레나 2025년 두 번째로 많은 사람이 했어요. 조용한 2~4명 전략이라 스플렌더와 맛이 겹쳐요.", "#3a5f8f", 0],
+  ["노 땡스", "3~7명, 15분", "벌점 카드를 칩으로 버티며 넘기는 눈치 게임. 규칙이 세 줄이라 판 사이에 하기 좋아요. 1차 묶음이 끝나면 가장 먼저 넣을 후보예요.", "#8a3b2b", 0],
+  ["카르카손", "2~5명, 35분", "타일을 이어 붙여 길과 성을 만드는 게임. 보드게임아레나 2025년 대회가 가장 많이 열린 게임(6.5천)이에요. 점수 세기 규칙이 많아요.", "#6d6a2f", 0],
+  ["라스베가스", "2~5명, 30분", "주사위를 카지노에 걸어 돈을 따는 게임. 보드라이프 추천 글에 두 번 나왔지만 마헤와 같은 주사위 운 칸이에요.", "#5a7d2a", 0],
+];
+
+const esc = s => String(s).replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+const id = (g) => "g-" + g[1].replace(/\s/g, "");
+
+function gameHTML(g) {
+  const [orig, name, , min, max, ext, time, col, lt, why, flow, good, hard, bot] = g;
+  return `<article class="game" id="${id(g)}">
+    <div><div class="lid${lt ? " lt" : ""}" style="background:${col}"><small>원작 ${esc(orig)}</small><b>${esc(name)}</b></div>
+      <div class="meta"><span><b>${min}~${max}명</b>${ext ? ` (확장 ${ext}명)` : ""}</span><span><b>${time}</b></span><span>봇 <b>${esc(bot)}</b></span></div></div>
+    <div><p class="why">${esc(why)}</p>
+      <div class="flow">${flow.map(s => `<span>${esc(s)}</span>`).join("")}</div>
+      <div class="two"><p><b>화면이라 좋아지는 점</b>${esc(good)}</p><p><b>만들 때 걸리는 점</b>${esc(hard)}</p></div></div>
+  </article>`;
+}
+document.getElementById("mustList").innerHTML = MUST.map(gameHTML).join("");
+document.getElementById("recList").innerHTML = REC.map(gameHTML).join("");
+document.getElementById("candList").innerHTML = CAND.map(c =>
+  `<div id="c-${c[0].replace(/\s/g, "")}"><b>${esc(c[0])}</b><div class="meta"><span>${esc(c[1])}</span></div><p>${esc(c[2])}</p></div>`).join("");
+
+// 선반
+const H = [196, 214, 178, 205, 222, 188, 208, 230, 182, 200, 215, 176, 198, 186, 210];
+let k = 0;
+const spine = (orig, href, col, lt, tag) => {
+  const h = H[k], w = 46 + (k * 7) % 18; k++;
+  return `<a class="spine${lt ? " lt" : ""}" href="${href}" style="background:${col};height:${h}px;width:${w}px"><b>${esc(orig)}</b><small>${tag}</small></a>`;
+};
+document.getElementById("shelf").innerHTML =
+  `<div class="grp"><i>꼭 넣을 게임</i>${MUST.map(g => spine(g[0], "#" + id(g), g[7], g[8], g[3] + "~" + g[4])).join("")}</div>` +
+  `<div class="grp"><i>추천</i>${REC.map(g => spine(g[0], "#" + id(g), g[7], g[8], g[3] + "~" + g[4])).join("")}</div>` +
+  `<div class="grp cand"><i>후보</i>${CAND.map(c => spine(c[0], "#c-" + c[0].replace(/\s/g, ""), c[3], c[4], c[1].split("명")[0])).join("")}</div>`;
+
+// 인원 막대 (2~10명)
+let pc = `<div></div>` + [2,3,4,5,6,7,8,9,10].map(n => `<div class="hd">${n}명</div>`).join("");
+let row = 2;
+const bars = (list, cls) => list.map(g => {
+  const [orig, name, , min, max, ext] = g;
+  let s = `<div class="nm" style="grid-row:${row}">${esc(orig)}</div>`;
+  s += `<div class="bar ${cls}" style="grid-row:${row};grid-column:${min}/${max + 1}" data-t="${esc(orig)}: ${min}~${max}명"></div>`;
+  if (ext) s += `<div class="bar ext" style="grid-row:${row};grid-column:${max + 1}/${ext + 1}" data-t="${esc(orig)}: 원작 확장판으로 ${ext}명까지"></div>`;
+  row++;
+  return s;
+}).join("");
+pc += bars(MUST, "");
+pc += `<div class="split" style="grid-row:${row++}"></div>`;
+pc += bars(REC, "rec");
+document.getElementById("pc").innerHTML = pc;
+
+const tip = document.getElementById("tip");
+document.getElementById("pc").addEventListener("pointermove", e => {
+  const t = e.target.closest("[data-t]");
+  if (!t) { tip.hidden = true; return; }
+  tip.textContent = t.dataset.t; tip.hidden = false;
+  tip.style.left = Math.min(e.clientX + 12, innerWidth - tip.offsetWidth - 8) + "px";
+  tip.style.top = (e.clientY - 38) + "px";
+});
+document.getElementById("pc").addEventListener("pointerleave", () => tip.hidden = true);
+
+// 이름 표
+document.getElementById("names").insertAdjacentHTML("beforeend",
+  MUST.concat(REC).map(g => `<tr><td>${esc(g[0])}</td><td>${esc(g[1])}</td><td>${esc(g[2])}</td></tr>`).join(""));
+</script>
+<script src="../hub/back.js" data-cat="game" defer></script>
+</body>
+</html>
