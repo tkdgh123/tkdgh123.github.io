@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Adam · Paper Seminar</title>
+<title>Adam Paper Seminar</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@300;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
@@ -163,8 +163,38 @@ dd{margin:0;color:var(--sub)}
 .end p{margin:8px 0 0;font:300 clamp(22px,3vw,30px)/1.45 var(--serif)}
 .end p b{font-weight:700}
 
+/* 처음부터 */
+.easy-h{margin-bottom:0}
+.easy-h p{max-width:44ch}
+.body.e{margin-top:40px}
+.ex{background:var(--soft);border-radius:12px;padding:16px 20px;margin:16px 0}
+.ex>b{display:block;margin-bottom:4px}
+.ex p{margin:0 0 8px}.ex p:last-child{margin:0}
+.eng{color:var(--sub);font-size:15px;margin-top:-6px}
+.wv{background:var(--soft);border-radius:14px;padding:18px 20px;margin:16px 0}
+.wv .row{display:grid;grid-template-columns:110px 1fr;gap:12px;align-items:end;margin:6px 0}
+.wv .row span{font-size:14px;color:var(--sub);padding-bottom:2px}
+.wv svg{width:100%;height:56px;display:block}
+.wv small{display:block;color:var(--mute);font-size:13px;margin-top:8px}
+td.c,th.c{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.calc{background:var(--soft);border-radius:14px;padding:20px;margin:16px 0}
+.calc label{display:block;font-weight:600;margin-bottom:6px}
+.calc input{width:100%;font:16px var(--mono);padding:10px 12px;border:1px solid var(--rule);border-radius:10px;background:var(--bg);color:var(--ink)}
+.calc .pick{margin:12px 0 4px}
+.calc table{min-width:620px;font-size:14px}
+.calc td.b{width:120px}
+.sb{height:8px;border-radius:4px;background:var(--blue)}
+.sb.o{background:var(--orange);margin-top:3px}
+.gl dt small{display:block;font:400 12.5px var(--mono);color:var(--mute)}
+.gl dd p{margin:0}
+.gl dd .s{display:block;color:var(--mute);font-size:14px;margin-top:2px}
+.gl dt,.gl dd{padding:10px 0;border-top:1px solid var(--rule)}
+.gl{gap:0 24px}
+
 @media (max-width:860px){
   .hero h1,.hero .meta,.core .f,.core p{grid-column:1/-1}
+  .wv .row{grid-template-columns:1fr;gap:2px}
+  .gl{grid-template-columns:1fr}.gl dd{border-top:0;padding-top:0}
   .body{grid-template-columns:1fr;gap:0}
   .toc{display:none}
   .three{grid-template-columns:1fr}
@@ -178,20 +208,256 @@ dd{margin:0;color:var(--sub)}
 <div class="bar"><div class="in">
   
   <div class="tabs" role="group" aria-label="보기">
-    <button type="button" data-t="read" aria-pressed="true">내용 정리</button>
+    <button type="button" data-t="easy" aria-pressed="true">처음부터</button>
+    <button type="button" data-t="read" aria-pressed="false">내용 정리</button>
     <button type="button" data-t="talk" aria-pressed="false">발표 순서</button>
   </div>
 </div></div>
 
+<!-- ───────────── 처음부터 ───────────── -->
+<div class="wrap" id="easy">
+  <div class="talk-h easy-h">
+    <h1>처음부터 <b>천천히</b></h1>
+    <p>학습이 무엇인지부터 시작해서 논문이 풀려는 문제, m과 v, 편향 보정까지 한 칸씩 쌓아요. 표의 숫자는 논문 기본값으로 직접 계산했어요.</p>
+  </div>
+
+  <div class="body e">
+    <nav class="toc" aria-label="목차">
+      <a href="#e1"><i>01</i>학습이 하는 일</a>
+      <a href="#e2"><i>02</i>막히는 곳</a>
+      <a href="#e3"><i>03</i>논문의 목적</a>
+      <a href="#e4"><i>04</i>m</a>
+      <a href="#e5"><i>05</i>v</a>
+      <a href="#e6"><i>06</i>m ÷ √v</a>
+      <a href="#e7"><i>07</i>편향 보정</a>
+      <a href="#e8"><i>08</i>직접 넣어 보기</a>
+      <a href="#e9"><i>09</i>이름과 결과</a>
+      <a href="#e10"><i>10</i>용어 사전</a>
+    </nav>
+
+    <main>
+      <section id="e1">
+        <div class="no">01 학습이 하는 일</div>
+        <h2>학습은 <b>숫자를 고치는 일</b>이에요</h2>
+        <p>인공지능 모델 안에는 숫자가 아주 많이 들어 있어요. 이 숫자를 매개변수라고 하고 논문은 θ(세타)로 써요. 사진을 보고 고양이인지 맞히는 모델이라면 이 숫자들이 어느 픽셀을 얼마나 무겁게 볼지 정해요.</p>
+        <p>모델이 답을 내면 정답과 비교해서 얼마나 틀렸는지를 숫자 하나로 계산해요. 이 값이 손실이고 논문은 목적 함수 f(θ)라고 불러요. 학습은 손실이 작아지는 쪽으로 매개변수를 조금씩 고치는 일을 수만 번 되풀이하는 과정이에요. 논문 제목의 Optimization(최적화)이 이 일을 가리켜요.</p>
+        <div class="ex">
+          <b>매개변수 하나짜리 모델로 해 보기</b>
+          <p>집 넓이 x로 집값을 맞히는 모델 <b>예측 = w × x</b>가 있다고 해요. 매개변수는 w 하나예요. 넓이 2, 진짜 값 6인 집을 넣어요.</p>
+          <p>지금 w = 1이면 예측은 2예요. 정답보다 4 모자라고 손실은 (2 − 6)² = 16이에요.</p>
+          <p>w를 아주 조금 늘리면 손실이 얼마나 바뀌는지가 기울기예요. 이 모델에서는 2 × (예측 − 정답) × x = 2 × (−4) × 2 = <b>−16</b>이에요. 음수니까 w를 늘리면 손실이 줄어요.</p>
+        </div>
+        <p>눈을 가리고 산에서 가장 낮은 곳을 찾아 내려간다고 생각하면 쉬워요. 지도는 없고 발밑이 어느 쪽으로 기울었는지만 느낄 수 있어요. 그 기울어짐이 기울기예요. 매개변수가 100만 개면 100만 방향의 기울기를 한 번에 느끼는 셈이에요.</p>
+      </section>
+
+      <section id="e2">
+        <div class="no">02 막히는 곳</div>
+        <h2>기울기 반대로 걷기, <b>그런데</b></h2>
+        <div class="eq">$$w_{\text{새}} = w_{\text{옛}} - \alpha \times \text{기울기}$$</div>
+        <p>α(알파)는 한 번에 얼마나 움직일지 정하는 걸음 폭이에요. 학습률이라고도 해요. 위 예에서 α = 0.01이면 새 w = 1 − 0.01 × (−16) = 1.16이에요. 예측이 2.32로 올라서 정답 6에 조금 가까워졌어요. 강의안 lec4-1 25쪽의 경사 하강법(Gradient Descent)이 이 식이에요.</p>
+        <p>실제 딥러닝에서 이 식을 그대로 쓰면 세 군데서 막혀요.</p>
+        <div class="props">
+          <div><div><h3>기울기가 매번 흔들려요</h3><p>데이터가 100만 장이면 한 걸음마다 100만 장을 다 보고 기울기를 구하기엔 너무 느려요. 그래서 128장 같은 일부(미니배치)만 보고 기울기를 구하는데 어떤 128장을 뽑았느냐에 따라 기울기가 매번 달라져요. 이렇게 하는 경사 하강법이 확률적 경사 하강법(SGD)이고 논문 제목의 Stochastic(확률적)이 이 흔들림을 가리켜요. 학습 중 뉴런을 무작위로 끄는 dropout도 기울기를 흔들어요.</p></div></div>
+          <div><div><h3>매개변수마다 기울기 크기가 달라요</h3><p>어떤 매개변수는 기울기가 늘 100쯤이고 어떤 건 늘 0.01쯤이에요. α를 0.01로 정하면 앞의 것은 한 번에 1씩 튀고 뒤의 것은 0.0001씩만 움직여요. 둘 다 맞는 α 하나는 없어요.</p></div></div>
+          <div><div><h3>α를 고르기 어려워요</h3><p>α가 크면 골짜기를 넘어 반대편으로 튀고 작으면 학습이 끝나지 않아요. 사람이 여러 값을 직접 돌려 봐야 해요. CNN을 SGD로 학습할 때는 층마다 기울기 크기가 크게 달라서 합성곱 층에 더 작은 α를 따로 주곤 했어요(논문 6.3절).</p></div></div>
+        </div>
+        <p>곡률까지 쓰는 Newton 방법(같은 25쪽)은 걸음 폭을 알아서 맞추지만 매개변수가 n개면 n × n 표(헤세 행렬)가 필요해요. 매개변수 100만 개면 칸이 1조 개라서 만들 수 없어요. 논문도 이런 고차 방법은 맞지 않는다고 보고 기울기만 쓰는 1차 방법으로 범위를 좁혀요.</p>
+        <div class="q">“In these cases, higher-order optimization methods are ill-suited, and discussion in this paper will be restricted to first-order methods.”<br><span class="src">1절</span></div>
+      </section>
+
+      <section id="e3">
+        <div class="no">03 논문의 목적</div>
+        <h2>기울기만으로 <b>매개변수마다 걸음 맞추기</b></h2>
+        <p class="lead">데이터도 많고 매개변수도 많고 기울기가 흔들리는 문제에서, 기울기만 써서 매개변수마다 걸음 폭을 알아서 정하는 방법을 만들려고 해요.</p>
+        <div class="q">“We propose Adam, a method for efficient stochastic optimization that only requires first-order gradients with little memory requirement. The method computes individual adaptive learning rates for different parameters from estimates of first and second moments of the gradients.”<br><span class="src">1절</span></div>
+        <p class="eng">1차 기울기만 필요하고 메모리를 적게 쓰는 확률적 최적화 방법 Adam을 제안한다. 이 방법은 기울기의 1차, 2차 모멘트 추정값으로 매개변수마다 따로 맞춘 학습률을 계산한다.</p>
+        <p>초록에는 이 방법이 갖추려는 조건이 줄줄이 나와요. 앞의 막히는 곳과 짝지으면 이래요.</p>
+        <div class="tw"><table>
+          <tr><th>초록 원문</th><th>쉬운 말</th><th>풀리는 문제</th></tr>
+          <tr><td>computationally efficient, little memory requirements</td><td>기울기를 구한 뒤 덧셈, 곱셈 몇 번만 더해요. 매개변수마다 숫자 두 개(m, v)만 더 저장해요.</td><td>Newton의 1조 칸</td></tr>
+          <tr><td>invariant to diagonal rescaling of the gradients</td><td>매개변수마다 기울기에 다른 수를 곱해도 걸음이 그대로예요.</td><td>크기가 다른 기울기</td></tr>
+          <tr><td>very noisy and/or sparse gradients</td><td>흔들리는 기울기, 대부분 0이고 가끔만 나오는 기울기에도 돼요.</td><td>흔들리는 기울기</td></tr>
+          <tr><td>hyper-parameters have intuitive interpretations and typically require little tuning</td><td>α가 “한 걸음의 대략적인 최대 크기”라는 뜻을 가져서 고르기 쉽고 기본값 그대로 써도 대부분 돼요.</td><td>α 고르기</td></tr>
+          <tr><td>large in terms of data and/or parameters, non-stationary objectives</td><td>데이터와 매개변수가 많아도 되고 학습하는 동안 손실의 모양이 바뀌어도 따라가요.</td><td>쓸 수 있는 범위</td></tr>
+        </table></div>
+        <p>설계 목표는 먼저 나온 두 방법의 장점을 합치는 거였어요. 드문드문 나오는 기울기에 강한 AdaGrad(2011)와, 목표가 계속 바뀌는 문제에 강한 RMSProp(2012)예요(1절).</p>
+      </section>
+
+      <section id="e4">
+        <div class="no">04 m</div>
+        <h2>m은 <b>최근 기울기의 평균</b>이에요</h2>
+        <p>m은 매개변수마다 하나씩 들고 다니는 숫자예요. 이번 기울기 하나만 믿지 않고 최근 기울기들을 평균 내서 “대체로 어느 쪽으로 가야 하는지”를 기억해요. 논문은 1차 모멘트 추정값(1st moment estimate)이라고 불러요. 통계에서 1차 모멘트는 평균이에요.</p>
+        <div class="eq">$$m_t = \beta_1\, m_{t-1} + (1-\beta_1)\, g_t \qquad \beta_1 = 0.9$$</div>
+        <p>t는 몇 번째 걸음인지, g<sub>t</sub>는 이번 기울기예요. 식을 말로 읽으면 “지난번 m을 90% 남기고 이번 기울기를 10% 섞는다”예요. 매번 이렇게 섞으면 오래된 기울기일수록 비중이 0.9배씩 줄어서 조금씩 잊혀요. 이런 평균을 지수이동평균이라고 해요.</p>
+        <div class="wv" id="wv"></div>
+        <div class="ex">
+          <b>숫자로 따라가기</b>
+          <p>진짜 내려갈 방향은 +1인데 미니배치 때문에 기울기가 3, −1, 3, −1로 흔들린다고 해요. m은 0에서 시작해요.</p>
+        </div>
+        <div class="tw"><table>
+          <tr><th>t</th><th class="c">기울기 g</th><th class="c">m</th><th class="c">보정한 m̂</th><th>계산</th></tr>
+          <tr><td>1</td><td class="c">3</td><td class="c">0.300</td><td class="c">3.00</td><td>0.9 × 0 + 0.1 × 3</td></tr>
+          <tr><td>2</td><td class="c">−1</td><td class="c">0.170</td><td class="c">0.89</td><td>0.9 × 0.3 + 0.1 × (−1)</td></tr>
+          <tr><td>3</td><td class="c">3</td><td class="c">0.453</td><td class="c">1.67</td><td>0.9 × 0.17 + 0.1 × 3</td></tr>
+          <tr><td>4</td><td class="c">−1</td><td class="c">0.308</td><td class="c">0.89</td><td></td></tr>
+          <tr><td>⋮</td><td></td><td></td><td></td><td></td></tr>
+          <tr><td>19</td><td class="c">3</td><td class="c">0.984</td><td class="c">1.14</td><td></td></tr>
+          <tr class="hl"><td>20</td><td class="c">−1</td><td class="c">0.786</td><td class="c">0.89</td><td>기울기는 3과 −1을 오가도 m̂은 1 근처</td></tr>
+        </table></div>
+        <p>m 자체는 0에서 출발해서 천천히 차올라요. 그 모자란 만큼을 메운 값이 m̂(엠 햇)이고 07에서 자세히 봐요. m̂은 기울기가 3과 −1을 오가는데도 0.9와 1.1 사이에 모여요. 흔들림은 서로 지워지고 진짜 방향 +1이 남은 거예요.</p>
+        <p>이 생각은 예전 방법인 모멘텀에서 왔어요. 비탈을 구르는 공은 작은 돌부리에 부딪혀도 원래 구르던 쪽으로 계속 가요.</p>
+      </section>
+
+      <section id="e5">
+        <div class="no">05 v</div>
+        <h2>v는 <b>기울기 제곱의 평균</b>이에요</h2>
+        <p>v도 매개변수마다 하나씩 있어요. 이번엔 기울기를 제곱해서 평균을 내요. 논문은 2차 원점 모멘트 추정값(2nd raw moment estimate)이라고 불러요.</p>
+        <div class="eq">$$v_t = \beta_2\, v_{t-1} + (1-\beta_2)\, g_t^2 \qquad \beta_2 = 0.999$$</div>
+        <p>제곱하면 부호가 사라져요. 3² = 9이고 (−1)² = 1이에요. 그래서 v는 방향을 잊고 “이 매개변수의 기울기가 평소 얼마나 큰지”만 기억해요. 제곱해서 평균을 냈으니 √v를 하면 다시 기울기와 같은 단위가 돼요. √v가 기울기의 평소 크기예요.</p>
+        <p>β₂ = 0.999라서 이번 기울기를 0.1%만 섞어요. 위 그림에서 40번 전 기울기도 0.96의 무게로 남아 있고, 1000번 전 기울기도 0.37이 남아요. 크기는 오래 봐야 믿을 만한 값이 나와서 m보다 훨씬 길게 기억해요.</p>
+        <div class="tw"><table>
+          <tr><th>t</th><th class="c">기울기 g</th><th class="c">g²</th><th class="c">v</th><th class="c">보정한 v̂</th><th class="c">√v̂</th></tr>
+          <tr><td>1</td><td class="c">3</td><td class="c">9</td><td class="c">0.0090</td><td class="c">9.00</td><td class="c">3.00</td></tr>
+          <tr><td>2</td><td class="c">−1</td><td class="c">1</td><td class="c">0.0100</td><td class="c">5.00</td><td class="c">2.24</td></tr>
+          <tr><td>3</td><td class="c">3</td><td class="c">9</td><td class="c">0.0190</td><td class="c">6.33</td><td class="c">2.52</td></tr>
+          <tr><td>⋮</td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr class="hl"><td>20</td><td class="c">−1</td><td class="c">1</td><td class="c">0.0990</td><td class="c">5.00</td><td class="c">2.24</td></tr>
+        </table></div>
+        <p>9와 1의 평균은 5이고 √5 ≈ 2.24예요. 기울기가 평소 2.24 정도 크기로 출렁인다는 뜻이에요. v 자체는 0.1%씩만 차올라서 20번째에도 0.099로 아주 작아요. 이것도 07의 보정으로 메워요.</p>
+        <div class="tw"><table>
+          <tr><th></th><th>m</th><th>v</th></tr>
+          <tr><td><b>무엇의 평균</b></td><td>기울기 g</td><td>기울기 제곱 g²</td></tr>
+          <tr><td><b>알려 주는 것</b></td><td>방향 (+인지 −인지)</td><td>평소 크기</td></tr>
+          <tr><td><b>이번 기울기를 섞는 비율</b></td><td>10% (β₁ = 0.9)</td><td>0.1% (β₂ = 0.999)</td></tr>
+          <tr><td><b>주로 보는 길이</b></td><td>최근 10번쯤 (전체 무게의 65%)</td><td>최근 1000번쯤 (전체 무게의 63%)</td></tr>
+          <tr><td><b>3, −1 예에서</b></td><td>m̂ ≈ 1</td><td>v̂ ≈ 5, √v̂ ≈ 2.24</td></tr>
+          <tr><td><b>먼저 쓴 방법</b></td><td>모멘텀</td><td>AdaGrad, RMSProp</td></tr>
+        </table></div>
+      </section>
+
+      <section id="e6">
+        <div class="no">06 m ÷ √v</div>
+        <h2>둘을 나누면 <b>얼마나 확신하는지</b>가 나와요</h2>
+        <div class="eq">$$\theta_t = \theta_{t-1} - \alpha \cdot \frac{\hat m_t}{\sqrt{\hat v_t}+\epsilon}$$</div>
+        <p>Adam이 실제로 움직이는 양이에요. 위는 방향(m̂), 아래는 평소 크기(√v̂)라서 나눈 값은 “평소 크기에 비해 방향이 얼마나 한쪽으로 쏠렸나”를 재요. 논문 2.1절은 이 값을 신호 대 잡음비(SNR)라고 불러요. 신호는 진짜 방향, 잡음은 흔들림이에요. ε은 √v̂이 0일 때 0으로 나누지 않으려고 더한 아주 작은 수(10⁻⁸)예요.</p>
+        <div class="tw"><table>
+          <tr><th>최근 기울기</th><th class="c">m̂</th><th class="c">√v̂</th><th class="c">m̂ ÷ √v̂</th><th>움직임</th></tr>
+          <tr><td>2, 2, 2, …</td><td class="c">2</td><td class="c">2</td><td class="c"><b>1</b></td><td>α만큼</td></tr>
+          <tr><td>0.002, 0.002, …</td><td class="c">0.002</td><td class="c">0.002</td><td class="c"><b>1</b></td><td>똑같이 α만큼</td></tr>
+          <tr><td>3, −1, 3, −1, …</td><td class="c">≈ 1</td><td class="c">≈ 2.24</td><td class="c"><b>≈ 0.45</b></td><td>절반쯤</td></tr>
+          <tr><td>2, −2, 2, −2, …</td><td class="c">≈ 0.1</td><td class="c">2</td><td class="c"><b>≈ 0.05</b></td><td>거의 제자리</td></tr>
+        </table></div>
+        <div class="props">
+          <div><div><h3>기울기 크기에 흔들리지 않아요</h3><p>2짜리와 0.002짜리가 똑같이 α만큼 가요. 기울기에 c를 곱하면 m̂도 c배, √v̂도 c배가 되어 나눗셈에서 지워지거든요. 크기가 다른 기울기 문제가 여기서 풀려요.</p></div></div>
+          <div><div><h3>흔들리면 작게 걸어요</h3><p>방향이 오락가락하면 m̂이 0에 가까워지고 걸음도 작아져요. 최적점 근처에서는 기울기 방향이 흔들려서 저절로 천천히 가요. 논문은 이걸 자동 담금질(automatic annealing)이라고 불러요. lec4-1 14쪽 모의 담금질이 온도를 낮추며 점점 덜 돌아다니는 데서 따온 이름이에요.</p></div></div>
+          <div><div><h3>한 걸음이 대략 α를 넘지 않아요</h3><p>평균의 크기는 제곱 평균의 제곱근보다 클 수 없어서 비율이 보통 1 안쪽이에요. 그래서 α가 “한 번에 갈 수 있는 거리”라는 뜻을 가져요. 논문은 이 범위를 신뢰 영역(trust region)이라고 불러요. α 고르기가 쉬워지는 이유예요.</p></div></div>
+        </div>
+        <div class="ex">
+          <b>집값 예로 한 걸음</b>
+          <p>01의 집값 모델은 첫 기울기가 −16이었어요. SGD(α = 0.01)는 w를 0.16 옮겼어요. 기울기가 1600이었다면 16을 옮겨서 정답을 한참 지나쳤을 거예요.</p>
+          <p>Adam(α = 0.001)의 첫 걸음은 m = 0.1 × (−16) = −1.6, v = 0.001 × 256 = 0.256이에요. 보정하면 m̂ = −16, v̂ = 256, √v̂ = 16이라서 m̂ ÷ √v̂ = −1이에요. w는 1 + 0.001 = 1.001이 돼요. 기울기가 16이든 1600이든 첫 걸음은 α예요.</p>
+        </div>
+      </section>
+
+      <section id="e7">
+        <div class="no">07 편향 보정</div>
+        <h2>0에서 출발한 값을 <b>바로잡기</b></h2>
+        <p>m과 v는 0에서 시작해요(Algorithm 1의 m₀ ← 0, v₀ ← 0). 그래서 처음 몇 번은 실제보다 훨씬 작게 나와요. 기울기가 계속 2인데 첫 m은 0.1 × 2 = 0.2, 첫 v는 0.001 × 4 = 0.004예요. 논문은 이걸 “0 쪽으로 치우쳤다(biased towards zero)”고 해요. 편향은 한쪽으로 치우쳤다는 뜻이에요.</p>
+        <p>v가 m보다 훨씬 더 작게 잡혀서 문제가 돼요. m은 10%씩, v는 0.1%씩 차오르니까요. 그대로 나누면 0.2 ÷ √0.004 = 3.16, α의 세 배가 넘는 걸음이 나와요. 처음엔 기울기를 거의 모르는데 오히려 가장 크게 걷는 셈이에요.</p>
+        <div class="eq">$$\hat m_t=\frac{m_t}{1-\beta_1^{\,t}}\qquad \hat v_t=\frac{v_t}{1-\beta_2^{\,t}}$$</div>
+        <p>t = 1이면 1 − 0.9 = 0.1로 나눠서 m̂ = 0.2 ÷ 0.1 = 2, v̂ = 0.004 ÷ 0.001 = 4가 돼요. √4 = 2라서 비율이 정확히 1이에요. t가 커지면 0.9<sup>t</sup>와 0.999<sup>t</sup>가 0에 가까워져서 나누는 값이 1이 되고 보정은 저절로 사라져요.</p>
+        <div class="tw"><table>
+          <tr><th>t (기울기 계속 2)</th><th class="c">m</th><th class="c">v</th><th class="c">보정 없을 때 걸음</th><th class="c">1 − 0.9ᵗ</th><th class="c">1 − 0.999ᵗ</th><th class="c">보정한 걸음</th></tr>
+          <tr><td>1</td><td class="c">0.20</td><td class="c">0.0040</td><td class="c">3.16α</td><td class="c">0.100</td><td class="c">0.0010</td><td class="c">1α</td></tr>
+          <tr><td>2</td><td class="c">0.38</td><td class="c">0.0080</td><td class="c">4.25α</td><td class="c">0.190</td><td class="c">0.0020</td><td class="c">1α</td></tr>
+          <tr class="hl"><td>12</td><td class="c">1.44</td><td class="c">0.0477</td><td class="c">6.57α</td><td class="c">0.718</td><td class="c">0.0119</td><td class="c">1α</td></tr>
+          <tr><td>100</td><td class="c">2.00</td><td class="c">0.381</td><td class="c">3.24α</td><td class="c">1.000</td><td class="c">0.0952</td><td class="c">1α</td></tr>
+          <tr><td>1000</td><td class="c">2.00</td><td class="c">2.53</td><td class="c">1.26α</td><td class="c">1.000</td><td class="c">0.632</td><td class="c">1α</td></tr>
+          <tr><td>3000</td><td class="c">2.00</td><td class="c">3.80</td><td class="c">1.03α</td><td class="c">1.000</td><td class="c">0.950</td><td class="c">1α</td></tr>
+        </table></div>
+        <p>m은 30번쯤이면 거의 다 차지만 v는 수천 번이 걸려요. 보정이 없으면 학습 초반 수천 걸음 동안 α보다 크게 걷고 12번째에는 6.57배까지 커져요. 논문 6.4절(Figure 4)은 β₂가 1에 가까울수록 보정 없는 쪽이 학습 초반에 크게 튀는 걸 실험으로 보였어요. 논문은 편향 보정을 뺀 Adam을 모멘텀을 단 RMSProp으로 보기 때문에 이 실험은 Adam과 RMSProp의 비교이기도 해요.</p>
+      </section>
+
+      <section id="e8">
+        <div class="no">08 직접 넣어 보기</div>
+        <h2>기울기를 넣으면 <b>m, v, 걸음</b>이 나와요</h2>
+        <div class="calc">
+          <label for="gin">기울기를 차례대로 (쉼표로 띄워서, 40개까지)</label>
+          <input id="gin" inputmode="decimal" autocomplete="off" spellcheck="false" value="3, -1, 3, -1, 3, -1, 3, -1, 3, -1">
+          <div class="pick" id="gpre" role="group" aria-label="예시">
+            <button type="button" data-g="3,-1,3,-1,3,-1,3,-1,3,-1">진짜 방향 1에 잡음</button>
+            <button type="button" data-g="2,2,2,2,2,2,2,2,2,2,2,2">계속 2</button>
+            <button type="button" data-g="200,200,200,200,200,200">계속 200</button>
+            <button type="button" data-g="2,-2,2,-2,2,-2,2,-2,2,-2">번갈아</button>
+            <button type="button" data-g="0,0,0,0,5,0,0,0,0,5,0,0">가끔만 나옴</button>
+          </div>
+          <div class="legend"><span><i style="background:var(--blue)"></i>Adam 걸음</span><span><i style="background:var(--orange)"></i>보정 없을 때</span></div>
+          <div class="tw"><table id="gout"></table></div>
+        </div>
+        <p>“계속 2”와 “계속 200”의 걸음이 똑같아요. “가끔만 나옴”은 희소한 기울기예요. 0이 나오는 동안에도 m이 바로 0이 되지 않아서 같은 방향으로 조금씩 계속 가요. v는 5가 나왔던 걸 오래 기억해서 다음 5가 나와도 걸음이 α의 절반쯤으로 묶여요.</p>
+      </section>
+
+      <section id="e9">
+        <div class="no">09 이름과 결과</div>
+        <h2>Adam은 <b>모멘트 추정</b>에서 온 이름이에요</h2>
+        <p>Adam은 adaptive moment estimation의 줄임말이에요. 기울기의 모멘트(m, v)를 추정해서(estimation) 매개변수마다 걸음을 맞춘다(adaptive)는 뜻이에요. 사람 이름 아담과는 관계없어요.</p>
+        <p>논문은 로지스틱 회귀(MNIST, IMDB), 다층 신경망(MNIST), 합성곱 신경망(CIFAR-10), VAE 네 가지로 실험했어요. Adam은 모든 실험에서 다른 방법보다 빠르거나 비슷했어요(6절). 원문 그림과 설명은 <a href="?t=read#s7" data-read="s7">내용 정리 탭 07</a>에 있어요.</p>
+        <p>뒤에 고칠 점도 나왔어요. 4절의 수렴 증명에 오류가 있어서 2018년에 AMSGrad가 나왔고 2019년에는 가중치 감쇠를 따로 떼어 낸 AdamW가 나왔어요. 지금도 Adam과 AdamW가 딥러닝 학습의 기본값이에요(<a href="?t=read#s8" data-read="s8">내용 정리 탭 08</a>).</p>
+      </section>
+
+      <section id="e10">
+        <div class="no">10 용어 사전</div>
+        <h2>논문에 나오는 <b>용어</b></h2>
+        <dl class="gl">
+          <dt>최적화<small>optimization</small></dt><dd><p>어떤 값을 가장 작게(또는 크게) 만드는 입력을 찾는 일이에요.</p><span class="s">예: 손실을 가장 작게 하는 w 찾기</span></dd>
+          <dt>목적 함수, 손실<small>objective function, f(θ)</small></dt><dd><p>매개변수를 넣으면 얼마나 틀렸는지를 숫자 하나로 돌려주는 함수예요.</p><span class="s">예: (w × 2 − 6)²</span></dd>
+          <dt>매개변수<small>parameter, θ</small></dt><dd><p>학습으로 바뀌는 모델 안의 숫자예요. 가중치라고도 해요.</p><span class="s">예: 집값 모델의 w. 큰 언어 모델은 수십억 개</span></dd>
+          <dt>기울기<small>gradient, g</small></dt><dd><p>매개변수를 아주 조금 바꿀 때 손실이 어느 쪽으로 얼마나 바뀌는지예요. 매개변수마다 하나씩 있어서 묶으면 벡터예요.</p><span class="s">예: w = 1에서 −16</span></dd>
+          <dt>걸음 폭, 학습률<small>stepsize, learning rate, α</small></dt><dd><p>한 번에 움직이는 양을 정하는 수예요. Adam에서는 한 걸음의 대략적인 최대 크기예요.</p><span class="s">논문 기본값 0.001</span></dd>
+          <dt>확률적<small>stochastic</small></dt><dd><p>매번 무작위로 뽑은 일부 데이터로 계산해서 값이 조금씩 흔들리는 거예요.</p></dd>
+          <dt>미니배치<small>minibatch</small></dt><dd><p>한 걸음에 쓰는 데이터 묶음이에요.</p><span class="s">예: 6만 장 중 128장</span></dd>
+          <dt>SGD<small>stochastic gradient descent</small></dt><dd><p>미니배치로 구한 기울기로 하는 경사 하강법이에요. α 하나를 모든 매개변수가 같이 써요.</p></dd>
+          <dt>걸음, 반복<small>timestep, t</small></dt><dd><p>기울기를 구하고 매개변수를 한 번 고치는 한 바퀴예요. t = 1, 2, 3 …</p></dd>
+          <dt>epoch</dt><dd><p>데이터 전체를 한 번 다 보는 거예요.</p><span class="s">예: 6만 장을 128장씩 보면 약 469걸음이 1 epoch</span></dd>
+          <dt>1차 방법<small>first-order method</small></dt><dd><p>기울기(1차 미분)만 쓰는 최적화예요. 2차 방법은 곡률(2차 미분)까지 써요.</p></dd>
+          <dt>헤세 행렬<small>Hessian, H</small></dt><dd><p>기울기가 매개변수끼리 어떻게 바뀌는지 모은 n × n 표예요. Newton 방법이 써요.</p><span class="s">n = 100만이면 1조 칸</span></dd>
+          <dt>모멘트<small>moment</small></dt><dd><p>값들이 어떻게 퍼져 있는지 요약하는 수예요. 1차 모멘트 E[g]는 평균, 2차 원점 모멘트 E[g²]는 제곱의 평균이에요.</p></dd>
+          <dt>m<small>1st moment estimate</small></dt><dd><p>기울기의 지수이동평균이에요. 가야 할 방향을 기억해요.</p></dd>
+          <dt>v<small>2nd raw moment estimate</small></dt><dd><p>기울기 제곱의 지수이동평균이에요. 기울기의 평소 크기를 기억해요. 논문은 평균을 빼지 않은 분산(uncentered variance)이라고도 해요.</p></dd>
+          <dt>지수이동평균<small>exponential moving average</small></dt><dd><p>옛 평균을 β만큼 남기고 새 값을 1 − β만큼 섞는 평균이에요. 오래된 값일수록 무게가 β배씩 줄어요.</p></dd>
+          <dt>β₁, β₂<small>exponential decay rates</small></dt><dd><p>m과 v가 옛 값을 얼마나 남길지 정해요. 1에 가까울수록 오래 기억해요.</p><span class="s">기본값 0.9, 0.999</span></dd>
+          <dt>편향<small>bias</small></dt><dd><p>추정값이 한쪽으로 치우친 거예요. Adam에서는 0에서 시작해서 0 쪽으로 치우쳐요.</p></dd>
+          <dt>편향 보정<small>bias correction</small></dt><dd><p>m을 1 − β₁ᵗ로, v를 1 − β₂ᵗ로 나눠 처음 걸음들의 치우침을 바로잡는 거예요.</p></dd>
+          <dt>m̂, v̂<small>“엠 햇”, “브이 햇”</small></dt><dd><p>편향 보정을 마친 m과 v예요. 실제 걸음 계산에는 이 둘을 써요.</p></dd>
+          <dt>ε<small>epsilon</small></dt><dd><p>0으로 나누지 않으려고 분모에 더하는 아주 작은 수예요.</p><span class="s">기본값 10⁻⁸</span></dd>
+          <dt>원소별<small>element-wise</small></dt><dd><p>벡터의 칸마다 따로 계산한다는 뜻이에요. 그래서 매개변수마다 m, v, 걸음이 따로 있어요.</p></dd>
+          <dt>신호 대 잡음비<small>signal-to-noise ratio, SNR</small></dt><dd><p>m̂ ÷ √v̂이에요. 방향이 일정하면 1에, 오락가락하면 0에 가까워요.</p></dd>
+          <dt>신뢰 영역<small>trust region</small></dt><dd><p>지금 기울기를 믿고 가도 되는 범위예요. Adam에서는 대략 α예요.</p></dd>
+          <dt>자동 담금질<small>automatic annealing</small></dt><dd><p>최적점 근처에서 걸음이 저절로 작아지는 성질이에요.</p></dd>
+          <dt>희소한 기울기<small>sparse gradients</small></dt><dd><p>대부분 0이고 가끔만 값이 나오는 기울기예요.</p><span class="s">예: 단어 1만 개 중 그 리뷰에 나온 단어만 기울기가 생김</span></dd>
+          <dt>바뀌는 목적<small>non-stationary objective</small></dt><dd><p>학습하는 동안 손실의 모양이 바뀌는 문제예요.</p><span class="s">예: 강화학습에서 행동 방식이 바뀌면 모이는 데이터도 바뀜</span></dd>
+          <dt>대각 재조정에 불변<small>invariant to diagonal rescaling</small></dt><dd><p>매개변수마다 기울기에 서로 다른 수를 곱해도 걸음이 그대로라는 뜻이에요.</p></dd>
+          <dt>하이퍼파라미터<small>hyper-parameter</small></dt><dd><p>학습 전에 사람이 정하는 값이에요.</p><span class="s">Adam에서는 α, β₁, β₂, ε</span></dd>
+          <dt>수렴<small>convergence</small></dt><dd><p>더 고쳐도 매개변수가 거의 안 바뀌는 지점에 닿는 거예요. 논문 4절이 Adam의 수렴을 분석해요.</p></dd>
+          <dt>모멘텀<small>momentum</small></dt><dd><p>지난 걸음 방향을 관성처럼 이어 가는 방법이에요. Adam의 m과 같은 생각이에요.</p></dd>
+          <dt>AdaGrad<small>Duchi 외, 2011</small></dt><dd><p>지금까지 나온 기울기 제곱을 모두 더한 값의 제곱근으로 나눠요. 희소한 기울기에 강하지만 오래 학습하면 걸음이 계속 작아져요.</p></dd>
+          <dt>RMSProp<small>Tieleman, Hinton, 2012</small></dt><dd><p>기울기 제곱의 지수이동평균(Adam의 v)으로 나눠요. m과 편향 보정은 없어요.</p></dd>
+          <dt>dropout</dt><dd><p>학습할 때 뉴런 일부를 무작위로 꺼서 외워 버리는 걸 막는 방법이에요. 기울기를 흔드는 원인이기도 해요.</p></dd>
+        </dl>
+      </section>
+    </main>
+  </div>
+</div>
+
 <!-- ───────────── 내용 정리 ───────────── -->
-<div class="wrap" id="read">
+<div class="wrap" id="read" hidden>
   <header class="hero">
-    <div class="k">인공지능입문 · Paper Seminar</div>
+    <div class="k">인공지능입문 Paper Seminar</div>
     <h1><b>Adam</b></h1>
     <div class="meta">
       <strong>Adam: A Method for Stochastic Optimization</strong>
       Diederik P. Kingma, Jimmy Lei Ba<br>
-      <span>ICLR 2015 · <a href="https://arxiv.org/abs/1412.6980">arXiv 1412.6980</a></span>
+      <span>ICLR 2015, <a href="https://arxiv.org/abs/1412.6980">arXiv 1412.6980</a></span>
     </div>
   </header>
   <div class="core">
@@ -215,7 +481,7 @@ dd{margin:0;color:var(--sub)}
 
     <main>
       <section id="s1">
-        <div class="no">01 · 출발점</div>
+        <div class="no">01 출발점</div>
         <h2>수업에서 본 경사 하강법, <b>걸음 폭이 문제</b></h2>
         <p class="lead">lec4-1 25쪽(Gradient Descent and Newton-Raphson)에 나온 식이에요.</p>
         <div class="eq">$$x \leftarrow x-\alpha\,\nabla f(x)\qquad\qquad x \leftarrow x-H_f^{-1}\,\nabla f(x)$$</div>
@@ -228,10 +494,10 @@ dd{margin:0;color:var(--sub)}
       </section>
 
       <section id="s2">
-        <div class="no">02 · 관통하는 개념</div>
+        <div class="no">02 관통하는 개념</div>
         <h2>평균 ÷ 크기 = <b>얼마나 확신하는가</b></h2>
         <div class="three">
-          <div><div class="big">\(\hat m_t\)</div><b>방향 · 신호</b><small>최근 기울기의 평균<br>1차 모멘트</small></div>
+          <div><div class="big">\(\hat m_t\)</div><b>방향, 신호</b><small>최근 기울기의 평균<br>1차 모멘트</small></div>
           <div><div class="big">\(\sqrt{\hat v_t}\)</div><b>흔들림 크기</b><small>최근 기울기 제곱의 평균, 그 제곱근<br>2차 모멘트</small></div>
           <div class="r"><div class="big">\(\hat m_t/\sqrt{\hat v_t}\)</div><b>신호 대 잡음비 (SNR)</b><small>방향이 일정하면 1에 가깝고, 들쭉날쭉하면 0에 가까워요</small></div>
         </div>
@@ -241,7 +507,7 @@ dd{margin:0;color:var(--sub)}
       </section>
 
       <section id="s3">
-        <div class="no">03 · 알고리즘</div>
+        <div class="no">03 알고리즘</div>
         <h2>Algorithm 1, <b>다섯 줄</b></h2>
         <div class="tw"><table>
           <tr><th>#</th><th>식</th><th>뜻</th></tr>
@@ -256,7 +522,7 @@ dd{margin:0;color:var(--sub)}
       </section>
 
       <section id="s4">
-        <div class="no">04 · 숫자로 보기</div>
+        <div class="no">04 숫자로 보기</div>
         <h2>같은 α, <b>다른 걸음</b></h2>
         <div class="tw"><table>
           <tr><th>최근 기울기</th><th>m̂ (평균)</th><th>√v̂ (크기)</th><th>비율</th><th>결과</th></tr>
@@ -280,18 +546,18 @@ dd{margin:0;color:var(--sub)}
       </section>
 
       <section id="s5">
-        <div class="no">05 · 따라 나오는 성질</div>
+        <div class="no">05 따라 나오는 성질</div>
         <h2>비율 하나에서 <b>네 가지</b>가 나와요</h2>
         <div class="props">
           <div><div><h3>한 걸음은 대략 α를 넘지 않아요</h3><p>비율이 보통 ±1 안쪽이라 \(|\Delta_t|\lessapprox\alpha\)예요. 논문은 α를 “여기까지는 믿고 가도 되는 범위(trust region)”로 봐요. 그래서 α를 미리 정하기 쉬워요. <span class="src">2.1절</span></p></div></div>
           <div><div><h3>최적점 근처에서 저절로 느려져요</h3><p>최적점에 가까워지면 기울기 방향이 흔들려 비율이 0에 가까워져요. 논문은 이걸 “자동 담금질(automatic annealing)”이라고 불러요. <span class="src">2.1절</span></p></div></div>
           <div><div><h3>기울기 크기에 상관없어요</h3><p>\((c\,\hat m_t)/\sqrt{c^2\,\hat v_t}=\hat m_t/\sqrt{\hat v_t}\). 층마다 기울기 크기가 크게 달라도 같은 α로 돼요. <span class="src">2.1절</span></p></div></div>
-          <div><div><h3>편향 보정이 첫 걸음을 지켜요</h3><p>m과 v가 0에서 시작해서 처음엔 둘 다 작게 나와요. 기울기 2로 첫 걸음을 하면 \(m_1=0.2\), \(v_1=0.004\)라서 보정이 없으면 비율이 3.16이에요. 기울기가 계속 2면 12번째 걸음에서 α의 6.57배까지 커져요. 보정하면 처음부터 1이에요. <span class="src">3절 · 위 그래프 주황 선</span></p></div></div>
+          <div><div><h3>편향 보정이 첫 걸음을 지켜요</h3><p>m과 v가 0에서 시작해서 처음엔 둘 다 작게 나와요. 기울기 2로 첫 걸음을 하면 \(m_1=0.2\), \(v_1=0.004\)라서 보정이 없으면 비율이 3.16이에요. 기울기가 계속 2면 12번째 걸음에서 α의 6.57배까지 커져요. 보정하면 처음부터 1이에요. <span class="src">3절, 위 그래프 주황 선</span></p></div></div>
         </div>
       </section>
 
       <section id="s6">
-        <div class="no">06 · 이전 방법과의 관계</div>
+        <div class="no">06 이전 방법과의 관계</div>
         <h2>AdaGrad와 RMSProp의 <b>장점을 합쳤어요</b></h2>
         <div class="tw"><table>
           <tr><th>방법</th><th>방향 기억 (1차)</th><th>매개변수별 걸음 (2차)</th><th>편향 보정</th><th>논문이 말한 특징</th></tr>
@@ -302,46 +568,46 @@ dd{margin:0;color:var(--sub)}
           <tr class="hl"><td><b>Adam</b></td><td class="y">○</td><td class="y">○</td><td class="y">○</td><td>위 둘의 장점을 합침</td></tr>
         </table></div>
         <p><b>AdaGrad</b>는 Adam에서 β₁ = 0, β₂를 1에 아주 가깝게, α를 \(\alpha/\sqrt t\)로 줄여 가게 둔 특수한 경우예요. <span class="src">5절</span></p>
-        <p><b>RMSProp</b>에는 편향 보정이 없어요. β₂가 1에 가까우면 걸음이 아주 커져 발산하기도 해요. <span class="src">5절 · 6.4절</span></p>
+        <p><b>RMSProp</b>에는 편향 보정이 없어요. β₂가 1에 가까우면 걸음이 아주 커져 발산하기도 해요. <span class="src">5절, 6.4절</span></p>
       </section>
 
       <section id="s7">
-        <div class="no">07 · 실험</div>
+        <div class="no">07 실험</div>
         <h2>네 가지 실험, <b>원문 그림</b></h2>
         <div class="figs">
           <div class="fig w">
             <div class="img"><img src="img/fig1.webp" alt="로지스틱 회귀 학습 비용, 왼쪽 MNIST, 오른쪽 IMDB" width="1083" height="520"></div>
-            <div><h3>6.1 로지스틱 회귀 · MNIST, IMDB</h3><p>MNIST에선 Adam이 모멘텀 SGD만큼 빠르고 AdaGrad보다 빨라요(왼쪽). 단어 1만 개짜리 희소한 IMDB 리뷰에선 AdaGrad만큼 빨라요(오른쪽).</p><p class="src">Figure 1</p></div>
+            <div><h3>6.1 로지스틱 회귀 (MNIST, IMDB)</h3><p>MNIST에선 Adam이 모멘텀 SGD만큼 빠르고 AdaGrad보다 빨라요(왼쪽). 단어 1만 개짜리 희소한 IMDB 리뷰에선 AdaGrad만큼 빨라요(오른쪽).</p><p class="src">Figure 1</p></div>
           </div>
           <div class="fig w">
             <div class="img"><img src="img/fig2.webp" alt="MNIST 다층 신경망 학습 비용, (a) dropout 사용 (b) SFO와 비교" width="1083" height="550"></div>
-            <div><h3>6.2 다층 신경망 · MNIST</h3><p>은닉층 2개(1000개씩)예요. (a) dropout을 넣으면 자홍색 Adam이 AdaGrad, RMSProp, SGD+Nesterov, AdaDelta보다 낮게 내려가요. (b) 2차 정보를 쓰는 SFO와 비교하면 초록 Adam이 반복 수와 시간 모두 빨라요(SFO는 한 번 반복에 5~10배 느림).</p><p class="src">Figure 2</p></div>
+            <div><h3>6.2 다층 신경망 (MNIST)</h3><p>은닉층 2개(1000개씩)예요. (a) dropout을 넣으면 자홍색 Adam이 AdaGrad, RMSProp, SGD+Nesterov, AdaDelta보다 낮게 내려가요. (b) 2차 정보를 쓰는 SFO와 비교하면 초록 Adam이 반복 수와 시간 모두 빨라요(SFO는 한 번 반복에 5~10배 느림).</p><p class="src">Figure 2</p></div>
           </div>
           <div class="fig w">
             <div class="img"><img src="img/fig3.webp" alt="CIFAR-10 CNN 학습 비용, 왼쪽 처음 3 epoch, 오른쪽 45 epoch" width="1083" height="514"></div>
-            <div><h3>6.3 합성곱 신경망 · CIFAR-10</h3><p>처음엔 Adam과 AdaGrad가 빨리 내려가지만(왼쪽), 45 epoch에서는 Adam과 SGD가 AdaGrad보다 훨씬 낮아요(오른쪽). SGD보다 조금 나은 정도지만, 층마다 학습률을 사람이 고를 필요가 없어요.</p><p class="src">Figure 3</p></div>
+            <div><h3>6.3 합성곱 신경망 (CIFAR-10)</h3><p>처음엔 Adam과 AdaGrad가 빨리 내려가지만(왼쪽), 45 epoch에서는 Adam과 SGD가 AdaGrad보다 훨씬 낮아요(오른쪽). SGD보다 조금 나은 정도지만, 층마다 학습률을 사람이 고를 필요가 없어요.</p><p class="src">Figure 3</p></div>
           </div>
           <div class="fig w">
             <div class="img"><img src="img/fig4.webp" alt="VAE 학습 손실, 빨강 편향 보정 있음, 초록 없음, β 조합별" width="1083" height="423"></div>
-            <div><h3>6.4 편향 보정 · VAE</h3><p>칸마다 β₁, β₂ 조합이 다르고 가로축은 log₁₀ α예요. 빨강이 보정 있음, 초록이 없음이에요. β₂가 1에 가까우면 보정 없는 쪽이 특히 초반(10 epoch)에 튀어요. 하이퍼파라미터를 어떻게 잡아도 Adam이 RMSProp보다 같거나 나았어요.</p><p class="src">Figure 4</p></div>
+            <div><h3>6.4 편향 보정 (VAE)</h3><p>칸마다 β₁, β₂ 조합이 다르고 가로축은 log₁₀ α예요. 빨강이 보정 있음, 초록이 없음이에요. β₂가 1에 가까우면 보정 없는 쪽이 특히 초반(10 epoch)에 튀어요. 하이퍼파라미터를 어떻게 잡아도 Adam이 RMSProp보다 같거나 나았어요.</p><p class="src">Figure 4</p></div>
           </div>
         </div>
       </section>
 
       <section id="s8">
-        <div class="no">08 · 한계와 그 뒤</div>
+        <div class="no">08 한계와 그 뒤</div>
         <h2>지금도 <b>기본 최적화기</b></h2>
         <div class="tw"><table>
           <tr><th>무엇</th><th>내용</th><th>출처</th></tr>
           <tr><td><b>수렴 증명 오류</b></td><td>4절의 수렴 증명에 틀린 곳이 있었어요. Adam이 수렴하지 않는 간단한 예를 보이고, v̂의 최댓값을 유지하는 AMSGrad를 제안했어요.</td><td class="src">Reddi 외, ICLR 2018<br>On the Convergence of Adam and Beyond</td></tr>
-          <tr><td><b>가중치 감쇠</b></td><td>Adam에 L2 정규화를 넣으면 가중치 감쇠와 같아지지 않아요. 둘을 떼어 낸 AdamW가 나왔어요.</td><td class="src">Loshchilov·Hutter, ICLR 2019<br>Decoupled Weight Decay Regularization</td></tr>
+          <tr><td><b>가중치 감쇠</b></td><td>Adam에 L2 정규화를 넣으면 가중치 감쇠와 같아지지 않아요. 둘을 떼어 낸 AdamW가 나왔어요.</td><td class="src">Loshchilov, Hutter, ICLR 2019<br>Decoupled Weight Decay Regularization</td></tr>
           <tr><td><b>CNN에서의 한계</b></td><td>몇 epoch 뒤 v̂가 0에 가까워져 ε이 걸음을 좌우했어요. 이때는 2차 모멘트보다 1차 모멘트가 속도를 냈어요.</td><td class="src">이 논문 6.3절</td></tr>
           <tr><td><b>그 뒤의 쓰임</b></td><td>Transformer 원논문(Attention Is All You Need)도 Adam으로 학습했어요.</td><td class="src">Vaswani 외, NeurIPS 2017</td></tr>
         </table></div>
       </section>
 
       <section id="s9">
-        <div class="no">09 · 예상 질문</div>
+        <div class="no">09 예상 질문</div>
         <h2>질문이 오면 <b>이렇게</b></h2>
         <details><summary>SGD에서 학습률만 잘 고르면 되지 않나요?</summary><p>매개변수마다 기울기 크기가 다르면 α 하나로는 다 맞출 수 없어요. CNN은 층마다 기울기 차이가 커서 SGD로는 층별 학습률을 사람이 정하기도 해요(6.3절). Adam은 α가 “한 걸음의 상한”이라는 뜻이 있어서 고르기도 쉬워요.</p></details>
         <details><summary>왜 “신호 대 잡음비”라고 부르나요?</summary><p>\(|E[g]|/\sqrt{E[g^2]}\le 1\)이에요. 기울기가 늘 같은 방향이면 1, 방향이 무작위로 흔들리면 0에 가까워요. 방향에 대한 확신을 재는 값이라 그렇게 불러요(2.1절).</p></details>
@@ -352,7 +618,7 @@ dd{margin:0;color:var(--sub)}
       </section>
 
       <section id="s10">
-        <div class="no">10 · 용어</div>
+        <div class="no">10 용어</div>
         <h2>용어</h2>
         <dl>
           <dt>매개변수 θ</dt><dd>모델이 학습으로 바꾸는 숫자들(가중치)</dd>
@@ -373,7 +639,7 @@ dd{margin:0;color:var(--sub)}
 <div class="wrap" id="talk" hidden>
   <div class="talk-h">
     <h1>발표 <b>순서</b></h1>
-    <div class="dl"><p>12월 3일 · 15분 · 슬라이드 14장. 한 문장(관통하는 개념)을 처음과 끝에 두 번 말해요.</p><a class="ppt" href="Adam_PaperSeminar.pptx" download>PPT 받기</a></div>
+    <div class="dl"><p>12월 3일, 15분, 슬라이드 14장. 한 문장(관통하는 개념)을 처음과 끝에 두 번 말해요.</p><a class="ppt" href="Adam_PaperSeminar.pptx" download>PPT 받기</a></div>
   </div>
   <div class="time" id="time" aria-hidden="true"></div>
   <ol class="steps" id="steps"></ol>
@@ -390,38 +656,65 @@ const $ = id => document.getElementById(id);
 
 // 발표 순서: [시작(초), 끝(초), 슬라이드, 제목, 보여 줄 것, 할 말(PPT 메모와 같음), 내용 칸]
 const S = [
-  [0, 40, 1, "Adam: A Method for Stochastic Optimization", "논문 제목·저자, 관통하는 한 문장", "오늘 발표할 논문은 Adam이에요. 2015년 ICLR에 실린 논문이고, 지금도 딥러닝에서 가장 많이 쓰는 최적화 방법이에요. 결론부터 말하면, Adam은 기울기의 평균을 기울기의 크기로 나눈 만큼 움직이는 방법이에요. 이 한 문장이 어떻게 논문 전체를 설명하는지 보여 드릴게요.", "s2"],
-  [40, 120, 2, "수업에서 본 경사 하강법, 걸음 폭이 문제", "경사 하강법·Newton 식 카드 두 개, 논문의 질문", "수업 4-1에서 연속 공간의 경사 하강법을 배웠어요. 기울기 반대 방향으로 α만큼 움직이는데, 이 α 하나를 모든 매개변수가 같이 써요. 그런데 매개변수마다 기울기 크기가 다르고, 미니배치로 구한 기울기는 매번 흔들려요. Newton 방법은 헤세 행렬로 걸음을 맞추지만, 매개변수가 수백만 개면 그 행렬을 만들 수 없어요. 그래서 이 논문의 질문은, 기울기만 가지고 매개변수마다 걸음 폭을 맞출 수 없을까예요.", "s1"],
-  [120, 220, 3, "평균 ÷ 크기 = 얼마나 확신하는가", "큰 식 하나와 m̂ · √v̂ · 비율 세 줄", "이게 오늘의 핵심이에요. m̂은 최근 기울기의 평균, 곧 어느 방향으로 가야 하는지예요. √v̂는 기울기가 평소 얼마나 큰지예요. 이 둘을 나눈 값을 논문 2.1절에서 신호 대 잡음비라고 불러요. 방향이 확실할수록 1에 가깝고, 들쭉날쭉할수록 0에 가까워요. 여기에 α를 곱한 만큼 움직여요. 이름 Adam도 Adaptive Moment estimation, 모멘트를 추정해서 걸음을 맞춘다는 뜻이에요.", "s2"],
-  [220, 300, 4, "같은 α, 다른 걸음", "숫자 세 칸: 1 · 0.05 · 1", "숫자로 보면 쉬워요. 기울기가 계속 +2면 평균도 2, 크기도 2라서 비율은 1, α만큼 가요. +2와 -2를 오가면 평균이 거의 0이라 비율이 0.05, 거의 안 움직여요. 0.002처럼 아주 작은 기울기가 계속 나와도 평균과 크기가 같이 작아지니까 비율은 1이에요. 기울기 크기가 아니라, 방향이 얼마나 확실한지만큼 움직이는 거예요.", "s4"],
+  [0, 40, 1, "Adam: A Method for Stochastic Optimization", "논문 제목, 저자, 관통하는 한 문장", "오늘 발표할 논문은 Adam이에요. 2015년 ICLR에 실린 논문이고, 지금도 딥러닝에서 가장 많이 쓰는 최적화 방법이에요. 결론부터 말하면, Adam은 기울기의 평균을 기울기의 크기로 나눈 만큼 움직이는 방법이에요. 이 한 문장이 어떻게 논문 전체를 설명하는지 보여 드릴게요.", "s2"],
+  [40, 120, 2, "수업에서 본 경사 하강법, 걸음 폭이 문제", "경사 하강법, Newton 식 카드 두 개, 논문의 질문", "수업 4-1에서 연속 공간의 경사 하강법을 배웠어요. 기울기 반대 방향으로 α만큼 움직이는데, 이 α 하나를 모든 매개변수가 같이 써요. 그런데 매개변수마다 기울기 크기가 다르고, 미니배치로 구한 기울기는 매번 흔들려요. Newton 방법은 헤세 행렬로 걸음을 맞추지만, 매개변수가 수백만 개면 그 행렬을 만들 수 없어요. 그래서 이 논문의 질문은, 기울기만 가지고 매개변수마다 걸음 폭을 맞출 수 없을까예요.", "s1"],
+  [120, 220, 3, "평균 ÷ 크기 = 얼마나 확신하는가", "큰 식 하나와 m̂, √v̂, 비율 세 줄", "이게 오늘의 핵심이에요. m̂은 최근 기울기의 평균, 곧 어느 방향으로 가야 하는지예요. √v̂는 기울기가 평소 얼마나 큰지예요. 이 둘을 나눈 값을 논문 2.1절에서 신호 대 잡음비라고 불러요. 방향이 확실할수록 1에 가깝고, 들쭉날쭉할수록 0에 가까워요. 여기에 α를 곱한 만큼 움직여요. 이름 Adam도 Adaptive Moment estimation, 모멘트를 추정해서 걸음을 맞춘다는 뜻이에요.", "s2"],
+  [220, 300, 4, "같은 α, 다른 걸음", "숫자 세 칸: 1, 0.05, 1", "숫자로 보면 쉬워요. 기울기가 계속 +2면 평균도 2, 크기도 2라서 비율은 1, α만큼 가요. +2와 -2를 오가면 평균이 거의 0이라 비율이 0.05, 거의 안 움직여요. 0.002처럼 아주 작은 기울기가 계속 나와도 평균과 크기가 같이 작아지니까 비율은 1이에요. 기울기 크기가 아니라, 방향이 얼마나 확실한지만큼 움직이는 거예요.", "s4"],
   [300, 380, 5, "Algorithm 1, 매 걸음 다섯 줄", "논문 Algorithm 1 원문 + 다섯 줄 풀이", "논문의 Algorithm 1이에요. 반복문 안에서 하는 일은 다섯 줄이에요. 기울기를 구하고, 기울기의 평균 m과 기울기 제곱의 평균 v를 지수이동평균으로 갱신해요. m과 v가 0에서 시작해서 처음엔 작게 나오니까 1 빼기 베타의 t제곱으로 나눠 바로잡고, 마지막에 비율만큼 움직여요. 논문이 제시한 기본값은 α 0.001, β1 0.9, β2 0.999예요. 모든 계산이 원소별이라 매개변수마다 자기 걸음 폭을 가져요.", "s3"],
   [380, 450, 6, "비율 하나에서 나오는 세 가지", "성질 세 칸", "이 비율 하나에서 세 가지 성질이 나와요. 첫째, 비율이 보통 1 안쪽이라 한 걸음은 대략 α를 넘지 않아요. 그래서 α를 고르기 쉬워요. 둘째, 최적점에 가까워지면 기울기 방향이 흔들려서 비율이 작아지고 저절로 천천히 가요. 셋째, 기울기 전체에 c를 곱해도 위아래가 같이 c배가 돼서 비율이 그대로예요. 층마다 기울기 크기가 크게 달라도 같은 α로 학습할 수 있어요.", "s5"],
-  [450, 510, 7, "보정이 없으면 처음 걸음이 α의 6배 넘게 커져요", "보정 있음/없음 그래프, 3.16α · 6.57α", "4번째 줄 편향 보정이 왜 필요한지 계산해 봤어요. m과 v가 0에서 시작하니까 첫 걸음에서 m은 0.2, v는 0.004예요. 그대로 나누면 비율이 3.16, α의 세 배가 넘어요. 기울기가 계속 2라면 12번째 걸음에서 6.57배까지 커져요. v가 m보다 훨씬 천천히 차기 때문이에요. 1 빼기 베타의 t제곱으로 나눠 보정하면 처음부터 정확히 1이에요. 이 효과는 뒤의 실험 4에서 논문도 직접 확인해요.", "s5"],
+  [450, 510, 7, "보정이 없으면 처음 걸음이 α의 6배 넘게 커져요", "보정 있음/없음 그래프, 3.16α, 6.57α", "4번째 줄 편향 보정이 왜 필요한지 계산해 봤어요. m과 v가 0에서 시작하니까 첫 걸음에서 m은 0.2, v는 0.004예요. 그대로 나누면 비율이 3.16, α의 세 배가 넘어요. 기울기가 계속 2라면 12번째 걸음에서 6.57배까지 커져요. v가 m보다 훨씬 천천히 차기 때문이에요. 1 빼기 베타의 t제곱으로 나눠 보정하면 처음부터 정확히 1이에요. 이 효과는 뒤의 실험 4에서 논문도 직접 확인해요.", "s5"],
   [510, 570, 8, "AdaGrad와 RMSProp의 장점을 합쳤어요", "SGD부터 Adam까지 비교 표", "Adam 전에 나온 방법들과 비교해 보면, 모멘텀은 방향을 기억하고, AdaGrad와 RMSProp은 매개변수마다 걸음을 다르게 해요. AdaGrad는 희소한 기울기에 강하고, RMSProp은 목표가 계속 바뀌는 문제에 강해요. Adam은 이 둘의 장점을 합치고 편향 보정을 더했어요. 논문 5절에 따르면 AdaGrad는 Adam의 특수한 경우이고, RMSProp은 편향 보정이 없어서 β2가 1에 가까우면 걸음이 너무 커져 발산하기도 해요.", "s6"],
-  [570, 620, 9, "단순한 모델에서도 가장 빠른 쪽", "Figure 1: MNIST · IMDB 로지스틱 회귀", "첫 번째 실험은 가장 단순한 로지스틱 회귀예요. x축은 데이터 전체를 몇 번 돌았는지, y축은 학습 비용이고 낮을수록 좋아요. 왼쪽 MNIST에서 빨간 선 Adam은 모멘텀 SGD만큼 빠르고 파란 AdaGrad보다 훨씬 빨라요. 오른쪽 IMDB는 단어 1만 개짜리 희소한 데이터인데, 하늘색 Adam이 희소한 데 강한 AdaGrad만큼 빨라요.", "s7"],
+  [570, 620, 9, "단순한 모델에서도 가장 빠른 쪽", "Figure 1: MNIST, IMDB 로지스틱 회귀", "첫 번째 실험은 가장 단순한 로지스틱 회귀예요. x축은 데이터 전체를 몇 번 돌았는지, y축은 학습 비용이고 낮을수록 좋아요. 왼쪽 MNIST에서 빨간 선 Adam은 모멘텀 SGD만큼 빠르고 파란 AdaGrad보다 훨씬 빨라요. 오른쪽 IMDB는 단어 1만 개짜리 희소한 데이터인데, 하늘색 Adam이 희소한 데 강한 AdaGrad만큼 빨라요.", "s7"],
   [620, 670, 10, "다층 신경망에서 다른 방법보다 빨리 내려가요", "Figure 2: 다층 신경망 (a) dropout (b) SFO", "두 번째는 은닉층이 두 개인 신경망이에요. 왼쪽 (a)는 dropout을 넣은 학습인데, 자홍색 Adam이 다른 네 방법보다 확실히 낮게 내려가요. 오른쪽 (b)는 곡률 정보를 쓰는 SFO라는 방법과 비교한 건데, 초록 Adam이 반복 횟수로도, 실제 걸린 시간으로도 더 빨라요. SFO는 한 번 반복에 5~10배 더 걸리고 메모리도 많이 써요.", "s7"],
   [670, 720, 11, "CNN에서도 SGD와 함께 가장 낮아요", "Figure 3: CIFAR-10 CNN", "세 번째는 CIFAR-10 이미지 분류용 CNN이에요. 왼쪽 처음 3 epoch에서는 Adam과 AdaGrad가 빨리 내려가요. 오른쪽 45 epoch까지 보면 자홍색 Adam과 빨간 SGD가 AdaGrad보다 훨씬 낮아져요. 논문은 여기서 SGD보다 조금 나은 정도라고 솔직하게 말해요. 대신 SGD는 층마다 학습률을 사람이 골라야 하는데, Adam은 알아서 맞춰 준다는 게 장점이에요.", "s7"],
   [720, 770, 12, "β₂가 1에 가까울수록 보정이 꼭 필요해요", "Figure 4: 편향 보정 VAE", "마지막 실험은 앞에서 계산해 본 편향 보정을 실제로 확인한 거예요. 칸마다 β1, β2 조합이 다르고, 가로축은 α, 세로축은 손실이에요. 빨강이 보정 있음, 초록이 보정 없음이에요. β2가 0.9999처럼 1에 가까울수록 초록 선이 위로 튀어요. 특히 학습 초반인 10 epoch에서 심해요. 편향 보정을 뺀 게 사실상 RMSProp인데, Adam은 어떤 설정에서도 그보다 같거나 나았어요.", "s7"],
-  [770, 840, 13, "증명엔 오류가 있었지만, 지금도 기본 최적화기", "AMSGrad · AdamW · Transformer 세 칸", "한계도 있어요. 4절의 수렴 증명에는 오류가 있어서, 2018년에 Adam이 수렴하지 않는 예와 함께 AMSGrad라는 수정판이 나왔어요. 2019년에는 Adam에서 가중치 감쇠를 제대로 하도록 고친 AdamW가 나왔어요. 그래도 Transformer 원논문도 Adam으로 학습했고, 지금도 Adam과 AdamW가 가장 흔한 기본값이에요.", "s8"],
+  [770, 840, 13, "증명엔 오류가 있었지만, 지금도 기본 최적화기", "AMSGrad, AdamW, Transformer 세 칸", "한계도 있어요. 4절의 수렴 증명에는 오류가 있어서, 2018년에 Adam이 수렴하지 않는 예와 함께 AMSGrad라는 수정판이 나왔어요. 2019년에는 Adam에서 가중치 감쇠를 제대로 하도록 고친 AdamW가 나왔어요. 그래도 Transformer 원논문도 Adam으로 학습했고, 지금도 Adam과 AdamW가 가장 흔한 기본값이에요.", "s8"],
   [840, 900, 14, "평균을 크기로 나눈 만큼 움직인다", "정리 한 문장, 질문 받기", "정리하면, Adam은 기울기의 평균을 기울기의 크기로 나눈 만큼 움직여요. 방향이 확실하면 크게, 불확실하면 작게, 그리고 매개변수마다 따로요. 여기에 0에서 시작한 값을 바로잡는 편향 보정을 더한 게 전부예요. 감사합니다. 질문 받을게요.", "s2"],
 ];
 const mm = x => `${Math.floor(x / 60)}:${String(x % 60).padStart(2, "0")}`;
 $("time").innerHTML = S.map(s => `<span style="flex:${s[1] - s[0]}"></span>`).join("");
 $("steps").innerHTML = S.map(([a, b, n, h, show, say, sec]) => `<li>
-  <div class="t">${mm(a)}–${mm(b)}<small>슬라이드 ${n} · ${b - a}초</small></div>
-  <div><h3>${h}</h3><p class="show"><b>보여 줄 것</b> · ${show}</p><p class="say">${say}</p><a class="go" href="#${sec}" data-go="${sec}">내용 보기 →</a></div>
+  <div class="t">${mm(a)}–${mm(b)}<small>슬라이드 ${n}, ${b - a}초</small></div>
+  <div><h3>${h}</h3><p class="show"><b>보여 줄 것</b> ${show}</p><p class="say">${say}</p><a class="go" href="#${sec}" data-go="${sec}">내용 보기</a></div>
 </li>`).join("");
 
 // 탭
 function tab(t, keep) {
   for (const b of document.querySelectorAll(".tabs button")) b.setAttribute("aria-pressed", b.dataset.t === t);
-  $("read").hidden = t !== "read"; $("talk").hidden = t !== "talk";
+  for (const id of ["easy", "read", "talk"]) $(id).hidden = t !== id;
   if (t === "read" && typeof draw === "function" && $("plot").clientWidth !== W) draw(P);
-  if (!keep) { history.replaceState(null, "", t === "talk" ? "?t=talk" : location.pathname); scrollTo(0, 0); }
+  if (!keep) { history.replaceState(null, "", t === "easy" ? location.pathname : "?t=" + t); scrollTo(0, 0); }
 }
 document.querySelector(".tabs").onclick = e => { const b = e.target.closest("button"); if (b) tab(b.dataset.t); };
-$("steps").onclick = e => { const a = e.target.closest("[data-go]"); if (!a) return; e.preventDefault(); tab("read", 1); history.replaceState(null, "", location.pathname); $(a.dataset.go).scrollIntoView(); };
-if (new URLSearchParams(location.search).get("t") === "talk") tab("talk", 1);
+const toRead = id => { tab("read", 1); history.replaceState(null, "", "?t=read"); $(id).scrollIntoView(); };
+$("steps").onclick = e => { const a = e.target.closest("[data-go]"); if (!a) return; e.preventDefault(); toRead(a.dataset.go); };
+$("easy").addEventListener("click", e => { const a = e.target.closest("[data-read]"); if (!a) return; e.preventDefault(); toRead(a.dataset.read); });
+
+// 지수이동평균 무게: 이번 기울기를 1로 놓고 k번 전 기울기의 무게
+{
+  const K = 41, w = 410, h = 56, bw = w / K;
+  const bars = b => Array.from({ length: K }, (_, k) => { const y = b ** k; return `<rect x="${(k * bw + 1).toFixed(1)}" y="${(h - y * h).toFixed(1)}" width="${(bw - 2).toFixed(1)}" height="${(y * h).toFixed(1)}" rx="1.5" fill="var(--${b < .99 ? "blue" : "mute"})"/>`; }).join("");
+  $("wv").innerHTML = `<div class="row"><span>m (β₁ = 0.9)</span><svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-label="m의 무게, 40번 전이면 이번의 1.5%">${bars(.9)}</svg></div>
+    <div class="row"><span>v (β₂ = 0.999)</span><svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-label="v의 무게, 40번 전도 이번의 96%">${bars(.999)}</svg></div>
+    <small>막대 하나가 기울기 하나예요. 맨 왼쪽이 이번 기울기, 오른쪽으로 갈수록 오래된 기울기(40번 전까지)이고, 이번 기울기의 무게를 1로 놓고 그렸어요. m에서 10번 전 기울기의 무게는 0.35, 40번 전은 0.015예요. v에서는 40번 전도 0.96이에요.</small>`;
+}
+
+// 직접 넣어 보기
+function calc() {
+  const gs = $("gin").value.split(/[,\s]+/).filter(Boolean).map(Number).filter(isFinite).slice(0, 40);
+  const B1 = .9, B2 = .999, E = 1e-8, f = (x, d) => Math.abs(x) >= 1e4 ? x.toExponential(2) : x.toFixed(d);
+  let m = 0, v = 0, rows = "";
+  gs.forEach((g, i) => {
+    const t = i + 1; m = B1 * m + (1 - B1) * g; v = B2 * v + (1 - B2) * g * g;
+    const mh = m / (1 - B1 ** t), vh = v / (1 - B2 ** t), s = mh / (Math.sqrt(vh) + E), r = m / (Math.sqrt(v) + E);
+    rows += `<tr><td>${t}</td><td class="c">${g}</td><td class="c">${f(m, 3)}</td><td class="c">${f(v, 4)}</td><td class="c">${f(mh, 3)}</td><td class="c">${f(Math.sqrt(vh), 3)}</td><td class="c"><b>${s.toFixed(2)}α</b></td><td class="c">${r.toFixed(2)}α</td><td class="b"><div class="sb" style="width:${Math.min(100, Math.abs(s) / 7 * 100)}%"></div><div class="sb o" style="width:${Math.min(100, Math.abs(r) / 7 * 100)}%"></div></td></tr>`;
+  });
+  $("gout").innerHTML = `<tr><th>t</th><th class="c">g</th><th class="c">m</th><th class="c">v</th><th class="c">m̂</th><th class="c">√v̂</th><th class="c">걸음</th><th class="c">보정 없으면</th><th></th></tr>` + (rows || `<tr><td colspan="9">숫자를 넣어 주세요</td></tr>`);
+  for (const b of $("gpre").children) b.setAttribute("aria-pressed", b.dataset.g === gs.join(","));
+}
+$("gin").addEventListener("input", calc);
+$("gpre").onclick = e => { const b = e.target.closest("button"); if (!b) return; $("gin").value = b.dataset.g.split(",").join(", "); calc(); };
+calc();
 
 // 목차 현재 위치
 const links = [...document.querySelectorAll(".toc a")];
@@ -468,7 +761,7 @@ function draw(p) {
   </svg>`);
   const f = x => x.toFixed(2) + "α";
   const pk = cur[1].reduce((a, y, i) => y > cur[1][a] ? i : a, 0);
-  $("stat").innerHTML = `<div><b>${f(cur[0][N - 1])}</b>100번째 걸음 · Adam</div><div><b>${f(cur[1][N - 1])}</b>100번째 걸음 · 보정 없음</div><div><b>${f(cur[1][pk])}</b>보정 없음 최대 (${pk + 1}번째)</div>`;
+  $("stat").innerHTML = `<div><b>${f(cur[0][N - 1])}</b>100번째 걸음, Adam</div><div><b>${f(cur[1][N - 1])}</b>100번째 걸음, 보정 없음</div><div><b>${f(cur[1][pk])}</b>보정 없음 최대 (${pk + 1}번째)</div>`;
   const svg = $("plot").querySelector("svg"), tip = $("tip");
   const move = e => {
     const r = svg.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * W;
@@ -486,6 +779,7 @@ function draw(p) {
 $("pick").onclick = e => { const b = e.target.closest("button"); if (!b) return; for (const x of $("pick").children) x.setAttribute("aria-pressed", x === b); draw(+b.dataset.p); };
 draw(0);
 let rw = 0; addEventListener("resize", () => { cancelAnimationFrame(rw); rw = requestAnimationFrame(() => draw(P)); });
+{ const t = new URLSearchParams(location.search).get("t"); if (t === "read" || t === "talk") tab(t, 1); }
 </script>
 <script src="../hub/back.js" data-cat="study" defer></script>
 </body>
