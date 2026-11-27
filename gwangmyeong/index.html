@@ -199,7 +199,7 @@ function render() {
             <span>${s.walk}${s.note ? `. ${s.note}` : ""}</span>
           </div>
           ${s.tip ? `<p class="tip">${s.tip}</p>` : ""}
-          <div class="links"><a href="${s.kakao}" target="_blank" rel="noopener">카카오맵</a>${s.insta ? `<a href="https://www.instagram.com/${s.insta}" target="_blank" rel="noopener">인스타</a>` : ""}</div>
+          <div class="links"><a href="https://map.naver.com/p/search/${encodeURIComponent("광명 " + s.name)}" target="_blank" rel="noopener">네이버 지도</a><a href="${s.kakao}" target="_blank" rel="noopener">카카오맵</a>${s.insta ? `<a href="https://www.instagram.com/${s.insta}" target="_blank" rel="noopener">인스타</a>` : ""}</div>
         </div>
       </article>`;
     })()).join("")}
