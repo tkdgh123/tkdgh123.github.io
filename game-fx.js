@@ -1,4 +1,4 @@
-// 게임 손맛: 소리(파일 없이 Web Audio로 만듦) + 판 흔들기·튕기기. 음소거는 게임끼리 같이 씀
+// 게임 손맛: 소리(Web Audio로 만든 소리, 또는 load로 받은 녹음 파일) + 판 흔들기·튕기기. 음소거는 게임끼리 같이 씀
 const FX = (() => {
   let AC, OUT, NZ, muted = false;
   try { muted = localStorage.getItem("game-mute") === "1" } catch {}
@@ -32,6 +32,18 @@ const FX = (() => {
     g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(.0005, t + d);
     s.connect(fl).connect(g).connect(OUT); s.start(t, Math.random() * .5); s.stop(t + d + .03);
   }
+  // 녹음 파일: load({이름: 주소})로 받아 두고 play(이름). 같은 소리가 기계처럼 반복되지 않게 빠르기를 조금씩 흔든다
+  const BUF = {};
+  function load(map) {
+    if (!au()) return;
+    for (const k in map) fetch(map[k]).then(r => r.arrayBuffer()).then(b => AC.decodeAudioData(b)).then(d => BUF[k] = d).catch(() => {});
+  }
+  function play(k, { vol = 1, at = 0, rate = 1 } = {}) {
+    if (muted || !au() || !BUF[k]) return;
+    const s = AC.createBufferSource(), g = AC.createGain();
+    s.buffer = BUF[k]; s.playbackRate.value = rate * (.95 + Math.random() * .1); g.gain.value = vol;
+    s.connect(g).connect(OUT); s.start(AC.currentTime + at);
+  }
   // 오음 음계 i번째 음 (도 레 미 솔 라, 한 바퀴마다 한 옥타브 위)
   const PENT = [0, 2, 4, 7, 9];
   const pent = (i, base = 523.25) => base * 2 ** (PENT[((i % 5) + 5) % 5] / 12 + Math.floor(i / 5));
@@ -56,24 +68,24 @@ const FX = (() => {
     }, 50);
   }
   // 결과 점수가 0부터 굴러 올라감(올라가는 동안 작은 소리)
-  function count(el, to, ms = 700) {
+  function count(el, to, ms = 700, tick = true) {
     const t0 = performance.now(); let last = -1;
     (function f(now) {
       const k = Math.min(1, (now - t0) / ms), v = Math.round(to * (1 - (1 - k) ** 3)), q = k * 12 | 0;
       el.textContent = v;
-      if (q !== last && k < 1) { last = q; tone(900 + q * 60, { d: .03, type: "triangle", vol: .04 }) }
+      if (tick && q !== last && k < 1) { last = q; tone(900 + q * 60, { d: .03, type: "triangle", vol: .04 }) }
       if (k < 1) requestAnimationFrame(f);
     })(t0);
   }
 
   const ON = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
   const OFF = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="m16 9 6 6M22 9l-6 6"/></svg>';
-  function button(el) {
+  function button(el, beep = () => tone(880, { d: .1, vol: .12, type: "triangle" })) {
     const show = () => { el.innerHTML = muted ? OFF : ON; el.setAttribute("aria-label", muted ? "소리 켜기" : "소리 끄기") };
     el.onclick = () => {
       muted = !muted;
       try { localStorage.setItem("game-mute", muted ? "1" : "0") } catch {}
-      if (!muted) tone(880, { d: .1, vol: .12, type: "triangle" });
+      if (!muted) beep();
       show();
     };
     show();
@@ -137,7 +149,7 @@ const FX = (() => {
   }
   requestAnimationFrame(frame);
   return {
-    tone, noise, pent, button, burst, home, music, count,
+    tone, noise, pent, load, play, button, burst, home, music, count,
     board: e => { el = e },
     shake: a => { trauma = Math.min(1, trauma + a) },
     punch: p => { punch += p },
