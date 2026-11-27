@@ -33,8 +33,6 @@ body { margin: 0; background: var(--bg); color: var(--ink); font: 500 16px/1.4 "
 /* ×2·×3은 곱해지는 점수 바로 왼쪽에 (×1일 땐 안 보임) */
 .sc { display: flex; align-items: baseline; justify-content: flex-end; gap: 8px }
 .score b { display: block; font: 700 44px/1 Hahmlet, serif; font-variant-numeric: tabular-nums; letter-spacing: -.02em }
-.score span { font-size: 13px; color: var(--muted) }
-.score span.hot { color: var(--red); font-weight: 700 }
 .timer { display: flex; align-items: center; gap: 12px }
 .timer .time { flex: 1 }
 .sec { min-width: 3.4em; text-align: right; font: 700 20px/1 Hahmlet, serif; font-variant-numeric: tabular-nums; transition: color .3s }
@@ -63,11 +61,12 @@ body[data-s="3"] { background: var(--s3) }
 .cbar[data-c="4"] s { background: var(--red) }
 .cbar.late s { animation: beat .25s infinite alternate }
 /* 막대 이름표: 막대 바로 위(판 밖)에 글자로 — 색만으로 뜻을 전하지 않게. 판을 가리지 않고 손가락 길과도 안 겹침 */
-.cblab { position: absolute; left: calc(-1 * var(--cbw)); bottom: calc(100% + 3px); font: 700 13px/1 Pretendard, system-ui, sans-serif; color: var(--label); white-space: nowrap; pointer-events: none; visibility: hidden }
+.cblab { position: absolute; left: calc(-1 * var(--cbw)); bottom: calc(100% + 12px); display: flex; align-items: center; gap: 10px; font: 700 15px/1 Pretendard, system-ui, sans-serif; color: var(--label); white-space: nowrap; pointer-events: none; visibility: hidden }
 .cblab.on { visibility: visible }
-.cblab.go { color: var(--ink) }
-.cblab small { font: inherit; color: #f08a24 }
-.cblab[data-c="4"] small { color: var(--red) }
+.cblab.go { font: 700 30px/1 Hahmlet, serif; color: var(--ink) }
+.cblab.go.pop { animation: pop .3s }
+.cblab small { font: 800 18px/1 Pretendard, system-ui, sans-serif; color: #fff; background: #f08a24; padding: 6px 10px; border-radius: 6px }
+.cblab[data-c="4"] small { background: var(--red) }
 /* 설명의 콤보 단계: 막대와 이름표를 깜빡여 눈이 가게 */
 .cbar.hl { animation: hl .8s infinite alternate }
 @keyframes hl { to { box-shadow: 0 0 0 4px rgb(240 138 36 / .45) } }
@@ -168,7 +167,7 @@ canvas { display: block; background: var(--paper); border-radius: 20px; box-shad
     
     <button class="snd" id="snd"></button>
     <button class="snd" id="again" aria-label="다시 하기" title="다시 하기" hidden><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></button>
-    <div class="score"><div class="sc"><i class="mult" id="mult" hidden></i><b id="score">0</b></div><span id="best">최고 0</span></div>
+    <div class="score"><div class="sc"><i class="mult" id="mult" hidden></i><b id="score">0</b></div></div>
   </header>
   <div class="timer"><div class="time" id="time"><i id="bar"></i></div><b class="sec" id="sec">120초</b></div>
   <div class="stage" id="stage"><div class="board">
@@ -250,7 +249,7 @@ function axisEnds(ax) {
 
 // 접기: 쉬움은 선 한쪽 전체, 보통은 짝이 있는 칸까지만 띠로 넘어가 덮고(T_HIT, 철썩) 잠깐 눌러 뒷면 물감이 짝과 겹쳐 보인 뒤(HOLD) 터지며 펼쳐진다(T_END). 점수·판 계산은 바로
 const T_HIT = 220, HOLD = 130, T_END = 600;
-let fl = null, passed = false, seen = false;
+let fl = null, seen = false;
 // 콤보: 한 쌍이라도 접은 뒤(접는 동작이 끝난 때부터) 정해진 시간 안에 또 접으면 이어진다(색·쌍 수 상관없음).
 // 시간은 2초에서 2분 끝 1.2초까지 줄고, 콤보 2부터 그 접기 점수 ×1.5, ×2 … 최대 ×3. 헛접기·시간 넘김이면 끊김
 let combo = 0, cdl = -1, cw = 1;
@@ -297,12 +296,6 @@ function impact(now) {
   }
   lastAx = f.ax; lastSeg = f.seg; lastT = now;
   if (!seen) { seen = true; try { localStorage.setItem("decal-seen", 1) } catch {} }
-  if (playing && !passed && best > 0 && score > best) {
-    passed = true; $("best").textContent = "새 최고 기록"; $("best").classList.add("hot");
-    const b = $("best").getBoundingClientRect();
-    FX.burst(b.left + b.width / 2, b.top + b.height / 2, "#d8443c", { n: 16, v: 300, up: 60, size: 5, shape: "k", life: 900, g: 200 });
-    [4, 5, 7, 9].forEach((k, j) => FX.tone(FX.pent(k), { d: .25, type: "triangle", vol: .12, at: .25 + j * .08 }));
-  }
   const n = f.ps.length, r = cv.getBoundingClientRect(), scr = (x, y) => [r.left + px(x), r.top + px(y)];
   let cx = 0, cy = 0;
   f.ps.forEach(([x, y, mx, my, c], i) => {
@@ -536,7 +529,8 @@ function paintCombo() {
   const key = on ? combo : 0;
   if (lab.dataset.k !== String(key)) {
     lab.dataset.k = key; lab.classList.toggle("go", on);
-    lab.innerHTML = on ? `콤보 ${combo} <small>· 다음 ×${cbMul(combo + 1)}</small>` : "콤보";
+    lab.innerHTML = on ? `콤보 ${combo} <small>다음 ×${cbMul(combo + 1)}</small>` : "콤보";
+    if (on) FX.pop(lab);
   }
 }
 function loop(now) {
@@ -597,7 +591,7 @@ cv.addEventListener("pointercancel", () => { drag = null; axis = null });
 
 // 쉬움: 선이 판 끝까지 접힘 · 보통: 그은 만큼만 접힘. 최고 점수는 모드마다
 const NAME = { easy: "쉬움", normal: "보통" }, KEY = { easy: "decal-best", normal: "decal-best-normal" };
-const loadBest = () => { best = 0; try { best = +localStorage.getItem(KEY[mode]) || 0 } catch {} $("best").textContent = NAME[mode] + " 최고 " + best; $("best").classList.remove("hot") };
+const loadBest = () => { best = 0; try { best = +localStorage.getItem(KEY[mode]) || 0 } catch {} };
 const modes = () => `<div class="modes">${["easy", "normal"].map(m => `<button data-m="${m}" class="${m === mode ? "on" : ""}">${NAME[m]}</button>`).join("")}</div>`;
 const RKLINE = '<div class="rk-line"><span class="rk-line" id="ov-rk"></span><button class="rk-link" data-tut>설명</button></div>';
 const bind = () => {
@@ -687,7 +681,7 @@ function start(m) {
   $("score").textContent = 0;
   $("ov").hidden = true; playing = true; $("again").hidden = false;
   [0, 1, 2, 3, 4].forEach(i => FX.tone(FX.pent(i) * 2, { d: .18, vol: .1, at: .05 + i * .05, to: FX.pent(i) }));
-  passed = false; FX.music(true, { bpm: 80, root: 261.63 });
+  FX.music(true, { bpm: 80, root: 261.63 });
 }
 function end() {
   playing = false; left = 0; drag = null; axis = null; combo = 0; cdl = -1; stage(1); $("again").hidden = true; document.body.classList.remove("low"); $("sec").classList.remove("low");
@@ -699,7 +693,6 @@ function end() {
   FX.shake(.5); FX.music(false);
   [3, 2, 0].forEach((i, j) => FX.tone(FX.pent(i, 392), { d: .35, type: "triangle", vol: .16, at: j * .13 }));
   if (nb) { best = score; try { localStorage.setItem(KEY[mode], best) } catch {} }
-  $("best").textContent = NAME[mode] + " 최고 " + best;
   setTimeout(() => {
     $("ov").innerHTML = `<p>점수</p><div class="big">${score}</div>${nb ? '<p class="nb">최고 기록</p>' : `<p>${NAME[mode]} 최고 ${best}</p>`}${modes()}${RKLINE}`;
     bind(); window.RK?.ended(mode, score, { ticket: tk?.id, seed, log });
