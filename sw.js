@@ -2,12 +2,16 @@
 // 어떤 파일이 잠겼는지 목록도 암호문(lock/files.enc)이라 열쇠 없이는 이름조차 모른다.
 const TYPES = { html: "text/html; charset=utf-8", css: "text/css", js: "text/javascript", json: "application/json", webp: "image/webp", png: "image/png", jpg: "image/jpeg", svg: "image/svg+xml", pdf: "application/pdf", gif: "image/gif", ico: "image/x-icon", avif: "image/avif", mjs: "text/javascript", txt: "text/plain; charset=utf-8", md: "text/plain; charset=utf-8", csv: "text/csv; charset=utf-8", woff2: "font/woff2", woff: "font/woff", ttf: "font/ttf", mp3: "audio/mpeg", wav: "audio/wav", ogg: "audio/ogg", mp4: "video/mp4", webm: "video/webm", glb: "model/gltf-binary", wasm: "application/wasm" };
 const dec = (key, b) => crypto.subtle.decrypt({ name: "AES-GCM", iv: b.slice(0, 12) }, key, b.slice(12));
-const getKey = () => new Promise(res => {
+const readKey = () => new Promise(res => {
   const o = indexedDB.open("lock", 1);
   o.onupgradeneeded = () => o.result.createObjectStore("k");
   o.onsuccess = () => { const r = o.result.transaction("k").objectStore("k").get("key"); r.onsuccess = () => res(r.result); r.onerror = () => res(null); };
   o.onerror = () => res(null);
 });
+// 열쇠는 한 번만 꺼내 두고 쓴다(요청마다 IndexedDB를 열면 그림이 많은 페이지가 느려진다).
+// 아직 열쇠가 없으면 다음 요청 때 다시 본다
+let keyP = null;
+const getKey = () => keyP ??= readKey().then(k => { if (!k) keyP = null; return k; });
 let man = null, manAt = 0;
 async function manifest(key) {
   if (man && Date.now() - manAt < 60e3) return man;

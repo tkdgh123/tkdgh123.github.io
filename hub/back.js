@@ -61,6 +61,9 @@
   addEventListener("resize", later);
   addEventListener("scroll", later, { passive: true });
   addEventListener("load", later);
-  setInterval(later, 1500); // 늦게 나타나는 게임판·앱 화면 전환도 따라간다
+  // 늦게 나타나는 게임판, 누른 뒤 바뀌는 앱 화면도 따라간다.
+  // 1.5초마다 계속 재면 게임 페이지에서 화면 배치를 강제로 다시 계산해 끊겨서, 필요한 때만 잰다
+  [500, 1500, 4000].forEach(ms => setTimeout(later, ms));
+  addEventListener("click", () => setTimeout(later, 350), true);
   later();
 })();

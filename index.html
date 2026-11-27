@@ -23,7 +23,6 @@ if (/^#(notes|prog|quiz|wrong|code)$/.test(location.hash)) location.replace("stu
   --sans: "Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif;
   --mono: "IBM Plex Mono", "Pretendard Variable", Pretendard, ui-monospace, monospace;
   --ease: cubic-bezier(.7, 0, .2, 1); --out: cubic-bezier(.2, .8, .2, 1);
-  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   --bg: var(--dark); --fg: var(--on-dark); --soft: var(--on-dark-soft); --gl: .06;
   color-scheme: light;
 }
@@ -33,9 +32,8 @@ body[data-c="기타"] { --bg: var(--olive); --fg: #eeece6; --soft: #b6baab; --gl
 * { box-sizing: border-box }
 html, body { margin: 0; height: 100% }
 body { height: 100svh; overflow: hidden; background: var(--bg); color: var(--fg); font: 400 17px/1.6 var(--sans); word-break: keep-all; -webkit-font-smoothing: antialiased; transition: background-color .9s var(--ease), color .9s var(--ease) }
-/* 바닥에 고인 빛과 종이 결 */
+/* 바닥에 고인 빛 */
 body::before { content: ""; position: fixed; inset: 0; pointer-events: none; background: radial-gradient(55% 40% at 50% 60%, #fff, transparent 72%); opacity: var(--gl); transition: opacity .9s var(--ease) }
-body::after { content: ""; position: fixed; inset: 0; pointer-events: none; background: var(--grain); z-index: 100; mix-blend-mode: overlay }
 a { color: inherit }
 h1, h2, p { margin: 0 }
 button { font: inherit; color: inherit }
@@ -59,9 +57,12 @@ a:focus-visible, button:focus-visible { outline: 2px solid currentColor; outline
 .chip:hover { background: color-mix(in srgb, currentColor 16%, transparent) }
 .chip .mono { color: var(--soft); white-space: nowrap; transition: color .9s }
 .chip b { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 11em }
-.chip .dot { width: 7px; height: 7px; flex: none; border-radius: 50%; background: #ff7a45; box-shadow: 0 0 0 0 rgb(255 122 69 / .6); animation: ping 2.4s infinite }
-@keyframes ping { 70%, 100% { box-shadow: 0 0 0 9px rgb(255 122 69 / 0) } }
-.chip.done .dot { background: currentColor; animation: none; opacity: .5 }
+.chip .dot { position: relative; width: 7px; height: 7px; flex: none; border-radius: 50%; background: #ff7a45 }
+/* 퍼지는 원은 크기와 투명도만 바꾼다(그림자를 애니메이션하면 매 프레임 다시 칠해서 느리다) */
+.chip .dot::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: #ff7a45; animation: ping 2.4s infinite }
+@keyframes ping { 0% { transform: scale(1); opacity: .6 } 70%, 100% { transform: scale(3.6); opacity: 0 } }
+.chip.done .dot { background: currentColor; opacity: .5 }
+.chip.done .dot::after { display: none }
 .chip, .listbtn { border: 0; cursor: pointer }
 .listbtn { text-decoration: none }
 .listbtn { display: flex; align-items: center; gap: 10px; min-height: 42px; padding: 0 14px; font-weight: 600; font-size: 14px; white-space: nowrap; background: color-mix(in srgb, currentColor 9%, transparent) }
@@ -75,12 +76,14 @@ a:focus-visible, button:focus-visible { outline: 2px solid currentColor; outline
 .card { position: absolute; left: calc(var(--w) / -2); top: calc(var(--w) * -.3125); width: var(--w); aspect-ratio: 16 / 10; transform-style: preserve-3d; will-change: transform, opacity }
 .face { position: absolute; inset: 0; display: block; overflow: hidden; background: #0c0c0c; box-shadow: 0 40px 70px -38px rgb(0 0 0 / .7), 0 0 0 1px rgb(255 255 255 / .04) inset; transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transition: transform .5s var(--out); -webkit-user-drag: none }
 .face img, .refl img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none }
-.face img { transform: scale(1.05) translateX(calc(clamp(-1, var(--k, 0), 1) * -2%)); will-change: transform }  /* 매 프레임 바뀌는 값은 따로 레이어로: 큰 그림을 다시 칠하지 않게 */
-.face::after { content: ""; position: absolute; inset: 0; background: #000; opacity: var(--dim, 0); pointer-events: none; will-change: opacity }
+/* 고리가 돌 때 frame()이 그림 위치, 어둡기, 반사 투명도를 요소에 바로 쓴다.
+   CSS 변수로 넘기면 자식 요소 스타일까지 매 프레임 다시 계산해서 느려진다 */
+.face img { transform: scale(1.05); will-change: transform }
+.face .dim { position: absolute; inset: 0; background: #000; opacity: 0; pointer-events: none; will-change: opacity }
 .face .lk { position: absolute; left: 12px; top: 12px; z-index: 1; padding: 3px 8px; background: rgb(0 0 0 / .55); color: #fff; backdrop-filter: blur(6px) }
 .glare { position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity .35s; mix-blend-mode: screen; background: radial-gradient(38% 55% at var(--gx, 50%) var(--gy, 30%), rgb(255 255 255 / .22), rgb(255 255 255 / 0) 70%) }
 .card.hot .glare { opacity: 1 }
-.refl { position: absolute; left: 0; right: 0; top: calc(100% + 8px); height: 26%; overflow: hidden; opacity: calc(.24 - var(--dim, 0) * .35); will-change: opacity; -webkit-mask-image: linear-gradient(#000, transparent 85%); mask-image: linear-gradient(#000, transparent 85%); pointer-events: none }
+.refl { position: absolute; left: 0; right: 0; top: calc(100% + 8px); height: 26%; overflow: hidden; opacity: .24; will-change: opacity; -webkit-mask-image: linear-gradient(#000, transparent 85%); mask-image: linear-gradient(#000, transparent 85%); pointer-events: none }
 .refl img { position: absolute; left: 0; top: 0; height: calc(100% / .26); transform: scaleY(-1) }
 
 /* 아래: 작품 글 + 큰 번호 */
@@ -133,7 +136,7 @@ body[data-c="프로젝트"] .go:hover { background: #e3e7f8 }
 .hint.gone { opacity: 0 }
 
 /* 커서: 고리 위에서만 동그라미가 된다 */
-.cur { position: fixed; left: 0; top: 0; z-index: 70; width: 78px; height: 78px; margin: -39px 0 0 -39px; border-radius: 50%; background: #fff; color: #000; mix-blend-mode: difference; display: grid; place-items: center; font: 700 12.5px var(--sans); pointer-events: none; opacity: 0; translate: var(--x, -100px) var(--y, -100px); scale: var(--sc, .3); transition: opacity .25s, scale .35s var(--out) }
+.cur { position: fixed; left: 0; top: 0; z-index: 70; width: 78px; height: 78px; margin: -39px 0 0 -39px; border-radius: 50%; background: #fff; color: #000; mix-blend-mode: difference; display: grid; place-items: center; font: 700 12.5px var(--sans); pointer-events: none; opacity: 0; translate: -100px -100px; scale: var(--sc, .3); transition: opacity .25s, scale .35s var(--out) }
 .cur.on { opacity: 1 }
 @media (hover: hover) and (pointer: fine) { .stage.fine, .stage.fine a { cursor: none } }
 
@@ -245,7 +248,7 @@ body.snap, body.snap::before, body.snap .rooms { transition: none !important }
   .rgo { display: none }
 }
 @media (prefers-reduced-motion: reduce) {
-  body, body::before, .txt *, .no *, .face, .list, .chip .dot, .rooms, .room, .fan img, .veil { transition: none !important; animation: none !important }
+  body, body::before, .txt *, .no *, .face, .list, .chip .dot::after, .rooms, .room, .fan img, .veil { transition: none !important; animation: none !important }
 }
 </style>
 </head>
@@ -383,9 +386,9 @@ const mod = (x, m) => ((x % m) + m) % m;
 const esc = s => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 const STEP = 32;   // 이웃 카드 사이 각도. 분류마다 개수가 달라도 같은 휘어짐으로 끝없이 돈다
 const stage = $("stage"), ring = $("ring");
-let list = [], cards = [], cat = "대표", pos = 0, vel = 0, target = 0, cur = -1, born = 0, cw = 400;
+let list = [], cards = [], parts = [], cat = "대표", pos = 0, vel = 0, target = 0, cur = -1, born = 0, cw = 400;
 const measure = () => { cw = cards[0]?.offsetWidth || 400; };
-addEventListener("resize", measure);
+addEventListener("resize", () => { measure(); wake(); });
 
 // 분류 단추
 const drawTabs = () => $("tabs").innerHTML = CATS.map(c => `<button type="button" data-c="${c}"><span>${c}</span><i>${of(c).length}</i></button>`).join("");
@@ -404,22 +407,30 @@ function build(c, start) {
   const n = list.length;
   ring.innerHTML = list.map((w, i) => {
     const near = Math.abs(mod(i - start + n / 2, n) - n / 2) <= 3, lz = near ? "" : ' loading="lazy"';
-    return `<div class="card" data-i="${i}"><a class="face" href="${w.href}" draggable="false" tabindex="-1"><img src="${w.img}" alt="${esc(w.t)}" draggable="false"${lz}>${w.lock ? '<span class="lk mono">잠금</span>' : ""}<i class="glare"></i></a><div class="refl" aria-hidden="true"><img src="${w.img}" alt=""${lz}></div></div>`;
+    return `<div class="card" data-i="${i}"><a class="face" href="${w.href}" draggable="false" tabindex="-1"><img src="${w.img}" alt="${esc(w.t)}" draggable="false"${lz}>${w.lock ? '<span class="lk mono">잠금</span>' : ""}<i class="glare"></i><i class="dim"></i></a><div class="refl" aria-hidden="true"><img src="${w.img}" alt=""${lz}></div></div>`;
   }).join("");
   cards = [...ring.children]; measure();
+  // frame()이 매 프레임 찾지 않게 카드마다 바꿀 요소를 미리 모아 둔다. op = 지난 프레임 투명도
+  parts = cards.map(c => ({ card: c, img: c.querySelector(".face img"), dim: c.querySelector(".dim"), refl: c.querySelector(".refl"), op: -1 }));
   $("ticks").innerHTML = list.map((w, i) => `<button type="button" tabindex="-1" data-i="${i}" data-t="${esc(w.t)}"${c !== "대표" && i && w.cat !== list[i - 1].cat ? ' class="gap"' : ""}></button>`).join("");
   target = start; pos = calm ? start : start - 1.2; vel = 0; cur = -1; born = performance.now();
   // 처음엔 가까운 그림만, 조금 뒤에 나머지도 미리 받아 둔다
   setTimeout(() => ring.querySelectorAll("img[loading]").forEach(im => im.loading = "eager"), 1500);
+  wake();
 }
 
 const rel = i => { const n = list.length; return mod(i - pos + n / 2, n) - n / 2; };   // 앞에서 몇 칸(짧은 쪽으로)
-const go = d => { target = Math.round(target) + d; hideHint(); };
-const goTo = i => { const n = list.length, b = Math.round(target); target = b + mod(i - b + n / 2, n) - n / 2; hideHint(); };
+const go = d => { target = Math.round(target) + d; hideHint(); wake(); };
+const goTo = i => { const n = list.length, b = Math.round(target); target = b + mod(i - b + n / 2, n) - n / 2; hideHint(); wake(); };
 const ease = x => 1 - (1 - x) ** 3;
+const ENTER_MS = 700 + 6 * 70;   // 들어오는 움직임이 다 끝나는 시간(가장 늦은 카드 기준)
 
 let tx = 0, ty = 0, sx = 0, sy = 0;
-addEventListener("pointermove", e => { tx = e.clientX / innerWidth - .5; ty = e.clientY / innerHeight - .5; }, { passive: true });
+addEventListener("pointermove", e => { tx = e.clientX / innerWidth - .5; ty = e.clientY / innerHeight - .5; wake(); }, { passive: true });
+
+// 고리는 움직일 게 있을 때만 그린다. 다 멈추면 frame()이 스스로 쉬고, 입력(끌기, 화살표, 휠, 마우스)이 다시 깨운다
+let inside = false, running = false;
+function wake() { if (inside && !running) { running = true; requestAnimationFrame(frame); } }
 
 function frame(now) {
   if (!drag) {
@@ -432,24 +443,30 @@ function frame(now) {
   const w = cw;
   const r = Math.max(w * 1.15, (w / 2 + 26) / Math.tan(Math.PI * STEP / 360));
   ring.style.transform = (calm ? "" : `rotateX(${(-sy * 5 - 2).toFixed(2)}deg) rotateY(${(sx * 6).toFixed(2)}deg) `) + `translateZ(${-r}px)`;
-  stage.style.setProperty("--po", `${50 + sx * 6}% ${40 + sy * 6}%`);
+  stage.style.perspectiveOrigin = `${50 + sx * 6}% ${40 + sy * 6}%`;
   const n = list.length;
   for (let i = 0; i < n; i++) {
-    const k = rel(i), a = k * STEP, abs = Math.abs(a), c = cards[i];
+    const k = rel(i), a = k * STEP, abs = Math.abs(a), p = parts[i], c = p.card;
     // 들어올 때: 앞 카드부터 차례로 아래에서 솟는다
     const order = Math.min(Math.abs(mod(i - target + n / 2, n) - n / 2), 6);
     const e = calm ? 1 : ease(Math.min(1, Math.max(0, (now - born - order * 70) / 700)));
     const op = (abs < 48 ? 1 : abs > 80 ? 0 : 1 - (abs - 48) / 32) * e;
+    if (op < .005 && p.op >= 0 && p.op < .005) continue;   // 뒤쪽에 계속 숨어 있는 카드는 건드리지 않는다
+    p.op = op;
     c.style.transform = `rotateY(${a.toFixed(3)}deg) translateZ(${r.toFixed(1)}px) translate3d(0, ${((1 - e) * 170).toFixed(1)}px, ${(-(1 - e) * 320).toFixed(1)}px) rotateX(${((1 - e) * -25).toFixed(2)}deg)`;
     c.style.opacity = op.toFixed(3);
     c.style.visibility = op < .005 ? "hidden" : "";
     c.style.pointerEvents = op > .2 ? "" : "none";
-    c.style.setProperty("--dim", Math.min(Math.abs(k) * .17, .58).toFixed(3));
-    c.style.setProperty("--k", k.toFixed(3));
+    const dim = Math.min(abs / STEP * .17, .58);   // 앞에서 멀수록 어둡게
+    p.dim.style.opacity = dim.toFixed(3);
+    p.refl.style.opacity = (.24 - dim * .35).toFixed(3);
+    p.img.style.transform = `scale(1.05) translateX(${(Math.max(-1, Math.min(1, k)) * -2).toFixed(2)}%)`;   // 옆 카드 그림이 살짝 밀려 보이게
   }
   const near = mod(Math.round(pos), n);
   if (near !== cur) show(near);
-  requestAnimationFrame(frame);
+  const settled = !drag && pos === target && Math.abs(tx - sx) < 1e-3 && Math.abs(ty - sy) < 1e-3 && (calm || now - born > ENTER_MS);
+  if (settled || !inside) running = false;
+  else requestAnimationFrame(frame);
 }
 
 let tm;
@@ -491,6 +508,7 @@ const end = () => {
   const v = performance.now() - drag.lt > 90 ? 0 : drag.v;
   drag = null;
   if (moved) { vel = v; target = Math.round(pos + v * 7); }
+  wake();
 };
 stage.addEventListener("pointerup", end); stage.addEventListener("pointercancel", end);
 stage.addEventListener("click", e => {
@@ -521,17 +539,23 @@ stage.addEventListener("pointerleave", cool);
 // 커서 동그라미: 빈 곳은 끌기, 앞 카드는 열기, 옆 카드는 보기
 if (fine && !calm) {
   stage.classList.add("fine");
-  const cu = $("cur"); let cx = -100, cy = -100, mx = -100, my = -100, on = false;
+  const cu = $("cur"); let cx = -100, cy = -100, mx = -100, my = -100, on = false, chasing = false;
+  // 동그라미가 마우스를 따라잡으면 멈추고, 마우스가 움직이면 다시 쫓는다
+  const chase = () => {
+    cx += (mx - cx) * .22; cy += (my - cy) * .22;
+    cu.style.translate = `${cx.toFixed(1)}px ${cy.toFixed(1)}px`;
+    if (Math.abs(mx - cx) + Math.abs(my - cy) > .3) requestAnimationFrame(chase); else chasing = false;
+  };
   stage.addEventListener("pointermove", e => {
     mx = e.clientX; my = e.clientY;
     if (!on) { cx = mx; cy = my; on = true; cu.classList.add("on"); }
+    if (!chasing) { chasing = true; requestAnimationFrame(chase); }
     const c = e.target.closest(".card"), front = c && Math.abs(rel(+c.dataset.i)) < .5;
     const label = drag && moved ? "" : front ? "열기" : c ? "보기" : "끌기";
     if (cu.textContent !== label) cu.textContent = label;
     cu.style.setProperty("--sc", drag && moved ? .35 : front ? 1 : c ? .82 : .7);
   });
   stage.addEventListener("pointerleave", () => { on = false; cu.classList.remove("on"); });
-  (function loop() { cx += (mx - cx) * .22; cy += (my - cy) * .22; cu.style.setProperty("--x", cx + "px"); cu.style.setProperty("--y", cy + "px"); requestAnimationFrame(loop); })();
 }
 
 // 휠·트랙패드: 한 번 굴리면 한 칸 (트랙패드 관성으로 여러 칸 넘어가지 않게)
@@ -719,7 +743,6 @@ secretCards().catch(() => {}).then(() => {
 });
 
 // 분류 방 ↔ 고리
-let inside = false, running = false;
 function drawRooms() {
   $("rooms").innerHTML = ROOMS.filter(([c]) => CATS.includes(c)).map(([c, h, s, rb, rf], n) => {
     const ws = of(c), imgs = ws.slice(0, 3).reverse().map(w => `<img src="${w.img}" alt="" loading="lazy">`).join("");
@@ -733,7 +756,6 @@ function enter(c, start = 0, now = false) {
   const go = () => {
     inside = true; document.body.classList.add("in");
     build(c, i);
-    if (!running) { running = true; requestAnimationFrame(frame); }
   };
   const r = [...$("rooms").children].find(r => r.dataset.c === c);
   if (now || calm || !r) return go();
@@ -749,7 +771,7 @@ function enter(c, start = 0, now = false) {
     document.body.classList.add("snap"); go();
     // 3) 그려진 뒤 덮개를 걷고, 카드는 그때부터 솟는다
     raf2(() => {
-      document.body.classList.remove("snap"); born = performance.now();
+      document.body.classList.remove("snap"); born = performance.now(); wake();
       veil.style.transition = "opacity .45s var(--ease)"; veil.style.opacity = "0";
       setTimeout(() => { veil.hidden = true; r.classList.remove("pick"); $("rooms").classList.remove("going"); }, 470);
     });
