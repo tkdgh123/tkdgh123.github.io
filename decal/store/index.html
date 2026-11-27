@@ -111,6 +111,12 @@ footer p { color: var(--soft); font-size: 15px }
 @keyframes rise { from { opacity: 0; transform: translateY(22px) } }
 @media (prefers-reduced-motion: reduce) { .rise.in { animation: none } html { scroll-behavior: auto } }
 
+/* 지금 상황(11-28): 모집 글 상자 */
+.now .week li { padding: 6px 0 }
+.msg { white-space: pre-wrap; background: var(--paper); border-radius: 18px; padding: 22px 24px; font: 400 16px/1.7 "Pretendard Variable", Pretendard, system-ui, sans-serif; margin: 0 0 12px }
+.copy { border: 0; background: var(--ink); color: var(--paper); padding: 12px 22px; border-radius: 22px; font: 700 15px "Pretendard Variable", Pretendard, system-ui, sans-serif; cursor: pointer; min-height: 44px }
+.note { color: var(--soft); font-size: 15px; margin-top: 28px; max-width: 46em }
+
 @media (max-width: 860px) {
   .hero, .two, .plan { grid-template-columns: 1fr }
   .hero { padding-block: 16px 90px }
@@ -145,7 +151,8 @@ footer p { color: var(--soft); font-size: 15px }
   <div class="wrap hero">
     <div>
       <h1>데칼코마니를 앱으로</h1>
-      <p class="lead">지금 웹 게임 그대로 Capacitor 하나로 감싸 구글 플레이와 앱스토어에 둘 다 내요. 맥은 없어도 되고, 돈은 등록비만 들어요.</p>
+      <p class="lead"><a href="#now">11월 28일 지금 상황부터 보기</a></p>
+      <p class="lead" style="margin-top:14px">지금 웹 게임 그대로 Capacitor 하나로 감싸 구글 플레이와 앱스토어에 둘 다 내요. 맥은 없어도 되고, 돈은 등록비만 들어요.</p>
       <ul class="nums">
         <li><b>25달러</b><span>구글 플레이 등록비, 한 번</span></li>
         <li><b>99달러</b><span>애플 개발자 프로그램, 매년</span></li>
@@ -158,6 +165,51 @@ footer p { color: var(--soft); font-size: 15px }
       <figure class="rise"><img src="img/combo.webp" width="390" height="844" alt="데칼코마니 게임 화면: 점수 12840 왼쪽에 ×2, 판 왼쪽에 콤보 막대와 '콤보 2 · 다음 ×2'"><figcaption>게임 중, ×2 단계에서 콤보 2</figcaption></figure>
     </div>
   </div>
+
+  <section class="wrap now" id="now">
+    <h2 class="rise">11월 28일, 지금 어디까지</h2>
+    <p class="intro rise">구글 플레이에 먼저 내기로 했어요. 데칼코마니와 뒤집기 도장 모두 출시판을 따로 만들어 랭킹과 로그인을 뺐어요. 그래서 아래 '지금 코드에서 막히는 것'의 구글 로그인, 애플 로그인, 계정 삭제, 닉네임 칸은 출시판에 해당하지 않아요.</p>
+    <div class="plan" style="margin-top:36px">
+      <div class="week rise"><h3>끝낸 것</h3><p class="done">Claude가 노트북에서 한 일</p><ul>
+        <li>출시판 두 개에서 랭킹, 로그인, 바깥 글꼴 주소를 뺐어요. 인터넷 없이 돌아가요</li>
+        <li>글꼴과 소리 라이선스 파일을 앱 안에 넣고, 메뉴에 정보 창(개인정보, 문의, 출처)을 달았어요</li>
+        <li>안드로이드 빌드 도구(Java 21, 안드로이드 SDK 36)를 깔았어요. Android Studio는 디스크가 모자라 안 깔고 명령줄로 빌드해요</li>
+        <li>데칼코마니 시험 APK(4.5MB)를 만들어 열어 봤어요. targetSdk 36, 진동 권한, 세로 고정, 게임 파일이 다 들어 있었어요</li>
+        <li>개인정보처리방침과 문의 페이지 초안에 개발자 이름 김창식(Kim Changsik)을 넣었어요</li>
+      </ul></div>
+      <div class="week rise"><h3>직접 하실 것</h3><p class="done">본인 인증이나 결제가 있어 대신 못 하는 일</p><ul>
+        <li>새 Gmail 만들기(<a href="https://accounts.google.com/signup">구글 가입</a>). 전화 인증과 약관 동의를 본인이 해야 해요. changup은 누가 쓰고 있을 수 있어요. 만든 주소를 알려 주시면 방침과 문의 페이지에 넣어 올릴게요</li>
+        <li>여권 영문 이름이 Kim Changsik과 다르면 알려 주세요</li>
+        <li>Play Console 가입: 25달러 한 번, 본명, 신분증, 전화번호 인증. 이 전화번호는 한국 사용자에게 앱 설명 아래 공개돼요</li>
+        <li>안드로이드 10 이상 폰의 Play Console 앱으로 기기 인증 한 번. 1분이면 끝나고, 가족이나 친구 폰을 빌려 로그인하고 인증한 뒤 로그아웃해도 돼요(<a href="https://support.google.com/googleplay/android-developer/answer/14316361">구글</a>)</li>
+      </ul></div>
+      <div class="week rise"><h3>테스터 모으기</h3><p class="done">출시 일정에서 가장 오래 걸리는 일</p><ul>
+        <li>테스터 12명 이상이 비공개 테스트에 14일 연속 남아 있어야 출시를 신청할 수 있어요. 한 명이 나갔다 들어오면 그 사람은 14일을 다시 채워요. 그래서 15~20명을 모아요(<a href="https://support.google.com/googleplay/android-developer/answer/14151465">구글</a>)</li>
+        <li>안드로이드 폰과 구글 계정이 있어야 해요. 아이폰 쓰는 사람은 참여할 수 없어요</li>
+        <li>구글 그룹 하나를 두 앱 테스트에 같이 넣으면 테스터는 그룹 가입 한 번, 앱마다 참여 링크 한 번만 누르면 돼요(<a href="https://support.google.com/googleplay/android-developer/answer/9845334">구글</a>)</li>
+        <li>가족, 친구, 학과 단톡방, 동아리, 에브리타임에서 모아요. 출시 신청서가 테스터가 실제로 써 봤는지, 받은 의견과 고친 것을 물어서 설치만 해 주는 교환 모임보다 실제로 해 볼 지인이 나아요. 돈 받고 테스터를 붙여 주는 서비스는 쓰지 않아요</li>
+        <li>의견은 구글 폼이나 오픈채팅 하나로 받고 날짜별로 적어 두면 그대로 신청서 답이 돼요</li>
+      </ul></div>
+      <div class="week rise"><h3>남은 일</h3><p class="done">출시 전에 Claude와 같이 할 일</p><ul>
+        <li>앱 아이콘과 시작 화면. 지금은 기본 아이콘이라 이대로 내면 안 돼요</li>
+        <li>스토어 스크린샷 2장 이상과 등록 글</li>
+        <li>서명 키를 만들어 git 밖 두 곳에 보관하고, 두 앱 출시용 AAB 빌드</li>
+        <li>실제 안드로이드 폰에서 시험. 폰이 없으면 노트북 에뮬레이터(약 5GB, 남은 공간 31GB)를 깔지 정해 주세요</li>
+      </ul></div>
+    </div>
+    <h3 class="rise" style="margin-top:48px">단톡방에 붙여 넣을 모집 글</h3>
+    <pre class="msg rise" id="msg">안드로이드 폰 쓰는 분께 부탁드려요!
+제가 만든 퍼즐 게임 두 개(데칼코마니, 뒤집기 도장)를 구글 플레이에 내려는데, 출시 전에 14일 동안 시험해 줄 사람이 12명 넘게 필요해요.
+1) 아래 구글 그룹에 가입 (1분)
+2) 참여 링크를 누르고 플레이스토어에서 설치
+3) 14일 동안 지우지 말고, 생각날 때 한두 판만 해 주세요
+광고, 결제, 로그인 없고 개인정보도 안 모아요. 이상한 점은 편하게 말해 주세요.
+그룹: (주소)
+데칼코마니: (참여 링크)
+뒤집기 도장: (참여 링크)</pre>
+    <button type="button" class="copy rise" id="copy">글 복사</button>
+    <p class="note rise">괄호 칸은 Play Console에 앱을 올린 뒤 생기는 주소예요. 설치하다 생긴 일도 적어 둬요. 새 안드로이드 명령줄 도구가 사용 기록을 구글에 보내는 방식이었어요. 쌓여 있던 기록 9개를 지우고 SDK 관리 도구가 늘 <code>--no-metrics</code>로 돌게 고쳤어요. 처음 실행할 때 한 번은 이미 보냈을 수 있고, 그 뒤 8분짜리 빌드까지 돌려도 기록은 0개였어요(<a href="https://developer.android.com/tools/agents/android-cli">Android CLI 문서</a>).</p>
+  </section>
 
   <section class="wrap" id="wrap">
     <div class="two">
@@ -342,7 +394,7 @@ footer p { color: var(--soft); font-size: 15px }
 
 <footer class="wrap">
   <p class="name">데칼코마니</p>
-  <p>2026년 11월 11일 기준으로 조사했어요. 정책과 금액은 바뀔 수 있으니 내기 직전에 출처를 다시 확인해요. <a href="../">게임으로 돌아가기</a></p>
+  <p>2026년 11월 11일 기준으로 조사했고, 11월 28일에 지금 상황 칸을 더했어요. 정책과 금액은 바뀔 수 있으니 내기 직전에 출처를 다시 확인해요. <a href="../">게임으로 돌아가기</a></p>
 </footer>
 
 <script>
@@ -361,6 +413,10 @@ let done = {}; try { done = JSON.parse(localStorage.getItem(KEY)) || {} } catch 
 const paint = () => { document.getElementById("pn").textContent = boxes.filter(b => b.checked).length + " / " + boxes.length };
 boxes.forEach(b => { b.checked = !!done[b.dataset.k]; b.onchange = () => { done[b.dataset.k] = b.checked; try { localStorage.setItem(KEY, JSON.stringify(done)) } catch {} paint() } });
 document.getElementById("reset").onclick = () => { boxes.forEach(b => b.checked = false); done = {}; try { localStorage.removeItem(KEY) } catch {} paint() };
+// 모집 글 복사
+document.getElementById("copy").onclick = async e => {
+  try { await navigator.clipboard.writeText(document.getElementById("msg").textContent); e.target.textContent = "복사했어요" } catch { e.target.textContent = "길게 눌러 복사해 주세요" }
+};
 paint();
 </script>
 <script src="../../hub/back.js" data-cat="game" defer></script>
