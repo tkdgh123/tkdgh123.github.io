@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>광명역 요즘 카페와 밥집 — 창업실</title>
-<meta name="description" content="KTX 광명역에서 걸어서 15분 안, 올해 새로 열었거나 요즘 블로그와 인스타에 자주 올라오는 카페 넷과 밥집 넷.">
+<title>광명역 카페와 밥집 — 창업실</title>
+<meta name="description" content="KTX 광명역에서 걸어서 15분 안 카페 24곳, 밥집 28곳. 카카오맵 별점, 요즘 SNS 글, 길찾기 순위로 매긴 추천 순서와 일요일 영업시간.">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
 :root {
   --bg: #eef0f2; --panel: #fff; --ink: #17191c; --sub: #4f555d; --faint: #868c94; --line: #e3e6ea;
-  --cafe: #7b4d26; --cafe-soft: #f5ede5; --food: #1d6b57; --food-soft: #e5f1ed;
-  --open: #1a7f37; --warn: #b54708; --shut: #b42318;
+  --cafe: #7b4d26; --cafe-soft: #f5ede5; --food: #1d6b57; --food-soft: #e5f1ed; --off: #9aa0a6;
+  --warn: #b54708; --shut: #b42318;
   --sans: "Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif;
 }
 * { box-sizing: border-box }
@@ -20,53 +20,63 @@ body { margin: 0; background: var(--bg); color: var(--ink); font: 400 15px/1.6 v
 a { color: inherit }
 h1, h2, h3, p { margin: 0 }
 
-.wrap { display: grid; grid-template-columns: minmax(360px, 440px) 1fr; height: 100vh; height: 100dvh }
+.wrap { display: grid; grid-template-columns: minmax(380px, 460px) 1fr; height: 100vh; height: 100dvh }
 .side { order: -1; background: var(--panel); overflow-y: auto; border-right: 1px solid var(--line) }
 .map { position: relative; height: 100%; background: #dfe3e6 }
 #map { position: absolute; inset: 0 }
 .nomap[hidden] { display: none }
 .nomap { position: absolute; inset: 0; display: grid; place-items: center; color: var(--sub); padding: 24px; text-align: center }
 
-header { padding: 28px 24px 18px }
+header { padding: 28px 24px 16px }
 .where { font-size: 13px; font-weight: 600; color: var(--sub) }
 h1 { font-size: 26px; line-height: 1.3; font-weight: 750; letter-spacing: -.02em; margin-top: 6px }
 .lede { color: var(--sub); margin-top: 8px; font-size: 14.5px }
+.how { margin-top: 14px; border: 1px solid var(--line); border-radius: 10px; font-size: 14px }
+.how summary { cursor: pointer; padding: 10px 14px; font-weight: 700 }
+.how div { padding: 0 14px 12px; color: var(--sub); display: grid; gap: 8px }
+.how b { color: var(--ink) }
 
 .seg { position: sticky; top: 0; z-index: 2; display: flex; gap: 6px; padding: 10px 24px; background: rgba(255,255,255,.94); backdrop-filter: blur(6px); border-bottom: 1px solid var(--line) }
 .seg button { font: 600 14px var(--sans); border: 1px solid var(--line); background: #fff; color: var(--sub); padding: 7px 12px; border-radius: 8px; cursor: pointer }
 .seg button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff }
 
-.group { padding: 6px 0 4px }
-.group h2 { font-size: 13px; font-weight: 700; color: var(--faint); padding: 18px 24px 6px }
-.spot { display: grid; grid-template-columns: 30px 1fr; gap: 0 14px; padding: 16px 24px 18px; border-left: 3px solid transparent; cursor: pointer; transition: background .15s }
+.group h2 { font-size: 13px; font-weight: 700; color: var(--faint); padding: 20px 24px 6px }
+.group h2.shut { color: var(--shut) }
+.spot { display: grid; grid-template-columns: 32px 1fr auto; gap: 0 12px; padding: 16px 24px 18px; border-left: 3px solid transparent; cursor: pointer; transition: background .15s }
 .spot:hover { background: #f7f8f9 }
 .spot.on { background: var(--soft); border-left-color: var(--c) }
 .spot.cafe { --c: var(--cafe); --soft: var(--cafe-soft) }
 .spot.food { --c: var(--food); --soft: var(--food-soft) }
-.pin { width: 28px; height: 28px; border-radius: 50% 50% 50% 6px; background: var(--c); color: #fff; font: 700 13px/28px var(--sans); text-align: center; margin-top: 2px }
-.spot h3 { font-size: 17.5px; font-weight: 700; letter-spacing: -.01em; line-height: 1.4 }
-.kind { font-size: 13px; color: var(--faint); font-weight: 500; margin-left: 4px }
-.new { display: inline-block; font-size: 12px; font-weight: 700; color: var(--c); margin-left: 6px }
-.why { margin-top: 4px; color: var(--ink) }
-.menu { margin-top: 8px; font-size: 14px; color: var(--sub) }
-.menu b { color: var(--ink); font-weight: 600 }
+.spot.closed { --c: var(--off); --soft: #f1f2f3 }
+.spot.closed h3, .spot.closed .line { color: var(--sub) }
+.pin { width: 30px; height: 30px; border-radius: 50% 50% 50% 6px; background: var(--c); color: #fff; font: 700 13px/30px var(--sans); text-align: center; margin-top: 2px }
+.spot h3 { font-size: 17px; font-weight: 700; letter-spacing: -.01em; line-height: 1.4 }
+.kind { font-size: 13px; color: var(--faint); font-weight: 500; margin-left: 5px }
+.score { text-align: right; line-height: 1.2 }
+.score b { display: block; font-size: 20px; font-weight: 750; color: var(--c) }
+.score small { font-size: 11.5px; color: var(--faint) }
+.body { grid-column: 2 / 4 }
+.line { margin-top: 4px }
+.ev { margin-top: 8px; font-size: 13.5px; color: var(--sub); background: #f6f7f8; border-radius: 8px; padding: 8px 10px }
+.ev b { color: var(--ink); font-weight: 600 }
+.spot.on .ev { background: rgba(255,255,255,.7) }
 .facts { margin-top: 8px; font-size: 13.5px; color: var(--sub); display: grid; gap: 2px }
-.now { font-weight: 700 }
-.now.o { color: var(--open) } .now.w { color: var(--warn) } .now.x { color: var(--shut) }
-.links { margin-top: 10px; display: flex; gap: 14px; font-size: 13.5px; font-weight: 600 }
+.sun { font-weight: 700; color: var(--ink) }
+.sun.x { color: var(--shut) } .sun.q { color: var(--warn) }
+.links { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13.5px; font-weight: 600 }
 .links a { color: var(--c); text-decoration: none; border-bottom: 1px solid currentColor; padding-bottom: 1px }
-.tip { margin-top: 8px; font-size: 13.5px; color: var(--warn) }
+.spot.closed .links a { color: var(--sub) }
 
 footer { padding: 22px 24px 96px; font-size: 13px; color: var(--faint); border-top: 1px solid var(--line); margin-top: 8px }
 
-/* 지도 위 표시 */
-.mk { transform: translate(-50%, -37px); cursor: pointer; display: flex; flex-direction: column; align-items: center }
-.mk i { width: 30px; height: 30px; border-radius: 50% 50% 50% 6px; transform: rotate(-45deg); background: var(--c); border: 2px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,.28); display: grid; place-items: center; transition: transform .15s }
-.mk i span { transform: rotate(45deg); color: #fff; font: 700 13px var(--sans) }
-.mk em { font: 600 12px var(--sans); font-style: normal; background: #fff; color: var(--ink); padding: 2px 7px; border-radius: 5px; margin-top: 4px; box-shadow: 0 1px 4px rgba(0,0,0,.2); white-space: nowrap }
-.mk.cafe { --c: var(--cafe) } .mk.food { --c: var(--food) }
+.mk { transform: translate(-50%, -35px); cursor: pointer; display: flex; flex-direction: column; align-items: center }
+.mk i { width: 28px; height: 28px; border-radius: 50% 50% 50% 6px; transform: rotate(-45deg); background: var(--c); border: 2px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,.28); display: grid; place-items: center; transition: transform .15s }
+.mk i span { transform: rotate(45deg); color: #fff; font: 700 12px var(--sans) }
+.mk em { display: none; font: 600 12px var(--sans); font-style: normal; background: #fff; color: var(--ink); padding: 2px 7px; border-radius: 5px; margin-top: 4px; box-shadow: 0 1px 4px rgba(0,0,0,.2); white-space: nowrap }
+.mk:hover em, .mk.on em { display: block }
+.mk.cafe { --c: var(--cafe) } .mk.food { --c: var(--food) } .mk.closed { --c: var(--off) }
 .mk.on i { transform: rotate(-45deg) scale(1.25) }
-.mk.on { z-index: 5 }
+.mk.on, .mk:hover { z-index: 5 }
 .mk.off { display: none }
 .st { transform: translate(-50%, -50%); background: var(--ink); color: #fff; font: 700 12.5px var(--sans); padding: 5px 10px; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,.3); white-space: nowrap }
 
@@ -77,22 +87,29 @@ footer { padding: 22px 24px 96px; font-size: 13px; color: var(--faint); border-t
   header { padding: 22px 16px 14px }
   h1 { font-size: 23px }
   .seg { top: 40vh; top: 40dvh; padding: 8px 16px }
-  .group h2 { padding: 16px 16px 4px }
-  .spot { padding: 14px 16px 16px; gap: 0 12px }
+  .group h2 { padding: 18px 16px 4px }
+  .spot { padding: 14px 16px 16px; gap: 0 10px }
   footer { padding: 20px 16px 88px }
-  .mk em { display: none }
-  .mk.on em { display: block }
 }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="map"><div id="map"></div><p class="nomap" id="nomap" hidden>지도를 불러오지 못했어요. 목록의 카카오맵 링크로 보세요.</p></div>
+  <div class="map"><div id="map"></div><p class="nomap" id="nomap" hidden>지도를 불러오지 못했어요. 목록의 지도 링크로 보세요.</p></div>
   <main class="side" id="side">
     <header>
-      <p class="where">KTX 광명역, 일직동</p>
-      <h1>광명역 요즘 카페와 밥집</h1>
-      <p class="lede">올해 새로 열었거나 요즘 블로그, 인스타에 자주 올라오는 곳만 골랐어요. 모두 걸어서 15분 안이에요.</p>
+      <p class="where">KTX 광명역에서 걸어서 15분 안, 11월 29일 일요일 기준</p>
+      <h1>광명역 카페와 밥집</h1>
+      <p class="lede">카페 24곳, 밥집 28곳을 제가 매긴 추천 순서대로 놓았어요. 일요일에 쉬는 곳은 각 칸 맨 아래에 따로 모았어요.</p>
+      <details class="how">
+        <summary>추천 순서 정한 법 (100점)</summary>
+        <div>
+          <p><b>맛 50점.</b> 카카오맵 별점이에요. 후기가 적으면 별점 4.0짜리 후기 10개가 더 있다고 치고 평균을 내서, 후기 한두 개짜리 5점이 앞서지 않게 했어요. 3.5 이하는 0점, 5.0이면 50점이에요.</p>
+          <p><b>요즘 언급 25점.</b> 11월 27~28일에 인스타그램, 스레드, 틱톡, 유튜브, 네이버 블로그에서 최근 3개월 글 약 370개를 찾아 그 가게가 나온 글 수를 셌어요. 1개 8점, 2~3개 14점, 4개 이상 20점, 두 플랫폼 넘게 나오면 5점 더해요.</p>
+          <p><b>길찾기 순위 25점.</b> 카카오맵 일직동 길찾기 랭킹(11월 28일 갱신)에서 그 가게 칸(카페, 빵, 한식, 양식, 일식) 순위예요. 1~3위 25점, 4~10위 18점, 11~20위 10점이에요.</p>
+          <p>일요일 영업은 11월 29일 카카오맵 영업정보로 확인했어요. 프랜차이즈는 넣지 않았어요.</p>
+        </div>
+      </details>
     </header>
     <nav class="seg" aria-label="거르기">
       <button type="button" data-f="all" aria-pressed="true">전체</button>
@@ -100,115 +117,44 @@ footer { padding: 22px 24px 96px; font-size: 13px; color: var(--faint); border-t
       <button type="button" data-f="food" aria-pressed="false">밥</button>
     </nav>
     <div id="list"></div>
-    <footer>11월 27일에 카카오맵 영업정보로 확인했어요. 쉬는 날은 가게 인스타에서 한 번 더 보고 가세요.</footer>
+    <footer>영업시간은 바뀔 수 있어요. 가기 전에 네이버 지도나 가게 인스타에서 한 번 더 보세요.</footer>
   </main>
 </div>
 
 <script>
-// 요일 순서: 일 월 화 수 목 금 토. [여는, 닫는, 브레이크 시작, 끝] 분 단위, null = 쉬는 날
-const H = (o, c, b1, b2) => [o, c, b1 ?? null, b2 ?? null];
-const t = s => { const [h, m] = s.split(":").map(Number); return h * 60 + m; };
-const every = h => [h, h, h, h, h, h, h];
-
-const S = [
-  { g: "cafe", name: "담백한밀라노", kind: "빵집", tag: "7월 오픈", lat: 37.414957, lng: 126.885526,
-    why: "광명역 8번 출구 바로 건너편. 주말엔 오픈런 줄이 생기는 식사빵 집이에요.",
-    menu: [["올리브 듬뿍 치아바타", "7,800원"], ["소금빵", "3,000원"]],
-    walk: "8번 출구에서 걸어서 3분", addr: "광명역로 26 광명역파크자이 상가동 1층",
-    h: every(H(t("10:00"), t("21:00"))), note: "다 팔리면 일찍 닫아요",
-    kakao: "https://place.map.kakao.com/1508361303", insta: "dammil_bakery" },
-  { g: "cafe", name: "희한한 과자점", kind: "과일모찌, 디저트", tag: "9월 오픈", lat: 37.417903, lng: 126.881333,
-    why: "요즘 웨이팅이 생기는 과일모찌 집. 떠먹는 케이크와 타르트도 매일 바뀌어요.",
-    menu: [["요거트 과일모찌", ""], ["떠먹는 케이크", ""]],
-    walk: "3번 출구에서 걸어서 9분", addr: "양지로 9 U플래닛 A2동 1층 B108호",
-    h: [H(t("12:00"), t("19:00")), H(t("12:00"), t("19:00")), null, null, null, H(t("12:00"), t("19:00")), H(t("12:00"), t("19:00"))],
-    note: "포장만 돼요", tip: "여는 요일이 달마다 바뀌어요. 인스타 DM으로 픽업 예약하면 줄을 안 서요.",
-    kakao: "https://place.map.kakao.com/406949001", insta: "heehanan" },
-  { g: "cafe", name: "원하나베이크하우스", kind: "구움과자, 머랭롤", tag: "11월 화제", lat: 37.419675, lng: 126.888385,
-    why: "생딸기 머랭롤이 이번 주 광명 인스타에 계속 올라와요. 서울에서만 보던 디저트예요.",
-    menu: [["생딸기 머랭롤", ""], ["구움과자", ""]],
-    walk: "광명역에서 약 500m, 자이타워 B동 2층", addr: "새빛공원로 67 광명역자이타워 B동 207호",
-    h: null, tip: "머랭롤은 11시 반에 나오고 금방 다 팔려요. 전화나 DM으로 남았는지 묻고 가세요.",
-    kakao: "https://map.kakao.com/link/map/원하나베이크하우스,37.419675,126.888385", insta: "one.hana_bakehouse" },
-  { g: "cafe", name: "모하커피", kind: "카페", tag: "올해 오픈", lat: 37.422338, lng: 126.884124,
-    why: "이케아, 롯데아울렛 맞은편 2층이라 창밖이 트여 있어요. 마들렌을 매장에서 직접 구워요.",
-    menu: [["마들렌", ""], ["에그타르트", ""], ["샤케라토", ""]],
-    walk: "1번 출구에서 걸어서 13분", addr: "일직로 22 효성해링턴타워 2층 203호",
-    h: [H(t("10:00"), t("20:00")), H(t("09:00"), t("20:00")), H(t("09:00"), t("20:00")), H(t("09:00"), t("20:00")), H(t("09:00"), t("20:00")), H(t("09:00"), t("20:00")), H(t("10:00"), t("20:00"))],
-    note: "주문은 19:30까지", kakao: "https://place.map.kakao.com/2048037305", insta: "moha617_coffee" },
-
-  { g: "food", name: "비앙", kind: "뱡뱡면", tag: "10월 31일 오픈", lat: 37.419439, lng: 126.882101,
-    why: "광명에 처음 생긴 뱡뱡면 집. 오징어 먹물로 반죽한 넓고 쫄깃한 면이 대표예요.",
-    menu: [["뱡뱡면", "9,000원"], ["우육탕면", "13,000원"]],
-    walk: "3번 출구에서 걸어서 12분", addr: "양지로 7 U플래닛 유스트리트몰 지하 1층 A131호",
-    h: every(H(t("11:00"), t("22:00"), t("15:00"), t("17:00"))),
-    kakao: "https://place.map.kakao.com/1824064869", insta: "biang.official" },
-  { g: "food", name: "전무님", kind: "칼국수, 뼈찜", tag: "재방문 많음", lat: 37.417786, lng: 126.882363,
-    why: "사골 국물 뼈칼국수와 이베리코 뼈찜. 11월에도 다시 갔다는 후기가 계속 올라와요.",
-    menu: [["뼈칼국수", "11,000원"], ["홍콩식 비빔칼국수", "11,000원"]],
-    walk: "3번 출구에서 걸어서 9분", addr: "양지로 21 어반브릭스 C동 1층",
-    h: [H(t("11:00"), t("22:00")), H(t("11:00"), t("22:00")), null, H(t("11:00"), t("22:00")), H(t("11:00"), t("22:00")), H(t("11:00"), t("22:00")), H(t("11:00"), t("22:00"))],
-    note: "주문은 21:00까지", kakao: "https://place.map.kakao.com/1804231439", insta: "jeon_mu_nim__" },
-  { g: "food", name: "멘지", kind: "라멘", tag: "일직동 검색 3위", lat: 37.420657, lng: 126.883174,
-    why: "진한 닭 육수 토리파이탄에 자가제면. 카카오맵 별점 4.8이에요.",
-    menu: [["차슈가득 토리파이탄", "15,000원"], ["토리파이탄", "10,000원"]],
-    walk: "1번 출구에서 걸어서 12분", addr: "신기로17번길 3 1층",
-    h: every(H(t("11:00"), t("21:00"), t("15:30"), t("17:00"))),
-    kakao: "https://place.map.kakao.com/1668610661", insta: "menji_gwangmyeong" },
-  { g: "food", name: "라까사키친", kind: "파스타, 피자", tag: "7층 창가", lat: 37.421235, lng: 126.881977,
-    why: "라까사호텔 7층 통창 자리. 둘이 분위기 내고 싶을 때 가는 곳이에요.",
-    menu: [["고르곤졸라 피자", "16,000원"], ["샤프란 리조또", "18,000원"]],
-    walk: "1번 출구에서 걸어서 14분", addr: "일직로12번길 22 라까사호텔 7층",
-    h: every(H(t("11:30"), t("21:30"), t("15:00"), t("18:00"))),
-    note: "캐치테이블로 예약돼요", kakao: "https://place.map.kakao.com/374374199" },
-];
+const S = [{"g":"cafe","rank":1,"name":"담백한밀라노","kind":"제과,베이커리","score":71,"parts":[21,25,25],"line":"8번 출구 건너편 식사빵 집. 올리브 치아바타가 대표고 주말엔 오픈런 줄이 서요.","why":["카카오 별점 4.2 (후기 23개)","길찾기 빵 2위","요즘 글 12개 (인스타, 스레드, 블로그)"],"menu":"소금빵 3,000원, 올리브 듬뿍 치아바타 7,800원","sun":"일요일 10:00~21:00","closed":false,"walk":"8번 출구에서 걸어서 3분","lat":37.414957253212556,"lng":126.88552582896381,"kakao":"https://place.map.kakao.com/1508361303","insta":"dammil_bakery"},{"g":"cafe","rank":2,"name":"희한한 과자점","kind":"제과,베이커리","score":51,"parts":[8,25,18],"line":"과일모찌 집. 떠먹는 케이크와 타르트가 매일 바뀌고 포장만 돼요.","why":["카카오 별점 1.0 (후기 1개)","길찾기 빵 10위","요즘 글 5개 (인스타, 블로그)"],"menu":"","sun":"일요일 12:00~19:00","closed":false,"walk":"3번 출구에서 걸어서 9분","lat":37.41790305286413,"lng":126.88133256621916,"kakao":"https://place.map.kakao.com/406949001","insta":"heehanan"},{"g":"cafe","rank":3,"name":"화이트리에","kind":"화이트리에","score":50,"parts":[18,14,18],"line":"생식빵 전문점. 잼을 곁들인 세트가 있어요.","why":["카카오 별점 4.1 (후기 8개)","길찾기 빵 6위","요즘 글 3개 (블로그)"],"menu":"프리미엄 생식빵 FULL 11,000원, 스위트 타임 세트 21,000원","sun":"일요일 10:00~20:30","closed":false,"walk":"3번 출구에서 걸어서 9분","lat":37.41909741015451,"lng":126.88274503840714,"kakao":"https://place.map.kakao.com/180952612","insta":""},{"g":"cafe","rank":4,"name":"광명커피","kind":"카페","score":47,"parts":[29,0,18],"line":"유스트리트몰 안 작은 커피집. 비엔나커피가 대표예요.","why":["카카오 별점 4.8 (후기 9개)","길찾기 카페 6위","요즘 글 못 찾음"],"menu":"비엔나커피 5,900원, 생과일주스 7,200원","sun":"일요일 08:00~23:00","closed":false,"walk":"3번 출구에서 걸어서 9분","lat":37.4181477409597,"lng":126.881843917765,"kakao":"https://place.map.kakao.com/1196741214","insta":""},{"g":"cafe","rank":5,"name":"후일리","kind":"카페","score":46,"parts":[21,0,25],"line":"어반브릭스 1층 우드톤 카페. 커스터드크림라떼가 대표예요.","why":["카카오 별점 4.3 (후기 7개)","길찾기 카페 3위","요즘 글 못 찾음"],"menu":"커스터드크림라떼(ICE) 5,500원, 아메리카노 3,800원","sun":"일요일 09:00~21:00","closed":false,"walk":"3번 출구에서 걸어서 9분","lat":37.4190189006396,"lng":126.882623155725,"kakao":"https://place.map.kakao.com/594190216","insta":""},{"g":"cafe","rank":6,"name":"무뚝뚝한 제빵소","kind":"제과,베이커리","score":46,"parts":[36,0,10],"line":"4번 출구 쪽 담백한 식사빵 집. 카카오 후기 43개에 별점 4.7이에요.","why":["카카오 별점 4.7 (후기 43개)","길찾기 빵 11위","요즘 글 못 찾음"],"menu":"","sun":"일요일 10:30~19:00","closed":false,"walk":"4번 출구에서 걸어서 7분","lat":37.4143187861121,"lng":126.882218184231,"kakao":"https://place.map.kakao.com/740184530","insta":""},{"g":"cafe","rank":7,"name":"가베의미소","kind":"카페","score":45,"parts":[27,0,18],"line":"자이타워 1층 작은 커피집. 아메리카노 2,500원이에요.","why":["카카오 별점 4.8 (후기 6개)","길찾기 카페 8위","요즘 글 못 찾음"],"menu":"아메리카노(HOT) 2,500원, 카페라떼(HOT) 3,200원","sun":"일요일 영업시간 확인 안 됨","closed":false,"walk":"5번 출구에서 걸어서 7분","lat":37.41886376830137,"lng":126.88803453833626,"kakao":"https://place.map.kakao.com/1912565921","insta":""},{"g":"cafe","rank":8,"name":"더콤마라운지","kind":"카페","score":44,"parts":[25,19,0],"line":"24시간 여는 소파 카페. 늦게 가도 앉을 수 있어요.","why":["카카오 별점 4.3 (후기 47개)","길찾기 순위 밖","요즘 글 3개 (틱톡, 블로그)"],"menu":"아메리카노 5,500원, 밀크티 7,000원","sun":"일요일 00:00~24:00","closed":false,"walk":"5번 출구에서 걸어서 14분","lat":37.4233938698912,"lng":126.885924212794,"kakao":"https://place.map.kakao.com/597842220","insta":""},{"g":"cafe","rank":9,"name":"미오커피앤베이커리","kind":"디저트카페","score":43,"parts":[17,8,18],"line":"1, 2층으로 넓은 베이커리 카페. 아침 7시부터 밤 11시 반까지 열어요.","why":["카카오 별점 없음","길찾기 카페 5위","요즘 글 1개 (인스타)"],"menu":"아메리카노(R) 4,500원, 카페라떼(R) 5,000원","sun":"일요일 07:00~23:30","closed":false,"walk":"1번 출구에서 걸어서 13분","lat":37.42088973612308,"lng":126.88204182685432,"kakao":"https://place.map.kakao.com/790437864","insta":""},{"g":"cafe","rank":10,"name":"바닐라크레뮤","kind":"디저트카페","score":42,"parts":[17,0,25],"line":"일직동 카페 길찾기 1위. 더블바닐라 라떼를 파는 디저트 카페예요.","why":["카카오 별점 없음","길찾기 카페 1위","요즘 글 못 찾음"],"menu":"더블바닐라 9,000원","sun":"일요일 11:00~19:00","closed":false,"walk":"1번 출구에서 걸어서 12분","lat":37.4204176835911,"lng":126.883029923112,"kakao":"https://place.map.kakao.com/358487718","insta":""},{"g":"cafe","rank":11,"name":"커피케어라벨","kind":"카페","score":42,"parts":[28,14,0],"line":"앤티크 인테리어에 말차크림 라떼가 대표. 크로플도 유명해요.","why":["카카오 별점 4.5 (후기 24개)","길찾기 순위 밖","요즘 글 3개 (인스타)"],"menu":"케어라떼 5,500원, 아이스크림라떼 7,500원","sun":"일요일 11:00~22:00, 주문 21:15까지","closed":false,"walk":"3번 출구에서 걸어서 10분","lat":37.417692189465,"lng":126.882208382934,"kakao":"https://place.map.kakao.com/1790751721","insta":""},{"g":"cafe","rank":12,"name":"모하커피","kind":"카페","score":40,"parts":[26,14,0],"line":"이케아, 롯데아울렛 맞은편 2층. 창밖이 트였고 마들렌을 직접 구워요.","why":["카카오 별점 5.0 (후기 4개)","길찾기 순위 밖","요즘 글 2개 (인스타)"],"menu":"","sun":"일요일 10:00~20:00, 주문 19:30까지","closed":false,"walk":"1번 출구에서 걸어서 13분","lat":37.4223379285405,"lng":126.88412390075,"kakao":"https://place.map.kakao.com/2048037305","insta":"moha617_coffee"},{"g":"cafe","rank":13,"name":"카페오리엔트","kind":"커피전문점","score":40,"parts":[22,0,18],"line":"7번 출구에서 2분. 아이스크림 크로플과 프렌치토스트 집이에요.","why":["카카오 별점 4.3 (후기 12개)","길찾기 카페 7위","요즘 글 못 찾음"],"menu":"아이스크림 크로플 5,500원, 프렌치토스트 8,500원","sun":"일요일 10:30~20:30","closed":false,"walk":"7번 출구에서 걸어서 2분","lat":37.41550092591239,"lng":126.88589664780211,"kakao":"https://place.map.kakao.com/519534350","insta":""},{"g":"cafe","rank":14,"name":"원하나베이크하우스","kind":"디저트","score":37,"parts":[17,20,0],"line":"생딸기 머랭롤이 이번 주 광명 인스타에 계속 올라와요. 11시 반에 나오고 금방 팔려요.","why":["카카오 별점 없음","길찾기 순위 밖","요즘 글 4개 (인스타)"],"menu":"생딸기 머랭롤","sun":"일요일 영업시간 확인 안 됨","closed":false,"walk":"광명역에서 약 500m, 자이타워 B동 2층","lat":37.419675,"lng":126.888385,"kakao":"https://map.kakao.com/link/map/원하나베이크하우스,37.419675,126.888385","insta":"one.hana_bakehouse"},{"g":"cafe","rank":15,"name":"메르시에","kind":"디저트카페","score":36,"parts":[17,19,0],"line":"꽃으로 꾸민 디저트 카페. 기네스크림라떼가 유명해요.","why":["카카오 별점 없음","길찾기 순위 밖","요즘 글 2개 (스레드, 블로그)"],"menu":"기네스크림라떼 (ONLY ICE) 6,500원, 더블바닐라아이스크림라떼 (ONLY ICE) 7,000원","sun":"일요일 09:00~22:00","closed":false,"walk":"1번 출구에서 걸어서 12분","lat":37.42186115144781,"lng":126.8849041418504,"kakao":"https://place.map.kakao.com/1077935640","insta":""},{"g":"cafe","rank":16,"name":"백금당","kind":"카페","score":31,"parts":[17,14,0],"line":"수플레 팬케이크 카페. 지브리 느낌 원목 인테리어예요.","why":["카카오 별점 없음","길찾기 순위 밖","요즘 글 2개 (인스타)"],"menu":"백금당 케이크 15,000원, 백금당 팬수플레 11,000원","sun":"일요일 12:00~22:00, 주문 21:15까지","closed":false,"walk":"5번 출구에서 걸어서 14분","lat":37.421343433595354,"lng":126.89002252821709,"kakao":"https://place.map.kakao.com/891205940","insta":""},{"g":"cafe","rank":17,"name":"BLCTD 덕안점","kind":"디저트카페","score":27,"parts":[17,0,10],"line":"직접 볶는 커피와 수제 디저트. 아메리카노 2,800원이에요.","why":["카카오 별점 4.0 (후기 38개)","길찾기 카페 12위","요즘 글 못 찾음"],"menu":"아메리카노 2,800원, 카페라떼 3,300원","sun":"일요일 11:00~23:00","closed":false,"walk":"1번 출구에서 걸어서 10분","lat":37.42160375304021,"lng":126.8842809328121,"kakao":"https://place.map.kakao.com/108333294","insta":""},{"g":"cafe","rank":18,"name":"밀당","kind":"디저트카페","score":27,"parts":[17,0,10],"line":"광명역로 28 디저트 카페예요.","why":["카카오 별점 없음","길찾기 카페 20위","요즘 글 못 찾음"],"menu":"","sun":"일요일 10:00~19:00","closed":false,"walk":"5번 출구에서 걸어서 8분","lat":37.4179034208485,"lng":126.887231650098,"kakao":"https://place.map.kakao.com/13699851","insta":""},{"g":"cafe","rank":19,"name":"달스케이크","kind":"제과,베이커리","score":27,"parts":[17,0,10],"line":"어반브릭스 케이크 가게예요.","why":["카카오 별점 없음","길찾기 빵 13위","요즘 글 못 찾음"],"menu":"","sun":"일요일 영업시간 확인 안 됨","closed":false,"walk":"3번 출구에서 걸어서 10분","lat":37.4176903896741,"lng":126.882210645067,"kakao":"https://place.map.kakao.com/1227014347","insta":""},{"g":"cafe","rank":0,"name":"해디베이크","kind":"제과,베이커리","score":50,"parts":[32,8,10],"line":"10월에 다시 문 연 소금빵, 생초코모찌 집이에요.","why":["카카오 별점 4.9 (후기 11개)","길찾기 빵 12위","요즘 글 1개 (블로그)"],"menu":"","sun":"일요일 휴무","closed":true,"walk":"3번 출구에서 걸어서 9분","lat":37.4179021484539,"lng":126.881329178666,"kakao":"https://place.map.kakao.com/1582349247","insta":""},{"g":"cafe","rank":0,"name":"디두커피","kind":"카페","score":39,"parts":[14,0,25],"line":"포카치아 카페. 잠봉뵈르 포카치아가 대표예요.","why":["카카오 별점 3.7 (후기 3개)","길찾기 카페 2위","요즘 글 못 찾음"],"menu":"아메리카노 4,300원, 잠봉뵈르 포카치아 7,800원","sun":"일요일 휴무","closed":true,"walk":"5번 출구에서 걸어서 9분","lat":37.419273147914595,"lng":126.88932854283767,"kakao":"https://place.map.kakao.com/1732904234","insta":""},{"g":"cafe","rank":0,"name":"가을제과","kind":"제과,베이커리","score":35,"parts":[17,8,10],"line":"휘낭시에 집. 두바이 초콜릿 휘낭시에가 대표예요.","why":["카카오 별점 없음","길찾기 빵 15위","요즘 글 1개 (블로그)"],"menu":"두바이 초콜릿 휘낭시에 4,000원, 두바이초코쿠키 4,800원","sun":"일요일 휴무","closed":true,"walk":"1번 출구에서 걸어서 13분","lat":37.422337928548785,"lng":126.88412390074926,"kakao":"https://place.map.kakao.com/1725760523","insta":""},{"g":"cafe","rank":0,"name":"청현재이","kind":"카페","score":32,"parts":[22,0,10],"line":"카페와 리빙 소품 가게를 같이 해요.","why":["카카오 별점 5.0 (후기 2개)","길찾기 카페 17위","요즘 글 못 찾음"],"menu":"아메리카노 4,000원, 땅콩크림라떼(only ICE) 5,500원","sun":"일요일 휴무","closed":true,"walk":"3번 출구에서 걸어서 10분","lat":37.4176903896824,"lng":126.882210645066,"kakao":"https://place.map.kakao.com/1365615702","insta":""},{"g":"cafe","rank":0,"name":"카페드아멜리","kind":"디저트카페","score":25,"parts":[17,8,0],"line":"케이크 카페. 밤케이크 후기가 있어요.","why":["카카오 별점 없음","길찾기 순위 밖","요즘 글 1개 (인스타)"],"menu":"아메리카노 3,800원, 카페라떼 4,500원","sun":"일요일 휴무","closed":true,"walk":"5번 출구에서 걸어서 18분","lat":37.42421488895049,"lng":126.88706288984089,"kakao":"https://place.map.kakao.com/1839667248","insta":""},{"g":"food","rank":1,"name":"논두렁오리주물럭","kind":"오리","score":79,"parts":[46,8,25],"line":"일직동 길찾기 전체 1위. 카카오 후기 1,061개에 별점 4.9인 오리주물럭 집이에요.","why":["카카오 별점 4.9 (후기 1061개)","길찾기 한식 1위","요즘 글 1개 (블로그)"],"menu":"양념 오리 주물럭 (2~3인) 62,000원, 매운 오리 주물럭(2인~3인) 62,000원","sun":"일요일 10:00~22:00","closed":false,"walk":"1번 출구에서 걸어서 13분","lat":37.4212425675823,"lng":126.883488432089,"kakao":"https://place.map.kakao.com/1293916533","insta":""},{"g":"food","rank":2,"name":"처비핑거스","kind":"햄버거","score":62,"parts":[37,0,25],"line":"미국 다이너 같은 수제버거 집. 후기 67개에 별점 4.7이에요.","why":["카카오 별점 4.7 (후기 67개)","길찾기 양식 3위","요즘 글 못 찾음"],"menu":"처비버거 10,000원, 쓰리핑거스버거 9,500원","sun":"일요일 11:30~20:30, 쉬는 시간 15:00~16:00, 주문 20:00까지","closed":false,"walk":"5번 출구에서 걸어서 13분","lat":37.4216175966173,"lng":126.890295518495,"kakao":"https://place.map.kakao.com/1246007988","insta":""},{"g":"food","rank":3,"name":"고칸","kind":"일식","score":57,"parts":[39,0,18],"line":"아브뉴프랑 연어덮밥 집. 후기 20개가 모두 5점이에요.","why":["카카오 별점 5.0 (후기 20개)","길찾기 일식 6위","요즘 글 못 찾음"],"menu":"연새덮밥 12,900원, 토시살 스테이크동 13,900원","sun":"일요일 11:00~21:00","closed":false,"walk":"3번 출구에서 걸어서 12분","lat":37.41710346254836,"lng":126.88094748821189,"kakao":"https://place.map.kakao.com/1617296268","insta":""},{"g":"food","rank":4,"name":"회랑게랑","kind":"회","score":57,"parts":[20,19,18],"line":"룸이 있는 회 코스 집. 블로그 1,939개예요.","why":["카카오 별점 4.1 (후기 59개)","길찾기 한식 6위","요즘 글 3개 (유튜브, 인스타, 블로그)"],"menu":"(사시미) 스페셜 코스 48,000원, (런치) 프리미엄 정식 30,000원","sun":"일요일 11:00~22:00","closed":false,"walk":"1번 출구에서 걸어서 11분","lat":37.421771866124615,"lng":126.88481729021147,"kakao":"https://place.map.kakao.com/1760073311","insta":""},{"g":"food","rank":5,"name":"멘야마쯔리","kind":"일본식라면","score":55,"parts":[30,0,25],"line":"하카타 돈코츠 라멘 집. 블로그 글이 668개예요.","why":["카카오 별점 4.5 (후기 34개)","길찾기 일식 3위","요즘 글 못 찾음"],"menu":"혼밥세트 17,000원, 커플세트 34,000원","sun":"일요일 11:00~21:00, 쉬는 시간 15:00~17:00","closed":false,"walk":"3번 출구에서 걸어서 9분","lat":37.41901890063961,"lng":126.88262315572548,"kakao":"https://place.map.kakao.com/382478021","insta":""},{"g":"food","rank":6,"name":"해든부엌","kind":"양식","score":54,"parts":[29,0,25],"line":"초록 인테리어의 양식집. 스테이크 필라프, 파스타가 대표예요.","why":["카카오 별점 4.8 (후기 9개)","길찾기 양식 2위","요즘 글 못 찾음"],"menu":"갈릭 스테이크 필라프 12,000원, 찹스테이크 오일 파스타 17,000원","sun":"일요일 10:00~22:30","closed":false,"walk":"1번 출구에서 걸어서 14분","lat":37.420964125291476,"lng":126.8816463130914,"kakao":"https://place.map.kakao.com/941493499","insta":""},{"g":"food","rank":7,"name":"인생돈가스","kind":"돈까스,우동","score":54,"parts":[17,19,18],"line":"지하철 칸처럼 꾸민 돈가스 집이에요.","why":["카카오 별점 없음","길찾기 일식 9위","요즘 글 2개 (인스타, 블로그)"],"menu":"매운돈가스 14,500원, 오꼬노미야끼돈가스(맵게가능) 14,500원","sun":"일요일 11:00~21:00, 주문 20:30까지","closed":false,"walk":"3번 출구에서 걸어서 9분","lat":37.416571951659094,"lng":126.88193563485372,"kakao":"https://place.map.kakao.com/442589113","insta":""},{"g":"food","rank":8,"name":"얼룩말식당","kind":"일식","score":53,"parts":[28,0,25],"line":"8번 출구에서 4분. 스키야키와 가지덮밥 덮밥집이에요.","why":["카카오 별점 4.5 (후기 21개)","길찾기 일식 2위","요즘 글 못 찾음"],"menu":"우삼겹 스키야키 15,000원, 가지덮밥 10,000원","sun":"일요일 11:30~22:00, 쉬는 시간 15:30~17:30, 주문 21:00까지","closed":false,"walk":"8번 출구에서 걸어서 4분","lat":37.414220737457015,"lng":126.88513045860515,"kakao":"https://place.map.kakao.com/682823187","insta":""},{"g":"food","rank":9,"name":"라까사키친","kind":"양식","score":51,"parts":[7,19,25],"line":"라까사호텔 7층 통창 자리. 분위기는 좋은데 카카오 별점은 3.6이에요.","why":["카카오 별점 3.6 (후기 23개)","길찾기 양식 1위","요즘 글 3개 (블로그, 인스타)"],"menu":"고르곤졸라 치즈피자 16,000원, 치킨 샐러드 16,000원","sun":"일요일 11:30~21:30, 쉬는 시간 15:00~18:00, 주문 20:30까지","closed":false,"walk":"1번 출구에서 걸어서 14분","lat":37.4212347610964,"lng":126.881976892185,"kakao":"https://place.map.kakao.com/374374199","insta":""},{"g":"food","rank":10,"name":"멘지","kind":"일본식라면","score":51,"parts":[33,0,18],"line":"닭 육수 토리파이탄 라멘에 직접 뽑은 면이에요.","why":["카카오 별점 4.8 (후기 17개)","길찾기 일식 8위","요즘 글 못 찾음"],"menu":"차슈가득 토리파이탄 15,000원, 뭉게구름 속 풍성한 냉라멘 11,000원","sun":"일요일 11:00~21:00, 쉬는 시간 15:30~17:00","closed":false,"walk":"1번 출구에서 걸어서 12분","lat":37.4206574969274,"lng":126.883174151877,"kakao":"https://place.map.kakao.com/1668610661","insta":"menji_gwangmyeong"},{"g":"food","rank":11,"name":"정성순대","kind":"순대","score":51,"parts":[26,25,0],"line":"곱창순대전골 집. 요즘 틱톡, 스레드에도 보여요.","why":["카카오 별점 4.4 (후기 20개)","길찾기 순위 밖","요즘 글 4개 (틱톡, 스레드, 블로그)"],"menu":"한우곱창순대전골 (1인) 22,000원, 프리미엄버섯 순대전골 (1인) 19,500원","sun":"일요일 11:00~22:00, 쉬는 시간 14:30~17:00, 주문 21:30까지","closed":false,"walk":"3번 출구에서 걸어서 10분","lat":37.41610049393627,"lng":126.88171044832978,"kakao":"https://place.map.kakao.com/156868746","insta":""},{"g":"food","rank":12,"name":"7곡제면소","kind":"국수","score":49,"parts":[31,0,18],"line":"6번 출구 바로 앞. 일곱 가지 곡물 면 칼국수예요.","why":["카카오 별점 4.8 (후기 12개)","길찾기 한식 10위","요즘 글 못 찾음"],"menu":"육개장 칼국수 11,000원, 사골 칼국수 10,000원","sun":"일요일 08:00~21:00, 주문 20:30까지","closed":false,"walk":"6번 출구에서 걸어서 1분","lat":37.416726167408314,"lng":126.88574793554427,"kakao":"https://place.map.kakao.com/229253981","insta":""},{"g":"food","rank":13,"name":"가나안바베큐","kind":"양식","score":48,"parts":[38,0,10],"line":"참나무 훈연 바베큐 플래터. 저녁 5시부터 열어요.","why":["카카오 별점 4.7 (후기 93개)","길찾기 양식 13위","요즘 글 못 찾음"],"menu":"시그니처 플래터 (2인) 60,000원, 비프립 플래터 (2인) 81,000원","sun":"일요일 17:00~21:30, 주문 20:30까지","closed":false,"walk":"5번 출구에서 걸어서 8분","lat":37.41865736884222,"lng":126.8889193782873,"kakao":"https://place.map.kakao.com/460497327","insta":""},{"g":"food","rank":14,"name":"참치가게","kind":"참치회","score":46,"parts":[28,0,18],"line":"다찌에 앉아 먹는 참치 전문점이에요.","why":["카카오 별점 4.6 (후기 14개)","길찾기 일식 10위","요즘 글 못 찾음"],"menu":"참다랑어모둠(20pcs) 60,000원, 도로초밥 (10p)+반우동 33,000원","sun":"일요일 11:30~23:30, 쉬는 시간 14:00~17:00","closed":false,"walk":"1번 출구에서 걸어서 13분","lat":37.420610868830806,"lng":126.88249188512575,"kakao":"https://place.map.kakao.com/1697116299","insta":""},{"g":"food","rank":15,"name":"비앙","kind":"중국요리","score":46,"parts":[22,14,10],"line":"10월 31일에 연 광명 첫 뱡뱡면 집. 오징어 먹물 면이 대표예요.","why":["카카오 별점 5.0 (후기 2개)","길찾기 전체 12위","요즘 글 2개 (인스타)"],"menu":"뱡뱡면 9,000원, 우육탕면 13,000원","sun":"일요일 11:00~22:00, 쉬는 시간 15:00~17:00","closed":false,"walk":"3번 출구에서 걸어서 12분","lat":37.41943915604003,"lng":126.8821005862517,"kakao":"https://place.map.kakao.com/1824064869","insta":"biang.official"},{"g":"food","rank":16,"name":"산촌신쭈꾸미","kind":"해물,생선","score":46,"parts":[17,19,10],"line":"불향 쭈꾸미 한상 집이에요.","why":["카카오 별점 4.0 (후기 3개)","길찾기 한식 15위","요즘 글 3개 (인스타, 블로그)"],"menu":"쭈꾸미1인분 도시락세트 15,900원, 쭈꾸미1인분＋밥도시락 12,900원","sun":"일요일 11:00~21:00, 주문 20:30까지","closed":false,"walk":"3번 출구에서 걸어서 9분","lat":37.41901890063961,"lng":126.88262315572548,"kakao":"https://place.map.kakao.com/588722845","insta":""},{"g":"food","rank":17,"name":"원뼈감자탕","kind":"감자탕","score":45,"parts":[27,0,18],"line":"묵은지 뼈해장국과 감자탕 집이에요.","why":["카카오 별점 4.4 (후기 34개)","길찾기 한식 4위","요즘 글 못 찾음"],"menu":"뼈해장국 10,000원, 내장탕 10,000원","sun":"일요일 10:00~22:00, 쉬는 시간 15:00~16:00","closed":false,"walk":"3번 출구에서 걸어서 11분","lat":37.41840031778,"lng":126.879455404043,"kakao":"https://place.map.kakao.com/1509539878","insta":""},{"g":"food","rank":18,"name":"전무님","kind":"한식","score":44,"parts":[25,19,0],"line":"사골 뼈칼국수와 이베리코 뼈찜. 블로그 544개예요.","why":["카카오 별점 4.3 (후기 50개)","길찾기 순위 밖","요즘 글 2개 (티스토리, 유튜브)"],"menu":"뼈칼국수 11,000원, 홍콩식비빔칼국수 11,000원","sun":"일요일 11:00~22:00, 주문 21:00까지","closed":false,"walk":"3번 출구에서 걸어서 9분","lat":37.417786049300055,"lng":126.8823629991079,"kakao":"https://place.map.kakao.com/1804231439","insta":"jeon_mu_nim__"},{"g":"food","rank":19,"name":"스시벼리","kind":"초밥,롤","score":42,"parts":[17,0,25],"line":"초밥과 회덮밥, 김치우동 집이에요.","why":["카카오 별점 4.0 (후기 27개)","길찾기 일식 1위","요즘 글 못 찾음"],"menu":"회덮밥 12,000원, 연어회덮밥 16,000원","sun":"일요일 11:00~22:00, 주문 21:00까지","closed":false,"walk":"3번 출구에서 걸어서 10분","lat":37.41997583963154,"lng":126.88268153579727,"kakao":"https://place.map.kakao.com/1888932742","insta":""},{"g":"food","rank":20,"name":"드렁킨타이","kind":"태국음식","score":36,"parts":[17,19,0],"line":"태국 골목 같은 쌀국수, 팟타이 집. 블로그 1,893개예요.","why":["카카오 별점 없음","길찾기 순위 밖","요즘 글 2개 (블로그, 틱톡)"],"menu":"소고기국수 11,500원, 치킨팟타이 12,000원","sun":"일요일 11:00~21:00, 쉬는 시간 16:00~17:00","closed":false,"walk":"3번 출구에서 걸어서 9분","lat":37.4180321257625,"lng":126.88246202445985,"kakao":"https://place.map.kakao.com/1913701771","insta":""},{"g":"food","rank":21,"name":"한양중식","kind":"중국요리","score":25,"parts":[0,25,0],"line":"아브뉴프랑 2층 중식 세트 집. 많이 올라오지만 카카오 별점은 2.9예요.","why":["카카오 별점 2.9 (후기 56개)","길찾기 순위 밖","요즘 글 4개 (인스타, 스레드, 틱톡, 블로그)"],"menu":"1인탕수육 7,000원, 고추짜장면 8,500원","sun":"일요일 11:00~21:30","closed":false,"walk":"3번 출구에서 걸어서 10분","lat":37.4162898103254,"lng":126.881812947441,"kakao":"https://place.map.kakao.com/510523534","insta":""},{"g":"food","rank":22,"name":"운종가","kind":"한식","score":23,"parts":[15,8,0],"line":"한옥 느낌 보리밥, 보쌈솥밥 정식이에요.","why":["카카오 별점 3.9 (후기 7개)","길찾기 순위 밖","요즘 글 1개 (인스타)"],"menu":"보리밥정식 12,000원, 보쌈솥밥정식 16,000원","sun":"일요일 10:30~22:00","closed":false,"walk":"3번 출구에서 걸어서 9분","lat":37.41894311313376,"lng":126.88252047353046,"kakao":"https://place.map.kakao.com/427740018","insta":""},{"g":"food","rank":23,"name":"철길부산집","kind":"철길부산집","score":22,"parts":[14,8,0],"line":"오뎅바 포장마차예요. 저녁에 한잔하기 좋아요.","why":["카카오 별점 3.8 (후기 5개)","길찾기 순위 밖","요즘 글 1개 (인스타)"],"menu":"오뎅2인세트 17,000원","sun":"일요일 영업시간 확인 안 됨","closed":false,"walk":"1번 출구에서 걸어서 13분","lat":37.420568618712835,"lng":126.88259023504457,"kakao":"https://place.map.kakao.com/872031104","insta":""},{"g":"food","rank":24,"name":"고시고시","kind":"일식","score":19,"parts":[0,19,0],"line":"아브뉴프랑 퓨전 일식 돈가스 집이에요.","why":["카카오 별점 2.7 (후기 6개)","길찾기 순위 밖","요즘 글 2개 (인스타, 유튜브)"],"menu":"","sun":"일요일 10:30~21:00, 주문 20:30까지","closed":false,"walk":"3번 출구에서 걸어서 12분","lat":37.41710346254836,"lng":126.88094748821189,"kakao":"https://place.map.kakao.com/612376590","insta":""},{"g":"food","rank":0,"name":"온가원","kind":"칼국수","score":42,"parts":[32,0,10],"line":"칼국수와 소머리곰탕 집이에요.","why":["카카오 별점 4.7 (후기 18개)","길찾기 한식 17위","요즘 글 못 찾음"],"menu":"온가칼국수 9,000원, 황소 소머리곰탕 10,000원","sun":"일요일 휴무","closed":true,"walk":"5번 출구에서 걸어서 9분","lat":37.419881071602966,"lng":126.88904748515822,"kakao":"https://place.map.kakao.com/1297143870","insta":""},{"g":"food","rank":0,"name":"스시153","kind":"초밥,롤","score":41,"parts":[31,0,10],"line":"초밥 세트 집. 후기 79개에 별점 4.5예요.","why":["카카오 별점 4.5 (후기 79개)","길찾기 일식 16위","요즘 글 못 찾음"],"menu":"A세트 16,000원, 커플세트 34,000원","sun":"일요일 휴무","closed":true,"walk":"1번 출구에서 걸어서 13분","lat":37.4222784282575,"lng":126.884090100665,"kakao":"https://place.map.kakao.com/934043674","insta":""},{"g":"food","rank":0,"name":"더킹텍사스","kind":"양식","score":38,"parts":[24,14,0],"line":"하드타코 집이에요.","why":["카카오 별점 5.0 (후기 3개)","길찾기 순위 밖","요즘 글 2개 (인스타)"],"menu":"비프 클래식 하드타코 6,000원, Twins 비프 클래식 타코 9,900원","sun":"일요일 휴무","closed":true,"walk":"5번 출구에서 걸어서 13분","lat":37.4227704468172,"lng":126.886946437303,"kakao":"https://place.map.kakao.com/201706257","insta":""},{"g":"food","rank":0,"name":"봄봄","kind":"한식뷔페","score":36,"parts":[17,19,0],"line":"9,000원 한식뷔페. 평일 점심만 해요.","why":["카카오 별점 없음","길찾기 순위 밖","요즘 글 3개 (틱톡, 블로그)"],"menu":"","sun":"일요일 휴무","closed":true,"walk":"3번 출구에서 걸어서 9분","lat":37.4190189006396,"lng":126.882623155725,"kakao":"https://place.map.kakao.com/1109623420","insta":""}];
 const STATION = { lat: 37.416196, lng: 126.884681 };
-
-const hm = m => `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
-function status(s) {
-  if (!s.h) return ["", "영업시간은 인스타에서 확인"];
-  const d = new Date(), day = d.getDay(), now = d.getHours() * 60 + d.getMinutes(), h = s.h[day];
-  const range = h ? `오늘 ${hm(h[0])}~${hm(h[1])}${h[2] != null ? `, 쉬는 시간 ${hm(h[2])}~${hm(h[3])}` : ""}` : "";
-  if (!h) {
-    for (let i = 1; i <= 7; i++) { const n = s.h[(day + i) % 7]; if (n) return ["x", `오늘 쉬어요, ${i === 1 ? "내일" : "다음엔 " + "일월화수목금토"[(day + i) % 7] + "요일"} ${hm(n[0])}에 열어요`]; }
-  }
-  if (now < h[0]) return ["w", `${hm(h[0])}에 열어요`, range];
-  if (now >= h[1]) return ["x", "오늘은 닫았어요", range];
-  if (h[2] != null && now >= h[2] && now < h[3]) return ["w", `쉬는 시간, ${hm(h[3])}에 다시 열어요`, range];
-  if (h[1] - now <= 60) return ["w", `곧 닫아요 (${hm(h[1])})`, range];
-  return ["o", "지금 영업 중", range];
-}
-
 const list = document.getElementById("list");
 const GROUP = { cafe: "카페, 디저트", food: "밥" };
 let sel = -1, cur = "all", overlays = [], map = null;
 
+const card = (s, i) => `<article class="spot ${s.g}${s.closed ? " closed" : ""}" data-i="${i}" id="s${i}">
+  <div class="pin">${s.closed ? "휴" : s.rank}</div>
+  <h3>${s.name}<span class="kind">${s.kind}</span></h3>
+  <div class="score"><b>${s.score}점</b><small>맛 ${s.parts[0]}, 요즘 ${s.parts[1]}, 길찾기 ${s.parts[2]}</small></div>
+  <div class="body">
+    <p class="line">${s.line}</p>
+    <p class="ev">${s.why.map(w => `<b>${w.replace(/ \(/, "</b> (").replace(/^([^<]*)$/, "$1</b>")}`).join(", ")}</p>
+    <div class="facts">
+      <span class="sun${s.closed ? " x" : /확인/.test(s.sun) ? " q" : ""}">${s.sun}</span>
+      ${s.menu ? `<span>${s.menu}</span>` : ""}
+      <span>${s.walk}</span>
+    </div>
+    <div class="links"><a href="https://map.naver.com/p/search/${encodeURIComponent("광명 " + s.name)}" target="_blank" rel="noopener">네이버 지도</a><a href="${s.kakao}" target="_blank" rel="noopener">카카오맵</a>${s.insta ? `<a href="https://www.instagram.com/${s.insta}" target="_blank" rel="noopener">인스타</a>` : ""}</div>
+  </div>
+</article>`;
+
 function render() {
-  list.innerHTML = Object.entries(GROUP).map(([g, label]) => `
-    <section class="group" data-g="${g}"><h2>${label}</h2>
-    ${S.map((s, i) => s.g !== g ? "" : (() => {
-      const [c, txt, range] = status(s);
-      return `<article class="spot ${s.g}" data-i="${i}" id="s${i}">
-        <div class="pin">${i + 1}</div>
-        <div>
-          <h3>${s.name}<span class="kind">${s.kind}</span><span class="new">${s.tag}</span></h3>
-          <p class="why">${s.why}</p>
-          <p class="menu">${s.menu.map(([n, p]) => `<b>${n}</b>${p ? " " + p : ""}`).join(", ")}</p>
-          <div class="facts">
-            <span><span class="now ${c}">${txt}</span>${range ? `, ${range.replace("오늘 ", "")}` : ""}</span>
-            <span>${s.walk}${s.note ? `. ${s.note}` : ""}</span>
-          </div>
-          ${s.tip ? `<p class="tip">${s.tip}</p>` : ""}
-          <div class="links"><a href="https://map.naver.com/p/search/${encodeURIComponent("광명 " + s.name)}" target="_blank" rel="noopener">네이버 지도</a><a href="${s.kakao}" target="_blank" rel="noopener">카카오맵</a>${s.insta ? `<a href="https://www.instagram.com/${s.insta}" target="_blank" rel="noopener">인스타</a>` : ""}</div>
-        </div>
-      </article>`;
-    })()).join("")}
-    </section>`).join("");
-  document.querySelectorAll(".group").forEach(g => g.hidden = cur !== "all" && g.dataset.g !== cur);
-  if (sel >= 0) document.getElementById("s" + sel).classList.add("on");
+  list.innerHTML = Object.entries(GROUP).map(([g, label]) => {
+    const open = S.map((s, i) => [s, i]).filter(([s]) => s.g === g && !s.closed);
+    const shut = S.map((s, i) => [s, i]).filter(([s]) => s.g === g && s.closed);
+    return `<section class="group" data-g="${g}">
+      <h2>${label} ${open.length}곳, 추천 순</h2>${open.map(([s, i]) => card(s, i)).join("")}
+      <h2 class="shut">${label}, 일요일 휴무 ${shut.length}곳</h2>${shut.map(([s, i]) => card(s, i)).join("")}
+    </section>`;
+  }).join("");
 }
 render();
-setInterval(render, 60000);
 
 function pick(i, fromMap) {
   sel = i;
@@ -244,13 +190,12 @@ function fit(f = "all") {
   const b = new kakao.maps.LatLngBounds();
   b.extend(new kakao.maps.LatLng(STATION.lat, STATION.lng));
   S.forEach(s => (f === "all" || s.g === f) && b.extend(new kakao.maps.LatLng(s.lat, s.lng)));
-  map.setBounds(b, 40, 40, 40, 40);
+  map.setBounds(b, 30, 30, 30, 30);
 }
 
 const sdk = document.createElement("script");
 sdk.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=358283f945823ab37a1aa0778845e544&autoload=false";
 sdk.onerror = () => document.getElementById("nomap").hidden = false;
-document.head.append(sdk);
 sdk.onload = () => kakao.maps.load(() => {
   map = new kakao.maps.Map(document.getElementById("map"), { center: new kakao.maps.LatLng(STATION.lat, STATION.lng), level: 4 });
   map.addControl(new kakao.maps.ZoomControl(), kakao.maps.ControlPosition.RIGHT);
@@ -258,14 +203,15 @@ sdk.onload = () => kakao.maps.load(() => {
   new kakao.maps.CustomOverlay({ map, position: new kakao.maps.LatLng(STATION.lat, STATION.lng), content: st, yAnchor: .5, zIndex: 1 });
   overlays = S.map((s, i) => {
     const el = document.createElement("div");
-    el.className = "mk " + s.g;
-    el.innerHTML = `<i><span>${i + 1}</span></i><em>${s.name}</em>`;
+    el.className = "mk " + s.g + (s.closed ? " closed" : "");
+    el.innerHTML = `<i><span>${s.closed ? "휴" : s.rank}</span></i><em>${s.name}</em>`;
     el.onclick = () => pick(i, true);
-    new kakao.maps.CustomOverlay({ map, position: new kakao.maps.LatLng(s.lat, s.lng), content: el, xAnchor: 0, yAnchor: 0, zIndex: 2 });
+    new kakao.maps.CustomOverlay({ map, position: new kakao.maps.LatLng(s.lat, s.lng), content: el, xAnchor: 0, yAnchor: 0, zIndex: s.closed ? 1 : 100 - s.rank });
     return { el };
   });
   fit();
 });
+document.head.append(sdk);
 </script>
 <script src="../hub/back.js" data-cat="etc" defer></script>
 </body>
