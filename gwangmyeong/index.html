@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>광명역 요즘 카페와 밥집 — 창업실</title>
+<meta name="description" content="KTX 광명역에서 걸어서 15분 안, 올해 새로 열었거나 요즘 블로그와 인스타에 자주 올라오는 카페 넷과 밥집 넷.">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+:root {
+  --bg: #eef0f2; --panel: #fff; --ink: #17191c; --sub: #4f555d; --faint: #868c94; --line: #e3e6ea;
+  --cafe: #7b4d26; --cafe-soft: #f5ede5; --food: #1d6b57; --food-soft: #e5f1ed;
+  --open: #1a7f37; --warn: #b54708; --shut: #b42318;
+  --sans: "Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif;
+}
+* { box-sizing: border-box }
+html, body { height: 100% }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 15px/1.6 var(--sans); word-break: keep-all; -webkit-font-smoothing: antialiased }
+a { color: inherit }
+h1, h2, h3, p { margin: 0 }
+
+.wrap { display: grid; grid-template-columns: minmax(360px, 440px) 1fr; height: 100vh; height: 100dvh }
+.side { order: -1; background: var(--panel); overflow-y: auto; border-right: 1px solid var(--line) }
+.map { position: relative; height: 100%; background: #dfe3e6 }
+#map { position: absolute; inset: 0 }
+.nomap[hidden] { display: none }
+.nomap { position: absolute; inset: 0; display: grid; place-items: center; color: var(--sub); padding: 24px; text-align: center }
+
+header { padding: 28px 24px 18px }
+.where { font-size: 13px; font-weight: 600; color: var(--sub) }
+h1 { font-size: 26px; line-height: 1.3; font-weight: 750; letter-spacing: -.02em; margin-top: 6px }
+.lede { color: var(--sub); margin-top: 8px; font-size: 14.5px }
+
+.seg { position: sticky; top: 0; z-index: 2; display: flex; gap: 6px; padding: 10px 24px; background: rgba(255,255,255,.94); backdrop-filter: blur(6px); border-bottom: 1px solid var(--line) }
+.seg button { font: 600 14px var(--sans); border: 1px solid var(--line); background: #fff; color: var(--sub); padding: 7px 12px; border-radius: 8px; cursor: pointer }
+.seg button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff }
+
+.group { padding: 6px 0 4px }
+.group h2 { font-size: 13px; font-weight: 700; color: var(--faint); padding: 18px 24px 6px }
+.spot { display: grid; grid-template-columns: 30px 1fr; gap: 0 14px; padding: 16px 24px 18px; border-left: 3px solid transparent; cursor: pointer; transition: background .15s }
+.spot:hover { background: #f7f8f9 }
+.spot.on { background: var(--soft); border-left-color: var(--c) }
+.spot.cafe { --c: var(--cafe); --soft: var(--cafe-soft) }
+.spot.food { --c: var(--food); --soft: var(--food-soft) }
+.pin { width: 28px; height: 28px; border-radius: 50% 50% 50% 6px; background: var(--c); color: #fff; font: 700 13px/28px var(--sans); text-align: center; margin-top: 2px }
+.spot h3 { font-size: 17.5px; font-weight: 700; letter-spacing: -.01em; line-height: 1.4 }
+.kind { font-size: 13px; color: var(--faint); font-weight: 500; margin-left: 4px }
+.new { display: inline-block; font-size: 12px; font-weight: 700; color: var(--c); margin-left: 6px }
+.why { margin-top: 4px; color: var(--ink) }
+.menu { margin-top: 8px; font-size: 14px; color: var(--sub) }
+.menu b { color: var(--ink); font-weight: 600 }
+.facts { margin-top: 8px; font-size: 13.5px; color: var(--sub); display: grid; gap: 2px }
+.now { font-weight: 700 }
+.now.o { color: var(--open) } .now.w { color: var(--warn) } .now.x { color: var(--shut) }
+.links { margin-top: 10px; display: flex; gap: 14px; font-size: 13.5px; font-weight: 600 }
+.links a { color: var(--c); text-decoration: none; border-bottom: 1px solid currentColor; padding-bottom: 1px }
+.tip { margin-top: 8px; font-size: 13.5px; color: var(--warn) }
+
+footer { padding: 22px 24px 96px; font-size: 13px; color: var(--faint); border-top: 1px solid var(--line); margin-top: 8px }
+
+/* 지도 위 표시 */
+.mk { transform: translate(-50%, -37px); cursor: pointer; display: flex; flex-direction: column; align-items: center }
+.mk i { width: 30px; height: 30px; border-radius: 50% 50% 50% 6px; transform: rotate(-45deg); background: var(--c); border: 2px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,.28); display: grid; place-items: center; transition: transform .15s }
+.mk i span { transform: rotate(45deg); color: #fff; font: 700 13px var(--sans) }
+.mk em { font: 600 12px var(--sans); font-style: normal; background: #fff; color: var(--ink); padding: 2px 7px; border-radius: 5px; margin-top: 4px; box-shadow: 0 1px 4px rgba(0,0,0,.2); white-space: nowrap }
+.mk.cafe { --c: var(--cafe) } .mk.food { --c: var(--food) }
+.mk.on i { transform: rotate(-45deg) scale(1.25) }
+.mk.on { z-index: 5 }
+.mk.off { display: none }
+.st { transform: translate(-50%, -50%); background: var(--ink); color: #fff; font: 700 12.5px var(--sans); padding: 5px 10px; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,.3); white-space: nowrap }
+
+@media (max-width: 760px) {
+  .wrap { display: block; height: auto }
+  .map { position: sticky; top: 0; z-index: 3; height: 40vh; height: 40dvh }
+  .side { border-right: 0; overflow: visible }
+  header { padding: 22px 16px 14px }
+  h1 { font-size: 23px }
+  .seg { top: 40vh; top: 40dvh; padding: 8px 16px }
+  .group h2 { padding: 16px 16px 4px }
+  .spot { padding: 14px 16px 16px; gap: 0 12px }
+  footer { padding: 20px 16px 88px }
+  .mk em { display: none }
+  .mk.on em { display: block }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="map"><div id="map"></div><p class="nomap" id="nomap" hidden>지도를 불러오지 못했어요. 목록의 카카오맵 링크로 보세요.</p></div>
+  <main class="side" id="side">
+    <header>
+      <p class="where">KTX 광명역, 일직동</p>
+      <h1>광명역 요즘 카페와 밥집</h1>
+      <p class="lede">올해 새로 열었거나 요즘 블로그, 인스타에 자주 올라오는 곳만 골랐어요. 모두 걸어서 15분 안이에요.</p>
+    </header>
+    <nav class="seg" aria-label="거르기">
+      <button type="button" data-f="all" aria-pressed="true">전체</button>
+      <button type="button" data-f="cafe" aria-pressed="false">카페, 디저트</button>
+      <button type="button" data-f="food" aria-pressed="false">밥</button>
+    </nav>
+    <div id="list"></div>
+    <footer>11월 27일에 카카오맵 영업정보로 확인했어요. 쉬는 날은 가게 인스타에서 한 번 더 보고 가세요.</footer>
+  </main>
+</div>
+
+<script>
+// 요일 순서: 일 월 화 수 목 금 토. [여는, 닫는, 브레이크 시작, 끝] 분 단위, null = 쉬는 날
+const H = (o, c, b1, b2) => [o, c, b1 ?? null, b2 ?? null];
+const t = s => { const [h, m] = s.split(":").map(Number); return h * 60 + m; };
+const every = h => [h, h, h, h, h, h, h];
+
+const S = [
+  { g: "cafe", name: "담백한밀라노", kind: "빵집", tag: "7월 오픈", lat: 37.414957, lng: 126.885526,
+    why: "광명역 8번 출구 바로 건너편. 주말엔 오픈런 줄이 생기는 식사빵 집이에요.",
+    menu: [["올리브 듬뿍 치아바타", "7,800원"], ["소금빵", "3,000원"]],
+    walk: "8번 출구에서 걸어서 3분", addr: "광명역로 26 광명역파크자이 상가동 1층",
+    h: every(H(t("10:00"), t("21:00"))), note: "다 팔리면 일찍 닫아요",
+    kakao: "https://place.map.kakao.com/1508361303", insta: "dammil_bakery" },
+  { g: "cafe", name: "희한한 과자점", kind: "과일모찌, 디저트", tag: "9월 오픈", lat: 37.417903, lng: 126.881333,
+    why: "요즘 웨이팅이 생기는 과일모찌 집. 떠먹는 케이크와 타르트도 매일 바뀌어요.",
+    menu: [["요거트 과일모찌", ""], ["떠먹는 케이크", ""]],
+    walk: "3번 출구에서 걸어서 9분", addr: "양지로 9 U플래닛 A2동 1층 B108호",
+    h: [H(t("12:00"), t("19:00")), H(t("12:00"), t("19:00")), null, null, null, H(t("12:00"), t("19:00")), H(t("12:00"), t("19:00"))],
+    note: "포장만 돼요", tip: "여는 요일이 달마다 바뀌어요. 인스타 DM으로 픽업 예약하면 줄을 안 서요.",
+    kakao: "https://place.map.kakao.com/406949001", insta: "heehanan" },
+  { g: "cafe", name: "원하나베이크하우스", kind: "구움과자, 머랭롤", tag: "11월 화제", lat: 37.419675, lng: 126.888385,
+    why: "생딸기 머랭롤이 이번 주 광명 인스타에 계속 올라와요. 서울에서만 보던 디저트예요.",
+    menu: [["생딸기 머랭롤", ""], ["구움과자", ""]],
+    walk: "광명역에서 약 500m, 자이타워 B동 2층", addr: "새빛공원로 67 광명역자이타워 B동 207호",
+    h: null, tip: "머랭롤은 11시 반에 나오고 금방 다 팔려요. 전화나 DM으로 남았는지 묻고 가세요.",
+    kakao: "https://map.kakao.com/link/map/원하나베이크하우스,37.419675,126.888385", insta: "one.hana_bakehouse" },
+  { g: "cafe", name: "모하커피", kind: "카페", tag: "올해 오픈", lat: 37.422338, lng: 126.884124,
+    why: "이케아, 롯데아울렛 맞은편 2층이라 창밖이 트여 있어요. 마들렌을 매장에서 직접 구워요.",
+    menu: [["마들렌", ""], ["에그타르트", ""], ["샤케라토", ""]],
+    walk: "1번 출구에서 걸어서 13분", addr: "일직로 22 효성해링턴타워 2층 203호",
+    h: [H(t("10:00"), t("20:00")), H(t("09:00"), t("20:00")), H(t("09:00"), t("20:00")), H(t("09:00"), t("20:00")), H(t("09:00"), t("20:00")), H(t("09:00"), t("20:00")), H(t("10:00"), t("20:00"))],
+    note: "주문은 19:30까지", kakao: "https://place.map.kakao.com/2048037305", insta: "moha617_coffee" },
+
+  { g: "food", name: "비앙", kind: "뱡뱡면", tag: "10월 31일 오픈", lat: 37.419439, lng: 126.882101,
+    why: "광명에 처음 생긴 뱡뱡면 집. 오징어 먹물로 반죽한 넓고 쫄깃한 면이 대표예요.",
+    menu: [["뱡뱡면", "9,000원"], ["우육탕면", "13,000원"]],
+    walk: "3번 출구에서 걸어서 12분", addr: "양지로 7 U플래닛 유스트리트몰 지하 1층 A131호",
+    h: every(H(t("11:00"), t("22:00"), t("15:00"), t("17:00"))),
+    kakao: "https://place.map.kakao.com/1824064869", insta: "biang.official" },
+  { g: "food", name: "전무님", kind: "칼국수, 뼈찜", tag: "재방문 많음", lat: 37.417786, lng: 126.882363,
+    why: "사골 국물 뼈칼국수와 이베리코 뼈찜. 11월에도 다시 갔다는 후기가 계속 올라와요.",
+    menu: [["뼈칼국수", "11,000원"], ["홍콩식 비빔칼국수", "11,000원"]],
+    walk: "3번 출구에서 걸어서 9분", addr: "양지로 21 어반브릭스 C동 1층",
+    h: [H(t("11:00"), t("22:00")), H(t("11:00"), t("22:00")), null, H(t("11:00"), t("22:00")), H(t("11:00"), t("22:00")), H(t("11:00"), t("22:00")), H(t("11:00"), t("22:00"))],
+    note: "주문은 21:00까지", kakao: "https://place.map.kakao.com/1804231439", insta: "jeon_mu_nim__" },
+  { g: "food", name: "멘지", kind: "라멘", tag: "일직동 검색 3위", lat: 37.420657, lng: 126.883174,
+    why: "진한 닭 육수 토리파이탄에 자가제면. 카카오맵 별점 4.8이에요.",
+    menu: [["차슈가득 토리파이탄", "15,000원"], ["토리파이탄", "10,000원"]],
+    walk: "1번 출구에서 걸어서 12분", addr: "신기로17번길 3 1층",
+    h: every(H(t("11:00"), t("21:00"), t("15:30"), t("17:00"))),
+    kakao: "https://place.map.kakao.com/1668610661", insta: "menji_gwangmyeong" },
+  { g: "food", name: "라까사키친", kind: "파스타, 피자", tag: "7층 창가", lat: 37.421235, lng: 126.881977,
+    why: "라까사호텔 7층 통창 자리. 둘이 분위기 내고 싶을 때 가는 곳이에요.",
+    menu: [["고르곤졸라 피자", "16,000원"], ["샤프란 리조또", "18,000원"]],
+    walk: "1번 출구에서 걸어서 14분", addr: "일직로12번길 22 라까사호텔 7층",
+    h: every(H(t("11:30"), t("21:30"), t("15:00"), t("18:00"))),
+    note: "캐치테이블로 예약돼요", kakao: "https://place.map.kakao.com/374374199" },
+];
+const STATION = { lat: 37.416196, lng: 126.884681 };
+
+const hm = m => `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
+function status(s) {
+  if (!s.h) return ["", "영업시간은 인스타에서 확인"];
+  const d = new Date(), day = d.getDay(), now = d.getHours() * 60 + d.getMinutes(), h = s.h[day];
+  const range = h ? `오늘 ${hm(h[0])}~${hm(h[1])}${h[2] != null ? `, 쉬는 시간 ${hm(h[2])}~${hm(h[3])}` : ""}` : "";
+  if (!h) {
+    for (let i = 1; i <= 7; i++) { const n = s.h[(day + i) % 7]; if (n) return ["x", `오늘 쉬어요, ${i === 1 ? "내일" : "다음엔 " + "일월화수목금토"[(day + i) % 7] + "요일"} ${hm(n[0])}에 열어요`]; }
+  }
+  if (now < h[0]) return ["w", `${hm(h[0])}에 열어요`, range];
+  if (now >= h[1]) return ["x", "오늘은 닫았어요", range];
+  if (h[2] != null && now >= h[2] && now < h[3]) return ["w", `쉬는 시간, ${hm(h[3])}에 다시 열어요`, range];
+  if (h[1] - now <= 60) return ["w", `곧 닫아요 (${hm(h[1])})`, range];
+  return ["o", "지금 영업 중", range];
+}
+
+const list = document.getElementById("list");
+const GROUP = { cafe: "카페, 디저트", food: "밥" };
+let sel = -1, cur = "all", overlays = [], map = null;
+
+function render() {
+  list.innerHTML = Object.entries(GROUP).map(([g, label]) => `
+    <section class="group" data-g="${g}"><h2>${label}</h2>
+    ${S.map((s, i) => s.g !== g ? "" : (() => {
+      const [c, txt, range] = status(s);
+      return `<article class="spot ${s.g}" data-i="${i}" id="s${i}">
+        <div class="pin">${i + 1}</div>
+        <div>
+          <h3>${s.name}<span class="kind">${s.kind}</span><span class="new">${s.tag}</span></h3>
+          <p class="why">${s.why}</p>
+          <p class="menu">${s.menu.map(([n, p]) => `<b>${n}</b>${p ? " " + p : ""}`).join(", ")}</p>
+          <div class="facts">
+            <span><span class="now ${c}">${txt}</span>${range ? `, ${range.replace("오늘 ", "")}` : ""}</span>
+            <span>${s.walk}${s.note ? `. ${s.note}` : ""}</span>
+          </div>
+          ${s.tip ? `<p class="tip">${s.tip}</p>` : ""}
+          <div class="links"><a href="${s.kakao}" target="_blank" rel="noopener">카카오맵</a>${s.insta ? `<a href="https://www.instagram.com/${s.insta}" target="_blank" rel="noopener">인스타</a>` : ""}</div>
+        </div>
+      </article>`;
+    })()).join("")}
+    </section>`).join("");
+  document.querySelectorAll(".group").forEach(g => g.hidden = cur !== "all" && g.dataset.g !== cur);
+  if (sel >= 0) document.getElementById("s" + sel).classList.add("on");
+}
+render();
+setInterval(render, 60000);
+
+function pick(i, fromMap) {
+  sel = i;
+  document.querySelectorAll(".spot").forEach(e => e.classList.toggle("on", +e.dataset.i === i));
+  overlays.forEach((o, k) => o.el.classList.toggle("on", k === i));
+  if (map) map.panTo(new kakao.maps.LatLng(S[i].lat, S[i].lng));
+  if (!fromMap) return;
+  const el = document.getElementById("s" + i);
+  if (matchMedia("(max-width:760px)").matches) {
+    const cover = document.querySelector(".map").offsetHeight + document.querySelector(".seg").offsetHeight + 8;
+    scrollTo({ top: el.getBoundingClientRect().top + scrollY - cover, behavior: "smooth" });
+  } else el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+list.addEventListener("click", e => {
+  if (e.target.closest("a")) return;
+  const a = e.target.closest(".spot"); if (a) pick(+a.dataset.i);
+});
+
+document.querySelectorAll(".seg button").forEach(b => b.onclick = () => {
+  const f = cur = b.dataset.f;
+  document.querySelectorAll(".seg button").forEach(x => x.setAttribute("aria-pressed", x === b));
+  document.querySelectorAll(".group").forEach(g => g.hidden = f !== "all" && g.dataset.g !== f);
+  overlays.forEach((o, k) => o.el.classList.toggle("off", f !== "all" && S[k].g !== f));
+  fit(f);
+  const side = document.getElementById("side");
+  const top = document.querySelector("header").offsetHeight;
+  if (matchMedia("(max-width:760px)").matches) { if (scrollY > top) scrollTo({ top }); }
+  else side.scrollTop = Math.min(side.scrollTop, top);
+});
+
+function fit(f = "all") {
+  if (!map) return;
+  const b = new kakao.maps.LatLngBounds();
+  b.extend(new kakao.maps.LatLng(STATION.lat, STATION.lng));
+  S.forEach(s => (f === "all" || s.g === f) && b.extend(new kakao.maps.LatLng(s.lat, s.lng)));
+  map.setBounds(b, 40, 40, 40, 40);
+}
+
+const sdk = document.createElement("script");
+sdk.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=358283f945823ab37a1aa0778845e544&autoload=false";
+sdk.onerror = () => document.getElementById("nomap").hidden = false;
+document.head.append(sdk);
+sdk.onload = () => kakao.maps.load(() => {
+  map = new kakao.maps.Map(document.getElementById("map"), { center: new kakao.maps.LatLng(STATION.lat, STATION.lng), level: 4 });
+  map.addControl(new kakao.maps.ZoomControl(), kakao.maps.ControlPosition.RIGHT);
+  const st = document.createElement("div"); st.className = "st"; st.textContent = "광명역";
+  new kakao.maps.CustomOverlay({ map, position: new kakao.maps.LatLng(STATION.lat, STATION.lng), content: st, yAnchor: .5, zIndex: 1 });
+  overlays = S.map((s, i) => {
+    const el = document.createElement("div");
+    el.className = "mk " + s.g;
+    el.innerHTML = `<i><span>${i + 1}</span></i><em>${s.name}</em>`;
+    el.onclick = () => pick(i, true);
+    new kakao.maps.CustomOverlay({ map, position: new kakao.maps.LatLng(s.lat, s.lng), content: el, xAnchor: 0, yAnchor: 0, zIndex: 2 });
+    return { el };
+  });
+  fit();
+});
+</script>
+<script src="../hub/back.js" data-cat="etc" defer></script>
+</body>
+</html>
