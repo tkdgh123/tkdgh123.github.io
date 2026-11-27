@@ -13,9 +13,29 @@
   a.setAttribute("aria-label", "창업실로 돌아가기");
   a.innerHTML = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>창업실</span>';
   const css = document.createElement("style");
-  css.textContent = "#cu-home{--lift:0px;position:fixed;left:max(14px,env(safe-area-inset-left,0px));bottom:calc(max(14px,env(safe-area-inset-bottom,0px)) + var(--lift));z-index:2147483000;display:inline-flex;align-items:center;gap:5px;height:34px;padding:0 14px 0 9px;border-radius:17px;background:rgba(21,21,20,.84);color:#f2f1ec;font:600 13px/1 \"Pretendard Variable\",Pretendard,system-ui,\"Malgun Gothic\",sans-serif;letter-spacing:0;text-decoration:none;white-space:nowrap;overflow:hidden;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);box-shadow:0 6px 18px -8px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.08) inset;transition:transform .2s,background-color .2s,padding .2s,max-width .25s;max-width:120px}"
-    + "#cu-home:hover{background:rgba(21,21,20,.96);transform:translateY(-1px)}#cu-home:focus-visible{outline:2px solid #2b44a6;outline-offset:3px}#cu-home svg{width:15px;height:15px;flex:none}"
-    + "#cu-home.small{max-width:34px;padding:0 0 0 9px}#cu-home.small:hover,#cu-home.small:focus-visible{max-width:120px;padding:0 14px 0 9px}@media print{#cu-home{display:none}}";
+  // --lift: 아래 고정 막대 높이만큼 단추를 올린다. .small: 게임판 위에서는 화살표만 남긴다
+  css.textContent = `
+    #cu-home {
+      --lift: 0px;
+      position: fixed; z-index: 2147483000;
+      left: max(14px, env(safe-area-inset-left, 0px));
+      bottom: calc(max(14px, env(safe-area-inset-bottom, 0px)) + var(--lift));
+      display: inline-flex; align-items: center; gap: 5px;
+      height: 34px; max-width: 120px; padding: 0 14px 0 9px; border-radius: 17px; overflow: hidden;
+      background: rgba(21, 21, 20, .84); color: #f2f1ec;
+      font: 600 13px/1 "Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif;
+      letter-spacing: 0; text-decoration: none; white-space: nowrap;
+      -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+      box-shadow: 0 6px 18px -8px rgba(0, 0, 0, .55), 0 0 0 1px rgba(255, 255, 255, .08) inset;
+      transition: transform .2s, background-color .2s, padding .2s, max-width .25s;
+    }
+    #cu-home:hover { background: rgba(21, 21, 20, .96); transform: translateY(-1px) }
+    #cu-home:focus-visible { outline: 2px solid #2b44a6; outline-offset: 3px }
+    #cu-home svg { width: 15px; height: 15px; flex: none }
+    #cu-home.small { max-width: 34px; padding: 0 0 0 9px }
+    #cu-home.small:hover, #cu-home.small:focus-visible { max-width: 120px; padding: 0 14px 0 9px }
+    @media print { #cu-home { display: none } }
+  `;
   document.head.append(css);
   document.body.append(a);
 
