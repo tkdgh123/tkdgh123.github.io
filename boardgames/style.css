@@ -1032,13 +1032,13 @@ body.watching .endbox .row, body.watching .endbox .peek { display: none }
 #app.room .seats span.new { animation: turnin .45s cubic-bezier(.3,1.6,.5,1) }
 @keyframes turnin { from { transform: scale(.85) } }
 
-/* 넓은 화면: 이름표를 오른쪽 세로 칸으로 빼서 차례와 그 사람 정보를 크게 */
-@media (min-width: 900px) {
-  #app.room { max-width: 1080px; display: grid; grid-template-columns: minmax(0, 1fr) 236px; grid-template-rows: auto auto minmax(0, 1fr); column-gap: 14px }
-  #app.room .bar { grid-column: 1 / -1 }
-  #app.room .banner { grid-column: 1; grid-row: 2 }
-  #app.room .stage { grid-column: 1; grid-row: 3; margin-top: 10px }
-  #app.room .seats { grid-column: 2; grid-row: 2 / 4; flex-direction: column; overflow: auto; margin: 10px 0 0; gap: 8px; min-height: 0; align-content: start }
+/* 넓은 화면: 게임 판은 가운데 그대로, 이름표는 판 오른쪽 빈자리에 세로 칸으로 */
+@media (min-width: 1180px) {
+  #app.room { max-width: none; display: grid; grid-template-columns: minmax(236px, 1fr) minmax(0, 760px) minmax(236px, 1fr); grid-template-rows: auto auto minmax(0, 1fr); column-gap: 18px }
+  #app.room .bar { grid-column: 2 }
+  #app.room .banner { grid-column: 2; grid-row: 2 }
+  #app.room .stage { grid-column: 2; grid-row: 3; margin-top: 10px }
+  #app.room .seats { grid-column: 3; grid-row: 2 / 4; width: 236px; justify-self: start; flex-direction: column; overflow: auto; margin: 10px 0 0; gap: 8px; min-height: 0; align-content: start }
   #app.room .seats::before { content: "같이 하는 사람"; font: 700 12px var(--ui); color: rgba(255,255,255,.75); text-shadow: 0 1px 2px rgba(0,0,0,.6); padding-left: 2px }
   #app.room .seats span { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 4px 6px; padding: 10px 12px; border-radius: 10px; background: #1a1f27; color: #e9edf2; border-left: 6px solid var(--s); font-size: 14px; white-space: normal; box-shadow: 0 3px 10px rgba(0,0,0,.4); transition: none }
   #app.room .seats span b { grid-column: 1; font-size: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
