@@ -124,7 +124,7 @@ export default {
       <p class="say">${v.win != null ? "판이 끝났어요" : my ? (v.w4 ? "넷 더를 받았어요. 4장 받을지 도전할지 골라요" : v.drawn != null ? "가져온 카드를 내거나 넘겨요" : "낼 카드를 누르거나 한 장 가져와요") : `${esc(n[v.cur])} 차례예요`}</p>
       <div class="ring">${v.counts.map((k, p) => `<span class="${p === v.cur ? "cur" : ""}${p === me ? " me" : ""}" style="--s:${SEAT[p]}">${esc(n[p])} <b>${k}</b>${k === 1 ? "<i>한 장</i>" : ""}</span>`).join(v.dir > 0 ? "" : "")}<small>${v.dir > 0 ? "순서: 오른쪽으로" : "순서: 왼쪽으로"}</small></div>
       <div class="table">
-        <button class="lc back" ${my && v.drawn == null && !v.w4 ? "" : "disabled"} data-draw><b>${v.pileN}</b><small>한 장 가져오기</small></button>
+        <button class="lc back" ${my && v.drawn == null && !v.w4 ? "" : "disabled"} data-draw><b>${v.pileN}</b><small>가져오기</small></button>
         ${card(v.top, "disabled", "top")}
         <div class="nowc" style="--c:${COL[v.color][1]}">지금 색<b>${COL[v.color][0]}</b></div>
       </div>

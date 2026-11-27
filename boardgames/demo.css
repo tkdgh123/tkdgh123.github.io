@@ -102,3 +102,14 @@
 .demo .tok { margin: 0 }
 .demo .box.say { margin: 0; min-height: 0 }
 .demo .die { padding: 0; grid-template-columns: 1fr }
+
+/* 11-28 폰에서 읽히게: 설명 그림 글자 키움(판 320칸이 폰에서 약 1.1배라 9칸 아래는 안 읽힘) */
+.demo .card small { font-size: 9.5px }
+.demo .card.hw small { font-size: 9.5px }
+.demo .card.lg small { font-size: 10.5px }
+.demo .tok b { font-size: 10.5px }
+.demo .hex b { font-size: 10px }
+.demo .box span { font-size: 10.5px }
+.demo .box.btn span { font-size: 11px }
+.demo .box.say span, .demo .box.wd span { font-size: 12px }
+.demo .box.say.lg span { font-size: 13px }

@@ -1158,3 +1158,32 @@ button:not(:disabled):active, .lb-card:active { scale: .95 }
 }
 .lb-brand p { white-space: normal; word-break: keep-all }
 .lb-brand p { white-space: nowrap; font-size: 12.5px }
+
+/* 11-28 설명 창 아래 단추 칸: 뒤 글이 비치지 않게 흰 바탕, 위쪽만 살짝 흐리게 */
+.ds-go { background: #fff; box-shadow: 0 -22px 16px -6px #fff; padding-top: 10px }
+
+/* 11-28 손가락으로 눌러 본 기준 */
+/* 위쪽 단추: 손가락으로 누를 수 있게 높이 38px */
+#app.room .bar .out, #app.room .bar .rule, #app.room .bar .hostb, #app.room .bar .code { min-height: 38px; padding-inline: 12px; font-size: 14px }
+/* 차례 안내: 판 정보(1판, 더미 23장)는 띄워서 흐리게, 낱말 중간에서 안 끊기게, 세 줄까지 */
+#app.room .stage > div > .say { word-break: keep-all; -webkit-line-clamp: 3; max-height: calc(4.05em + 12px) }
+#app.room .say small { margin-left: 8px; font-size: 12.5px; opacity: .85; white-space: nowrap }
+/* 결투 손패: 옆으로 숨지 않게 줄 바꿈 */
+.duel .dhand { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); overflow: visible }
+.duel .dc { flex-basis: auto }
+/* 위 이름표 줄 글자 */
+@media (max-width: 1179px) { #app.room .seats span { font-size: 12.5px } #app.room .seats em { font-size: 12px } }
+/* 폰에서 9px 아래로 떨어지던 글자 키움 */
+#app.room .seats small { font-size: 11px }
+.crab .sp > b { font-size: 11px } .crab .cinfo .shell small { font-size: 11.5px }
+.cw i { font-size: 9.5px; letter-spacing: -.5px }
+.lc small { font-size: 10px }
+.hw small { font-size: 9.5px } .hw i { font-size: 10px }
+.gems .gc .cost .gem { min-width: 19px; height: 19px; font-size: 11px }
+.bell .tbl .pl:not(.me) .cnt { font-size: 11.5px }
+.mosaic .mt { width: 23px; height: 23px } .mosaic .mt i { font-size: 10.5px }
+.hw i { white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: clip }
+.lc small { word-break: keep-all }
+/* 넓고 높은 화면: 판 안 내용이 폰 크기 그대로라 휑해서, 높이가 넉넉하면 키움 */
+@media (min-width: 1180px) and (min-height: 860px) { #app.room .stage > div { zoom: 1.2 } }
+@media (min-width: 1180px) and (min-height: 1040px) { #app.room .stage > div { zoom: 1.35 } }
