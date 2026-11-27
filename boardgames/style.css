@@ -1187,3 +1187,11 @@ button:not(:disabled):active, .lb-card:active { scale: .95 }
 /* 넓고 높은 화면: 판 안 내용이 폰 크기 그대로라 휑해서, 높이가 넉넉하면 키움 */
 @media (min-width: 1180px) and (min-height: 860px) { #app.room .stage > div { zoom: 1.2 } }
 @media (min-width: 1180px) and (min-height: 1040px) { #app.room .stage > div { zoom: 1.35 } }
+/* 카드 종이 그림자가 덮어 버린 상태 표시 되살림: 암호 단어 대장의 팀 색 테두리, 대부호 고른 카드, 고스톱 달 색 테두리 */
+#app .grid5 .cw.r { box-shadow: inset 0 0 0 4px #c8321f, var(--card-sh) !important }
+#app .grid5 .cw.b { box-shadow: inset 0 0 0 4px #2a64b8, var(--card-sh) !important }
+#app .grid5 .cw.a { box-shadow: inset 0 0 0 4px #111, var(--card-sh) !important }
+#app .grid5 .cw.x { box-shadow: inset 0 0 0 4px #b9ad92, var(--card-sh) !important }
+#app .grid5 .cw.op { background-image: none }
+#app .rhand .rk.on { box-shadow: inset 0 0 0 3px #6b3f78, 0 8px 16px rgba(0,0,0,.35) !important }
+#app .hw { box-shadow: inset 0 0 0 2px var(--h), 0 1px 1px rgba(0,0,0,.28), 0 4px 10px rgba(0,0,0,.28) !important }

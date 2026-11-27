@@ -87,7 +87,7 @@ export default {
       const t = v.task;
       if (t.done) body = `<p class="say">냈어요. ${v.n - v.sub.length}명 기다리는 중 <small>${left}초</small></p>`;
       else if (t.kind === "draw") body = `<p class="say">이걸 그려요: <b class="word">${esc(t.prev)}</b><small>${left}초</small></p><div class="pad" id="padw"></div><div class="acts"><button class="ghost clr">다 지우기</button><button class="sendd">다 그렸어요</button></div>`;
-      else body = `<p class="say">이 그림은 뭘까요? <small>${left}초</small></p><div class="pic">${t.prev ? `<img src="${t.prev}" alt="앞사람 그림">` : `<span class="dim">앞사람이 시간 안에 못 그렸어요</span>`}</div><form class="gform"><input name="w" maxlength="20" placeholder="낱말" autocomplete="off" required><button>내기</button></form>`;
+      else body = `<p class="say">이 그림은 뭘까요? <small>${left}초</small></p><div class="pic">${t.prev ? `<img src="${t.prev}" alt="앞사람 그림">` : `<span class="dim">앞사람이 시간 안에 못 그렸어요</span>`}</div><form class="gform"><input name="w" maxlength="20" placeholder="낱말" autocomplete="off"><button>내기</button></form>`;
     } else if (v.phase === "play") body = `<p class="say">구경 중이에요</p>`;
     else {
       body = `<p class="say">${v.phase === "end" ? "다 넘겨 봤어요" : `${esc(n[v.showB])}의 책 (${v.showB + 1}/${v.n})`}</p>
@@ -104,7 +104,7 @@ export default {
       gi.value = UI.g[v.step] || ""; if (UI.focus) { gi.focus(); gi.setSelectionRange(gi.value.length, gi.value.length); }
       gi.oninput = () => UI.g[v.step] = gi.value; gi.onfocus = () => UI.focus = true; gi.onblur = () => UI.focus = false;
     }
-    el.querySelector(".gform")?.addEventListener("submit", e => { e.preventDefault(); UI.focus = false; send({ t: "guess", w: new FormData(e.target).get("w") }); });
+    el.querySelector(".gform")?.addEventListener("submit", e => { e.preventDefault(); if (!e.target.w.value.trim()) return e.target.w.focus(); UI.focus = false; send({ t: "guess", w: new FormData(e.target).get("w") }); });
     const pw = el.querySelector("#padw");
     if (pw) {
       const cv = keep || makeCanvas();
