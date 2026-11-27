@@ -1,6 +1,6 @@
 // 궁궐 신분전 — 같은 숫자 묶음을 더 작은 숫자로 덮으며 손패를 먼저 털면 다음 판 왕이 되는 게임 (4~8명)
-// 카드: 숫자 k가 k장(1~10, 55장) + 광대 2장(아무 숫자로 같이 냄). 작은 숫자가 셈.
-// 판이 끝나면 꼴찌가 제일 좋은 카드 둘을 왕에게, 왕은 아무 카드 둘을 꼴찌에게. 세 판 점수로 순위.
+// 카드: 숫자 k가 k장(1~12, 78장) + 광대 2장(아무 숫자로 같이 냄). 작은 숫자가 셈. 원작(달무티) 80장 그대로.
+// 판이 끝나면 꼴찌가 제일 좋은 카드 둘을 왕에게, 왕은 나쁜 카드 둘을 꼴찌에게. 둘째와 꼴찌 앞 사람은 한 장씩. 세 판 점수로 순위.
 import { esc, shuffle, SEAT, logPush, nameB } from "../lib.js";
 
 const J = 13, ROUNDS = 3, TITLE = ["왕", "대신", "선비", "장인", "상인", "농부", "머슴", "노비"];
@@ -8,7 +8,7 @@ const titleOf = (place, n) => place === 0 ? "왕" : place === n - 1 ? "노비" :
 
 function deal(s, rng) {
   const d = [];
-  for (let k = 1; k <= 10; k++) for (let i = 0; i < k; i++) d.push(k);
+  for (let k = 1; k <= 12; k++) for (let i = 0; i < k; i++) d.push(k);
   d.push(J, J);
   shuffle(d, rng);
   const order = s.order; // 자리 순서 = 지난 판 등수 (첫 판은 자리 번호)
@@ -21,6 +21,11 @@ function deal(s, rng) {
     s.hands[king].push(...good); s.hands[low].push(...bad);
     s.hands.forEach(h => h.sort((a, b) => a - b));
     logPush(s, { k: "tax", king, low, good });
+    const two = order[1], low2 = order[s.n - 2]; // 둘째와 꼴찌 앞 사람은 한 장씩
+    const g1 = s.hands[low2].splice(0, 1), b1 = s.hands[two].splice(-1, 1);
+    s.hands[two].push(...g1); s.hands[low2].push(...b1);
+    s.hands.forEach(h => h.sort((a, b) => a - b));
+    logPush(s, { k: "tax", king: two, low: low2, good: g1 });
   }
   s.cur = order[0]; s.lead = order[0]; s.top = null; s.passed = []; s.out = [];
 }

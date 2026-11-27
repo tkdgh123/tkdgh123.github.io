@@ -1,0 +1,104 @@
+/* 설명 그림(demo.js) — 11-27 */
+.demo { position: relative; overflow: hidden; border-radius: 12px; background: radial-gradient(ellipse at 50% 40%, #2f7a57, #1d523a 75%); box-shadow: inset 0 0 0 1px rgba(255,255,255,.08), inset 0 -20px 40px rgba(0,0,0,.2); user-select: none; -webkit-user-select: none }
+.dstage { position: absolute; left: 0; top: 0; width: 320px; height: 200px; transform-origin: 0 0 }
+.demo .it { position: absolute; left: 0; top: 0; display: grid; place-items: center; --c: rgba(255,255,255,.1) } /* 바깥(분류) 색을 물려받지 않게, 색은 대본의 c로만 */
+.demo .card { background: #fbf8f0; border-radius: 4px; box-shadow: 0 1px 0 rgba(0,0,0,.2), 0 3px 6px rgba(0,0,0,.35); overflow: hidden }
+.demo .card b { font: 900 15px/1 var(--box); letter-spacing: -.02em }
+.demo .card small { position: absolute; left: 2px; top: 1px; font: 700 7px/1 var(--ui); color: #6b5b45 }
+.demo .card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover }
+.demo .card .many { display: flex; flex-wrap: wrap; align-content: center; justify-content: center; gap: 1px; width: 100%; height: 100%; padding: 2px }
+.demo .card .many img { position: static; width: 44%; height: auto; aspect-ratio: 1; object-fit: contain }
+.demo .card .many.n1 img { width: 80% }
+.demo .card .ci { position: absolute; right: 2px; bottom: 1px; font-size: 12px; background: rgba(255,255,255,.92); border-radius: 3px; padding: 1px 3px }
+.demo .card .bk { position: absolute; inset: 2px; border-radius: 3px; background: repeating-linear-gradient(45deg, var(--c) 0 3px, color-mix(in srgb, var(--c), #fff 22%) 3px 6px); box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.55) }
+.demo .die { background: #fffaf0; border-radius: 5px; box-shadow: 0 2px 0 #cbbf9f, 0 4px 6px rgba(0,0,0,.35) }
+.demo .die .pp { display: grid; grid: repeat(3, 1fr) / repeat(3, 1fr); width: 100%; height: 100%; padding: 3px }
+.demo .die .pp i { width: 4.4px; height: 4.4px; border-radius: 50%; background: #1d1d1d; place-self: center }
+.demo .die.red { background: #d93a2b } .demo .die.red .pp i { background: #fff }
+.demo .tok { border-radius: 50%; background: var(--c); box-shadow: 0 2px 0 rgba(0,0,0,.3), inset 0 -2px 0 rgba(0,0,0,.18); color: #fff; overflow: hidden }
+.demo .tok b { font: 800 9px/1 var(--ui) }
+.demo .tok img { width: 100%; height: 100%; object-fit: cover }
+.demo .tok.house { border-radius: 0; clip-path: polygon(50% 0, 100% 42%, 100% 100%, 0 100%, 0 42%); box-shadow: none }
+.demo .tok.pawn { border-radius: 0; clip-path: polygon(50% 0, 78% 18%, 66% 52%, 100% 100%, 0 100%, 34% 52%, 22% 18%); box-shadow: none }
+.demo .tok.crab { background: transparent; box-shadow: none; border-radius: 0; overflow: visible; filter: drop-shadow(0 2px 2px rgba(0,0,0,.4)) }
+.demo .tok.crab::after { content: ""; position: absolute; left: 50%; bottom: -4px; width: 10px; height: 4px; margin-left: -5px; border-radius: 2px; background: var(--c) }
+.demo .tok.bell { background: radial-gradient(circle at 40% 35%, #fff3b0, #f2c230 45%, #b8860b); box-shadow: 0 4px 0 #7a5a10, 0 6px 10px rgba(0,0,0,.4) }
+.demo .tile { background: #fbf6e6; border-radius: 3px; box-shadow: 0 2px 0 #cdbf98, 0 3px 5px rgba(0,0,0,.3) }
+.demo .tile b { font: 900 14px/1 var(--box) }
+.demo .hex svg { width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 2px 2px rgba(0,0,0,.35)) }
+.demo .hex b { position: absolute; left: 50%; top: 50%; width: 17px; height: 17px; margin: -8.5px 0 0 -8.5px; border-radius: 50%; background: #f6ecd0; font: 800 9px/17px var(--ui); text-align: center; color: #222; box-shadow: 0 1px 2px rgba(0,0,0,.4) }
+.demo .hex b.hot { color: #c0392b }
+.demo .img img { width: 100%; height: 100%; object-fit: cover; border-radius: 6px }
+.demo .box { border-radius: 6px; background: var(--c, rgba(255,255,255,.1)); box-shadow: inset 0 0 0 1px rgba(255,255,255,.22) }
+.demo .box span { position: absolute; left: 4px; top: 2px; font: 700 8px/1.1 var(--ui); color: rgba(255,255,255,.85); white-space: nowrap }
+.demo .box.road { border-radius: 2px; box-shadow: 0 1px 2px rgba(0,0,0,.4) }
+.demo .box.btn { background: #fff; box-shadow: 0 2px 0 rgba(0,0,0,.3) }
+.demo .box.btn span { position: static; color: #222; font-size: 9px }
+.demo .box.cell { border-radius: 0; box-shadow: inset 0 0 0 .5px rgba(0,0,0,.45) }
+.demo .stone { border-radius: 50%; box-shadow: 0 2px 2px rgba(0,0,0,.4) }
+.demo .stone.b { background: radial-gradient(circle at 35% 30%, #666, #111 60%) }
+.demo .stone.w { background: radial-gradient(circle at 35% 30%, #fff, #d8d4c8 70%) }
+.demo .txt { color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.5) }
+.demo .it.hl { animation: dhl .7s }
+@keyframes dhl { 40% { box-shadow: 0 0 0 3px #ffd84d, 0 0 16px 4px rgba(255,216,77,.8) } }
+.demo .hex.hl, .demo .txt.hl, .demo .tok.crab.hl { animation: dhlf .7s }
+@keyframes dhlf { 40% { filter: brightness(1.35) drop-shadow(0 0 6px #ffd84d) } }
+.demo .finger { position: absolute; left: -14px; top: -9px; width: 30px; height: 30px; z-index: 50; pointer-events: none; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M10 7.5c0-.83.67-1.5 1.5-1.5S13 6.67 13 7.5v6h.76c.19 0 .37.04.54.11l4.54 2.26c.53.22.91.76.91 1.38 0 .06-.01.13-.02.2l-.75 5.27c-.11.73-.69 1.28-1.44 1.28h-6.79c-.41 0-.79-.17-1.06-.44L4.75 18.6l.79-.8c.2-.2.48-.33.79-.33.09 0 .16.02.24.03L10 18.24z' fill='%23fff' stroke='%23222' stroke-width='1.1' stroke-linejoin='round'/%3E%3C/svg%3E") 0 0 / 100% no-repeat; filter: drop-shadow(0 3px 3px rgba(0,0,0,.45)) }
+.demo .finger::after { content: ""; position: absolute; left: 14.4px; top: 9.4px; width: 0; height: 0; border-radius: 50%; border: 2px solid #fff; opacity: 0; transform: translate(-50%, -50%) }
+.demo .finger.press { animation: fpress .36s }
+.demo .finger.press::after { animation: fring .5s ease-out }
+.demo .finger.hold { scale: .9 }
+@keyframes fpress { 50% { scale: .82 } }
+@keyframes fring { from { width: 4px; height: 4px; opacity: 1 } to { width: 34px; height: 34px; opacity: 0 } }
+.demo .pop { position: absolute; left: 0; top: 0; z-index: 60; font: 900 13px/1 var(--box); color: #fff; white-space: nowrap; pointer-events: none; text-shadow: 0 1px 0 #000, 0 0 6px rgba(0,0,0,.7); translate: -50% 0; animation: dpop 1.45s forwards }
+@keyframes dpop { from { margin-top: 6px; opacity: 0 } 15% { margin-top: 0; opacity: 1 } 75% { opacity: 1 } to { margin-top: -14px; opacity: 0 } }
+/* 설명 그림 c.js 전용 모양 (11-27) */
+.demo .box.say { background: #fff; border-radius: 9px; box-shadow: 0 2px 0 rgba(0,0,0,.25) }
+.demo .box.say span { position: static; color: #222; font: 800 10px/1 var(--ui); white-space: nowrap }
+.demo .box.btn.big span { font-size: 12px }
+.demo .box.ln { border-radius: 0; box-shadow: none }
+.demo .box.ring { background: none; border-radius: 50%; box-shadow: 0 0 0 2.5px #ffd84d }
+.demo .box.wd { background: var(--c, #f2ead2); border-radius: 4px; box-shadow: 0 1px 0 rgba(0,0,0,.3) }
+.demo .box.wd span { position: static; color: #222; font: 800 10px/1 var(--ui) }
+.demo .box.sheet { background: #fbf7ea; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,.35) }
+.demo .box.yut { border-radius: 6px; background: var(--c, #f2e2b0); box-shadow: 0 2px 0 rgba(0,0,0,.35), inset 0 0 0 1px rgba(0,0,0,.25) }
+.demo .txt.ink { text-shadow: none }
+.demo .tile.blk { background: #2d2d36; box-shadow: 0 2px 0 #111, 0 3px 5px rgba(0,0,0,.4) }
+.demo .tok.tm b { font-size: 16px }
+.demo .card.hw:not(.down) { background: linear-gradient(var(--c) 0 36%, #fffdf4 36%) }
+.demo .card.hw b { margin-top: 9px; font-size: 13px }
+.demo .card.hw small { color: #fff; font-size: 8px }
+
+/* c 11-27 (2차: 큰 글자, 체력, 개수 표시) */
+.demo .box.say.lg span { font-size: 12px }
+.demo .box.say.xl span { font-size: 14px }
+.demo .box.say.gold { background: #ffd84d }
+.demo .box.cnt { background: rgba(0,0,0,.4); box-shadow: inset 0 0 0 1px rgba(255,255,255,.25) }
+.demo .box.cnt span { position: static; color: #ffd84d; font: 900 22px/1 var(--ui) }
+.demo .box.wd.lg span { font-size: 14px }
+.demo .tok.hp { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 21s-8-5.2-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.800-8 11-8 11z' fill='%23ff4d5a' stroke='%237a0f1c' stroke-width='1.4'/%3E%3C/svg%3E") center / contain no-repeat; box-shadow: none; overflow: visible }
+.demo .tok.hp b { display: none }
+.demo .tok.t2 b { font-size: 11px }
+/* b 11-27: b.js 설명 그림 크게 보이게 */
+.demo .card.lg b { font-size: 22px }
+.demo .card.lg small { font-size: 9px }
+.demo .tile.lg b { font-size: 19px }
+.demo .tile.old { filter: brightness(.76) saturate(.85) }
+.demo .die.lg .pp i { width: 6px; height: 6px }
+.demo .it.box.wd { --c: #f2ead2 } .demo .it.box.yut { --c: #f2e2b0 } /* 기본 색이 있는 칸 */
+
+/* 11-27 밤: 방 안과 같은 카드 종이, 금박 뒷면, 상아 주사위 */
+.demo .card { background: url(art/cardface.webp) center / 100% 100%; border-radius: 4px; box-shadow: 0 1px 1px rgba(0,0,0,.3), 0 3px 7px rgba(0,0,0,.35) }
+.demo .card .bk { inset: 0; border-radius: 4px; background: url(art/cardback.webp) center / 100% 100%; box-shadow: none }
+.demo .card.hw:not(.down) { background: linear-gradient(var(--c) 0 36%, transparent 36%), url(art/cardface.webp) center / 100% 100% }
+.demo .die { background: radial-gradient(130% 130% at 28% 22%, #fffefa 0%, #f6efdf 45%, #e6dac0 100%); border-radius: 24%; box-shadow: inset 0 -2px 1px rgba(130,100,50,.28), inset 0 1px 1px rgba(255,255,255,.95), 0 1px 1px rgba(0,0,0,.3), 0 4px 7px rgba(0,0,0,.32) }
+.demo .die .pp i { background: radial-gradient(circle at 42% 38%, #4a4a4a 0, #111 60%); box-shadow: inset 0 1px 1px rgba(0,0,0,.9) }
+.demo .die.red { background: radial-gradient(130% 130% at 28% 22%, #f07a66 0%, #d93a2b 55%, #a8251a 100%) } .demo .die.red .pp i { background: #fff; box-shadow: none }
+
+/* 겹침 고침 */
+.demo .pop.still { animation: dpops 1.45s forwards }
+@keyframes dpops { from { opacity: 0 } 12% { opacity: 1 } 80% { opacity: 1 } to { opacity: 0 } }
+/* style.css의 .tok, .say, .die 가 설명 그림 물건에 섞여 들어와 토큰이 10px, 말풍선이 8px 아래로 밀리던 것을 되돌림 */
+.demo .tok { margin: 0 }
+.demo .box.say { margin: 0; min-height: 0 }
+.demo .die { padding: 0; grid-template-columns: 1fr }

@@ -1,8 +1,9 @@
 /* 주사위섬 보드게임방 */
+@font-face { font-family: "Gmarket Box"; src: url(https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansBold.woff) format("woff"); font-weight: 100 900; font-display: swap }
 :root {
   --sea: #0f4c5c; --sea-2: #1b6a7a; --bg: #e7eff1; --paper: #fbfcfc; --ink: #14202a; --ink-2: #56636e; --rule: #cfdadf;
   --ui: "Pretendard Variable", Pretendard, system-ui, "Malgun Gothic", sans-serif;
-  --box: "Black Han Sans", "Pretendard Variable", "Malgun Gothic", sans-serif;
+  --box: "Gmarket Box", "Pretendard Variable", "Malgun Gothic", sans-serif;
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent }
 html { background: var(--bg) }
@@ -17,26 +18,6 @@ input { font: inherit; padding: 10px 12px; border: 1.5px solid var(--rule); bord
 #toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(24px + env(safe-area-inset-bottom, 0px)); background: var(--ink); color: #fff; padding: 10px 18px; border-radius: 10px; z-index: 50; max-width: calc(100% - 32px); font-size: 15px }
 
 /* ── 첫 화면 ── */
-.lobby .top { padding: 18px 0 6px }
-.lobby h1 { font: 400 clamp(44px, 12vw, 72px)/1 var(--box); margin: 0 0 12px; color: var(--sea) }
-.lobby .top p { margin: 0; color: var(--ink-2); max-width: 30em }
-.join { display: grid; grid-template-columns: 1fr 110px auto; gap: 8px; align-items: end; margin: 22px 0 28px }
-.join label { font-size: 13px; color: var(--ink-2); display: grid; gap: 4px }
-@media (max-width: 460px) { .join { grid-template-columns: 1fr 1fr } .join button { grid-column: 1 / -1 } }
-.places { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px }
-.places li { display: grid; grid-template-columns: 88px 1fr; gap: 6px 16px; background: var(--paper); border-radius: 12px; padding: 16px; position: relative; overflow: hidden }
-.places li::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 6px; background: var(--c) }
-.places .pl { padding-left: 6px }
-.places .pl b { display: block; font: 400 24px/1.1 var(--box); color: var(--c) }
-.places .pl small { color: var(--ink-2); font-size: 12px }
-.places h2 { font: 400 23px/1.15 var(--box); margin: 0 0 4px }
-.places p { margin: 0 0 4px; font-size: 15px }
-.places span { font-size: 13px; color: var(--ink-2) }
-.places .bt { grid-column: 2; display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px }
-.places .bt button { background: var(--c) }
-.places .bt button.ghost { background: transparent }
-@media (max-width: 460px) { .places li { grid-template-columns: 1fr } .places .bt { grid-column: 1 } .places .pl { display: flex; gap: 8px; align-items: baseline } }
-.note { color: var(--ink-2); font-size: 13px; margin-top: 18px }
 
 /* ── 방 ── */
 .wait { padding: 40px 0; display: grid; gap: 12px; max-width: 360px }
@@ -239,10 +220,6 @@ body:has(#app.room) #cu-home { display: none }
 .tg button { padding: 6px 0 }
 
 /* ── 첫 화면 인원 거르기 ── */
-.want { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 0 0 14px }
-.want span { font-size: 14px; color: var(--ink-2); margin-right: 4px }
-.want button { background: var(--paper); color: var(--ink); padding: 7px 12px; font-size: 14px; box-shadow: inset 0 0 0 1.5px var(--rule) }
-.want button.on { background: var(--sea); color: #fff; box-shadow: none }
 
 /* ── 주사위 족보 ── */
 .ydice { display: flex; gap: 10px; justify-content: center; margin: 10px 0; min-height: 56px; align-items: center }
@@ -604,18 +581,6 @@ body::before { content: ""; position: fixed; inset: 0; pointer-events: none; z-i
 #app { position: relative; z-index: 1 }
 
 /* 첫 화면: 섬 지도 + 게임 상자 */
-.lobby .top { position: relative; margin: 0 -14px; padding: 0; border-radius: 0 0 18px 18px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,.45) }
-.lobby .top img { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover }
-.lobby .top .tt { position: absolute; left: 0; right: 0; bottom: 0; padding: 40px 18px 16px; background: linear-gradient(transparent, rgba(8,30,40,.82)) }
-.lobby h1 { color: #fff; text-shadow: 0 3px 0 rgba(0,0,0,.35); margin: 0 0 6px }
-.lobby .top p { color: #e9f1f0; margin: 0 }
-@media (min-width: 800px) { .lobby .top { margin: 0; border-radius: 18px } }
-.join { background: var(--paper); border-radius: 12px; padding: 12px; box-shadow: var(--card-sh) }
-.want span { color: #fff3dc; text-shadow: 0 1px 2px rgba(0,0,0,.6) }
-.want button { box-shadow: var(--card-sh) }
-.places li { background: linear-gradient(180deg, #fffaf0, #f1e7d2); box-shadow: 0 2px 0 rgba(0,0,0,.25), 0 10px 22px rgba(0,0,0,.4); border-radius: 10px }
-.places li::before { width: 10px; box-shadow: inset -2px 0 0 rgba(0,0,0,.15) }
-.note { color: #f3e4c8 }
 
 /* 방 머리: 가죽 띠, 이름표 */
 .bar { background: linear-gradient(180deg, #3a2a1e, #24180f); box-shadow: 0 4px 14px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.08) }
@@ -827,10 +792,6 @@ body:has(#app.room) { padding-inline: 6px }
 
 /* ════ 11-26 밤 3판: 닉네임, 나가기, 방장 메뉴, 규칙, 움직임, 소라게 판, 판 그림 ════ */
 /* 첫 화면 닉네임 */
-.nick { display: flex; align-items: center; gap: 10px; background: var(--paper); border-radius: 12px; padding: 10px 12px; margin: 14px 0 10px; box-shadow: var(--card-sh) }
-.nick span { font-size: 13px; color: var(--ink-2) } .nick b { flex: 1; font-size: 17px } .nick button { padding: 6px 12px }
-.join { grid-template-columns: 1fr auto; margin-top: 0 }
-.places .bt button[data-rule] { margin-left: auto }
 .nickin { font-size: 18px }
 /* 위 띠 단추 */
 #app.room .bar { gap: 6px }
@@ -849,11 +810,6 @@ body:has(#app.room) { padding-inline: 6px }
 .appsheet .in { gap: 8px }
 .appsheet .in > button { width: 100% }
 .appsheet .wrow { display: flex; flex-wrap: wrap; gap: 6px; align-items: center } .appsheet .wrow button { padding: 6px 10px; font-size: 13px }
-.rules .rt { font: 400 22px var(--box); color: var(--c); margin: 0 } .rules .rt small { font: 500 13px var(--ui); color: var(--ink-2); margin-left: 6px }
-.rules .rstep { display: grid; grid-template-columns: 42px 1fr; gap: 10px; align-items: start; min-height: 120px }
-.rules .rstep b { font: 400 18px var(--box); color: #fff; background: var(--sea); border-radius: 8px; padding: 6px 0; text-align: center }
-.rules .rstep p { margin: 0; font-weight: 500; font-size: 16px; line-height: 1.6 }
-.rules .row { margin: 0 } .rules .row button { flex: 1 }
 /* 대기실 */
 .lobbywait .wtitle { font: 400 26px var(--box); color: var(--c); margin: 0 0 4px; display: flex; align-items: baseline; gap: 8px }
 .lobbywait .wtitle small { font: 500 13px var(--ui); color: var(--ink-2) }
@@ -900,7 +856,7 @@ body:has(#app.room) { padding-inline: 6px }
 .crab .cr.pick { cursor: pointer; animation: bob .7s infinite alternate } .crab .cr.pick::before { box-shadow: 0 0 0 3px #fff, 0 0 12px 4px #ffe07a }
 @keyframes bob { to { translate: 0 -4px } }
 .crab .seat { position: absolute; transform: translate(-50%, -50%); background: var(--paper); border-bottom: 3px solid var(--s); border-radius: 6px; padding: 1px 7px; font-size: 11px; font-weight: 700; box-shadow: var(--card-sh); white-space: nowrap; z-index: 9 }
-.crab .seat.cur { background: var(--s); color: #fff } .crab .seat.me { outline: 2px solid #fff }
+.crab .seat.cur { background: var(--s); color: #fff } .crab .seat.me::after { content: "나"; margin-left: 4px; padding: 0 4px; border-radius: 3px; background: var(--ink); color: #fff; font-size: 9px }
 .crab .tray { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 46%; height: 16%; display: flex; gap: 6%; align-items: center; justify-content: center; z-index: 8; pointer-events: none }
 .crab .tray .die { width: 30%; max-width: 46px; height: auto; aspect-ratio: 1; padding: 6% }
 .crab .tray .die i { width: auto; height: auto; aspect-ratio: 1; margin: 18% }
@@ -944,3 +900,261 @@ body:has(#app.room) { padding-inline: 6px }
 .bell .tbl.t5 { grid-template-columns: repeat(4, 1fr) } .bell .tbl.t6 { grid-template-columns: repeat(5, 1fr) }
 .bell .tbl .pl:not(.me) .fc { max-width: min(70px, 9vh) } .bell .tbl .pl:not(.me) { padding: 5px 3px } .bell .tbl .pl:not(.me) .cnt { font-size: 10px }
 .bell .tbl.t2 .pl:not(.me) .fc, .bell .tbl.t3 .pl:not(.me) .fc { max-width: min(84px, 11vh) }
+
+/* ════ 첫 화면 2판 (11-27): 어두운 게임 선반, 분류 색, 움직이는 상자 그림 ════ */
+html:has(#app.lobby), body:has(#app.lobby) { background: #0f1216 }
+body:has(#app.lobby)::before { display: none }
+#app.lobby { --mut: #8f99a5; --line: #29303a; --tile: #181d24; max-width: 1120px; padding-block: calc(10px + env(safe-area-inset-top, 0px)) 100px; color: #eef2f6 }
+.lb-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 4px 0 12px }
+.lb-brand { display: flex; gap: 11px; align-items: center; min-width: 0 }
+.lb-logo { flex: none; width: 34px; height: 34px; border-radius: 8px; background: #fbf7ee; transform: rotate(-9deg); display: grid; grid: repeat(3, 1fr) / repeat(3, 1fr); padding: 5px; box-shadow: 0 3px 0 #c9bea4 }
+.lb-logo i { width: 6px; height: 6px; border-radius: 50%; background: #d23b2b; place-self: center }
+.lb-logo i:nth-child(1) { grid-area: 1 / 1 } .lb-logo i:nth-child(2) { grid-area: 1 / 3 } .lb-logo i:nth-child(3) { grid-area: 2 / 2 } .lb-logo i:nth-child(4) { grid-area: 3 / 1 } .lb-logo i:nth-child(5) { grid-area: 3 / 3 }
+.lb-brand h1 { font: 700 25px/1 var(--box); color: #fff; margin: 0; letter-spacing: -.01em }
+.lb-brand p { margin: 4px 0 0; font-size: 12.5px; color: var(--mut); white-space: nowrap }
+.lb-nick { flex: none; background: var(--tile); color: #fff; border-radius: 10px; padding: 6px 12px; display: grid; text-align: right; font-weight: 700; font-size: 15px; line-height: 1.25; box-shadow: inset 0 0 0 1px var(--line); max-width: 42vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.lb-nick small { font-size: 10.5px; color: var(--mut); font-weight: 500 }
+.lb-me { display: flex; gap: 6px; flex: none }
+.lb-code { background: #eef2f6; color: #111; border-radius: 10px; padding: 0 12px; font-size: 14px; font-weight: 700 }
+.lb-join { display: flex; gap: 8px; margin: 0 }
+.sheet .lb-join input { background: #fff; color: #111; border-color: var(--rule); font-size: 22px }
+.lb-join input { font-weight: 700; letter-spacing: .12em; text-transform: uppercase; padding: 9px 12px }
+.lb-join input::placeholder { letter-spacing: .12em; color: #9aa3ad; font-weight: 500; text-transform: none }
+.lb-join button { flex: none; padding: 9px 18px }
+.lb-filter { position: sticky; top: 0; z-index: 6; margin: 8px -14px 0; padding: 8px 14px; display: grid; gap: 7px; background: rgba(15,18,22,.94); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border-bottom: 1px solid #1d232b }
+.lb-cats, .lb-want { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; align-items: center }
+.lb-cats::-webkit-scrollbar, .lb-want::-webkit-scrollbar { display: none }
+.lb-cats a { flex: none; display: flex; align-items: center; gap: 5px; padding: 6px 8px; border-radius: 8px; background: color-mix(in srgb, var(--c) 16%, #151a20); color: #fff; text-decoration: none; font-weight: 700; font-size: 13.5px; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 50%, transparent) }
+.lb-cats a { box-shadow: inset 0 -3px 0 var(--c), inset 0 0 0 1px color-mix(in srgb, var(--c) 45%, transparent) }
+.lb-cats a.zero { opacity: .35; pointer-events: none }
+.lb-cats a small { color: color-mix(in srgb, var(--c) 45%, #fff); font-weight: 600; font-size: 12px }
+.lb-want span { color: var(--mut); font-size: 12.5px; margin-right: 2px; flex: none }
+.lb-want button { flex: none; min-width: 33px; padding: 5px 7px; background: var(--tile); color: #cfd6de; font-size: 13px; font-weight: 600; border-radius: 7px; box-shadow: inset 0 0 0 1px var(--line) }
+.lb-want button.on { background: #eef2f6; color: #111; box-shadow: none }
+.lb-count { margin: 12px 0 0; color: var(--mut); font-size: 13px }
+.lb-sec { margin-top: 18px; scroll-margin-top: 96px }
+.lb-sec h2 { display: flex; align-items: baseline; flex-wrap: wrap; gap: 2px 8px; font: 700 18px/1.2 var(--box); color: #fff; margin: 0 0 10px; padding-left: 9px; border-left: 4px solid var(--c) }
+.lb-sec h2 small { font: 500 12.5px var(--ui); color: var(--mut) }
+.lb-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px }
+@media (min-width: 640px) { .lb-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px } }
+.lb-card { background: var(--tile); border-radius: 12px; overflow: hidden; cursor: pointer; box-shadow: inset 0 0 0 1px #242b34; display: flex; flex-direction: column; transition: transform .15s, box-shadow .15s; outline: none }
+.lb-card:hover, .lb-card:focus-visible { transform: translateY(-2px); box-shadow: inset 0 0 0 2px var(--c), 0 8px 20px rgba(0,0,0,.35) }
+.lb-card:active { transform: scale(.98) }
+.lb-demo { aspect-ratio: 16 / 10 }
+.lb-card .demo, .ds-demo.demo { background: radial-gradient(ellipse at 50% 38%, color-mix(in srgb, var(--c) 48%, #2a3a33), color-mix(in srgb, var(--c) 26%, #0e1411) 82%) }
+.lb-card .demo { border-radius: 0 }
+.lb-info { padding: 9px 10px 11px; display: grid; gap: 4px; align-content: start; border-top: 3px solid var(--c) }
+.lb-info h3 { margin: 0; font: 700 16.5px/1.2 var(--box); color: #fff; letter-spacing: -.01em }
+.lb-orig { justify-self: start; font-size: 12px; font-weight: 700; color: color-mix(in srgb, var(--c) 40%, #fff); background: color-mix(in srgb, var(--c) 22%, transparent); padding: 1px 6px; border-radius: 5px }
+.lb-info p { margin: 1px 0 0; font-size: 13px; line-height: 1.42; color: #c6ced7; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden }
+.lb-meta { font-size: 12px; color: #a3adb9 }
+.lb-note { color: var(--mut); font-size: 13px; margin-top: 24px }
+
+/* 게임 설명 창 */
+body.noscroll { overflow: hidden }
+body.noscroll #cu-home, body:has(.sheet) #cu-home { display: none }
+.ds-in > * { flex: none }
+.dsheet { position: fixed; inset: 0; z-index: 40; background: rgba(5,8,12,.62); display: grid; place-items: end center; animation: dsf .18s ease-out }
+.ds-in { background: #fff; color: #1b222a; width: min(100%, 560px); max-height: 94dvh; overflow: auto; overscroll-behavior: contain; border-radius: 18px 18px 0 0; padding: 14px 16px 0; display: flex; flex-direction: column; gap: 10px; animation: dsu .24s cubic-bezier(.2,.8,.2,1) }
+@media (min-width: 700px) { .dsheet { place-items: center } .ds-in { border-radius: 18px; max-height: 90vh } }
+@keyframes dsf { from { opacity: 0 } } @keyframes dsu { from { transform: translateY(40px) } }
+.ds-head { display: flex; justify-content: space-between; align-items: center }
+.ds-cat { background: var(--c); color: #fff; font-weight: 700; font-size: 12.5px; padding: 3px 9px; border-radius: 6px }
+.ds-x { background: #eef1f4; color: #333; padding: 6px 12px; font-size: 14px }
+.ds-in h2 { margin: 0; font: 700 28px/1.15 var(--box); letter-spacing: -.01em }
+.ds-orig { margin: -4px 0 0; color: #55606b; font-size: 14px; display: flex; flex-wrap: wrap; gap: 2px 10px; align-items: baseline }
+.ds-orig b { color: color-mix(in srgb, var(--c) 80%, #000) }
+.ds-orig span { color: #7b8691; font-size: 13px }
+.ds-cap { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: start; min-height: 3.1em }
+.ds-n { background: var(--c); color: #fff; font: 700 13px/1 var(--box); padding: 6px 7px 5px; border-radius: 6px; min-width: 34px; text-align: center }
+.ds-cap p { margin: 0; font-size: 16px; font-weight: 600; line-height: 1.45; word-break: keep-all }
+.ds-pause { padding: 5px 10px; font-size: 13px; color: #333 }
+.ds-dots { display: flex; gap: 4px; margin-top: -4px }
+.ds-dots i { flex: 1; height: 4px; border-radius: 2px; background: #e3e7eb; transition: background .3s }
+.ds-dots i.on { background: var(--c) }
+.ds-in section { border-top: 1px solid #edf0f3; padding-top: 10px }
+.ds-in section h3 { margin: 0 0 6px; font: 700 15px var(--box); color: #222 }
+.ds-same { margin-left: 8px; font: 700 12px var(--ui); padding: 2px 7px; border-radius: 5px; vertical-align: 2px }
+.ds-same.s3 { background: #e3f4ea; color: #1d7a45 } .ds-same.s2 { background: #fff1d6; color: #9a5b00 } .ds-same.s1 { background: #fde4e4; color: #b42318 }
+.ds-in section p { margin: 0; font-size: 14.5px; color: #3d4650; line-height: 1.55 }
+.ds-rules { padding-bottom: 8px }
+.ds-rules ol { margin: 0; padding-left: 20px; display: grid; gap: 7px; font-size: 14.5px; line-height: 1.6; color: #2b333b; word-break: keep-all }
+.ds-watch { width: 100%; color: #222 }
+.ds-frame { position: relative; overflow: hidden; border-radius: 12px; background: #3a2616 }
+.ds-frame iframe { position: absolute; left: 0; top: 0; width: 390px; height: 700px; border: 0; transform-origin: 0 0 }
+.ds-go { position: sticky; bottom: 0; display: flex; gap: 8px; padding: 14px 0 calc(14px + env(safe-area-inset-bottom, 0px)); background: linear-gradient(rgba(255,255,255,0), #fff 28%); margin-top: auto }
+.ds-go button { flex: 1; padding: 14px; font-size: 16px }
+.ds-go .ds-make, .ds-go .ds-ok { background: var(--c) }
+.ds-go .ghost { color: #222 }
+/* 봇 판 작은 창 안 */
+body.watching #cu-home, body.watching .bar .out, body.watching .bar .rule, body.watching .bar .code, body.watching .bar .hostb, body.watching #toast { display: none !important }
+body.watching .endbox .row, body.watching .endbox .peek { display: none }
+
+/* 대기실: 분류 색 단추 + 설명 그림 (11-27) */
+.lobbywait .wtitle { color: color-mix(in srgb, var(--c) 85%, #000) }
+.lobbywait .big b { color: #1b222a }
+.lobbywait button:not(.ghost) { background: var(--c) }
+.lobbywait .wdemo { margin: 8px 0 6px }
+.lobbywait .wcap { margin: 0 0 8px; font-weight: 600; font-size: 14px; min-height: 2.9em; color: #3a3226 }
+@media (max-width: 380px) {
+  .lb-brand p { white-space: normal; word-break: keep-all }
+  .lb-cats { gap: 4px } .lb-cats a { padding: 5px 6px; font-size: 12.5px; gap: 3px }
+  .lb-want { gap: 4px } .lb-want button { min-width: 29px; padding: 5px 5px } .lb-want span { font-size: 12px }
+}
+.ds-yt { display: inline-block; margin-top: 8px; font-size: 14px; font-weight: 700; color: #c4302b; text-decoration: none; border-bottom: 1.5px solid currentColor }
+/* 방 머리 띠: 첫 화면과 같은 어두운 띠 + 분류 색 줄 (11-27) */
+#app.room .bar { background: #14181e; box-shadow: 0 4px 14px rgba(0,0,0,.45), inset 0 -3px 0 var(--c) }
+#app.room .bar .out, #app.room .bar .rule, #app.room .bar .code { background: #232a33 }
+#app.room .bar .gname { border-left-color: var(--c) }
+#app.room { --sea: color-mix(in srgb, var(--c) 78%, #000) }
+.lb-easy { display: flex; gap: 6px; align-items: center; overflow-x: auto; scrollbar-width: none; margin: 12px 0 0 }
+.lb-easy::-webkit-scrollbar { display: none }
+.lb-easy span { flex: none; color: var(--mut); font-size: 12.5px; margin-right: 2px }
+.lb-easy button { flex: none; background: transparent; color: #eef2f6; font-size: 13px; font-weight: 700; padding: 5px 9px; border-radius: 7px; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 60%, transparent) }
+.lobbywait .whow { margin: 2px 0 0; font-size: 14px; color: #5b5142; line-height: 1.5 } .lobbywait .whow b { color: #1b222a; letter-spacing: .05em }
+/* 폰 가독성 (11-27 6차 평가) */
+.lb-info h3 { font-size: 17px }
+.lb-info p { font-size: 13.5px; line-height: 1.45 }
+.lb-meta { font-size: 12.5px }
+.ds-cap p { font-size: 16.5px }
+.ds-in section p, .ds-rules ol { font-size: 15px }
+/* 게임 안 안내 띠: 누구 차례인지 한눈에 (11-27 화면 평가) */
+#app.room .stage > div > .say { background: rgba(8,12,16,.5); border-left: 4px solid var(--c); border-radius: 8px; padding: 6px 10px; min-height: calc(2.7em + 12px); max-height: calc(2.7em + 12px) }
+#app.room .stage.myturn > div > .say { background: color-mix(in srgb, var(--c) 30%, rgba(8,12,16,.72)); border-left-color: #ffd84d; box-shadow: inset 0 0 0 1.5px rgba(255,216,77,.7); }
+#app.room .stage.myturn > div > .say::before { content: "내 차례"; display: inline-block; margin-right: 7px; padding: 1px 7px; border-radius: 5px; background: #ffd84d; color: #2a2108; font: 800 12px/1.6 var(--ui); vertical-align: 1px }
+#app.room .map .mtool .cur svg { width: 76px; height: 76px; box-shadow: 0 0 0 3px #ffd84d, 0 4px 10px rgba(0,0,0,.4) } #app.room .map .mtool .cur small { color: #ffe9a8; font-weight: 700; font-size: 12px } /* 놓을 조각을 눈에 띄게 */
+
+/* 11-27 저녁: 이름표. 차례인 사람은 자리 색으로만 칠하고 흰 테두리는 없앰. 내 자리는 "나" 딱지 */
+#app.room .seats span.on, #app.room .seats span.me { box-shadow: var(--card-sh); outline: none }
+#app.room .seats small { font-size: 10px; font-weight: 800; padding: 0 5px; border-radius: 4px; background: var(--ink); color: #fff; line-height: 1.6 }
+#app.room .seats span.on small { background: rgba(0,0,0,.35) }
+#app.room .seats u { display: none; text-decoration: none }
+#app.room .seats span.new { animation: turnin .45s cubic-bezier(.3,1.6,.5,1) }
+@keyframes turnin { from { transform: scale(.85) } }
+
+/* 넓은 화면: 이름표를 오른쪽 세로 칸으로 빼서 차례와 그 사람 정보를 크게 */
+@media (min-width: 900px) {
+  #app.room { max-width: 1080px; display: grid; grid-template-columns: minmax(0, 1fr) 236px; grid-template-rows: auto auto minmax(0, 1fr); column-gap: 14px }
+  #app.room .bar { grid-column: 1 / -1 }
+  #app.room .banner { grid-column: 1; grid-row: 2 }
+  #app.room .stage { grid-column: 1; grid-row: 3; margin-top: 10px }
+  #app.room .seats { grid-column: 2; grid-row: 2 / 4; flex-direction: column; overflow: auto; margin: 10px 0 0; gap: 8px; min-height: 0; align-content: start }
+  #app.room .seats::before { content: "같이 하는 사람"; font: 700 12px var(--ui); color: rgba(255,255,255,.75); text-shadow: 0 1px 2px rgba(0,0,0,.6); padding-left: 2px }
+  #app.room .seats span { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 4px 6px; padding: 10px 12px; border-radius: 10px; background: #1a1f27; color: #e9edf2; border-left: 6px solid var(--s); font-size: 14px; white-space: normal; box-shadow: 0 3px 10px rgba(0,0,0,.4); transition: none }
+  #app.room .seats span b { grid-column: 1; font-size: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+  #app.room .seats small { grid-column: 2; justify-self: start; background: #e9edf2; color: #1a1f27 }
+  #app.room .seats em { grid-column: 1 / -1; grid-row: 2; background: none; padding: 0; margin: 0; font-size: 13px; color: #b3bcc7 }
+  #app.room .seats span.on { background: color-mix(in srgb, var(--s) 38%, #1a1f27); color: #fff; transform: translateX(-8px) }
+  #app.room .seats span.on em { background: none; color: #f1f4f7 }
+  #app.room .seats span.on small { background: #fff; color: #1a1f27 }
+  #app.room .seats u { display: inline-block; grid-column: 3; grid-row: 1; background: #ffd84d; color: #2a2108; font: 800 12px/1.7 var(--ui); padding: 0 8px; border-radius: 6px }
+  #app.room .seats span.new { animation: turnin2 .5s cubic-bezier(.3,1.5,.5,1) }
+  #app.room .seats .watch { display: block; text-align: center; border-left: 0; background: #2b2f36 }
+}
+@keyframes turnin2 { from { transform: translateX(14px); opacity: .4 } }
+
+/* 11-27 밤: 카드와 주사위 고급판. 앞면은 상아색 카드 종이(art/cardface), 뒷면은 남색 금박 무늬(art/cardback, Gemini) */
+#app :is(.rk, .cw:not(.empty):not(.six), .hw, .tl, .fc:not(.empty), .bc, .dc, .vt.w) {
+  background-image: url(art/cardface.webp); background-size: 100% 100%; background-blend-mode: multiply; border-radius: 8px;
+  box-shadow: 0 1px 1px rgba(0,0,0,.28), 0 4px 10px rgba(0,0,0,.28), inset 0 0 0 1px rgba(120,90,40,.18) !important }
+#app :is(.rk, .cw, .hw, .tl, .vt.w) { text-shadow: 0 1px 0 rgba(255,255,255,.7) }
+/* 뒷면: 원카드 더미, 시장 종 뒤집기 전 더미, 불꽃 축제 내 손(모르는 카드) */
+#app .lc.back, #app .fc.empty { background: url(art/cardback.webp) center / 100% 100%; box-shadow: 0 1px 1px rgba(0,0,0,.3), 0 2px 0 #10172a, 0 4px 0 #0c1220, 0 8px 14px rgba(0,0,0,.4) !important; border-radius: 9px }
+#app .lc.back b { color: #f3dc9a; text-shadow: 0 2px 3px #000, 0 0 10px #000; font-size: 26px }
+#app .lc.back small { color: #f3dc9a; background: rgba(10,16,32,.75); border-radius: 4px; padding: 1px 4px; text-shadow: none }
+#app .fcd.hid { background: url(art/cardback.webp) center / 100% 100%; box-shadow: inset 0 0 0 3px var(--c), 0 4px 10px rgba(0,0,0,.35) !important }
+#app .fcd.hid b, #app .fcd.hid small { text-shadow: 0 1px 3px #000, 0 0 8px #000 }
+/* 색 카드(원카드, 불꽃 축제): 흰 테두리 안에 색 판, 가운데 빛나는 원, 숫자에 입체 그림자, 모서리 숫자 */
+#app .lc:not(.back), #app .fcd:not(.hid) {
+  background: radial-gradient(circle at 50% 48%, rgba(255,255,255,.26) 0 27%, rgba(255,255,255,.08) 28% 34%, transparent 35%),
+    linear-gradient(155deg, color-mix(in srgb, var(--c) 70%, #fff) 0%, var(--c) 45%, color-mix(in srgb, var(--c) 72%, #000) 100%);
+  box-shadow: inset 0 0 0 3px #fbf7ee, inset 0 0 0 4px rgba(0,0,0,.12), 0 1px 1px rgba(0,0,0,.3), 0 5px 12px rgba(0,0,0,.32) !important; border-radius: 9px; position: relative }
+#app .lc:not(.back) b, #app .fcd:not(.hid) b { text-shadow: 0 2px 0 rgba(0,0,0,.35), 0 0 2px rgba(0,0,0,.5) }
+#app .lc[data-n]:not(.back)::before, #app .lc[data-n]:not(.back)::after { content: attr(data-n); position: absolute; font: 400 12px/1 var(--box); color: #fff; text-shadow: 0 1px 0 rgba(0,0,0,.4) }
+#app .lc[data-n]:not(.back)::before { left: 8px; top: 7px } #app .lc[data-n]:not(.back)::after { right: 8px; bottom: 7px; transform: rotate(180deg) }
+#app .lc.top[data-n]::before, #app .lc.top[data-n]::after { font-size: 15px }
+/* 금고 검은 패는 윤나는 흑단 */
+#app .vt.b { background: linear-gradient(160deg, #474d57 0%, #23272e 40%, #121418 100%); box-shadow: inset 0 1px 0 rgba(255,255,255,.18), inset 0 0 0 1px rgba(255,255,255,.06), 0 4px 10px rgba(0,0,0,.4) !important }
+/* 주사위: 모서리를 깎은 상아 주사위, 눈은 파인 자국 */
+#app .die { background: radial-gradient(130% 130% at 28% 22%, #fffefa 0%, #f6efdf 45%, #e6dac0 100%); border-radius: 24%;
+  box-shadow: inset 0 -3px 2px rgba(130,100,50,.28), inset 0 2px 1px rgba(255,255,255,.95), inset 0 0 0 1px rgba(140,110,60,.22), 0 2px 1px rgba(0,0,0,.28), 0 6px 12px rgba(0,0,0,.32) }
+#app .die { grid-template-rows: repeat(3, 1fr) } #app .die i { width: 66%; height: 66%; aspect-ratio: auto; margin: auto; border-radius: 50% }
+#app .die i.on { background: radial-gradient(circle at 42% 38%, #4a4a4a 0, #151515 55%, #000 100%); box-shadow: inset 0 1px 1px rgba(0,0,0,.9), 0 1px 0 rgba(255,255,255,.85) }
+#app .die.bad { background: radial-gradient(130% 130% at 28% 22%, #fff3ef 0%, #f6d3c8 50%, #e6b2a3 100%) }
+#app .die.bad i.on { background: radial-gradient(circle at 42% 38%, #e0533a 0, #a51f0d 70%) }
+#app .ydice .die.kept { background: radial-gradient(130% 130% at 28% 22%, #fffbe6 0%, #ffe9a0 55%, #e8c45a 100%) }
+
+/* ───── 11-27 밤 2: 글씨 한 벌로, 움직임 층 ───── */
+/* 화면 글씨는 Pretendard 한 벌(굵기로 나눔). 지마켓 산스는 카드 숫자 같은 인쇄된 게임 재료에만 */
+:root { --title: "Pretendard Variable", Pretendard, system-ui, sans-serif }
+body { font-feature-settings: "tnum" 0; letter-spacing: -.01em; -webkit-font-smoothing: antialiased }
+.lb-brand h1 { font: 800 28px/1 var(--title); letter-spacing: -.035em }
+.lb-brand p { font-size: 13.5px; font-weight: 500; color: #9aa5b1; margin-top: 4px }
+.lb-sec h2 { font: 800 21px/1.2 var(--title); letter-spacing: -.03em; border-left: 0; padding-left: 0; gap: 2px 10px }
+.lb-sec h2::before { content: ""; width: 10px; height: 10px; border-radius: 3px; background: var(--c); align-self: center; margin-right: 2px }
+.lb-sec h2 small { font: 500 13px var(--title); color: #8d98a5; letter-spacing: -.01em }
+.lb-info h3 { font: 800 19px/1.2 var(--title); letter-spacing: -.035em }
+.lb-info p { font-size: 13.5px; line-height: 1.45; font-weight: 500; color: #c3cbd4 }
+.lb-meta { font-size: 12.5px; font-weight: 500; color: #8d98a5; font-variant-numeric: tabular-nums }
+.lb-orig { font-weight: 700; letter-spacing: -.01em }
+.ds-in h2 { font: 800 32px/1.1 var(--title); letter-spacing: -.04em }
+.ds-in section h3 { font: 800 16px var(--title); letter-spacing: -.02em }
+.ds-in p, .ds-in li { font-size: 15px; line-height: 1.6 }
+.ds-n { font: 800 13px/1 var(--title) }
+.bar .gname { font: 800 18px var(--title); letter-spacing: -.03em }
+.endbox h2 { font: 800 28px/1.15 var(--title); letter-spacing: -.035em }
+.lobbywait .wtitle { font: 800 26px var(--title); letter-spacing: -.035em }
+#app.room .say { font-weight: 600; letter-spacing: -.015em }
+#app.room .seats b { letter-spacing: -.02em }
+
+/* 누름 반응: 모든 단추와 상자가 눌리면 살짝 들어감, 손을 올리면 떠오름 (transform과 따로 놀게 scale, translate 속성으로) */
+button, .lb-card, [role=button] { transition: scale .14s cubic-bezier(.16,1,.3,1), translate .22s cubic-bezier(.16,1,.3,1), transform .2s cubic-bezier(.16,1,.3,1), background-color .2s, box-shadow .2s, filter .2s }
+button:not(:disabled):active, .lb-card:active { scale: .95 }
+@media (hover: hover) {
+  #app.room .stage button:not(:disabled):hover { translate: 0 -3px; filter: brightness(1.06) }
+  .lb-card:hover .demo { scale: 1.03 }
+}
+.lb-card .demo { transition: scale .5s cubic-bezier(.16,1,.3,1) }
+
+/* 첫 화면: 분류 이름, 상자가 차례로 떠오름 */
+@keyframes rise { from { opacity: 0; translate: 0 22px } }
+#app.lobby .lb-top, #app.lobby .lb-want, #app.lobby .lb-filter, #app.lobby .lb-easy { animation: rise .6s cubic-bezier(.16,1,.3,1) both }
+#app.lobby .lb-want { animation-delay: 60ms } #app.lobby .lb-filter { animation-delay: 120ms } #app.lobby .lb-easy { animation-delay: 180ms }
+#app.lobby .lb-sec h2, #app.lobby .lb-card { animation: rise .7s cubic-bezier(.16,1,.3,1) both; animation-delay: calc(200ms + var(--i, 0) * 55ms) }
+
+/* 설명 창과 확인 창: 아래에서 밀려 올라옴 */
+.dsheet { animation: dsf .25s ease-out both } .ds-in { animation: dsu2 .48s cubic-bezier(.16,1,.3,1) both }
+@keyframes dsu2 { from { transform: translateY(70px); opacity: .3 } }
+.sheet .in { animation: dsu2 .4s cubic-bezier(.16,1,.3,1) both }
+#toast:not([hidden]) { animation: toastin .35s cubic-bezier(.16,1,.3,1) both }
+@keyframes toastin { from { opacity: 0; transform: translate(-50%, 14px) } }
+
+/* 방에 들어오면 머리 띠, 이름표가 차례로 */
+#app.room .bar { animation: rise .5s cubic-bezier(.16,1,.3,1) both }
+#app.room .seats span { animation: rise .5s cubic-bezier(.16,1,.3,1) both; animation-delay: calc(80ms + var(--i, 0) * 50ms) }
+#app.room .seats.settled span:not(.new) { animation: none }
+
+/* 내 차례가 오면 판 가운데로 큰 띠가 지나감 */
+.turnfx { position: fixed; left: 0; right: 0; top: 42%; z-index: 30; pointer-events: none; display: grid; place-items: center }
+.turnfx b { font: 900 34px/1 var(--title); letter-spacing: -.04em; color: #2a2108; background: #ffd84d; padding: 14px 34px; border-radius: 14px; box-shadow: 0 14px 40px rgba(0,0,0,.45); animation: turnfx 1.25s cubic-bezier(.16,1,.3,1) both }
+.turnfx::before { content: ""; position: absolute; left: 0; right: 0; height: 74px; background: color-mix(in srgb, var(--c, #ffd84d) 55%, rgba(0,0,0,.35)); animation: turnband 1.25s cubic-bezier(.16,1,.3,1) both; z-index: -1 }
+@keyframes turnfx { 0% { opacity: 0; transform: translateX(-60px) scale(.9) } 18% { opacity: 1; transform: none } 72% { opacity: 1; transform: none } 100% { opacity: 0; transform: translateX(60px) } }
+@keyframes turnband { 0% { transform: scaleX(0); transform-origin: left } 20% { transform: scaleX(1); transform-origin: left } 75% { transform: scaleX(1); transform-origin: right; opacity: 1 } 100% { transform: scaleX(0); transform-origin: right; opacity: .6 } }
+
+/* 점수, 장수가 바뀌면 그 숫자가 한 번 튐 */
+#app.room .seats em.bump { animation: bump .6s cubic-bezier(.16,1,.3,1) }
+@keyframes bump { 0% { transform: scale(1) } 30% { transform: scale(1.35); background: #ffd84d; color: #2a2108 } 100% { transform: scale(1) } }
+
+/* 판이 끝나면 꽃가루 */
+.confetti { position: fixed; inset: 0; pointer-events: none; z-index: 45; overflow: hidden }
+.confetti i { position: absolute; left: 50%; top: 38%; width: 9px; height: 14px; border-radius: 2px; background: var(--k); animation: conf 1.6s cubic-bezier(.16,1,.3,1) forwards; animation-delay: var(--d) }
+@keyframes conf { 0% { transform: translate(0, 0) rotate(0); opacity: 1 } 70% { opacity: 1 } 100% { transform: translate(var(--x), var(--y)) rotate(var(--r)); opacity: 0 } }
+.endbox { animation: endin .6s cubic-bezier(.16,1,.3,1) both } .endbox li { animation: rise .5s cubic-bezier(.16,1,.3,1) both; animation-delay: calc(250ms + var(--i, 0) * 90ms) }
+@keyframes endin { from { opacity: 0; transform: translateY(30px) scale(.94) } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-delay: 0ms !important; transition-duration: .01ms !important }
+  .turnfx, .confetti { display: none }
+}
+.lb-brand p { white-space: normal; word-break: keep-all }
+.lb-brand p { white-space: nowrap; font-size: 12.5px }

@@ -1,5 +1,6 @@
 // 고스톱 — 화투 48장으로 같은 달끼리 짝을 맞춰 먹고, 점수가 나면 "고"로 더 갈지 "스톱"으로 끝낼지 정하는 전통 놀이 (2~3명, 돈 없이 점수만)
 // 점수 나는 기준: 둘이면 7점, 셋이면 3점. 광, 열끗, 띠, 피와 고도리, 홍단, 청단, 초단. 쪽, 뻑, 따닥, 싹쓸이는 피를 하나씩 빼앗음.
+// 11-27: 흔들기(같은 달 셋을 쥐고 바닥에 없을 때 보여 주고 내기)와 폭탄(같은 달 셋 + 바닥 하나를 한꺼번에 먹고 피 하나씩)은 한 번마다 점수 두 배.
 import { esc, shuffle, SEAT, logPush, nameB } from "../lib.js";
 
 const MON = ["", "송학", "매조", "벚꽃", "흑싸리", "난초", "모란", "홍싸리", "공산", "국화", "단풍", "오동", "비"];
@@ -39,10 +40,10 @@ export default {
   setup(n, rng) {
     const deck = shuffle(CARDS.map(c => ({ ...c })), rng), hs = n === 2 ? 10 : 7, fl = n === 2 ? 8 : 6;
     const hands = Array.from({ length: n }, () => deck.splice(0, hs).sort((a, b) => a.m - b.m));
-    return { n, deck, hands, floor: deck.splice(0, fl), cap: Array.from({ length: n }, () => []), go: Array(n).fill(0), last: Array(n).fill(0), cur: 0, phase: "play", log: [], win: null, flip: null, nagari: false };
+    return { n, deck, hands, floor: deck.splice(0, fl), cap: Array.from({ length: n }, () => []), go: Array(n).fill(0), shake: Array(n).fill(0), last: Array(n).fill(0), cur: 0, phase: "play", log: [], win: null, flip: null, nagari: false };
   },
   view(s, seat) {
-    return { n: s.n, floor: s.floor, cap: s.cap, go: s.go, cur: s.cur, phase: s.phase, log: s.log, win: s.win, flip: s.flip, nagari: s.nagari, final: s.final ?? null,
+    return { n: s.n, floor: s.floor, cap: s.cap, go: s.go, shake: s.shake, cur: s.cur, phase: s.phase, log: s.log, win: s.win, flip: s.flip, nagari: s.nagari, final: s.final ?? null,
       deckN: s.deck.length, counts: s.hands.map(h => h.length), hand: seat >= 0 ? s.hands[seat] : null, scores: s.cap.map(c => score(c)), need: s.n === 2 ? 7 : 3, turn: this.turn(s) };
   },
   turn(s) { return s.win != null || s.nagari ? [] : [s.cur]; },
@@ -53,16 +54,29 @@ export default {
       if (a.t === "stop") return this.stop(s, seat);
       throw new Error("고 또는 스톱");
     }
-    if (a.t !== "play") throw new Error("낼 패를 골라요");
-    const H = s.hands[seat], i = H.findIndex(c => c.id === a.id);
-    if (i < 0) throw new Error("그 패가 없어요");
-    const c = H.splice(i, 1)[0], got = [];
+    if (a.t !== "play" && a.t !== "bomb") throw new Error("낼 패를 골라요");
+    const H = s.hands[seat], got = [];
     const same = m => s.floor.filter(f => f.m === m);
+    let c, fa = [], stage = -1, pairA = null;
+    if (a.t === "bomb") { // 폭탄: 같은 달 셋 + 바닥 하나
+      const tri = H.filter(x => x.m === a.m), fl = same(a.m);
+      if (tri.length !== 3 || fl.length !== 1) throw new Error("같은 달 셋을 쥐고 바닥에 하나 있을 때만 폭탄이 돼요");
+      s.hands[seat] = H.filter(x => x.m !== a.m); s.floor = s.floor.filter(f => f.m !== a.m);
+      got.push(...tri, fl[0]); c = tri[0]; s.shake[seat]++; steal(s, seat); logPush(s, { k: "bomb", s: seat, m: a.m });
+    } else {
+    const i = H.findIndex(x => x.id === a.id);
+    if (i < 0) throw new Error("그 패가 없어요");
+    if (a.shake) { // 흔들기: 같은 달 셋을 쥐고 바닥에 그 달이 없을 때
+      if (H.filter(x => x.m === H[i].m).length !== 3 || same(H[i].m).length) throw new Error("같은 달 셋을 쥐고 바닥에 없을 때만 흔들 수 있어요");
+      s.shake[seat]++; logPush(s, { k: "shake", s: seat, m: H[i].m });
+    }
+    c = H.splice(i, 1)[0];
     // 1) 낸 패
-    const fa = same(c.m); let stage = fa.length, pairA = null;
+    fa = same(c.m); stage = fa.length;
     if (fa.length === 0) s.floor.push(c);
     else if (fa.length === 3) { got.push(c, ...fa); s.floor = s.floor.filter(f => f.m !== c.m); logPush(s, { k: "sweep3", s: seat }); steal(s, seat); }
     else { pairA = fa.length === 1 ? fa[0] : best(fa); }
+    }
     // 2) 뒤집은 패
     const d = s.deck.pop(); s.flip = d;
     if (d) {
@@ -96,6 +110,7 @@ export default {
     const me = score(s.cap[p]);
     let mult = 1; const why = [];
     if (s.go[p] >= 3) { mult *= 2 ** (s.go[p] - 2); why.push(`${s.go[p]}고`); }
+    if (s.shake[p]) { mult *= 2 ** s.shake[p]; why.push(`흔들기 ${s.shake[p]}번`); }
     const others = [...Array(s.n).keys()].filter(o => o !== p);
     if (me.pi >= 10 && others.some(o => score(s.cap[o]).pi < 5)) { mult *= 2; why.push("피박"); }
     if (me.g >= 3 && others.some(o => score(s.cap[o]).g === 0)) { mult *= 2; why.push("광박"); }
@@ -114,7 +129,9 @@ export default {
       const opp = Math.max(...s.cap.map((c, o) => o === seat ? 0 : score(c).s));
       return { ...d, a: { t: opp <= 2 && s.hands[seat].length >= 3 && s.go[seat] < 2 && rng() < .6 ? "go" : "stop" } };
     }
-    const H = s.hands[seat];
+    const H = s.hands[seat], cnt = m => H.filter(x => x.m === m).length;
+    const bm = H.find(x => cnt(x.m) === 3 && s.floor.filter(f => f.m === x.m).length === 1);
+    if (bm) return { ...d, a: { t: "bomb", m: bm.m } };
     let bc = H[0], bv = -1e9;
     for (const c of H) {
       const m = s.floor.filter(f => f.m === c.m);
@@ -123,9 +140,9 @@ export default {
       v += rng();
       if (v > bv) { bv = v; bc = c; }
     }
-    return { ...d, a: { t: "play", id: bc.id } };
+    return { ...d, a: { t: "play", id: bc.id, shake: cnt(bc.m) === 3 && !s.floor.some(f => f.m === bc.m) } };
   },
-  badge(v, i) { return `${v.scores[i].s}점${v.go[i] ? `, ${v.go[i]}고` : ""}`; },
+  badge(v, i) { return `${v.scores[i].s}점${v.go[i] ? `, ${v.go[i]}고` : ""}${v.shake?.[i] ? `, 흔듦 ${v.shake[i]}` : ""}`; },
   render(el, v, me, send, ui) {
     const n = ui.names, my = v.cur === me && v.win == null && !v.nagari;
     const card = (c, attrs = "", cls = "", k = true) => `<button ${k ? `data-k="h${c.id}"` : ""} class="hw k-${kind(c)} ${cls}" style="--h:${MCOL[c.m]}" ${attrs}><b>${c.m}</b><small>${MON[c.m]}</small><i>${LABEL(c)}</i></button>`;
@@ -135,11 +152,14 @@ export default {
       <p class="say">${v.nagari ? "나가리예요" : v.win != null ? "판이 끝났어요" : my ? (v.phase === "gostop" ? `${v.scores[me].s}점! 고 할까요, 스톱 할까요?` : "낼 패를 골라요 (짝이 있는 패는 위로 올라와 있어요)") : `${esc(n[v.cur])} 차례`}<small>더미 ${v.deckN}장, ${v.need}점부터 스톱</small></p>
       ${my && v.phase === "gostop" ? `<div class="acts"><button class="go">고 (${v.go[me] + 1}고)</button><button class="ghost st">스톱</button></div>` : ""}
       <div class="floor">${v.floor.map(c => card(c, "disabled")).join("")}${v.flip ? `<div class="flipped"><small>방금 뒤집은 패</small>${card(v.flip, "disabled", "", false)}</div>` : ""}</div>
+      ${my && v.phase === "play" && v.hand ? (() => { const ms = [...new Set(v.hand.map(c => c.m))].filter(m => v.hand.filter(c => c.m === m).length === 3); const b = ms.map(m => { const f = v.floor.filter(c => c.m === m).length; return f === 1 ? `<button class="bomb" data-m="${m}">${m}월 폭탄 (넷 먹고 두 배)</button>` : f === 0 ? `<button class="ghost shk" data-id="${v.hand.find(c => c.m === m).id}">${m}월 흔들고 내기 (두 배)</button>` : ""; }).join(""); return b ? `<div class="acts">${b}</div>` : ""; })() : ""}
       ${v.hand ? `<div class="hhand">${v.hand.map(c => card(c, `data-id="${c.id}" ${my && v.phase === "play" ? "" : "disabled"}`, hl.has(c.id) ? "up" : "")).join("")}</div>` : ""}
       <div class="caps">${[...Array(v.n).keys()].map(p => `<div class="cp${p === v.cur ? " cur" : ""}" style="--s:${SEAT[p]}"><div class="ch"><b>${esc(n[p])}</b><span>${v.scores[p].s}점${v.go[p] ? `, ${v.go[p]}고` : ""}</span><small>손 ${v.counts[p]}</small></div><div class="cr">${capView(v.cap[p])}</div>${v.scores[p].why.length ? `<small class="why">${v.scores[p].why.join(", ")}</small>` : ""}</div>`).join("")}</div>
       <ol class="log">${v.log.map(x => `<li>${line(x, n)}</li>`).join("")}</ol>
     </div>`;
     el.querySelectorAll(".hhand .hw:not([disabled])").forEach(b => b.onclick = () => send({ t: "play", id: +b.dataset.id }));
+    el.querySelectorAll(".bomb").forEach(b => b.onclick = () => send({ t: "bomb", m: +b.dataset.m }));
+    el.querySelectorAll(".shk").forEach(b => b.onclick = () => send({ t: "play", id: +b.dataset.id, shake: true }));
     el.querySelector(".go")?.addEventListener("click", () => send({ t: "go" }));
     el.querySelector(".st")?.addEventListener("click", () => send({ t: "stop" }));
   }
@@ -154,6 +174,8 @@ function line(x, n) {
     case "sweep3": return `${b(x.s)} 뻑 먹기! 피 하나씩 받음`;
     case "clean": return `${b(x.s)} 싹쓸이! 피 하나씩 받음`;
     case "go": return `${b(x.s)} ${x.n}고!`;
+    case "bomb": return `${b(x.s)} ${x.m}월 폭탄! 넷 먹고 피 하나씩, 두 배`;
+    case "shake": return `${b(x.s)} ${x.m}월 흔들기! 두 배`;
     case "stop": return `${b(x.s)} 스톱, ${x.t}점`;
     case "nagari": return "나가리";
   }

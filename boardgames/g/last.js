@@ -1,5 +1,6 @@
 // 마지막 한 장 — 같은 색이나 같은 숫자를 내며 손패를 먼저 털어 내는 카드 달리기 (2~10명)
 // 한 장 남기는 순간 "한 장!"을 안 외치면 다른 사람이 잡아서 두 장을 먹일 수 있다.
+// 넷 더(+4)를 받은 사람은 받거나 도전한다(11-27, 원작 규칙). 낸 사람이 그때 색과 같은 카드를 갖고 있었으면 낸 사람이 4장, 아니면 도전한 사람이 6장.
 import { esc, shuffle, SEAT, logPush, nameB } from "../lib.js";
 
 export const COL = [["바다", "#2f6fb0"], ["산호", "#d9472b"], ["모래", "#e0a526"], ["숲", "#3c8d5a"]];
@@ -33,11 +34,11 @@ export default {
     const pile = newDeck(rng), hands = Array.from({ length: n }, () => pile.splice(0, 7));
     let i = pile.findIndex(c => typeof c.v === "number");
     const top = pile.splice(i, 1)[0];
-    return { n, pile, disc: [top], top, color: top.c, dir: 1, cur: 0, hands, drawn: null, uncalled: null, log: [], win: null };
+    return { n, pile, disc: [top], top, color: top.c, dir: 1, cur: 0, hands, drawn: null, uncalled: null, w4: null, log: [], win: null };
   },
   view(s, seat) {
     return {
-      n: s.n, top: s.top, color: s.color, dir: s.dir, cur: s.cur, drawn: s.cur === seat ? s.drawn : null, uncalled: s.uncalled, log: s.log, win: s.win,
+      n: s.n, top: s.top, color: s.color, dir: s.dir, cur: s.cur, drawn: s.cur === seat ? s.drawn : null, uncalled: s.uncalled, w4: s.w4 ? { by: s.w4.by } : null, log: s.log, win: s.win,
       counts: s.hands.map(h => h.length), hand: seat >= 0 ? s.hands[seat] : null, pileN: s.pile.length, turn: this.turn(s)
     };
   },
@@ -56,6 +57,15 @@ export default {
     if (seat !== s.cur) throw new Error("내 차례가 아니에요");
     if (s.uncalled != null && s.uncalled !== seat) s.uncalled = null; // 다음 사람이 움직이면 못 잡음
     const H = s.hands[seat];
+    if (s.w4) { // 넷 더를 받은 사람: 받기 또는 도전
+      const w = s.w4; s.w4 = null;
+      if (a.t === "accept") { draw(s, seat, 4, ctx.rng); logPush(s, { k: "eat", s: seat, n: 4 }); s.cur = step(s); return; }
+      if (a.t === "challenge") {
+        if (w.guilty) { draw(s, w.by, 4, ctx.rng); logPush(s, { k: "chal", s: seat, p: w.by, ok: true }); return; } // 도전 성공: 내 차례 그대로
+        draw(s, seat, 6, ctx.rng); logPush(s, { k: "chal", s: seat, p: w.by, ok: false }); s.cur = step(s); return;
+      }
+      s.w4 = w; throw new Error("4장을 받거나 도전해요");
+    }
     if (a.t === "draw") {
       if (s.drawn != null) throw new Error("이미 한 장 가져왔어요");
       draw(s, seat, 1, ctx.rng); s.drawn = H[H.length - 1]?.id ?? -1; logPush(s, { k: "draw", s: seat });
@@ -71,6 +81,7 @@ export default {
       const c = H[i];
       if (s.drawn != null && c.id !== s.drawn) throw new Error("가져온 카드만 낼 수 있어요");
       if (!canPlay(s, c)) throw new Error("색이나 숫자가 같아야 해요");
+      const guilty = c.v === "w4" && H.some(h => h.id !== c.id && h.c === s.color); // 그때 색 카드가 있었는데 +4를 냈나
       if (c.c < 0 && !(a.color >= 0 && a.color < 4)) throw new Error("색을 골라요");
       H.splice(i, 1); s.disc.push(c); s.top = c; s.color = c.c < 0 ? a.color : c.c; s.drawn = null;
       logPush(s, { k: "play", s: seat, c, col: s.color });
@@ -79,7 +90,8 @@ export default {
       let skip = 1;
       if (c.v === "r") { s.dir *= -1; if (s.n === 2) skip = 2; }
       if (c.v === "s") skip = 2;
-      if (c.v === "d2" || c.v === "w4") { const nx = step(s); draw(s, nx, c.v === "d2" ? 2 : 4, ctx.rng); logPush(s, { k: "eat", s: nx, n: c.v === "d2" ? 2 : 4 }); skip = 2; }
+      if (c.v === "d2") { const nx = step(s); draw(s, nx, 2, ctx.rng); logPush(s, { k: "eat", s: nx, n: 2 }); skip = 2; }
+      if (c.v === "w4") { s.w4 = { by: seat, guilty }; } // 다음 사람이 받거나 도전
       s.cur = step(s, skip);
       return;
     }
@@ -94,6 +106,7 @@ export default {
   bot(s, seat, rng) {
     if (seat !== s.cur) return s.uncalled != null ? { delay: 1400 + rng() * 2200, a: { t: "catch" } } : null;
     const d = { delay: 800 + rng() * 600 }, H = s.hands[seat];
+    if (s.w4) return { ...d, a: { t: rng() < .3 ? "challenge" : "accept" } };
     let ok = H.filter(c => canPlay(s, c) && (s.drawn == null || c.id === s.drawn));
     if (!ok.length) return { ...d, a: { t: s.drawn == null ? "draw" : "pass" } };
     const nextFew = s.hands[step(s)].length <= 2;
@@ -105,17 +118,18 @@ export default {
   badge(v, i) { return `${v.counts[i]}장`; },
   render(el, v, me, send, ui) {
     const n = ui.names, my = v.cur === me && v.win == null;
-    const card = (c, attrs = "", cls = "") => `<button class="lc ${cls}" data-k="l${c.id}" style="--c:${c.c < 0 ? "#222" : COL[c.c][1]}" ${attrs}><b>${lab(c)}</b><small>${typeof c.v === "number" ? "" : SYM[c.v]}</small></button>`;
-    const playable = c => my && (c.c < 0 || c.c === v.color || c.v === v.top.v) && (v.drawn == null || c.id === v.drawn);
+    const card = (c, attrs = "", cls = "") => `<button class="lc ${cls}" data-k="l${c.id}" data-n="${esc(lab(c))}" style="--c:${c.c < 0 ? "#222" : COL[c.c][1]}" ${attrs}><b>${lab(c)}</b><small>${typeof c.v === "number" ? "" : SYM[c.v]}</small></button>`;
+    const playable = c => my && !v.w4 && (c.c < 0 || c.c === v.color || c.v === v.top.v) && (v.drawn == null || c.id === v.drawn);
     el.innerHTML = `<div class="last">
-      <p class="say">${v.win != null ? "판이 끝났어요" : my ? (v.drawn != null ? "가져온 카드를 내거나 넘겨요" : "낼 카드를 누르거나 한 장 가져와요") : `${esc(n[v.cur])} 차례예요`}</p>
+      <p class="say">${v.win != null ? "판이 끝났어요" : my ? (v.w4 ? "넷 더를 받았어요. 4장 받을지 도전할지 골라요" : v.drawn != null ? "가져온 카드를 내거나 넘겨요" : "낼 카드를 누르거나 한 장 가져와요") : `${esc(n[v.cur])} 차례예요`}</p>
       <div class="ring">${v.counts.map((k, p) => `<span class="${p === v.cur ? "cur" : ""}${p === me ? " me" : ""}" style="--s:${SEAT[p]}">${esc(n[p])} <b>${k}</b>${k === 1 ? "<i>한 장</i>" : ""}</span>`).join(v.dir > 0 ? "" : "")}<small>${v.dir > 0 ? "순서: 오른쪽으로" : "순서: 왼쪽으로"}</small></div>
       <div class="table">
-        <button class="lc back" ${my && v.drawn == null ? "" : "disabled"} data-draw><b>${v.pileN}</b><small>한 장 가져오기</small></button>
+        <button class="lc back" ${my && v.drawn == null && !v.w4 ? "" : "disabled"} data-draw><b>${v.pileN}</b><small>한 장 가져오기</small></button>
         ${card(v.top, "disabled", "top")}
         <div class="nowc" style="--c:${COL[v.color][1]}">지금 색<b>${COL[v.color][0]}</b></div>
       </div>
       ${v.uncalled != null && v.uncalled !== me && me >= 0 ? `<button class="catch">${esc(n[v.uncalled])} "한 장!" 안 외침, 잡기</button>` : ""}
+      ${my && v.w4 ? `<p class="say small">${esc(n[v.w4.by])}이(가) 지금 색 카드를 갖고도 냈다면 도전이 성공해서 그 사람이 4장을 먹어요. 아니면 내가 6장이에요.</p><div class="acts"><button class="w4ok">4장 받기</button><button class="ghost w4ch">도전하기</button></div>` : ""}
       ${my && v.drawn != null ? `<div class="acts"><button class="ghost pass">넘기기</button></div>` : ""}
       ${v.hand ? `<div class="lhand">${v.hand.map(c => card(c, `data-id="${c.id}" ${playable(c) ? "" : "disabled"}`, playable(c) ? "ok" : "")).join("")}</div>
         ${my && v.hand.length === 2 ? `<label class="callb"><input type="checkbox" ${UI.call ? "checked" : ""}> 이번에 내면 한 장 남아요. "한 장!" 외치기</label>` : ""}` : ""}
@@ -127,6 +141,8 @@ export default {
     const re = () => this.render(el, v, me, send, ui);
     el.querySelector("[data-draw]")?.addEventListener("click", () => send({ t: "draw" }));
     el.querySelector(".pass")?.addEventListener("click", () => send({ t: "pass" }));
+    el.querySelector(".w4ok")?.addEventListener("click", () => send({ t: "accept" }));
+    el.querySelector(".w4ch")?.addEventListener("click", () => send({ t: "challenge" }));
     el.querySelector(".catch")?.addEventListener("click", () => send({ t: "catch" }));
     el.querySelector(".callb input")?.addEventListener("change", e => { UI.call = e.target.checked; });
     el.querySelectorAll(".lhand .lc:not([disabled])").forEach(b => b.onclick = () => {
@@ -147,6 +163,7 @@ function line(x, n) {
     case "eat": return `${b(x.s)} ${x.n}장 먹음`;
     case "call": return `${b(x.s)} "한 장!"`;
     case "catch": return `${b(x.s)}이(가) ${b(x.p)}을(를) 잡음, 두 장`;
+    case "chal": return x.ok ? `${b(x.s)} 도전 성공, ${b(x.p)} 4장` : `${b(x.s)} 도전 실패, 6장`;
   }
   return "";
 }

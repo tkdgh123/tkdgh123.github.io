@@ -1,0 +1,12 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width">
+<base href="../">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="style.css"><link rel="stylesheet" href="demo.css">
+<style>body{background:#222;padding:10px} .g{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px} .g p{color:#fff;margin:4px 0;font-size:13px;min-height:2.6em}</style>
+<div class="g" id="g"></div>
+<script type="module">
+// 설명 그림 확인용: ?g=isle,bell 처럼 고른다
+import { play } from "./demo.js"; import { DEMOS } from "./demos/index.js";
+const U = new URLSearchParams(location.search), pick = (U.get("g") || Object.keys(DEMOS).join(",")).split(",");
+for (const k of pick) { const w = document.createElement("div"), d = document.createElement("div"), p = document.createElement("p"); w.append(d, p); g.append(w); p.textContent = k; play(d, DEMOS[k], { onStep: (i, s, n) => p.textContent = `${k} ${i + 1}/${n} ${s}` }); }
+</script>

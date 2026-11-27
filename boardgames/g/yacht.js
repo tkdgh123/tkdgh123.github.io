@@ -87,7 +87,7 @@ export default {
       ${CAT.map(([, name], c) => `<tr${c === 6 ? ' class="gap"' : ""}><td>${name}</td>${v.sheet.map((r, p) => {
         const can = my && p === me && r[c] == null && v.rolls;
         return `<td>${r[c] != null ? r[c] : can ? `<button class="yc" data-c="${c}">${score(v.dice, c)}</button>` : ""}</td>`;
-      }).join("")}</tr>${c === 5 ? `<tr class="sub"><td>위 칸 합 (63 넘으면 +35)</td>${v.sheet.map(r => `<td>${upper(r)}</td>`).join("")}</tr>` : ""}`).join("")}
+      }).join("")}</tr>${c === 5 ? `<tr class="sub"><td>위 칸 합 (63 이상 +35)</td>${v.sheet.map(r => `<td>${upper(r)}</td>`).join("")}</tr>` : ""}`).join("")}
       <tr class="tot"><td>합계</td>${v.totals.map(t => `<td>${t}</td>`).join("")}</tr></table></div>
       <ol class="log">${v.log.map(x => `<li>${nameB(n, x.s)} ${CAT[x.c][1]} ${x.v}점 (${x.d.join(" ")})</li>`).join("")}</ol>
     </div>`;
